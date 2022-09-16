@@ -1,4 +1,4 @@
-script: HelloPython.py
+script: helloPython.py
 inputs:
   some_int:
     label: Some int
