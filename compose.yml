@@ -13,15 +13,15 @@ services:
   script-server:
     container_name: biab-script-server
     volumes:
-      - ./scripts:/scripts:ro
-      - ./pipelines:/pipelines:ro
-      - ./userdata:/userdata:ro
-      - ./output:/output:rw
+      - ../scripts:/scripts:ro
+      - ../pipelines:/pipelines:ro
+      - ../userdata:/userdata:ro
+      - ../output:/output:rw
       - /var/run/docker.sock:/var/run/docker.sock
     expose:
       - "8080"
     env_file:
-      - .env
+      - ../.env
     environment:
       - SCRIPT_LOCATION=/scripts
       - USERDATA_LOCATION=/userdata
@@ -35,11 +35,11 @@ services:
   runner-r:
     container_name: biab-runner-r
     volumes:
-      - ./scripts:/scripts:ro
-      - ./userdata:/userdata:ro
-      - ./output:/output:rw
+      - ../scripts:/scripts:ro
+      - ../userdata:/userdata:ro
+      - ../output:/output:rw
     env_file:
-      - .env
+      - ../.env
     environment:
       - SCRIPT_LOCATION=/scripts
       - USERDATA_LOCATION=/userdata
@@ -48,11 +48,11 @@ services:
   runner-julia:
     container_name: biab-runner-julia
     volumes:
-      - ./scripts:/scripts:ro
-      - ./userdata:/userdata:ro
-      - ./output:/output:rw
+      - ../scripts:/scripts:ro
+      - ../userdata:/userdata:ro
+      - ../output:/output:rw
     env_file:
-      - .env
+      - ../.env
     environment:
       - SCRIPT_LOCATION=/scripts
       - USERDATA_LOCATION=/userdata
@@ -65,7 +65,7 @@ services:
       - "80:80"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./output:/static/output:ro
+      - ../output:/static/output:ro
     depends_on:
       - script-server
       - ui
@@ -74,8 +74,8 @@ services:
     container_name: biab-tiler
     image: ghcr.io/developmentseed/titiler:latest
     volumes:
-      - ./output:/output:ro
-      - ./userdata:/userdata:ro
+      - ../output:/output:ro
+      - ../userdata:/userdata:ro
     environment:
       - PORT=8000
       - WORKERS_PER_CORE=1
