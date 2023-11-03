@@ -3,6 +3,7 @@
 echo "Updating compose file..."
 git checkout origin/repo-split -- compose.yml
 git checkout origin/repo-split -- compose.prod.yml
+git checkout origin/repo-split -- http-proxy/conf.d-prod/ngnix.conf
 
 echo "Pulling docker images..."
 cd .. # Back to pipeline-repo folder
