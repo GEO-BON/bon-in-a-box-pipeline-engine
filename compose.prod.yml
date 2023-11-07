@@ -2,9 +2,11 @@
 ##   docker compose up
 version: "3.7"
 
+# Production compose file.
+# Contains configurations specific to the production environment.
+
 services:
 
-## UI server to use when you just want to use the UI
   ui:
     container_name: biab-ui
     image: geobon/bon-in-a-box:ui

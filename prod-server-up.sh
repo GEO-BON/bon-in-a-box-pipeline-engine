@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Fetches all the files necessary, then runs the production server.
+# This script is ran by server-up.sh in the pipeline-repo folder.
+
 RED="\033[31m"
 ENDCOLOR="\033[0m"
 assertSuccess () {

@@ -1,4 +1,5 @@
-## Base compose file. 
+# Base compose file
+# Contains all that is common between production and development configurations.
 version: "3.7"
 
 services:
