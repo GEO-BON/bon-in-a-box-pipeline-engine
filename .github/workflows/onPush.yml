@@ -35,13 +35,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: YML file syntax validation
-      uses: navikt/yaml-validator@v4
-      with:
-        schema_path: scripts/cerberusValidationSchema
-        document_path: scripts
-        validate_file_extension: no
-        filter_extensions: .yml
     - name: YML test files syntax validation
       uses: navikt/yaml-validator@v4
       with:
@@ -50,10 +43,10 @@ jobs:
         validate_file_extension: no
         filter_extensions: .yml
     - name: Find duplicate lines inside same step YML file
-      working-directory: ./scripts
-      run: ../.github/findDuplicateDescriptions.sh
+      working-directory: script-server/src/test/resources/scripts/
+      run:  ${GITHUB_WORKSPACE}/.github/findDuplicateDescriptions.sh
       shell: bash
     - name: Find duplicate lines inside same pipeline JSON file
-      working-directory: ./pipelines
-      run: ../.github/findDuplicateIds.sh
+      working-directory: script-server/src/test/resources/pipelines
+      run:  ${GITHUB_WORKSPACE}/.github/findDuplicateIds.sh
       shell: bash
