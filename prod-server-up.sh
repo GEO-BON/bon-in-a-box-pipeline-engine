@@ -27,7 +27,7 @@ git checkout origin/repo-split -- script-stubs ; assertSuccess
 
 echo "Pulling docker images..."
 cd .. # Back to pipeline-repo folder
-docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml pull
+docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml --env-file .server/.prod-paths.env pull
 assertSuccess
 
 echo "Starting the server..."
