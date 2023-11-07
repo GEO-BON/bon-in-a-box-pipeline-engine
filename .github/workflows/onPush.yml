@@ -43,10 +43,10 @@ jobs:
         validate_file_extension: no
         filter_extensions: .yml
     - name: Find duplicate lines inside same step YML file
-      working-directory: script-server/src/test/resources/scripts/
+      working-directory: script-stubs
       run:  $GITHUB_WORKSPACE/.github/findDuplicateDescriptions.sh
       shell: bash
     - name: Find duplicate lines inside same pipeline JSON file
-      working-directory: script-server/src/test/resources/pipelines
+      working-directory: script-stubs
       run:  $GITHUB_WORKSPACE/.github/findDuplicateIds.sh
       shell: bash
