@@ -20,13 +20,13 @@ echo "Pulling docker images..."
 cd .. # Back to pipeline-repo folder
 docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml pull
 if [[ $? -ne 0 ]] ; then
-    echo "${RED}Failed${ENDCOLOR}" ; exit 1
+    echo -e "${RED}Failed${ENDCOLOR}" ; exit 1
 fi
 
 echo "Starting the server..."
 docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml up -d
 if [[ $? -ne 0 ]] ; then
-    echo "${RED}Failed${ENDCOLOR}"; exit 1
+    echo -e "${RED}Failed${ENDCOLOR}"; exit 1
 fi
 
 echo "Done."
