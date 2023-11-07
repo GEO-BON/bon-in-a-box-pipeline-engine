@@ -14,7 +14,7 @@ services:
     container_name: biab-script-server
     volumes:
       - ../scripts:/scripts:ro
-      - script-stubs:/scripts-stub:ro
+      - ./script-stubs:/scripts-stub:ro
       - ../pipelines:/pipelines:ro
       - ../userdata:/userdata:ro
       - ../output:/output:rw
