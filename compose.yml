@@ -9,20 +9,20 @@ services:
       - script-server
       - tiler
 
-  # This can be accessed within the docker network with http://biab-script-server:8081/script/...
+  # This can be accessed within the docker network with http://biab-script-server:8080/script/...
   script-server:
     container_name: biab-script-server
     volumes:
-      - ../scripts:/scripts:ro
+      - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ./script-stubs:/scripts-stub:ro
-      - ../pipelines:/pipelines:ro
-      - ../userdata:/userdata:ro
-      - ../output:/output:rw
+      - ${PIPELINE_REPO_PATH}/pipelines:/pipelines:ro
+      - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
+      - ${PIPELINE_REPO_PATH}/output:/output:rw
       - /var/run/docker.sock:/var/run/docker.sock
     expose:
       - "8080"
     env_file:
-      - ../runner.env
+      - ${PIPELINE_REPO_PATH}/runner.env
     environment:
       - SCRIPT_LOCATION=/scripts
       - SCRIPT_STUBS_LOCATION=/script-stubs
@@ -37,11 +37,11 @@ services:
   runner-r:
     container_name: biab-runner-r
     volumes:
-      - ../scripts:/scripts:ro
-      - ../userdata:/userdata:ro
-      - ../output:/output:rw
+      - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
+      - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
+      - ${PIPELINE_REPO_PATH}/output:/output:rw
     env_file:
-      - ../runner.env
+      - ${PIPELINE_REPO_PATH}/runner.env
     environment:
       - SCRIPT_LOCATION=/scripts
       - USERDATA_LOCATION=/userdata
@@ -50,11 +50,11 @@ services:
   runner-julia:
     container_name: biab-runner-julia
     volumes:
-      - ../scripts:/scripts:ro
-      - ../userdata:/userdata:ro
-      - ../output:/output:rw
+      - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
+      - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
+      - ${PIPELINE_REPO_PATH}/output:/output:rw
     env_file:
-      - ../runner.env
+      - ${PIPELINE_REPO_PATH}/runner.env
     environment:
       - SCRIPT_LOCATION=/scripts
       - USERDATA_LOCATION=/userdata
@@ -67,7 +67,7 @@ services:
       - "80:80"
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ../output:/static/output:ro
+      - ${PIPELINE_REPO_PATH}/output:/static/output:ro
     depends_on:
       - script-server
       - ui
@@ -76,8 +76,8 @@ services:
     container_name: biab-tiler
     image: ghcr.io/developmentseed/titiler:latest
     volumes:
-      - ../output:/output:ro
-      - ../userdata:/userdata:ro
+      - ${PIPELINE_REPO_PATH}/output:/output:ro
+      - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
     environment:
       - PORT=8000
       - WORKERS_PER_CORE=1

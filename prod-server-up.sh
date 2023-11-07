@@ -12,6 +12,7 @@ assertSuccess () {
 }
 
 echo "Updating server files..."
+git checkout origin/repo-split -- .prod-paths.env ; assertSuccess
 git checkout origin/repo-split -- compose.yml ; assertSuccess
 git checkout origin/repo-split -- compose.prod.yml ; assertSuccess
 git checkout origin/repo-split -- prod-server-down.sh ; assertSuccess
@@ -30,7 +31,7 @@ docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env
 assertSuccess
 
 echo "Starting the server..."
-docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml up -d
+docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml up -d -env-file .prod-paths.env
 assertSuccess
 
 echo "Done."
