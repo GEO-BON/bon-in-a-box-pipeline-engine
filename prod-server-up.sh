@@ -11,6 +11,8 @@ git checkout origin/repo-split -- .github/scriptValidationSchema.yml
 
 git checkout origin/repo-split -- http-proxy/conf.d-prod/ngnix.conf
 
+git checkout origin/repo-split -- script-stubs
+
 echo "Pulling docker images..."
 cd .. # Back to pipeline-repo folder
 docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml pull

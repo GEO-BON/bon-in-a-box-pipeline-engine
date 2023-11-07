@@ -19,7 +19,8 @@ data class RunContext(val runId: String, val inputs: String?) {
     constructor(descriptionFile: File, inputs: String?) : this(
         File(
             // Unique to this script
-            descriptionFile.relativeTo(scriptRoot).path.removeSuffix(".yml"),
+            descriptionFile.relativeTo(scriptRoot).path.removeSuffix(".yml")
+                .replace("../", ""), // This replacement is to accommodate script-stubs
             // Unique to these params
             if (inputs.isNullOrEmpty()) "no_params" else inputsToMd5(inputs)
         ).path,
