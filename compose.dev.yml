@@ -21,12 +21,6 @@ services:
       - WDS_SOCKET_PORT=0
       - REACT_APP_VIEWER_HOST=${REACT_APP_VIEWER_HOST}
 
-  http-gateway:
-    volumes:
-      - ./http-proxy/conf.d:/etc/nginx/conf.d:rw
-    depends_on:
-      - openapi_swagger
-
   ## In the DEV version, using a volume and a single docker. To rebuild without restarting everything, use
   ## docker exec -it biab-script-server sh -c "cd /home/gradle/project/ && gradle build"
   script-server:
@@ -39,6 +33,10 @@ services:
     command: gradle run
     environment:
       DEV: true
+
+  http-gateway:
+    depends_on:
+      - openapi_swagger
 
   ## Server to use when making changes to the OpenAPI specification.
   openapi_swagger:

@@ -16,10 +16,6 @@ services:
     expose:
       - '80'
 
-  http-gateway:
-    volumes:
-    - ./http-proxy/conf.d-prod:/etc/nginx/conf.d:ro
-
   script-server:
     image: geobon/bon-in-a-box:script-server
     # build:
