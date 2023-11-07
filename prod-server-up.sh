@@ -31,7 +31,7 @@ docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env
 assertSuccess
 
 echo "Starting the server..."
-docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml up -d -env-file .prod-paths.env
+docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml --env-file .server/.prod-paths.env up -d
 assertSuccess
 
 echo "Done."
