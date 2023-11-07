@@ -24,3 +24,6 @@ echo "$RESULTS"
 if [[ "$RESULTS" == *"[DUPLICATE]"* ]]
   then exit 1
 fi
+
+echo "No duplicates found."
+echo ""

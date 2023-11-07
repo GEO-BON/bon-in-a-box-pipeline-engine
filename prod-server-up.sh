@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Updating compose file..."
+echo "Updating server files..."
 git checkout origin/repo-split -- compose.yml
 git checkout origin/repo-split -- compose.prod.yml
 git checkout origin/repo-split -- prod-server-down.sh
