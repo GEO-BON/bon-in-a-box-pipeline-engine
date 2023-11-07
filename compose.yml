@@ -1,5 +1,4 @@
-## Base compose file. Automatically merged with compose.override.yml when running
-##   docker compose up
+## Base compose file. 
 version: "3.7"
 
 services:
@@ -22,7 +21,7 @@ services:
     expose:
       - "8080"
     env_file:
-      - ../.env
+      - ../runner.env
     environment:
       - SCRIPT_LOCATION=/scripts
       - SCRIPT_STUBS_LOCATION=/script-stubs
@@ -41,7 +40,7 @@ services:
       - ../userdata:/userdata:ro
       - ../output:/output:rw
     env_file:
-      - ../.env
+      - ../runner.env
     environment:
       - SCRIPT_LOCATION=/scripts
       - USERDATA_LOCATION=/userdata
@@ -54,7 +53,7 @@ services:
       - ../userdata:/userdata:ro
       - ../output:/output:rw
     env_file:
-      - ../.env
+      - ../runner.env
     environment:
       - SCRIPT_LOCATION=/scripts
       - USERDATA_LOCATION=/userdata
