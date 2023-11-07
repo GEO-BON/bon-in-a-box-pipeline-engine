@@ -2,31 +2,32 @@
 
 RED="\033[31m"
 ENDCOLOR="\033[0m"
+assertSuccess () {
+    if [[ $? -ne 0 ]] ; then
+        echo -e "${RED}FAILED${ENDCOLOR}" ; exit 1
+    fi
+}
 
 echo "Updating server files..."
-git checkout origin/repo-split -- compose.yml
-git checkout origin/repo-split -- compose.prod.yml
-git checkout origin/repo-split -- prod-server-down.sh
+git checkout origin/repo-split -- compose.yml ; assertSuccess
+git checkout origin/repo-split -- compose.prod.yml ; assertSuccess
+git checkout origin/repo-split -- prod-server-down.sh ; assertSuccess
 
-git checkout origin/repo-split -- .github/findDuplicateDescriptions.sh
-git checkout origin/repo-split -- .github/findDuplicateIds.sh
-git checkout origin/repo-split -- .github/scriptValidationSchema.yml
+git checkout origin/repo-split -- .github/findDuplicateDescriptions.sh ; assertSuccess
+git checkout origin/repo-split -- .github/findDuplicateIds.sh ; assertSuccess
+git checkout origin/repo-split -- .github/scriptValidationSchema.yml ; assertSuccess
 
-git checkout origin/repo-split -- http-proxy/conf.d-prod/ngnix.conf
+git checkout origin/repo-split -- http-proxy/conf.d-prod/ngnix.conf ; assertSuccess
 
-git checkout origin/repo-split -- script-stubs
+git checkout origin/repo-split -- script-stubs ; assertSuccess
 
 echo "Pulling docker images..."
 cd .. # Back to pipeline-repo folder
 docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml pull
-if [[ $? -ne 0 ]] ; then
-    echo -e "${RED}Failed${ENDCOLOR}" ; exit 1
-fi
+assertSuccess
 
 echo "Starting the server..."
 docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml up -d
-if [[ $? -ne 0 ]] ; then
-    echo -e "${RED}Failed${ENDCOLOR}"; exit 1
-fi
+assertSuccess
 
 echo "Done."
