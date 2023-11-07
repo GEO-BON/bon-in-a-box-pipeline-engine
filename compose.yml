@@ -14,7 +14,7 @@ services:
     container_name: biab-script-server
     volumes:
       - ../scripts:/scripts:ro
-      - scripts-stubs:/scripts-stubs:ro
+      - script-stubs:/scripts-stub:ro
       - ../pipelines:/pipelines:ro
       - ../userdata:/userdata:ro
       - ../output:/output:rw
@@ -25,7 +25,7 @@ services:
       - ../.env
     environment:
       - SCRIPT_LOCATION=/scripts
-      - SCRIPT_STUBS_LOCATION=/scripts-stubs
+      - SCRIPT_STUBS_LOCATION=/script-stubs
       - USERDATA_LOCATION=/userdata
       - PIPELINES_LOCATION=/pipelines
       - OUTPUT_LOCATION=/output
