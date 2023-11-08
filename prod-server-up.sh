@@ -1,7 +1,10 @@
 #!/bin/bash
-
 # Fetches all the files necessary, then runs the production server.
-# This script is ran by server-up.sh in the pipeline-repo folder.
+
+if [ -d "pipeline-repo" ]; then
+  echo "ERROR: Do not run directly! This script is meant to be ran by server-up.sh in the pipeline-repo folder."
+  exit 1
+fi
 
 RED="\033[31m"
 ENDCOLOR="\033[0m"
