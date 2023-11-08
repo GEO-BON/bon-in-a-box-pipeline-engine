@@ -1,5 +1,22 @@
 # Developer documentation
 
+## Contributing
+If you wish to contribute code to this pipeline engine, please let us know at web@geobon.org.
+
+The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup in the user documentation. You can create a branch or fork to save your work. Once complete, open a pull request to this repository. The pull request will be peer-reviewed before acceptation.
+
+## Getting the code
+The code in this repository runs an engine, but the engine needs content! Here are the steps to start the server in development mode with the BON in a Box scripts and pipelines:
+
+0. docker and docker compose must be installed.
+1. Clone this repo: `git clone git@github.com:GEO-BON/bon-in-a-box-pipeline-engine.git pipeline-engine`
+2. `cd pipeline engine`
+3. Clone the BON in a Box repo (or any compatible repo of your choice) **into the pipeline-repo folder**: `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git pipeline-repo`
+4. `cd ..`
+5. Pull the pre-compiled images: `./dev-server pull`
+6. Build the remaining images: `./dev-server build`
+5. Start the development server: `./dev-server up`
+
 ## IDE setup
 
 For the global project, Visual Studio Code. Recommended extensions:
