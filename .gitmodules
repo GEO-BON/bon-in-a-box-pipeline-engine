@@ -1,3 +1,0 @@
-[submodule "pipeline-repo"]
-	path = pipeline-repo
-	url = git@github.com:GEO-BON/bon-in-a-box-pipelines.git
