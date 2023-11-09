@@ -12,9 +12,10 @@ The code in this repository runs an engine, but the engine needs content! Here a
 1. Clone this repo: `git clone git@github.com:GEO-BON/bon-in-a-box-pipeline-engine.git pipeline-engine`
 2. `cd pipeline engine`
 3. Clone the BON in a Box repo (or any compatible repo of your choice) **into the pipeline-repo folder**: `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git pipeline-repo`
-4. `cd ..`
-5. Pull the pre-compiled images: `./dev-server pull`
-6. Build the remaining images: `./dev-server build`
+4. Create a runner.env file as per user instructions.
+5. `cd ..`
+6. Pull the pre-compiled images: `./dev-server pull`
+7. Build the remaining images: `./dev-server build`
 5. Start the development server: `./dev-server up`
 
 ## IDE setup
