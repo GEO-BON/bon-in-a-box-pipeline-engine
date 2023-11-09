@@ -43,6 +43,11 @@ tasks.test {
 	}
 }
 
+task("runValidator", JavaExec::class) {
+    mainClass.set("org.geobon.pipeline.Validator")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
 dependencies {
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
@@ -52,10 +57,10 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml:$ktorVersion")
 
     // https://mvnrepository.com/artifact/org.json/json
-    implementation("org.json:json:20220924")
+    implementation("org.json:json:20230227")
 
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
-    implementation("org.yaml:snakeyaml:1.33")
+    implementation("org.yaml:snakeyaml:2.0")
     
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
