@@ -66,7 +66,7 @@ When modifying pipelines in the /pipelines folder, servers do not need to be res
 
 ## Running the servers remotely
 1. Run the [ansible playbook](https://github.com/GEO-BON/biab-server/tree/main/ansible)
-2. Create a runner.env file on the server, as above.
+2. Create a `runner.env` file on the server, as above.
 3. `./server-up.sh`
 
 ## Running a script or pipeline
