@@ -17,27 +17,13 @@ assertSuccess () {
     fi
 }
 
-echo "Updating server files..."
-git checkout origin/$branch -- .prod-paths.env ; assertSuccess
-git checkout origin/$branch -- compose.yml ; assertSuccess
-git checkout origin/$branch -- compose.prod.yml ; assertSuccess
-git checkout origin/$branch -- prod-server-down.sh ; assertSuccess
-
-git checkout origin/$branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
-git checkout origin/$branch -- .github/findDuplicateIds.sh ; assertSuccess
-git checkout origin/$branch -- .github/scriptValidationSchema.yml ; assertSuccess
-
-git checkout origin/$branch -- http-proxy/conf.d-prod/ngnix.conf ; assertSuccess
-
-git checkout origin/$branch -- script-stubs ; assertSuccess
+./prod-get-server.sh $branch
 
 echo "Pulling docker images..."
 cd .. # Back to pipeline-repo folder
-docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml --env-file .server/.prod-paths.env pull
-assertSuccess
+./prod-server.sh pull ; assertSuccess
 
 echo "Starting the server..."
-docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml --env-file .server/.prod-paths.env up -d
-assertSuccess
+./prod-server.sh up -d ; assertSuccess
 
 echo "Done."
