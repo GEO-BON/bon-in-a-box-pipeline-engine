@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Most probably, only prod-server-up/down scripts are needed for end-users.
 #
 # Use this script to run your docker commands on the server manually.
