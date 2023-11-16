@@ -33,6 +33,10 @@ function help {
     echo "    up                   Start the server, accessible in http://localhost"
     echo "    stop                 Stops the server"
     echo "    validate             Run basic basic validation on pipelines and scripts. "
+    echo "    clean                Removes the docker containers of all services."
+    echo "                         This is useful in development switching from prod to dev server,"
+    echo "                         in cases when we get the following error:"
+    echo "                         \"The container name ... is already in use by container ...\""
     echo "    command [ARGS...]    Run an arbitrary docker compose command,"
     echo "                         such as (pull|run|up|down|build|logs)"
     echo
@@ -45,7 +49,6 @@ function command { # args appended to the docker compose command
    assertSuccess
 }
 
-# Run basic validation 
 function validate {
     get_server $branch
 
@@ -72,8 +75,8 @@ function validate {
     assertSuccess
 }
 
-function checkout { # Mandatory arg 1: branch name of server repo
-    branch=$1
+function checkout {
+    branch=$1 # Mandatory arg 1: branch name of server repo
 
     echo "Updating server files..."
     git checkout origin/$branch -- .prod-paths.env ; assertSuccess
@@ -100,10 +103,14 @@ function up {
     echo "Done."
 }
 
-# Stops the production server.
 function down {
     command down
 }
+
+function clean {
+    docker container rm http-rev-prox biab-ui biab-script-server \
+        biab-tiler biab-runner-r biab-runner-julia
+}     
 
 case "$1" in
     help)
@@ -124,6 +131,9 @@ case "$1" in
     command)
         shift
         command $@
+        ;;
+    clean)
+        clean
         ;;
     *)
         help
