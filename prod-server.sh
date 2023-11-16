@@ -91,7 +91,7 @@ function validate {
 }
 
 function checkout {
-    branch=$1 # Mandatory arg 1: branch name of server repo
+    branch=origin/$1 # Mandatory arg 1: branch name of server repo on remote origin
     echo "Updating server configuration from $branch..."
 
     git checkout $branch -- .prod-paths.env ; assertSuccess
