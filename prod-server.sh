@@ -1,6 +1,7 @@
 #!/bin/bash
 
 RED="\033[31m"
+GREEN="\033[32m"
 ENDCOLOR="\033[0m"
 
 if [ -d "pipeline-repo" ]; then
@@ -21,6 +22,14 @@ fi
 function assertSuccess {
     if [[ $? -ne 0 ]] ; then
         echo -e "${RED}FAILED${ENDCOLOR}" ; exit 1
+    fi
+}
+
+$nErrors = 0
+function flagErrors {
+    if [[ $? -ne 0 ]] ; then
+        echo -e "${RED}FAILED${ENDCOLOR}"
+        $nErrors++
     fi
 }
 
@@ -50,46 +59,54 @@ function command { # args appended to the docker compose command
 }
 
 function validate {
-    get_server $branch
+    echo "Running basic validation of pipelines and scripts..."
 
-    # Find duplicate descriptions
+    echo "Checking for duplicate descriptions in scripts..."
     cd scripts ; assertSuccess
-    .github/findDuplicateDescriptions.sh ; assertSuccess
+    .github/findDuplicateDescriptions.sh ; flagErrors
     cd ..
 
-    # Validate against schema
+    echo "Validating script metadata against schema..."
     docker run --rm --name biab-yaml-validator -v $(pwd)/scripts:"/scripts" \
         -v $(pwd)/../.server/.github/:"/.github" \
         navikt/yaml-validator:v4 \
         ".github/scriptValidationSchema.yml" "scripts/" "no" ".yml"
-    assertSuccess
+    flagErrors
 
-    # Find duplicates in pipelines
+    echo "Checking for duplicate descriptions in pipelines..."
     cd pipelines ; assertSuccess
-    .github/findDuplicateIds.sh ; assertSuccess
+    .github/findDuplicateIds.sh ; flagErrors
     cd ..
 
-    # Validate pipeline structure
+    echo "Validating pipeline structure"
     ./prod-server.sh run script-server \
         java -cp biab-script-server.jar org.geobon.pipeline.Validator
-    assertSuccess
+    flagErrors
+
+    if [[ $nErrors -e 0 ]] ; then
+        echo "${GREEN}Validation complete.${ENDCOLOR}"
+    else 
+        echo "${RED}Errors occured during validation. Check logs above.${ENDCOLOR}"
+    fi
 }
 
 function checkout {
     branch=$1 # Mandatory arg 1: branch name of server repo
+    echo "Updating server configuration from $branch..."
 
-    echo "Updating server files..."
-    git checkout origin/$branch -- .prod-paths.env ; assertSuccess
-    git checkout origin/$branch -- compose.yml ; assertSuccess
-    git checkout origin/$branch -- compose.prod.yml ; assertSuccess
+    git checkout $branch -- .prod-paths.env ; assertSuccess
+    git checkout $branch -- compose.yml ; assertSuccess
+    git checkout $branch -- compose.prod.yml ; assertSuccess
 
-    git checkout origin/$branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
-    git checkout origin/$branch -- .github/findDuplicateIds.sh ; assertSuccess
-    git checkout origin/$branch -- .github/scriptValidationSchema.yml ; assertSuccess
+    git checkout $branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
+    git checkout $branch -- .github/findDuplicateIds.sh ; assertSuccess
+    git checkout $branch -- .github/scriptValidationSchema.yml ; assertSuccess
 
-    git checkout origin/$branch -- http-proxy/conf.d-prod/ngnix.conf ; assertSuccess
+    git checkout $branch -- http-proxy/conf.d-prod/ngnix.conf ; assertSuccess
 
-    git checkout origin/$branch -- script-stubs ; assertSuccess
+    git checkout $branch -- script-stubs ; assertSuccess
+
+    echo "${GREEN}Server configuration updated.${ENDCOLOR}"
 }
 
 function up {
@@ -100,16 +117,21 @@ function up {
     echo "Starting the server..."
     command up -d ; assertSuccess
 
-    echo "Done."
+    echo "${GREEN}Server is running.${ENDCOLOR}"
 }
 
 function down {
-    command down
+    echo "Stopping the servers..."
+    command down ; assertSuccess
+    echo "${GREEN}Server has stopped.${ENDCOLOR}"
 }
 
 function clean {
+    echo "Removing shared containers between dev and prod"
     docker container rm http-rev-prox biab-ui biab-script-server \
         biab-tiler biab-runner-r biab-runner-julia
+    assertSuccess
+    echo "${ENDCOLOR}Clean complete.${ENDCOLOR}"
 }     
 
 case "$1" in
