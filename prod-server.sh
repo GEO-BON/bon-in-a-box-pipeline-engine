@@ -25,11 +25,11 @@ function assertSuccess {
     fi
 }
 
-$nErrors = 0
+nErrors=0
 function flagErrors {
     if [[ $? -ne 0 ]] ; then
         echo -e "${RED}FAILED${ENDCOLOR}"
-        $nErrors++
+        ((nErrors++))
     fi
 }
 
@@ -63,26 +63,33 @@ function validate {
 
     echo "Checking for duplicate descriptions in scripts..."
     cd scripts ; assertSuccess
-    .github/findDuplicateDescriptions.sh ; flagErrors
+    ../.server/.github/findDuplicateDescriptions.sh ; flagErrors
     cd ..
 
     echo "Validating script metadata against schema..."
     docker run --rm --name biab-yaml-validator -v $(pwd)/scripts:"/scripts" \
-        -v $(pwd)/../.server/.github/:"/.github" \
+        -v $(pwd)/.server/.github/:"/.github" \
         navikt/yaml-validator:v4 \
         ".github/scriptValidationSchema.yml" "scripts/" "no" ".yml"
     flagErrors
 
     echo "Checking for duplicate descriptions in pipelines..."
     cd pipelines ; assertSuccess
-    .github/findDuplicateIds.sh ; flagErrors
+    ../.server/.github/findDuplicateIds.sh ; flagErrors
     cd ..
 
     echo "Validating pipeline structure"
-    ./prod-server.sh run script-server \
+    # TODO The run command on script-server starts the runners because of depends-on relationship.
+    # We want to know if the server is up in order to keep or bring them down afterwards.
+    #docker ps | grep runner-
+    #shouldStop=$? -eq 0
+    #echo "should stop=$shouldStop"
+
+    command run script-server \
         java -cp biab-script-server.jar org.geobon.pipeline.Validator
     flagErrors
 
+    # Final assesment
     if [[ $nErrors -eq 0 ]] ; then
         echo -e "${GREEN}Validation complete.${ENDCOLOR}"
     else 
