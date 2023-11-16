@@ -83,10 +83,10 @@ function validate {
         java -cp biab-script-server.jar org.geobon.pipeline.Validator
     flagErrors
 
-    if [[ $nErrors -e 0 ]] ; then
-        echo "${GREEN}Validation complete.${ENDCOLOR}"
+    if [[ $nErrors -eq 0 ]] ; then
+        echo -e "${GREEN}Validation complete.${ENDCOLOR}"
     else 
-        echo "${RED}Errors occured during validation. Check logs above.${ENDCOLOR}"
+        echo -e "${RED}Errors occured during validation. Check logs above.${ENDCOLOR}"
     fi
 }
 
@@ -106,7 +106,7 @@ function checkout {
 
     git checkout $branch -- script-stubs ; assertSuccess
 
-    echo "${GREEN}Server configuration updated.${ENDCOLOR}"
+    echo -e "${GREEN}Server configuration updated.${ENDCOLOR}"
 }
 
 function up {
@@ -117,13 +117,13 @@ function up {
     echo "Starting the server..."
     command up -d ; assertSuccess
 
-    echo "${GREEN}Server is running.${ENDCOLOR}"
+    echo -e "${GREEN}Server is running.${ENDCOLOR}"
 }
 
 function down {
     echo "Stopping the servers..."
     command down ; assertSuccess
-    echo "${GREEN}Server has stopped.${ENDCOLOR}"
+    echo -e "${GREEN}Server has stopped.${ENDCOLOR}"
 }
 
 function clean {
@@ -131,7 +131,7 @@ function clean {
     docker container rm http-rev-prox biab-ui biab-script-server \
         biab-tiler biab-runner-r biab-runner-julia
     assertSuccess
-    echo "${ENDCOLOR}Clean complete.${ENDCOLOR}"
+    echo -e "${ENDCOLOR}Clean complete.${ENDCOLOR}"
 }     
 
 case "$1" in
