@@ -79,12 +79,6 @@ function validate {
     cd ..
 
     echo "Validating pipeline structure"
-    # TODO The run command on script-server starts the runners because of depends-on relationship.
-    # We want to know if the server is up in order to keep or bring them down afterwards.
-    #docker ps | grep runner-
-    #shouldStop=$? -eq 0
-    #echo "should stop=$shouldStop"
-
     command run script-server \
         java -cp biab-script-server.jar org.geobon.pipeline.Validator
     flagErrors
