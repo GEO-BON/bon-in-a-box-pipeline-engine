@@ -42,12 +42,13 @@ object Validator {
                             }
                         }
                     }
-                    println(fakeInputs.toString(2))
 
                     // Run validation
                     createRootPipeline(file, fakeInputs.toString(2))
+                    println("$file: OK")
                 } catch (e: Exception) {
                     errorMessages += "${file.relativeTo(pipelinesRoot)}:\n\t${e.message}\n"
+                    println("$file: FAILED")
                 }
             }
         }
