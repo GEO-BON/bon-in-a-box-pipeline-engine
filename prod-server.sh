@@ -132,7 +132,7 @@ function clean {
     docker container rm http-rev-prox biab-ui biab-script-server \
         biab-tiler biab-runner-r biab-runner-julia
     assertSuccess
-    echo -e "${ENDCOLOR}Clean complete.${ENDCOLOR}"
+    echo -e "${GREEN}Clean complete.${ENDCOLOR}"
 }     
 
 case "$1" in
