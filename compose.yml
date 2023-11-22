@@ -30,9 +30,6 @@ services:
       - PIPELINES_LOCATION=/pipelines
       - OUTPUT_LOCATION=/output
       - HOST_PATH=${PWD}
-    depends_on:
-      - runner-r
-      - runner-julia
 
   runner-r:
     container_name: biab-runner-r

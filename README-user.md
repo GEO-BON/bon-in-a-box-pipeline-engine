@@ -7,11 +7,14 @@ The recommended method is to setup an instance of BON in a Box somewhere you can
 
 ## Running the servers locally
 Prerequisites : 
- - Git
- - Linux: Docker with Docker Compose installed. It is recommended to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
- - Windows/Mac: Docker Desktop
- - At least 6 GB of free space (this includes the installation of Docker Desktop)
- - RAM requirements will depend on the scripts that you run.
+- Git
+- At least 6 GB of free space (this includes the installation of Docker Desktop)
+- RAM requirements will depend on the scripts that you run.
+- **Windows:**
+  - Docker Desktop
+  - A Linux shell (git bash, [Bash through PowerShell](https://learn.microsoft.com/en-us/windows/wsl/install), cygwin, etc.) necessary to run th `.sh` scripts in the instructions below.
+- **Mac:** Docker Desktop
+- **Linux:** Docker with Docker Compose installed. It is recommended to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
 
 To run:
 1. Clone repository (Windows users: do not clone this in a folder under OneDrive.)
@@ -183,9 +186,7 @@ options_example:
 ```
 
 ### Script validation
-The syntax and structure of the script description file will be validated on push. To run the validation locally,
-- On Windows: Make sure docker is running, then run [validateScripts.bat](/scripts/validateScripts.bat)
-- On Linux: Run [validateScripts.sh](/scripts/validateScripts.sh)
+The syntax and structure of the script description file will be validated on push. To run the validation locally, run `validate.sh`
 
 This validates that the syntax and structure are correct, but not that it's content is correct. Hence, peer review of the scripts and the description files is mandatory before accepting a pull requests.
 
