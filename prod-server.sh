@@ -55,7 +55,6 @@ function help {
 # `command <command>` with command such as pull/run/up/down/build/logs...
 function command { # args appended to the docker compose command
    docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml --env-file .server/.prod-paths.env $@
-   assertSuccess
 }
 
 function validate {
@@ -159,6 +158,7 @@ case "$1" in
     command)
         shift
         command $@
+        assertSuccess
         ;;
     clean)
         clean
