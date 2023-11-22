@@ -116,7 +116,12 @@ function up {
     command pull ; assertSuccess
 
     echo "Starting the server..."
-    command up -d ; assertSuccess
+    command up -d |& grep "is already in use by container"
+    if [[ $? -eq 0 ]] ; then # Container conflict, perform clean and try again.
+        clean
+        echo "Starting the server after a clean..."
+        command up -d ; assertSuccess
+    fi
 
     echo -e "${GREEN}Server is running.${ENDCOLOR}"
 }
