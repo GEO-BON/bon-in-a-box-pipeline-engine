@@ -15,7 +15,7 @@ services:
     volumes:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ./script-stubs:/scripts-stub:ro
-      - ${PIPELINE_REPO_PATH}/pipelines:/pipelines:ro
+      - ${PIPELINE_REPO_PATH}/pipelines:/pipelines:rw
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
       - /var/run/docker.sock:/var/run/docker.sock
