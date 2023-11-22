@@ -23,7 +23,7 @@ function command { # args appended to the docker compose command
 function clean {
     echo "Removing shared containers between dev and prod"
     docker container rm http-rev-prox biab-ui biab-script-server \
-        biab-tiler biab-runner-r biab-runner-julia openapi_swagger
+        biab-tiler biab-runner-r biab-runner-julia swagger_editor
     echo "Clean complete."
 }     
 
