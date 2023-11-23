@@ -68,9 +68,7 @@ When modifying pipelines in the /pipelines folder, servers do not need to be res
 - When adding or renaming pipelines, refresh the browser page.
 
 ## Running the servers remotely
-1. Run the [ansible playbook](https://github.com/GEO-BON/biab-server/tree/main/ansible)
-2. Create a `runner.env` file on the server, as above.
-3. `./server-up.sh`
+Use the [ansible playbook](ansible/README.md) instructions.
 
 ## Running a script or pipeline
 You have an instance of BON in a Box running, either [locally](#running-the-servers-locally) or [remotely](#running-the-servers-remotely), and you want to run your first script or pipeline.
