@@ -241,6 +241,12 @@ fun Application.configureRouting() {
                 .replace("../", "") // Avoid any attempt to access outside of pipelines directory
                 .trim() // Remove trailing whitespaces
 
+            val file = File(pipelinesRoot, "$filename.json")
+            if(file.nameWithoutExtension.isEmpty()){
+                call.respond(HttpStatusCode.BadRequest, "File name is empty.")
+                return@post
+            }
+
             // Validate JSON (abort if fails)
             val pipelineContent = call.receive<String>()
             val pipelineJSON = try {
@@ -261,7 +267,6 @@ fun Application.configureRouting() {
             }
 
             // Save
-            val file = File(pipelinesRoot, "$filename.json")
             try {
                 file.parentFile.mkdirs()
                 file.delete()

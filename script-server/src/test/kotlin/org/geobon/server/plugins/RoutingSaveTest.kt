@@ -291,6 +291,15 @@ class RoutingSaveTest {
             assertTrue(file.exists())
             assertEquals(content, file.readText())
         }
+
+        client.post("/pipeline/save/test>") {
+            setBody(content)
+        }.apply { // Check
+            val file = File(testFolder, ".json")
+            assertFalse(file.exists())
+            assertEquals(HttpStatusCode.BadRequest, status)
+            assertEquals("File name is empty.", bodyAsText())
+        }
     }
 
     @Test
