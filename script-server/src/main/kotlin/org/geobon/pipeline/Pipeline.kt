@@ -89,6 +89,7 @@ open class Pipeline constructor(
             error = ex.message ?: ex.stackTraceToString()
             logger.debug(error)
 
+            // TODO: Vérifier fonction stop
             if (!cancelled) failure = true
         } catch (ex: Exception) {
             error =
@@ -191,8 +192,16 @@ open class Pipeline constructor(
         private fun createFromFile(stepId: StepId, relPath: String, inputsJSON: String? = null): Pipeline =
             createFromFile(stepId, File(pipelineRoot, relPath), inputsJSON)
 
-        private fun createFromFile(stepId: StepId, descriptionFile: File, inputsJSON: String? = null): Pipeline {
-            val logger = LoggerFactory.getLogger(descriptionFile.nameWithoutExtension)
+        private fun createFromFile(stepId: StepId, descriptionFile: File, inputsJSON: String? = null): Pipeline =
+            createFromJSON(
+                stepId,
+                JSONObject(descriptionFile.readText()),
+                descriptionFile.relativeTo(pipelineRoot.parentFile).path,
+                JSONObject(inputsJSON ?: "")
+            )
+
+        fun createFromJSON(stepId: StepId, pipelineJSON: JSONObject, name:String, inputsJSON: JSONObject): Pipeline {
+            val logger = LoggerFactory.getLogger(name)
 
             val constants = mutableMapOf<String, ConstantPipe>()
             val outputIds = mutableListOf<String>()
@@ -200,7 +209,6 @@ open class Pipeline constructor(
             val outputs: MutableMap<String, Output> = mutableMapOf()
 
             // Load all nodes and classify them as steps, constants or pipeline outputs
-            val pipelineJSON = JSONObject(descriptionFile.readText())
             pipelineJSON.getJSONArray(NODES_LIST).forEach { node ->
                 if (node is JSONObject) {
                     val nodeId = node.getString(NODE__ID)
@@ -287,37 +295,33 @@ open class Pipeline constructor(
 
             return Pipeline(
                 stepId,
-                descriptionFile.relativeTo(pipelineRoot.parentFile).path,
+                name,
                 steps,
                 inputsToConstants(inputsJSON, pipelineJSON),
                 outputs
             )
         }
 
-        private fun inputsToConstants(inputsJSON: String?, pipelineJSON: JSONObject): MutableMap<String, Pipe> {
-            if (inputsJSON == null)
-                return mutableMapOf()
-
-            val inputsParsed = JSONObject(inputsJSON)
+        private fun inputsToConstants(inputsJSON: JSONObject, pipelineJSON: JSONObject): MutableMap<String, Pipe> {
             val constants = mutableMapOf<String, Pipe>()
             pipelineJSON.optJSONObject(INPUTS)?.let { inputsSpec ->
-                inputsParsed.keySet().forEach { key ->
+                inputsJSON.keySet().forEach { key ->
                     val inputSpec = inputsSpec.optJSONObject(key)
                         ?: throw RuntimeException("Input received \"$key\" is not listed in pipeline inputs. Listed inputs are ${inputsSpec.keySet()}")
                     val type = inputSpec.getString(INPUTS__TYPE)
 
-                    constants[key] = createConstant(key, inputsParsed, type, key)
+                    constants[key] = createConstant(key, inputsJSON, type, key)
                 }
             }
 
             return constants
         }
 
-        private fun inputsToConstants(inputsJSON: String?, step: ScriptStep): MutableMap<String, Pipe> {
-            if (inputsJSON == null)
+        private fun inputsToConstants(inputsString: String?, step: ScriptStep): MutableMap<String, Pipe> {
+            if (inputsString == null)
                 return mutableMapOf()
 
-            val inputsParsed = JSONObject(inputsJSON)
+            val inputsParsed = JSONObject(inputsString)
             val constants = mutableMapOf<String, Pipe>()
             inputsParsed.keySet().forEach { key ->
                 val type = step.inputsDefinition[key]

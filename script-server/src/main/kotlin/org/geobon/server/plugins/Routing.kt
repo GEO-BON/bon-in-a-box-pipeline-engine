@@ -229,15 +229,27 @@ fun Application.configureRouting() {
 
 
         post("/pipeline/save/{filename}") {
-            // TODO: Disallow on server. Env var?
+            if(System.getenv("SAVE_TO_SERVER") == "deny") {
+                call.respond(HttpStatusCode.ServiceUnavailable, "This server does not allow \"Save to server\" API.\n" +
+                        "Use \"Save to clipboard\" and submit file through git.")
+                return@post
+            }
 
             val filename = call.parameters["filename"]!!
+                .replace("""\s*$FILE_SEPARATOR\s*""".toRegex(), "/") // Support sub-directories
+                .replace("../", "") // Avoid any attempt to access outside of pipelines directory
+                .trim() // Remove trailing whitespaces
+
             val pipelineContent = call.receive<String>()
+            val pipelineJSON = JSONObject(pipelineContent)
+            val fakeInputs = Validator.generateInputFromExamples(pipelineJSON)
+            try {
+                Pipeline.createFromJSON(StepId("",""), pipelineJSON, filename, fakeInputs)
+            } catch (e:Exception) {
+                call.respond(... )
+            }
+
             val file = File(pipelinesRoot, "$filename.json")
-
-            // TODO: Validate json integrity
-            // TODO: Validate pipeline integrity
-
             try {
                 file.delete()
                 file.writeText(pipelineContent)

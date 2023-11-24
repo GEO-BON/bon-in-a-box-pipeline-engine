@@ -48,6 +48,10 @@ To run:
     # NB: applied on next docker compose up
     SCRIPT_SERVER_CACHE_CLEANER=full
 
+    # Allow to save pipelines using the "save to server" button or not.
+    # Accepts (allow | deny), default "allow"
+    SAVE_TO_SERVER=allow
+
     ```
 2. Using a terminal, navigate to top-level folder.
 3. `./server-up.sh`
