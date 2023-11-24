@@ -281,7 +281,7 @@ No authorization required
 
 ## savePipeline
 
-> savePipeline(filename, requestBody)
+> String savePipeline(filename, requestBody)
 
 Save a json file to the pipeline folder.
 
@@ -291,13 +291,13 @@ Save a json file to the pipeline folder.
 import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
-let filename = "filename_example"; // String | The name of the JSON file.
+let filename = "filename_example"; // String | The name of the JSON file (without extension).
 let requestBody = {key: null}; // {String: Object} | Content of pipeline.json to save
 apiInstance.savePipeline(filename, requestBody, (error, data, response) => {
   if (error) {
     console.error(error);
   } else {
-    console.log('API called successfully.');
+    console.log('API called successfully. Returned data: ' + data);
   }
 });
 ```
@@ -307,12 +307,12 @@ apiInstance.savePipeline(filename, requestBody, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **filename** | **String**| The name of the JSON file. | 
+ **filename** | **String**| The name of the JSON file (without extension). | 
  **requestBody** | [**{String: Object}**](Object.md)| Content of pipeline.json to save | 
 
 ### Return type
 
-null (empty response body)
+**String**
 
 ### Authorization
 
@@ -321,7 +321,7 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
-- **Accept**: Not defined
+- **Accept**: text/plain
 
 
 ## stop

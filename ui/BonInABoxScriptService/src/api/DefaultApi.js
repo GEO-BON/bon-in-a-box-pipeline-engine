@@ -305,15 +305,16 @@ export default class DefaultApi {
      * Callback function to receive the result of the savePipeline operation.
      * @callback module:api/DefaultApi~savePipelineCallback
      * @param {String} error Error message, if any.
-     * @param data This operation does not return a value.
+     * @param {String} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
      * Save a json file to the pipeline folder.
-     * @param {String} filename The name of the JSON file.
+     * @param {String} filename The name of the JSON file (without extension).
      * @param {Object.<String, {String: Object}>} requestBody Content of pipeline.json to save
      * @param {module:api/DefaultApi~savePipelineCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link String}
      */
     savePipeline(filename, requestBody, callback) {
       let postBody = requestBody;
@@ -338,8 +339,8 @@ export default class DefaultApi {
 
       let authNames = [];
       let contentTypes = ['application/json'];
-      let accepts = [];
-      let returnType = null;
+      let accepts = ['text/plain'];
+      let returnType = 'String';
       return this.apiClient.callApi(
         '/pipeline/save/{filename}', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,

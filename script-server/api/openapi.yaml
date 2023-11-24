@@ -55,10 +55,33 @@ paths:
               additionalProperties: true
       responses:
         "200":
-          description: File saved
-        "400":
-          description: Bad request
-        
+          description: File saved (check body for pipeline validation errors)
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+              examples:
+                success:
+                  value: saved
+                warning:
+                  value: |
+                    Pipeline saved with errors:
+                    helloWorld>helloPython.yml@0: Wrong type "text" for input "some_int", "int" expected.
+        default:
+          description: |
+            An error occurred, check body for details.
+            Possible errors are server config blocking save API, invalid json file, IO errors.
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+              example:
+                503:
+                  value: |
+                    This server does not allow "Save to server" API.
+                    Use "Save to clipboard" and submit file through git.
   /{type}/{descriptionPath}/info:
     get:
       tags: []

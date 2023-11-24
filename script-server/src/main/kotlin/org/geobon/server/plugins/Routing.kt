@@ -12,6 +12,7 @@ import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
 import org.geobon.pipeline.RunContext.Companion.scriptRoot
 import org.geobon.utils.runCommand
+import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -240,25 +241,38 @@ fun Application.configureRouting() {
                 .replace("../", "") // Avoid any attempt to access outside of pipelines directory
                 .trim() // Remove trailing whitespaces
 
+            // Validate JSON (abort if fails)
             val pipelineContent = call.receive<String>()
-            val pipelineJSON = JSONObject(pipelineContent)
-            val fakeInputs = Validator.generateInputFromExamples(pipelineJSON)
-            try {
-                Pipeline.createFromJSON(StepId("",""), pipelineJSON, filename, fakeInputs)
-            } catch (e:Exception) {
-                call.respond(... )
+            val pipelineJSON = try {
+                JSONObject(pipelineContent)
+            } catch (e:JSONException) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid JSON syntax.\n" +
+                        "${e.message}")
+                return@post
             }
 
+            // Validate pipeline (warning if fails)
+            val fakeInputs = Validator.generateInputFromExamples(pipelineJSON)
+            var message = "Saved"
+            try {
+                createRootPipeline(filename, pipelineJSON, fakeInputs)
+            } catch (e:Exception) {
+                message = "Pipeline saved with errors:\n${e.message}"
+            }
+
+            // Save
             val file = File(pipelinesRoot, "$filename.json")
             try {
+                file.parentFile.mkdirs()
                 file.delete()
                 file.writeText(pipelineContent)
             } catch (ex:Exception) {
                 logger.warn(ex.message)
                 call.respondText(text = "Failed to save pipeline.", status = HttpStatusCode.BadRequest)
+                return@post
             }
 
-            call.respond(HttpStatusCode.OK)
+            call.respond(HttpStatusCode.OK, message)
         }
     }
 }

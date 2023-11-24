@@ -138,6 +138,14 @@ open class Pipeline constructor(
         return "Pipeline(${debugName})"
     }
 
+    private fun initRoot() {
+        linkInputs()
+        val errors = validateGraph()
+        if (errors.isNotEmpty()) {
+            throw RuntimeException(errors)
+        }
+    }
+
     companion object {
         fun createMiniPipelineFromScript(
             descriptionFile: File,
@@ -162,11 +170,7 @@ open class Pipeline constructor(
                 step.outputs.toMutableMap()
             )
 
-            miniPipeline.linkInputs()
-            val errors = miniPipeline.validateGraph()
-            if (errors.isNotEmpty()) {
-                throw RuntimeException(errors)
-            }
+            miniPipeline.initRoot()
 
             return miniPipeline
         }
@@ -180,12 +184,18 @@ open class Pipeline constructor(
                 descriptionFile,
                 inputsJSON
             ).apply {
-                linkInputs()
+                initRoot()
+            }
+        }
 
-                val errors = validateGraph()
-                if (errors.isNotEmpty()) {
-                    throw RuntimeException(errors)
-                }
+        fun createRootPipeline(debugName: String, pipelineJSON: JSONObject, inputsJSON: JSONObject): Pipeline {
+            return createFromJSON(
+                StepId("", ""),
+                debugName,
+                pipelineJSON,
+                inputsJSON
+            ).apply {
+                initRoot()
             }
         }
 
@@ -195,13 +205,13 @@ open class Pipeline constructor(
         private fun createFromFile(stepId: StepId, descriptionFile: File, inputsJSON: String? = null): Pipeline =
             createFromJSON(
                 stepId,
-                JSONObject(descriptionFile.readText()),
                 descriptionFile.relativeTo(pipelineRoot.parentFile).path,
-                JSONObject(inputsJSON ?: "")
+                JSONObject(descriptionFile.readText()),
+                inputsJSON?.let { JSONObject(inputsJSON) } ?: JSONObject()
             )
 
-        fun createFromJSON(stepId: StepId, pipelineJSON: JSONObject, name:String, inputsJSON: JSONObject): Pipeline {
-            val logger = LoggerFactory.getLogger(name)
+        private fun createFromJSON(stepId: StepId, debugName: String, pipelineJSON: JSONObject, inputsJSON: JSONObject): Pipeline {
+            val logger = LoggerFactory.getLogger(debugName)
 
             val constants = mutableMapOf<String, ConstantPipe>()
             val outputIds = mutableListOf<String>()
@@ -295,7 +305,7 @@ open class Pipeline constructor(
 
             return Pipeline(
                 stepId,
-                name,
+                debugName,
                 steps,
                 inputsToConstants(inputsJSON, pipelineJSON),
                 outputs
