@@ -29,7 +29,7 @@ services:
       - USERDATA_LOCATION=/userdata
       - PIPELINES_LOCATION=/pipelines
       - OUTPUT_LOCATION=/output
-      - HOST_PATH=${PWD}
+      - HOST_PATH=${PIPELINE_REPO_PATH}
 
   runner-r:
     container_name: biab-runner-r
