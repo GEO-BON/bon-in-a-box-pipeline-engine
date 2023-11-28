@@ -23,10 +23,6 @@ To run:
 
 2. Provide an environment file named `runner.env` in the root folder with the following keys
     ```
-    # Windows only - path to the root directory of the project with forward slashes
-    # Uncomment line and specify path with forward slashes such as PWD=/c/Users/me/biab-2.0
-    #PWD=
-
     # Access the planetary computer APIs
     JUPYTERHUB_API_TOKEN=
     DASK_GATEWAY__AUTH__TYPE=
