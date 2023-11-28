@@ -54,7 +54,7 @@ function help {
 # Run your docker commands on the server manually.
 # `command <command>` with command such as pull/run/up/down/build/logs...
 function command { # args appended to the docker compose command
-   docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml --env-file .server/.prod-paths.env $@
+   docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml --env-file runner.env --env-file .server/.prod-paths.env $@
 }
 
 function validate {
@@ -115,11 +115,17 @@ function up {
     command pull ; assertSuccess
 
     echo "Starting the server..."
-    command up -d |& grep "is already in use by container"
-    if [[ $? -eq 0 ]] ; then # Container conflict, perform clean and try again.
+    output=$(command up $@); returnCode=$?; 
+    echo "ReturnCode=$returnCode, output is $output"
+    if [[ $output == *"is already in use by container"* ]] ; then 
+    # Container conflict, perform clean and try again.
         clean
         echo "Starting the server after a clean..."
-        command up -d ; assertSuccess
+        command up $@ ; assertSuccess
+    else # No container conflict, check the return code
+        if [[ $returnCode -ne 0 ]] ; then
+            echo -e "${RED}FAILED${ENDCOLOR}" ; exit 1
+        fi
     fi
 
     echo -e "${GREEN}Server is running.${ENDCOLOR}"
@@ -147,7 +153,8 @@ case "$1" in
         checkout $2 
         ;;
     up)
-        up
+        shift
+        up $@
         ;;
     down)
         down
