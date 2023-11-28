@@ -147,8 +147,7 @@ case "$1" in
         checkout $2 
         ;;
     up)
-        shift
-        up $@
+        up
         ;;
     down)
         down
