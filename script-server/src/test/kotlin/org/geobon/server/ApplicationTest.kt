@@ -39,8 +39,7 @@ class ApplicationTest {
             assertTrue(jsonResult.length() > 0)
             assertTrue(jsonResult.has("helloWorld.json"))
 
-            // Todo: Pipelines will eventually have names too
-            assertEquals("helloWorld.json", jsonResult.getString("helloWorld.json"))
+            assertEquals("Hello World pipeline", jsonResult.getString("helloWorld.json"))
         }
 
         var id:String

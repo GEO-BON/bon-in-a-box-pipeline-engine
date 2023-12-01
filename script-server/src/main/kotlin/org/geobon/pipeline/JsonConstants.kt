@@ -28,3 +28,4 @@ const val INPUTS__EXAMPLE = "example"
 
 const val OUTPUTS = "outputs"
 const val METADATA = "metadata"
+const val METADATA__NAME = "name"
