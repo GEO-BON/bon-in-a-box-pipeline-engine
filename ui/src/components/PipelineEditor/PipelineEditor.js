@@ -1,6 +1,7 @@
 import "react-flow-renderer/dist/style.css";
 import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
+import { TextField, Button, Modal, Box, Typography } from '@mui/material';
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactFlow, {
@@ -59,16 +60,16 @@ export default function PipelineEditor(props) {
   const [selectedNodes, setSelectedNodes] = useState(null);
   const [inputList, setInputList] = useState([]);
   const [outputList, setOutputList] = useState([]);
-  const [metadata, setMetadata] = useState("")
+  const [metadata, setMetadata] = useState("");
+  const [currentFileName, setCurrentFileName] = useState("");
 
   const [editSession, setEditSession] = useState(Math.random());
 
   const [toolTip, setToolTip] = useState(null);
-
+  const [tempList, setTempList] = useState([]);
   const [popupMenuPos, setPopupMenuPos] = useState({ x: 0, y: 0 });
   const [popupMenuOptions, setPopupMenuOptions] = useState();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [fileName, setFileName] = useState('');
+  const [openSaveServer, setOpenSaveServer] = useState(false);
 
   // We need this since the functions passed through node data retain their old selectedNodes state.
   // Note that the stratagem fails if trying to add edges from many sources at the same time.
@@ -560,7 +561,11 @@ export default function PipelineEditor(props) {
         });
       }
       else if (saveType === "server") {
-        api.savePipeline(fileName, JSON.stringify(flow, null, 2), (error, data, response) => {
+        let fileNameWithoutExtension = currentFileName;
+        if (fileNameWithoutExtension.endsWith(".json")) {
+          fileNameWithoutExtension = currentFileName.slice(0, -5);
+        }
+        api.savePipeline(fileNameWithoutExtension, JSON.stringify(flow, null, 2), (error, data, response) => {
           if (error) {
             if (response && response.text) alert(response.text);
             else alert(error.toString());
@@ -571,7 +576,7 @@ export default function PipelineEditor(props) {
         });
       }
     }
-  }, [reactFlowInstance, inputList, outputList, metadata,fileName]);
+  }, [reactFlowInstance, inputList, outputList, metadata,currentFileName]);
 
   const onLoadFromFileBtnClick = () => inputFile.current.click(); // will call onLoad
 
@@ -585,7 +590,8 @@ export default function PipelineEditor(props) {
       fr.readAsText(file);
       fr.onload = (loadEvent) =>
         onLoadFlow(JSON.parse(loadEvent.target.result));
-
+      console.log('file name ',file.name)
+      setCurrentFileName(file.name);
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
     }
@@ -609,7 +615,8 @@ export default function PipelineEditor(props) {
               if (error) {
                 if (response && response.text) alert(response.text);
                 else alert(error.toString());
-              } else {
+              } else { 
+                setCurrentFileName(descriptionFile);
                 onLoadFlow(data);
               }
             });
@@ -728,18 +735,32 @@ export default function PipelineEditor(props) {
     onPopupMenu
   ]);
 
-  const openModal = () => {
-    setFileName('');
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const openSaveModal = () => {
+    setOpenSaveServer(true);
   };
 
   const handleSaveFileToServer = () => {
-    onSave("server");
-    closeModal();
+    api.getListOf("pipeline", (error, pipelineList, response) => {
+      if (error) {
+        console.error(error);
+      } else {
+        const pipelineValues = Object.values(pipelineList);
+        console.log(pipelineValues)
+        console.log(currentFileName)
+        if (pipelineValues.includes(currentFileName)) {
+          console.log("yes");
+        }
+        onSave('server');
+      }
+    });
+    
+  };
+  const handleClose = () => {
+    setOpenSaveServer(false);
+  };
+
+  const handleSaveFormTextChange = (event) => {
+    setCurrentFileName(event.target.value);
   };
 
   return (
@@ -754,22 +775,44 @@ export default function PipelineEditor(props) {
           the documentation
         </a>
       </p>
-      {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2>Enter File Name</h2>
-            <p>(without extension)</p>
-            <input
-              type="text"
-              placeholder="Save As..."
-              value={fileName}
-              onChange={(e) => setFileName(e.target.value)}
-            />
-            <button onClick={handleSaveFileToServer}>Save</button>
-            <button onClick={closeModal}>Cancel</button>
-          </div>
-        </div>
-      )}
+        <Modal
+        open={openSaveServer}
+        onClose={handleClose}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            border: '2px solid #000',
+            boxShadow: 24,
+            p: 4,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column'
+          }}
+        >
+          <Typography id="modal-title" variant="h6" component="h2">
+            Modal Title
+          </Typography>
+          <Typography id="modal-description" sx={{ mt: 2 }}>
+            This is the content of the modal. You can place any content here.
+          </Typography>
+          <TextField
+            label="Enter file name"
+            variant="outlined"
+            value={currentFileName}
+            onChange={handleSaveFormTextChange}
+          />
+          <Button onClick={handleSaveFileToServer}>Save</Button>
+        </Box>
+      </Modal>
       <div className="dndflow">
         <ReactFlowProvider>
           <div className="reactflow-wrapper" ref={reactFlowWrapper}>
@@ -805,7 +848,7 @@ export default function PipelineEditor(props) {
                   Load from server
                 </button>
                 <button onClick={() => onSave("clipboard")}>Save to clipboard</button>
-                <button onClick={() => openModal()}>Save to server</button>
+                <button onClick={() => openSaveModal()}>Save to server</button>
               </div>
 
               <Controls />
