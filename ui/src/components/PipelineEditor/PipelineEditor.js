@@ -452,7 +452,7 @@ export default function PipelineEditor(props) {
             stepDescription.outputs &&
             stepDescription.outputs[edge.sourceHandle];
 
-          // When linkin an output to an input or a constant, the description will be undefined.
+          // When linking an output to an input or a constant, the description will be undefined.
           if (outputDescription === undefined) {
             let newNode = {};
             if (sourceNode.type === 'userInput') {
@@ -462,8 +462,8 @@ export default function PipelineEditor(props) {
                 description: input.description,
                 label: input.label,
                 example: input.example,
-                nodeId: getStepNodeId(outputNodeId),
-                outputId: getStepOutput(outputNodeId),
+                nodeId: edge.source,
+                outputId: "defaultOutput",
                 file: sourceNode.data.descriptionFile,
                 type: input.type
               }
@@ -474,25 +474,13 @@ export default function PipelineEditor(props) {
                 description: 'This constant has no description',
                 label: 'This constant has no label',
                 example: sourceNode.data.value,
-                nodeId: getStepNodeId(outputNodeId),
-                outputId: getStepOutput(outputNodeId),
-                // nodeId: edge.source,
+                nodeId: edge.source,
+                outputId: "defaultOutput",
                 // outputId: edge.sourceHandle,
                 file: sourceNode.data.descriptionFile,
               }
               newPipelineOutputs.push(newNode);
             }
-
-            // TODO: Why adding it already? There is another setOutputList below.
-            // FIXME: outputList should NOT be a dependency
-            const updateOutputList = outputList.map((output) => {
-              return (
-                (output.nodeId === getStepNodeId(outputNodeId) && output.outputId === getStepOutput(outputNodeId)) 
-                  ? newNode 
-                  : output
-              );
-            });
-            setOutputList(updateOutputList);
 
           } else {
             newPipelineOutputs.push({
