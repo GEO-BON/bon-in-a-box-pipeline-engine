@@ -1,9 +1,16 @@
+import React, { useEffect, useState } from 'react';
 import AutoResizeTextArea from './AutoResizeTextArea'
 
 export const ARRAY_PLACEHOLDER = 'Array (comma-separated)';
 export const CONSTANT_PLACEHOLDER = 'Constant';
 
 export default function ScriptInput({ type, value, options, onValueUpdated, cols, ...passedProps }) {
+
+  const [fieldValue, setFieldValue] = useState(value)
+
+  useEffect(() => {
+    setFieldValue(value || '')
+  }, [value])
 
   if(type.endsWith('[]')) {
     return <AutoResizeTextArea {...passedProps}
@@ -43,8 +50,10 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
         onChange={e => onValueUpdated(e.target.checked)}  />
 
     case 'int':
-      return <input type='text' {...passedProps} defaultValue={value}
+      console.log('ScriptInput', value, fieldValue)
+      return <input type='text' {...passedProps} value={fieldValue}
         placeholder={CONSTANT_PLACEHOLDER}
+        onChange={e => setFieldValue(e.target.value)}
         onKeyDown={e => { if (e.key === "Enter") onValueUpdated(parseInt(e.target.value)) }}
         onBlur={e => onValueUpdated(parseInt(e.target.value))} />
 

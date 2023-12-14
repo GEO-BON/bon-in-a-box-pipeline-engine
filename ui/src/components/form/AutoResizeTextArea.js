@@ -1,12 +1,17 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-export default function AutoResizeTextArea({defaultValue, keepWidth, className, ...props}) {
+export default function AutoResizeTextArea({ defaultValue, keepWidth, className, ...props }) {
 
-  const textAreaRef = useRef(null)
+  const textAreaRef = useRef(null);
+  const [value, setValue] = useState(defaultValue || ''); // Initialize with defaultValue prop
 
   useEffect(() => {
-    resize(textAreaRef.current)
-  }, [defaultValue, resize])
+    setValue(defaultValue || '');
+  }, [defaultValue]);
+
+  useEffect(() => {
+    resize(textAreaRef.current);
+  }, [value, resize]);
 
   /**
    * Automatic horizontal and vertical resizing of textarea
@@ -16,12 +21,22 @@ export default function AutoResizeTextArea({defaultValue, keepWidth, className, 
     input.style.height = 0;
     input.style.height = input.scrollHeight + "px";
 
-    if(!keepWidth) {
+    if (!keepWidth) {
       input.style.width = "auto";
       input.style.width = input.scrollWidth + "px";
     }
   }
 
-  return <textarea className={(className ? className + ' ' : '') + 'autoResize'} ref={textAreaRef} defaultValue={defaultValue} {...props} 
-    onChange={(e) => resize(e.target)} />;
+  return (
+    <textarea
+      className={(className ? className + ' ' : '') + 'autoResize'}
+      ref={textAreaRef}
+      value={value} // Use value instead of defaultValue
+      onChange={(e) => {
+        setValue(e.target.value); // Update state when the value changes
+        resize(e.target);
+      }}
+      {...props}
+    />
+  );
 }

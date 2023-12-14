@@ -327,7 +327,7 @@ export default function PipelineEditor(props) {
 
       setInputList((previousInputs) => {
         let newUserInputs = [];
-
+   
         allNodes.forEach((node) => {
           if (node.data) {
             if (node.type === "userInput") {
@@ -437,9 +437,10 @@ export default function PipelineEditor(props) {
     let newPipelineOutputs = [];
     allNodes.forEach((node) => {
       if (node.type === "output") {
-        const connectedEdges = getConnectedEdges([node], edges);
+        const outputNodeId = node.id;
+        const connectedEdges = getConnectedEdges([node], edges); //returns all edges connected to the output node
         connectedEdges.forEach((edge) => {
-          const sourceNode = allNodes.find((n) => n.id === edge.source); // Always 1
+          const sourceNode = allNodes.find((n) => n.id === edge.source); // Always 1, you get the source node
 
           // outputDescription may be null if stepDescription not yet available.
           // This is ok when loading since we rely on the saved description anyways.
@@ -451,12 +452,56 @@ export default function PipelineEditor(props) {
             stepDescription.outputs &&
             stepDescription.outputs[edge.sourceHandle];
 
-          newPipelineOutputs.push({
-            ...outputDescription, // shallow clone
-            nodeId: edge.source,
-            outputId: edge.sourceHandle,
-            file: sourceNode.data.descriptionFile,
-          });
+          // When linkin an output to an input or a constant, the description will be undefined.
+          if (outputDescription === undefined) {
+            let newNode = {};
+            if (sourceNode.type === 'userInput') {
+              // look for node in inputList
+              const input = inputList.find((input) => input.nodeId === sourceNode.id);
+              newNode = {
+                description: input.description,
+                label: input.label,
+                example: input.example,
+                nodeId: getStepNodeId(outputNodeId),
+                outputId: getStepOutput(outputNodeId),
+                file: sourceNode.data.descriptionFile,
+                type: input.type
+              }
+              newPipelineOutputs.push(newNode);
+
+            } else if (sourceNode.type === 'constant') {
+              newNode = {
+                description: 'This constant has no description',
+                label: 'This constant has no label',
+                example: sourceNode.data.value,
+                nodeId: getStepNodeId(outputNodeId),
+                outputId: getStepOutput(outputNodeId),
+                // nodeId: edge.source,
+                // outputId: edge.sourceHandle,
+                file: sourceNode.data.descriptionFile,
+              }
+              newPipelineOutputs.push(newNode);
+            }
+
+            // TODO: Why adding it already? There is another setOutputList below.
+            // FIXME: outputList should NOT be a dependency
+            const updateOutputList = outputList.map((output) => {
+              return (
+                (output.nodeId === getStepNodeId(outputNodeId) && output.outputId === getStepOutput(outputNodeId)) 
+                  ? newNode 
+                  : output
+              );
+            });
+            setOutputList(updateOutputList);
+
+          } else {
+            newPipelineOutputs.push({
+              ...outputDescription, // shallow clone
+              nodeId: edge.source,
+              outputId: edge.sourceHandle,
+              file: sourceNode.data.descriptionFile,
+            });
+          }
         });
       }
     });
@@ -474,7 +519,8 @@ export default function PipelineEditor(props) {
           : newOutput;
       })
     );
-  }, [edges, reactFlowInstance, setOutputList]);
+  }, [edges, inputList, reactFlowInstance, setOutputList, onConstantValueChange]);
+  // TODO: inputlistVariable needs to be refreshed, but we know that it will not add a new output... can we prevent re-execution?
 
   const onLayout = useCallback(() => {
     layoutElements(
