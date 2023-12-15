@@ -455,15 +455,9 @@ export default function PipelineEditor(props) {
           if (outputDescription === undefined) {
             let newNode = {};
             if (sourceNode.type === 'userInput') {
-              // look for node in inputList
-              const input = inputList.find((input) => input.nodeId === sourceNode.id);
-              newNode = {
-                description: input.description,
-                label: input.label,
-                example: input.example,
+              newNode = { // Will be populated from userInput in below hook
                 nodeId: edge.source,
-                outputId: "defaultOutput",
-                type: input.type
+                outputId: "defaultOutput"
               }
               newPipelineOutputs.push(newNode);
 
@@ -472,10 +466,13 @@ export default function PipelineEditor(props) {
                 description: 'This constant has no description',
                 label: 'This constant has no label',
                 example: sourceNode.data.value,
+                type: sourceNode.data.type,
                 nodeId: edge.source,
                 outputId: "defaultOutput",
               }
               newPipelineOutputs.push(newNode);
+            } else {
+              console.error("Failed to load undefined output")
             }
 
           } else {
@@ -503,8 +500,33 @@ export default function PipelineEditor(props) {
           : newOutput;
       })
     );
-  }, [edges, inputList, reactFlowInstance, setOutputList, onConstantValueChange]);
-  // TODO: inputlistVariable needs to be refreshed, but we know that it will not add a new output... can we prevent re-execution?
+    // Everytime the edge changes, there might be a new connection to an output block.
+  }, [edges, reactFlowInstance, setOutputList]);
+
+  // Fill newly connected outputs to userInputs
+  useEffect(() => {
+    let newOutputFromUserInput = outputList.find(o => o.label === undefined)
+    if(newOutputFromUserInput) {
+      let matchingInput = inputList.find(i => i.nodeId === newOutputFromUserInput.nodeId)
+      if(matchingInput) {
+        setOutputList(prevOutputs => 
+          prevOutputs.map(prevOutput => {
+            if(prevOutput.nodeId === newOutputFromUserInput.nodeId) {
+              return {
+                ...prevOutput,
+                label: matchingInput.label,
+                description: matchingInput.description,
+                example: matchingInput.example,
+                type: matchingInput.type,
+              }
+            } else {
+              return prevOutput
+            }
+          })
+        )
+      }
+    }
+  }, [inputList, outputList, setOutputList]);
 
   const onLayout = useCallback(() => {
     layoutElements(
