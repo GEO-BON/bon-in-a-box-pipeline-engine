@@ -453,23 +453,20 @@ export default function PipelineEditor(props) {
 
           // When linking an output to an input or a constant, the description will be undefined.
           if (outputDescription === undefined) {
-            let newNode = {};
+            let newNode = {
+              nodeId: edge.source,
+              outputId: "defaultOutput"
+            };
+
             if (sourceNode.type === 'userInput') {
-              newNode = { // Will be populated from userInput in below hook
-                nodeId: edge.source,
-                outputId: "defaultOutput"
-              }
+              // Rest of fields will be populated from userInput in below hook
               newPipelineOutputs.push(newNode);
 
             } else if (sourceNode.type === 'constant') {
-              newNode = {
-                description: 'This constant has no description',
-                label: 'This constant has no label',
-                example: sourceNode.data.value,
-                type: sourceNode.data.type,
-                nodeId: edge.source,
-                outputId: "defaultOutput",
-              }
+              newNode['description'] = 'This constant has no description'
+              newNode['label'] = 'This constant has no label'
+              newNode['example'] = sourceNode.data.value
+              newNode['type'] = sourceNode.data.type
               newPipelineOutputs.push(newNode);
             } else {
               console.error("Failed to load undefined output")
