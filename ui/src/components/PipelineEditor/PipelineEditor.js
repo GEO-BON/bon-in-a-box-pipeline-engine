@@ -24,7 +24,7 @@ import {
   getUpstreamNodes,
   getDownstreamNodes,
 } from "./react-flow-utils/getConnectedNodes";
-import { getStepDescription } from "./StepDescriptionStore";
+import { fetchStepDescription, getStepDescription } from "./StepDescriptionStore";
 import {
   getStepNodeId,
   getStepOutput,
@@ -635,9 +635,24 @@ export default function PipelineEditor(props) {
     });
   };
 
-  const onLoadFlow = useCallback((flow) => {
+  const onLoadFlow = useCallback(async (flow) => {
     if (flow) {
       setEditSession(Math.random())
+
+      // Load script descriptions (this has to be done before adding inputs and outputs or a few weird side-effects will occur)
+      let callbacksRemaining = 0
+      flow.nodes.forEach(n => {
+        if(n.data && n.data.descriptionFile) {
+          callbacksRemaining++;
+          fetchStepDescription(n.data.descriptionFile, () => callbacksRemaining--);
+        }
+      })
+
+      let waitCount = 0 // Wait max 5s
+      while(callbacksRemaining > 0 && waitCount < 500){
+        await sleep(10)
+        waitCount++
+      }
 
       // Read metadata
       setMetadata(flow.metadata ? yaml.dump(flow.metadata) : "")
