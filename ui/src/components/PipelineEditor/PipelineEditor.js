@@ -525,6 +525,49 @@ export default function PipelineEditor(props) {
     }
   }, [inputList, outputList, setOutputList]);
 
+  // In some cases the inputList is changed because a label or a description of a userInput has changed. 
+  // If this userInput happens to be also an output, we want to update description and label.
+  useEffect(() => {
+    setOutputList(prevOutputs =>
+      prevOutputs.map(prevOutput => {
+        let matchingInput = inputList.find(i => i.nodeId === prevOutput.nodeId)
+        if (matchingInput) {
+          console.log("matchingInput", matchingInput)
+          return {
+            ...prevOutput,
+            description: matchingInput.description,
+            label: matchingInput.label,
+            example: matchingInput.example,
+          }
+        } else {
+          return prevOutput
+        }
+      })
+    );
+  }, [inputList, setOutputList]);
+
+/*
+  // In some cases the outputList is changed because a label or a description of a userInput has changed. 
+  // If this userInput being also an input, we want to update description and label.
+  useEffect(() => {
+    setInputList(prevInputs =>
+      prevInputs.map(prevInput => {
+        let matchingOutput = outputList.find(i => i.nodeId === prevInput.nodeId)
+        if (matchingOutput) {
+          console.log("matchingOutput", matchingOutput)
+          return {
+            ...prevInput,
+            description: matchingOutput.description,
+            label: matchingOutput.label,
+            example: matchingOutput.example,
+          }
+        } else {
+          return prevInput
+        }
+      })
+    );
+  }, [outputList, setInputList, setOutputList]);
+*/
   const onLayout = useCallback(() => {
     layoutElements(
       reactFlowInstance.getNodes(),
