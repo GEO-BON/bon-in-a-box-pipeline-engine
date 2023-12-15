@@ -15,7 +15,6 @@ export const IOListPane = ({
   editSession
 }) => {
   const [collapsedPane, setCollapsedPane] = useState(true);
-  console.log("IOListPane", inputList, outputList, selectedNodes);
   return (
     <div className={`rightPane ioList ${collapsedPane ? "paneCollapsed" : "paneOpen"}`}>
       <div className="collapseTab" onClick={() => setCollapsedPane(!collapsedPane)}>
@@ -116,10 +115,8 @@ function valueEdited(value, valueKey, io, setter) {
     if(previousIO.nodeId === io.nodeId
       && previousIO.inputId === io.inputId
       && previousIO.outputId === io.outputId) {
-        console.log('Match found:', io);
         newIO[valueKey] = value
       }
-      console.log('New IO:', newIO)
       return newIO
   }))
 }
