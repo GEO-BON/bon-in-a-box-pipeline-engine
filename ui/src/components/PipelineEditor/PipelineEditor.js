@@ -36,6 +36,7 @@ import sleep from "../../utils/Sleep";
 import { getFolderAndName } from "../StepDescription";
 import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
+import { useEffectIfChanged } from "../../utils/UseEffectIfChanged";
 
 const yaml = require('js-yaml');
 
@@ -546,10 +547,10 @@ export default function PipelineEditor(props) {
     );
   }, [inputList, setOutputList]);
 
-/*
+
   // In some cases the outputList is changed because a label or a description of a userInput has changed. 
   // If this userInput being also an input, we want to update description and label.
-  useEffect(() => {
+  useEffectIfChanged(() => {
     setInputList(prevInputs =>
       prevInputs.map(prevInput => {
         let matchingOutput = outputList.find(i => i.nodeId === prevInput.nodeId)
@@ -567,7 +568,7 @@ export default function PipelineEditor(props) {
       })
     );
   }, [outputList, setInputList, setOutputList]);
-*/
+
   const onLayout = useCallback(() => {
     layoutElements(
       reactFlowInstance.getNodes(),
