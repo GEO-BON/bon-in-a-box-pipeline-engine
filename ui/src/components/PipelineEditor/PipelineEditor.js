@@ -437,7 +437,6 @@ export default function PipelineEditor(props) {
     let newPipelineOutputs = [];
     allNodes.forEach((node) => {
       if (node.type === "output") {
-        const outputNodeId = node.id;
         const connectedEdges = getConnectedEdges([node], edges); //returns all edges connected to the output node
         connectedEdges.forEach((edge) => {
           const sourceNode = allNodes.find((n) => n.id === edge.source); // Always 1, you get the source node
@@ -464,7 +463,6 @@ export default function PipelineEditor(props) {
                 example: input.example,
                 nodeId: edge.source,
                 outputId: "defaultOutput",
-                file: sourceNode.data.descriptionFile,
                 type: input.type
               }
               newPipelineOutputs.push(newNode);
@@ -476,8 +474,6 @@ export default function PipelineEditor(props) {
                 example: sourceNode.data.value,
                 nodeId: edge.source,
                 outputId: "defaultOutput",
-                // outputId: edge.sourceHandle,
-                file: sourceNode.data.descriptionFile,
               }
               newPipelineOutputs.push(newNode);
             }
