@@ -528,10 +528,11 @@ export default function PipelineEditor(props) {
 
   // In some cases the inputList is changed because a label or a description of a userInput has changed. 
   // If this userInput happens to be also an output, we want to update description and label.
-  useEffect(() => {
+  useEffectIfChanged(() => {
     setOutputList(prevOutputs =>
       prevOutputs.map(prevOutput => {
-        let matchingInput = inputList.find(i => i.nodeId === prevOutput.nodeId)
+        // userInput have inputId undefined, we look for a matching node #
+        let matchingInput = inputList.find(i => i.inputId === undefined && i.nodeId === prevOutput.nodeId)
         if (matchingInput) {
           console.log("matchingInput", matchingInput)
           return {
@@ -553,8 +554,9 @@ export default function PipelineEditor(props) {
   useEffectIfChanged(() => {
     setInputList(prevInputs =>
       prevInputs.map(prevInput => {
-        let matchingOutput = outputList.find(i => i.nodeId === prevInput.nodeId)
-        if (matchingOutput) {
+        // userInput have inputId undefined, we look for a matching node #
+        let matchingOutput = outputList.find(i => i.inputId === undefined && i.nodeId === prevInput.nodeId)
+        if (matchingOutput && matchingOutput.label !== undefined) { // we do not want to trigger propagation for newly added nodes
           console.log("matchingOutput", matchingOutput)
           return {
             ...prevInput,

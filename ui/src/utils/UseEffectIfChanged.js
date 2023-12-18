@@ -1,6 +1,6 @@
 
 import { useEffect, useRef } from 'react';
-var array = require('lodash/array');
+var _lang = require('lodash/lang');
 
 export const useEffectIfChanged = (callback, dependencies) => {
     const prevDependenciesRef = useRef(dependencies);
@@ -10,10 +10,9 @@ export const useEffectIfChanged = (callback, dependencies) => {
     useEffect(() => {
       const dependenciesChanged =
         dependencies.length !== prevDependenciesRef.current.length ||
-        dependencies.some((dep, index) => array.isEqual(dep, prevDependenciesRef.current[index]));
+        dependencies.some((dep, index) => !_lang.isEqual(dep, prevDependenciesRef.current[index]));
   
       if (dependenciesChanged) {
-        console.log("changed!")
         callback();
         prevDependenciesRef.current = dependencies;
       } else {
