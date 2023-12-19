@@ -554,7 +554,7 @@ export default function PipelineEditor(props) {
     setInputList(prevInputs =>
       prevInputs.map(prevInput => {
         // userInput have inputId undefined, we look for a matching node #
-        let matchingOutput = outputList.find(i => i.inputId === undefined && i.nodeId === prevInput.nodeId)
+        let matchingOutput = outputList.find(o => prevInput.inputId === undefined && o.nodeId === prevInput.nodeId)
         if (matchingOutput && matchingOutput.label !== undefined) { // we do not want to trigger propagation for newly added nodes
           return {
             ...prevInput,
