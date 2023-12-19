@@ -328,7 +328,7 @@ export default function PipelineEditor(props) {
 
       setInputList((previousInputs) => {
         let newUserInputs = [];
-   
+
         allNodes.forEach((node) => {
           if (node.data) {
             if (node.type === "userInput") {
@@ -569,7 +569,7 @@ export default function PipelineEditor(props) {
         }
       })
     );
-  }, [outputList, setInputList, setOutputList]);
+  }, [outputList, setInputList]);
 
   const onLayout = useCallback(() => {
     layoutElements(

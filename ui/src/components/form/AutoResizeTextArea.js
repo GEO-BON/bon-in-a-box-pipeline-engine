@@ -18,7 +18,7 @@ export default function AutoResizeTextArea({ keepWidth, className, onChange, def
 
   const textAreaRef = useRef(null);
 
-  // Initial size
+  // Initial size, supports both controlled and uncontrolled modes
   useEffect(() => {
     resize(textAreaRef.current, keepWidth);
   }, [value, defaultValue, keepWidth]);
