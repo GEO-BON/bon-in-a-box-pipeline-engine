@@ -14,25 +14,27 @@ function resize(input, keepWidth) {
   }
 }
 
-export default function AutoResizeTextArea({ keepWidth, className, ...props }) {
+export default function AutoResizeTextArea({ keepWidth, className, onChange, defaultValue, value, ...props }) {
 
   const textAreaRef = useRef(null);
 
   // Initial size
   useEffect(() => {
     resize(textAreaRef.current, keepWidth);
-  }, [keepWidth]);
+  }, [value, defaultValue, keepWidth]);
 
   return (
     <textarea
+      value={value}
+      defaultValue={defaultValue}
       className={(className ? className + ' ' : '') + 'autoResize'}
       ref={textAreaRef}
       onChange={(e) => {
         resize(e.target, keepWidth);
 
         // Forwarding onChange event
-        if (typeof props.onChange === 'function') {
-          props.onChange(e)
+        if (typeof onChange === 'function') {
+          onChange(e)
         }
       }}
       {...props}
