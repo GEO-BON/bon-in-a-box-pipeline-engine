@@ -5,7 +5,6 @@ var _lang = require('lodash/lang');
 export const useEffectIfChanged = (callback, dependencies) => {
     const prevDependenciesRef = useRef(dependencies);
   
-  
     // Use effect if dependencies changed
     useEffect(() => {
       const dependenciesChanged =
@@ -15,8 +14,6 @@ export const useEffectIfChanged = (callback, dependencies) => {
       if (dependenciesChanged) {
         callback();
         prevDependenciesRef.current = dependencies;
-      } else {
-        console.log("did not change")
       }
     }, [dependencies, callback]);
   };

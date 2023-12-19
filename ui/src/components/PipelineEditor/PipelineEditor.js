@@ -534,7 +534,6 @@ export default function PipelineEditor(props) {
         // userInput have inputId undefined, we look for a matching node #
         let matchingInput = inputList.find(i => i.inputId === undefined && i.nodeId === prevOutput.nodeId)
         if (matchingInput) {
-          console.log("matchingInput", matchingInput)
           return {
             ...prevOutput,
             description: matchingInput.description,
@@ -557,7 +556,6 @@ export default function PipelineEditor(props) {
         // userInput have inputId undefined, we look for a matching node #
         let matchingOutput = outputList.find(i => i.inputId === undefined && i.nodeId === prevInput.nodeId)
         if (matchingOutput && matchingOutput.label !== undefined) { // we do not want to trigger propagation for newly added nodes
-          console.log("matchingOutput", matchingOutput)
           return {
             ...prevInput,
             description: matchingOutput.description,
