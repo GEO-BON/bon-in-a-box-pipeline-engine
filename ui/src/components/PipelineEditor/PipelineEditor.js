@@ -468,6 +468,7 @@ export default function PipelineEditor(props) {
               newNode['label'] = 'This constant has no label'
               newNode['example'] = sourceNode.data.value
               newNode['type'] = sourceNode.data.type
+              newNode['options'] = sourceNode.data.options
               newPipelineOutputs.push(newNode);
             } else {
               console.error("Failed to load undefined output")
@@ -516,6 +517,7 @@ export default function PipelineEditor(props) {
                 description: matchingInput.description,
                 example: matchingInput.example,
                 type: matchingInput.type,
+                options: matchingInput.options
               }
             } else {
               return prevOutput
