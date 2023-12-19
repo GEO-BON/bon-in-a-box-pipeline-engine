@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 /**
  * Automatic horizontal and vertical resizing of textarea
@@ -17,23 +17,23 @@ function resize(input, keepWidth) {
 export default function AutoResizeTextArea({ defaultValue, keepWidth, className, ...props }) {
 
   const textAreaRef = useRef(null);
-  const [value, setValue] = useState(defaultValue || ''); // Initialize with defaultValue prop
 
+  // Override value if default value changes
   useEffect(() => {
-    setValue(defaultValue || '');
+    textAreaRef.current.value = defaultValue || '';
   }, [defaultValue]);
 
+  // Initial size
   useEffect(() => {
     resize(textAreaRef.current, keepWidth);
-  }, [value, keepWidth]);
+  }, [keepWidth]);
 
   return (
     <textarea
       className={(className ? className + ' ' : '') + 'autoResize'}
       ref={textAreaRef}
-      value={value} // Use value instead of defaultValue
+      defaultValue={defaultValue}
       onChange={(e) => {
-        setValue(e.target.value); // Update state when the value changes
         resize(e.target, keepWidth);
       }}
       {...props}
