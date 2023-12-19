@@ -91,7 +91,7 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
       }
 
       if (fieldValue && fieldValue.includes("\n")) {
-        return <AutoResizeTextArea {...props} />
+        return <AutoResizeTextArea keepWidth={true} cols={cols} {...props} />
       } else {
         return <input type='text' {...props}
           onKeyDown={e => { if (e.key === "Enter") updateValue(e) }} />
