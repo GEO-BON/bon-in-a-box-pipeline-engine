@@ -10,10 +10,14 @@ export const useEffectIfChanged = (callback, dependencies) => {
       const dependenciesChanged =
         dependencies.length !== prevDependenciesRef.current.length ||
         dependencies.some((dep, index) => !_lang.isEqual(dep, prevDependenciesRef.current[index]));
-  
+
       if (dependenciesChanged) {
         callback();
-        prevDependenciesRef.current = dependencies;
       }
+
+      // Update the previous dependencies after the callback is executed
+      return () => {
+        prevDependenciesRef.current = dependencies;
+      };
     }, [dependencies, callback]);
   };
