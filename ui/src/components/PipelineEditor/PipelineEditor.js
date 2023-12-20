@@ -318,6 +318,21 @@ export default function PipelineEditor(props) {
     [reactFlowInstance, injectConstant, injectOutput, setNodes]
   );
 
+  // Descriptions may vary between all steps connected, we pick the one from the first outgoing edge.
+  const getDescriptionFromConnection = useCallback((allNodes, allEdges, sourceNode) => {
+    const edgeFound = allEdges.find(edge => sourceNode.id === edge.source)
+
+    if (edgeFound) {
+      const nodeFound = allNodes.find(n => edgeFound.target === n.id)
+      const stepDescription = getStepDescription(nodeFound.data.descriptionFile)
+
+      if (stepDescription && stepDescription.inputs) {
+        return stepDescription.inputs[edgeFound.targetHandle]
+      }
+    }
+    return undefined
+  }, [])
+
   /**
    * Refresh the list of "dangling" inputs that the user will need to provide.
    */
@@ -349,28 +364,11 @@ export default function PipelineEditor(props) {
                   nodeId: node.id
                 }
 
-                // Descriptions may vary between all steps connected, we pick the one from the first outgoing edge.
-                const edgeFound = allEdges.find(
-                  (edge) => node.id === edge.source
-                );
-                if (edgeFound) {
-                  const nodeFound = allNodes.find(
-                    (n) => edgeFound.target === n.id
-                  );
-                  const stepDescription = getStepDescription(
-                    nodeFound.data.descriptionFile
-                  );
-
-                  if (stepDescription && stepDescription.inputs) {
-                    const inputDescription =
-                      stepDescription.inputs[edgeFound.targetHandle];
-
-                    if (inputDescription) {
-                      // This will fill label, description, and other fields.
-                      Object.assign(toAdd, inputDescription)
-                      node.data.label = inputDescription.label;
-                    }
-                  }
+                const inputDescription = getDescriptionFromConnection(allNodes, allEdges, node)
+                if (inputDescription) {
+                  // This will fill label, description, and other fields.
+                  Object.assign(toAdd, inputDescription)
+                  node.data.label = inputDescription.label;
                 }
 
                 newUserInputs.push(toAdd);
@@ -417,7 +415,7 @@ export default function PipelineEditor(props) {
         return newUserInputs;
       });
     },
-    [setInputList]
+    [setInputList, getDescriptionFromConnection]
   );
 
   useEffect(() => {
@@ -469,7 +467,15 @@ export default function PipelineEditor(props) {
               newNode['example'] = sourceNode.data.value
               newNode['type'] = sourceNode.data.type
               newNode['options'] = sourceNode.data.options
+
+              const inputDescription = getDescriptionFromConnection(allNodes, reactFlowInstance.getEdges(), sourceNode)
+              if (inputDescription) {
+                // This will fill label, description, and other fields.
+                Object.assign(newNode, inputDescription)
+              }
+
               newPipelineOutputs.push(newNode);
+
             } else {
               console.error("Failed to load undefined output")
             }
@@ -500,7 +506,7 @@ export default function PipelineEditor(props) {
       })
     );
     // Everytime the edge changes, there might be a new connection to an output block.
-  }, [edges, reactFlowInstance, setOutputList]);
+  }, [edges, reactFlowInstance, setOutputList, getDescriptionFromConnection]);
 
   // Fill newly connected outputs to userInputs
   useEffect(() => {
