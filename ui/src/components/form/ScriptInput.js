@@ -50,6 +50,7 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
 
     case 'float':
       return <input type='number' step="any" {...passedProps} defaultValue={value}
+        className={`input-float ${passedProps.className ? passedProps.className : ''}`}
         placeholder={CONSTANT_PLACEHOLDER}
         onKeyDown={e => { if (e.key === "Enter") onValueUpdated(parseFloat(e.target.value)) }}
         onBlur={e => onValueUpdated(parseFloat(e.target.value))} />
