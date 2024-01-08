@@ -7,6 +7,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import kotlin.time.Duration
@@ -41,6 +43,7 @@ class ScriptRun( // Constructor used in single script run
     companion object {
         const val ERROR_KEY = "error"
         val DEFAULT_TIMEOUT = 1.hours
+        private val TIMESTAMP_FORMAT: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
     }
 
     suspend fun execute() {
@@ -86,8 +89,8 @@ class ScriptRun( // Constructor used in single script run
                 val cleanOption = System.getenv("SCRIPT_SERVER_CACHE_CLEANER")
                 logBuffer += (
                         "Script was updated, flushing the cache for this script with option $cleanOption.\n" +
-                        "Script time: ${scriptFile.lastModified()}\n" +
-                        "Result time: ${resultFile.lastModified()}\n"
+                        "Script timestamp: ${TIMESTAMP_FORMAT.format(Date(scriptFile.lastModified()))}\n" +
+                        "Result timestamp: ${TIMESTAMP_FORMAT.format(Date(resultFile.lastModified()))}\n"
                         ).also { logger.debug(it) }
 
                 when(cleanOption) {

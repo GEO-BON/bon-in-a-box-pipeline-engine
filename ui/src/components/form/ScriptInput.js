@@ -43,13 +43,14 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
         onChange={e => onValueUpdated(e.target.checked)}  />
 
     case 'int':
-      return <input type='text' {...passedProps} defaultValue={value}
+      return <input type='number' {...passedProps} defaultValue={value}
         placeholder={CONSTANT_PLACEHOLDER}
         onKeyDown={e => { if (e.key === "Enter") onValueUpdated(parseInt(e.target.value)) }}
         onBlur={e => onValueUpdated(parseInt(e.target.value))} />
 
     case 'float':
-      return <input type='text' {...passedProps} defaultValue={value}
+      return <input type='number' step="any" {...passedProps} defaultValue={value}
+        className={`input-float ${passedProps.className ? passedProps.className : ''}`}
         placeholder={CONSTANT_PLACEHOLDER}
         onKeyDown={e => { if (e.key === "Enter") onValueUpdated(parseFloat(e.target.value)) }}
         onBlur={e => onValueUpdated(parseFloat(e.target.value))} />
