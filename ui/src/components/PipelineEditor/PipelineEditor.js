@@ -745,10 +745,14 @@ export default function PipelineEditor(props) {
         console.error(error);
       } else {
         const pipelineValues = Object.values(pipelineList);
-        console.log(pipelineValues)
-        console.log(currentFileName)
         if (pipelineValues.includes(currentFileName)) {
-          console.log("yes");
+          const confirmation = window.confirm(
+            'This file name already exists. Do you want to continue and overwrite the existing file?'
+          );
+          if (!confirmation) {
+            // User chose not to continue, stop the save operation
+            return;
+          }
         }
         onSave('server');
       }
@@ -799,16 +803,17 @@ export default function PipelineEditor(props) {
           }}
         >
           <Typography id="modal-title" variant="h6" component="h2">
-            Modal Title
+            Saving to server
           </Typography>
           <Typography id="modal-description" sx={{ mt: 2 }}>
-            This is the content of the modal. You can place any content here.
+            Enter the name of the file you want to save to the server.
           </Typography>
           <TextField
             label="Enter file name"
             variant="outlined"
             value={currentFileName}
             onChange={handleSaveFormTextChange}
+            sx={{ mt: 2 }}
           />
           <Button onClick={handleSaveFileToServer}>Save</Button>
         </Box>
