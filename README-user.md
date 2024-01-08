@@ -13,9 +13,7 @@ Prerequisites :
 - **Windows:**
   - Docker Desktop
   - A Linux shell (git bash, [Bash through PowerShell](https://learn.microsoft.com/en-us/windows/wsl/install), cygwin, etc.) necessary to run th `.sh` scripts in the instructions below.
-- **Mac:** Docker Desktop.
-  - Make sure docker is added to the path of your terminal. From a terminal, run command `docker run hello-world`. If there is an error message, see [https://stackoverflow.com/a/71923962/3519951](https://stackoverflow.com/a/71923962/3519951).
-  - If you encounter error `no matching manifest for linux/arm64/v8 in the manifest list entries`, export DOCKER_DEFAULT_PLATFORM. See [https://stackoverflow.com/a/76404045/3519951](https://stackoverflow.com/a/76404045/3519951).
+- **Mac:** Docker Desktop
 - **Linux:** Docker with Docker Compose installed. It is recommended to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
 
 To run:
@@ -25,6 +23,10 @@ To run:
 
 2. Provide an environment file named `runner.env` in the root folder with the following keys
     ```
+    # Windows only - path to the root directory of the project with forward slashes
+    # Uncomment line and specify path with forward slashes such as PWD=/c/Users/me/biab-2.0
+    #PWD=
+
     # Access the planetary computer APIs
     JUPYTERHUB_API_TOKEN=
     DASK_GATEWAY__AUTH__TYPE=
@@ -70,7 +72,9 @@ When modifying pipelines in the /pipelines folder, servers do not need to be res
 - When adding or renaming pipelines, refresh the browser page.
 
 ## Running the servers remotely
-Use the [ansible playbook](ansible/README.md) instructions.
+1. Run the [ansible playbook](https://github.com/GEO-BON/biab-server/tree/main/ansible)
+2. Create a `runner.env` file on the server, as above.
+3. `./server-up.sh`
 
 ## Running a script or pipeline
 You have an instance of BON in a Box running, either [locally](#running-the-servers-locally) or [remotely](#running-the-servers-remotely), and you want to run your first script or pipeline.

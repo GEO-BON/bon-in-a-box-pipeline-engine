@@ -115,18 +115,11 @@ function up {
     command pull ; assertSuccess
 
     echo "Starting the server..."
-    output=$(command up -d $@ 2>&1); returnCode=$?; 
-    
-    if [[ $output == *"is already in use by container"* ]] ; then 
-        # Container conflict, perform clean and try again.
+    command up -d |& grep "is already in use by container"
+    if [[ $? -eq 0 ]] ; then # Container conflict, perform clean and try again.
         clean
         echo "Starting the server after a clean..."
-        command up $@ ; assertSuccess
-    else # No container conflict, check the return code
-        if [[ $returnCode -ne 0 ]] ; then
-            echo $output
-            echo -e "${RED}FAILED${ENDCOLOR}" ; exit 1
-        fi
+        command up -d ; assertSuccess
     fi
 
     echo -e "${GREEN}Server is running.${ENDCOLOR}"
@@ -154,8 +147,7 @@ case "$1" in
         checkout $2 
         ;;
     up)
-        shift
-        up $@
+        up
         ;;
     down)
         down
