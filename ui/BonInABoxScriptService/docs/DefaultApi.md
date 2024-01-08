@@ -10,6 +10,7 @@ Method | HTTP request | Description
 [**getPipeline**](DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
 [**getVersions**](DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
 [**run**](DefaultApi.md#run) | **POST** /{type}/{descriptionPath}/run | Runs the script or pipeline matching &#x60;descriptionPath&#x60;.
+[**savePipeline**](DefaultApi.md#savePipeline) | **POST** /pipeline/save/{filename} | Save a json file to the pipeline folder.
 [**stop**](DefaultApi.md#stop) | **GET** /{type}/{id}/stop | Stop the specified pipeline run.
 
 
@@ -278,6 +279,51 @@ No authorization required
 - **Accept**: text/plain
 
 
+## savePipeline
+
+> String savePipeline(filename, requestBody)
+
+Save a json file to the pipeline folder.
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+let filename = "filename_example"; // String | The name of the JSON file (without extension).
+let requestBody = {key: null}; // {String: Object} | Content of pipeline.json to save
+apiInstance.savePipeline(filename, requestBody, (error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **filename** | **String**| The name of the JSON file (without extension). | 
+ **requestBody** | [**{String: Object}**](Object.md)| Content of pipeline.json to save | 
+
+### Return type
+
+**String**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: text/plain
+
+
 ## stop
 
 > stop(type, id)
@@ -321,4 +367,3 @@ No authorization required
 
 - **Content-Type**: Not defined
 - **Accept**: Not defined
-

@@ -22,6 +22,21 @@ object Validator {
         }
     }
 
+    fun generateInputFromExamples(pipelineJSON: JSONObject): JSONObject {
+        val fakeInputs = JSONObject()
+        pipelineJSON.optJSONObject(INPUTS)?.let { inputsSpec ->
+            inputsSpec.keySet().forEach { key ->
+                inputsSpec.optJSONObject(key)?.let { inputSpec ->
+                    fakeInputs.put(
+                        key,
+                        inputSpec.opt(INPUTS__EXAMPLE) ?: JSONObject.NULL
+                    )
+                }
+            }
+        }
+        return fakeInputs
+    }
+
     fun validateAllPipelines(directory: File): String {
         var errorMessages = ""
         directory.listFiles()?.forEach { file ->
@@ -30,18 +45,9 @@ object Validator {
             } else if (file.extension == "json") {
                 try {
                     // Generate fake inputs
-                    val fakeInputs = JSONObject()
+
                     val pipelineJSON = JSONObject(file.readText())
-                    pipelineJSON.optJSONObject(INPUTS)?.let { inputsSpec ->
-                        inputsSpec.keySet().forEach { key ->
-                            inputsSpec.optJSONObject(key)?.let { inputSpec ->
-                                fakeInputs.put(
-                                    key,
-                                    inputSpec.opt(INPUTS__EXAMPLE) ?: JSONObject.NULL
-                                )
-                            }
-                        }
-                    }
+                    val fakeInputs = generateInputFromExamples(pipelineJSON)
 
                     // Run validation
                     createRootPipeline(file, fakeInputs.toString(2))

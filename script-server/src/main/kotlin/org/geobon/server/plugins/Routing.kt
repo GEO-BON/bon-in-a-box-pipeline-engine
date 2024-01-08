@@ -239,5 +239,57 @@ fun Application.configureRouting() {
                     ?.let { it.substring(0, it.lastIndexOf(':')).replace('T', ' ') }}
                 """.trimIndent())
         }
+
+
+        post("/pipeline/save/{filename}") {
+            if(System.getenv("SAVE_TO_SERVER") == "deny") {
+                call.respond(HttpStatusCode.ServiceUnavailable, "This server does not allow \"Save to server\" API.\n" +
+                        "Use \"Save to clipboard\" and submit file through git.")
+                return@post
+            }
+
+            val filename = call.parameters["filename"]!!
+                .replace("""\s*$FILE_SEPARATOR\s*""".toRegex(), "/") // Support sub-directories
+                .replace("../", "") // Avoid any attempt to access outside of pipelines directory
+                .trim() // Remove trailing whitespaces
+
+            val file = File(pipelinesRoot, "$filename.json")
+            if(file.nameWithoutExtension.isEmpty()){
+                call.respond(HttpStatusCode.BadRequest, "File name is empty.")
+                return@post
+            }
+
+            // Validate JSON (abort if fails)
+            val pipelineContent = call.receive<String>()
+            val pipelineJSON = try {
+                JSONObject(pipelineContent)
+            } catch (e:JSONException) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid JSON syntax.\n" +
+                        "${e.message}")
+                return@post
+            }
+
+            // Validate pipeline (warning if fails)
+            val fakeInputs = Validator.generateInputFromExamples(pipelineJSON)
+            var message = "Saved"
+            try {
+                createRootPipeline(filename, pipelineJSON, fakeInputs)
+            } catch (e:Exception) {
+                message = "Pipeline saved with errors:\n${e.message}"
+            }
+
+            // Save
+            try {
+                file.parentFile.mkdirs()
+                file.delete()
+                file.writeText(pipelineContent)
+            } catch (ex:Exception) {
+                logger.warn(ex.message)
+                call.respondText(text = "Failed to save pipeline.", status = HttpStatusCode.BadRequest)
+                return@post
+            }
+
+            call.respond(HttpStatusCode.OK, message)
+        }
     }
 }
