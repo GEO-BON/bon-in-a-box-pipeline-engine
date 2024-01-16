@@ -23,6 +23,7 @@ const val EDGE__TARGET_INPUT = "targetHandle"
 const val VIEWPORT = "viewport"
 
 const val INPUTS = "inputs"
+const val INPUTS__LABEL = "label"
 const val INPUTS__TYPE = "type"
 const val INPUTS__EXAMPLE = "example"
 

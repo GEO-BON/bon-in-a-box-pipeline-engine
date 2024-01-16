@@ -1,6 +1,7 @@
 package org.geobon.pipeline
 
 import org.geobon.script.Description.INPUTS
+import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
 import org.geobon.script.Description.TYPE
 import org.geobon.script.Description.TYPE_OPTIONS
@@ -111,6 +112,10 @@ abstract class YMLStep(
         if (previousValue == null) {
             super.dumpOutputFolders(allOutputs)
         }
+    }
+
+    override fun toString(): String {
+        return "${javaClass.simpleName} (id=$id, name=\"${yamlParsed[NAME]}\", file=${yamlFile.relativeTo(RunContext.scriptRoot)})"
     }
 
     companion object {

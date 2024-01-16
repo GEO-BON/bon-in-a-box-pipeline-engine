@@ -24,6 +24,12 @@ internal class ScriptStepTest {
     }
 
     @Test
+    fun toStringTest(){
+        val step = ScriptStep("0in1out.yml", StepId("StepId", "0"))
+        assertEquals("ScriptStep (id=StepId@0, name=\"0 in 1 out\", file=0in1out.yml)", step.toString())
+    }
+
+    @Test
     fun givenNoInput_whenExecute_thenNoInputFileIsGenerated_andOutputIsThere() = runTest {
         val step = ScriptStep(File(scriptRoot, "0in1out.yml"), StepId("script", "nodeId"))
         assertTrue(step.validateGraph().isEmpty())

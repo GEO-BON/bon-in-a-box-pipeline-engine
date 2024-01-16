@@ -20,7 +20,7 @@ class Output(override val type:String) : Pipe {
         }
         return value
             ?: throw RuntimeException("Output of type \"$type\" has not been set by " +
-                    step?.run { "${javaClass.simpleName} $id" })
+                    step?.toString())
     }
 
     override suspend fun pullIf(condition: (step: Step) -> Boolean): Any? {
