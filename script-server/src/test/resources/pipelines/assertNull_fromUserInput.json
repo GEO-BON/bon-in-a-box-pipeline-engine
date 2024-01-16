@@ -1,0 +1,77 @@
+{
+  "nodes": [
+    {
+      "id": "1",
+      "type": "io",
+      "position": {
+        "x": 415,
+        "y": 12
+      },
+      "data": {
+        "descriptionFile": "assertNull.yml"
+      }
+    },
+    {
+      "id": "2",
+      "type": "output",
+      "position": {
+        "x": 754,
+        "y": 8
+      },
+      "data": {
+        "label": "Output"
+      }
+    },
+    {
+      "id": "4",
+      "type": "userInput",
+      "position": {
+        "x": 86.5,
+        "y": 14
+      },
+      "dragHandle": ".dragHandle",
+      "data": {
+        "type": "text"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "1",
+      "sourceHandle": "the_same",
+      "target": "2",
+      "targetHandle": null,
+      "id": "reactflow__edge-1the_same-2"
+    },
+    {
+      "source": "4",
+      "sourceHandle": null,
+      "target": "1",
+      "targetHandle": "input",
+      "id": "reactflow__edge-4-1input"
+    }
+  ],
+  "inputs": {
+    "pipeline@4": {
+      "label": "Text input",
+      "description": "Some input, we use text as an example but could be other type.",
+      "type": "text"
+    }
+  },
+  "outputs": {
+    "assertNull.yml@1|the_same": {
+      "description": "The same value as in the inputs. But this crashes if not null!",
+      "label": "Same value",
+      "type": "text"
+    }
+  },
+  "metadata": {
+    "name": "Assert null from user input",
+    "description": "Checks that a user input can receive a null value",
+    "author": [
+      {
+        "name": "Jean-Michel Lord"
+      }
+    ]
+  }
+}
