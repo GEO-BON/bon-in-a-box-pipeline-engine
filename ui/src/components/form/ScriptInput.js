@@ -63,7 +63,7 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
         }} />
 
     case 'int':
-      return <input type='text' {...passedProps}
+      return <input type='number' {...passedProps}
         value={fieldValue}
         onChange={e => setFieldValue(e.target.value)}
         placeholder={CONSTANT_PLACEHOLDER}
@@ -71,9 +71,10 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
         onBlur={e => onValueUpdated(parseInt(e.target.value))} />
 
     case 'float':
-      return <input type='text' {...passedProps}
+      return <input type='number' step="any" {...passedProps}
         value={fieldValue}
         onChange={e => setFieldValue(e.target.value)}
+        className={`input-float ${passedProps.className ? passedProps.className : ''}`}
         placeholder={CONSTANT_PLACEHOLDER}
         onKeyDown={e => { if (e.key === "Enter") onValueUpdated(parseFloat(e.target.value)) }}
         onBlur={e => onValueUpdated(parseFloat(e.target.value))} />
