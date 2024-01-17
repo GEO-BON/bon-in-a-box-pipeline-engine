@@ -84,6 +84,10 @@ abstract class Step(
         inputs.values.forEach{it.dumpOutputFolders(allOutputs)}
     }
 
+    override fun toString(): String {
+        return "${javaClass.simpleName} (id=$id)"
+    }
+
     companion object {
         const val DEFAULT_IN = "defaultInput"
         const val DEFAULT_OUT = "defaultOutput"
