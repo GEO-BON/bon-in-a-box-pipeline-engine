@@ -36,6 +36,7 @@ import sleep from "../../utils/Sleep";
 import { getFolderAndName } from "../StepDescription";
 import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
+import { useEffectIfChanged } from "../../utils/UseEffectIfChanged";
 
 const yaml = require('js-yaml');
 
@@ -317,6 +318,21 @@ export default function PipelineEditor(props) {
     [reactFlowInstance, injectConstant, injectOutput, setNodes]
   );
 
+  // Descriptions may vary between all steps connected, we pick the one from the first outgoing edge.
+  const getDescriptionFromConnection = useCallback((allNodes, allEdges, sourceNode) => {
+    const edgeFound = allEdges.find(edge => sourceNode.id === edge.source)
+
+    if (edgeFound) {
+      const nodeFound = allNodes.find(n => edgeFound.target === n.id)
+      const stepDescription = getStepDescription(nodeFound.data.descriptionFile)
+
+      if (stepDescription && stepDescription.inputs) {
+        return stepDescription.inputs[edgeFound.targetHandle]
+      }
+    }
+    return undefined
+  }, [])
+
   /**
    * Refresh the list of "dangling" inputs that the user will need to provide.
    */
@@ -348,28 +364,11 @@ export default function PipelineEditor(props) {
                   nodeId: node.id
                 }
 
-                // Descriptions may vary between all steps connected, we pick the one from the first outgoing edge.
-                const edgeFound = allEdges.find(
-                  (edge) => node.id === edge.source
-                );
-                if (edgeFound) {
-                  const nodeFound = allNodes.find(
-                    (n) => edgeFound.target === n.id
-                  );
-                  const stepDescription = getStepDescription(
-                    nodeFound.data.descriptionFile
-                  );
-
-                  if (stepDescription && stepDescription.inputs) {
-                    const inputDescription =
-                      stepDescription.inputs[edgeFound.targetHandle];
-
-                    if (inputDescription) {
-                      // This will fill label, description, and other fields.
-                      Object.assign(toAdd, inputDescription)
-                      node.data.label = inputDescription.label;
-                    }
-                  }
+                const inputDescription = getDescriptionFromConnection(allNodes, allEdges, node)
+                if (inputDescription) {
+                  // This will fill label, description, and other fields.
+                  Object.assign(toAdd, inputDescription)
+                  node.data.label = inputDescription.label;
                 }
 
                 newUserInputs.push(toAdd);
@@ -416,7 +415,7 @@ export default function PipelineEditor(props) {
         return newUserInputs;
       });
     },
-    [setInputList]
+    [setInputList, getDescriptionFromConnection]
   );
 
   useEffect(() => {
@@ -437,9 +436,9 @@ export default function PipelineEditor(props) {
     let newPipelineOutputs = [];
     allNodes.forEach((node) => {
       if (node.type === "output") {
-        const connectedEdges = getConnectedEdges([node], edges);
+        const connectedEdges = getConnectedEdges([node], edges); //returns all edges connected to the output node
         connectedEdges.forEach((edge) => {
-          const sourceNode = allNodes.find((n) => n.id === edge.source); // Always 1
+          const sourceNode = allNodes.find((n) => n.id === edge.source); // Always 1, you get the source node
 
           // outputDescription may be null if stepDescription not yet available.
           // This is ok when loading since we rely on the saved description anyways.
@@ -451,12 +450,44 @@ export default function PipelineEditor(props) {
             stepDescription.outputs &&
             stepDescription.outputs[edge.sourceHandle];
 
-          newPipelineOutputs.push({
-            ...outputDescription, // shallow clone
-            nodeId: edge.source,
-            outputId: edge.sourceHandle,
-            file: sourceNode.data.descriptionFile,
-          });
+          // When linking an output to an input or a constant, the description will be undefined.
+          if (outputDescription === undefined) {
+            let newNode = {
+              nodeId: edge.source,
+              outputId: "defaultOutput"
+            };
+
+            if (sourceNode.type === 'userInput') {
+              // Rest of fields will be populated from userInput in below hook
+              newPipelineOutputs.push(newNode);
+
+            } else if (sourceNode.type === 'constant') {
+              newNode['description'] = 'This constant has no description'
+              newNode['label'] = 'This constant has no label'
+              newNode['example'] = sourceNode.data.value
+              newNode['type'] = sourceNode.data.type
+              newNode['options'] = sourceNode.data.options
+
+              const inputDescription = getDescriptionFromConnection(allNodes, reactFlowInstance.getEdges(), sourceNode)
+              if (inputDescription) {
+                // This will fill label, description, and other fields.
+                Object.assign(newNode, inputDescription)
+              }
+
+              newPipelineOutputs.push(newNode);
+
+            } else {
+              console.error("Failed to load undefined output")
+            }
+
+          } else {
+            newPipelineOutputs.push({
+              ...outputDescription, // shallow clone
+              nodeId: edge.source,
+              outputId: edge.sourceHandle,
+              file: sourceNode.data.descriptionFile,
+            });
+          }
         });
       }
     });
@@ -474,7 +505,77 @@ export default function PipelineEditor(props) {
           : newOutput;
       })
     );
-  }, [edges, reactFlowInstance, setOutputList]);
+    // Everytime the edge changes, there might be a new connection to an output block.
+  }, [edges, reactFlowInstance, setOutputList, getDescriptionFromConnection]);
+
+  // Fill newly connected outputs to userInputs
+  useEffect(() => {
+    let newOutputFromUserInput = outputList.find(o => o.label === undefined)
+    if(newOutputFromUserInput) {
+      let matchingInput = inputList.find(i => i.nodeId === newOutputFromUserInput.nodeId)
+      if(matchingInput) {
+        setOutputList(prevOutputs => 
+          prevOutputs.map(prevOutput => {
+            if(prevOutput.nodeId === newOutputFromUserInput.nodeId) {
+              return {
+                ...prevOutput,
+                label: matchingInput.label,
+                description: matchingInput.description,
+                example: matchingInput.example,
+                type: matchingInput.type,
+                options: matchingInput.options
+              }
+            } else {
+              return prevOutput
+            }
+          })
+        )
+      }
+    }
+  }, [inputList, outputList, setOutputList]);
+
+  // In some cases the inputList is changed because a label or a description of a userInput has changed. 
+  // If this userInput happens to be also an output, we want to update description and label.
+  useEffectIfChanged(() => {
+    setOutputList(prevOutputs =>
+      prevOutputs.map(prevOutput => {
+        // userInput have inputId undefined, we look for a matching node #
+        let matchingInput = inputList.find(i => i.inputId === undefined && i.nodeId === prevOutput.nodeId)
+        if (matchingInput) {
+          return {
+            ...prevOutput,
+            description: matchingInput.description,
+            label: matchingInput.label,
+            example: matchingInput.example,
+          }
+        } else {
+          return prevOutput
+        }
+      })
+    );
+  }, [inputList, setOutputList]);
+
+
+  // In some cases the outputList is changed because a label or a description of a userInput has changed. 
+  // If this userInput being also an input, we want to update description and label.
+  useEffectIfChanged(() => {
+    setInputList(prevInputs =>
+      prevInputs.map(prevInput => {
+        // userInput have inputId undefined, we look for a matching node #
+        let matchingOutput = outputList.find(o => prevInput.inputId === undefined && o.nodeId === prevInput.nodeId)
+        if (matchingOutput && matchingOutput.label !== undefined) { // we do not want to trigger propagation for newly added nodes
+          return {
+            ...prevInput,
+            description: matchingOutput.description,
+            label: matchingOutput.label,
+            example: matchingOutput.example,
+          }
+        } else {
+          return prevInput
+        }
+      })
+    );
+  }, [outputList, setInputList]);
 
   const onLayout = useCallback(() => {
     layoutElements(
