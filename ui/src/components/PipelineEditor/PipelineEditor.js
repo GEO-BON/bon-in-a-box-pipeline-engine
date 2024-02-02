@@ -68,7 +68,7 @@ export default function PipelineEditor(props) {
   const [toolTip, setToolTip] = useState(null);
   const [popupMenuPos, setPopupMenuPos] = useState({ x: 0, y: 0 });
   const [popupMenuOptions, setPopupMenuOptions] = useState();
-  const [openSaveServer, setOpenSaveServer] = useState(false);
+  const [modal, setModal] = useState(null);
 
   // We need this since the functions passed through node data retain their old selectedNodes state.
   // Note that the stratagem fails if trying to add edges from many sources at the same time.
@@ -850,10 +850,10 @@ export default function PipelineEditor(props) {
   ]);
 
   const openSaveModal = () => {
-    setOpenSaveServer(true);
+    setModal('saveAs');
   };
 
-  const handleSaveFileToServer = () => {
+  const saveFileToServer = () => {
     api.getListOf("pipeline", (error, pipelineList, response) => {
       if (error) {
         console.error(error);
@@ -886,17 +886,19 @@ export default function PipelineEditor(props) {
           the documentation
         </a>
       </p>
+
       <Dialog
-        open={openSaveServer}
-        onClose={() => setOpenSaveServer(false)}
+        open={modal === 'saveAs'}
+        onClose={() => setModal(null)}
         PaperProps={{
           component: 'form',
           onSubmit: (event) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
+
+            setModal(null)
             setCurrentFileName(formData.get('fileName'))
-            handleSaveFileToServer()
-            setOpenSaveServer(false)
+            saveFileToServer()
           },
         }}
       >
@@ -919,10 +921,11 @@ export default function PipelineEditor(props) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenSaveServer(false)}>Cancel</Button>
+          <Button onClick={() => setModal(null)}>Cancel</Button>
           <Button type="submit">Save</Button>
         </DialogActions>
       </Dialog>
+
       <div className="dndflow">
         <ReactFlowProvider>
           <div className="reactflow-wrapper" ref={reactFlowWrapper}>
