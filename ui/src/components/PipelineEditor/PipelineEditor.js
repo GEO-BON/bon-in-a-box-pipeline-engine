@@ -849,17 +849,13 @@ export default function PipelineEditor(props) {
     onPopupMenu
   ]);
 
-  const openSaveModal = () => {
-    setModal('saveAs');
-  };
-
-  const saveFileToServer = () => {
+  const saveFileToServer = useCallback((descriptionFile) => {
     api.getListOf("pipeline", (error, pipelineList, response) => {
       if (error) {
         console.error(error);
       } else {
-        const pipelineValues = Object.values(pipelineList);
-        if (pipelineValues.includes(currentFileName)) {
+        const descriptionFiles = Object.keys(pipelineList);
+        if (descriptionFiles.includes(descriptionFile)) {
           const confirmation = window.confirm(
             'This file name already exists. Do you want to continue and overwrite the existing file?'
           );
@@ -871,8 +867,7 @@ export default function PipelineEditor(props) {
         onSave('server');
       }
     });
-    
-  };
+  }, [onSave]);
 
   return (
     <div id="editorLayout">
@@ -898,7 +893,7 @@ export default function PipelineEditor(props) {
 
             setModal(null)
             setCurrentFileName(formData.get('fileName'))
-            saveFileToServer()
+            saveFileToServer(formData.get('fileName'))
           },
         }}
       >
@@ -907,7 +902,7 @@ export default function PipelineEditor(props) {
           <TextField
             label="File name"
             type="text"
-            value={currentFileName}
+            defaultValue={currentFileName}
             id="fileName"
             name="fileName"
             autoFocus
@@ -959,7 +954,7 @@ export default function PipelineEditor(props) {
                   Load from server
                 </button>
                 <button onClick={() => onSave("clipboard")}>Save to clipboard</button>
-                <button onClick={() => openSaveModal()}>Save to server</button>
+                <button onClick={() => setModal('saveAs')}>Save to server</button>
               </div>
 
               <Controls />
