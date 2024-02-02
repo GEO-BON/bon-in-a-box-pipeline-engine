@@ -1,7 +1,7 @@
 import "react-flow-renderer/dist/style.css";
 import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
-import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, Snackbar } from '@mui/material';
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactFlow, {
@@ -69,6 +69,10 @@ export default function PipelineEditor(props) {
   const [popupMenuPos, setPopupMenuPos] = useState({ x: 0, y: 0 });
   const [popupMenuOptions, setPopupMenuOptions] = useState();
   const [modal, setModal] = useState(null);
+
+  const hideModal = useCallback((modalName) => {
+    setModal(currentModal => currentModal === modalName ? null : currentModal)
+  }, [setModal])
 
   // We need this since the functions passed through node data retain their old selectedNodes state.
   // Note that the stratagem fails if trying to add edges from many sources at the same time.
@@ -670,7 +674,7 @@ export default function PipelineEditor(props) {
             else alert(error.toString());
 
           } else {
-            alert("Pipeline saved to server.");
+            setModal('saveSuccess');
           }
         });
       }
@@ -884,14 +888,14 @@ export default function PipelineEditor(props) {
 
       <Dialog
         open={modal === 'saveAs'}
-        onClose={() => setModal(null)}
+        onClose={() => hideModal('saveAs')}
         PaperProps={{
           component: 'form',
           onSubmit: (event) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
 
-            setModal(null)
+            hideModal('saveAs')
             setCurrentFileName(formData.get('fileName'))
             saveFileToServer(formData.get('fileName'))
           },
@@ -914,10 +918,18 @@ export default function PipelineEditor(props) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setModal(null)}>Cancel</Button>
+          <Button onClick={() => hideModal('saveAs')}>Cancel</Button>
           <Button type="submit">Save</Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar open={modal === 'saveSuccess'}
+        autoHideDuration={3000} onClose={() => hideModal('saveSuccess')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success">Pipeline saved to server</Alert>
+      </Snackbar>
+      
 
       <div className="dndflow">
         <ReactFlowProvider>
