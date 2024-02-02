@@ -1,7 +1,7 @@
 import "react-flow-renderer/dist/style.css";
 import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
-import { TextField, Button, Modal, Box, Typography } from '@mui/material';
+import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactFlow, {
@@ -873,13 +873,6 @@ export default function PipelineEditor(props) {
     });
     
   };
-  const handleClose = () => {
-    setOpenSaveServer(false);
-  };
-
-  const handleSaveFormTextChange = (event) => {
-    setCurrentFileName(event.target.value);
-  };
 
   return (
     <div id="editorLayout">
@@ -893,45 +886,43 @@ export default function PipelineEditor(props) {
           the documentation
         </a>
       </p>
-      <Modal
+      <Dialog
         open={openSaveServer}
-        onClose={handleClose}
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
+        onClose={() => setOpenSaveServer(false)}
+        PaperProps={{
+          component: 'form',
+          onSubmit: (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            setCurrentFileName(formData.get('fileName'))
+            handleSaveFileToServer()
+            setOpenSaveServer(false)
+          },
+        }}
       >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: 'background.paper',
-            border: '2px solid #000',
-            boxShadow: 24,
-            p: 4,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexDirection: 'column'
-          }}
-        >
-          <Typography id="modal-title" variant="h6" component="h2">
-            Saving to server
-          </Typography>
-          <Typography id="modal-description" sx={{ mt: 2 }}>
-            Enter the name of the file you want to save to the server.
-          </Typography>
+        <DialogTitle>Save to server</DialogTitle>
+        <DialogContent>
           <TextField
-            label="Enter file name"
-            variant="outlined"
+            label="File name"
+            type="text"
             value={currentFileName}
-            onChange={handleSaveFormTextChange}
-            sx={{ mt: 2 }}
+            id="fileName"
+            name="fileName"
+            autoFocus
+            required
+            margin="dense"
+            fullWidth
+            variant="standard"
+            sx={{
+              width: '400px'
+            }}
           />
-          <Button onClick={handleSaveFileToServer}>Save</Button>
-        </Box>
-      </Modal>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenSaveServer(false)}>Cancel</Button>
+          <Button type="submit">Save</Button>
+        </DialogActions>
+      </Dialog>
       <div className="dndflow">
         <ReactFlowProvider>
           <div className="reactflow-wrapper" ref={reactFlowWrapper}>
