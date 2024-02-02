@@ -912,8 +912,6 @@ export default function PipelineEditor(props) {
             name="fileName"
             autoFocus
             required
-            margin="dense"
-            fullWidth
             variant="standard"
             sx={{
               width: '400px'
