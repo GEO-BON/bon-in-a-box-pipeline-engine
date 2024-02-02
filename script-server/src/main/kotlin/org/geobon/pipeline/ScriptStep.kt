@@ -52,10 +52,6 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
         return scriptRun.results
     }
 
-    override fun toString(): String {
-        return "ScriptStep(yamlFile=$yamlFile)"
-    }
-
     companion object {
         /**
          * runId to ScriptRun

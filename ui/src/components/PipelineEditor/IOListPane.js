@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import AutoResizeTextArea from "../form/AutoResizeTextArea";
+import { ControlledTextArea } from "../form/AutoResizeTextArea";
 import { toIOId } from "../../utils/IOId";
 import ScriptInput from "../form/ScriptInput";
 
@@ -44,15 +44,15 @@ export const IOListPane = ({
                   : ""}
               >
                 <p>
-                  <AutoResizeTextArea className="label" keepWidth={true}
+                  <ControlledTextArea className="label" keepWidth={true}
                     onBlur={e => valueEdited(e.target.value, "label", input, setInputList)}
                     onInput={preventNewLines}
-                    defaultValue={input.label}></AutoResizeTextArea>
+                    defaultValue={input.label} />
 
                   <br />
-                  <AutoResizeTextArea className="description" keepWidth={true}
+                  <ControlledTextArea className="description" keepWidth={true}
                     onBlur={e => valueEdited(e.target.value, "description", input, setInputList)}
-                    defaultValue={input.description}></AutoResizeTextArea>
+                    defaultValue={input.description} />
 
                   {input.type &&
                     <>
@@ -81,15 +81,15 @@ export const IOListPane = ({
                   : ""}
               >
                 <p>
-                  <AutoResizeTextArea className="label" keepWidth={true}
+                  <ControlledTextArea className="label" keepWidth={true}
                     onBlur={e => valueEdited(e.target.value, "label", output, setOutputList)}
                     onInput={preventNewLines}
-                    defaultValue={output.label}></AutoResizeTextArea>
+                    defaultValue={output.label} />
 
                   <br />
-                  <AutoResizeTextArea className="description" keepWidth={true}
+                  <ControlledTextArea className="description" keepWidth={true}
                     onBlur={e => valueEdited(e.target.value, "description", output, setOutputList)}
-                    defaultValue={output.description}></AutoResizeTextArea>
+                    defaultValue={output.description} />
 
                   {output.type &&
                     <>
@@ -117,7 +117,6 @@ function valueEdited(value, valueKey, io, setter) {
       && previousIO.outputId === io.outputId) {
         newIO[valueKey] = value
       }
-
       return newIO
   }))
 }

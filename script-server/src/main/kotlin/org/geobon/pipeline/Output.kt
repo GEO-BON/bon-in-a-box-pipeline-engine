@@ -1,9 +1,13 @@
 package org.geobon.pipeline
 
 class Output(override val type:String) : Pipe {
-
+    private var isInit = false
     var step: Step? = null
     var value: Any? = null
+        set(newValue) {
+            isInit = true
+            field = newValue
+        }
 
     fun getId():IOId {
         step?.let { step ->
@@ -13,14 +17,15 @@ class Output(override val type:String) : Pipe {
         } ?: throw RuntimeException("Output of type $type disconnected from any step when calling findId()")
     }
 
-    override suspend fun pull(): Any {
-        if(value == null) {
+    override suspend fun pull(): Any? {
+        if(!isInit) {
             step?.execute()
                 ?: throw RuntimeException("Output of type $type disconnected from any step when pulling")
         }
-        return value
-            ?: throw RuntimeException("Output of type \"$type\" has not been set by " +
-                    step?.run { "${javaClass.simpleName} $id" })
+
+        // Hopefully now it has been initialized
+        return if(isInit) value else
+            throw RuntimeException("Output of type \"$type\" has not been set by $step")
     }
 
     override suspend fun pullIf(condition: (step: Step) -> Boolean): Any? {
@@ -43,7 +48,7 @@ class Output(override val type:String) : Pipe {
     }
 
     override fun toString(): String {
-        return "Output(type='$type', value=$value)"
+        return "Output(type='$type', value=$value, step=${step?.id})"
     }
 
 }

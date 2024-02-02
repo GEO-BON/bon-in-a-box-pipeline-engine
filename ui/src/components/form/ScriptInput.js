@@ -1,32 +1,49 @@
+import React, { useEffect, useState } from 'react';
 import AutoResizeTextArea from './AutoResizeTextArea'
 
 export const ARRAY_PLACEHOLDER = 'Array (comma-separated)';
 export const CONSTANT_PLACEHOLDER = 'Constant';
 
+function joinIfArray(value) {
+  return value &&
+    typeof value.join === 'function' ? value.join(', ') : value
+}
+
 export default function ScriptInput({ type, value, options, onValueUpdated, cols, ...passedProps }) {
 
-  if(type.endsWith('[]')) {
+  const [fieldValue, setFieldValue] = useState(value || '')
+
+  useEffect(() => {
+    setFieldValue(value || '')
+  }, [value])
+
+  if (type.endsWith('[]')) {
     return <AutoResizeTextArea {...passedProps}
-        defaultValue={value && typeof value.join === 'function' ? value.join(', ') : value}
-        placeholder={ARRAY_PLACEHOLDER}
-        keepWidth={true}
-        cols={cols}
-        onBlur={e => {
-          const value = e.target.value
-          if(!value || value === "") {
-            onValueUpdated([])
-          } else {
-            onValueUpdated(e.target.value.split(',').map(v=>v.trim()))}
-          }
-        } />
+      value={joinIfArray(fieldValue)}
+      onChange={e => setFieldValue(e.target.value)}
+      placeholder={ARRAY_PLACEHOLDER}
+      keepWidth={true}
+      cols={cols}
+      onBlur={e => {
+        const newValue = e.target.value
+        if (!newValue || newValue === "") {
+          onValueUpdated([])
+        } else {
+          onValueUpdated(e.target.value.split(',').map(v => v.trim()))
+        }
+      }}
+    />
   }
 
   switch (type) {
     case 'options':
       if (options) {
         return <select {...passedProps}
-          value={value}
-          onChange={e => onValueUpdated(e.target.value)}>
+          value={fieldValue}
+          onChange={e => {
+            setFieldValue(e.target.value)
+            onValueUpdated(e.target.value)
+          }}>
           <option hidden></option> {/* Allows the box to be empty when value not set */}
           {options.map(choice =>
             <option key={choice} value={choice}>{choice}</option>
@@ -39,17 +56,24 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
 
     case 'boolean':
       return <input type='checkbox' {...passedProps}
-        defaultChecked={value}
-        onChange={e => onValueUpdated(e.target.checked)}  />
+        checked={fieldValue}
+        onChange={e => {
+          setFieldValue(e.target.checked)
+          onValueUpdated(e.target.checked)
+        }} />
 
     case 'int':
-      return <input type='number' {...passedProps} defaultValue={value}
+      return <input type='number' {...passedProps}
+        value={fieldValue}
+        onChange={e => setFieldValue(e.target.value)}
         placeholder={CONSTANT_PLACEHOLDER}
         onKeyDown={e => { if (e.key === "Enter") onValueUpdated(parseInt(e.target.value)) }}
         onBlur={e => onValueUpdated(parseInt(e.target.value))} />
 
     case 'float':
-      return <input type='number' step="any" {...passedProps} defaultValue={value}
+      return <input type='number' step="any" {...passedProps}
+        value={fieldValue}
+        onChange={e => setFieldValue(e.target.value)}
         className={`input-float ${passedProps.className ? passedProps.className : ''}`}
         placeholder={CONSTANT_PLACEHOLDER}
         onKeyDown={e => { if (e.key === "Enter") onValueUpdated(parseFloat(e.target.value)) }}
@@ -60,16 +84,17 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
       const updateValue = e => onValueUpdated(/^(null)?$/i.test(e.target.value) ? null : e.target.value)
 
       const props = {
-        defaultValue: value,
+        value: fieldValue,
+        onChange: e => setFieldValue(e.target.value),
         placeholder: 'null',
         onBlur: updateValue,
         ...passedProps
       }
 
-      if (value && value.includes("\n")) {
-        return <AutoResizeTextArea {...props} />
+      if (fieldValue && fieldValue.includes("\n")) {
+        return <AutoResizeTextArea keepWidth={true} cols={cols} {...props} />
       } else {
-        return <input type='text' {...props} 
+        return <input type='text' {...props}
           onKeyDown={e => { if (e.key === "Enter") updateValue(e) }} />
       }
   }

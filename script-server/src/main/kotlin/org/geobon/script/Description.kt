@@ -7,6 +7,7 @@ package org.geobon.script
 object Description {
     // General script description
     const val SCRIPT = "script"
+    const val NAME = "name"
     const val INPUTS = "inputs"
     const val OUTPUTS = "outputs"
     const val TIMEOUT = "timeout"

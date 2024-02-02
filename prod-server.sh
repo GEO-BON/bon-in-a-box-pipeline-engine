@@ -87,6 +87,7 @@ function validate {
         echo -e "${GREEN}Validation complete.${ENDCOLOR}"
     else 
         echo -e "${RED}Errors occured during validation. Check logs above.${ENDCOLOR}"
+        exit 1
     fi
 }
 

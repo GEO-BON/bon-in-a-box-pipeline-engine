@@ -196,11 +196,18 @@ internal class PipelineTest {
     }
 
     @Test
-    fun `given a pipeline with userInput string_when ran_then input fed to child steps`() = runTest {
+    fun `given a pipeline with userInput string_when ran_then input fed to first step`() = runTest {
         val pipeline = createRootPipeline("userInput.json", """ { "pipeline@1": 10} """)
         pipeline.pullFinalOutputs()
         assertTrue(pipeline.getPipelineOutputs()[0].pull() == 11)
         assertTrue(pipeline.getPipelineOutputs()[1].pull() == 12)
+    }
+
+    @Test
+    fun `given a pipeline with userInput null_when ran_then null fed to first step`() = runTest {
+        val pipeline = createRootPipeline("assertNull_fromUserInput.json", """ { "pipeline@4": null} """)
+        pipeline.pullFinalOutputs()
+        assertTrue(pipeline.getPipelineOutputs()[0].pull() == null)
     }
 
     @Test

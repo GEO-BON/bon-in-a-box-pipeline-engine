@@ -252,8 +252,15 @@ open class Pipeline constructor(
                         NODE__TYPE_USER_INPUT -> {
                             val nodeData = node.getJSONObject(NODE__DATA)
                             val type = nodeData.getString(NODE__DATA__TYPE)
+                            val userInputId = StepId("pipeline", nodeId, stepId)
 
-                            steps[nodeId] = UserInput(StepId("pipeline", nodeId, stepId), type)
+                            steps[nodeId] = UserInput(
+                                userInputId,
+                                type,
+                                pipelineJSON.optJSONObject(INPUTS)
+                                    ?.optJSONObject(userInputId.toString())
+                                    ?.optString(INPUTS__LABEL, null)
+                            )
                         }
 
                         NODE__TYPE_OUTPUT -> outputIds.add(nodeId)
