@@ -34,7 +34,6 @@ import {
   toIOId,
 } from "../../utils/IOId";
 import sleep from "../../utils/Sleep";
-import { getFolderAndName } from "../StepDescription";
 import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
 import { useEffectIfChanged } from "../../utils/UseEffectIfChanged";
@@ -67,7 +66,6 @@ export default function PipelineEditor(props) {
   const [editSession, setEditSession] = useState(Math.random());
 
   const [toolTip, setToolTip] = useState(null);
-  const [tempList, setTempList] = useState([]);
   const [popupMenuPos, setPopupMenuPos] = useState({ x: 0, y: 0 });
   const [popupMenuOptions, setPopupMenuOptions] = useState();
   const [openSaveServer, setOpenSaveServer] = useState(false);
@@ -895,7 +893,7 @@ export default function PipelineEditor(props) {
           the documentation
         </a>
       </p>
-        <Modal
+      <Modal
         open={openSaveServer}
         onClose={handleClose}
         aria-labelledby="modal-title"
