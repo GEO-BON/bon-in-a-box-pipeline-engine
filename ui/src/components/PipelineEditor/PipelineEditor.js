@@ -711,7 +711,7 @@ export default function PipelineEditor(props) {
       } else {
         let options = {};
         Object.entries(pipelineMap).forEach(([descriptionFile, pipelineName]) =>
-          (options[getFolderAndName(descriptionFile, pipelineName)] = () => {
+          (options[descriptionFile + ' (' + pipelineName + ')'] = () => {
             api.getPipeline(descriptionFile, (error, data, response) => {
               if (error) {
                 if (response && response.text) alert(response.text);
