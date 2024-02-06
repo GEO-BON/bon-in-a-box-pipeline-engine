@@ -38,17 +38,6 @@
         owner: ubuntu
         group: ubuntu
 
-    - name: CERTBOT.
-      include_role:
-        name: geerlingguy.certbot
-      vars:
-        certbot_admin_email: web@geobon.org
-        certbot_create_if_missing: true
-        certbot_create_standalone_stop_services: []
-        certbot_certs:
-          - domains:
-              - biab2.geobon.org
-
     - name: NGINX - server
       include_role:
         name: geerlingguy.nginx
@@ -61,12 +50,12 @@
             filename: "biab-main.conf"
             extra_parameters: |
               location / {
-                  proxy_pass http://localhost:80;
+                  proxy_pass http://localhost:81;
                   proxy_read_timeout 100000;
                   proxy_connect_timeout 100000;
                   proxy_send_timeout 100000;
                   add_header Access-Control-Allow-Origin *;
-                  
+
                   # WebSocket support
                   proxy_http_version 1.1;
                   proxy_set_header Upgrade $http_upgrade;
@@ -92,6 +81,21 @@
         path: /etc/nginx/sites-enabled/default
         state: absent
 
+    - name: CERTBOT.
+      include_role:
+        name: geerlingguy.certbot
+      vars:
+        certbot_admin_email: web@geobon.org
+        certbot_create_if_missing: true
+        certbot_create_standalone_stop_services: []
+        certbot_certs:
+          - domains:
+              - biab2.geobon.org
+        certbot_install_method: snap
+        certbot_auto_renew_minute: "30"
+        certbot_auto_renew_hour: "2"
+        certbot_create_extra_args: "--nginx"
+
     - name: DOCKER.
       include_role:
         name: geerlingguy.docker
@@ -109,7 +113,7 @@
         repo: https://github.com/GEO-BON/bon-in-a-box-pipelines
         dest: /home/ubuntu/data/biab-2.0/
         force: true
-        
+
     - name: docker compose pull
       become_user: ubuntu
       ansible.builtin.shell: docker compose -f compose.yml -f compose.override.yml pull
