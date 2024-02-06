@@ -114,14 +114,3 @@
         dest: /home/ubuntu/data/biab-2.0/
         force: true
 
-    - name: docker compose pull
-      become_user: ubuntu
-      ansible.builtin.shell: docker compose -f compose.yml -f compose.override.yml pull
-      args:
-        chdir: /home/ubuntu/data/biab-2.0/
-
-    - name: docker compose up
-      become_user: ubuntu
-      ansible.builtin.shell: docker compose -f compose.yml -f compose.override.yml up -d
-      args:
-        chdir: /home/ubuntu/data/biab-2.0/
