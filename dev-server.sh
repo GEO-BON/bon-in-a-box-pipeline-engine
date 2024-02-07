@@ -17,7 +17,7 @@ function help {
 }
 
 function command { # args appended to the docker compose command
-   docker compose -f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml --env-file .dev-paths.env $@
+   docker compose -f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml --env-file $@
 }
 
 function clean {
@@ -25,7 +25,7 @@ function clean {
     docker container rm http-rev-prox biab-ui biab-script-server \
         biab-tiler biab-runner-r biab-runner-julia swagger_editor
     echo "Clean complete."
-}     
+}
 
 case "$1" in
     help)
@@ -34,7 +34,11 @@ case "$1" in
     clean)
         clean
         ;;
+    test-paths)
+        shift 1
+        command .test-paths.env $@
+        ;;
     *)
-        command $@
+        command .dev-paths.env $@
         ;;
 esac
