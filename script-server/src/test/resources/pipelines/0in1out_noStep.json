@@ -63,6 +63,21 @@
   ],
   "inputs": {},
   "outputs": {
-    "undefined@0": {}
+    "pipeline@0": {
+      "description": "This constant has no description",
+      "label": "This constant has no label",
+      "example": "19",
+      "type": "int"
+    }
+  },
+  "metadata": {
+    "name": "0 in 1 out - no step",
+    "description": "Pipeline for automated tests",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }
