@@ -1,4 +1,8 @@
-import json, yaml, cerberus, os, glob
+import json, yaml, cerberus, os, glob, argparse
+
+parser = argparse.ArgumentParser("validateCerberusSchema")
+parser.add_argument("schemaPath", help="Path towards the cerberus validation schema. Absolute or relative to the working directory.", type=str)
+args = parser.parse_args()
 
 # Some utils
 class bcolors:
@@ -33,7 +37,7 @@ def get_files(path, extension, recursive=False):
                 yield file_path
 
 # Load validator
-with open('cerberusValidationSchema.yaml') as f:
+with open(args.schemaPath) as f:
     schema = yaml.safe_load(f)
 
 v = cerberus.Validator(schema)

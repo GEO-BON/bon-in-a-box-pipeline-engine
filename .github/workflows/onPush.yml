@@ -64,7 +64,7 @@ jobs:
     - run: pip install cerberus
     - name: Metadata validation
       working-directory: script-server/src/test/resources/pipelines/
-      run: python3 $GITHUB_WORKSPACE/.github/validatePipelines.py
+      run: python3 $GITHUB_WORKSPACE/.github/validateCerberusSchema.py $GITHUB_WORKSPACE/.github/pipelineValidationSchema.yml
     - name: Find duplicate lines inside same pipeline JSON file
       working-directory: script-server/src/test/resources/pipelines/
       run:  $GITHUB_WORKSPACE/.github/findDuplicateIds.sh
