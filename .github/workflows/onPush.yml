@@ -30,23 +30,42 @@ jobs:
         name: Test results
         path: script-server/build/reports/tests/test/
 
-  
-  run-yml-validation:
+  run-script-validation:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: YML test files syntax validation
+    - name: YML syntax validation (test files)
       uses: navikt/yaml-validator@v4
       with:
         schema_path: .github/scriptValidationSchema.yml
         document_path: script-server/src/test/resources/scripts/
         validate_file_extension: no
         filter_extensions: .yml
-    - name: Find duplicate lines inside same step YML file
+    - name: YML test files syntax validation (stubs)
+      uses: navikt/yaml-validator@v4
+      with:
+        schema_path: .github/scriptValidationSchema.yml
+        document_path: script-stubs
+        validate_file_extension: no
+        filter_extensions: .yml
+    - name: Find duplicate lines inside step YML file (test files)
+      working-directory: script-server/src/test/resources/scripts/
+      run:  $GITHUB_WORKSPACE/.github/findDuplicateDescriptions.sh
+      shell: bash
+    - name: Find duplicate lines inside step YML file (stubs)
       working-directory: script-stubs
       run:  $GITHUB_WORKSPACE/.github/findDuplicateDescriptions.sh
       shell: bash
+
+  run-pipeline-validation:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: pip install cerberus
+    - name: Metadata validation
+      working-directory: script-server/src/test/resources/pipelines/
+      run: python3 $GITHUB_WORKSPACE/.github/validatePipelines.py
     - name: Find duplicate lines inside same pipeline JSON file
-      working-directory: script-stubs
+      working-directory: script-server/src/test/resources/pipelines/
       run:  $GITHUB_WORKSPACE/.github/findDuplicateIds.sh
       shell: bash
