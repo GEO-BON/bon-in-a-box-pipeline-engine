@@ -1,7 +1,7 @@
 import "react-flow-renderer/dist/style.css";
 import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
-import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, Snackbar } from '@mui/material';
+import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, Snackbar, DialogContentText } from '@mui/material';
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactFlow, {
@@ -860,13 +860,8 @@ export default function PipelineEditor(props) {
       } else {
         const descriptionFiles = Object.keys(pipelineList);
         if (descriptionFiles.includes(descriptionFile)) {
-          const confirmation = window.confirm(
-            'This file name already exists. Do you want to continue and overwrite the existing file?'
-          );
-          if (!confirmation) {
-            // User chose not to continue, stop the save operation
-            return;
-          }
+          setModal('overwrite')
+          return;
         }
         onSave('server');
       }
@@ -920,6 +915,26 @@ export default function PipelineEditor(props) {
         <DialogActions>
           <Button onClick={() => hideModal('saveAs')}>Cancel</Button>
           <Button type="submit">Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={modal === 'overwrite'}
+        onClose={() => hideModal('overwrite')}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">This file name already exists.</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Do you want to continue and overwrite the existing file?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModal('saveAs')}>Cancel</Button>
+          <Button onClick={() => onSave('server')} autoFocus>
+            Overwrite
+          </Button>
         </DialogActions>
       </Dialog>
 
