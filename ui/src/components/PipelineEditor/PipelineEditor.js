@@ -965,8 +965,13 @@ export default function PipelineEditor(props) {
                 <button onClick={onLoadFromServerBtnClick}>
                   Load from server
                 </button>
-                <button onClick={() => onSave("clipboard")}>Save to clipboard</button>
-                <button onClick={() => setModal('saveAs')}>Save to server</button>
+                {/^deny$/i.test(process.env.REACT_APP_SAVE_TO_SERVER)
+                  ? <button onClick={() => onSave("clipboard")}>Save to clipboard</button>
+                  : <>
+                    <button onClick={() => onSave('server')}>Save</button>
+                    <button onClick={() => setModal('saveAs')}>Save As...</button>
+                  </>
+                } 
               </div>
 
               <Controls />
