@@ -1,7 +1,7 @@
 import "react-flow-renderer/dist/style.css";
 import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
-import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, Snackbar, DialogContentText } from '@mui/material';
+import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, AlertTitle, Snackbar, DialogContentText } from '@mui/material';
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactFlow, {
@@ -69,6 +69,9 @@ export default function PipelineEditor(props) {
   const [popupMenuPos, setPopupMenuPos] = useState({ x: 0, y: 0 });
   const [popupMenuOptions, setPopupMenuOptions] = useState();
   const [modal, setModal] = useState(null);
+  const [alertSeverity, setAlertSeverity] = useState("");
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertMessage, setAlertMessage] = useState();
 
   const hideModal = useCallback((modalName) => {
     setModal(currentModal => currentModal === modalName ? null : currentModal)
@@ -433,11 +436,11 @@ export default function PipelineEditor(props) {
   useEffect(() => {
     if (!reactFlowInstance)
       return
-    
+
     const allNodes = reactFlowInstance.getNodes();
     if(allNodes.length === 0)
       return
-  
+
     let newPipelineOutputs = [];
     allNodes.forEach((node) => {
       if (node.type === "output") {
@@ -519,7 +522,7 @@ export default function PipelineEditor(props) {
     if(newOutputFromUserInput) {
       let matchingInput = inputList.find(i => i.nodeId === newOutputFromUserInput.nodeId)
       if(matchingInput) {
-        setOutputList(prevOutputs => 
+        setOutputList(prevOutputs =>
           prevOutputs.map(prevOutput => {
             if(prevOutput.nodeId === newOutputFromUserInput.nodeId) {
               return {
@@ -539,7 +542,7 @@ export default function PipelineEditor(props) {
     }
   }, [inputList, outputList, setOutputList]);
 
-  // In some cases the inputList is changed because a label or a description of a userInput has changed. 
+  // In some cases the inputList is changed because a label or a description of a userInput has changed.
   // If this userInput happens to be also an output, we want to update description and label.
   useEffectIfChanged(() => {
     setOutputList(prevOutputs =>
@@ -561,7 +564,7 @@ export default function PipelineEditor(props) {
   }, [inputList, setOutputList]);
 
 
-  // In some cases the outputList is changed because a label or a description of a userInput has changed. 
+  // In some cases the outputList is changed because a label or a description of a userInput has changed.
   // If this userInput being also an input, we want to update description and label.
   useEffectIfChanged(() => {
     setInputList(prevInputs =>
@@ -673,6 +676,10 @@ export default function PipelineEditor(props) {
             if (response && response.text) alert(response.text);
             else alert(error.toString());
 
+          } else if (response.text) {
+            setAlertSeverity('warning')
+            setAlertTitle('Pipeline saved with errors')
+            setAlertMessage(response.text)
           } else {
             setModal('saveSuccess');
           }
@@ -718,7 +725,7 @@ export default function PipelineEditor(props) {
               if (error) {
                 if (response && response.text) alert(response.text);
                 else alert(error.toString());
-              } else { 
+              } else {
                 setCurrentFileName(descriptionFile);
                 onLoadFlow(data);
               }
@@ -868,6 +875,12 @@ export default function PipelineEditor(props) {
     });
   }, [onSave]);
 
+  const clearAlert = useCallback(() => {
+    setAlertMessage("")
+    setAlertSeverity("")
+    setAlertTitle("")
+  }, [setAlertTitle, setAlertSeverity, setAlertMessage])
+
   return (
     <div id="editorLayout">
       <p>
@@ -938,13 +951,26 @@ export default function PipelineEditor(props) {
         </DialogActions>
       </Dialog>
 
+      {alertMessage && alertMessage !== '' &&
+        <Dialog open={true} onClose={clearAlert}>
+          <Alert severity={alertSeverity} id="alert-dialog-description" style={{ whiteSpace: "pre-wrap" }}>
+            <AlertTitle>{alertTitle}</AlertTitle>
+            {alertMessage}
+          </Alert>
+          <DialogActions>
+            <Button onClick={clearAlert}>OK</Button>
+          </DialogActions>
+        </Dialog>
+      }
+
+
       <Snackbar open={modal === 'saveSuccess'}
         autoHideDuration={3000} onClose={() => hideModal('saveSuccess')}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert severity="success">Pipeline saved to server</Alert>
       </Snackbar>
-      
+
 
       <div className="dndflow">
         <ReactFlowProvider>
@@ -986,7 +1012,7 @@ export default function PipelineEditor(props) {
                     <button onClick={() => onSave('server')}>Save</button>
                     <button onClick={() => setModal('saveAs')}>Save As...</button>
                   </>
-                } 
+                }
               </div>
 
               <Controls />

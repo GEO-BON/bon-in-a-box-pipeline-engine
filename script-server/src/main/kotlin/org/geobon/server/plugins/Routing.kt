@@ -271,11 +271,11 @@ fun Application.configureRouting() {
 
             // Validate pipeline (warning if fails)
             val fakeInputs = Validator.generateInputFromExamples(pipelineJSON)
-            var message = "Saved"
+            var message = ""
             try {
                 createRootPipeline(filename, pipelineJSON, fakeInputs)
             } catch (e:Exception) {
-                message = "Pipeline saved with errors:\n${e.message}"
+                message = "${e.message}"
             }
 
             // Save

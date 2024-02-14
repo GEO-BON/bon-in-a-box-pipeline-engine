@@ -110,6 +110,7 @@ class RoutingSaveTest {
             assertEquals(HttpStatusCode.OK, status)
             assertTrue(file.exists())
             assertEquals(content, file.readText())
+            assertTrue(bodyAsText().isEmpty())
         }
     }
 
@@ -191,7 +192,7 @@ class RoutingSaveTest {
             assertTrue(file.exists())
             assertEquals(content, file.readText())
 
-            assertTrue(bodyAsText().startsWith("""Pipeline saved with errors:"""))
+            assertTrue(bodyAsText().isNotEmpty())
         }
     }
 
