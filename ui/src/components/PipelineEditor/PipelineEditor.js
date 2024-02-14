@@ -667,10 +667,11 @@ export default function PipelineEditor(props) {
         });
       }
       else if (saveType === "server") {
-        let fileNameWithoutExtension = currentFileName;
+        let fileNameWithoutExtension = currentFileName.replaceAll("/", ">")
         if (fileNameWithoutExtension.endsWith(".json")) {
-          fileNameWithoutExtension = currentFileName.slice(0, -5);
+          fileNameWithoutExtension = fileNameWithoutExtension.slice(0, -5);
         }
+
         api.savePipeline(fileNameWithoutExtension, JSON.stringify(flow, null, 2), (error, data, response) => {
           if (error) {
             if (response && response.text) alert(response.text);
@@ -865,8 +866,11 @@ export default function PipelineEditor(props) {
       if (error) {
         console.error(error);
       } else {
+        let sanitized = descriptionFile.trim().replace(/\s*(\/|>)\s*/, '>')
+        if(!sanitized.endsWith('.json')) sanitized += '.json'
+
         const descriptionFiles = Object.keys(pipelineList);
-        if (descriptionFiles.includes(descriptionFile)) {
+        if (descriptionFiles.includes(sanitized)) {
           setModal('overwrite')
           return;
         }
@@ -951,7 +955,7 @@ export default function PipelineEditor(props) {
         </DialogActions>
       </Dialog>
 
-      {alertMessage && alertMessage !== '' &&
+      {alertMessage && alertMessage !== '' && // when in open={...}, there was a flash frame while closing.
         <Dialog open={true} onClose={clearAlert}>
           <Alert severity={alertSeverity} id="alert-dialog-description" style={{ whiteSpace: "pre-wrap" }}>
             <AlertTitle>{alertTitle}</AlertTitle>
