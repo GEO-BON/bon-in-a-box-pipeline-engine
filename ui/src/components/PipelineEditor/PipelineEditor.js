@@ -52,6 +52,23 @@ const customNodeTypes = {
 let id = 0;
 const getId = () => `${id++}`;
 
+// Capture ctrl + s and ctrl + shift + s to quickly save the pipeline
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey) {
+    let button;
+    if (e.key === 's') {
+      button = document.getElementById("saveBtn")
+    } else if (e.key === 'S') {
+      button = document.getElementById("saveAsBtn")
+    }
+
+    if (button) {
+      e.preventDefault();
+      button.click()
+    }
+  }
+});
+
 export default function PipelineEditor(props) {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -1011,10 +1028,10 @@ export default function PipelineEditor(props) {
                   Load from server
                 </button>
                 {/^deny$/i.test(process.env.REACT_APP_SAVE_TO_SERVER)
-                  ? <button onClick={() => onSave("clipboard")}>Save to clipboard</button>
+                  ? <button id="saveBtn" onClick={() => onSave("clipboard")}>Save to clipboard</button>
                   : <>
-                    <button onClick={() => onSave('server')}>Save</button>
-                    <button onClick={() => setModal('saveAs')}>Save As...</button>
+                    <button id="saveBtn" onClick={() => { if (currentFileName) onSave('server'); else setModal('saveAs') }}>Save</button>
+                    <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
                   </>
                 }
               </div>
