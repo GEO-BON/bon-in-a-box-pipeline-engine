@@ -945,7 +945,7 @@ export default function PipelineEditor(props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setModal('saveAs')}>Cancel</Button>
-          <Button onClick={() => onSave('server')} autoFocus>
+          <Button onClick={() => {hideModal('overwrite'); onSave('server')}} autoFocus>
             Overwrite
           </Button>
         </DialogActions>
