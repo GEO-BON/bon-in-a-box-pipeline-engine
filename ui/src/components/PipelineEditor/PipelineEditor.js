@@ -676,13 +676,14 @@ export default function PipelineEditor(props) {
         fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
         api.savePipeline(fileNameWithoutExtension, JSON.stringify(flow, null, 2), (error, data, response) => {
           if (error) {
-            if (response && response.text) alert(response.text);
-            else alert(error.toString());
+            showAlert(
+              'error',
+              'Error saving the pipeline',
+              (response && response.text) ? response.text : error.toString()
+            )
 
           } else if (response.text) {
-            setAlertSeverity('warning')
-            setAlertTitle('Pipeline saved with errors')
-            setAlertMessage(response.text)
+            showAlert('warning', 'Pipeline saved with errors', response.text)
 
           } else {
             setModal('saveSuccess');
@@ -693,12 +694,12 @@ export default function PipelineEditor(props) {
         navigator.clipboard
           .writeText(JSON.stringify(flow, null, 2))
           .then(() => {
-            alert(
-              "Pipeline content copied to clipboard.\nUse git to add the code to the BON in a Box repository."
+            showAlert('info', 'Pipeline content copied to clipboard',
+              'Use git to add the code to the BON in a Box repository.'
             );
           })
           .catch(() => {
-            alert("Error: Failed to copy content to clipboard.");
+            showAlert('error', 'Error', 'Failed to copy content to clipboard.');
           });
       }
     }
@@ -731,16 +732,22 @@ export default function PipelineEditor(props) {
 
     api.getListOf("pipeline", (error, pipelineMap, response) => {
       if (error) {
-        if (response && response.text) alert(response.text);
-        else alert(error.toString());
+        showAlert(
+          'error',
+          'Error loading the pipeline list',
+          (response && response.text) ? response.text : error.toString()
+        )
       } else {
         let options = {};
         Object.entries(pipelineMap).forEach(([descriptionFile, pipelineName]) =>
           (options[descriptionFile + ' (' + pipelineName + ')'] = () => {
             api.getPipeline(descriptionFile, (error, data, response) => {
               if (error) {
-                if (response && response.text) alert(response.text);
-                else alert(error.toString());
+                showAlert(
+                  'error',
+                  'Error loading the pipeline',
+                  (response && response.text) ? response.text : error.toString()
+                )
               } else {
                 setCurrentFileName(descriptionFile);
                 onLoadFlow(data);
@@ -893,6 +900,12 @@ export default function PipelineEditor(props) {
       }
     });
   }, [onSave]);
+
+  const showAlert = useCallback((severity, title, message) => {
+    setAlertSeverity(severity)
+    setAlertTitle(title)
+    setAlertMessage(message)
+  }, [setAlertTitle, setAlertSeverity, setAlertMessage])
 
   const clearAlert = useCallback(() => {
     setAlertMessage("")
