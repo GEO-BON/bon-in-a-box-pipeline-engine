@@ -11,9 +11,9 @@ Prerequisites :
 - At least 6 GB of free space (this includes the installation of Docker Desktop)
 - RAM requirements will depend on the scripts that you run.
 - **Windows:**
-  - Docker Desktop
+  - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
   - A Linux shell (git bash, [Bash through PowerShell](https://learn.microsoft.com/en-us/windows/wsl/install), cygwin, etc.) necessary to run th `.sh` scripts in the instructions below.
-- **Mac:** Docker Desktop.
+- **Mac:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
   - Make sure docker is added to the path of your terminal. From a terminal, run command `docker run hello-world`. If there is an error message, see [https://stackoverflow.com/a/71923962/3519951](https://stackoverflow.com/a/71923962/3519951).
   - If you encounter error `no matching manifest for linux/arm64/v8 in the manifest list entries`, export DOCKER_DEFAULT_PLATFORM. See [https://stackoverflow.com/a/76404045/3519951](https://stackoverflow.com/a/76404045/3519951).
 - **Linux:** Docker with Docker Compose installed. It is recommended to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
