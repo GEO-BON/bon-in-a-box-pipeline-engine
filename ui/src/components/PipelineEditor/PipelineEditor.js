@@ -852,7 +852,7 @@ export default function PipelineEditor(props) {
           case "output":
             break;
           default:
-            console.error("Unsupported type " + node.type);
+            showAlert('error', 'Pipeline loaded with errors', 'Unsupported node type ' + node.type)
         }
       });
       id++;
@@ -868,7 +868,7 @@ export default function PipelineEditor(props) {
         setEdges(flow.edges || []);
       });
     } else {
-      console.error("Error parsing flow");
+      showAlert('error', 'Error loading the pipeline', 'No data received.')
     }
   }, [
     reactFlowInstance,
@@ -886,7 +886,12 @@ export default function PipelineEditor(props) {
   const saveFileToServer = useCallback((descriptionFile) => {
     api.getListOf("pipeline", (error, pipelineList, response) => {
       if (error) {
-        console.error(error);
+        showAlert(
+          'error',
+          'Error saving the pipeline',
+          'Failed to retreive pipeline list.\n' +
+            ((response && response.text) ? response.text : error.toString())
+        )
       } else {
         let sanitized = descriptionFile.trim().replace(/\s*(\/|>)\s*/, '>')
         if(!sanitized.endsWith('.json')) sanitized += '.json'
