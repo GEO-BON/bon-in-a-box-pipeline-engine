@@ -35,7 +35,7 @@ function flagErrors {
 
 function help {
     echo "Usage: ./prod-server.sh COMMAND [ARGS...]"
-    echo 
+    echo
     echo "Commands:"
     echo "    help                 Display this help"
     echo "    checkout [BRANCH]    Checkout config files from given branch of pipeline engine repo."
@@ -72,7 +72,7 @@ function validate {
         ".github/scriptValidationSchema.yml" "scripts/" "no" ".yml"
     flagErrors
 
-    echo "Checking for duplicate descriptions in pipelines..."
+    echo "Checking for duplicate ids in pipelines..."
     cd pipelines ; assertSuccess
     ../.server/.github/findDuplicateIds.sh ; flagErrors
     cd ..
@@ -85,7 +85,7 @@ function validate {
     # Final assesment
     if [[ $nErrors -eq 0 ]] ; then
         echo -e "${GREEN}Validation complete.${ENDCOLOR}"
-    else 
+    else
         echo -e "${RED}Errors occured during validation. Check logs above.${ENDCOLOR}"
         exit 1
     fi
@@ -116,9 +116,9 @@ function up {
     command pull ; assertSuccess
 
     echo "Starting the server..."
-    output=$(command up -d $@ 2>&1); returnCode=$?; 
-    
-    if [[ $output == *"is already in use by container"* ]] ; then 
+    output=$(command up -d $@ 2>&1); returnCode=$?;
+
+    if [[ $output == *"is already in use by container"* ]] ; then
         # Container conflict, perform clean and try again.
         clean
         echo "Starting the server after a clean..."
@@ -145,14 +145,14 @@ function clean {
         biab-tiler biab-runner-r biab-runner-julia
     assertSuccess
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
-}     
+}
 
 case "$1" in
     help)
         help
         ;;
     checkout)
-        checkout $2 
+        checkout $2
         ;;
     up)
         shift
