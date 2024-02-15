@@ -612,7 +612,7 @@ export default function PipelineEditor(props) {
     );
   }, [reactFlowInstance, setNodes]);
 
-  const onSave = useCallback((saveType) => {
+  const onSave = useCallback((fileName) => {
     if (reactFlowInstance) {
       const flow = reactFlowInstance.toObject();
 
@@ -671,24 +671,9 @@ export default function PipelineEditor(props) {
         flow.metadata = yaml.load(metadata)
       }
 
-      if (saveType === "clipboard") {
-        navigator.clipboard
-        .writeText(JSON.stringify(flow, null, 2))
-        .then(() => {
-          alert(
-            "Pipeline content copied to clipboard.\nUse git to add the code to BON in a Box's repository."
-          );
-        })
-        .catch(() => {
-          alert("Error: Failed to copy content to clipboard.");
-        });
-      }
-      else if (saveType === "server") {
-        let fileNameWithoutExtension = currentFileName.replaceAll("/", ">")
-        if (fileNameWithoutExtension.endsWith(".json")) {
-          fileNameWithoutExtension = fileNameWithoutExtension.slice(0, -5);
-        }
-
+      if (fileName) {
+        let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
+        fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
         api.savePipeline(fileNameWithoutExtension, JSON.stringify(flow, null, 2), (error, data, response) => {
           if (error) {
             if (response && response.text) alert(response.text);
@@ -698,13 +683,26 @@ export default function PipelineEditor(props) {
             setAlertSeverity('warning')
             setAlertTitle('Pipeline saved with errors')
             setAlertMessage(response.text)
+
           } else {
             setModal('saveSuccess');
           }
         });
+
+      } else {
+        navigator.clipboard
+          .writeText(JSON.stringify(flow, null, 2))
+          .then(() => {
+            alert(
+              "Pipeline content copied to clipboard.\nUse git to add the code to the BON in a Box repository."
+            );
+          })
+          .catch(() => {
+            alert("Error: Failed to copy content to clipboard.");
+          });
       }
     }
-  }, [reactFlowInstance, inputList, outputList, metadata,currentFileName]);
+  }, [reactFlowInstance, inputList, outputList, metadata, ]);
 
   const onLoadFromFileBtnClick = () => inputFile.current.click(); // will call onLoad
 
@@ -891,7 +889,7 @@ export default function PipelineEditor(props) {
           setModal('overwrite')
           return;
         }
-        onSave('server');
+        onSave(descriptionFile);
       }
     });
   }, [onSave]);
@@ -966,7 +964,7 @@ export default function PipelineEditor(props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setModal('saveAs')}>Cancel</Button>
-          <Button onClick={() => {hideModal('overwrite'); onSave('server')}} autoFocus>
+          <Button onClick={() => {hideModal('overwrite'); onSave(currentFileName)}} autoFocus>
             Overwrite
           </Button>
         </DialogActions>
@@ -1028,9 +1026,9 @@ export default function PipelineEditor(props) {
                   Load from server
                 </button>
                 {/^deny$/i.test(process.env.REACT_APP_SAVE_TO_SERVER)
-                  ? <button id="saveBtn" onClick={() => onSave("clipboard")}>Save to clipboard</button>
+                  ? <button id="saveBtn" onClick={() => onSave()}>Save to clipboard</button>
                   : <>
-                    <button id="saveBtn" onClick={() => { if (currentFileName) onSave('server'); else setModal('saveAs') }}>Save</button>
+                    <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
                     <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
                   </>
                 }
