@@ -59,11 +59,27 @@
     },
     "1in1out.yml@1|some_int": {
       "description": "A number",
+      "label": "Some int",
       "type": "int",
       "example": 3
     }
   },
   "outputs": {
-    "divideFloat.yml@0|result": {}
+    "divideFloat.yml@0|result": {
+      "label": "Divider",
+      "description": "The divider",
+      "example": 2,
+      "type": "float"
+    }
+  },
+  "metadata": {
+    "name": "Int to float automatic conversion",
+    "description": "Pipeline for automated tests",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }

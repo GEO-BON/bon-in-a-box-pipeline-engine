@@ -72,6 +72,21 @@
   ],
   "inputs": {},
   "outputs": {
-    "assertInt.yml@9|the_same": {}
+    "assertInt.yml@9|the_same": {
+      "description": "The same integer as in the inputs. But this crashes if not an integer.",
+      "label": "Same value",
+      "type": "int",
+      "example": false
+    }
+  },
+  "metadata": {
+    "name": "Assert int",
+    "description": "Pipeline for automated tests",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }

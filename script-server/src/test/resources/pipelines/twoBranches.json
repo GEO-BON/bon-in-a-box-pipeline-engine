@@ -95,5 +95,15 @@
       "type": "float",
       "example": 12.34
     }
+  },
+  "metadata": {
+    "name": "Two branches",
+    "description": "Pipeline for automated tests",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }

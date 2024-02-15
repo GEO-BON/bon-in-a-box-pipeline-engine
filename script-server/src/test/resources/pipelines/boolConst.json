@@ -4,8 +4,8 @@
       "id": "1",
       "type": "output",
       "position": {
-        "x": 477.5,
-        "y": 197.89999389648438
+        "x": 534,
+        "y": 66.5
       },
       "data": {
         "label": "Output"
@@ -29,8 +29,8 @@
       "id": "2",
       "type": "io",
       "position": {
-        "x": 224,
-        "y": 131.89999389648438
+        "x": 237,
+        "y": 25
       },
       "data": {
         "descriptionFile": "assertBoolean.yml"
@@ -63,8 +63,8 @@
       "id": "3",
       "type": "constant",
       "position": {
-        "x": -64.59370835690285,
-        "y": 117.29969161001281
+        "x": 12,
+        "y": 12
       },
       "data": {
         "type": "boolean",
@@ -104,6 +104,21 @@
   ],
   "inputs": {},
   "outputs": {
-    "assertBoolean.yml@2|the_same": {}
+    "assertBoolean.yml@2|the_same": {
+      "description": "The same boolean as in the inputs. But this crashes if not a boolean.",
+      "label": "Same value",
+      "type": "boolean",
+      "example": false
+    }
+  },
+  "metadata": {
+    "name": "Assert boolean",
+    "description": "Pipeline for automated tests",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }

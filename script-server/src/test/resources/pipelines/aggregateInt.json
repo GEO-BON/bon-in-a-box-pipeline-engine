@@ -94,6 +94,25 @@
   ],
   "inputs": {},
   "outputs": {
-    "assertArray.yml@0|the_same": {}
+    "assertArray.yml@0|the_same": {
+      "description": "The same array as in the inputs. But this crashes if not an array",
+      "label": "Same value",
+      "type": "int[]",
+      "example": [
+        3,
+        4,
+        5
+      ]
+    }
+  },
+  "metadata": {
+    "name": "Aggregate int to int[]",
+    "description": "Pipeline for automated tests",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }

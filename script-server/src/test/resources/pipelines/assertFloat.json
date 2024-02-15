@@ -72,6 +72,21 @@
   ],
   "inputs": {},
   "outputs": {
-    "assertFloat.yml@5|the_same": {}
+    "assertFloat.yml@5|the_same": {
+      "description": "The same float as in the inputs. But this crashes if not an float.",
+      "label": "Same value",
+      "type": "float",
+      "example": 12.34
+    }
+  },
+  "metadata": {
+    "name": "Assert float",
+    "description": "Pipeline for automated tests",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }
