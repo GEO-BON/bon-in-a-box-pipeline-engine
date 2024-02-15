@@ -54,7 +54,8 @@
     "assertNull.yml@0|input": {
       "description": "Some input, we use text as an example but could be other type.",
       "label": "Text input",
-      "type": "text"
+      "type": "text",
+      "example": null
     }
   },
   "outputs": {
