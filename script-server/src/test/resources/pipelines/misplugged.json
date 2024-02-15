@@ -1,0 +1,112 @@
+{
+  "nodes": [
+    {
+      "id": "7",
+      "type": "io",
+      "position": {
+        "x": 62,
+        "y": 22
+      },
+      "data": {
+        "descriptionFile": "1in2out.yml"
+      }
+    },
+    {
+      "id": "8",
+      "type": "io",
+      "position": {
+        "x": 408,
+        "y": 12
+      },
+      "data": {
+        "descriptionFile": "assertBoolean.yml"
+      }
+    },
+    {
+      "id": "9",
+      "type": "io",
+      "position": {
+        "x": 474,
+        "y": 83
+      },
+      "data": {
+        "descriptionFile": "assertInt.yml"
+      }
+    },
+    {
+      "id": "10",
+      "type": "output",
+      "position": {
+        "x": 784,
+        "y": 60.333333333333336
+      },
+      "data": {
+        "label": "Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "7",
+      "sourceHandle": "increment",
+      "target": "8",
+      "targetHandle": "input_bool",
+      "id": "reactflow__edge-7increment-8input_bool"
+    },
+    {
+      "source": "7",
+      "sourceHandle": "tell_me",
+      "target": "9",
+      "targetHandle": "input",
+      "id": "reactflow__edge-7tell_me-9input"
+    },
+    {
+      "source": "8",
+      "sourceHandle": "the_same",
+      "target": "10",
+      "targetHandle": null,
+      "id": "reactflow__edge-8the_same-10"
+    },
+    {
+      "source": "9",
+      "sourceHandle": "the_same",
+      "target": "10",
+      "targetHandle": null,
+      "id": "reactflow__edge-9the_same-10"
+    }
+  ],
+  "inputs": {
+    "1in2out.yml@7|some_int": {
+      "description": "A number",
+      "label": "Some int",
+      "type": "int",
+      "example": 3
+    }
+  },
+  "outputs": {
+    "assertBoolean.yml@8|the_same": {
+      "description": "The same boolean as in the inputs. But this crashes if not a boolean.",
+      "label": "Same value",
+      "type": "boolean",
+      "example": false
+    },
+    "assertInt.yml@9|the_same": {
+      "description": "The same integer as in the inputs. But this crashes if not an integer.",
+      "label": "Same value",
+      "type": "int",
+      "example": false
+    }
+  },
+  "metadata": {
+    "name": "Misplugged pipeline",
+    "description": "This pipeline has two pipes plugged into the wrong input types.",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ],
+    "license": "MIT",
+    "external_link": "https://github.com/GEO-BON/biab-2.0"
+  }
+}

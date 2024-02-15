@@ -4,7 +4,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import io.mockk.InternalPlatformDsl.toArray
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.plugins.configureRouting
 import org.json.JSONObject
@@ -42,7 +41,7 @@ class ApplicationTest {
             assertEquals("Hello World pipeline", jsonResult.getString("helloWorld.json"))
         }
 
-        var id:String
+        var id: String
         client.post("/pipeline/helloWorld.json/run") {
             setBody("{\"helloWorld>helloPython.yml@0|some_int\":1}")
         }.apply {
@@ -56,7 +55,8 @@ class ApplicationTest {
 
             val folder = File(
                 outputRoot,
-                result.getString(result.keys().next()))
+                result.getString(result.keys().next())
+            )
             assertTrue(folder.isDirectory)
 
             val files = folder.listFiles()
@@ -77,7 +77,7 @@ class ApplicationTest {
             assertEquals("Python Example", jsonResult.getString("helloWorld>helloPython.yml"))
         }
 
-        var id:String
+        var id: String
         client.post("/script/helloWorld>helloPython.yml/run") {
             setBody("{\"some_int\":1}")
         }.apply {
@@ -91,13 +91,18 @@ class ApplicationTest {
 
             val folder = File(
                 outputRoot,
-                result.getString(result.keys().next()))
+                result.getString(result.keys().next())
+            )
             assertTrue(folder.isDirectory)
 
             val files = folder.listFiles()
-            assertTrue(files!!.size == 4, "Expected input, pipeline output, script output and log files to be there.\nFound ${files.toList()}")
+            assertTrue(
+                files!!.size == 4,
+                "Expected input, pipeline output, script output and log files to be there.\nFound ${files.toList()}"
+            )
 
-            assertEquals("""
+            assertEquals(
+                """
                 {
                   "increment": 2
                 }""".trimIndent(),
@@ -156,6 +161,7 @@ class ApplicationTest {
             assertEquals(HttpStatusCode.NotFound, status)
         }
     }
+
     @Test
     fun `given pipeline exists_when getting info_then info returned`() = testApplication {
         application { configureRouting() }
@@ -250,4 +256,5 @@ class ApplicationTest {
             println(bodyAsText())
         }
     }
+
 }
