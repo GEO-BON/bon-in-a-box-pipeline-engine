@@ -206,17 +206,29 @@
       "id": "reactflow__edge-6identified_layer-9identified_layers"
     }
   ],
-  "viewport": {
-    "x": -168,
-    "y": 104,
-    "zoom": 1
-  },
   "inputs": {
     "pipeline>PullLayersById.yml@9|with_ids": {
       "description": "Config containing the ids. The an id will be replaced by the corresponding layer in with_layers output.",
       "label": "With IDs",
       "type": "text",
-      "example": "layer, current, change\nfirstId, 0.2, 0.5\nsecondId, 0.5, 0.2\nthirdId, 0.3, 0.3\n"
+      "example": "layer, current, change\nGFW180W, 0.2, 0.5\nsecondId, 0.5, 0.2\nGFW170E, 0.3, 0.3\n"
     }
+  },
+  "outputs": {
+    "pipeline>PullLayersById.yml@9|with_layers": {
+      "description": "The initial config, where ids have been replaced by layers.",
+      "label": "With layers",
+      "type": "text",
+      "example": "layer, current, change\npath/to/my/layer1.tiff, 0.2, 0.5\npath/to/my/layer2.tiff, 0.5, 0.2\npath/to/my/layer3.tiff, 0.3, 0.3\n"
+    }
+  },
+  "metadata": {
+    "name": "Pull layers by ID test",
+    "description": "Checks that a user input can receive a null value",
+    "author": [
+      {
+        "name": "Jean-Michel Lord"
+      }
+    ]
   }
 }

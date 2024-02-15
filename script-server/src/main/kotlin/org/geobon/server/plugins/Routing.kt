@@ -26,6 +26,7 @@ import java.io.File
 const val FILE_SEPARATOR = '>'
 private val gson = Gson()
 private val pipelinesRoot = File(System.getenv("PIPELINES_LOCATION"))
+private val scriptStubsRoot = File(System.getenv("SCRIPT_STUBS_LOCATION"))
 
 private val runningPipelines = mutableMapOf<String, Pipeline>()
 private val logger: Logger = LoggerFactory.getLogger("Server")
@@ -36,15 +37,15 @@ fun Application.configureRouting() {
 
         get("/{type}/list") {
             val type = call.parameters["type"]
-            val root: File
+            val roots: List<File>
             val extension: String
             when (type) {
                 "pipeline" -> {
-                    root = pipelinesRoot
+                    roots = listOf(pipelinesRoot)
                     extension = "json"
                 }
                 "script" -> {
-                    root = scriptRoot
+                    roots = listOf(scriptRoot, scriptStubsRoot)
                     extension = "yml"
                 }
                 else -> {
@@ -59,24 +60,26 @@ fun Application.configureRouting() {
             // TODO: This is accessing many files and should not be done at every call.
             // But if we cache, when do we refresh?
             val possible = mutableMapOf<String, String>()
-            root.walkTopDown().forEach { file ->
-                if (file.extension == extension) {
-                    val relativePath = file.relativeTo(root).path.replace('/', FILE_SEPARATOR)
+            roots.forEach { root ->
+                root.walkTopDown().forEach { file ->
+                    if (file.extension == extension) {
+                        val relativePath = file.relativeTo(root).path.replace('/', FILE_SEPARATOR)
 
-                    val name = try {
-                        if (file.extension == "yml") { // Scripts
-                            val lineStart = "name: "
-                            file.useLines { sequence ->
-                                sequence.find { l -> l.startsWith(lineStart) }?.substring(lineStart.length)
+                        val name = try {
+                            if (file.extension == "yml") { // Scripts
+                                val lineStart = "name: "
+                                file.useLines { sequence ->
+                                    sequence.find { l -> l.startsWith(lineStart) }?.substring(lineStart.length)
+                                }
+                            } else { // Pipelines
+                                JSONObject(file.readText()).getJSONObject(METADATA).getString(METADATA__NAME)
                             }
-                        } else { // Pipelines
-                            JSONObject(file.readText()).getJSONObject(METADATA).getString(METADATA__NAME)
+                        } catch (e: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
+                            null
                         }
-                    } catch (e: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
-                        null
-                    }
 
-                    possible[relativePath] = name ?: file.name // Fallback on file name
+                        possible[relativePath] = name ?: file.name // Fallback on file name
+                    }
                 }
             }
 
@@ -89,12 +92,19 @@ fun Application.configureRouting() {
                 val ymlPath = call.parameters["scriptPath"]!!.run {
                     replace(FILE_SEPARATOR, '/').replace(Regex("""\.\w+$"""), ".yml")
                 }
-                val scriptFile = File(scriptRoot, ymlPath)
+
+                var scriptFile = File(scriptRoot, ymlPath)
+
                 if (scriptFile.exists()) {
                     call.respond(Yaml().load(scriptFile.readText()) as Map<String, Any>)
                 } else {
-                    call.respondText(text = "$scriptFile does not exist", status = HttpStatusCode.NotFound)
-                    logger.debug("404: getInfo ${call.parameters["scriptPath"]}")
+                    scriptFile = File(scriptStubsRoot, ymlPath)
+                    if (scriptFile.exists()) {
+                        call.respond(Yaml().load(scriptFile.readText()) as Map<String, Any>)
+                    } else {
+                        call.respondText(text = "$scriptFile does not exist", status = HttpStatusCode.NotFound)
+                        logger.debug("404: getInfo ${call.parameters["scriptPath"]} ${scriptFile.absolutePath}")
+                    }
                 }
             } catch (ex: Exception) {
                 call.respondText(text = ex.message!!, status = HttpStatusCode.InternalServerError)
