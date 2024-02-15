@@ -1,6 +1,7 @@
 import "react-flow-renderer/dist/style.css";
 import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
+import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, AlertTitle, Snackbar, DialogContentText } from '@mui/material';
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactFlow, {
@@ -33,7 +34,6 @@ import {
   toIOId,
 } from "../../utils/IOId";
 import sleep from "../../utils/Sleep";
-import { getFolderAndName } from "../StepDescription";
 import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
 import { useEffectIfChanged } from "../../utils/UseEffectIfChanged";
@@ -52,6 +52,23 @@ const customNodeTypes = {
 let id = 0;
 const getId = () => `${id++}`;
 
+// Capture ctrl + s and ctrl + shift + s to quickly save the pipeline
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey) {
+    let button;
+    if (e.key === 's') {
+      button = document.getElementById("saveBtn")
+    } else if (e.key === 'S') {
+      button = document.getElementById("saveAsBtn")
+    }
+
+    if (button) {
+      e.preventDefault();
+      button.click()
+    }
+  }
+});
+
 export default function PipelineEditor(props) {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -60,14 +77,22 @@ export default function PipelineEditor(props) {
   const [selectedNodes, setSelectedNodes] = useState(null);
   const [inputList, setInputList] = useState([]);
   const [outputList, setOutputList] = useState([]);
-  const [metadata, setMetadata] = useState("")
+  const [metadata, setMetadata] = useState("");
+  const [currentFileName, setCurrentFileName] = useState("");
 
   const [editSession, setEditSession] = useState(Math.random());
 
   const [toolTip, setToolTip] = useState(null);
-
   const [popupMenuPos, setPopupMenuPos] = useState({ x: 0, y: 0 });
   const [popupMenuOptions, setPopupMenuOptions] = useState();
+  const [modal, setModal] = useState(null);
+  const [alertSeverity, setAlertSeverity] = useState("");
+  const [alertTitle, setAlertTitle] = useState("");
+  const [alertMessage, setAlertMessage] = useState();
+
+  const hideModal = useCallback((modalName) => {
+    setModal(currentModal => currentModal === modalName ? null : currentModal)
+  }, [setModal])
 
   // We need this since the functions passed through node data retain their old selectedNodes state.
   // Note that the stratagem fails if trying to add edges from many sources at the same time.
@@ -428,11 +453,11 @@ export default function PipelineEditor(props) {
   useEffect(() => {
     if (!reactFlowInstance)
       return
-    
+
     const allNodes = reactFlowInstance.getNodes();
     if(allNodes.length === 0)
       return
-  
+
     let newPipelineOutputs = [];
     allNodes.forEach((node) => {
       if (node.type === "output") {
@@ -514,7 +539,7 @@ export default function PipelineEditor(props) {
     if(newOutputFromUserInput) {
       let matchingInput = inputList.find(i => i.nodeId === newOutputFromUserInput.nodeId)
       if(matchingInput) {
-        setOutputList(prevOutputs => 
+        setOutputList(prevOutputs =>
           prevOutputs.map(prevOutput => {
             if(prevOutput.nodeId === newOutputFromUserInput.nodeId) {
               return {
@@ -534,7 +559,7 @@ export default function PipelineEditor(props) {
     }
   }, [inputList, outputList, setOutputList]);
 
-  // In some cases the inputList is changed because a label or a description of a userInput has changed. 
+  // In some cases the inputList is changed because a label or a description of a userInput has changed.
   // If this userInput happens to be also an output, we want to update description and label.
   useEffectIfChanged(() => {
     setOutputList(prevOutputs =>
@@ -556,7 +581,7 @@ export default function PipelineEditor(props) {
   }, [inputList, setOutputList]);
 
 
-  // In some cases the outputList is changed because a label or a description of a userInput has changed. 
+  // In some cases the outputList is changed because a label or a description of a userInput has changed.
   // If this userInput being also an input, we want to update description and label.
   useEffectIfChanged(() => {
     setInputList(prevInputs =>
@@ -587,7 +612,7 @@ export default function PipelineEditor(props) {
     );
   }, [reactFlowInstance, setNodes]);
 
-  const onSave = useCallback(() => {
+  const onSave = useCallback((fileName) => {
     if (reactFlowInstance) {
       const flow = reactFlowInstance.toObject();
 
@@ -646,18 +671,39 @@ export default function PipelineEditor(props) {
         flow.metadata = yaml.load(metadata)
       }
 
-      navigator.clipboard
-        .writeText(JSON.stringify(flow, null, 2))
-        .then(() => {
-          alert(
-            "Pipeline content copied to clipboard.\nUse git to add the code to BON in a Box's repository."
-          );
-        })
-        .catch(() => {
-          alert("Error: Failed to copy content to clipboard.");
+      if (fileName) {
+        let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
+        fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
+        api.savePipeline(fileNameWithoutExtension, JSON.stringify(flow, null, 2), (error, data, response) => {
+          if (error) {
+            showAlert(
+              'error',
+              'Error saving the pipeline',
+              (response && response.text) ? response.text : error.toString()
+            )
+
+          } else if (response.text) {
+            showAlert('warning', 'Pipeline saved with errors', response.text)
+
+          } else {
+            setModal('saveSuccess');
+          }
         });
+
+      } else {
+        navigator.clipboard
+          .writeText(JSON.stringify(flow, null, 2))
+          .then(() => {
+            showAlert('info', 'Pipeline content copied to clipboard',
+              'Use git to add the code to the BON in a Box repository.'
+            );
+          })
+          .catch(() => {
+            showAlert('error', 'Error', 'Failed to copy content to clipboard.');
+          });
+      }
     }
-  }, [reactFlowInstance, inputList, outputList, metadata]);
+  }, [reactFlowInstance, inputList, outputList, metadata, ]);
 
   const onLoadFromFileBtnClick = () => inputFile.current.click(); // will call onLoad
 
@@ -671,7 +717,8 @@ export default function PipelineEditor(props) {
       fr.readAsText(file);
       fr.onload = (loadEvent) =>
         onLoadFlow(JSON.parse(loadEvent.target.result));
-
+      console.log('file name ',file.name)
+      setCurrentFileName(file.name);
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
     }
@@ -685,17 +732,24 @@ export default function PipelineEditor(props) {
 
     api.getListOf("pipeline", (error, pipelineMap, response) => {
       if (error) {
-        if (response && response.text) alert(response.text);
-        else alert(error.toString());
+        showAlert(
+          'error',
+          'Error loading the pipeline list',
+          (response && response.text) ? response.text : error.toString()
+        )
       } else {
         let options = {};
         Object.entries(pipelineMap).forEach(([descriptionFile, pipelineName]) =>
-          (options[getFolderAndName(descriptionFile, pipelineName)] = () => {
+          (options[descriptionFile + ' (' + pipelineName + ')'] = () => {
             api.getPipeline(descriptionFile, (error, data, response) => {
               if (error) {
-                if (response && response.text) alert(response.text);
-                else alert(error.toString());
+                showAlert(
+                  'error',
+                  'Error loading the pipeline',
+                  (response && response.text) ? response.text : error.toString()
+                )
               } else {
+                setCurrentFileName(descriptionFile);
                 onLoadFlow(data);
               }
             });
@@ -798,7 +852,7 @@ export default function PipelineEditor(props) {
           case "output":
             break;
           default:
-            console.error("Unsupported type " + node.type);
+            showAlert('error', 'Pipeline loaded with errors', 'Unsupported node type ' + node.type)
         }
       });
       id++;
@@ -814,7 +868,7 @@ export default function PipelineEditor(props) {
         setEdges(flow.edges || []);
       });
     } else {
-      console.error("Error parsing flow");
+      showAlert('error', 'Error loading the pipeline', 'No data received.')
     }
   }, [
     reactFlowInstance,
@@ -829,6 +883,41 @@ export default function PipelineEditor(props) {
     onPopupMenu
   ]);
 
+  const saveFileToServer = useCallback((descriptionFile) => {
+    api.getListOf("pipeline", (error, pipelineList, response) => {
+      if (error) {
+        showAlert(
+          'error',
+          'Error saving the pipeline',
+          'Failed to retreive pipeline list.\n' +
+            ((response && response.text) ? response.text : error.toString())
+        )
+      } else {
+        let sanitized = descriptionFile.trim().replace(/\s*(\/|>)\s*/, '>')
+        if(!sanitized.endsWith('.json')) sanitized += '.json'
+
+        const descriptionFiles = Object.keys(pipelineList);
+        if (descriptionFiles.includes(sanitized)) {
+          setModal('overwrite')
+          return;
+        }
+        onSave(descriptionFile);
+      }
+    });
+  }, [onSave]);
+
+  const showAlert = useCallback((severity, title, message) => {
+    setAlertSeverity(severity)
+    setAlertTitle(title)
+    setAlertMessage(message)
+  }, [setAlertTitle, setAlertSeverity, setAlertMessage])
+
+  const clearAlert = useCallback(() => {
+    setAlertMessage("")
+    setAlertSeverity("")
+    setAlertTitle("")
+  }, [setAlertTitle, setAlertSeverity, setAlertMessage])
+
   return (
     <div id="editorLayout">
       <p>
@@ -841,6 +930,85 @@ export default function PipelineEditor(props) {
           the documentation
         </a>
       </p>
+
+      <Dialog
+        open={modal === 'saveAs'}
+        onClose={() => hideModal('saveAs')}
+        PaperProps={{
+          component: 'form',
+          onSubmit: (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+
+            hideModal('saveAs')
+            setCurrentFileName(formData.get('fileName'))
+            saveFileToServer(formData.get('fileName'))
+          },
+        }}
+      >
+        <DialogTitle>Save to server</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="File name"
+            type="text"
+            defaultValue={currentFileName}
+            id="fileName"
+            name="fileName"
+            autoFocus
+            required
+            variant="standard"
+            sx={{
+              width: '400px'
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => hideModal('saveAs')}>Cancel</Button>
+          <Button type="submit">Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={modal === 'overwrite'}
+        onClose={() => hideModal('overwrite')}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">This file name already exists.</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Do you want to continue and overwrite the existing file?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModal('saveAs')}>Cancel</Button>
+          <Button onClick={() => {hideModal('overwrite'); onSave(currentFileName)}} autoFocus>
+            Overwrite
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {alertMessage && alertMessage !== '' && // when in open={...}, there was a flash frame while closing.
+        <Dialog open={true} onClose={clearAlert}>
+          <Alert severity={alertSeverity} id="alert-dialog-description" style={{ whiteSpace: "pre-wrap" }}>
+            <AlertTitle>{alertTitle}</AlertTitle>
+            {alertMessage}
+          </Alert>
+          <DialogActions>
+            <Button onClick={clearAlert}>OK</Button>
+          </DialogActions>
+        </Dialog>
+      }
+
+
+      <Snackbar open={modal === 'saveSuccess'}
+        autoHideDuration={3000} onClose={() => hideModal('saveSuccess')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success">Pipeline saved to server</Alert>
+      </Snackbar>
+
+
       <div className="dndflow">
         <ReactFlowProvider>
           <div className="reactflow-wrapper" ref={reactFlowWrapper}>
@@ -875,7 +1043,13 @@ export default function PipelineEditor(props) {
                 <button onClick={onLoadFromServerBtnClick}>
                   Load from server
                 </button>
-                <button onClick={onSave}>Save to clipboard</button>
+                {/^deny$/i.test(process.env.REACT_APP_SAVE_TO_SERVER)
+                  ? <button id="saveBtn" onClick={() => onSave()}>Save to clipboard</button>
+                  : <>
+                    <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
+                    <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
+                  </>
+                }
               </div>
 
               <Controls />

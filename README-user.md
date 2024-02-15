@@ -40,6 +40,11 @@ To run:
     # Access Red List Index
     IUCN_TOKEN=
 
+    # Allow save to server. This API can be blocked on some infrastructures by changing this value.
+    # - deny: Saving will be rejected by server. In the UI, "Save to clipboard" button can be used.
+    # - allow, or anything else: Save and save as buttons available in the UI.
+    SAVE_TO_SERVER=allow
+
     # Script server cache option: 
     # - full: when a script file changes, all related caches are cleared.
     # - partial: when a script file changes, cache is only overriden when running with the same inputs. 
