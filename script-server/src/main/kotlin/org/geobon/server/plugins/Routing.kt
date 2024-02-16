@@ -242,7 +242,7 @@ fun Application.configureRouting() {
 
 
         post("/pipeline/save/{filename}") {
-            if(System.getenv("SAVE_TO_SERVER") == "deny") {
+            if(System.getenv("SAVE_PIPELINE_TO_SERVER") == "deny") {
                 call.respond(HttpStatusCode.ServiceUnavailable, "This server does not allow \"Save to server\" API.\n" +
                         "Use \"Save to clipboard\" and submit file through git.")
                 return@post
