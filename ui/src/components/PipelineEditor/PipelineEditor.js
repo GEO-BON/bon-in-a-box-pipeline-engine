@@ -1025,7 +1025,7 @@ export default function PipelineEditor(props) {
               onDragOver={onDragOver}
               onSelectionChange={onSelectionChange}
               onNodesDelete={onNodesDelete}
-              deleteKeyCode="Delete"
+              deleteKeyCode={['Backspace', 'Delete']}
               onMouseDownCapture={onPopupMenuHide}
             >
               {toolTip && <div className="tooltip">{toolTip}</div>}
