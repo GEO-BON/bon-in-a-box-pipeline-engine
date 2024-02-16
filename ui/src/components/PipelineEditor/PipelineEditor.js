@@ -715,9 +715,10 @@ export default function PipelineEditor(props) {
     if (file) {
       var fr = new FileReader();
       fr.readAsText(file);
-      fr.onload = (loadEvent) =>
+      fr.onload = (loadEvent) => {
         onLoadFlow(JSON.parse(loadEvent.target.result));
-      console.log('file name ',file.name)
+      }
+
       setCurrentFileName(file.name);
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
@@ -889,7 +890,7 @@ export default function PipelineEditor(props) {
         showAlert(
           'error',
           'Error saving the pipeline',
-          'Failed to retreive pipeline list.\n' +
+          'Failed to retrieve pipeline list.\n' +
             ((response && response.text) ? response.text : error.toString())
         )
       } else {
