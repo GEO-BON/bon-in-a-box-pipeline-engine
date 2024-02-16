@@ -32,7 +32,6 @@ services:
       PIPELINES_LOCATION: /pipelines
       OUTPUT_LOCATION: /output
       PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
-      SAVE_TO_SERVER: ${SAVE_TO_SERVER}
 
   runner-r:
     container_name: biab-runner-r
