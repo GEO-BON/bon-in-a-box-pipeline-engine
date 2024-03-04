@@ -320,18 +320,13 @@ Pipeline inputs and outputs then appear in a collapsible pane on the right of th
 Once edited, make sure to save your work before leaving the page.
 
 ### Saving and loading
-The editor _does not_ allow you to edit files live on the server. Files need to be committed to the github repo using git.
+The editor supports saving and loading on the server, unless explicitly disabled by host. This is done intuitively via the "Load from server" and "Save" buttons.
 
-To load an existing pipeline:
-1. Make sure you are up to date using (e.g. `git pull --rebase`).
-2. Click "Load from file"
-3. Browse to the file on your computer and open it.
-
-To save your modifications:
+_In the event that saving has been disabled on your server instance,_ the save button will display "Save to clipboard". To save your modifications:
 1. Click save: the content is copied to your clipboard.
 2. Make sure you are up to date (e.g. `git pull --rebase`).
 3. Remove all the content of the target file.
 4. Paste content and save.
-
-To share your modifications, commit and push on a branch using git. Then, create a pull request for that branch through the github UI.
+5. Commit and push on a branch using git.
+6. To share your modifications, create a pull request for that branch through the github UI.
 
