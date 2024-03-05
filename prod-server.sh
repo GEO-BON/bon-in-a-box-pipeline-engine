@@ -90,6 +90,7 @@ function validate {
         -w /toValidate/ \
         geobon/bon-in-a-box:script-server \
         python3 /validator/validateCerberusSchema.py /validator/pipelineValidationSchema.yml
+    flagErrors
 
     # Final assessment
     if [[ $nErrors -eq 0 ]] ; then
