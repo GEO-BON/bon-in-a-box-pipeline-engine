@@ -715,9 +715,10 @@ export default function PipelineEditor(props) {
     if (file) {
       var fr = new FileReader();
       fr.readAsText(file);
-      fr.onload = (loadEvent) =>
+      fr.onload = (loadEvent) => {
         onLoadFlow(JSON.parse(loadEvent.target.result));
-      console.log('file name ',file.name)
+      }
+
       setCurrentFileName(file.name);
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
@@ -889,7 +890,7 @@ export default function PipelineEditor(props) {
         showAlert(
           'error',
           'Error saving the pipeline',
-          'Failed to retreive pipeline list.\n' +
+          'Failed to retrieve pipeline list.\n' +
             ((response && response.text) ? response.text : error.toString())
         )
       } else {
@@ -1024,7 +1025,7 @@ export default function PipelineEditor(props) {
               onDragOver={onDragOver}
               onSelectionChange={onSelectionChange}
               onNodesDelete={onNodesDelete}
-              deleteKeyCode="Delete"
+              deleteKeyCode={['Backspace', 'Delete']}
               onMouseDownCapture={onPopupMenuHide}
             >
               {toolTip && <div className="tooltip">{toolTip}</div>}
@@ -1043,7 +1044,7 @@ export default function PipelineEditor(props) {
                 <button onClick={onLoadFromServerBtnClick}>
                   Load from server
                 </button>
-                {/^deny$/i.test(process.env.REACT_APP_SAVE_TO_SERVER)
+                {/^deny$/i.test(process.env.REACT_APP_SAVE_PIPELINE_TO_SERVER)
                   ? <button id="saveBtn" onClick={() => onSave()}>Save to clipboard</button>
                   : <>
                     <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>

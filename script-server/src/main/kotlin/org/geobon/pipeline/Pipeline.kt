@@ -89,7 +89,6 @@ open class Pipeline constructor(
             error = ex.message ?: ex.stackTraceToString()
             logger.debug(error)
 
-            // TODO: Vérifier fonction stop
             if (!cancelled) failure = true
         } catch (ex: Exception) {
             error =

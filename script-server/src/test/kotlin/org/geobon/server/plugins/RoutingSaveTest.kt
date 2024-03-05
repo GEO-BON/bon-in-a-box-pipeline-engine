@@ -337,7 +337,7 @@ class RoutingSaveTest {
     }
     @Test
     fun testSaveNotAllowed() = testApplication {
-        withEnvironment("SAVE_TO_SERVER", "deny", OverrideMode.SetOrOverride) {
+        withEnvironment("SAVE_PIPELINE_TO_SERVER", "deny", OverrideMode.SetOrOverride) {
             application { configureRouting() }
 
             val content = """
