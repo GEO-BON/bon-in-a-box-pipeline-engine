@@ -82,7 +82,16 @@ function validate {
         java -cp biab-script-server.jar org.geobon.pipeline.Validator
     flagErrors
 
-    # Final assesment
+    echo "Validating pipeline metadata"
+    docker run --rm  \
+        -v $(pwd)/pipelines:/toValidate \
+        -v $(pwd)/.server/.github/validateCerberusSchema.py:/validator/validateCerberusSchema.py:ro \
+        -v $(pwd)/.server/.github/pipelineValidationSchema.yml:/validator/pipelineValidationSchema.yml:ro \
+        -w /toValidate/ \
+        geobon/bon-in-a-box:script-server \
+        python3 /validator/validateCerberusSchema.py /validator/pipelineValidationSchema.yml
+
+    # Final assessment
     if [[ $nErrors -eq 0 ]] ; then
         echo -e "${GREEN}Validation complete.${ENDCOLOR}"
     else
