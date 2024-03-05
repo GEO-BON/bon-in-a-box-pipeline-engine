@@ -102,6 +102,8 @@ function checkout {
     git checkout $branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
     git checkout $branch -- .github/findDuplicateIds.sh ; assertSuccess
     git checkout $branch -- .github/scriptValidationSchema.yml ; assertSuccess
+    git checkout $branch -- .github/pipelineValidationSchema.yml ; assertSuccess
+    git checkout $branch -- .github/validateCerberusSchema.py ; assertSuccess
 
     git checkout $branch -- http-proxy/conf.d-prod/ngnix.conf ; assertSuccess
 
