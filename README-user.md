@@ -8,12 +8,13 @@ The recommended method is to setup an instance of BON in a Box somewhere you can
 ## Running the servers locally
 Prerequisites :
 - Git
+- A github account, with an SSH key registered. See [Adding a new SSH key to your GitHub account](https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
 - At least 6 GB of free space (this includes the installation of Docker Desktop)
 - RAM requirements will depend on the scripts that you run.
 - **Windows:**
-  - Docker Desktop
+  - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
   - A Linux shell (git bash, [Bash through PowerShell](https://learn.microsoft.com/en-us/windows/wsl/install), cygwin, etc.) necessary to run th `.sh` scripts in the instructions below.
-- **Mac:** Docker Desktop.
+- **Mac:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
   - Make sure docker is added to the path of your terminal. From a terminal, run command `docker run hello-world`. If there is an error message, see [https://stackoverflow.com/a/71923962/3519951](https://stackoverflow.com/a/71923962/3519951).
   - If you encounter error `no matching manifest for linux/arm64/v8 in the manifest list entries`, export DOCKER_DEFAULT_PLATFORM. See [https://stackoverflow.com/a/76404045/3519951](https://stackoverflow.com/a/76404045/3519951).
 - **Linux:** Docker with Docker Compose installed. It is recommended to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
@@ -39,6 +40,12 @@ To run:
 
     # Access Red List Index
     IUCN_TOKEN=
+
+    # Allows to save the pipeline directly to the server in the Pipeline Editor.
+    # This API can be blocked on some infrastructures by changing this value.
+    # - deny: Saving will be rejected by server. In the UI, "Save to clipboard" button can be used.
+    # - allow, or anything else: "Save" and "Save as" buttons available in the UI.
+    SAVE_PIPELINE_TO_SERVER=allow
 
     # Script server cache option:
     # - full: when a script file changes, all related caches are cleared.
@@ -318,18 +325,13 @@ Pipeline inputs and outputs then appear in a collapsible pane on the right of th
 Once edited, make sure to save your work before leaving the page.
 
 ### Saving and loading
-The editor _does not_ allow you to edit files live on the server. Files need to be committed to the github repo using git.
+The editor supports saving and loading on the server, unless explicitly disabled by host. This is done intuitively via the "Load from server" and "Save" buttons.
 
-To load an existing pipeline:
-1. Make sure you are up to date using (e.g. `git pull --rebase`).
-2. Click "Load from file"
-3. Browse to the file on your computer and open it.
-
-To save your modifications:
+_In the event that saving has been disabled on your server instance,_ the save button will display "Save to clipboard". To save your modifications:
 1. Click save: the content is copied to your clipboard.
 2. Make sure you are up to date (e.g. `git pull --rebase`).
 3. Remove all the content of the target file.
 4. Paste content and save.
-
-To share your modifications, commit and push on a branch using git. Then, create a pull request for that branch through the github UI.
+5. Commit and push on a branch using git.
+6. To share your modifications, create a pull request for that branch through the github UI.
 

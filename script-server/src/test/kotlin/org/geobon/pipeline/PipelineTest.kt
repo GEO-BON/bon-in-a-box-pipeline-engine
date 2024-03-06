@@ -4,6 +4,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
+import org.geobon.utils.productionPipelinesRoot
+import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
 
@@ -295,6 +297,21 @@ internal class PipelineTest {
 
         // Result should still be valid
         assertEquals(6, pipeline.outputs["twoBranches.json@14|divideFloat.yml@5|result"]!!.pull())
+    }
+
+    @Test
+    fun `given a pipeline with two errors_when validate_then both error messages are shown`() = runTest {
+        var message = ""
+        try {
+            val file = File(System.getenv("PIPELINES_LOCATION"), "misplugged.json")
+            val pipelineJSON = JSONObject(file.readText())
+            val fakeInputs = Validator.generateInputFromExamples(pipelineJSON)
+            createRootPipeline(file.name, pipelineJSON, fakeInputs)
+        } catch (e:Exception) {
+            message = "${e.message}"
+        }
+
+        assertEquals(2, Regex("Wrong type").findAll(message).count())
     }
 
     @Test

@@ -33,6 +33,55 @@ paths:
                   "SHI.yml": "Species Habitat Index",
                   "Folder>SDM.yml": "Species distribution model"
                 }
+
+  /pipeline/save/{filename}:
+    post:
+      summary: Save a json file to the pipeline folder.
+      operationId: savePipeline
+      parameters:
+        - name: filename
+          in: path
+          description: The name of the JSON file (without extension).
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Content of pipeline.json to save
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "200":
+          description: File saved (check body for pipeline validation errors)
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+              examples:
+                success:
+                  value: saved
+                warning:
+                  value: |
+                    Pipeline saved with errors:
+                    helloWorld>helloPython.yml@0: Wrong type "text" for input "some_int", "int" expected.
+        default:
+          description: |
+            An error occurred, check body for details.
+            Possible errors are server config blocking save API, invalid json file, IO errors.
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+              example:
+                503:
+                  value: |
+                    This server does not allow "Save to server" API.
+                    Use "Save to clipboard" and submit file through git.
   /{type}/{descriptionPath}/info:
     get:
       tags: []
@@ -66,7 +115,7 @@ paths:
               schema:
                 type: object
                 nullable: false
-              example: 
+              example:
                 {
                   "nodes": [
                     {
@@ -214,7 +263,7 @@ paths:
                   Julia runner: 2023-09-07 19:24
                   Julia: julia version 1.8.1
                   TiTiler: 2023-08-30 15:44
-            
+
 components:
   parameters:
     stepType:
@@ -231,8 +280,8 @@ components:
       name: descriptionPath
       in: path
       description:
-        Where to find the step. 
-        For scripts, paths are relative to the /script folder. 
+        Where to find the step.
+        For scripts, paths are relative to the /script folder.
         For pipelines, paths are relative to the /pipeline folder.
       required: true
       style: simple
@@ -252,13 +301,13 @@ components:
     info:
       type: object
       properties:
-        script: 
+        script:
           type: string
           example: helloR.R
         name:
           type: string
           example: R Example
-        description: 
+        description:
           type: string
           example: This sample script shows how it works.
         author:
@@ -272,115 +321,115 @@ components:
               identifier:
                 type: string
                 description: Full URL of a unique digital identifier such as an ORCID
-          example: 
+          example:
             - name: Jane Doe
             - name: John Doe
               identifier: https://orcid.org/0000-0000-0000-0000
         license:
           type: string
           example: CC BY
-        external_link: 
+        external_link:
           type: string
           example: https://github.com/GEO-BON/biab-2.0
         timeout:
           type: number
           example: 60
-        inputs: 
+        inputs:
           type: object
-          additionalProperties: 
+          additionalProperties:
             type: object
-            properties: 
-              description: 
+            properties:
+              description:
                 type: string
                 example: scientific name of the species
-              label: 
+              label:
                 type: string
                 example: species names
-              type: 
+              type:
                 type: string
                 example: text
-              options: 
+              options:
                 type: array
                 items:
                   type: string
                 example:
-                - Option 1
-                - Option 2
+                  - Option 1
+                  - Option 2
               properties:
                 type: array
-                items: 
+                items:
                   type: string
-                example: 
+                example:
                   - id
                   - layer
-              example: 
+              example:
                 example: Glyptemys insculpta
                 oneOf:
-                - type: string
-                - type: number
-                - type: boolean
-                - type: array
-                  items:
-                    oneOf:
-                    - type: string
-                    - type: number
-                    - type: boolean
-        outputs: 
+                  - type: string
+                  - type: number
+                  - type: boolean
+                  - type: array
+                    items:
+                      oneOf:
+                        - type: string
+                        - type: number
+                        - type: boolean
+        outputs:
           type: object
-          additionalProperties: 
+          additionalProperties:
             type: object
-            properties: 
-              description: 
+            properties:
+              description:
                 type: string
-                example: coordinate of occurances in 
-              label: 
+                example: coordinate of occurances in
+              label:
                 type: string
                 example: occurences
-              type: 
+              type:
                 type: string
                 example: text/csv
-              range: 
+              range:
                 type: array
                 items:
                   type: number
                 minItems: 2
                 maxItems: 2
                 example: [0, 1]
-              options: 
+              options:
                 type: array
                 items:
                   type: string
                 example:
-                - Option 1
-                - Option 2
+                  - Option 1
+                  - Option 2
               properties:
                 type: array
-                items: 
+                items:
                   type: string
-                example: 
+                example:
                   - id
                   - layer
-              example: 
+              example:
                 example: file.csv
                 oneOf:
-                - type: string
-                - type: number
-                - type: boolean
-                - type: array
-                  items:
-                    oneOf:
-                    - type: string
-                    - type: number
-                    - type: boolean
-        references: 
+                  - type: string
+                  - type: number
+                  - type: boolean
+                  - type: array
+                    items:
+                      oneOf:
+                        - type: string
+                        - type: number
+                        - type: boolean
+        references:
           type: array
-          items: 
+          items:
             type: object
-            properties: 
-              text: 
+            properties:
+              text:
                 type: string
                 example: Rick Bonney Expanding the Impact of Citizen Science BioScience Volume 71 Issue 5 May 2021 Pages 448–451
-              doi: 
+              doi:
                 type: string
                 example: 10.1093/biosci/biab041
   requestBodies:
@@ -391,8 +440,8 @@ components:
         text/plain:
           schema:
             type: string
-            example: 
-              { 
-                "occurence":"/output/result/from/previous/script", 
+            example:
+              {
+                "occurence":"/output/result/from/previous/script",
                 "intensity":3
               }

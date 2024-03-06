@@ -438,7 +438,7 @@ class ApiClient {
         }
 
         if (contentType === 'application/x-www-form-urlencoded') {
-            
+
             request.send(
                 // Migrated from querystring (deprecated) to URLSearchParams
                 new URLSearchParams(this.normalizeParams(formParams)).toString()
@@ -475,7 +475,9 @@ class ApiClient {
         if (returnType === 'Blob') {
           request.responseType('blob');
         } else if (returnType === 'String') {
-          request.responseType('string');
+          // JM Lord: This should be text, not string. Otherwise it generates the following warning:
+          // "The provided value 'string' is not a valid enum value of type XMLHttpRequestResponseType."
+          request.responseType('text');
         }
 
         // Attach previously saved cookies, if enabled

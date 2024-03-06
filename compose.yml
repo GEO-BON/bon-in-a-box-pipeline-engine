@@ -8,6 +8,8 @@ services:
     depends_on:
       - script-server
       - tiler
+    environment:
+      REACT_APP_SAVE_PIPELINE_TO_SERVER: ${SAVE_PIPELINE_TO_SERVER}
 
   # This can be accessed within the docker network with http://biab-script-server:8080/script/...
   script-server:
@@ -15,7 +17,7 @@ services:
     volumes:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ./script-stubs:/scripts-stub:ro
-      - ${PIPELINE_REPO_PATH}/pipelines:/pipelines:ro
+      - ${PIPELINE_REPO_PATH}/pipelines:/pipelines:rw
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
       - /var/run/docker.sock:/var/run/docker.sock
@@ -24,12 +26,12 @@ services:
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
     environment:
-      - SCRIPT_LOCATION=/scripts
-      - SCRIPT_STUBS_LOCATION=/script-stubs
-      - USERDATA_LOCATION=/userdata
-      - PIPELINES_LOCATION=/pipelines
-      - OUTPUT_LOCATION=/output
-      - PIPELINE_REPO_PATH=${PIPELINE_REPO_PATH}
+      SCRIPT_LOCATION: /scripts
+      SCRIPT_STUBS_LOCATION: /script-stubs
+      USERDATA_LOCATION: /userdata
+      PIPELINES_LOCATION: /pipelines
+      OUTPUT_LOCATION: /output
+      PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
 
   runner-r:
     container_name: biab-runner-r
@@ -40,9 +42,9 @@ services:
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
     environment:
-      - SCRIPT_LOCATION=/scripts
-      - USERDATA_LOCATION=/userdata
-      - OUTPUT_LOCATION=/output
+      SCRIPT_LOCATION: /scripts
+      USERDATA_LOCATION: /userdata
+      OUTPUT_LOCATION: /output
 
   runner-julia:
     container_name: biab-runner-julia
@@ -53,9 +55,9 @@ services:
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
     environment:
-      - SCRIPT_LOCATION=/scripts
-      - USERDATA_LOCATION=/userdata
-      - OUTPUT_LOCATION=/output
+      SCRIPT_LOCATION: /scripts
+      USERDATA_LOCATION: /userdata
+      OUTPUT_LOCATION: /output
 
   http-gateway:
     container_name: http-rev-prox
@@ -77,8 +79,8 @@ services:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
     environment:
-      - PORT=8000
-      - WORKERS_PER_CORE=1
-      - TITILER_API_CORS_ORIGINS=*
+      PORT: 8000
+      WORKERS_PER_CORE: 1
+      TITILER_API_CORS_ORIGINS: '*'
     extra_hosts:
       - "host.docker.internal:host-gateway"
