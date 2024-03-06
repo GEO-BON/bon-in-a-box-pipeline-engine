@@ -53,6 +53,11 @@ To run:
     # NB: applied on next docker compose up
     SCRIPT_SERVER_CACHE_CLEANER=full
 
+    # Optional: By default, server starts on localhost with port 80.
+    # If port 80 is already in use on your server, specify another port here.
+    # The UI will be visible in http://localhost:81 if HTTP_PORT=81
+    #HTTP_PORT=81
+
     ```
 2. Using a terminal, navigate to top-level folder.
 3. `./server-up.sh`
