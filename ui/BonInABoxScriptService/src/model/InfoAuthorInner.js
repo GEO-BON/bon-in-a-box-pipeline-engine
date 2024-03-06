@@ -50,6 +50,9 @@ class InfoAuthorInner {
             if (data.hasOwnProperty('name')) {
                 obj['name'] = ApiClient.convertToType(data['name'], 'String');
             }
+            if (data.hasOwnProperty('email')) {
+                obj['email'] = ApiClient.convertToType(data['email'], 'String');
+            }
             if (data.hasOwnProperty('identifier')) {
                 obj['identifier'] = ApiClient.convertToType(data['identifier'], 'String');
             }
@@ -66,6 +69,10 @@ class InfoAuthorInner {
         // ensure the json data is a string
         if (data['name'] && !(typeof data['name'] === 'string' || data['name'] instanceof String)) {
             throw new Error("Expected the field `name` to be a primitive type in the JSON string but got " + data['name']);
+        }
+        // ensure the json data is a string
+        if (data['email'] && !(typeof data['email'] === 'string' || data['email'] instanceof String)) {
+            throw new Error("Expected the field `email` to be a primitive type in the JSON string but got " + data['email']);
         }
         // ensure the json data is a string
         if (data['identifier'] && !(typeof data['identifier'] === 'string' || data['identifier'] instanceof String)) {
@@ -85,6 +92,12 @@ class InfoAuthorInner {
  * @member {String} name
  */
 InfoAuthorInner.prototype['name'] = undefined;
+
+/**
+ * Email of the author
+ * @member {String} email
+ */
+InfoAuthorInner.prototype['email'] = undefined;
 
 /**
  * Full URL of a unique digital identifier such as an ORCID
