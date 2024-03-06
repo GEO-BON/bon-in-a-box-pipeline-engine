@@ -14,12 +14,15 @@ description:
 author:
   type: list
   required: true
-  schema: 
+  schema:
     type: dict
     schema:
-      name: 
+      name:
         type: string
         required: true
+      email:
+        type: string
+        required: false
       identifier:
         type: string
         required: false
@@ -42,11 +45,11 @@ inputs:
   required: false
   nullable: true
   type: dict
-  keysrules: 
+  keysrules:
    type: string
    regex: "[a-z0-9_]+"
-  valuesrules: 
-    schema: 
+  valuesrules:
+    schema:
       label:
         required: true
         type: string
@@ -89,12 +92,12 @@ outputs:
   required: true
   nullable: false
   type: dict
-  keysrules: 
+  keysrules:
    type: string
    regex: "[a-z0-9_]+"
    forbidden: [info, warning, error]
-  valuesrules: 
-    schema: 
+  valuesrules:
+    schema:
       label:
         required: true
         type: string
@@ -146,8 +149,8 @@ references:
   type: list
   schema:
     type: dict
-    schema: 
-      text: 
+    schema:
+      text:
         required: true
         type: string
       doi:

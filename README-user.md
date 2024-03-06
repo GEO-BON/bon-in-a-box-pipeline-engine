@@ -53,6 +53,11 @@ To run:
     # NB: applied on next docker compose up
     SCRIPT_SERVER_CACHE_CLEANER=full
 
+    # Optional: By default, server starts on localhost with port 80.
+    # If port 80 is already in use on your server, specify another port here.
+    # The UI will be visible in http://localhost:81 if HTTP_PORT=81
+    #HTTP_PORT=81
+
     ```
 2. Using a terminal, navigate to top-level folder.
 3. `./server-up.sh`
@@ -109,7 +114,8 @@ name: # short name, such as My Script
 description: # Targetted to those who will interpret pipeline results and edit pipelines.
 author: # 1 to many
   - name: # Full name
-    identifier: # Optional, full URL of a unique digital identifier such as an ORCID
+    email: # Optional, email address of the author. This will be publicly available.
+    identifier: # Optional, full URL of a unique digital identifier, such as an ORCID.
 license: # Optional. If unspecified, the project's MIT license will apply.
 external_link: # Optional, link to a separate project, github repo, etc.
 timeout: # Optional, in minutes. By defaults steps time out after 1h to avoid hung process to consume resources. It can be made longer for heavy processes.

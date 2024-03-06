@@ -25,23 +25,32 @@ export function getFolderAndName(ymlPath, name) {
 /**
  * Prints a general description of the script, along with the references.
  * @param {string} Path to the yml script description file
- * @param {object} Script metadata 
+ * @param {object} Script metadata
 */
 export function GeneralDescription({ ymlPath, metadata }) {
     if (!metadata)
         return null
 
     const codeLink = getCodeUrl(ymlPath, metadata.script)
-    
+
     return <div className='stepDescription'>
         {metadata.author &&
             <p>
                 <i>
                     {metadata.author.map((author, i, array) => {
+                        let email = author.email && <a href={'mailto:' + author.email} style={{textDecoration:'none'}}> &#9993;</a>
                         let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
-                        return author.identifier ?
-                            <span key={i}><a href={author.identifier} target="_blank">{author.name}{comma}</a> </span>
-                            : <span key={i}>{author.name}{comma} </span>
+                        if (author.identifier)
+                            return <span key={i}>
+                                <a href={author.identifier} target="_blank">
+                                    {author.name}{!email && comma}
+                                </a>
+                                {email && <>{email}{comma}</>}
+                                &nbsp;
+                            </span>
+
+                        else
+                            return <span key={i}>{author.name}{email}{comma} </span>
                     })}
                 </i>
             </p>
@@ -112,7 +121,7 @@ function getCodeUrl(ymlPath, scriptFileName) {
         return null
     }
 
-    return 'https://github.com/GEO-BON/biab-2.0/tree/main/scripts/' + removeLastSlash(ymlPath.replaceAll('>', '/')) + scriptFileName 
+    return 'https://github.com/GEO-BON/biab-2.0/tree/main/scripts/' + removeLastSlash(ymlPath.replaceAll('>', '/')) + scriptFileName
 }
 
 function removeLastSlash(s) {
@@ -123,7 +132,7 @@ function removeLastSlash(s) {
 
 /**
  * Prints the inputs from the script metadata.
- * @param {object} Script metadata 
+ * @param {object} Script metadata
  */
 export function InputsDescription({ metadata }) {
     if (!metadata || !metadata.inputs)
@@ -137,7 +146,7 @@ export function InputsDescription({ metadata }) {
 
 /**
  * Prints the outputs from the script metadata.
- * @param {object} Script metadata 
+ * @param {object} Script metadata
  */
 export function OutputsDescription({ metadata }) {
     if (!metadata || !metadata.outputs)
