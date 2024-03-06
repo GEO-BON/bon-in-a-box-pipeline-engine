@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Editor from '@monaco-editor/react';
+const Editor = React.lazy(() => import('@monaco-editor/react'));
 
 // TODO: See https://github.com/suren-atoyan/monaco-react for configuration
 // TODO: Try this for code validation: https://github.com/suren-atoyan/monaco-react/issues/228#issuecomment-1159365104
-// TODO: Split the editor in a separate bundle. It's quite heavy and not needed when running the pipeline... 
 
 const emptyMetadata = `name: # short name, such as My Script
 description: # Targetted to those who will interpret pipeline results and edit pipelines.
