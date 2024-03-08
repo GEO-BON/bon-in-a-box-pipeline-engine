@@ -134,7 +134,7 @@ function up {
         # Container conflict, perform clean and try again.
         clean
         echo "Starting the server after a clean..."
-        command up $@ ; assertSuccess
+        command up -d $@ ; assertSuccess
     else # No container conflict, check the return code
         if [[ $returnCode -ne 0 ]] ; then
             echo $output
