@@ -12,11 +12,11 @@ inputs:
 outputs:
   increment:
     label: A number (input++)
-    description: bla bla
+    description: bla bla int
     type: int
     example: 4
   tell_me:
     label: Tell me
-    description: bla bla
+    description: bla bla text
     type: text/plain
     example: "Some string"

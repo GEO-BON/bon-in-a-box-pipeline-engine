@@ -4,8 +4,8 @@
       "id": "0",
       "type": "constant",
       "position": {
-        "x": -13,
-        "y": 93.76666259765625
+        "x": 12,
+        "y": 145.5
       },
       "data": {
         "type": "int",
@@ -30,8 +30,8 @@
       "id": "1",
       "type": "output",
       "position": {
-        "x": 892.5,
-        "y": 338.8999938964844
+        "x": 672,
+        "y": 86.5
       },
       "data": {
         "label": "Output"
@@ -55,8 +55,8 @@
       "id": "3",
       "type": "io",
       "position": {
-        "x": 199,
-        "y": 162.39999389648438
+        "x": 357,
+        "y": 159.5
       },
       "data": {
         "descriptionFile": "helloWorld>helloPython.yml"
@@ -89,8 +89,8 @@
       "id": "5",
       "type": "io",
       "position": {
-        "x": 531.2093167415944,
-        "y": 110.36905671527575
+        "x": 752,
+        "y": 239.5
       },
       "data": {
         "descriptionFile": "helloWorld>helloPython.yml"
@@ -123,8 +123,8 @@
       "id": "6",
       "type": "io",
       "position": {
-        "x": 456.73943935904254,
-        "y": 291.47306241997455
+        "x": 357,
+        "y": 26
       },
       "data": {
         "descriptionFile": "helloWorld>helloPython.yml"
@@ -157,8 +157,8 @@
       "id": "7",
       "type": "io",
       "position": {
-        "x": 862.23809573488,
-        "y": 111.8234655072233
+        "x": 1147,
+        "y": 319.5
       },
       "data": {
         "descriptionFile": "helloWorld>helloPython.yml"
@@ -191,8 +191,8 @@
       "id": "8",
       "type": "output",
       "position": {
-        "x": 1160.5058233187715,
-        "y": 192.06986288977328
+        "x": 1462,
+        "y": 380
       },
       "data": {
         "label": "Output"
@@ -216,8 +216,8 @@
       "id": "9",
       "type": "constant",
       "position": {
-        "x": 140.7973292066638,
-        "y": 224.6065132286244
+        "x": 12,
+        "y": 12
       },
       "data": {
         "type": "int",
@@ -297,5 +297,15 @@
       "type": "int",
       "example": 4
     }
+  },
+  "metadata": {
+    "name": "0 in 2 out - parallel pipelines",
+    "description": "Pipeline for automated tests",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }

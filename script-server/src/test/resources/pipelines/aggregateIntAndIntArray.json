@@ -87,5 +87,15 @@
         5
       ]
     }
+  },
+  "metadata": {
+    "name": "Aggregate int and int[] to int[]",
+    "description": "Pipeline for automated tests",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }

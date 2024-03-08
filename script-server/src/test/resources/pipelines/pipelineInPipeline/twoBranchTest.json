@@ -85,5 +85,15 @@
       "type": "float",
       "example": 1.6
     }
+  },
+  "metadata": {
+    "name": "Subpipeline with two branches",
+    "description": "Pipeline for automated tests. Only one of the branches should execute.",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }

@@ -35,7 +35,7 @@ function flagErrors {
 
 function help {
     echo "Usage: ./prod-server.sh COMMAND [ARGS...]"
-    echo 
+    echo
     echo "Commands:"
     echo "    help                 Display this help"
     echo "    checkout [BRANCH]    Checkout config files from given branch of pipeline engine repo."
@@ -54,7 +54,7 @@ function help {
 # Run your docker commands on the server manually.
 # `command <command>` with command such as pull/run/up/down/build/logs...
 function command { # args appended to the docker compose command
-   docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml --env-file .server/.prod-paths.env $@
+   docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml --env-file runner.env --env-file .server/.prod-paths.env $@
 }
 
 function validate {
@@ -72,7 +72,7 @@ function validate {
         ".github/scriptValidationSchema.yml" "scripts/" "no" ".yml"
     flagErrors
 
-    echo "Checking for duplicate descriptions in pipelines..."
+    echo "Checking for duplicate ids in pipelines..."
     cd pipelines ; assertSuccess
     ../.server/.github/findDuplicateIds.sh ; flagErrors
     cd ..
@@ -82,10 +82,20 @@ function validate {
         java -cp biab-script-server.jar org.geobon.pipeline.Validator
     flagErrors
 
-    # Final assesment
+    echo "Validating pipeline metadata"
+    docker run --rm  \
+        -v $(pwd)/pipelines:/toValidate \
+        -v $(pwd)/.server/.github/validateCerberusSchema.py:/validator/validateCerberusSchema.py:ro \
+        -v $(pwd)/.server/.github/pipelineValidationSchema.yml:/validator/pipelineValidationSchema.yml:ro \
+        -w /toValidate/ \
+        geobon/bon-in-a-box:script-server \
+        python3 /validator/validateCerberusSchema.py /validator/pipelineValidationSchema.yml
+    flagErrors
+
+    # Final assessment
     if [[ $nErrors -eq 0 ]] ; then
         echo -e "${GREEN}Validation complete.${ENDCOLOR}"
-    else 
+    else
         echo -e "${RED}Errors occured during validation. Check logs above.${ENDCOLOR}"
         exit 1
     fi
@@ -102,6 +112,8 @@ function checkout {
     git checkout $branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
     git checkout $branch -- .github/findDuplicateIds.sh ; assertSuccess
     git checkout $branch -- .github/scriptValidationSchema.yml ; assertSuccess
+    git checkout $branch -- .github/pipelineValidationSchema.yml ; assertSuccess
+    git checkout $branch -- .github/validateCerberusSchema.py ; assertSuccess
 
     git checkout $branch -- http-proxy/conf.d-prod/ngnix.conf ; assertSuccess
 
@@ -116,13 +128,13 @@ function up {
     command pull ; assertSuccess
 
     echo "Starting the server..."
-    output=$(command up -d $@ 2>&1); returnCode=$?; 
-    
-    if [[ $output == *"is already in use by container"* ]] ; then 
+    output=$(command up -d $@ 2>&1); returnCode=$?;
+
+    if [[ $output == *"is already in use by container"* ]] ; then
         # Container conflict, perform clean and try again.
         clean
         echo "Starting the server after a clean..."
-        command up $@ ; assertSuccess
+        command up -d $@ ; assertSuccess
     else # No container conflict, check the return code
         if [[ $returnCode -ne 0 ]] ; then
             echo $output
@@ -145,14 +157,14 @@ function clean {
         biab-tiler biab-runner-r biab-runner-julia
     assertSuccess
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
-}     
+}
 
 case "$1" in
     help)
         help
         ;;
     checkout)
-        checkout $2 
+        checkout $2
         ;;
     up)
         shift

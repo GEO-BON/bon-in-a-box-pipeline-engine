@@ -26,8 +26,8 @@
       "id": "4",
       "type": "userInput",
       "position": {
-        "x": 86.5,
-        "y": 14
+        "x": 84.33331298828125,
+        "y": 11
       },
       "dragHandle": ".dragHandle",
       "data": {
@@ -55,12 +55,13 @@
     "pipeline@4": {
       "label": "Text input",
       "description": "Some input, we use text as an example but could be other type.",
-      "type": "text"
+      "type": "text",
+      "example": null
     }
   },
   "outputs": {
     "assertNull.yml@1|the_same": {
-      "description": "The same value as in the inputs. But this crashes if not null!",
+      "description": "The same value as in the inputs. But this crashes if not null!\n\nSo it will always be null...",
       "label": "Same value",
       "type": "text"
     }

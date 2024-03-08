@@ -7,7 +7,7 @@ import org.json.JSONObject
 import java.io.File
 
 class AssignId(stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()) :
-    YMLStep(File(System.getenv("SCRIPT_STUB_LOCATION"),"pipeline/AssignId.yml"), stepId, inputs = inputs) {
+    YMLStep(File(System.getenv("SCRIPT_STUBS_LOCATION"),"pipeline/AssignId.yml"), stepId, inputs = inputs) {
 
     var idForLayer:String? = null
 

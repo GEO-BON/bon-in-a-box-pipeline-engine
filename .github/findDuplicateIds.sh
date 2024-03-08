@@ -3,13 +3,16 @@
 RED="\033[31m"
 ENDCOLOR="\033[0m"
 
-echo "Checking for duplicate ids inside each json files..."
+echo "Checking for duplicate ids inside each json file..."
 # A duplicate id in a pipeline JSON file can occur after a merge that went wrong.
 # The usual solution is to delete one of the two edges, but it needs careful manual validation
 # to check if the edges connected the same steps.
 
+# The number of spaces here is important, because it matches the indentation of node ids.
+# It is normal that input or output "id" repeats if a script is there twice.
+
 RESULTS=$(find . -name "*.json" -exec sh -c "echo {}; \
-grep \"\\\"id\\\": \\\"\" '{}' \
+grep \"^      \\\"id\\\": \\\"\" '{}' \
   | sort \
   | uniq -d \
   | awk '{print \"${RED}\" \"[DUPLICATE] \" \$0 \"${ENDCOLOR}\"}'" \;)

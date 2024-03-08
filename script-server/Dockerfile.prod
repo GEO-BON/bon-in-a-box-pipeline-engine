@@ -1,11 +1,14 @@
 FROM openjdk:11-jre-bullseye as base-image
 
-# Installing 
+# Installing
 # - python (to run python scripts directly on the server)
 RUN set -ex; \
     apt-get update; \
-    apt-get install -y --no-install-recommends python3 libc6-dev; \
+    apt-get install -y --no-install-recommends python3 pip libc6-dev; \
     apt-get clean all;
+
+# Necessary for pipeline validation with cerberus schema
+RUN pip3 install pyyaml cerberus;
 
 #INSTALL DOCKER CLI
 ENV DOCKER_VERSION=20.10.9
@@ -32,4 +35,4 @@ COPY --from=builder /home/gradle/project/build/libs/biab-script-server-all.jar /
 WORKDIR /root
 CMD ["java", "-server", "-Xms4g", "-Xmx4g", "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=100", "-XX:+UseStringDeduplication", "-jar", "biab-script-server.jar"]
 
-RUN date +"%Y-%m-%d %R" > /version.txt 
+RUN date +"%Y-%m-%d %R" > /version.txt

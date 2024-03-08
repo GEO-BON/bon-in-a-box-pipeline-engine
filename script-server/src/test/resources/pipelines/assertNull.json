@@ -54,10 +54,25 @@
     "assertNull.yml@0|input": {
       "description": "Some input, we use text as an example but could be other type.",
       "label": "Text input",
-      "type": "text"
+      "type": "text",
+      "example": null
     }
   },
   "outputs": {
-    "assertNull.yml@1|the_same": {}
+    "assertNull.yml@1|the_same": {
+      "description": "The same value as in the inputs. But this crashes if not null!",
+      "label": "Same value",
+      "type": "text"
+    }
+  },
+  "metadata": {
+    "name": "Assert null from implicit input",
+    "description": "Pipeline for automated tests",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }

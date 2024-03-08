@@ -30,7 +30,7 @@ tasks.test {
 
     environment(mapOf(
         "SCRIPT_LOCATION" to "$projectDir/src/test/resources/scripts/",
-        "SCRIPT_STUB_LOCATION" to projectDir.parent + "/script-stubs/",
+        "SCRIPT_STUBS_LOCATION" to projectDir.parent + "/script-stubs/",
         "PIPELINES_LOCATION" to "$projectDir/src/test/resources/pipelines/",
         "OUTPUT_LOCATION" to "$projectDir/src/test/resources/outputs/",
         "SCRIPT_SERVER_CACHE_CLEANER" to "full"
@@ -61,7 +61,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementation("org.yaml:snakeyaml:2.0")
-    
+
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
     testImplementation("io.mockk:mockk:1.13.2")
