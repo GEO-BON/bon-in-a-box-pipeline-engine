@@ -133,7 +133,7 @@ export function PipelineResults({
 export function DelayedResult({
   breadcrumbs, folder, setRunningScripts, setPipelineOutputResults,
 }) {
-  const [resultData, setResultData] = useState(null);
+  const [outputData, setOutputData] = useState(null);
   const [scriptMetadata, setScriptMetadata] = useState(null);
   const [running, setRunning] = useState(false);
   const [skippedMessage, setSkippedMessage] = useState();
@@ -142,7 +142,7 @@ export function DelayedResult({
 
   useEffect(() => {
     // A script is running when we know it's folder but have yet no result nor error message
-    let nowRunning = folder && !resultData;
+    let nowRunning = folder && !outputData;
     setRunning(nowRunning);
 
     setRunningScripts((oldSet) => {
@@ -150,20 +150,20 @@ export function DelayedResult({
       nowRunning ? newSet.add(folder) : newSet.delete(folder);
       return newSet;
     });
-  }, [setRunningScripts, folder, resultData]);
+  }, [setRunningScripts, folder, outputData]);
 
   useEffect(() => {
     if (folder) {
       if (folder === "skipped") {
-        setResultData({
+        setOutputData({
           info: "Skipped: not necessary with the given parameters",
         });
         setSkippedMessage("Skipped");
       } else if (folder === "aborted") {
-        setResultData({ warning: "Skipped due to previous failure" });
+        setOutputData({ warning: "Skipped due to previous failure" });
         setSkippedMessage("Aborted");
       } else if (folder === "cancelled") {
-        setResultData({ warning: "Skipped when pipeline stopped" });
+        setOutputData({ warning: "Skipped when pipeline stopped" });
         setSkippedMessage("Cancelled");
       }
     }
@@ -189,7 +189,7 @@ export function DelayedResult({
         })
         .then((json) => {
           // Detailed results
-          setResultData(json);
+          setOutputData(json);
 
           // Contribute to pipeline outputs (if this script is relevant)
           setPipelineOutputResults((results) => {
@@ -200,7 +200,7 @@ export function DelayedResult({
         })
         .catch((response) => {
           clearInterval(interval);
-          setResultData({
+          setOutputData({
             error: response.status + " (" + response.statusText + ")",
           });
         });
@@ -222,17 +222,17 @@ export function DelayedResult({
   let content, inline = null;
   let className = "foldableScriptResult";
   if (folder) {
-    if (resultData) {
-      content = <StepResult data={resultData} metadata={scriptMetadata} />;
+    if (outputData) {
+      content = <StepResult data={outputData} metadata={scriptMetadata} />;
       inline = (
         <>
-          {resultData.error && (
+          {outputData.error && (
             <img src={errorImg} alt="Error" className="error-inline" />
           )}
-          {resultData.warning && (
+          {outputData.warning && (
             <img src={warningImg} alt="Warning" className="error-inline" />
           )}
-          {resultData.info && (
+          {outputData.info && (
             <img src={infoImg} alt="Info" className="info-inline" />
           )}
           {skippedMessage && <i>{skippedMessage}</i>}
@@ -259,7 +259,7 @@ export function DelayedResult({
       <GeneralDescription ymlPath={script} metadata={scriptMetadata} />
       {content}
       {folder && !skippedMessage && (
-        <LogViewer address={logsAddress} autoUpdate={!resultData} />
+        <LogViewer address={logsAddress} autoUpdate={!outputData} />
       )}
     </FoldableOutputWithContext>
   );
