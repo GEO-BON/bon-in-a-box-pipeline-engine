@@ -213,6 +213,14 @@ img#logo {
   border-left: 0.4em solid #115CA2;
 }
 
+.stepInputs .outputContent {
+  border-left: 0.4em solid #EAA222;
+}
+
+.stepInputs .outputContent .outputContent {
+  border-left: 0.4em solid #ebcf9f;
+}
+
 table {
   border-collapse: collapse;
   margin-bottom: 0.5em;

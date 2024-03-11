@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { StepResult, SingleOutputResult } from "./StepResult";
 import {
+  FoldableOutput,
   RenderContext,
   createContext
 } from "./FoldableOutput";
@@ -133,6 +134,7 @@ export function PipelineResults({
 export function DelayedResult({
   breadcrumbs, folder, setRunningScripts, setPipelineOutputResults,
 }) {
+  const [inputData, setInputData] = useState(null);
   const [outputData, setOutputData] = useState(null);
   const [scriptMetadata, setScriptMetadata] = useState(null);
   const [running, setRunning] = useState(false);
@@ -172,6 +174,22 @@ export function DelayedResult({
 
   const interval = useInterval(
     () => {
+      if(!inputData) {
+        fetch("/output/" + folder + "/input.json")
+          .then((response) => {
+            if (response.ok)
+              return response.json();
+
+            return Promise.reject(response);
+          })
+          .then((json) => {setInputData(json);})
+          .catch((response) => {
+            setInputData({
+              error: response.status + " (" + response.statusText + ")",
+            });
+          });
+      }
+
       // Fetch the output
       fetch("/output/" + folder + "/output.json")
         .then((response) => {
@@ -219,11 +237,17 @@ export function DelayedResult({
     api.getInfo("script", script, callback);
   }, [script]);
 
-  let content, inline = null;
+  let inputsContent, outputsContent, inline = null;
   let className = "foldableScriptResult";
-  if (folder) {
+  if (folder && scriptMetadata) {
+    if(inputData){
+      inputsContent = <FoldableOutput title="Inputs" className="stepInputs">
+        <StepResult data={inputData} sectionMetadata={scriptMetadata.inputs} />
+      </FoldableOutput>
+    }
+
     if (outputData) {
-      content = <StepResult data={outputData} metadata={scriptMetadata} />;
+      outputsContent = <StepResult data={outputData} sectionMetadata={scriptMetadata.outputs} />;
       inline = (
         <>
           {outputData.error && (
@@ -239,11 +263,11 @@ export function DelayedResult({
         </>
       );
     } else {
-      content = <p>Running...</p>;
+      outputsContent = <p>Running...</p>;
       inline = <InlineSpinner />;
     }
   } else {
-    content = <p>Waiting for previous steps to complete.</p>;
+    outputsContent = <p>Waiting for previous steps to complete.</p>;
     className += " gray";
   }
 
@@ -257,7 +281,8 @@ export function DelayedResult({
       className={className}
     >
       <GeneralDescription ymlPath={script} metadata={scriptMetadata} />
-      {content}
+      {inputsContent}
+      {outputsContent}
       {folder && !skippedMessage && (
         <LogViewer address={logsAddress} autoUpdate={!outputData} />
       )}

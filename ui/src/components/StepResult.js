@@ -4,13 +4,13 @@ import React from 'react';
 import RenderedCSV from './csv/RenderedCSV';
 import { FoldableOutputWithContext, RenderContext, createContext, FoldableOutput } from "./FoldableOutput";
 
-export function StepResult({data, metadata, logs}) {
+export function StepResult({data, sectionMetadata, logs}) {
     const [activeRenderer, setActiveRenderer] = useState({});
 
     return (data || logs) && (
         <div>
             <RenderContext.Provider value={createContext(activeRenderer, setActiveRenderer)}>
-                <AllOutputsResults key="files" files={data} stepMetadata={metadata} />
+                <AllOutputsResults key="results" results={data} sectionMetadata={sectionMetadata} />
                 <Logs key="logs" logs={logs} />
             </RenderContext.Provider>
         </div>
@@ -23,8 +23,8 @@ export function StepResult({data, metadata, logs}) {
  * Others out there: image/geotiff, image/tiff;subtype=geotiff, image/geo+tiff
  * See https://github.com/opengeospatial/geotiff/issues/34
  * Plus covering a common typo when second F omitted
- * 
- * @param {string} mime subtype 
+ *
+ * @param {string} mime subtype
  * @return True if subtype image is a geotiff
  */
 function isGeotiff(subtype) {
@@ -41,29 +41,29 @@ function FallbackDisplay({content}) {
             return <RenderedCSV url={content} delimiter="," />
         else if(content.search(/.tsv$/i))
             return <RenderedCSV url={content} delimiter="&#9;" />
-        else 
+        else
             return <img src={content} alt={content} />
     }
 
     // Plain text or numeric value
-    return <p className="resultText">{content}</p>    
+    return <p className="resultText">{content}</p>
 }
 
-function AllOutputsResults({ files, stepMetadata }) {
-    return files && Object.entries(files).map(entry => {
+function AllOutputsResults({ results, sectionMetadata }) {
+    return results && Object.entries(results).map(entry => {
         const [key, value] = entry;
 
         if (key === "warning" || key === "error" || key === "info") {
             return value && <p key={key} className={key}>{value}</p>;
         }
 
-        const outputMetadata = stepMetadata && stepMetadata.outputs && stepMetadata.outputs[key]
+        const ioMetadata = sectionMetadata && sectionMetadata[key]
 
-        return <SingleOutputResult key={key} outputId={key} outputValue={value} outputMetadata={outputMetadata} />
+        return <SingleOutputResult key={key} outputId={key} outputValue={value} outputMetadata={ioMetadata} />
     });
 }
 
-export function SingleOutputResult({ outputId, outputValue, outputMetadata, componentId }) { 
+export function SingleOutputResult({ outputId, outputValue, outputMetadata, componentId }) {
     if(!componentId)
         componentId = outputId
 
@@ -122,7 +122,7 @@ export function SingleOutputResult({ outputId, outputValue, outputMetadata, comp
                     return <RenderedCSV url={content} delimiter="," />;
                 if (subtype === "tab-separated-values")
                     return <RenderedCSV url={content} delimiter="&#9;" />;
-                
+
                 break;
 
             case "object":
@@ -210,7 +210,7 @@ function Logs({ logs }) {
 
 
 function isRelativeLink(value) {
-    if (value && typeof value.startsWith === "function") { 
+    if (value && typeof value.startsWith === "function") {
         return value.startsWith('/')
     }
     return false
