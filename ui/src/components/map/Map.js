@@ -50,7 +50,7 @@ function MarkerCluster({ markers }) {
       if (markerClusterLayer)
         markerClusterLayer.remove()
     };
-  }, [markers])
+  }, [markers, map])
 
   return null
 }
@@ -65,7 +65,7 @@ function MarkerGroup({markers}) {
     [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY],
     [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY]
   ]
-  
+
   const markerComponents = markers.map((marker, i) => {
     if (marker.pos && marker.pos[0] && marker.pos[1]) {
       bounds[0][0] = Math.min(bounds[0][0], marker.pos[0])

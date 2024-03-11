@@ -90,6 +90,18 @@ export default function PipelineEditor(props) {
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState();
 
+  const showAlert = useCallback((severity, title, message) => {
+    setAlertSeverity(severity)
+    setAlertTitle(title)
+    setAlertMessage(message)
+  }, [setAlertTitle, setAlertSeverity, setAlertMessage])
+
+  const clearAlert = useCallback(() => {
+    setAlertMessage("")
+    setAlertSeverity("")
+    setAlertTitle("")
+  }, [setAlertTitle, setAlertSeverity, setAlertMessage])
+
   const hideModal = useCallback((modalName) => {
     setModal(currentModal => currentModal === modalName ? null : currentModal)
   }, [setModal])
@@ -703,7 +715,7 @@ export default function PipelineEditor(props) {
           });
       }
     }
-  }, [reactFlowInstance, inputList, outputList, metadata, ]);
+  }, [reactFlowInstance, inputList, outputList, metadata, showAlert]);
 
   const onLoadFromFileBtnClick = () => inputFile.current.click(); // will call onLoad
 
@@ -881,7 +893,8 @@ export default function PipelineEditor(props) {
     injectConstant,
     injectOutput,
     onConstantValueChange,
-    onPopupMenu
+    onPopupMenu,
+    showAlert
   ]);
 
   const saveFileToServer = useCallback((descriptionFile) => {
@@ -905,19 +918,7 @@ export default function PipelineEditor(props) {
         onSave(descriptionFile);
       }
     });
-  }, [onSave]);
-
-  const showAlert = useCallback((severity, title, message) => {
-    setAlertSeverity(severity)
-    setAlertTitle(title)
-    setAlertMessage(message)
-  }, [setAlertTitle, setAlertSeverity, setAlertMessage])
-
-  const clearAlert = useCallback(() => {
-    setAlertMessage("")
-    setAlertSeverity("")
-    setAlertTitle("")
-  }, [setAlertTitle, setAlertSeverity, setAlertMessage])
+  }, [onSave, showAlert]);
 
   return (
     <div id="editorLayout">
