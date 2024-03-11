@@ -275,6 +275,7 @@ export function PipelinePage({ runType }) {
         <PipelineResults
           key="results"
           pipelineMetadata={pipelineMetadata}
+          inputFileContent={inputFileContent}
           resultsData={resultsData}
           runningScripts={runningScripts}
           setRunningScripts={setRunningScripts}

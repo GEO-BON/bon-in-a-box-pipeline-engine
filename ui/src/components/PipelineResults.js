@@ -11,7 +11,7 @@ import { InlineSpinner } from "./Spinner";
 import { DelayedResult } from "./PipelinePage";
 
 export function PipelineResults({
-  pipelineMetadata, resultsData, runningScripts, setRunningScripts, pipeline, runHash, isPipeline,
+  pipelineMetadata, inputFileContent, resultsData, runningScripts, setRunningScripts, pipeline, runHash, isPipeline,
 }) {
   const [activeRenderer, setActiveRenderer] = useState({});
   const [pipelineOutputResults, setPipelineOutputResults] = useState({});
@@ -63,8 +63,14 @@ export function PipelineResults({
                 const [ioId, outputDescription] = entry;
                 const breadcrumbs = getBreadcrumbs(ioId);
                 const outputId = getScriptOutput(ioId);
-                const value = pipelineOutputResults[breadcrumbs] &&
+                let value = pipelineOutputResults[breadcrumbs] &&
                   pipelineOutputResults[breadcrumbs][outputId];
+
+                // If not in outputs, check if it was an input marked as output
+                if(!value) {
+                  value = inputFileContent[breadcrumbs];
+                }
+
                 if (!value) {
                   return (
                     <div key={ioId} className="outputTitle">
