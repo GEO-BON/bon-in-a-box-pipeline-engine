@@ -24,14 +24,29 @@
 }
 
 .constant {
-  padding: 1px 2px 1px 10px;
+  padding: 0;
   border-color: #0041d0;
+
+  /* Prevent the hand cursor from appearing in non-draggable zones */
+  cursor: auto;
+}
+
+.constant table {
+  margin: 0;
+}
+
+.constant table td {
+  border: none;
+  padding: 3px 0px;
+  vertical-align: top;
+}
+
+.constant table td.dragHandle {
+  padding: 3px 2px;
 }
 
 .constant p {
-  display: inline-block;
-  vertical-align: top;
-  margin: 1px 10px 0 0;
+  margin: 0px 10px 0 10px;
 }
 
 .dragHandle {
