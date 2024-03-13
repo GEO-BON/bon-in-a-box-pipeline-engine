@@ -175,20 +175,27 @@ export function DelayedResult({
 
   const interval = useInterval(
     () => {
-      if(!inputData) {
-        fetch("/output/" + folder + "/input.json")
-          .then((response) => {
-            if (response.ok)
-              return response.json();
+      if(!inputData && scriptMetadata) {
+        if(scriptMetadata.inputs) {
+          fetch("/output/" + folder + "/input.json")
+            .then((response) => {
+              if (response.ok)
+                return response.json();
 
-            return Promise.reject(response);
-          })
-          .then((json) => {setInputData(json);})
-          .catch((response) => {
-            setInputData({
-              error: response.status + " (" + response.statusText + ")",
+              return Promise.reject(response);
+            })
+            .then((json) => {setInputData(json);})
+            .catch((response) => {
+              setInputData({
+                error: response.status + " (" + response.statusText + ")",
+              });
             });
+
+        } else {
+          setInputData({
+            info: "No inputs",
           });
+        }
       }
 
       // Fetch the output
@@ -241,6 +248,7 @@ export function DelayedResult({
   let inputsContent, outputsContent, inline = null;
   let className = "foldableScriptResult";
   if (folder && scriptMetadata) {
+    console.log("inputs metadta", scriptMetadata.inputs)
     if(inputData){
       inputsContent = <FoldableOutput title="Inputs" className="stepInputs">
         <StepResult data={inputData} sectionMetadata={scriptMetadata.inputs} sectionName="input" />
