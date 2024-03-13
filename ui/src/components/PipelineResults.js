@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StepResult, SingleOutputResult } from "./StepResult";
+import { StepResult, SingleIOResult } from "./StepResult";
 import {
   FoldableOutput,
   RenderContext,
@@ -102,12 +102,13 @@ export function PipelineResults({
                 }
 
                 return (
-                  <SingleOutputResult
+                  <SingleIOResult
+                    sectionName="output"
                     key={ioId}
-                    outputId={outputId}
+                    ioId={outputId}
                     componentId={ioId}
-                    outputValue={value}
-                    outputMetadata={outputDescription} />
+                    value={value}
+                    ioMetadata={outputDescription} />
                 );
               })}
 
@@ -242,12 +243,12 @@ export function DelayedResult({
   if (folder && scriptMetadata) {
     if(inputData){
       inputsContent = <FoldableOutput title="Inputs" className="stepInputs">
-        <StepResult data={inputData} sectionMetadata={scriptMetadata.inputs} />
+        <StepResult data={inputData} sectionMetadata={scriptMetadata.inputs} sectionName="input" />
       </FoldableOutput>
     }
 
     if (outputData) {
-      outputsContent = <StepResult data={outputData} sectionMetadata={scriptMetadata.outputs} />;
+      outputsContent = <StepResult data={outputData} sectionMetadata={scriptMetadata.outputs} sectionName="output" />;
       inline = (
         <>
           {outputData.error && (
