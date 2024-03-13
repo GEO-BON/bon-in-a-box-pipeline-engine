@@ -55,7 +55,7 @@ export default function IONode({ id, data }) {
       <td className='name' onMouseEnter={showScriptTooltip} onMouseLeave={hideTooltip}>
         {pathList.map((s, i) => <span key={i}>{s}<br/></span>)}
       </td>
-      <td className='outputs'> 
+      <td className='outputs'>
         {metadata.outputs && Object.entries(metadata.outputs).map(([outputName, desc]) => {
           let warning = checkForWarning(desc)
 
@@ -90,6 +90,9 @@ function ScriptIO({children, desc, setToolTip, onDoubleClick, warning}) {
   }
 
   function renderExample(example){
+    if(!example)
+      return example // will be "null" in a normal case, or undefined if there is a problem.
+
     if(Array.isArray(example))
       return example.map((v, i) => renderExample(v) + (i === example.length - 1 ? "" : ", "))
 
