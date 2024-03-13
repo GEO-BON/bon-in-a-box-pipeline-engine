@@ -106,13 +106,21 @@ outputs:
         type: string
       type:
         required: true
-        type: string
         oneof:
-        - forbidden: [options, object, "object[]"]
-        - allowed: [options]
-          dependencies: options
-        - allowed: [object, "object[]"]
-          dependencies: properties
+          # case where output takes type from input
+          - type: dict
+            schema:
+              from:
+                required: true
+                type: string
+          # normal case, with explicit type
+          - type: string
+            oneof:
+            - forbidden: [options, object, "object[]"]
+            - allowed: [options]
+              dependencies: options
+            - allowed: [object, "object[]"]
+              dependencies: properties
       options:
         required: false
         type: list

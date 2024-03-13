@@ -1,0 +1,40 @@
+script: PassFailGate.kt
+name: Pass-Fail Gate
+description: |
+  This script blocks the pipeline flow, asking the user to validate the intermediate results.
+  If the user approves, the flow of the pipeline will continue.
+  If the user rejects, this stops the pipeline.
+
+  Note that for pipelines with parallel branches, this will not stop other parallel branches from executing while waiting for the user's input.
+  (Cannot be ran as a single script.)
+author:
+  - name: Jean-Michel Lord
+    email: jean-michel.lord@mcgill.ca
+    identifier: https://orcid.org/0009-0007-3826-1125
+
+inputs:
+  value_if_accepted:
+    label: value if accepted
+    description: |
+      This value will be output to the next step, if the user accepts the intermediate results.
+      Any type of value is accepted.
+    type: any
+    example: Some string that we'll give to the next script, if everything is OK.
+
+  prerequisites:
+    label: Prerequisites
+    description: |
+      Any value that should be available before the user intervention occurs, in order to take the decision.
+      Once all these values are available, the user will receive a notification.
+    type: any[]
+    example: ['someMap.tiff', 'Some string', 123]
+
+outputs:
+  validated:
+    label: Validated
+    description: |
+      The value given as an input, if the intermediate results have been accepted.
+      This output is polymorphic and will take the type from what was given to "value if accepted" input.
+    type:
+      from: value_if_accepted
+    example: Some string that we'll give to the next script, if everything is OK.
