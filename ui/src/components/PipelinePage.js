@@ -1,24 +1,11 @@
 import React, { useState, useEffect, useReducer } from "react";
-import { StepResult } from "./StepResult";
 import {
-  FoldableOutputWithContext,
   FoldableOutput,
 } from "./FoldableOutput";
 
-import { useInterval } from "../UseInterval";
 
-import errorImg from "../img/error.svg";
-import warningImg from "../img/warning.svg";
-import infoImg from "../img/info.svg";
-import { LogViewer } from "./LogViewer";
-import {
-  getFolderAndNameFromMetadata,
-  GeneralDescription,
-} from "./StepDescription";
 import { PipelineForm } from "./form/PipelineForm";
-import { getScript } from "../utils/IOId";
 import { useParams } from "react-router-dom";
-import { InlineSpinner } from "./Spinner";
 import { PipelineResults } from "./PipelineResults";
 
 const pipelineConfig = { extension: ".json", defaultFile: "helloWorld.json" };
@@ -285,144 +272,5 @@ export function PipelinePage({ runType }) {
         />
       )}
     </>
-  );
-}
-
-export function DelayedResult({
-  breadcrumbs,
-  folder,
-  setRunningScripts,
-  setPipelineOutputResults,
-}) {
-  const [resultData, setResultData] = useState(null);
-  const [scriptMetadata, setScriptMetadata] = useState(null);
-  const [running, setRunning] = useState(false);
-  const [skippedMessage, setSkippedMessage] = useState();
-
-  const script = getScript(breadcrumbs);
-
-  useEffect(() => {
-    // A script is running when we know it's folder but have yet no result nor error message
-    let nowRunning = folder && !resultData;
-    setRunning(nowRunning);
-
-    setRunningScripts((oldSet) => {
-      let newSet = new Set(oldSet);
-      nowRunning ? newSet.add(folder) : newSet.delete(folder);
-      return newSet;
-    });
-  }, [setRunningScripts, folder, resultData]);
-
-  useEffect(() => {
-    if (folder) {
-      if (folder === "skipped") {
-        setResultData({
-          info: "Skipped: not necessary with the given parameters",
-        });
-        setSkippedMessage("Skipped");
-      } else if (folder === "aborted") {
-        setResultData({ warning: "Skipped due to previous failure" });
-        setSkippedMessage("Aborted");
-      } else if (folder === "cancelled") {
-        setResultData({ warning: "Skipped when pipeline stopped" });
-        setSkippedMessage("Cancelled");
-      }
-    }
-    // Execute only when folder changes (omitting resultData on purpose)
-  }, [folder]);
-
-  const interval = useInterval(
-    () => {
-      // Fetch the output
-      fetch("/output/" + folder + "/output.json")
-        .then((response) => {
-          if (response.ok) {
-            clearInterval(interval);
-            return response.json();
-          }
-
-          // Script not done yet: wait for next attempt
-          if (response.status === 404) {
-            return Promise.resolve(null);
-          }
-
-          return Promise.reject(response);
-        })
-        .then((json) => {
-          // Detailed results
-          setResultData(json);
-
-          // Contribute to pipeline outputs (if this script is relevant)
-          setPipelineOutputResults((results) => {
-            if (breadcrumbs in results) results[breadcrumbs] = json;
-
-            return results;
-          });
-        })
-        .catch((response) => {
-          clearInterval(interval);
-          setResultData({
-            error: response.status + " (" + response.statusText + ")",
-          });
-        });
-
-      // Will start when folder has value, and continue the until resultData also has a value
-    },
-    running ? 1000 : null
-  );
-
-  useEffect(() => {
-    // Script metadata
-    var callback = function (error, data, response) {
-      setScriptMetadata(data);
-    };
-
-    api.getInfo("script", script, callback);
-  }, [script]);
-
-  let content,
-    inline = null;
-  let className = "foldableScriptResult";
-  if (folder) {
-    if (resultData) {
-      content = <StepResult data={resultData} metadata={scriptMetadata} />;
-      inline = (
-        <>
-          {resultData.error && (
-            <img src={errorImg} alt="Error" className="error-inline" />
-          )}
-          {resultData.warning && (
-            <img src={warningImg} alt="Warning" className="error-inline" />
-          )}
-          {resultData.info && (
-            <img src={infoImg} alt="Info" className="info-inline" />
-          )}
-          {skippedMessage && <i>{skippedMessage}</i>}
-        </>
-      );
-    } else {
-      content = <p>Running...</p>;
-      inline = <InlineSpinner />;
-    }
-  } else {
-    content = <p>Waiting for previous steps to complete.</p>;
-    className += " gray";
-  }
-
-  let logsAddress = folder && "/output/" + folder + "/logs.txt";
-
-  return (
-    <FoldableOutputWithContext
-      title={getFolderAndNameFromMetadata(breadcrumbs, scriptMetadata)}
-      componentId={breadcrumbs}
-      inline={inline}
-      className={className}
-    >
-      <GeneralDescription ymlPath={script} metadata={scriptMetadata} />
-      {content}
-      {folder && !skippedMessage && (
-        <LogViewer address={logsAddress} autoUpdate={!resultData} />
-      )}
-    </FoldableOutputWithContext>
   );
 }

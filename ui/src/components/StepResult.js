@@ -4,13 +4,13 @@ import React from 'react';
 import RenderedCSV from './csv/RenderedCSV';
 import { FoldableOutputWithContext, RenderContext, createContext, FoldableOutput } from "./FoldableOutput";
 
-export function StepResult({data, metadata, logs}) {
+export function StepResult({data, sectionName, sectionMetadata, logs}) {
     const [activeRenderer, setActiveRenderer] = useState({});
 
     return (data || logs) && (
         <div>
             <RenderContext.Provider value={createContext(activeRenderer, setActiveRenderer)}>
-                <AllOutputsResults key="files" files={data} stepMetadata={metadata} />
+                <AllSectionResults key="results" results={data} sectionMetadata={sectionMetadata} sectionName={sectionName} />
                 <Logs key="logs" logs={logs} />
             </RenderContext.Provider>
         </div>
@@ -23,8 +23,8 @@ export function StepResult({data, metadata, logs}) {
  * Others out there: image/geotiff, image/tiff;subtype=geotiff, image/geo+tiff
  * See https://github.com/opengeospatial/geotiff/issues/34
  * Plus covering a common typo when second F omitted
- * 
- * @param {string} mime subtype 
+ *
+ * @param {string} mime subtype
  * @return True if subtype image is a geotiff
  */
 function isGeotiff(subtype) {
@@ -41,42 +41,42 @@ function FallbackDisplay({content}) {
             return <RenderedCSV url={content} delimiter="," />
         else if(content.search(/.tsv$/i))
             return <RenderedCSV url={content} delimiter="&#9;" />
-        else 
+        else
             return <img src={content} alt={content} />
     }
 
     // Plain text or numeric value
-    return <p className="resultText">{content}</p>    
+    return <p className="resultText">{content}</p>
 }
 
-function AllOutputsResults({ files, stepMetadata }) {
-    return files && Object.entries(files).map(entry => {
+function AllSectionResults({ results, sectionMetadata, sectionName }) {
+    return results && Object.entries(results).map(entry => {
         const [key, value] = entry;
 
         if (key === "warning" || key === "error" || key === "info") {
             return value && <p key={key} className={key}>{value}</p>;
         }
 
-        const outputMetadata = stepMetadata && stepMetadata.outputs && stepMetadata.outputs[key]
+        const ioMetadata = sectionMetadata && sectionMetadata[key]
 
-        return <SingleOutputResult key={key} outputId={key} outputValue={value} outputMetadata={outputMetadata} />
+        return <SingleIOResult key={key} ioId={key} value={value} ioMetadata={ioMetadata} sectionName={sectionName} />
     });
 }
 
-export function SingleOutputResult({ outputId, outputValue, outputMetadata, componentId }) { 
+export function SingleIOResult({ ioId, value, ioMetadata, componentId, sectionName }) {
     if(!componentId)
-        componentId = outputId
+        componentId = ioId
 
     function renderContent(content) {
         let error = ""
-        if (outputMetadata) {
-            if (outputMetadata.type) { // Got our mime type!
-                return renderWithMime(content, outputMetadata.type)
+        if (ioMetadata) {
+            if (ioMetadata.type) { // Got our mime type!
+                return renderWithMime(content, ioMetadata.type)
             } else {
-                error = "Missing mime type in output description."
+                error = `Missing mime type in ${sectionName} description.`
             }
         } else {
-            error = "Output description not found in this script's YML description file."
+            error = `The ${sectionName} description was not found in this script's YML description file.`
         }
 
 
@@ -113,16 +113,16 @@ export function SingleOutputResult({ outputId, outputValue, outputMetadata, comp
         switch (type) {
             case "image":
                 if (isGeotiff(subtype)) {
-                    return <Map tiff={content} range={outputMetadata.range} />
+                    return <Map tiff={content} range={ioMetadata.range} />
                 }
-                return <img src={content} alt={outputMetadata.label} />;
+                return <img src={content} alt={ioMetadata.label} />;
 
             case "text":
                 if (subtype === "csv")
                     return <RenderedCSV url={content} delimiter="," />;
                 if (subtype === "tab-separated-values")
                     return <RenderedCSV url={content} delimiter="&#9;" />;
-                
+
                 break;
 
             case "object":
@@ -174,24 +174,24 @@ export function SingleOutputResult({ outputId, outputValue, outputMetadata, comp
         return content
     }
 
-    let title = outputId;
+    let title = ioId;
     let description = null;
-    if (outputMetadata) {
-        if (outputMetadata.label)
-            title = outputMetadata.label;
+    if (ioMetadata) {
+        if (ioMetadata.label)
+            title = ioMetadata.label;
 
-        if (outputMetadata.description)
-            description = <p className="outputDescription">{outputMetadata.description}</p>;
+        if (ioMetadata.description)
+            description = <p className="outputDescription">{ioMetadata.description}</p>;
     }
 
-    let isLink = isRelativeLink(outputValue)
+    let isLink = isRelativeLink(value)
     return (
-        <FoldableOutputWithContext key={outputId} title={title} componentId={componentId}
-            inline={isLink && <a href={outputValue} target="_blank" rel="noreferrer">{outputValue}</a>}
-            inlineCollapsed={!isLink && renderInline(outputValue)}
+        <FoldableOutputWithContext key={ioId} title={title} componentId={componentId}
+            inline={isLink && <a href={value} target="_blank" rel="noreferrer">{value}</a>}
+            inlineCollapsed={!isLink && renderInline(value)}
             className="foldableOutput">
             {description}
-            {renderContent(outputValue)}
+            {renderContent(value)}
         </FoldableOutputWithContext>
     );
 }
@@ -210,7 +210,7 @@ function Logs({ logs }) {
 
 
 function isRelativeLink(value) {
-    if (value && typeof value.startsWith === "function") { 
+    if (value && typeof value.startsWith === "function") {
         return value.startsWith('/')
     }
     return false
