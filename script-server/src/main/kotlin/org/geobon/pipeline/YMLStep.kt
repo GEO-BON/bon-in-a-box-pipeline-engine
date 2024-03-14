@@ -3,7 +3,6 @@ package org.geobon.pipeline
 import org.geobon.script.Description.INPUTS
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
-import org.geobon.script.Description.SCRIPT
 import org.geobon.script.Description.TYPE
 import org.geobon.script.Description.TYPE_OPTIONS
 import org.geobon.script.ScriptRun
@@ -22,8 +21,6 @@ abstract class YMLStep(
     protected val yamlParsed: Map<String, Any> = Yaml().load(yamlFile.readText())
 ) : Step(stepId, inputs, readOutputs(yamlParsed, logger)) {
 
-    protected val scriptFile = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
-
     /**
      * Context becomes set in validateInputsReceived(), once the invocation inputs are known.
      */
@@ -32,9 +29,6 @@ abstract class YMLStep(
     val inputsDefinition = readInputs(yamlParsed, logger)
 
     override fun validateInputsConfiguration(): String {
-        if(scriptFile.extension != "kt" && !scriptFile.exists()) {
-            return "Script file not found: ${scriptFile.relativeTo(RunContext.scriptRoot)}"
-        }
 
         if (inputs.size != inputsDefinition.size) {
             return "Bad number of inputs." +

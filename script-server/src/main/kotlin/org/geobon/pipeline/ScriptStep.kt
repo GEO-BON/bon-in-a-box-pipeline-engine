@@ -12,17 +12,23 @@ import kotlin.time.Duration.Companion.minutes
 class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()) :
     YMLStep(yamlFile, stepId, inputs = inputs) {
 
+    private val scriptFile = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
+
     constructor(fileName: String, stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()) : this(
         File(scriptRoot, fileName),
         stepId,
         inputs
     )
 
-    override fun validateGraph(): String {
+    override fun validateStep(): String {
         if (!yamlFile.exists())
             return "Description file not found: ${yamlFile.path}"
 
-        return super.validateGraph()
+        if (!scriptFile.exists()) {
+            return "Script file not found: ${scriptFile.relativeTo(scriptRoot)}\n"
+        }
+
+        return ""
     }
 
     override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
