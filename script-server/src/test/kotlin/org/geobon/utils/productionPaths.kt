@@ -8,7 +8,7 @@ val productionPipelinesRoot: File = File("/pipelines").let {
         // in the docker
         if(it.exists()) it 
         // intelliJ on local computer
-        else File(File("").absoluteFile.parent, "pipelines")
+        else File(File("").absoluteFile.parent, "pipeline-repo/pipelines")
     }
     
 
@@ -16,7 +16,7 @@ val productionScriptsRoot: File = File("/scripts").let {
         // in the docker
         if(it.exists()) it 
         // intelliJ on local computer
-        else File(File("").absoluteFile.parent, "scripts")
+        else File(File("").absoluteFile.parent, "pipeline-repo/scripts")
     }
 
 /**

@@ -26,7 +26,7 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
     }
 
     override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
-        val scriptFile = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
+
         val specificTimeout = (yamlParsed[TIMEOUT] as? Int)?.minutes
 
         var runOwner = false
