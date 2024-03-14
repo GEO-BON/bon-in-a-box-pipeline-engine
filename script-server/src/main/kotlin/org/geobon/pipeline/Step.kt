@@ -65,8 +65,10 @@ abstract class Step(
         if(validated)
             return "" // This avoids validating many times the same node in complex graphs
 
-        var problems = validateInputsConfiguration()
         validated = true
+
+        var problems = validateStep()
+        problems += validateInputsConfiguration()
 
         inputs.values.forEach { problems += it.validateGraph() }
 
@@ -74,7 +76,12 @@ abstract class Step(
         return if(problems.isEmpty()) "" else "$id: $problems"
     }
 
-    open fun validateInputsConfiguration(): String {
+    protected open fun validateStep(): String {
+        // Not all steps need step validation.
+        return ""
+    }
+
+    protected open fun validateInputsConfiguration(): String {
         // Not all steps need input validation.
         return ""
     }

@@ -45,7 +45,6 @@ object Validator {
             } else if (file.extension == "json") {
                 try {
                     // Generate fake inputs
-
                     val pipelineJSON = JSONObject(file.readText())
                     val fakeInputs = generateInputFromExamples(pipelineJSON)
 
