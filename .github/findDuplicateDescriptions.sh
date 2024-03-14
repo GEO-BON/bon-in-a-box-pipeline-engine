@@ -11,8 +11,11 @@ echo "Checking for duplicate lines inside each yml file..."
 # some description duplication will occur naturally between files and it's OK.
 # ex. "Species name" description should always look the same!
 
+# By using description:\s+\w+, we avoid matching "description: |" that is the yml syntax for mutliline comments.
+# Limitation: this does not check multiline description...
+
 RESULTS=$(find . -name "*.yml" -exec sh -c "echo {}; \
-grep \"description:
+grep -E \"description:\s+\w+
 text:
 doi:\" '{}' \
   | sort \
