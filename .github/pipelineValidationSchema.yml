@@ -70,7 +70,7 @@ inputs:
         dependencies:
           type: [object, "object[]"]
       example:
-        required: true
+        required: false
         nullable: true
         oneof:
         - type: number
