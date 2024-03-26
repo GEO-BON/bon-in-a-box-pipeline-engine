@@ -68,6 +68,9 @@ export function SingleIOResult({ ioId, value, ioMetadata, componentId, sectionNa
         componentId = ioId
 
     function renderContent(content) {
+        if(!content)
+            return "null"
+
         let error = ""
         if (ioMetadata) {
             if (ioMetadata.type) { // Got our mime type!
@@ -153,6 +156,9 @@ export function SingleIOResult({ ioId, value, ioMetadata, componentId, sectionNa
     }
 
     function renderInline(content) {
+        if (!content)
+            return "null"
+
         if (Array.isArray(content)) {
             return content
                 .map(c => {
