@@ -248,7 +248,6 @@ export function DelayedResult({
   let inputsContent, outputsContent, inline = null;
   let className = "foldableScriptResult";
   if (folder && scriptMetadata) {
-    console.log("inputs metadta", scriptMetadata.inputs)
     if(inputData){
       inputsContent = <FoldableOutput title="Inputs" className="stepInputs">
         <StepResult data={inputData} sectionMetadata={scriptMetadata.inputs} sectionName="input" />
