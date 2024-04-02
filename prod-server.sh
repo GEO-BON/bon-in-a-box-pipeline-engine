@@ -127,6 +127,9 @@ function up {
     cd .. # Back to pipeline-repo folder
     command pull ; assertSuccess
 
+    echo "Building (if necessary)"
+    command build ; assertSuccess
+
     echo "Starting the server..."
     output=$(command up -d $@ 2>&1); returnCode=$?;
 
