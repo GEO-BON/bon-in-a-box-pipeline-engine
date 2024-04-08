@@ -3,6 +3,8 @@ package org.geobon.pipeline
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
+import org.geobon.pipeline.ktstep.AssignId
+import org.geobon.pipeline.ktstep.PullLayersById
 import org.geobon.pipeline.teststeps.RecordPipe
 import org.json.JSONObject
 import kotlin.test.*

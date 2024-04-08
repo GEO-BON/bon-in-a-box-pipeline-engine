@@ -1,8 +1,10 @@
-package org.geobon.pipeline
+package org.geobon.pipeline.ktstep
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
+import org.geobon.pipeline.Pipe
+import org.geobon.pipeline.StepId
+import org.geobon.pipeline.YMLStep
 import org.json.JSONObject
 import java.io.File
 
@@ -24,7 +26,8 @@ class AssignId(stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()
     }
 
     override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
-        return mapOf(OUT_IDENTIFIED_LAYER to JSONObject(mapOf(
+        return mapOf(
+            OUT_IDENTIFIED_LAYER to JSONObject(mapOf(
             OUT_IDENTIFIED_LAYER_ID to resolvedInputs[IN_ID],
             OUT_IDENTIFIED_LAYER_LAYER to resolvedInputs[IN_LAYER]
         ))).also{ record(it) }

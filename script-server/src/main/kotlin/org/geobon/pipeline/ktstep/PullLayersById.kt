@@ -1,5 +1,8 @@
-package org.geobon.pipeline
+package org.geobon.pipeline.ktstep
 
+import org.geobon.pipeline.Pipe
+import org.geobon.pipeline.StepId
+import org.geobon.pipeline.YMLStep
 import org.json.JSONObject
 import java.io.File
 
