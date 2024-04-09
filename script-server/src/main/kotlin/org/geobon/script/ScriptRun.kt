@@ -214,19 +214,21 @@ class ScriptRun( // Constructor used in single script run
                     "r", "R" -> {
                         runner = "biab-runner-r"
                         command = listOf(
-                            "/usr/local/bin/docker", "exec", "-i", runner, "Rscript", "-e", 
-                            """
+                            "/usr/local/bin/docker", "exec", "-i", runner,
+                            "bash", "--login", // see https://stackoverflow.com/a/74017557/3519951
+                            "-c", """
+                            mamba activate rbase; Rscript -e '
                             options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
                             fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
                             outputFolder<-"${context.outputFolder.absolutePath}";
                             tryCatch(source("${scriptFile.absolutePath}"),
                                 error=function(e) if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
-                                        print("Suppressed: 'ignoring SIGPIPE signal'");
+                                        print("Suppressed: ignoring SIGPIPE signal");
                                     } else {
                                         stop(e);
                                     });
                             unlink("${pidFile.absolutePath}");
-                            gc();
+                            gc();'
                             """
                         )
                     }
@@ -256,7 +258,7 @@ class ScriptRun( // Constructor used in single script run
                                     if (process.isAlive) {
                                         val event = ex.message ?: ex.javaClass.name
 
-                                        if (pidFile.exists() && runner.isNotEmpty()) {
+                                                                                if (pidFile.exists() && runner.isNotEmpty()) {
                                             val pid = pidFile.readText().trim()
                                             log(logger::debug, "$event: killing runner process '$pid'")
 
