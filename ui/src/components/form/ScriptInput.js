@@ -65,19 +65,21 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
     case 'int':
       return <input type='number' {...passedProps}
         value={fieldValue}
-        onChange={e => setFieldValue(e.target.value)}
-        placeholder={CONSTANT_PLACEHOLDER}
-        onKeyDown={e => { if (e.key === "Enter") onValueUpdated(parseInt(e.target.value)) }}
-        onBlur={e => onValueUpdated(parseInt(e.target.value))} />
+        onChange={e => {
+          setFieldValue(e.target.value)
+          onValueUpdated(parseInt(e.target.value))
+        }}
+        placeholder={CONSTANT_PLACEHOLDER} />
 
     case 'float':
       return <input type='number' step="any" {...passedProps}
         value={fieldValue}
-        onChange={e => setFieldValue(e.target.value)}
+        onChange={e => {
+          setFieldValue(e.target.value)
+          onValueUpdated(parseFloat(e.target.value))
+        }}
         className={`input-float ${passedProps.className ? passedProps.className : ''}`}
-        placeholder={CONSTANT_PLACEHOLDER}
-        onKeyDown={e => { if (e.key === "Enter") onValueUpdated(parseFloat(e.target.value)) }}
-        onBlur={e => onValueUpdated(parseFloat(e.target.value))} />
+        placeholder={CONSTANT_PLACEHOLDER} />
 
     default:
       // use null if empty or a string representation of null
