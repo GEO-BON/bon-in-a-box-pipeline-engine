@@ -222,7 +222,9 @@ export function PipelinePage({ runType }) {
   const stop = () => {
     setStoppable(false);
     api.stop(runType, pipStates.runId, (error, data, response) => {
-      if (response.status === 200) {
+      if(error) {
+        showHttpError(error, response);
+      } else {
         setHttpError("Cancelled by user");
       }
     });
