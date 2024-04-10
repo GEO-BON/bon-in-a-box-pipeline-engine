@@ -24,7 +24,8 @@ abstract class YMLStep(
     /**
      * Context becomes set in validateInputsReceived(), once the invocation inputs are known.
      */
-    protected var context:RunContext? = null
+    var context:RunContext? = null
+        protected set
 
     val inputsDefinition = readInputs(yamlParsed, logger)
 

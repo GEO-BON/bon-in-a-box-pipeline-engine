@@ -1,10 +1,9 @@
-package org.geobon.pipeline
+package org.geobon.pipeline.ktstep
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
-import org.geobon.pipeline.ktstep.AssignId
-import org.geobon.pipeline.ktstep.PullLayersById
 import org.geobon.pipeline.teststeps.RecordPipe
 import org.json.JSONObject
 import kotlin.test.*
@@ -25,17 +24,21 @@ internal class PullLayersByIdTest {
 
         finishLine = mutableListOf()
 
-        step = PullLayersById(StepId("pull", "0"), mutableMapOf(
+        step = PullLayersById(
+            StepId("pull", "0"), mutableMapOf(
             PullLayersById.IN_IDENTIFIED_LAYERS to AggregatePipe(listOf(
-                AssignId(StepId("assign", "1"), mutableMapOf(
+                AssignId(
+                    StepId("assign", "1"), mutableMapOf(
                     AssignId.IN_ID to ConstantPipe("text", "first"),
                     AssignId.IN_LAYER to RecordPipe("1.tiff", finishLine, type = "image/tiff;application=geotiff")
                 )).outputs[AssignId.OUT_IDENTIFIED_LAYER]!!,
-                AssignId(StepId("assign", "2"), mutableMapOf(
+                AssignId(
+                    StepId("assign", "2"), mutableMapOf(
                     AssignId.IN_ID to ConstantPipe("text", "second"),
                     AssignId.IN_LAYER to RecordPipe("2.tiff", finishLine, type = "image/tiff;application=geotiff")
                 )).outputs[AssignId.OUT_IDENTIFIED_LAYER]!!,
-                AssignId(StepId("assign", "3"), mutableMapOf(
+                AssignId(
+                    StepId("assign", "3"), mutableMapOf(
                     AssignId.IN_ID to ConstantPipe("text", "third"),
                     AssignId.IN_LAYER to RecordPipe("3.tiff", finishLine, type = "image/tiff;application=geotiff")
                 )).outputs[AssignId.OUT_IDENTIFIED_LAYER]!!
@@ -67,7 +70,8 @@ internal class PullLayersByIdTest {
 
     @Test
     fun whenPullingConditionally_thenTypesAreRespected() = runTest {
-        val singlePullIf = AssignId(StepId("assign", "0"), mutableMapOf(
+        val singlePullIf = AssignId(
+            StepId("assign", "0"), mutableMapOf(
             AssignId.IN_ID to ConstantPipe("text", "first"),
             AssignId.IN_LAYER to RecordPipe("1.tiff", finishLine, type = "image/tiff;application=geotiff")
         )).outputs[AssignId.OUT_IDENTIFIED_LAYER]!!.pullIf { true }
