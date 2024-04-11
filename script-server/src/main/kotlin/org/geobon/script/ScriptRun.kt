@@ -219,6 +219,12 @@ class ScriptRun( // Constructor used in single script run
                             "-c", """
                             mamba activate rbase; Rscript -e '
                             options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
+
+                            # Define repo for install.packages
+                            repositories = getOption("repos")
+                            repositories["CRAN"] = "https://cloud.r-project.org/"
+                            options(repos = repositories)
+
                             fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
                             outputFolder<-"${context.outputFolder.absolutePath}";
                             tryCatch(source("${scriptFile.absolutePath}"),
