@@ -37,6 +37,7 @@ import sleep from "../../utils/Sleep";
 import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
 import { useEffectIfChanged } from "../../utils/UseEffectIfChanged";
+import isObject from "../../utils/isObject";
 
 const yaml = require('js-yaml');
 
@@ -518,12 +519,26 @@ export default function PipelineEditor(props) {
             }
 
           } else {
-            newPipelineOutputs.push({
+            const pipelineOutput = {
               ...outputDescription, // shallow clone
               nodeId: edge.source,
               outputId: edge.sourceHandle,
               file: sourceNode.data.descriptionFile,
-            });
+            };
+
+            // Supports the case where an output type is dependent on an input type
+            if (isObject(pipelineOutput.type)) {
+              console.log(stepDescription)
+              const correspondingInput = stepDescription.inputs[pipelineOutput.type['from']]
+              if (correspondingInput) {
+                pipelineOutput.type = correspondingInput.type
+              } else {
+                console.error("Could not find corresponding input")
+                pipelineOutput.type = "any"
+              }
+            }
+
+            newPipelineOutputs.push(pipelineOutput)
           }
         });
       }

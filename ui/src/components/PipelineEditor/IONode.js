@@ -73,10 +73,12 @@ export default function IONode({ id, data }) {
 
 function ScriptIO({children, desc, setToolTip, onDoubleClick, warning}) {
   function renderType(type) {
-    if(type === 'options') {
-      return "Options: " + (desc.options && desc.options.join(', '))
+    if(isObject(type)){
+      return `Type: Same type as ${type['from']} input`
+    } else if(type === 'options') {
+      return "Type options: " + (desc.options && desc.options.join(', '))
     } else {
-      return type
+      return "Type" + type
     }
   }
 
