@@ -9,7 +9,6 @@ fun String.runCommand(
     timeoutAmount: Long = 1,
     timeoutUnit: TimeUnit = TimeUnit.SECONDS
 ): String? = runCatching {
-    println("bash -c $this")
     ProcessBuilder("bash", "-c", this)
         .directory(workingDir)
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
