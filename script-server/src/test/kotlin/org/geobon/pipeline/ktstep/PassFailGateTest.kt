@@ -58,6 +58,7 @@ internal class PassFailGateTest {
         queue.resultReceived(step.context!!.runId, true)
         task.join()
         assertEquals("This is the value that goes through", result)
+        assertEquals(0, queue.size)
     }
 
     @Test
@@ -78,11 +79,24 @@ internal class PassFailGateTest {
             "User stopped the pipeline at this gate.",
             results.getString(ERROR_KEY)
         )
+        assertEquals(0, queue.size)
     }
 
     @Test
     fun givenWaitingForResult_whenCancelledByUser_thenRemovesFromWaitingList() = runTest {
+        val task = launch {
+            step.execute()
+        }
+        delay(1000L)
 
+        task.cancel()
+        task.join()
+
+        assertNull(step.outputs[PassFailGate.OUT_VALIDATED]!!.value)
+
+        // Error messages are in result file but not in step.outputs
+        assertFalse(step.context!!.resultFile.exists())
+        assertEquals(0, queue.size)
     }
 
 }

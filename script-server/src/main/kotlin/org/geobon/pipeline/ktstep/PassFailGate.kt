@@ -20,20 +20,21 @@ class PassFailGate(
     override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
         var result: Boolean? = null
 
-        coroutineScope {
+        runCatching {
             val waiter = Waiter()
-            launch {
-                userInteractionQueue.addToQueue(context!!.runId, "boolean", fun(response: Any) {
-                    if (response is Boolean) {
-                        result = response
-                        waiter.doNotify()
-                    } else {
-                        throw RuntimeException("Boolean response expected, found $response instead.")
-                    }
-                })
-            }
+            userInteractionQueue.addToQueue(context!!.runId, "boolean", fun(response: Any) {
+                if (response is Boolean) {
+                    result = response
+                    waiter.doNotify()
+                } else {
+                    throw RuntimeException("Boolean response expected, found $response instead.")
+                }
+            })
 
             waiter.doWait()
+        }.onFailure {
+            userInteractionQueue.remove(context!!.runId)
+            throw it
         }
 
         return mapOf(

@@ -8,7 +8,7 @@ class UserInteractionQueue : HashMap<String, Pair<String, (Any) -> Unit>>() {
     }
 
     fun resultReceived(runId:String, result: Any) {
-        this[runId]?.second?.let { fn -> fn(result) }
+        remove(runId)?.second?.let { fn -> fn(result) }
             ?: throw RuntimeException("Could not find a waiting task for id $runId.")
     }
 }
