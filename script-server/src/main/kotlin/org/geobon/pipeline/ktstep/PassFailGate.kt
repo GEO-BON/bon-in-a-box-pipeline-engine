@@ -1,7 +1,5 @@
 package org.geobon.pipeline.ktstep
 
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.StepId
 import org.geobon.pipeline.UserInteractionQueue
