@@ -12,7 +12,8 @@
  */
 
 import ApiClient from '../ApiClient';
-//import InfoOutputsValueExample from './InfoOutputsValueExample';
+// import InfoOutputsValueExample from './InfoOutputsValueExample';
+// import InfoOutputsValueType from './InfoOutputsValueType';
 
 /**
  * The InfoOutputsValue model module.
@@ -24,8 +25,8 @@ class InfoOutputsValue {
      * Constructs a new <code>InfoOutputsValue</code>.
      * @alias module:model/InfoOutputsValue
      */
-    constructor() { 
-        
+    constructor() {
+
         InfoOutputsValue.initialize(this);
     }
 
@@ -34,7 +35,7 @@ class InfoOutputsValue {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) { 
+    static initialize(obj) {
     }
 
     /**
@@ -55,7 +56,9 @@ class InfoOutputsValue {
                 obj['label'] = ApiClient.convertToType(data['label'], 'String');
             }
             if (data.hasOwnProperty('type')) {
-                obj['type'] = ApiClient.convertToType(data['type'], 'String');
+                // JM Lord: Current version of the generator does not work when type is "oneOf" in OpenAPI spec.
+                // We want the default convertToType clause to execute.
+                obj['type'] = ApiClient.convertToType(data['type'], 'depends on type');
             }
             if (data.hasOwnProperty('range')) {
                 obj['range'] = ApiClient.convertToType(data['range'], ['Number']);
@@ -89,9 +92,10 @@ class InfoOutputsValue {
         if (data['label'] && !(typeof data['label'] === 'string' || data['label'] instanceof String)) {
             throw new Error("Expected the field `label` to be a primitive type in the JSON string but got " + data['label']);
         }
-        // ensure the json data is a string
-        if (data['type'] && !(typeof data['type'] === 'string' || data['type'] instanceof String)) {
-            throw new Error("Expected the field `type` to be a primitive type in the JSON string but got " + data['type']);
+        // validate the optional field `type`
+        if (data['type']) { // data not null
+            // JM Lord: Current version of the generator does not work when type is "oneOf" in OpenAPI spec.
+            //InfoOutputsValueType.validateJSON(data['type']);
         }
         // ensure the json data is an array
         if (!Array.isArray(data['range'])) {
@@ -130,7 +134,7 @@ InfoOutputsValue.prototype['description'] = undefined;
 InfoOutputsValue.prototype['label'] = undefined;
 
 /**
- * @member {String} type
+ * @member {module:model/InfoOutputsValueType} type
  */
 InfoOutputsValue.prototype['type'] = undefined;
 

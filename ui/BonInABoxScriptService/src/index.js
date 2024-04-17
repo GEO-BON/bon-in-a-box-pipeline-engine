@@ -20,6 +20,8 @@ import InfoInputsValueExample from './model/InfoInputsValueExample';
 import InfoInputsValueExampleOneOfInner from './model/InfoInputsValueExampleOneOfInner';
 import InfoOutputsValue from './model/InfoOutputsValue';
 import InfoOutputsValueExample from './model/InfoOutputsValueExample';
+import InfoOutputsValueType from './model/InfoOutputsValueType';
+import InfoOutputsValueTypeOneOf from './model/InfoOutputsValueTypeOneOf';
 import InfoReferencesInner from './model/InfoReferencesInner';
 import DefaultApi from './api/DefaultApi';
 
@@ -103,6 +105,18 @@ export {
      * @property {module:model/InfoOutputsValueExample}
      */
     InfoOutputsValueExample,
+
+    /**
+     * The InfoOutputsValueType model constructor.
+     * @property {module:model/InfoOutputsValueType}
+     */
+    InfoOutputsValueType,
+
+    /**
+     * The InfoOutputsValueTypeOneOf model constructor.
+     * @property {module:model/InfoOutputsValueTypeOneOf}
+     */
+    InfoOutputsValueTypeOneOf,
 
     /**
      * The InfoReferencesInner model constructor.

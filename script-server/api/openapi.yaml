@@ -390,8 +390,14 @@ components:
                 type: string
                 example: occurences
               type:
-                type: string
-                example: text/csv
+                oneOf:
+                  - type: string
+                    example: text/csv
+                  - type: object
+                    properties:
+                      from:
+                        type: string
+                        example: input_id
               range:
                 type: array
                 items:
