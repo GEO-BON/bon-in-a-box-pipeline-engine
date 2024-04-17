@@ -5,6 +5,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.*
+import org.geobon.script.ScriptRun.Companion.ERROR_KEY
+import org.json.JSONObject
 import kotlin.test.*
 
 @ExperimentalCoroutinesApi
@@ -48,7 +50,6 @@ internal class PassFailGateTest {
     fun givenWaitingForResult_whenPositiveResultReceived_thenMovesOn() = runTest {
         var result: Any? = null
         val task = launch {
-            println(step.outputs)
             result = step.outputs[PassFailGate.OUT_VALIDATED]!!.pull()
         }
         delay(1000L)
@@ -60,8 +61,23 @@ internal class PassFailGateTest {
     }
 
     @Test
-    fun givenWaitingForResult_whenNegativeResultReceived_thenHaltsPipeline() = runTest {
+    fun givenWaitingForResult_whenNegativeResultReceived_thenErrorReturned() = runTest {
+        val task = launch {
+            step.execute()
+        }
+        delay(1000L)
 
+        queue.resultReceived(step.context!!.runId, false)
+        task.join()
+
+        assertNull(step.outputs[PassFailGate.OUT_VALIDATED]!!.value)
+
+        // Error messages are in result file but not in step.outputs
+        val results = JSONObject(step.context!!.resultFile.readText())
+        assertEquals(
+            "User stopped the pipeline at this gate.",
+            results.getString(ERROR_KEY)
+        )
     }
 
     @Test

@@ -83,7 +83,7 @@ abstract class YMLStep(
         }
     }
 
-    protected fun record(results: Map<String, Any>) {
+    protected fun record(results: Map<String, Any?>) {
         context?.apply {
             if(outputFolder.exists())
                 outputFolder.deleteRecursively()
