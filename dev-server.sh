@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function help {
-    echo "Usage: ./dev-server.sh [DOCKER COMPOSE COMMAND...]"
+    echo "Usage: ./dev-server.sh [test-paths] [DOCKER COMPOSE COMMAND...]"
     echo
     echo "Use this script to run your docker commands on the server more easily."
     echo "Most probably, you will need"
@@ -14,6 +14,8 @@ function help {
     echo "                         This is useful in development switching from prod to dev server,"
     echo "                         in cases when we get the following error:"
     echo "                         \"The container name ... is already in use by container ...\""
+    echo ""
+    echo "The test-paths option uses the files from the script-server test directories."
 }
 
 function command { # args appended to the docker compose command
