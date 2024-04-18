@@ -2,17 +2,17 @@ import { memo, useState } from "react";
 import Map from './map/Map';
 import React from 'react';
 import RenderedCSV from './csv/RenderedCSV';
-import { FoldableOutputWithContext, RenderContext, createContext, FoldableOutput } from "./FoldableOutput";
+import { FoldableOutputWithContext, FoldableOutput, FoldableOutputContextProvider } from "./FoldableOutput";
 
 export function StepResult({data, sectionName, sectionMetadata, logs}) {
     const [activeRenderer, setActiveRenderer] = useState({});
 
     return (data || logs) && (
         <div>
-            <RenderContext.Provider value={createContext(activeRenderer, setActiveRenderer)}>
+            <FoldableOutputContextProvider activeRenderer={activeRenderer} setActiveRenderer={setActiveRenderer}>
                 <AllSectionResults key="results" results={data} sectionMetadata={sectionMetadata} sectionName={sectionName} />
                 <Logs key="logs" logs={logs} />
-            </RenderContext.Provider>
+            </FoldableOutputContextProvider>
         </div>
     );
 }

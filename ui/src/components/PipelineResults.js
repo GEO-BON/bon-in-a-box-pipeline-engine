@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StepResult, SingleIOResult } from "./StepResult";
 import {
   FoldableOutput,
-  RenderContext,
-  createContext
+  FoldableOutputContextProvider
 } from "./FoldableOutput";
 import errorImg from "../img/error.svg";
 import warningImg from "../img/warning.svg";
@@ -51,9 +50,7 @@ export function PipelineResults({
 
   if (resultsData) {
     return (
-      <RenderContext.Provider
-        value={createContext(activeRenderer, setActiveRenderer)}
-      >
+      <FoldableOutputContextProvider activeRenderer={activeRenderer} setActiveRenderer={setActiveRenderer}>
         <h2>Results</h2>
         {isPipeline && viewerHost && runHash && (
           <button>
@@ -127,7 +124,7 @@ export function PipelineResults({
               setPipelineOutputResults={setPipelineOutputResults} />
           );
         })}
-      </RenderContext.Provider>
+      </FoldableOutputContextProvider>
     );
   } else return null;
 }
