@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import Map from './map/Map';
 import React from 'react';
 import RenderedCSV from './csv/RenderedCSV';
@@ -63,7 +63,7 @@ function AllSectionResults({ results, sectionMetadata, sectionName }) {
     });
 }
 
-export function SingleIOResult({ ioId, value, ioMetadata, componentId, sectionName }) {
+export const SingleIOResult = memo(({ ioId, value, ioMetadata, componentId, sectionName }) => {
     if(!componentId)
         componentId = ioId
 
@@ -200,7 +200,7 @@ export function SingleIOResult({ ioId, value, ioMetadata, componentId, sectionNa
             {renderContent(value)}
         </FoldableOutputWithContext>
     );
-}
+})
 
 function Logs({ logs }) {
     if (!logs)
