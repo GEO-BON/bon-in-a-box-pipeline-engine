@@ -3,10 +3,11 @@ import {
   FoldableOutput,
 } from "./FoldableOutput";
 
-
 import { PipelineForm } from "./form/PipelineForm";
 import { useParams } from "react-router-dom";
 import { PipelineResults } from "./PipelineResults";
+
+var _lang = require('lodash/lang');
 
 const pipelineConfig = { extension: ".json", defaultFile: "helloWorld.json" };
 const scriptConfig = {
@@ -120,7 +121,8 @@ export function PipelinePage({ runType }) {
               // try again later
               timeout = setTimeout(loadPipelineOutputs, 1000);
             }
-            setResultsData(data);
+
+            setResultsData(previousData => (_lang.isEqual(previousData, data)) ? previousData : data);
           }
         }
       );
