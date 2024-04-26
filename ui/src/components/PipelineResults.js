@@ -21,7 +21,15 @@ import { getScript } from "../utils/IOId";
 import { api } from "./PipelinePage";
 
 export function PipelineResults({
-  pipelineMetadata, inputFileContent, resultsData, runningScripts, setRunningScripts, pipeline, runHash, isPipeline,
+  pipelineMetadata,
+  inputFileContent,
+  resultsData,
+  runningScripts,
+  setRunningScripts,
+  pipeline,
+  runHash,
+  isPipeline,
+  displayTimeStamp
 }) {
   const [activeRenderer, setActiveRenderer] = useState({});
   const [pipelineOutputResults, setPipelineOutputResults] = useState({});
@@ -120,6 +128,7 @@ export function PipelineResults({
               key={key}
               breadcrumbs={key}
               folder={value}
+              displayTimeStamp={displayTimeStamp}
               setRunningScripts={setRunningScripts}
               setPipelineOutputResults={setPipelineOutputResults} />
           );
@@ -130,7 +139,7 @@ export function PipelineResults({
 }
 
 export function DelayedResult({
-  breadcrumbs, folder, setRunningScripts, setPipelineOutputResults,
+  breadcrumbs, folder, setRunningScripts, setPipelineOutputResults, displayTimeStamp
 }) {
   const [inputData, setInputData] = useState(null);
   const [outputData, setOutputData] = useState(null);
@@ -196,7 +205,7 @@ export function DelayedResult({
       }
 
       // Fetch the output
-      fetch("/output/" + folder + "/output.json")
+      fetch("/output/" + folder + "/output.json?t=" + displayTimeStamp)
         .then((response) => {
           if (response.ok) {
             clearInterval(interval);
@@ -276,7 +285,7 @@ export function DelayedResult({
     className += " gray";
   }
 
-  let logsAddress = folder && "/output/" + folder + "/logs.txt";
+  let logsAddress = folder && "/output/" + folder + "/logs.txt?t=" + displayTimeStamp;
 
   return (
     <FoldableOutputWithContext

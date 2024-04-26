@@ -24,6 +24,7 @@ function pipReducer(state, action) {
       return {
         ...state,
         lastAction: "rerun",
+        timestamp: Date.now(),
       };
     }
     case "url": {
@@ -37,6 +38,7 @@ function pipReducer(state, action) {
         descriptionFile: action.newDescriptionFile,
         runId: action.newHash ? selectionUrl + ">" + action.newHash : null,
         runType: state.runType,
+        timestamp: Date.now(),
       };
     }
     case "reset": {
@@ -71,6 +73,7 @@ function pipInitialState(init) {
     descriptionFile,
     runId,
     runType: init.runType,
+    timestamp: Date.now(),
   };
 }
 
@@ -272,6 +275,7 @@ export function PipelinePage({ runType }) {
           setRunningScripts={setRunningScripts}
           pipeline={pipeline}
           runHash={runHash}
+          displayTimeStamp={pipStates.timestamp}
           isPipeline={runType === "pipeline"}
         />
       )}
