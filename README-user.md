@@ -158,7 +158,7 @@ Any [MIME type](https://en.wikipedia.org/wiki/Media_type) is accepted. Here are 
 | File type                    | MIME type to use in the yaml   | UI rendering                 |
 | ---------------------------- |------------------------------- |------------------------------|
 | CSV                          | text/csv                       | HTML table (partial content) |
-| GeoJSON                      | application/geo+json           | Plain text (Map TBD)         |
+| GeoJSON                      | application/geo+json           | Map                          |
 | GeoPackage                   | application/geopackage+sqlite3 | Link                         |
 | GeoTIFF <sup>[1](#io1)</sup> | image/tiff;application=geotiff | Map widget (leaflet)         |
 | JPG                          | image/jpg                      | \<img> tag                   |
