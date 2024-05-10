@@ -574,49 +574,6 @@ export default function PipelineEditor(props) {
     }
   }, [inputList, outputList, setOutputList]);
 
-  // In some cases the inputList is changed because a label or a description of a userInput has changed.
-  // If this userInput happens to be also an output, we want to update description and label.
-  useEffectIfChanged(() => {
-    setOutputList(prevOutputs =>
-      prevOutputs.map(prevOutput => {
-        // userInput have inputId undefined, we look for a matching node #
-        let matchingInput = inputList.find(i => i.inputId === undefined && i.nodeId === prevOutput.nodeId)
-        if (matchingInput) {
-          return {
-            ...prevOutput,
-            description: matchingInput.description,
-            label: matchingInput.label,
-            example: matchingInput.example,
-          }
-        } else {
-          return prevOutput
-        }
-      })
-    );
-  }, [inputList, setOutputList]);
-
-
-  // In some cases the outputList is changed because a label or a description of a userInput has changed.
-  // If this userInput being also an input, we want to update description and label.
-  useEffectIfChanged(() => {
-    setInputList(prevInputs =>
-      prevInputs.map(prevInput => {
-        // userInput have inputId undefined, we look for a matching node #
-        let matchingOutput = outputList.find(o => prevInput.inputId === undefined && o.nodeId === prevInput.nodeId)
-        if (matchingOutput && matchingOutput.label !== undefined) { // we do not want to trigger propagation for newly added nodes
-          return {
-            ...prevInput,
-            description: matchingOutput.description,
-            label: matchingOutput.label,
-            example: matchingOutput.example,
-          }
-        } else {
-          return prevInput
-        }
-      })
-    );
-  }, [outputList, setInputList]);
-
   const onLayout = useCallback(() => {
     layoutElements(
       reactFlowInstance.getNodes(),
