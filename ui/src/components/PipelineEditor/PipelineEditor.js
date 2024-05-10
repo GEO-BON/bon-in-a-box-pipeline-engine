@@ -39,6 +39,7 @@ import { MetadataPane } from "./MetadataPane";
 import { useEffectIfChanged } from "../../utils/UseEffectIfChanged";
 
 const yaml = require('js-yaml');
+const _lang = require('lodash/lang');
 
 const BonInABoxScriptService = require("bon_in_a_box_script_service");
 const api = new BonInABoxScriptService.DefaultApi();
@@ -449,7 +450,7 @@ export default function PipelineEditor(props) {
           }
         });
 
-        return newUserInputs;
+        return _lang.isEqual(previousInputs, newUserInputs) ? previousInputs : newUserInputs;
       });
     },
     [setInputList, getDescriptionFromConnection]
@@ -529,8 +530,8 @@ export default function PipelineEditor(props) {
       }
     });
 
-    setOutputList((previousOutputs) =>
-      newPipelineOutputs.map((newOutput) => {
+    setOutputList((previousOutputs) => {
+      newPipelineOutputs = newPipelineOutputs.map((newOutput) => {
         const previousOutput = previousOutputs.find(
           (prev) =>
             prev.nodeId === newOutput.nodeId &&
@@ -541,7 +542,9 @@ export default function PipelineEditor(props) {
           ? previousOutput
           : newOutput;
       })
-    );
+
+      return _lang.isEqual(previousOutputs, newPipelineOutputs) ? previousOutputs : newPipelineOutputs
+    });
     // Everytime the edge changes, there might be a new connection to an output block.
   }, [edges, reactFlowInstance, setOutputList, getDescriptionFromConnection]);
 
