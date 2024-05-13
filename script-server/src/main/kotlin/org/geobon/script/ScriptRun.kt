@@ -212,7 +212,7 @@ class ScriptRun( // Constructor used in single script run
                     }
 
                     "r", "R" -> {
-                        runner = "biab-runner-r"
+                        runner = "biab-runner-conda"
                         command = listOf(
                             "/usr/local/bin/docker", "exec", "-i", runner,
                             "bash", "--login", // see https://stackoverflow.com/a/74017557/3519951

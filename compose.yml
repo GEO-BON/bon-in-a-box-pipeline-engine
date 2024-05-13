@@ -32,8 +32,8 @@ services:
       OUTPUT_LOCATION: /output
       PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
 
-  runner-r:
-    container_name: biab-runner-r
+  runner-conda:
+    container_name: biab-runner-conda
     volumes:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro

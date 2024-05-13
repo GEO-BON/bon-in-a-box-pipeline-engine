@@ -240,8 +240,13 @@ fun Application.configureRouting() {
                 UI: ${"docker exec -i biab-ui cat /version.txt".runCommand()}
                 Script server: ${"cat /version.txt".runCommand()}
                    ${"python3 --version".runCommand()}
-                R runner: ${"docker exec -i biab-runner-r cat /version.txt".runCommand()}
-                   ${"docker exec -i biab-runner-r Rscript --version".runCommand()}
+                Conda runner: ${
+                    ("""docker exec -i biab-runner-conda bash --login -c "
+                    cat /version.txt;
+                    echo '';
+                    mamba list --explicit;"
+                    """).runCommand()
+                }
                 Julia runner: ${"docker exec -i biab-runner-julia cat /version.txt".runCommand()}
                    ${"docker exec -i biab-runner-julia julia --version".runCommand()}
                 TiTiler: ${

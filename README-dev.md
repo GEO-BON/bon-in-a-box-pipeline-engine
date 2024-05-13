@@ -159,6 +159,6 @@ Every second, the UI polls for:
 
 ## Debugging signal forwarding
 
-Since runner-r and runner-julia run in a separate docker, when the user stops the pipeline, the signal must go from the script-server, to the runner, to the running script. Docker does not allow this by default, this is why we save the PID in a file and use a separate exec command to kill the process.
+Since runner-conda and runner-julia run in a separate docker, when the user stops the pipeline, the signal must go from the script-server, to the runner, to the running script. Docker does not allow this by default, this is why we save the PID in a file and use a separate exec command to kill the process.
 
 The PID file is called `.pid` and is located in the output folder of the run. It is deleted when the script completes. For details, see [ScriptRun.kt](./script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt).

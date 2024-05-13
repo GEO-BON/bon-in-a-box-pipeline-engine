@@ -207,7 +207,7 @@ Any `error` message will halt the rest of the pipeline.
 ### Script dependencies
 Scripts can install their own dependencies directly (`install.packages` in R, `Pkg.add` in Julia, etc). However, it will need to be reinstalled if the server is deployed on another computer or server.
 
-To pre-compile the dependency in the image, add it to [runners/r-dockerfile](runners/r-dockerfile) or [runners/julia-dockerfile](runners/julia-dockerfile). When the pull request is merged to main, a new image will be available to `docker compose pull` with the added dependencies.
+To pre-compile the dependency in the image, add it to [runners/r-environment.yml](runners/r-environment.yml) or [runners/julia-dockerfile](runners/julia-dockerfile). When the pull request is merged to main, a new image will be available to `docker compose pull` with the added dependencies.
 
 ### Receiving inputs
 When running a script, a folder is created for each given set of parameters. The same parameters result in the same folder, different parameters result in a different folder. The inputs for a given script are saved in an `input.json` file in this unique run folder.
