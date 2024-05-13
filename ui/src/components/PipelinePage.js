@@ -3,10 +3,11 @@ import {
   FoldableOutput,
 } from "./FoldableOutput";
 
-
 import { PipelineForm } from "./form/PipelineForm";
 import { useParams } from "react-router-dom";
 import { PipelineResults } from "./PipelineResults";
+
+var _lang = require('lodash/lang');
 
 const pipelineConfig = { extension: ".json", defaultFile: "helloWorld.json" };
 const scriptConfig = {
@@ -23,6 +24,7 @@ function pipReducer(state, action) {
       return {
         ...state,
         lastAction: "rerun",
+        timestamp: Date.now(),
       };
     }
     case "url": {
@@ -36,6 +38,7 @@ function pipReducer(state, action) {
         descriptionFile: action.newDescriptionFile,
         runId: action.newHash ? selectionUrl + ">" + action.newHash : null,
         runType: state.runType,
+        timestamp: Date.now(),
       };
     }
     case "reset": {
@@ -70,6 +73,7 @@ function pipInitialState(init) {
     descriptionFile,
     runId,
     runType: init.runType,
+    timestamp: Date.now(),
   };
 }
 
@@ -120,7 +124,8 @@ export function PipelinePage({ runType }) {
               // try again later
               timeout = setTimeout(loadPipelineOutputs, 1000);
             }
-            setResultsData(data);
+
+            setResultsData(previousData => (_lang.isEqual(previousData, data)) ? previousData : data);
           }
         }
       );
@@ -270,6 +275,7 @@ export function PipelinePage({ runType }) {
           setRunningScripts={setRunningScripts}
           pipeline={pipeline}
           runHash={runHash}
+          displayTimeStamp={pipStates.timestamp}
           isPipeline={runType === "pipeline"}
         />
       )}

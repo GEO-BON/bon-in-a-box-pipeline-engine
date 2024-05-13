@@ -7,16 +7,18 @@ export default function ConstantNode({ id, data, type }) {
   return (
     <div className='constant'>
       <table>
-        <tr>
-          <td className='dragHandle'><p>{data.type}</p></td>
-          <td>
-            <ScriptInput id={id} type={data.type} value={data.value} options={data.options}
-            onValueUpdated={v => data.onConstantValueChange(id, v)} />
-          </td>
-          <td className='dragHandle'>
-            <button className='arrowDownButton' title='options' onClick={(e) => data.onPopupMenu(e, id, type)} />
-          </td>
-        </tr>
+        <tbody>
+          <tr>
+            <td className='dragHandle'><p>{data.type}</p></td>
+            <td>
+              <ScriptInput id={id} type={data.type} value={data.value} options={data.options}
+              onValueUpdated={v => data.onConstantValueChange(id, v)} />
+            </td>
+            <td className='dragHandle'>
+              <button className='arrowDownButton' title='options' onClick={(e) => data.onPopupMenu(e, id, type)} />
+            </td>
+          </tr>
+        </tbody>
       </table>
 
       <Handle type="source" position={Position.Right} />
