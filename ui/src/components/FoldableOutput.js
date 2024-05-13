@@ -1,12 +1,15 @@
-import React, { useRef, useEffect, useContext, useState } from 'react';
+import React, { useRef, useEffect, useContext, useState, useCallback } from 'react';
 
 export const RenderContext = React.createContext();
 
-export function createContext(activeRenderer, setActiveRenderer) {
-    return { 
-        active: activeRenderer,
-        toggleVisibility: (componentId) => setActiveRenderer(activeRenderer === componentId ? null : componentId)
-    }
+export function FoldableOutputContextProvider({ activeRenderer, setActiveRenderer, children }) {
+    const toggleVisibility = useCallback(
+        (componentId) => setActiveRenderer((active) => active === componentId ? null : componentId),
+        [setActiveRenderer])
+
+    return <RenderContext.Provider value={{ active: activeRenderer, toggleVisibility }}>
+        {children}
+    </RenderContext.Provider>
 }
 
 export function FoldableOutputWithContext({className, title, componentId, inline, inlineCollapsed, children, keepWhenHidden}) {
@@ -45,7 +48,7 @@ function FoldableOutputInternal({toggle, active, className, title, inline, inlin
             {!active && inlineCollapsed}
         </div>
 
-       
+
         {keepWhenHidden ?  // If we need to keep it when hidden (such as not to lose the content of a form), then we set height to 0 when folded.
             <div className="outputContent" style={{
                 height: active ? "auto" : "0px",

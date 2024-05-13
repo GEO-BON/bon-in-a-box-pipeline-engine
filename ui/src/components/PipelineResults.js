@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StepResult, SingleIOResult } from "./StepResult";
 import {
   FoldableOutput,
-  RenderContext,
-  createContext
+  FoldableOutputContextProvider
 } from "./FoldableOutput";
 import errorImg from "../img/error.svg";
 import warningImg from "../img/warning.svg";
@@ -22,7 +21,15 @@ import { getScript } from "../utils/IOId";
 import { api } from "./PipelinePage";
 
 export function PipelineResults({
-  pipelineMetadata, inputFileContent, resultsData, runningScripts, setRunningScripts, pipeline, runHash, isPipeline,
+  pipelineMetadata,
+  inputFileContent,
+  resultsData,
+  runningScripts,
+  setRunningScripts,
+  pipeline,
+  runHash,
+  isPipeline,
+  displayTimeStamp
 }) {
   const [activeRenderer, setActiveRenderer] = useState({});
   const [pipelineOutputResults, setPipelineOutputResults] = useState({});
@@ -51,9 +58,7 @@ export function PipelineResults({
 
   if (resultsData) {
     return (
-      <RenderContext.Provider
-        value={createContext(activeRenderer, setActiveRenderer)}
-      >
+      <FoldableOutputContextProvider activeRenderer={activeRenderer} setActiveRenderer={setActiveRenderer}>
         <h2>Results</h2>
         {isPipeline && viewerHost && runHash && (
           <button>
@@ -123,17 +128,18 @@ export function PipelineResults({
               key={key}
               breadcrumbs={key}
               folder={value}
+              displayTimeStamp={displayTimeStamp}
               setRunningScripts={setRunningScripts}
               setPipelineOutputResults={setPipelineOutputResults} />
           );
         })}
-      </RenderContext.Provider>
+      </FoldableOutputContextProvider>
     );
   } else return null;
 }
 
 export function DelayedResult({
-  breadcrumbs, folder, setRunningScripts, setPipelineOutputResults,
+  breadcrumbs, folder, setRunningScripts, setPipelineOutputResults, displayTimeStamp
 }) {
   const [inputData, setInputData] = useState(null);
   const [outputData, setOutputData] = useState(null);
@@ -199,7 +205,7 @@ export function DelayedResult({
       }
 
       // Fetch the output
-      fetch("/output/" + folder + "/output.json")
+      fetch("/output/" + folder + "/output.json?t=" + displayTimeStamp)
         .then((response) => {
           if (response.ok) {
             clearInterval(interval);
@@ -279,7 +285,7 @@ export function DelayedResult({
     className += " gray";
   }
 
-  let logsAddress = folder && "/output/" + folder + "/logs.txt";
+  let logsAddress = folder && "/output/" + folder + "/logs.txt?t=" + displayTimeStamp;
 
   return (
     <FoldableOutputWithContext
