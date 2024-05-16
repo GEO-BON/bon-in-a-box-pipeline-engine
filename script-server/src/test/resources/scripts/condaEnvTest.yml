@@ -1,0 +1,22 @@
+script: condaEnvTest.R
+name: Conda Env Test
+description:
+  Test that dependencies specified within a conda file can be loaded, and even installed on the fly.
+  If this works, a plot should be generated from the csv.
+author:
+  - name: Jean-Michel Lord
+inputs:
+outputs:
+  plot:
+    label: Plot
+    description: The plot generated from the CSV
+    type: image/jpg
+
+conda:
+  name: condaEnvTest2
+  channels:
+    - r
+  dependencies:
+    - r-ggplot2
+    - r-dplyr
+    - r-rjson

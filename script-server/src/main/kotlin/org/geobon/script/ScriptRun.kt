@@ -21,7 +21,9 @@ import kotlin.time.measureTime
 class ScriptRun( // Constructor used in single script run
     private val scriptFile: File,
     private val context: RunContext,
-    private val timeout: Duration = DEFAULT_TIMEOUT) {
+    private val timeout: Duration = DEFAULT_TIMEOUT,
+    private val condaEnvName:String? = null,
+    private val condaEnvFile:String? = null) {
 
     // Constructor used in pipelines & tests
     constructor(
@@ -213,17 +215,34 @@ class ScriptRun( // Constructor used in single script run
 
                     "r", "R" -> {
                         runner = "biab-runner-conda"
+                        val loadEnvironment =
+                            if (condaEnvName?.isNotEmpty() == true && condaEnvFile?.isNotEmpty() == true) {
+                                """
+                                    echo "$condaEnvFile" > /data/$condaEnvName.yml;
+                                    if mamba activate $condaEnvName; then 
+                                        echo "Updating existing conda environment $condaEnvName"
+                                        mamba env update --file /data/$condaEnvName.yml --prune
+                                    else
+                                        echo "Creating new conda environment $condaEnvName"
+                                        mamba env create -f /data/$condaEnvName.yml;
+                                        mamba activate $condaEnvName
+                                    fi
+                                """.trimIndent()
+                            } else {
+                                "mamba activate rbase"
+                            }
+
                         command = listOf(
                             "/usr/local/bin/docker", "exec", "-i", runner,
                             "bash", "--login", // see https://stackoverflow.com/a/74017557/3519951
                             "-c", """
-                            mamba activate rbase; Rscript -e '
+                            $loadEnvironment; Rscript -e '
                             options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
 
                             # Define repo for install.packages
-                            repositories = getOption("repos")
-                            repositories["CRAN"] = "https://cloud.r-project.org/"
-                            options(repos = repositories)
+                            # repositories = getOption("repos")
+                            # repositories["CRAN"] = "https://cloud.r-project.org/"
+                            # options(repos = repositories)
 
                             fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
                             outputFolder<-"${context.outputFolder.absolutePath}";
