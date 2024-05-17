@@ -9,17 +9,14 @@ data <- read.table("/scripts/condaEnvTest.csv", header=TRUE)
 
 # JPEG device
 plot_file = file.path(outputFolder, "condaEnvTest.jpg")
-jpeg(file = plot_file, quality = 75)
+
 
 # Make the histogram
-data %>%
-  filter( price<300 ) %>%
-  ggplot( aes(x=price)) +
-    geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.8)
-
-# Close device
-dev.off()
-
+data |>
+  filter( price<300 ) |>
+  ggplot(aes(x=price)) +
+    geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.8) |>
+  ggsave(plot_file)
 
 ## Outputting result to JSON
 output <- list("plot" = plot_file)
