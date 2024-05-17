@@ -218,20 +218,20 @@ class ScriptRun( // Constructor used in single script run
                         val loadEnvironment =
                             if (condaEnvName?.isNotEmpty() == true && condaEnvFile?.isNotEmpty() == true) {
                                 """
-                                    if [ -f "/data/$condaEnvName.yml" ]; then
-                                        echo "$condaEnvFile" > /data/$condaEnvName.2.yml
-                                        if cmp -s /data/$condaEnvName.yml /data/$condaEnvName.2.yml; then
+                                    if [ -f "$condaEnvName.yml" ]; then
+                                        echo "$condaEnvFile" > $condaEnvName.2.yml
+                                        if cmp -s $condaEnvName.yml $condaEnvName.2.yml; then
                                             echo "Loading existing conda environment $condaEnvName"
-                                            rm /data/$condaEnvName.2.yml
+                                            rm $condaEnvName.2.yml
                                         else
                                             echo "Updating existing conda environment $condaEnvName"
-                                            mv /data/$condaEnvName.2.yml /data/$condaEnvName.yml
-                                            mamba env update --file /data/$condaEnvName.yml --prune
+                                            mv $condaEnvName.2.yml $condaEnvName.yml
+                                            mamba env update --file $condaEnvName.yml --prune
                                         fi
                                     else
                                         echo "Creating new conda environment $condaEnvName"
-                                        echo "$condaEnvFile" > /data/$condaEnvName.yml
-                                        mamba env create -f /data/$condaEnvName.yml
+                                        echo "$condaEnvFile" > $condaEnvName.yml
+                                        mamba env create -f $condaEnvName.yml
                                     fi
 
                                     mamba activate $condaEnvName
