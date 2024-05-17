@@ -218,15 +218,23 @@ class ScriptRun( // Constructor used in single script run
                         val loadEnvironment =
                             if (condaEnvName?.isNotEmpty() == true && condaEnvFile?.isNotEmpty() == true) {
                                 """
-                                    echo "$condaEnvFile" > /data/$condaEnvName.yml;
-                                    if mamba activate $condaEnvName; then 
-                                        echo "Updating existing conda environment $condaEnvName"
-                                        mamba env update --file /data/$condaEnvName.yml --prune
+                                    if [ -f "/data/$condaEnvName.yml" ]; then
+                                        echo "$condaEnvFile" > /data/$condaEnvName.2.yml
+                                        if cmp -s /data/$condaEnvName.yml /data/$condaEnvName.2.yml; then
+                                            echo "Loading existing conda environment $condaEnvName"
+                                            rm /data/$condaEnvName.2.yml
+                                        else
+                                            echo "Updating existing conda environment $condaEnvName"
+                                            mv /data/$condaEnvName.2.yml /data/$condaEnvName.yml
+                                            mamba env update --file /data/$condaEnvName.yml --prune
+                                        fi
                                     else
                                         echo "Creating new conda environment $condaEnvName"
-                                        mamba env create -f /data/$condaEnvName.yml;
-                                        mamba activate $condaEnvName
+                                        echo "$condaEnvFile" > /data/$condaEnvName.yml
+                                        mamba env create -f /data/$condaEnvName.yml
                                     fi
+
+                                    mamba activate $condaEnvName
                                 """.trimIndent()
                             } else {
                                 "mamba activate rbase"
