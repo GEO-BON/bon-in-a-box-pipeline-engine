@@ -15,8 +15,9 @@ plot_file = file.path(outputFolder, "condaEnvTest.jpg")
 data |>
   filter( price<300 ) |>
   ggplot(aes(x=price)) +
-    geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.8) |>
-  ggsave(plot_file)
+    geom_density(fill="#69b3a2", color="#e9ecef", alpha=0.8)
+
+ggsave(plot_file)
 
 ## Outputting result to JSON
 output <- list("plot" = plot_file)
