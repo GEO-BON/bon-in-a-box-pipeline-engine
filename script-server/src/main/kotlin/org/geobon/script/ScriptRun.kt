@@ -3,6 +3,7 @@ package org.geobon.script
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import org.geobon.pipeline.RunContext
+import org.geobon.server.plugins.Containers
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -171,6 +172,7 @@ class ScriptRun( // Constructor used in single script run
         var error = false
         var outputs: Map<String, Any>? = null
 
+        var container: Containers = Containers.SCRIPT_SERVER
         val elapsed = measureTime {
             val pidFile = File(context.outputFolder.absolutePath, ".pid")
 
@@ -197,13 +199,11 @@ class ScriptRun( // Constructor used in single script run
                     }
                 }
 
-
-                var runner = ""
                 val command:List<String>
                 when (scriptFile.extension) {
                     "jl", "JL" ->  {
-                        runner = "biab-runner-julia"
-                        command = listOf("/usr/local/bin/docker", "exec", "-i", runner, "julia", "-e",
+                        container = Containers.JULIA
+                        command = container.dockerCommandList + listOf("julia", "-e",
                             """
                             open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
                             ARGS=["${context.outputFolder.absolutePath}"];
@@ -214,7 +214,7 @@ class ScriptRun( // Constructor used in single script run
                     }
 
                     "r", "R" -> {
-                        runner = "biab-runner-conda"
+                        container = Containers.CONDA
                         val loadEnvironment =
                             if (condaEnvName?.isNotEmpty() == true && condaEnvFile?.isNotEmpty() == true) {
                                 """
@@ -240,8 +240,7 @@ class ScriptRun( // Constructor used in single script run
                                 "mamba activate rbase"
                             }
 
-                        command = listOf(
-                            "/usr/local/bin/docker", "exec", "-i", runner,
+                        command = container.dockerCommandList + listOf(
                             "bash", "--login", // see https://stackoverflow.com/a/74017557/3519951
                             "-c", """
                             $loadEnvironment; Rscript -e '
@@ -262,7 +261,7 @@ class ScriptRun( // Constructor used in single script run
                                     });
                             unlink("${pidFile.absolutePath}");
                             gc();'
-                            """
+                            """.trimIndent()
                         )
                     }
 
@@ -291,18 +290,16 @@ class ScriptRun( // Constructor used in single script run
                                     if (process.isAlive) {
                                         val event = ex.message ?: ex.javaClass.name
 
-                                                                                if (pidFile.exists() && runner.isNotEmpty()) {
+                                        if (pidFile.exists() && container.isExternal()) {
                                             val pid = pidFile.readText().trim()
                                             log(logger::debug, "$event: killing runner process '$pid'")
 
-                                            ProcessBuilder(listOf(
-                                                    "/usr/local/bin/docker", "exec", "-i", runner,
+                                            ProcessBuilder(container.dockerCommandList + listOf(
                                                     "kill", "-s", "TERM", pid
                                             )).start()
 
                                             if (!process.waitFor(10, TimeUnit.SECONDS)) {
-                                                ProcessBuilder(listOf(
-                                                        "/usr/local/bin/docker", "exec", "-i", runner,
+                                                ProcessBuilder(container.dockerCommandList + listOf(
                                                         "kill", "-s", "KILL", pid
                                                 )).start()
                                             }
@@ -387,6 +384,8 @@ class ScriptRun( // Constructor used in single script run
 
             pidFile.delete()
         }
+
+        log(logger::debug,"Runner: ${container.containerName} version ${container.version}\n")
         log(logger::info, "Elapsed: $elapsed")
 
         // Format log output

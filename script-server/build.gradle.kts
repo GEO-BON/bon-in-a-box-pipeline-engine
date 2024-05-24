@@ -7,6 +7,9 @@ val logbackVersion: String by project
 plugins {
     kotlin("jvm") version "1.8.0"
     id("io.ktor.plugin")
+
+    // Better behavior of trimIndent() when it includes variables
+    id("com.bennyhuo.kotlin.trimindent") version "1.9.20-1.1.0"
 }
 
 group = "org.geobon"
