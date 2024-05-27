@@ -48,7 +48,7 @@ enum class Containers(
 
     val version: String by lazy {
         val result = (dockerCommand + versionCommand).runCommand(showErrors = false)
-        if(result.isNullOrEmpty()) "offline" else result
+        if(result.isNullOrBlank()) "offline" else result
     }
 
     val environment: String by lazy {

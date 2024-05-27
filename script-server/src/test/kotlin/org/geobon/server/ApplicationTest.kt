@@ -260,6 +260,9 @@ class ApplicationTest {
             bodyAsText().also { body ->
                 assertContains(body, "UI: offline")
                 assertContains(body, "Script server: offline")
+                assertContains(body, "Conda runner: offline")
+                assertContains(body, "Julia runner: offline")
+                assertContains(body, "TiTiler: offline")
                 println(body)
             }
         }

@@ -244,7 +244,11 @@ fun Application.configureRouting() {
                         ${Containers.CONDA.environment}
                     Julia runner: ${Containers.JULIA.version}
                        ${Containers.JULIA.environment}
-                    TiTiler: ${Containers.TILER.version.let { it.substring(0, it.lastIndexOf(':')).replace('T', ' ') }}
+                    TiTiler: ${Containers.TILER.version.let {
+                        val end = it.lastIndexOf(':')
+                        if (end == -1) it
+                        else it.substring(0, end).replace('T', ' ') 
+                    }}
                 """.trimIndent()
             )
         }
