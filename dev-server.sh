@@ -17,8 +17,14 @@ function help {
 }
 
 function command { # args appended to the docker compose command
-    MY_UID="$(id -u)" MY_GID="$(id -g)" \
-        docker compose -f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml \
+    export MY_UID="$(id -u)"
+    export DOCKER_GID="$(getent group docker | cut -d: -f3)"
+    if test -z "$DOCKER_GID"; then
+        echo "Error: docker group not found"
+        exit 1
+    fi
+
+    docker compose -f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml \
         --env-file pipeline-repo/runner.env --env-file $@
 }
 

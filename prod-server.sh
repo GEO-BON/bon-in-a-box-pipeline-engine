@@ -54,8 +54,10 @@ function help {
 # Run your docker commands on the server manually.
 # `command <command>` with command such as pull/run/up/down/build/logs...
 function command { # args appended to the docker compose command
-    MY_UID="$(id -u)" MY_GID="$(id -g)" \
-        docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml \
+    export MY_UID="$(id -u)"
+    export DOCKER_GID="$(getent group docker | cut -d: -f3)"
+
+    docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml \
         --env-file runner.env --env-file .server/.prod-paths.env $@
 }
 

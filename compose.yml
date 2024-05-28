@@ -23,6 +23,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     expose:
       - "8080"
+    user: ${MY_UID}:${DOCKER_GID} # docker group necessary to access docker.sock
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
     environment:
@@ -39,6 +40,7 @@ services:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
+    user: ${MY_UID}:${DOCKER_GID}
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
     environment:
@@ -78,7 +80,7 @@ services:
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
-    user: ${MY_UID}:${MY_GID}
+    user: ${MY_UID}:${DOCKER_GID}
     environment:
       PORT: 8000
       WORKERS_PER_CORE: 1
