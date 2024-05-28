@@ -54,6 +54,7 @@ services:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
+    user: ${MY_UID}:${DOCKER_GID}
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
     environment:
