@@ -17,7 +17,9 @@ function help {
 }
 
 function command { # args appended to the docker compose command
-   docker compose -f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml --env-file pipeline-repo/runner.env --env-file $@
+    MY_UID="$(id -u)" MY_GID="$(id -g)" \
+        docker compose -f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml \
+        --env-file pipeline-repo/runner.env --env-file $@
 }
 
 function clean {

@@ -78,6 +78,7 @@ services:
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
+    user: ${MY_UID}:${MY_GID}
     environment:
       PORT: 8000
       WORKERS_PER_CORE: 1
