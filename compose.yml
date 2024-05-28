@@ -61,7 +61,7 @@ services:
 
   http-gateway:
     container_name: http-rev-prox
-    image: nginx
+    image: nginxinc/nginx-unprivileged
     ports:
       - "127.0.0.1:${HTTP_PORT:-80}:80"
     volumes:
