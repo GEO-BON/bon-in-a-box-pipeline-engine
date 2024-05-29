@@ -1,20 +1,55 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { ControlledTextArea } from "../form/AutoResizeTextArea";
-import { toIOId } from "../../utils/IOId";
+import { toInputId, toOutputId } from "../../utils/IOId";
 import ScriptInput from "../form/ScriptInput";
+
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  restrictToVerticalAxis,
+  restrictToParentElement
+} from '@dnd-kit/modifiers';
+
+import { IOListItem } from "./IOListItem";
 
 /**
  * @returns rendered view of the pipeline inputs and outputs
  */
 export const IOListPane = ({
   inputList,
-  setInputList, 
-  outputList, 
-  setOutputList, 
+  setInputList,
+  outputList,
+  setOutputList,
   selectedNodes,
   editSession
 }) => {
   const [collapsedPane, setCollapsedPane] = useState(true);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleInputDragEnd = useCallback((event)=>{
+    reorder(event, setInputList)
+  }, [setInputList])
+
+  const IOIdList = inputList.map(input => toInputId(input))
+
   return (
     <div className={`rightPane ioList ${collapsedPane ? "paneCollapsed" : "paneOpen"}`}>
       <div className="collapseTab" onClick={() => setCollapsedPane(!collapsedPane)}>
@@ -33,39 +68,34 @@ export const IOListPane = ({
       </div>
       <div className="rightPaneInner">
         <h3>User inputs</h3>
-        {inputList.length === 0
-          ? "No inputs"
-          : inputList.map((input) => {
-            return (
-              <div
-                key={editSession + "|" + toIOId(input.file, input.nodeId, input.inputId)}
-                className={selectedNodes.find((node) => node.id === input.nodeId)
-                  ? "selected"
-                  : ""}
+        <div>
+          {inputList.length === 0 ? "No inputs" :
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleInputDragEnd}
+              modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+            >
+              <SortableContext
+                items={IOIdList}
+                strategy={verticalListSortingStrategy}
               >
-                <p>
-                  <ControlledTextArea className="label" keepWidth={true}
-                    onBlur={e => valueEdited(e.target.value, "label", input, setInputList)}
-                    onInput={preventNewLines}
-                    defaultValue={input.label} />
-
-                  <br />
-                  <ControlledTextArea className="description" keepWidth={true}
-                    onBlur={e => valueEdited(e.target.value, "description", input, setInputList)}
-                    defaultValue={input.description} />
-
-                  {input.type &&
-                    <>
-                      <br />
-                      <span className="example-tag">Example: </span>
-                      <ScriptInput type={input.type} value={input.example} options={input.options}
-                        onValueUpdated={(value) => valueEdited(value, "example", input, setInputList)} />
-                    </>
-                  }
-                </p>
-              </div>
-            );
-          })}
+                {
+                  inputList.map((input, i) => {
+                    const ioId = IOIdList[i]
+                    return <IOListItem
+                      io={input}
+                      setter={setInputList}
+                      valueEdited={valueEdited}
+                      key={editSession + "|" + ioId}
+                      id={ioId}
+                      className={selectedNodes.find((node) => node.id === input.nodeId) ? "selected" : ""}
+                    />})
+                }
+              </SortableContext>
+            </DndContext>
+          }
+        </div>
         <h3>Pipeline outputs</h3>
         {outputList.length === 0 ? (
           <p className="error">
@@ -75,7 +105,7 @@ export const IOListPane = ({
           outputList.map((output) => {
             return (
               <div
-                key={editSession + "|" + toIOId(output.file, output.nodeId, output.outputId)}
+                key={editSession + "|" + toOutputId(output)}
                 className={selectedNodes.find((node) => node.id === output.nodeId)
                   ? "selected"
                   : ""}
@@ -109,18 +139,32 @@ export const IOListPane = ({
   );
 };
 
+function reorder(event, setItems) {
+  const {active, over} = event;
+  console.log("reorder", active, over)
+
+  if (active.id !== over.id) {
+    setItems((items) => {
+      const oldIndex = items.findIndex(item => toInputId(item) === active.id);
+      const newIndex = items.findIndex(item => toInputId(item) === over.id);
+      console.log("arrayMove", oldIndex, newIndex)
+      return arrayMove(items, oldIndex, newIndex);
+    });
+  }
+}
+
 function valueEdited(value, valueKey, io, setter) {
   setter(previousValues => previousValues.map(previousIO => {
-    let newIO = {...previousIO}
-    if(previousIO.nodeId === io.nodeId
+    let newIO = { ...previousIO }
+    if (previousIO.nodeId === io.nodeId
       && previousIO.inputId === io.inputId
       && previousIO.outputId === io.outputId) {
-        newIO[valueKey] = value
-      }
-      return newIO
+      newIO[valueKey] = value
+    }
+    return newIO
   }))
 }
 
-function preventNewLines(event){
+function preventNewLines(event) {
   event.target.value = event.target.value.replaceAll("\n", "")
 }
