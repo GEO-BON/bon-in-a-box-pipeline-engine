@@ -284,6 +284,26 @@
   background: none;
 }
 
+.ioList .draggable {
+  /* https://stackoverflow.com/a/34685980/3519951 */
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" style="font-size: 25px;"><text x="-5" y="20">⇳</text></svg>'), auto;
+}
+
+.ioList .ioListItem table {
+  width: 100%;
+}
+.ioList .ioListItem tr,
+.ioList .ioListItem td
+ {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ioList .ioListItem:hover {
+  background-color: white;
+}
+
 .collapseTab {
   text-align: center;
 }
