@@ -1,7 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { ControlledTextArea } from "../form/AutoResizeTextArea";
 import { toInputId, toOutputId } from "../../utils/IOId";
-import ScriptInput from "../form/ScriptInput";
 
 import {
   DndContext,
@@ -45,10 +43,15 @@ export const IOListPane = ({
   );
 
   const handleInputDragEnd = useCallback((event)=>{
-    reorder(event, setInputList)
+    reorder(event, setInputList, toInputId)
   }, [setInputList])
 
-  const IOIdList = inputList.map(input => toInputId(input))
+  const handleOutputDragEnd = useCallback((event)=>{
+    reorder(event, setOutputList, toOutputId)
+  }, [setOutputList])
+
+  const inputIdList = inputList.map(input => toInputId(input))
+  const outputIdList = outputList.map(output => toOutputId(output))
 
   return (
     <div className={`rightPane ioList ${collapsedPane ? "paneCollapsed" : "paneOpen"}`}>
@@ -77,12 +80,12 @@ export const IOListPane = ({
               modifiers={[restrictToVerticalAxis, restrictToParentElement]}
             >
               <SortableContext
-                items={IOIdList}
+                items={inputIdList}
                 strategy={verticalListSortingStrategy}
               >
                 {
                   inputList.map((input, i) => {
-                    const ioId = IOIdList[i]
+                    const ioId = inputIdList[i]
                     return <IOListItem
                       io={input}
                       setter={setInputList}
@@ -102,52 +105,45 @@ export const IOListPane = ({
             At least one output is needed for the pipeline to run
           </p>
         ) : (
-          outputList.map((output) => {
-            return (
-              <div
-                key={editSession + "|" + toOutputId(output)}
-                className={selectedNodes.find((node) => node.id === output.nodeId)
-                  ? "selected"
-                  : ""}
+          <div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleOutputDragEnd}
+              modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+            >
+              <SortableContext
+                items={outputIdList}
+                strategy={verticalListSortingStrategy}
               >
-                <p>
-                  <ControlledTextArea className="label" keepWidth={true}
-                    onBlur={e => valueEdited(e.target.value, "label", output, setOutputList)}
-                    onInput={preventNewLines}
-                    defaultValue={output.label} />
-
-                  <br />
-                  <ControlledTextArea className="description" keepWidth={true}
-                    onBlur={e => valueEdited(e.target.value, "description", output, setOutputList)}
-                    defaultValue={output.description} />
-
-                  {output.type &&
-                    <>
-                      <br />
-                      <span className="example-tag">Example: </span>
-                      <ScriptInput type={output.type} value={output.example} options={output.options}
-                        onValueUpdated={(value) => valueEdited(value, "example", output, setOutputList)} />
-                    </>
-                  }
-                </p>
-              </div>
-            );
-          })
+                {outputList.map((output, i) => {
+                  const ioId = outputIdList[i]
+                  return <IOListItem
+                    io={output}
+                    setter={setOutputList}
+                    valueEdited={valueEdited}
+                    key={editSession + "|" + ioId}
+                    id={ioId}
+                    className={selectedNodes.find((node) => node.id === output.nodeId) ? "selected" : ""}
+                  />
+                })
+                }
+              </SortableContext>
+            </DndContext>
+          </div>
         )}
       </div>
     </div>
   );
 };
 
-function reorder(event, setItems) {
+function reorder(event, setItems, getItemId) {
   const {active, over} = event;
-  console.log("reorder", active, over)
 
-  if (active.id !== over.id) {
+  if (active && over && active.id !== over.id) {
     setItems((items) => {
-      const oldIndex = items.findIndex(item => toInputId(item) === active.id);
-      const newIndex = items.findIndex(item => toInputId(item) === over.id);
-      console.log("arrayMove", oldIndex, newIndex)
+      const oldIndex = items.findIndex(item => getItemId(item) === active.id);
+      const newIndex = items.findIndex(item => getItemId(item) === over.id);
       return arrayMove(items, oldIndex, newIndex);
     });
   }
@@ -163,8 +159,4 @@ function valueEdited(value, valueKey, io, setter) {
     }
     return newIO
   }))
-}
-
-function preventNewLines(event) {
-  event.target.value = event.target.value.replaceAll("\n", "")
 }
