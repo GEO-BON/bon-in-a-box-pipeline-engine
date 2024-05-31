@@ -385,7 +385,7 @@ class ScriptRun( // Constructor used in single script run
             pidFile.delete()
         }
 
-        log(logger::debug,"Runner: ${container.containerName} version ${container.version}\n")
+        log(logger::debug,"Runner: ${container.containerName} version ${container.version}")
         log(logger::info, "Elapsed: $elapsed")
 
         // Format log output
