@@ -5,21 +5,23 @@ import ScriptInput from "../form/ScriptInput";
 
 
 
-export function IOListItem({io, id, valueEdited, setter, className}) {
+export function IOListItem({ io, id, valueEdited, setter, className }) {
     const {
         attributes,
         listeners,
         setNodeRef,
         transform,
         transition,
-      } = useSortable({id: id});
+        isDragging,
+    } = useSortable({ id: id });
 
-      const style = {
-        transform: CSS.Transform.toString(transform),
+    const style = {
+        transform: CSS.Transform.toString({ ...transform, scaleX: 1, scaleY: 1 }),
         transition,
-      };
+        zIndex: '5000',
+    };
 
-    return <div ref={setNodeRef} style={style} className="ioListItem">
+    return <div ref={setNodeRef} style={style} className={"ioListItem" + (isDragging ? " dragging" : "")}>
         <table>
             <tbody>
                 <tr>

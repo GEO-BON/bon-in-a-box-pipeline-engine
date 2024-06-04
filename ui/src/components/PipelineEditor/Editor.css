@@ -289,6 +289,15 @@
   cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" style="font-size: 25px;"><text x="-5" y="20">⇳</text></svg>'), auto;
 }
 
+.ioList .dragging * {
+  /* https://stackoverflow.com/a/34685980/3519951 */
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" style="font-size: 25px;"><text x="-5" y="20">⬍</text></svg>'), auto;
+}
+
+.ioList .ioListItem {
+  background-color: whitesmoke;
+}
+
 .ioList .ioListItem table {
   width: 100%;
 }
@@ -300,7 +309,8 @@
   margin: 0;
 }
 
-.ioList .ioListItem:hover {
+.ioList .ioListItem:hover,
+.ioList .ioListItem.dragging {
   background-color: white;
 }
 
