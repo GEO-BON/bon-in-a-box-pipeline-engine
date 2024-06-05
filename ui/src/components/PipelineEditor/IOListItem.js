@@ -18,7 +18,6 @@ export function IOListItem({ io, id, valueEdited, setter, className }) {
     const style = {
         transform: CSS.Transform.toString({ ...transform, scaleX: 1, scaleY: 1 }),
         transition,
-        zIndex: '5000',
     };
 
     return <div ref={setNodeRef} style={style} className={"ioListItem" + (isDragging ? " dragging" : "")}>
