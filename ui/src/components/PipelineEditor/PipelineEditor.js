@@ -614,21 +614,23 @@ export default function PipelineEditor(props) {
 
       // Save pipeline inputs
       flow.inputs = {};
-      inputList.forEach((input) => {
+      inputList.forEach((input, i) => {
         const id = toInputId(input)
 
         // Destructuring copy to leave out fields that are not part of the input description spec.
         const { file, nodeId, inputId, ...copy } = input;
+        copy.weight = i
         flow.inputs[id] = copy;
       });
 
       // Save pipeline outputs
       flow.outputs = {};
-      outputList.forEach((output) => {
+      outputList.forEach((output, i) => {
         const id = toOutputId(output)
 
         // Destructuring copy to leave out fields that are not part of the output description spec.
         let { file, nodeId, outputId, ...copy } = output;
+        copy.weight = i
         flow.outputs[id] = copy;
       });
 
