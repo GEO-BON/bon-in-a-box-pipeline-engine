@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **description** | **String** |  | [optional] 
 **label** | **String** |  | [optional] 
+**weight** | **Number** | The weight is used to sort outputs in the client UI. | [optional] 
 **type** | **String** |  | [optional] 
 **range** | **[Number]** |  | [optional] 
 **options** | **[String]** |  | [optional] 

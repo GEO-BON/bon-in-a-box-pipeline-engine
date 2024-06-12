@@ -24,8 +24,8 @@ class InfoInputsValue {
      * Constructs a new <code>InfoInputsValue</code>.
      * @alias module:model/InfoInputsValue
      */
-    constructor() { 
-        
+    constructor() {
+
         InfoInputsValue.initialize(this);
     }
 
@@ -34,7 +34,7 @@ class InfoInputsValue {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) { 
+    static initialize(obj) {
     }
 
     /**
@@ -53,6 +53,9 @@ class InfoInputsValue {
             }
             if (data.hasOwnProperty('label')) {
                 obj['label'] = ApiClient.convertToType(data['label'], 'String');
+            }
+            if (data.hasOwnProperty('weight')) {
+                obj['weight'] = ApiClient.convertToType(data['weight'], 'Number');
             }
             if (data.hasOwnProperty('type')) {
                 obj['type'] = ApiClient.convertToType(data['type'], 'String');
@@ -121,6 +124,12 @@ InfoInputsValue.prototype['description'] = undefined;
  * @member {String} label
  */
 InfoInputsValue.prototype['label'] = undefined;
+
+/**
+ * The weight is used to sort inputs in the client UI.
+ * @member {Number} weight
+ */
+InfoInputsValue.prototype['weight'] = undefined;
 
 /**
  * @member {String} type

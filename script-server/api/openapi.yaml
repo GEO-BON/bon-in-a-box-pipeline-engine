@@ -349,6 +349,10 @@ components:
               label:
                 type: string
                 example: species names
+              weight:
+                type: number
+                example: 1
+                description: The weight is used to sort inputs in the client UI.
               type:
                 type: string
                 example: text
@@ -389,6 +393,10 @@ components:
               label:
                 type: string
                 example: occurences
+              weight:
+                type: number
+                example: 1
+                description: The weight is used to sort outputs in the client UI.
               type:
                 type: string
                 example: text/csv

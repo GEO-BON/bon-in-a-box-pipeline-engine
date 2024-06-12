@@ -31,12 +31,12 @@ import {
   getStepOutput,
   getStepInput,
   getStepFile,
-  toIOId,
+  toInputId,
+  toOutputId,
 } from "../../utils/IOId";
 import sleep from "../../utils/Sleep";
 import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
-import { useEffectIfChanged } from "../../utils/UseEffectIfChanged";
 
 const yaml = require('js-yaml');
 const _lang = require('lodash/lang');
@@ -614,27 +614,23 @@ export default function PipelineEditor(props) {
 
       // Save pipeline inputs
       flow.inputs = {};
-      inputList.forEach((input) => {
+      inputList.forEach((input, i) => {
+        const id = toInputId(input)
+
         // Destructuring copy to leave out fields that are not part of the input description spec.
         const { file, nodeId, inputId, ...copy } = input;
-        const id =
-          file === undefined
-            ? toIOId("pipeline", input.nodeId)
-            : toIOId(input.file, input.nodeId, input.inputId);
-
+        copy.weight = i
         flow.inputs[id] = copy;
       });
 
       // Save pipeline outputs
       flow.outputs = {};
-      outputList.forEach((output) => {
+      outputList.forEach((output, i) => {
+        const id = toOutputId(output)
+
         // Destructuring copy to leave out fields that are not part of the output description spec.
         let { file, nodeId, outputId, ...copy } = output;
-        const id =
-          file === undefined
-            ? toIOId("pipeline", output.nodeId)
-            : toIOId(output.file, output.nodeId, output.outputId);
-
+        copy.weight = i
         flow.outputs[id] = copy;
       });
 

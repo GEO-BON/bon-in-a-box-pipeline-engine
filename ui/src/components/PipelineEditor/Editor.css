@@ -234,8 +234,6 @@
 .ioList .rightPaneInner {
   overflow-y: auto;
   overflow-x: hidden;
-  padding-left: 10px;
-  padding-right: 20px;
 }
 
 .ioList h3 {
@@ -256,7 +254,8 @@
 }
 
 .ioList textarea {
-  width: 100%;
+  /* Removing the width of the dragHandle from 100% */
+  width: calc(100% - 1rem);
   background-color: transparent;
   border: none;
   resize: none;
@@ -282,6 +281,41 @@
 
 .ioList textarea:hover:focus {
   background: none;
+}
+
+.ioList .draggable {
+  /* https://stackoverflow.com/a/34685980/3519951 */
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" style="font-size: 25px;"><text x="-5" y="20">⇳</text></svg>'), auto;
+}
+
+.ioList .dragging * {
+  /* https://stackoverflow.com/a/34685980/3519951 */
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" style="font-size: 25px;"><text x="-5" y="20">⬍</text></svg>'), auto;
+}
+
+.ioList .ioListItem {
+  background-color: whitesmoke;
+  padding-left: 5px;
+}
+
+.ioList .ioListItem table {
+  width: 100%;
+}
+.ioList .ioListItem tr,
+.ioList .ioListItem td
+ {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ioList .ioListItem td {
+  position: relative;
+}
+
+.ioList .ioListItem:hover,
+.ioList .ioListItem.dragging {
+  background-color: white;
 }
 
 .collapseTab {
