@@ -24,8 +24,8 @@ class InfoOutputsValue {
      * Constructs a new <code>InfoOutputsValue</code>.
      * @alias module:model/InfoOutputsValue
      */
-    constructor() { 
-        
+    constructor() {
+
         InfoOutputsValue.initialize(this);
     }
 
@@ -34,7 +34,7 @@ class InfoOutputsValue {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) { 
+    static initialize(obj) {
     }
 
     /**
@@ -53,6 +53,9 @@ class InfoOutputsValue {
             }
             if (data.hasOwnProperty('label')) {
                 obj['label'] = ApiClient.convertToType(data['label'], 'String');
+            }
+            if (data.hasOwnProperty('weight')) {
+                obj['weight'] = ApiClient.convertToType(data['weight'], 'Number');
             }
             if (data.hasOwnProperty('type')) {
                 obj['type'] = ApiClient.convertToType(data['type'], 'String');
@@ -128,6 +131,12 @@ InfoOutputsValue.prototype['description'] = undefined;
  * @member {String} label
  */
 InfoOutputsValue.prototype['label'] = undefined;
+
+/**
+ * The weight is used to sort outputs in the client UI.
+ * @member {Number} weight
+ */
+InfoOutputsValue.prototype['weight'] = undefined;
 
 /**
  * @member {String} type

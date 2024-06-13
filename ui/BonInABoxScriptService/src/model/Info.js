@@ -27,8 +27,8 @@ class Info {
      * Constructs a new <code>Info</code>.
      * @alias module:model/Info
      */
-    constructor() { 
-        
+    constructor() {
+
         Info.initialize(this);
     }
 
@@ -37,7 +37,7 @@ class Info {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) { 
+    static initialize(obj) {
     }
 
     /**
@@ -82,6 +82,19 @@ class Info {
                 obj['references'] = ApiClient.convertToType(data['references'], [InfoReferencesInner]);
             }
         }
+
+        // JML: Sorting by weight.
+        // Sorting properties is officially unsupported, but highly convenient in this case.
+        obj['inputs'] = Object.fromEntries(
+            Object.entries(obj['inputs']).sort(([,a], [,b]) => a.weight - b.weight)
+        );
+
+        obj['outputs'] = Object.fromEntries(
+            Object.entries(obj['outputs']).sort(([,a], [,b]) => a.weight - b.weight)
+        );
+        console.log("Sorted!", obj['inputs'])
+        // --- sorting
+
         return obj;
     }
 
