@@ -92,7 +92,6 @@ class Info {
         obj['outputs'] = Object.fromEntries(
             Object.entries(obj['outputs']).sort(([,a], [,b]) => a.weight - b.weight)
         );
-        console.log("Sorted!", obj['inputs'])
         // --- sorting
 
         return obj;
