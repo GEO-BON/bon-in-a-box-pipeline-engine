@@ -19,9 +19,10 @@ function help {
 function command { # args appended to the docker compose command
     export MY_UID="$(id -u)"
     export DOCKER_GID="$(getent group docker | cut -d: -f3)"
-    if test -z "$DOCKER_GID"; then
-        echo "Error: docker group not found"
-        exit 1
+
+    # On Windows, getent will not work. We just use the normal group.
+    if test -z $DOCKER_GID; then
+        export DOCKER_GID=$(id -g);
     fi
 
     docker compose -f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml \

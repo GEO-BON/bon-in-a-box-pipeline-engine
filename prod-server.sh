@@ -57,6 +57,11 @@ function command { # args appended to the docker compose command
     export MY_UID="$(id -u)"
     export DOCKER_GID="$(getent group docker | cut -d: -f3)"
 
+    # On Windows, getent will not work. We just use the normal group.
+    if test -z $DOCKER_GID; then
+        export DOCKER_GID=$(id -g);
+    fi
+
     docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml \
         --env-file runner.env --env-file .server/.prod-paths.env $@
 }
