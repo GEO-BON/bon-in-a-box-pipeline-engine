@@ -18,9 +18,10 @@ fun checkCacheVersion() {
         logger.debug("Using cache version $CACHE_VERSION")
     } else {
         outputRoot.listFiles()?.let { topLevelFiles ->
-            if(topLevelFiles.isNotEmpty()) {
+
+            if(topLevelFiles.size > 1) { // If there is only one file, it's the gitignore file
                 val archivePath = File(outputRoot, "OLD_v$oldVersion")
-                logger.debug("Disruptive change: Switching to cache version $CACHE_VERSION. Existing cache of version $oldVersion will be kept in a separate folder.")
+                logger.info("Disruptive change: Switching to cache version $CACHE_VERSION. Existing cache of version $oldVersion will be kept in a separate folder.")
                 archivePath.mkdir()
                 topLevelFiles.forEach {
                     if (it.name != ".gitignore") {

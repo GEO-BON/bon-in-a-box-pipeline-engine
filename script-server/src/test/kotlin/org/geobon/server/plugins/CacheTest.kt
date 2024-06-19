@@ -9,6 +9,7 @@ private const val DUMMY_TEXT = "Some content"
 class CacheTest {
     private var someDir = File(outputRoot, "someDir")
     private var someFile = File(someDir, "someFile")
+    private val gitignoreFile = File(outputRoot, ".gitignore")
 
     @BeforeTest
     fun setupOutputFolder() {
@@ -20,6 +21,7 @@ class CacheTest {
 
         someDir.mkdir()
         someFile.writeText(DUMMY_TEXT)
+        gitignoreFile.createNewFile()
     }
 
     @AfterTest
@@ -30,13 +32,14 @@ class CacheTest {
     @Test
     fun givenCacheVersionSame_whenCheckCache_thenNothingDone() {
         CACHE_VERSION_FILE.writeText(CACHE_VERSION)
-        assertEquals(2, outputRoot.listFiles()?.size)
+        assertEquals(3, outputRoot.listFiles()?.size)
 
         checkCacheVersion()
 
         assertEquals(CACHE_VERSION, CACHE_VERSION_FILE.readText())
 
-        assertEquals(2, outputRoot.listFiles()?.size)
+        assertEquals(3, outputRoot.listFiles()?.size)
+        assertTrue(gitignoreFile.exists())
         assertTrue(someDir.isDirectory)
         assertTrue(someFile.exists())
         assertEquals(DUMMY_TEXT, someFile.readText())
@@ -44,13 +47,14 @@ class CacheTest {
 
     @Test
     fun givenCacheVersionNotSet_whenCheckCache_thenMovedToCacheVersion0() {
-        assertEquals(1, outputRoot.listFiles()?.size)
+        assertEquals(2, outputRoot.listFiles()?.size)
 
         checkCacheVersion()
 
         assertEquals(CACHE_VERSION, CACHE_VERSION_FILE.readText())
 
-        assertEquals(2, outputRoot.listFiles()?.size)
+        assertEquals(3, outputRoot.listFiles()?.size)
+        assertTrue(gitignoreFile.exists())
         assertFalse(someDir.exists())
         assertFalse(someFile.exists())
 
@@ -66,13 +70,14 @@ class CacheTest {
     @Test
     fun givenCacheVersionDifferent_whenCheckCache_thenMovedToCacheVersion0() {
         CACHE_VERSION_FILE.writeText("1.0")
-        assertEquals(2, outputRoot.listFiles()?.size)
+        assertEquals(3, outputRoot.listFiles()?.size)
 
         checkCacheVersion()
 
         assertEquals(CACHE_VERSION, CACHE_VERSION_FILE.readText())
 
-        assertEquals(2, outputRoot.listFiles()?.size)
+        assertEquals(3, outputRoot.listFiles()?.size)
+        assertTrue(gitignoreFile.exists())
         assertFalse(someDir.exists())
         assertFalse(someFile.exists())
 
@@ -88,22 +93,21 @@ class CacheTest {
     @Test
     fun givenGitignoreFile_whenCacheMoved_thenStaysThere() {
         CACHE_VERSION_FILE.writeText("1.0")
-        val gitignore = File(outputRoot, ".gitignore")
-        gitignore.createNewFile()
 
         checkCacheVersion()
 
-        assertTrue(gitignore.exists())
+        assertTrue(gitignoreFile.exists())
     }
 
     @Test
     fun givenCacheNotExisting_whenCheckCache_thenOnlyPutsVersionFile() {
-        outputRoot.listFiles()?.forEach { it.deleteRecursively() }
-        assertEquals(0, outputRoot.listFiles()?.size)
+        someDir.deleteRecursively()
+        assertEquals(1, outputRoot.listFiles()?.size) // Only gitignore is left
 
         checkCacheVersion()
 
         assertEquals(CACHE_VERSION, CACHE_VERSION_FILE.readText())
-        assertEquals(1, outputRoot.listFiles()?.size)
+        assertEquals(2, outputRoot.listFiles()?.size,
+            "Expected 2 but got ${outputRoot.listFiles()?.toList()}")
     }
 }
