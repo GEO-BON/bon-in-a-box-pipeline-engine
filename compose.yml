@@ -1,6 +1,5 @@
 # Base compose file
 # Contains all that is common between production and development configurations.
-version: "3.7"
 
 services:
   ui:
@@ -23,6 +22,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     expose:
       - "8080"
+    user: ${MY_UID}:${DOCKER_GID} # docker group necessary to access docker.sock
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
     environment:
@@ -39,6 +39,7 @@ services:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
+    user: ${MY_UID}:${DOCKER_GID}
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
     environment:
@@ -52,6 +53,7 @@ services:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
+    user: ${MY_UID}:${DOCKER_GID}
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
     environment:
@@ -61,7 +63,7 @@ services:
 
   http-gateway:
     container_name: http-rev-prox
-    image: nginx
+    image: nginxinc/nginx-unprivileged
     ports:
       - "127.0.0.1:${HTTP_PORT:-80}:80"
     volumes:
@@ -78,6 +80,7 @@ services:
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
+    user: ${MY_UID}:${DOCKER_GID}
     environment:
       PORT: 8000
       WORKERS_PER_CORE: 1

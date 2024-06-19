@@ -54,7 +54,18 @@ function help {
 # Run your docker commands on the server manually.
 # `command <command>` with command such as pull/run/up/down/build/logs...
 function command { # args appended to the docker compose command
-   docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml --env-file runner.env --env-file .server/.prod-paths.env $@
+    export DOCKER_GID="$(getent group docker | cut -d: -f3)"
+
+     # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
+    if test -z $DOCKER_GID; then
+        export DOCKER_GID=
+        export MY_UID=
+    else
+        export MY_UID="$(id -u)"
+    fi
+
+    docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml \
+        --env-file runner.env --env-file .server/.prod-paths.env $@
 }
 
 function validate {
@@ -126,6 +137,9 @@ function up {
     echo "Pulling docker images..."
     cd .. # Back to pipeline-repo folder
     command pull ; assertSuccess
+
+    echo "Building (if necessary)"
+    command build ; assertSuccess
 
     echo "Starting the server..."
     output=$(command up -d $@ 2>&1); returnCode=$?;
