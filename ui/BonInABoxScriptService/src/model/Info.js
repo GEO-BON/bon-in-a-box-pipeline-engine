@@ -85,13 +85,17 @@ class Info {
 
         // JML: Sorting by weight.
         // Sorting properties is officially unsupported, but highly convenient in this case.
-        obj['inputs'] = Object.fromEntries(
-            Object.entries(obj['inputs']).sort(([,a], [,b]) => a.weight - b.weight)
-        );
+        if(obj['inputs']) {
+            obj['inputs'] = Object.fromEntries(
+                Object.entries(obj['inputs']).sort(([,a], [,b]) => a.weight - b.weight)
+            );
+        }
 
-        obj['outputs'] = Object.fromEntries(
-            Object.entries(obj['outputs']).sort(([,a], [,b]) => a.weight - b.weight)
-        );
+        if(obj['outputs']) {
+            obj['outputs'] = Object.fromEntries(
+                Object.entries(obj['outputs']).sort(([,a], [,b]) => a.weight - b.weight)
+            );
+        }
         // --- sorting
 
         return obj;
