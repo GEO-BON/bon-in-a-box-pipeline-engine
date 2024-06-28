@@ -138,6 +138,9 @@ function up {
     cd .. # Back to pipeline-repo folder
     command pull ; assertSuccess
 
+    echo "Building (if necessary)"
+    command build ; assertSuccess
+
     echo "Starting the server..."
     output=$(command up -d $@ 2>&1); returnCode=$?;
 
@@ -165,7 +168,7 @@ function down {
 function clean {
     echo "Removing shared containers between dev and prod"
     docker container rm http-rev-prox biab-ui biab-script-server \
-        biab-tiler biab-runner-r biab-runner-julia
+        biab-tiler biab-runner-conda biab-runner-julia
     assertSuccess
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
 }
