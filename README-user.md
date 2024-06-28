@@ -24,52 +24,21 @@ To run:
 
     `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git`
 
-2. Provide an environment file named `runner.env` in the root folder with the following keys
-    ```
-    # Access the planetary computer APIs
-    JUPYTERHUB_API_TOKEN=
-    DASK_GATEWAY__AUTH__TYPE=
-    DASK_GATEWAY__CLUSTER__OPTIONS__IMAGE=
-    DASK_GATEWAY__ADDRESS=
-    DASK_GATEWAY__PROXY_ADDRESS=
-
-    # Access GBIF API
-    GBIF_USER=
-    GBIF_PWD=
-    GBIF_EMAIL=
-
-    # Access Red List Index
-    IUCN_TOKEN=
-
-    # Allows to save the pipeline directly to the server in the Pipeline Editor.
-    # This API can be blocked on some infrastructures by changing this value.
-    # - deny: Saving will be rejected by server. In the UI, "Save to clipboard" button can be used.
-    # - allow, or anything else: "Save" and "Save as" buttons available in the UI.
-    SAVE_PIPELINE_TO_SERVER=allow
-
-    # Script server cache option:
-    # - full: when a script file changes, all related caches are cleared.
-    # - partial: when a script file changes, cache is only overriden when running with the same inputs.
-    # NB: applied on next docker compose up
-    SCRIPT_SERVER_CACHE_CLEANER=full
-
-    # Optional: By default, server starts on localhost with port 80.
-    # If port 80 is already in use on your server, specify another port here.
-    # The UI will be visible in http://localhost:81 if HTTP_PORT=81
-    #HTTP_PORT=81
-
-    ```
-2. Using a terminal, navigate to top-level folder.
-3. `./server-up.sh`
-  - The first execution will be long. The next ones will be shorter or immediate, depending on the changes.
-  - Network problems may fail the process. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.
-  - Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl ("wsl --update", see [https://docs.docker.com/desktop/troubleshoot/topics/#virtualization](https://docs.docker.com/desktop/troubleshoot/topics/#virtualization). Access to the BIOS may be required to enable virtualization)
-4. In browser:
+2. Provide the environment variables:
+    - Copy [`runner-sample.env`](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env) and rename it `runner.env`.
+    - Fill the properties depending on whay you intend to run.
+    - Adjust any server option as you see fit.
+3. Using a terminal, navigate to top-level folder.
+4. `./server-up.sh`
+    - The first execution will be long, in order to download the micro-services. The next ones will be shorter or immediate, depending on the changes.
+    - Network problems may fail the process. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.
+    - Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl ("wsl --update", see [https://docs.docker.com/desktop/troubleshoot/topics/#virtualization](https://docs.docker.com/desktop/troubleshoot/topics/#virtualization). Access to the BIOS may be required to enable virtualization)
+5. In browser:
     - http://localhost/ shows the UI
-5. `./server-down.sh` (to stop the server when done)
-6. On Windows, to completely stop the processes, you might have to run `wsl --shutdown`
+6. `./server-down.sh` (to stop the server when done)
+7. On Windows, to completely stop the processes, you might have to run `wsl --shutdown`
 
-When modifying scripts in the /scripts folder, servers do not need to be restarted:
+When modifying scripts in the `/scripts` folder, servers do not need to be restarted:
 - When modifying an existing script, simply re-run the script from the UI and the new version will be executed.
 - When adding or renaming scripts, refresh the browser page.
 

@@ -1,9 +1,31 @@
 // This file has a mirror in Kotlin server code.
 
 /**
- * 
- * @param {String} step 
- * @param {String} nodeId 
+ *
+ * @param {Object} props Properties of the input
+ * @returns the IO id: step@nodeId|input
+ */
+export function toInputId(props) {
+    return props.file === undefined
+            ? toIOId("pipeline", props.nodeId)
+            : toIOId(props.file, props.nodeId, props.inputId);
+}
+
+/**
+ *
+ * @param {Object} props Properties of the output
+ * @returns the IO id: step@nodeId|output
+ */
+export function toOutputId(props) {
+    return props.file === undefined
+            ? toIOId("pipeline", props.nodeId)
+            : toIOId(props.file, props.nodeId, props.outputId);
+}
+
+/**
+ *
+ * @param {String} step
+ * @param {String} nodeId
  * @param {String} inputOrOutput Optional, id of input or output in the yaml. Null for pipeline inputs.
  * @returns the IO id: step@nodeId|inputOrOutput
  */
@@ -13,10 +35,10 @@ export function toIOId(step, nodeId, inputOrOutput) {
 
 /**
  * @returns The path of the script that parses inputs / provides output.
- * 
+ *
  * from pipeline.json@12|pipeline.json@23|script.yml@31|output
  * returns script.yml
- * 
+ *
  * from script.yml@31|output
  * returns script.yml
  */
@@ -28,10 +50,10 @@ export function getScript(ioId) {
 
 /**
  * @returns The unique identification of this step in the outer pipeline.
- * 
+ *
  * from pipeline.json@12|pipeline.json@23|script.yml@31|output
  * returns pipeline.json@12
- * 
+ *
  * from script.yml@31
  * returns script.yml@31
  */
@@ -45,16 +67,16 @@ export function getStepId(ioId) {
 
 /**
  * @returns Breadcrumbs from the outer pipeline to the script
- * 
+ *
  * from pipeline.json@12|pipeline.json@23|script.yml@31|output
  * returns pipeline.json@12|pipeline.json@23|script.yml@31
- * 
+ *
  * from pipeline.json@12|pipeline.json@23|script.yml@31
  * returns pipeline.json@12|pipeline.json@23|script.yml@31
- * 
+ *
  * from script.yml@31|output
  * returns script.yml@31
- * 
+ *
  * from script.yml@31
  * returns script.yml@31
  */
@@ -70,7 +92,7 @@ export function getBreadcrumbs(ioId) {
 
 /**
  * @returns The description file for this step in the outer pipeline.
- * 
+ *
  * from pipeline.json@12|pipeline.json@23|script.yml@31|output
  * returns pipeline.json
  */
@@ -81,10 +103,10 @@ export function getStepFile(ioId) {
 
 /**
  * @returns The id of the react-flow node corresponding to this step, in the outer pipeline.
- * 
+ *
  * from pipeline.json@12|pipeline.json@23|script.yml@31|output
  * returns 12
- * 
+ *
  * from pipeline@12
  * returns 12
  */
@@ -98,10 +120,10 @@ export function getStepNodeId(ioId) {
 
 /**
  * @returns The name of the output of this step.
- * 
+ *
  * from pipeline.json@12|pipeline.json@23|script.yml@31|output
  * returns pipeline.json@23|script.yml@31|output
- * 
+ *
  * from pipeline@12
  * returns defaultOutput
  */
@@ -115,16 +137,16 @@ export function getStepOutput(ioId) {
 
 /**
  * @returns Output of the script (as defined in the script's yml)
- * 
+ *
  * from pipeline.json@12|pipeline.json@23|script.yml@31|output
  * returns output
- * 
+ *
  * from pipeline.json@12|pipeline.json@23|script.yml@31
  * returns defaultOutput
- * 
+ *
  * from script.yml@31|output
  * returns output
- * 
+ *
  * from script.yml@31
  * returns defaultOutput
  */
@@ -140,7 +162,7 @@ export function getScriptOutput(ioId) {
 
 /**
  * @returns The name of the input of this step.
- * 
+ *
  * from pipeline.json@12|pipeline.json@23|script.yml@31|input
  * returns pipeline.json@23|script.yml@31|input
  */
@@ -150,7 +172,7 @@ export function getStepInput(ioId) {
 
 /**
  * @returns The io id formatted in a human-readable way
- * 
+ *
  * from pipeline.json@12|pipeline.json@23|folder>script.yml@31|output
  * returns pipeline | pipeline | folder > script | output
  */

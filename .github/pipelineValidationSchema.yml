@@ -36,6 +36,20 @@ metadata:
       type: string
       regex: '^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$'
 
+    references:
+      required: false
+      nullable: true
+      type: list
+      schema:
+        type: dict
+        schema:
+          text:
+            required: true
+            type: string
+          doi:
+            required: false
+            type: string
+
 inputs:
   required: false
   nullable: true
@@ -140,20 +154,6 @@ outputs:
         - type: dict
           dependencies:
             type: [object]
-
-references:
-  required: false
-  nullable: true
-  type: list
-  schema:
-    type: dict
-    schema:
-      text:
-        required: true
-        type: string
-      doi:
-        required: false
-        type: string
 
 edges:
   required: true

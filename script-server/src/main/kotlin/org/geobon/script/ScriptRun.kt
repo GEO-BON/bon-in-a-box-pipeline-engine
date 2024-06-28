@@ -50,6 +50,9 @@ class ScriptRun( // Constructor used in single script run
     }
 
     suspend fun execute() {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
+        logBuffer += "${dateFormat.format(Calendar.getInstance().time)}\n"
+
         results = loadFromCache()
             ?: runScript()
     }

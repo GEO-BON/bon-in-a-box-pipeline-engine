@@ -8,8 +8,8 @@ RUN curl -sfL -o docker.tgz "https://download.docker.com/linux/static/stable/x86
   rm docker.tgz
 
 RUN curl -L "https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
-RUN chmod +x /usr/local/bin/docker-compose
-RUN chmod +x /usr/local/bin/docker
+RUN chmod 755 /usr/local/bin/docker-compose
+RUN chmod 755 /usr/local/bin/docker
 
 
 RUN set -ex; \
@@ -17,4 +17,4 @@ RUN set -ex; \
     apt-get install -y --no-install-recommends python3 libc6-dev; \
     apt-get clean all;
 
-RUN echo "dev" > /version.txt 
+RUN echo "dev" > /version.txt
