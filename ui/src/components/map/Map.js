@@ -55,6 +55,7 @@ function MarkerCluster({ markers }) {
   return null
 }
 
+// eslint-disable-next-line
 function MarkerGroup({markers}) {
   const map = useMap()
 

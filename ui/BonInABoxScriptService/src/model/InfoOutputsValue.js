@@ -55,6 +55,9 @@ class InfoOutputsValue {
             if (data.hasOwnProperty('label')) {
                 obj['label'] = ApiClient.convertToType(data['label'], 'String');
             }
+            if (data.hasOwnProperty('weight')) {
+                obj['weight'] = ApiClient.convertToType(data['weight'], 'Number');
+            }
             if (data.hasOwnProperty('type')) {
                 // JM Lord: Current version of the generator does not work when type is "oneOf" in OpenAPI spec.
                 // We want the default convertToType clause to execute.
@@ -132,6 +135,12 @@ InfoOutputsValue.prototype['description'] = undefined;
  * @member {String} label
  */
 InfoOutputsValue.prototype['label'] = undefined;
+
+/**
+ * The weight is used to sort outputs in the client UI.
+ * @member {Number} weight
+ */
+InfoOutputsValue.prototype['weight'] = undefined;
 
 /**
  * @member {module:model/InfoOutputsValueType} type

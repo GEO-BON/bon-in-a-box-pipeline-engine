@@ -47,6 +47,9 @@ class ScriptRun( // Constructor used in single script run
     }
 
     suspend fun execute() {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
+        logBuffer += "${dateFormat.format(Calendar.getInstance().time)}\n"
+
         results = loadFromCache()
             ?: runScript()
     }
@@ -214,7 +217,7 @@ class ScriptRun( // Constructor used in single script run
                     "r", "R" -> {
                         runner = "biab-runner-r"
                         command = listOf(
-                            "/usr/local/bin/docker", "exec", "-i", runner, "Rscript", "-e", 
+                            "/usr/local/bin/docker", "exec", "-i", runner, "Rscript", "-e",
                             """
                             options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
                             fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);

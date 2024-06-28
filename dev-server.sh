@@ -19,7 +19,18 @@ function help {
 }
 
 function command { # args appended to the docker compose command
-   docker compose -f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml --env-file pipeline-repo/runner.env --env-file $@
+    export DOCKER_GID="$(getent group docker | cut -d: -f3)"
+
+    # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
+    if test -z $DOCKER_GID; then
+        export DOCKER_GID=
+        export MY_UID=
+    else
+        export MY_UID="$(id -u)"
+    fi
+
+    docker compose -f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml \
+        --env-file pipeline-repo/runner.env --env-file $@
 }
 
 function clean {
