@@ -932,6 +932,17 @@ export default function PipelineEditor(props) {
       </Dialog>
 
       <Dialog
+        open={modal === 'clear'}
+        onClose={() => hideModal('clear')}
+      >
+        <DialogTitle>Are you sure you want to clear the pipeline editor?</DialogTitle>
+        <DialogActions>
+          <Button onClick={() => {clearPipelineEditor(); hideModal('clear'); }}> Yes </Button>
+          <Button onClick={() => hideModal('clear')}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
         open={modal === 'overwrite'}
         onClose={() => hideModal('overwrite')}
         aria-labelledby="alert-dialog-title"
@@ -1009,7 +1020,7 @@ export default function PipelineEditor(props) {
                 {/^deny$/i.test(process.env.REACT_APP_SAVE_PIPELINE_TO_SERVER)
                   ? <button id="saveBtn" onClick={() => onSave()}>Save to clipboard</button>
                   : <>
-                    <button id="clear" onClick={() => clearPipelineEditor()}>Clear</button>
+                    <button id="clear" onClick={() => { if (nodes.length > 0 || edges.length > 0) setModal('clear')}}>Clear</button>
                     <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
                     <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
                   </>
