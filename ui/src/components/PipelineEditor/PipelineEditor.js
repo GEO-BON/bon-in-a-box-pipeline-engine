@@ -879,6 +879,7 @@ export default function PipelineEditor(props) {
   const clearPipelineEditor = ()=> {
     setNodes([]);
     setEdges([]);
+    hideModal('clear');
   }
 
   return (
@@ -937,7 +938,7 @@ export default function PipelineEditor(props) {
       >
         <DialogTitle>Are you sure you want to clear the pipeline editor?</DialogTitle>
         <DialogActions>
-          <Button onClick={() => {clearPipelineEditor(); hideModal('clear'); }}> Yes </Button>
+          <Button onClick={() => {clearPipelineEditor()}}>Yes</Button>
           <Button onClick={() => hideModal('clear')}>Cancel</Button>
         </DialogActions>
       </Dialog>
