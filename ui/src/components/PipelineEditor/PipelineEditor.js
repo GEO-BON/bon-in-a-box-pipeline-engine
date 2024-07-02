@@ -876,6 +876,11 @@ export default function PipelineEditor(props) {
     });
   }, [onSave, showAlert]);
 
+  const clearPipelineEditor = ()=> {
+    setNodes([]);
+    setEdges([]);
+  }
+
   return (
     <div id="editorLayout">
       <p>
@@ -1004,6 +1009,7 @@ export default function PipelineEditor(props) {
                 {/^deny$/i.test(process.env.REACT_APP_SAVE_PIPELINE_TO_SERVER)
                   ? <button id="saveBtn" onClick={() => onSave()}>Save to clipboard</button>
                   : <>
+                    <button id="clear" onClick={() => clearPipelineEditor()}>Clear</button>
                     <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
                     <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
                   </>
