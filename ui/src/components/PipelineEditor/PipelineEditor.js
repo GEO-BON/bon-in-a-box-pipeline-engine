@@ -90,6 +90,7 @@ export default function PipelineEditor(props) {
   const [alertSeverity, setAlertSeverity] = useState("");
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState();
+  const [emptyEditor, setEmptyEditor] = useState(true);
 
   const showAlert = useCallback((severity, title, message) => {
     setAlertSeverity(severity)
@@ -574,6 +575,23 @@ export default function PipelineEditor(props) {
     }
   }, [inputList, outputList, setOutputList]);
 
+  useEffect(() => {
+    if (nodes.length > 0 || edges.length > 0) { 
+      setEmptyEditor(false);
+    } else {
+      setEmptyEditor(true);
+    }
+  }, [nodes, edges]);
+
+  useEffect(() => {
+    let button = document.getElementById('clear');
+    if(emptyEditor){
+      button.disabled = true;
+    } else {
+      button.disabled = false;
+    }
+  }, [emptyEditor]);
+
   const onLayout = useCallback(() => {
     layoutElements(
       reactFlowInstance.getNodes(),
@@ -1023,7 +1041,7 @@ export default function PipelineEditor(props) {
                 {/^deny$/i.test(process.env.REACT_APP_SAVE_PIPELINE_TO_SERVER)
                   ? <button id="saveBtn" onClick={() => onSave()}>Save to clipboard</button>
                   : <>
-                    <button id="clear" onClick={() => { if (nodes.length > 0 || edges.length > 0) setModal('clear')}}>Clear</button>
+                    <button id="clear" onClick={() => { setModal('clear')}}>Clear</button>
                     <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
                     <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
                   </>
