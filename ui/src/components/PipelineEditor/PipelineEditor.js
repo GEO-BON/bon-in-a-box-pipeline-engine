@@ -876,11 +876,13 @@ export default function PipelineEditor(props) {
     });
   }, [onSave, showAlert]);
 
-  const clearPipelineEditor = ()=> {
+  const clearPipelineEditor = useCallback(()=> {
+    setEditSession(Math.random());
+    setCurrentFileName("");
     setNodes([]);
     setEdges([]);
     hideModal('clear');
-  }
+  }, [setEditSession, setCurrentFileName, setNodes, setEdges, hideModal])
 
   return (
     <div id="editorLayout">
