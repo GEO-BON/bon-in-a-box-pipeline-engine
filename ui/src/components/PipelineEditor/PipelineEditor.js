@@ -938,8 +938,8 @@ export default function PipelineEditor(props) {
       >
         <DialogTitle>Are you sure you want to clear the pipeline editor?</DialogTitle>
         <DialogActions>
-          <Button onClick={() => {clearPipelineEditor()}}>Yes</Button>
-          <Button onClick={() => hideModal('clear')}>Cancel</Button>
+          <Button onClick={() => {clearPipelineEditor()}}>Clear canvas</Button>
+          <Button onClick={() => hideModal('clear')}>Keep changes</Button>
         </DialogActions>
       </Dialog>
 
