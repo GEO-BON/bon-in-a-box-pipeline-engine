@@ -66,7 +66,7 @@ function command { # args appended to the docker compose command
 
     # Apple M2 chip check, see https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/issues/85
     composeFiles="-f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml"
-    macCPU=$(sysctl -n machdep.cpu.brand_string)
+    macCPU=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
     if ! [[ -z "$macCPU" ]]; then
         # This is a Mac, check chip type
         if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
