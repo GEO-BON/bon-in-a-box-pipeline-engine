@@ -33,6 +33,7 @@ For the script-server (Kotlin code), IntelliJ Idea. Note that on Linux there wil
 1. Build the remaining images: `./dev-server.sh build`
 
 2. Start the development server: `./dev-server.sh up`
+    - If there is a container name conflict, run `./dev-server.sh clean`
 
 This command enables:
 
