@@ -71,7 +71,7 @@ function command { # args appended to the docker compose command
         # This is a Mac, check chip type
         if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
             echo "Apple M* chip detected"
-            composeFiles+=" -f compose.apple.yml"
+            composeFiles+=" -f .server/compose.apple.yml"
         fi
     fi
 
