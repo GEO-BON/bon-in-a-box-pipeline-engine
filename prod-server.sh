@@ -56,7 +56,7 @@ function help {
 function command { # args appended to the docker compose command
     export DOCKER_GID="$(getent group docker | cut -d: -f3)"
 
-     # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
+    # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
     if test -z $DOCKER_GID; then
         export DOCKER_GID=
         export MY_UID=
@@ -64,7 +64,18 @@ function command { # args appended to the docker compose command
         export MY_UID="$(id -u)"
     fi
 
-    docker compose -f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml \
+    # Apple M2 chip check, see https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/issues/85
+    composeFiles="-f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml"
+    macCPU=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
+    if ! [[ -z "$macCPU" ]]; then
+        # This is a Mac, check chip type
+        if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
+            echo "Apple M* chip detected"
+            composeFiles+=" -f .server/compose.apple.yml"
+        fi
+    fi
+
+    docker compose $composeFiles \
         --env-file runner.env --env-file .server/.prod-paths.env $@
 }
 
@@ -119,6 +130,7 @@ function checkout {
     git checkout $branch -- .prod-paths.env ; assertSuccess
     git checkout $branch -- compose.yml ; assertSuccess
     git checkout $branch -- compose.prod.yml ; assertSuccess
+    git checkout $branch -- compose.apple.yml; assertSuccess
 
     git checkout $branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
     git checkout $branch -- .github/findDuplicateIds.sh ; assertSuccess
