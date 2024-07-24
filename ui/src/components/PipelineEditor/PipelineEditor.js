@@ -70,10 +70,6 @@ document.addEventListener('keydown', e => {
   }
 });
 
-document.addEventListener("beforeunload", function(event) {
-  event.preventDefault();
-});
-
 export default function PipelineEditor(props) {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -887,6 +883,12 @@ export default function PipelineEditor(props) {
     setEdges([]);
     hideModal('clear');
   }, [setEditSession, setCurrentFileName, setNodes, setEdges, hideModal])
+
+  const handleBeforeUnload = function(event) {
+    event.preventDefault();
+  }
+  
+  document.addEventListener("beforeunload", handleBeforeUnload);
 
   return (
     <div id="editorLayout">
