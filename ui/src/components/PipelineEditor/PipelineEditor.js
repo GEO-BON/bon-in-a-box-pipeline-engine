@@ -70,6 +70,10 @@ document.addEventListener('keydown', e => {
   }
 });
 
+document.addEventListener("beforeunload", function(event) {
+  event.preventDefault();
+});
+
 export default function PipelineEditor(props) {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
