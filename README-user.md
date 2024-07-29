@@ -12,18 +12,19 @@ Prerequisites :
 - At least 6 GB of free space (this includes the installation of Docker Desktop)
 - RAM requirements will depend on the scripts that you run.
 - **Windows:**
-  - [Docker Desktop](https://www.docker.com/products/docker-desktop/) - Note it is not necessary to make an account
+  - [Docker Desktop](https://www.docker.com/products/docker-desktop/) - Note that it is not necessary to make an account
   - A Linux shell (git bash, [Bash through PowerShell](https://learn.microsoft.com/en-us/windows/wsl/install), cygwin, etc.) necessary to run th `.sh` scripts in the instructions below.
-- **Mac:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- **Mac:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) - Note that it is not necessary to make an account
   - Make sure docker is added to the path of your terminal. From a terminal, run command `docker run hello-world`. If there is an error message, see [https://stackoverflow.com/a/71923962/3519951](https://stackoverflow.com/a/71923962/3519951).
   - If you encounter error `no matching manifest for linux/arm64/v8 in the manifest list entries`, export DOCKER_DEFAULT_PLATFORM. See [https://stackoverflow.com/a/76404045/3519951](https://stackoverflow.com/a/76404045/3519951).
 - **Linux:** Docker with Docker Compose installed. It is recommended to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
 
 To run:
-1. Clone repository (Windows users: do not clone this in a folder under OneDrive.) This can be done in terminal using the following code: `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git` or in github desktop.
+1. Clone repository (Windows users: do not clone the repo in a folder under OneDrive.) This can be done in terminal using the following code: `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git` or in GitHub desktop.
 2. Provide the environment variables:
     - Open the newly cloned repository on your computer
-    - Find the file called [`runner-sample.env`](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env) and rename it `runner.env`.
+    - Find the file called [`runner-sample.env`](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env)
+    - Duplicate the file and rename the copy to `runner.env`.
     - Fill the properties depending on what you intend to run.
     - Adjust any server option as you see fit.
 3. Using a linux terminal (terminal on Mac or Git Bash), navigate to top-level folder.
@@ -32,10 +33,10 @@ To run:
     - The first execution will be long, in order to download the micro-services. The next ones will be shorter or immediate, depending on the changes.
     - Network problems may cause the process to fail. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.
     - Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl ("wsl --update", see [https://docs.docker.com/desktop/troubleshoot/topics/#virtualization](https://docs.docker.com/desktop/troubleshoot/topics/#virtualization). Access to the BIOS may be required to enable virtualization)
-6. In browser:
+5. In browser:
     - http://localhost/ shows the UI
-7. `./server-down.sh` (to stop the server when done)
-8. On Windows, to completely stop the processes, you might have to run `wsl --shutdown`
+6. `./server-down.sh` (to stop the server when done)
+7. On Windows, to completely stop the processes, you might have to run `wsl --shutdown`
 
 When modifying scripts in the `/scripts` folder, servers do not need to be restarted:
 - When modifying an existing script, simply re-run the script from the UI and the new version will be executed.
