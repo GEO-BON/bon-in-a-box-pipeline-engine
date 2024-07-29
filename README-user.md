@@ -8,11 +8,11 @@ The recommended method is to setup an instance of BON in a Box somewhere you can
 ## Running the servers locally
 Prerequisites :
 - Git
-- A github account, with an SSH key registered. See [Adding a new SSH key to your GitHub account](https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
+- A github account, with an SSH key registered. See [Adding a new SSH key to your GitHub account](https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). Make sure your SSH key does not have a password.
 - At least 6 GB of free space (this includes the installation of Docker Desktop)
 - RAM requirements will depend on the scripts that you run.
 - **Windows:**
-  - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+  - [Docker Desktop](https://www.docker.com/products/docker-desktop/) - Note it is not necessary to make an account
   - A Linux shell (git bash, [Bash through PowerShell](https://learn.microsoft.com/en-us/windows/wsl/install), cygwin, etc.) necessary to run th `.sh` scripts in the instructions below.
 - **Mac:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
   - Make sure docker is added to the path of your terminal. From a terminal, run command `docker run hello-world`. If there is an error message, see [https://stackoverflow.com/a/71923962/3519951](https://stackoverflow.com/a/71923962/3519951).
@@ -20,23 +20,22 @@ Prerequisites :
 - **Linux:** Docker with Docker Compose installed. It is recommended to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
 
 To run:
-1. Clone repository (Windows users: do not clone this in a folder under OneDrive.)
-
-    `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git`
-
+1. Clone repository (Windows users: do not clone this in a folder under OneDrive.) This can be done in terminal using the following code: `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git` or in github desktop.
 2. Provide the environment variables:
-    - Copy [`runner-sample.env`](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env) and rename it `runner.env`.
-    - Fill the properties depending on whay you intend to run.
+    - Open the newly cloned repository on your computer
+    - Find the file called [`runner-sample.env`](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env) and rename it `runner.env`.
+    - Fill the properties depending on what you intend to run.
     - Adjust any server option as you see fit.
-3. Using a terminal, navigate to top-level folder.
-4. `./server-up.sh`
+3. Using a linux terminal (terminal on Mac or Git Bash), navigate to top-level folder.
+4. In the linux terminal, type `./server-up.sh`
+    - Make sure you have docker open and running on your computer.
     - The first execution will be long, in order to download the micro-services. The next ones will be shorter or immediate, depending on the changes.
-    - Network problems may fail the process. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.
+    - Network problems may cause the process to fail. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.
     - Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl ("wsl --update", see [https://docs.docker.com/desktop/troubleshoot/topics/#virtualization](https://docs.docker.com/desktop/troubleshoot/topics/#virtualization). Access to the BIOS may be required to enable virtualization)
-5. In browser:
+6. In browser:
     - http://localhost/ shows the UI
-6. `./server-down.sh` (to stop the server when done)
-7. On Windows, to completely stop the processes, you might have to run `wsl --shutdown`
+7. `./server-down.sh` (to stop the server when done)
+8. On Windows, to completely stop the processes, you might have to run `wsl --shutdown`
 
 When modifying scripts in the `/scripts` folder, servers do not need to be restarted:
 - When modifying an existing script, simply re-run the script from the UI and the new version will be executed.
