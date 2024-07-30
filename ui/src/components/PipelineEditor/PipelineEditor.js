@@ -80,6 +80,7 @@ export default function PipelineEditor(props) {
   const [outputList, setOutputList] = useState([]);
   const [metadata, setMetadata] = useState("");
   const [currentFileName, setCurrentFileName] = useState("");
+  const [beforeUnloadEventListener, setBeforeUnloadEventListener] = useState(false);
 
   const [editSession, setEditSession] = useState(Math.random());
 
@@ -744,6 +745,7 @@ export default function PipelineEditor(props) {
     });
   };
 
+  //restores the last pipeline the user was editing from the localStorage
   useEffect(()=> {
     if(localStorage.getItem("currentFileName")){
       if (reactFlowInstance != null) {
@@ -913,12 +915,27 @@ export default function PipelineEditor(props) {
     hideModal('clear');
   }, [setEditSession, setCurrentFileName, setNodes, setEdges, hideModal])
 
-
-  //this adds it forever even when you switch pages
-  const handleBeforeUnload = function(event) {
+  //useCallback so react memorizes that it's the same function when beforeunload event listener is added and removed
+  const handleBeforeUnload = useCallback((event) => {
     event.preventDefault();
-  }
-  window.addEventListener("beforeunload", handleBeforeUnload);
+    event.returnValue = '';
+  }, []);
+
+  useEffect(()=> {
+
+    if (nodes.length === 0) {
+      if (beforeUnloadEventListener) {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        setBeforeUnloadEventListener(false);
+      }
+    } else if (!beforeUnloadEventListener) { //beforeUnloadEventListener state variable so there are no multiple eventListener instances
+      window.addEventListener("beforeunload", handleBeforeUnload);
+      setBeforeUnloadEventListener(true);
+    }
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
+    };
+  }, [nodes.length, edges.length, currentFileName]); //nodes.length and edges.length can be the same for a unnamed pipeline that a user is editing and a pipeline already saved to the server
 
   return (
     <div id="editorLayout">
