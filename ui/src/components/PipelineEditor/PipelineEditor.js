@@ -696,6 +696,7 @@ export default function PipelineEditor(props) {
       }
 
       setCurrentFileName(file.name);
+      setSavedJSON = null;
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
     }
@@ -932,15 +933,17 @@ export default function PipelineEditor(props) {
   }, []);
 
   useEffect(()=> {
-    if (nodes.length === 0) {
-      if (beforeUnloadEventListener) {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-        setBeforeUnloadEventListener(false);
-      }
-    } else if (currentFileName !== null && currentFileName !== '') {
-      if (!beforeUnloadEventListener) {
-        window.addEventListener('beforeunload', handleBeforeUnload);
-        setBeforeUnloadEventListener(true);
+    if (savedJSON === null) {
+      if (nodes.length === 0) {
+        if (beforeUnloadEventListener) {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+          setBeforeUnloadEventListener(false);
+        }
+      } else {
+        if (!beforeUnloadEventListener) {
+          window.addEventListener('beforeunload', handleBeforeUnload);
+          setBeforeUnloadEventListener(true);
+        }
       }
     }
     return () => {
@@ -965,7 +968,7 @@ export default function PipelineEditor(props) {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
     };
-  }, [savedJSON]);
+  }, [savedJSON, nodes.length, edges.length]);
 
   return (
     <div id="editorLayout">
@@ -1109,8 +1112,6 @@ export default function PipelineEditor(props) {
                     <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
                     <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
                     <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
-                    <button id="generate" onClick={() => console.log(generateSaveJSON()===savedJSON)}>Generate</button>
-                    <button id="savedJSON" onClick={() => console.log(savedJSON)}>SavedJSON</button>
                   </>
                 }
               </div>
