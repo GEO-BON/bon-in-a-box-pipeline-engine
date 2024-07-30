@@ -729,6 +729,35 @@ export default function PipelineEditor(props) {
     });
   };
 
+  const onLoadFromLocalStorage = (descriptionFile) => {
+    api.getPipeline(descriptionFile, (error, data, response) => {
+      if (error) {
+        showAlert(
+          'error',
+          'Error loading the pipeline',
+          (response && response.text) ? response.text : error.toString()
+        )
+      } else {
+        setCurrentFileName(descriptionFile);
+        onLoadFlow(data);
+      }
+    });
+  };
+
+  useEffect(()=> {
+    if(localStorage.getItem("currentFileName")){
+      if (reactFlowInstance != null) {
+        onLoadFromLocalStorage(localStorage.getItem("currentFileName"));
+      }
+    }
+  }, [reactFlowInstance]);
+
+  useEffect(()=> {
+    if (reactFlowInstance != null) {
+      localStorage.setItem("currentFileName", currentFileName);
+    }
+  }, [currentFileName]);
+
   const onLoadFlow = useCallback(async (flow) => {
     if (flow) {
       setEditSession(Math.random())
@@ -884,11 +913,12 @@ export default function PipelineEditor(props) {
     hideModal('clear');
   }, [setEditSession, setCurrentFileName, setNodes, setEdges, hideModal])
 
+
+  //this adds it forever even when you switch pages
   const handleBeforeUnload = function(event) {
     event.preventDefault();
   }
-  
-  document.addEventListener("beforeunload", handleBeforeUnload);
+  window.addEventListener("beforeunload", handleBeforeUnload);
 
   return (
     <div id="editorLayout">
