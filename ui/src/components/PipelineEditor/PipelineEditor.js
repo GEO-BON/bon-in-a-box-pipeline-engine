@@ -81,6 +81,7 @@ export default function PipelineEditor(props) {
   const [metadata, setMetadata] = useState("");
   const [currentFileName, setCurrentFileName] = useState("");
   const [beforeUnloadEventListener, setBeforeUnloadEventListener] = useState(false);
+  const [savedJSON, setSavedJSON] = useState(null);
 
   const [editSession, setEditSession] = useState(Math.random());
 
@@ -585,65 +586,70 @@ export default function PipelineEditor(props) {
     );
   }, [reactFlowInstance, setNodes]);
 
+  const generateSaveJSON = () => {
+    const flow = reactFlowInstance.toObject();
+
+    // react-flow properties that are not necessary to rebuild graph when loading
+    flow.nodes.forEach((node) => {
+      delete node.selected;
+      delete node.dragging;
+      delete node.positionAbsolute;
+      delete node.width;
+      delete node.height;
+      if (node.type === "userInput" || node.type === "constant")
+        delete node.data.label;
+
+      // These we will reinject when loading
+      delete node.targetPosition;
+      delete node.sourcePosition;
+    });
+
+    // No need to save the on-the-fly styling
+    flow.edges.forEach((edge) => {
+      delete edge.selected;
+      delete edge.style;
+    });
+
+    // Viewport is a source of merge conflicts
+    delete flow.viewport;
+
+    // Save pipeline inputs
+    flow.inputs = {};
+    inputList.forEach((input, i) => {
+      const id = toInputId(input)
+
+      // Destructuring copy to leave out fields that are not part of the input description spec.
+      const { file, nodeId, inputId, ...copy } = input;
+      copy.weight = i
+      flow.inputs[id] = copy;
+    });
+
+    // Save pipeline outputs
+    flow.outputs = {};
+    outputList.forEach((output, i) => {
+      const id = toOutputId(output)
+
+      // Destructuring copy to leave out fields that are not part of the output description spec.
+      let { file, nodeId, outputId, ...copy } = output;
+      copy.weight = i
+      flow.outputs[id] = copy;
+    });
+
+    // Save the metadata (only if metadata pane was edited)
+    if(metadata !== "") {
+      flow.metadata = yaml.load(metadata)
+    }
+
+    return JSON.stringify(flow, null, 2);
+  };
+
   const onSave = useCallback((fileName) => {
     if (reactFlowInstance) {
-      const flow = reactFlowInstance.toObject();
-
-      // react-flow properties that are not necessary to rebuild graph when loading
-      flow.nodes.forEach((node) => {
-        delete node.selected;
-        delete node.dragging;
-        delete node.positionAbsolute;
-        delete node.width;
-        delete node.height;
-        if (node.type === "userInput" || node.type === "constant")
-          delete node.data.label;
-
-        // These we will reinject when loading
-        delete node.targetPosition;
-        delete node.sourcePosition;
-      });
-
-      // No need to save the on-the-fly styling
-      flow.edges.forEach((edge) => {
-        delete edge.selected;
-        delete edge.style;
-      });
-
-      // Viewport is a source of merge conflicts
-      delete flow.viewport;
-
-      // Save pipeline inputs
-      flow.inputs = {};
-      inputList.forEach((input, i) => {
-        const id = toInputId(input)
-
-        // Destructuring copy to leave out fields that are not part of the input description spec.
-        const { file, nodeId, inputId, ...copy } = input;
-        copy.weight = i
-        flow.inputs[id] = copy;
-      });
-
-      // Save pipeline outputs
-      flow.outputs = {};
-      outputList.forEach((output, i) => {
-        const id = toOutputId(output)
-
-        // Destructuring copy to leave out fields that are not part of the output description spec.
-        let { file, nodeId, outputId, ...copy } = output;
-        copy.weight = i
-        flow.outputs[id] = copy;
-      });
-
-      // Save the metadata (only if metadata pane was edited)
-      if(metadata !== "") {
-        flow.metadata = yaml.load(metadata)
-      }
 
       if (fileName) {
         let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
         fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
-        api.savePipeline(fileNameWithoutExtension, JSON.stringify(flow, null, 2), (error, data, response) => {
+        api.savePipeline(fileNameWithoutExtension, generateSaveJSON(), (error, data, response) => {
           if (error) {
             showAlert(
               'error',
@@ -655,13 +661,14 @@ export default function PipelineEditor(props) {
             showAlert('warning', 'Pipeline saved with errors', response.text)
 
           } else {
+            setSavedJSON(generateSaveJSON());
             setModal('saveSuccess');
           }
         });
 
       } else {
         navigator.clipboard
-          .writeText(JSON.stringify(flow, null, 2))
+          .writeText(generateSaveJSON())
           .then(() => {
             showAlert('info', 'Pipeline content copied to clipboard',
               'Use git to add the code to the BON in a Box repository.'
@@ -721,6 +728,7 @@ export default function PipelineEditor(props) {
               } else {
                 setCurrentFileName(descriptionFile);
                 onLoadFlow(data);
+                setSavedJSON(JSON.stringify(data, null, 2));
               }
             });
           })
@@ -741,6 +749,7 @@ export default function PipelineEditor(props) {
       } else {
         setCurrentFileName(descriptionFile);
         onLoadFlow(data);
+        setSavedJSON(JSON.stringify(data, null, 2));
       }
     });
   };
@@ -913,6 +922,7 @@ export default function PipelineEditor(props) {
     setNodes([]);
     setEdges([]);
     hideModal('clear');
+    setSavedJSON(null);
   }, [setEditSession, setCurrentFileName, setNodes, setEdges, hideModal])
 
   //useCallback so react memorizes that it's the same function when beforeunload event listener is added and removed
@@ -922,20 +932,29 @@ export default function PipelineEditor(props) {
   }, []);
 
   useEffect(()=> {
-
     if (nodes.length === 0) {
       if (beforeUnloadEventListener) {
         window.removeEventListener('beforeunload', handleBeforeUnload);
         setBeforeUnloadEventListener(false);
       }
-    } else if (!beforeUnloadEventListener) { //beforeUnloadEventListener state variable so there are no multiple eventListener instances
-      window.addEventListener("beforeunload", handleBeforeUnload);
-      setBeforeUnloadEventListener(true);
+
+    } else if (savedJSON !== null) {
+      if (savedJSON === generateSaveJSON()) {
+        if (beforeUnloadEventListener) {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+          setBeforeUnloadEventListener(false);
+        }
+      } else {
+        if (!beforeUnloadEventListener) {
+          window.addEventListener('beforeunload', handleBeforeUnload);
+          setBeforeUnloadEventListener(true);
+        }
+      }
     }
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
     };
-  }, [nodes.length, edges.length, currentFileName]); //nodes.length and edges.length can be the same for a unnamed pipeline that a user is editing and a pipeline already saved to the server
+  }, [nodes.length, edges.length, savedJSON]); //nodes.length and edges.length can be the same for a unnamed pipeline that a user is editing and a pipeline already saved to the server
 
   return (
     <div id="editorLayout">
