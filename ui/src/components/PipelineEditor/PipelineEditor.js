@@ -727,8 +727,8 @@ export default function PipelineEditor(props) {
                 )
               } else {
                 setCurrentFileName(descriptionFile);
-                onLoadFlow(data);
                 setSavedJSON(JSON.stringify(data, null, 2));
+                onLoadFlow(data);
               }
             });
           })
@@ -748,8 +748,8 @@ export default function PipelineEditor(props) {
         )
       } else {
         setCurrentFileName(descriptionFile);
-        onLoadFlow(data);
         setSavedJSON(JSON.stringify(data, null, 2));
+        onLoadFlow(data);
       }
     });
   };
@@ -937,8 +937,19 @@ export default function PipelineEditor(props) {
         window.removeEventListener('beforeunload', handleBeforeUnload);
         setBeforeUnloadEventListener(false);
       }
+    } else if (currentFileName !== null && currentFileName !== '') {
+      if (!beforeUnloadEventListener) {
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        setBeforeUnloadEventListener(true);
+      }
+    }
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
+    };
+  }, [nodes.length, edges.length]);
 
-    } else if (savedJSON !== null) {
+  useEffect(()=> {
+    if (savedJSON !== null) {
       if (savedJSON === generateSaveJSON()) {
         if (beforeUnloadEventListener) {
           window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -954,7 +965,7 @@ export default function PipelineEditor(props) {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
     };
-  }, [nodes.length, edges.length, savedJSON]); //nodes.length and edges.length can be the same for a unnamed pipeline that a user is editing and a pipeline already saved to the server
+  }, [savedJSON]);
 
   return (
     <div id="editorLayout">
@@ -1098,6 +1109,8 @@ export default function PipelineEditor(props) {
                     <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
                     <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
                     <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
+                    <button id="generate" onClick={() => console.log(generateSaveJSON()===savedJSON)}>Generate</button>
+                    <button id="savedJSON" onClick={() => console.log(savedJSON)}>SavedJSON</button>
                   </>
                 }
               </div>
