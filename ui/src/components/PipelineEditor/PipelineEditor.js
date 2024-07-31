@@ -932,7 +932,7 @@ export default function PipelineEditor(props) {
     event.returnValue = '';
   }, []);
 
-  useEffect(()=> {
+  useEffect(() => {
     if (savedJSON === null) {
       if (nodes.length === 0) {
         if (beforeUnloadEventListener) {
@@ -945,14 +945,7 @@ export default function PipelineEditor(props) {
           setBeforeUnloadEventListener(true);
         }
       }
-    }
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
-    };
-  }, [nodes.length, edges.length]);
-
-  useEffect(()=> {
-    if (savedJSON !== null) {
+    } else {
       if (savedJSON === generateSaveJSON()) {
         if (beforeUnloadEventListener) {
           window.removeEventListener('beforeunload', handleBeforeUnload);
@@ -965,10 +958,13 @@ export default function PipelineEditor(props) {
         }
       }
     }
+  }, [nodes.length, edges.length, savedJSON]);
+
+  useEffect(() => {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
     };
-  }, [savedJSON, nodes.length, edges.length]);
+  }, [])
 
   return (
     <div id="editorLayout">
