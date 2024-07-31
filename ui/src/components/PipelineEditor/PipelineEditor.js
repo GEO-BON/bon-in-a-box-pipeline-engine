@@ -645,11 +645,11 @@ export default function PipelineEditor(props) {
 
   const onSave = useCallback((fileName) => {
     if (reactFlowInstance) {
-
+      let saveJSON = generateSaveJSON();
       if (fileName) {
         let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
         fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
-        api.savePipeline(fileNameWithoutExtension, generateSaveJSON(), (error, data, response) => {
+        api.savePipeline(fileNameWithoutExtension, saveJSON, (error, data, response) => {
           if (error) {
             showAlert(
               'error',
@@ -661,14 +661,14 @@ export default function PipelineEditor(props) {
             showAlert('warning', 'Pipeline saved with errors', response.text)
 
           } else {
-            setSavedJSON(generateSaveJSON());
+            setSavedJSON(saveJSON);
             setModal('saveSuccess');
           }
         });
 
       } else {
         navigator.clipboard
-          .writeText(generateSaveJSON())
+          .writeText(saveJSON)
           .then(() => {
             showAlert('info', 'Pipeline content copied to clipboard',
               'Use git to add the code to the BON in a Box repository.'
@@ -933,6 +933,9 @@ export default function PipelineEditor(props) {
   }, []);
 
   useEffect(() => {
+    //console.log(nodes.length, edges.length, savedJSON ? savedJSON === generateSaveJSON(): "");
+    //console.log(savedJSON ? savedJSON : "");
+    //console.log(reactFlowInstance ? generateSaveJSON() : "");
     if (savedJSON === null) {
       if (nodes.length === 0) {
         if (beforeUnloadEventListener) {
@@ -958,7 +961,7 @@ export default function PipelineEditor(props) {
         }
       }
     }
-  }, [nodes.length, edges.length, savedJSON]);
+  }, [nodes, edges, savedJSON]);
 
   useEffect(() => {
     return () => {
@@ -1108,6 +1111,9 @@ export default function PipelineEditor(props) {
                     <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
                     <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
                     <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
+                    <button id="savedJSON" onClick={() => console.log(savedJSON)}>savedJSON</button>
+                    <button id="generate" onClick={() => console.log(generateSaveJSON())}>generateSaveJSON</button>
+                    <button id="compare" onClick={() => console.log(savedJSON === generateSaveJSON())}>Compare</button>
                   </>
                 }
               </div>
