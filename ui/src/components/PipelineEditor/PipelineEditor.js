@@ -933,9 +933,6 @@ export default function PipelineEditor(props) {
   }, []);
 
   useEffect(() => {
-    //console.log(nodes.length, edges.length, savedJSON ? savedJSON === generateSaveJSON(): "");
-    //console.log(savedJSON ? savedJSON : "");
-    //console.log(reactFlowInstance ? generateSaveJSON() : "");
     if (savedJSON === null) {
       if (nodes.length === 0) {
         if (beforeUnloadEventListener) {
@@ -1111,9 +1108,6 @@ export default function PipelineEditor(props) {
                     <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
                     <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
                     <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
-                    <button id="savedJSON" onClick={() => console.log(savedJSON)}>savedJSON</button>
-                    <button id="generate" onClick={() => console.log(generateSaveJSON())}>generateSaveJSON</button>
-                    <button id="compare" onClick={() => console.log(savedJSON === generateSaveJSON())}>Compare</button>
                   </>
                 }
               </div>
