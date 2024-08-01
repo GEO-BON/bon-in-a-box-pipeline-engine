@@ -15,6 +15,7 @@ import StepChooser from "./components/PipelineEditor/StepChooser";
 import { Layout } from './Layout.js';
 import Versions from './components/Versions';
 import { Spinner } from './components/Spinner';
+import NavigationContext from './NavigationContext';
 const PipelineEditor = lazy(() => import("./components/PipelineEditor/PipelineEditor"));
 
 function NotFound() {
@@ -29,7 +30,11 @@ function NotFound() {
 function App() {
   const [popupContent, setPopupContent] = useState();
 
-  return <BrowserRouter>
+  const [hasChanged, setHasChanged] = useState(false);
+
+  return (
+  <NavigationContext.Provider value={{ hasChanged, setHasChanged }}> 
+  <BrowserRouter>
     <Routes>
       <Route path="/" element={<Layout />} />
 
@@ -62,7 +67,8 @@ function App() {
 
     </Routes>
   </BrowserRouter>
-}
+  </NavigationContext.Provider>
+)};
 
 const root = createRoot(document.getElementById('root'));
 root.render(<App />);
