@@ -760,6 +760,7 @@ export default function PipelineEditor(props) {
   const onLoadFromLocalStorage = (descriptionFile) => {
     api.getPipeline(descriptionFile, (error, data, response) => {
       if (error) {
+        localStorage.setItem("currentFileName", '');
         showAlert(
           'error',
           'Error loading the pipeline',
