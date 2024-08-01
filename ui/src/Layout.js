@@ -28,7 +28,6 @@ export function Layout(props) {
       const confirmNavigation = window.confirm("Reload site? Changes you made may not be saved.");
       if (!confirmNavigation) {
         event.preventDefault();
-        return;
       } 
     }
   };
