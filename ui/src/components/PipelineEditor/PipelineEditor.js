@@ -1126,8 +1126,6 @@ export default function PipelineEditor(props) {
                     <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
                     <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
                     <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
-                    <button id="1" onClick={() => console.log(savedJSON)}>savedJSON</button>
-                    <button id="2" onClick={() => console.log(generateSaveJSON())}>generateSaveJSON</button>
                   </>
                 }
               </div>
