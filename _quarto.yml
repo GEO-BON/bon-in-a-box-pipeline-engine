@@ -9,6 +9,8 @@ website:
       - href: index.qmd
         text: Home
       - about.qmd
+      - how_to_install.qmd
+      - developer_documentation.qmd
 
 format:
   html:

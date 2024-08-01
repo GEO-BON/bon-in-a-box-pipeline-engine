@@ -1,11 +1,13 @@
 ---
-title: "bon-in-a-box-pipeline-engine"
+title: "BON in a Box: A tool for monitoring biodiversity"
 ---
 
-This is a Quarto website.
-
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+BON in a Box description.
 
 ```{r}
 1 + 1
 ```
+
+Photo.
+
+Video.

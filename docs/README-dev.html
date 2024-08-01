@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>About – bon-in-a-box-pipeline-engine</title>
+<title>readme-dev – bon-in-a-box-pipeline-engine</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,40 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -127,7 +93,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./about.html" aria-current="page"> 
+    <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
@@ -145,40 +111,199 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#developer-documentation" id="toc-developer-documentation" class="nav-link active" data-scroll-target="#developer-documentation">Developer documentation</a>
+  <ul class="collapse">
+  <li><a href="#contributing" id="toc-contributing" class="nav-link" data-scroll-target="#contributing">Contributing</a></li>
+  <li><a href="#getting-the-code" id="toc-getting-the-code" class="nav-link" data-scroll-target="#getting-the-code">Getting the code</a></li>
+  <li><a href="#ide-setup" id="toc-ide-setup" class="nav-link" data-scroll-target="#ide-setup">IDE setup</a></li>
+  <li><a href="#launching-the-dockers-in-development-mode" id="toc-launching-the-dockers-in-development-mode" class="nav-link" data-scroll-target="#launching-the-dockers-in-development-mode">Launching the dockers in development mode</a></li>
+  <li><a href="#microservice-infrastructure" id="toc-microservice-infrastructure" class="nav-link" data-scroll-target="#microservice-infrastructure">Microservice infrastructure</a></li>
+  <li><a href="#script-lifecycle-artifacts" id="toc-script-lifecycle-artifacts" class="nav-link" data-scroll-target="#script-lifecycle-artifacts">Script lifecycle &amp; artifacts</a></li>
+  <li><a href="#openapi-specification" id="toc-openapi-specification" class="nav-link" data-scroll-target="#openapi-specification">OpenAPI specification</a>
+  <ul class="collapse">
+  <li><a href="#single-script-scenario" id="toc-single-script-scenario" class="nav-link" data-scroll-target="#single-script-scenario">Single-script scenario</a></li>
+  <li><a href="#pipeline-scenario" id="toc-pipeline-scenario" class="nav-link" data-scroll-target="#pipeline-scenario">Pipeline scenario</a></li>
+  <li><a href="#editing-the-openapi-specification-of-the-script-server" id="toc-editing-the-openapi-specification-of-the-script-server" class="nav-link" data-scroll-target="#editing-the-openapi-specification-of-the-script-server">Editing the OpenAPI specification of the script-server</a></li>
+  </ul></li>
+  <li><a href="#debugging-signal-forwarding" id="toc-debugging-signal-forwarding" class="nav-link" data-scroll-target="#debugging-signal-forwarding">Debugging signal forwarding</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">About</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
+<section id="developer-documentation" class="level1">
+<h1>Developer documentation</h1>
+<section id="contributing" class="level2">
+<h2 class="anchored" data-anchor-id="contributing">Contributing</h2>
+<p>If you wish to contribute code to this pipeline engine, please let us know at web@geobon.org.</p>
+<p>The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup in the user documentation. You can create a branch or fork to save your work. Once complete, open a pull request to this repository. The pull request will be peer-reviewed before acceptation.</p>
+</section>
+<section id="getting-the-code" class="level2">
+<h2 class="anchored" data-anchor-id="getting-the-code">Getting the code</h2>
+<p>The code in this repository runs an engine, but the engine needs content! Here are the steps to start the server in development mode with the BON in a Box scripts and pipelines:</p>
+<ol start="0" type="1">
+<li>docker and docker compose must be installed.</li>
+<li>Clone this repo: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipeline-engine.git pipeline-engine</code></li>
+<li><code>cd pipeline-engine</code></li>
+<li>Clone the BON in a Box repo (or any compatible repo of your choice) <strong>into the pipeline-repo folder</strong>: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git pipeline-repo</code></li>
+<li>Create a runner.env file as per <a href="./README-user.html#running-the-servers-locally">user instructions</a>.</li>
+<li><code>cd ..</code></li>
+<li>Pull the pre-compiled images: <code>./dev-server.sh pull</code></li>
+</ol>
+</section>
+<section id="ide-setup" class="level2">
+<h2 class="anchored" data-anchor-id="ide-setup">IDE setup</h2>
+<p>For the global project, Visual Studio Code. Recommended extensions:</p>
+<ul>
+<li>GitLens</li>
+<li>Markdown Preview Mermaid</li>
+<li>Mermaid Markdown Syntax Highlighting</li>
+</ul>
+<p>For the script-server (Kotlin code), IntelliJ Idea. Note that on Linux there will be an ownership conflict between gradle files generated by the development docker and those from the IDE. To solve this, make sure to stop the dockers and run <code>sudo chown -R &lt;yourinfo&gt;:&lt;yourinfo&gt; .</code> before running the tests in IntelliJ.</p>
+</section>
+<section id="launching-the-dockers-in-development-mode" class="level2">
+<h2 class="anchored" data-anchor-id="launching-the-dockers-in-development-mode">Launching the dockers in development mode</h2>
+<ol type="1">
+<li><p>Build the remaining images: <code>./dev-server.sh build</code></p></li>
+<li><p>Start the development server: <code>./dev-server.sh up</code></p>
+<ul>
+<li>If there is a container name conflict, run <code>./dev-server.sh clean</code></li>
+</ul></li>
+</ol>
+<p>This command enables:</p>
+<ul>
+<li>OpenAPI editor at http://localhost/swagger/</li>
+<li>UI server: React automatic hot-swapping</li>
+<li>Script-server: Kotlin hot-swapping by launching <a href="../script-server/hotswap.sh">./script-server/hotswap.sh</a></li>
+<li>NGINX: <a href="../http-proxy/conf.d/ngnix.conf">http-proxy/conf.d/ngnix.conf</a> will be loaded</li>
+</ul>
+<p>Once in a while you should use <code>docker compose -f compose.yml -f compose.dev.yml pull</code> to have the latest base images.</p>
+</section>
+<section id="microservice-infrastructure" class="level2">
+<h2 class="anchored" data-anchor-id="microservice-infrastructure">Microservice infrastructure</h2>
+<pre class="mermaid"><code>stateDiagram-v2
+    state "script-server" as script
+    state "scripts (static)" as scripts
+    state "output (static)" as output
+    state "R runner" as r
+    state "Julia runner" as julia
 
-    
-  
-    
-  </div>
-  
+    [*] --&gt; ngnix
+    ngnix --&gt; ui
+    ngnix --&gt; script
+    ngnix --&gt; output
+    script --&gt; scripts
+    script --&gt; r
+    script --&gt; julia</code></pre>
+<ul>
+<li>ui: React front-end</li>
+<li>script-server: Running scripts and pipeline orchestration</li>
+<li>R runner: Docker dedicated to runs R code, with most relevant packages pre-installed</li>
+<li>Julia runner: Docker dedicated to runs Julia code</li>
+</ul>
+<p>In addition to these services,</p>
+<ul>
+<li><a href="../scripts/">scripts</a> folder contains all the scripts that can be run.</li>
+<li><a href="../output/">output</a> folder contains all scripts result.</li>
+</ul>
+</section>
+<section id="script-lifecycle-artifacts" class="level2">
+<h2 class="anchored" data-anchor-id="script-lifecycle-artifacts">Script lifecycle &amp; artifacts</h2>
+<pre class="mermaid"><code>flowchart TD
+ never[Never ran] --&gt; running[Running]
+ running --&gt; input[(- run folder\n- input.json)]
+ running --&gt; log[(log file)]
+ running --&gt; success{Success?}
+ success --&gt; |Yes| Done
+ Done --&gt; output[(output.json)]
+ success --&gt; |No| Failed
+ Failed --&gt; |Add error flag|output</code></pre>
+</section>
+<section id="openapi-specification" class="level2">
+<h2 class="anchored" data-anchor-id="openapi-specification">OpenAPI specification</h2>
+<p>The <a href="../script-server/api/openapi.yaml">OpenApi specification file</a> is used by the UI to launch runs and track them until completion.</p>
+<section id="single-script-scenario" class="level3">
+<h3 class="anchored" data-anchor-id="single-script-scenario">Single-script scenario</h3>
+<pre class="mermaid"><code>sequenceDiagram
+    ui-&gt;&gt;script_server: script/list
+    script_server--&gt;&gt;ui:
+
+    ui-&gt;&gt;script_server: script/info
+    script_server--&gt;&gt;ui:
+
+    ui-&gt;&gt;script_server: script/run
+    script_server-&gt;&gt;script: launch
+    script_server--&gt;&gt;ui: runId
+
+    loop Until output.json file generated
+        ui-&gt;&gt;script_server: output/{id}/logs.txt
+        script_server--&gt;&gt;ui:
+
+        ui-&gt;&gt;script_server: output/{id}/output.json
+    end
 
 
-</header>
+    script--&gt;&gt;script_server: output.json
+
+    ui-&gt;&gt;script_server: output/{id}/output.json
+    script_server--&gt;&gt;ui:
+</code></pre>
+</section>
+<section id="pipeline-scenario" class="level3">
+<h3 class="anchored" data-anchor-id="pipeline-scenario">Pipeline scenario</h3>
+<pre class="mermaid"><code>sequenceDiagram
+    ui-&gt;&gt;script_server: pipeline/list
+    script_server--&gt;&gt;ui:
+
+    ui-&gt;&gt;script_server: pipeline/&lt;path&gt;/info
+    script_server--&gt;&gt;ui:
+
+    ui-&gt;&gt;script_server: pipeline/&lt;path&gt;/run
+    script_server--&gt;&gt;ui: id
+    loop For each step
+        script_server-&gt;&gt;script: run
+        Note right of script: see previous diagram
+        script--&gt;&gt;script_server: output.json (script)
+        ui-&gt;&gt;script_server: pipeline/&lt;id&gt;/outputs
+        script_server--&gt;&gt;ui: pipelineOutput.json (pipeline)
+    end
+</code></pre>
+<p>Every second, the UI polls for:</p>
+<ul>
+<li>pipelineOutput.json from the pipeline, to get the output folders of individual scripts. Stops polling when pipeline stops.</li>
+<li>logs.txt of individual scripts, for realtime logging, only if log section is opened. Stops when individual script completes, or when log section closed.</li>
+<li>output.json of individual scripts, to know when script completes and display its outputs. Stops when script stops.</li>
+</ul>
+</section>
+<section id="editing-the-openapi-specification-of-the-script-server" class="level3">
+<h3 class="anchored" data-anchor-id="editing-the-openapi-specification-of-the-script-server">Editing the OpenAPI specification of the script-server</h3>
+<ol type="1">
+<li>Using http://localhost/swagger, edit the specification.</li>
+<li>Copy the result to <a href="../script-server/api/openapi.yaml">script-server/api/openapi.yaml</a></li>
+<li>Use <a href="../ui/BonInABoxScriptService/generate-client.sh">ui/BonInABoxScriptService/generate-client.sh</a> and <a href="../script-server/generate-server-openapitools.sh">script-server/generate-server-openapitools.sh</a> to regenerate the client and the server.</li>
+<li>Merge carefully, not all generated code is to be kept.</li>
+<li>Implement the gaps.</li>
+</ol>
+</section>
+</section>
+<section id="debugging-signal-forwarding" class="level2">
+<h2 class="anchored" data-anchor-id="debugging-signal-forwarding">Debugging signal forwarding</h2>
+<p>Since runner-r and runner-julia run in a separate docker, when the user stops the pipeline, the signal must go from the script-server, to the runner, to the running script. Docker does not allow this by default, this is why we save the PID in a file and use a separate exec command to kill the process.</p>
+<p>The PID file is called <code>.pid</code> and is located in the output folder of the run. It is deleted when the script completes. For details, see <a href="./script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt">ScriptRun.kt</a>.</p>
 
 
-<p>About this site</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
-</div>
-</div>
-
-
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
