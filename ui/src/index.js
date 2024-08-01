@@ -15,7 +15,6 @@ import StepChooser from "./components/PipelineEditor/StepChooser";
 import { Layout } from './Layout.js';
 import Versions from './components/Versions';
 import { Spinner } from './components/Spinner';
-import NavigationContext from './NavigationContext';
 const PipelineEditor = lazy(() => import("./components/PipelineEditor/PipelineEditor"));
 
 function NotFound() {
