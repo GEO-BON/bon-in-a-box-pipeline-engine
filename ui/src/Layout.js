@@ -8,7 +8,7 @@ import BiaBLogo from "./img/boninabox.jpg"
 
 import useWindowDimensions from "./utils/WindowDimensions"
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 export function Layout(props) {
   const { windowHeight } = useWindowDimensions();
@@ -21,7 +21,6 @@ export function Layout(props) {
   }, [windowHeight])
 
   const location = useLocation();
-  const navigate = useNavigate();
   const hasChanged = props.hasChanged;
 
   const handleNavLinkClick = (event) => {
