@@ -2,12 +2,6 @@
 title: "How to Install"
 ---
 
-## Contributing
-
-If you wish to contribute your indicator or EBV code, please let us know at web\@geobon.org.
-
-The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup below. You can create a branch or fork to save your work. Make sure that the code is general, and will work when used with various parameters, such as in different regions around the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before acceptation.
-
 ## Running the servers locally {#running-the-servers-locally}
 
 Prerequisites :
