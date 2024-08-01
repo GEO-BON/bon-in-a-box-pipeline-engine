@@ -960,6 +960,7 @@ export default function PipelineEditor(props) {
     }
   }, [nodes, edges, savedJSON]);
 
+  //removes event listener when PipelineEditor component unmounts
   useEffect(() => {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
