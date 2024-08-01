@@ -24,18 +24,13 @@ export function Layout(props) {
   const navigate = useNavigate();
   const hasChanged = props.hasChanged;
 
-  const handleNavLinkClick = (event, to) => {
-    if (location.pathname == '/pipeline-editor') {
-      if (hasChanged){
-        const confirmNavigation = window.confirm("Reload site? Changes you made may not be saved.");
-        if (!confirmNavigation) {
-          event.preventDefault();
-        } else {
-          navigate(to);
-        }
-      } else {
-        navigate(to);
-      }
+  const handleNavLinkClick = (event) => {
+    if (location.pathname == '/pipeline-editor' && hasChanged) {
+      const confirmNavigation = window.confirm("Reload site? Changes you made may not be saved.");
+      if (!confirmNavigation) {
+        event.preventDefault();
+        return;
+      } 
     }
   };
 
@@ -50,13 +45,13 @@ export function Layout(props) {
 
       <div className='right-content'>
         <nav>
-          <NavLink to="/script-form" onClick={(event) => handleNavLinkClick(event, '/script-form')}>Single script run</NavLink>
+          <NavLink to="/script-form" onClick={handleNavLinkClick}>Single script run</NavLink>
           &nbsp;|&nbsp;
-          <NavLink to="/pipeline-form" onClick={(event) => handleNavLinkClick(event, '/pipeline-form')}>Pipeline run</NavLink>
+          <NavLink to="/pipeline-form" onClick={handleNavLinkClick}>Pipeline run</NavLink>
           &nbsp;|&nbsp;
           <NavLink to="/pipeline-editor">Pipeline editor</NavLink>
           &nbsp;|&nbsp;
-          <NavLink to="/versions" onClick={(event) => handleNavLinkClick(event, '/versions')}>Server info</NavLink>
+          <NavLink to="/versions" onClick={handleNavLinkClick}>Server info</NavLink>
         </nav>
 
         {props.popupContent && 
