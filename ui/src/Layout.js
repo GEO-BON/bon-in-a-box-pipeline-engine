@@ -21,14 +21,14 @@ export function Layout(props) {
   }, [windowHeight])
 
   const location = useLocation();
-  const hasChanged = props.hasChanged;
 
   const handleNavLinkClick = (event) => {
-    if (location.pathname == '/pipeline-editor' && hasChanged) {
-      const confirmNavigation = window.confirm("Reload site? Changes you made may not be saved.");
+    console.log(event)
+    if (location.pathname == '/pipeline-editor' && props.hasUnsavedChanges) {
+      const confirmNavigation = window.confirm("Leaving the editor: any unsaved changes will be lost.");
       if (!confirmNavigation) {
         event.preventDefault();
-      } 
+      }
     }
   };
 
@@ -52,7 +52,7 @@ export function Layout(props) {
           <NavLink to="/versions" onClick={handleNavLinkClick}>Server info</NavLink>
         </nav>
 
-        {props.popupContent && 
+        {props.popupContent &&
           <div className='fullScreenPopup'>
             <div className='content'>
               {props.popupContent}

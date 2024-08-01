@@ -28,8 +28,7 @@ function NotFound() {
 
 function App() {
   const [popupContent, setPopupContent] = useState();
-
-  const [hasChanged, setHasChanged] = useState(false);
+  const [hasUnsavedChanges, setUnsavedChanges] = useState(false);
 
   return <BrowserRouter>
     <Routes>
@@ -38,21 +37,21 @@ function App() {
       <Route path="script-form/:pipeline?/:runHash?" element={
         <Layout right={<PipelinePage runType="script" />} />
       } />
-      
+
       <Route path="pipeline-form/:pipeline?/:runHash?" element={
         <Layout right={<PipelinePage runType="pipeline" />} />
       } />
 
       <Route path="pipeline-editor" element={
-        <Layout left={<StepChooser popupContent={popupContent} setPopupContent={setPopupContent}/>}
+        <Layout left={<StepChooser popupContent={popupContent} setPopupContent={setPopupContent} />}
           right={
             <Suspense fallback={<Spinner />}>
-              <PipelineEditor hasChanged={hasChanged} setHasChanged={setHasChanged}/>
+              <PipelineEditor hasUnsavedChanges={hasUnsavedChanges} setUnsavedChanges={setUnsavedChanges}/>
             </Suspense>
           }
           popupContent={popupContent}
-          setPopupContent={setPopupContent} 
-          hasChanged={hasChanged} />
+          setPopupContent={setPopupContent}
+          hasUnsavedChanges={hasUnsavedChanges} />
       } />
 
       <Route path="versions" element={

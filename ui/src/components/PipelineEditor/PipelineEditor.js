@@ -81,8 +81,8 @@ export default function PipelineEditor(props) {
   const [metadata, setMetadata] = useState("");
   const [currentFileName, setCurrentFileName] = useState("");
   const [savedJSON, setSavedJSON] = useState(null);
-  const hasChanged = props.hasChanged;
-  const setHasChanged = props.setHasChanged;
+  const hasUnsavedChanges = props.hasUnsavedChanges;
+  const setUnsavedChanges = props.setUnsavedChanges;
 
   const [editSession, setEditSession] = useState(Math.random());
 
@@ -587,7 +587,10 @@ export default function PipelineEditor(props) {
     );
   }, [reactFlowInstance, setNodes]);
 
-  const generateSaveJSON = () => {
+  const generateSaveJSON = useCallback(() => {
+    if (!reactFlowInstance)
+      return null
+
     const flow = reactFlowInstance.toObject();
 
     // react-flow properties that are not necessary to rebuild graph when loading
@@ -642,11 +645,12 @@ export default function PipelineEditor(props) {
     }
 
     return JSON.stringify(flow, null, 2);
-  };
+  }, [reactFlowInstance]);
 
   const onSave = useCallback((fileName) => {
-    if (reactFlowInstance) {
-      let saveJSON = generateSaveJSON();
+    let saveJSON = generateSaveJSON();
+    if (saveJSON) {
+      console.log(saveJSON)
       if (fileName) {
         let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
         fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
@@ -669,8 +673,9 @@ export default function PipelineEditor(props) {
 
       } else {
         navigator.clipboard
-          .writeText(saveJSON)
-          .then(() => {
+        .writeText(saveJSON)
+        .then(() => {
+            setSavedJSON(saveJSON);
             showAlert('info', 'Pipeline content copied to clipboard',
               'Use git to add the code to the BON in a Box repository.'
             );
@@ -680,7 +685,7 @@ export default function PipelineEditor(props) {
           });
       }
     }
-  }, [reactFlowInstance, inputList, outputList, metadata, showAlert]);
+  }, [inputList, outputList, metadata, showAlert, generateSaveJSON]);
 
   const onLoadFromFileBtnClick = () => inputFile.current.click(); // will call onLoad
 
@@ -697,6 +702,8 @@ export default function PipelineEditor(props) {
       }
 
       setCurrentFileName(file.name);
+
+      // TODO: Use loaded JSON and test
       setSavedJSON(null);
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
@@ -784,9 +791,9 @@ export default function PipelineEditor(props) {
   }, [reactFlowInstance]);
 
   /**
-    * saveJSON instead of currentFileName in dependencies: after a pipeline is loaded from a file, when it is saved, 
+    * saveJSON instead of currentFileName in dependencies: after a pipeline is loaded from a file, when it is saved,
     * savedJSON changes but currentFileName doesn't and localStorage should be updated in this specific case.
-    * currentFileName should be added to these dependencies for a case where two different server files are identical 
+    * currentFileName should be added to these dependencies for a case where two different server files are identical
     * except for their file names, but this seems redundant and inefficient for most cases.
     */
   useEffect(()=> {
@@ -797,7 +804,7 @@ export default function PipelineEditor(props) {
         localStorage.setItem("currentFileName", '');
       }
     }
-  }, [savedJSON]); 
+  }, [savedJSON]);
 
   const onLoadFlow = useCallback(async (flow) => {
     if (flow) {
@@ -962,12 +969,12 @@ export default function PipelineEditor(props) {
   }, []);
 
   useEffect(() => {
-    if (hasChanged && ((savedJSON === null && nodes.length === 0) || (savedJSON !== null && savedJSON === generateSaveJSON()))) {
+    if (hasUnsavedChanges && ((savedJSON === null && nodes.length === 0) || (savedJSON !== null && savedJSON === generateSaveJSON()))) {
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      setHasChanged(false);
-    } else if (!hasChanged && ((savedJSON === null && nodes.length !== 0) || (savedJSON !== null && savedJSON !== generateSaveJSON()))) {
+      setUnsavedChanges(false);
+    } else if (!hasUnsavedChanges && ((savedJSON === null && nodes.length !== 0) || (savedJSON !== null && savedJSON !== generateSaveJSON()))) {
       window.addEventListener('beforeunload', handleBeforeUnload);
-      setHasChanged(true);
+      setUnsavedChanges(true);
     }
   }, [nodes, edges, savedJSON]);
 
