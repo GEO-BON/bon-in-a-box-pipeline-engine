@@ -944,7 +944,7 @@ export default function PipelineEditor(props) {
     setSavedJSON(null);
   }, [setEditSession, setCurrentFileName, setNodes, setEdges, hideModal])
 
-  //useCallback so react memorizes that it's the same function when beforeunload event listener is added and removed
+  //useCallback with empty dependencies so that addEventListener and removeEventListener only work on this one function only created once
   const handleBeforeUnload = useCallback((event) => {
     event.preventDefault();
     event.returnValue = '';
