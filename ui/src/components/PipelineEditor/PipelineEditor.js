@@ -782,6 +782,12 @@ export default function PipelineEditor(props) {
     }
   }, [reactFlowInstance]);
 
+  /**
+    * saveJSON instead of currentFileName in dependencies: after a pipeline is loaded from a file, when it is saved, 
+    * savedJSON changes but currentFileName doesn't and localStorage should be updated in this specific case.
+    * currentFileName should be added to these dependencies for a case where two different server files are identical 
+    * except for their file names, but this seems redundant and inefficient for most cases.
+    */
   useEffect(()=> {
     if (reactFlowInstance != null) {
       if (savedJSON !== null) { //when pipeline is loaded from file, it's not automatically saved to the server, but currentFileName is still set
@@ -790,7 +796,7 @@ export default function PipelineEditor(props) {
         localStorage.setItem("currentFileName", '');
       }
     }
-  }, [currentFileName]); 
+  }, [savedJSON]); 
 
   const onLoadFlow = useCallback(async (flow) => {
     if (flow) {
