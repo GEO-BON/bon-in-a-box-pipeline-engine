@@ -951,30 +951,12 @@ export default function PipelineEditor(props) {
   }, []);
 
   useEffect(() => {
-    if (savedJSON === null) {
-      if (nodes.length === 0) {
-        if (hasChanged) {
-          window.removeEventListener('beforeunload', handleBeforeUnload);
-          setHasChanged(false);
-        }
-      } else {
-        if (!hasChanged) {
-          window.addEventListener('beforeunload', handleBeforeUnload);
-          setHasChanged(true);
-        }
-      }
-    } else {
-      if (savedJSON === generateSaveJSON()) {
-        if (hasChanged) {
-          window.removeEventListener('beforeunload', handleBeforeUnload);
-          setHasChanged(false);
-        }
-      } else {
-        if (!hasChanged) {
-          window.addEventListener('beforeunload', handleBeforeUnload);
-          setHasChanged(true);
-        }
-      }
+    if (hasChanged && ((savedJSON === null && nodes.length === 0) || (savedJSON !== null && savedJSON === generateSaveJSON()))) {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      setHasChanged(false);
+    } else if (!hasChanged && ((savedJSON === null && nodes.length !== 0) || (savedJSON !== null && savedJSON !== generateSaveJSON()))) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      setHasChanged(true);
     }
   }, [nodes, edges, savedJSON]);
 
