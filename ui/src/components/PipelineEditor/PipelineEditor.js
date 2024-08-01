@@ -790,7 +790,7 @@ export default function PipelineEditor(props) {
         localStorage.setItem("currentFileName", '');
       }
     }
-  }, [savedJSON]); 
+  }, [currentFileName]); 
 
   const onLoadFlow = useCallback(async (flow) => {
     if (flow) {
