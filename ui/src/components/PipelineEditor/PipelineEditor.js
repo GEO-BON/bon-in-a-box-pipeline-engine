@@ -697,7 +697,7 @@ export default function PipelineEditor(props) {
       }
 
       setCurrentFileName(file.name);
-      setSavedJSON = null;
+      setSavedJSON(null);
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
     }
