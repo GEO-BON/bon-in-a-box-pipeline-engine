@@ -1,6 +1,6 @@
 import './Layout.css';
 
-import React, { useEffect, useState, useContext } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { NavLink } from "react-router-dom";
 
@@ -9,8 +9,6 @@ import BiaBLogo from "./img/boninabox.jpg"
 import useWindowDimensions from "./utils/WindowDimensions"
 
 import { useLocation, useNavigate } from "react-router-dom";
-
-import NavigationContext from './NavigationContext';
 
 export function Layout(props) {
   const { windowHeight } = useWindowDimensions();
@@ -24,14 +22,14 @@ export function Layout(props) {
 
   const location = useLocation();
   const navigate = useNavigate();
-  const { hasChanged, setHasChanged } = useContext(NavigationContext);
+  const hasChanged = props.hasChanged;
 
   const handleNavLinkClick = (event, to) => {
     if (location.pathname == '/pipeline-editor') {
       if (hasChanged){
         const confirmNavigation = window.confirm("Reload site? Changes you made may not be saved.");
         if (!confirmNavigation) {
-          event.preventDefault(); // Prevent navigation if canceled
+          event.preventDefault();
         } else {
           navigate(to);
         }

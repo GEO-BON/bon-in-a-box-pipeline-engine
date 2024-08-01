@@ -32,9 +32,7 @@ function App() {
 
   const [hasChanged, setHasChanged] = useState(false);
 
-  return (
-  <NavigationContext.Provider value={{ hasChanged, setHasChanged }}> 
-  <BrowserRouter>
+  return <BrowserRouter>
     <Routes>
       <Route path="/" element={<Layout />} />
 
@@ -47,14 +45,15 @@ function App() {
       } />
 
       <Route path="pipeline-editor" element={
-        <Layout left={<StepChooser popupContent={popupContent} setPopupContent={setPopupContent} />}
+        <Layout left={<StepChooser popupContent={popupContent} setPopupContent={setPopupContent}/>}
           right={
             <Suspense fallback={<Spinner />}>
-              <PipelineEditor />
+              <PipelineEditor hasChanged={hasChanged} setHasChanged={setHasChanged}/>
             </Suspense>
           }
           popupContent={popupContent}
-          setPopupContent={setPopupContent} />
+          setPopupContent={setPopupContent} 
+          hasChanged={hasChanged} />
       } />
 
       <Route path="versions" element={
@@ -67,8 +66,7 @@ function App() {
 
     </Routes>
   </BrowserRouter>
-  </NavigationContext.Provider>
-)};
+};
 
 const root = createRoot(document.getElementById('root'));
 root.render(<App />);

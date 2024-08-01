@@ -3,7 +3,7 @@ import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
 import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, AlertTitle, Snackbar, DialogContentText } from '@mui/material';
 
-import React, { useState, useRef, useCallback, useEffect, useContext } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
@@ -37,7 +37,6 @@ import {
 import sleep from "../../utils/Sleep";
 import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
-import NavigationContext from "../../NavigationContext";
 
 const yaml = require('js-yaml');
 const _lang = require('lodash/lang');
@@ -82,7 +81,8 @@ export default function PipelineEditor(props) {
   const [metadata, setMetadata] = useState("");
   const [currentFileName, setCurrentFileName] = useState("");
   const [savedJSON, setSavedJSON] = useState(null);
-  const { hasChanged, setHasChanged } = useContext(NavigationContext);
+  const hasChanged = props.hasChanged;
+  const setHasChanged = props.setHasChanged;
 
   const [editSession, setEditSession] = useState(Math.random());
 
