@@ -781,12 +781,11 @@ export default function PipelineEditor(props) {
     });
   };
 
-  //restores the last pipeline the user was editing from the localStorage
+  // Restores the last pipeline the user was editing from the localStorage.
+  // Executed once when opening the editor.
   useEffect(()=> {
-    if(localStorage.getItem("currentFileName")){
-      if (reactFlowInstance != null) {
+    if(localStorage.getItem("currentFileName") && reactFlowInstance){
         onLoadFromLocalStorage(localStorage.getItem("currentFileName"));
-      }
     }
   }, [reactFlowInstance]);
 
@@ -976,14 +975,14 @@ export default function PipelineEditor(props) {
       window.addEventListener('beforeunload', handleBeforeUnload);
       setUnsavedChanges(true);
     }
-  }, [nodes, edges, savedJSON]);
+  }, [nodes, edges, savedJSON, handleBeforeUnload]);
 
   //removes event listener when PipelineEditor component unmounts
   useEffect(() => {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
     };
-  }, [])
+  }, [handleBeforeUnload])
 
   return (
     <div id="editorLayout">
