@@ -784,11 +784,13 @@ export default function PipelineEditor(props) {
 
   useEffect(()=> {
     if (reactFlowInstance != null) {
-      localStorage.setItem("currentFileName", currentFileName);
+      if (savedJSON !== null) { //when pipeline is loaded from file, it's not automatically saved to the server, but currentFileName is still set
+        localStorage.setItem("currentFileName", currentFileName);
+      } else {
+        localStorage.setItem("currentFileName", '');
+      }
     }
   }, [savedJSON]); 
-  //savedJSON and not currentFileName since pipeline could be loaded from file which sets a currentFileName but no pipeline is saved to the server
-  //this will cause an error when user reloads page and the app tries to restore previous unsaved pipeline
 
   const onLoadFlow = useCallback(async (flow) => {
     if (flow) {
