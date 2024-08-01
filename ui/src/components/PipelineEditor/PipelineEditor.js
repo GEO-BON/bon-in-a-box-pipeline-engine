@@ -80,7 +80,7 @@ export default function PipelineEditor(props) {
   const [outputList, setOutputList] = useState([]);
   const [metadata, setMetadata] = useState("");
   const [currentFileName, setCurrentFileName] = useState("");
-  const [beforeUnloadEventListener, setBeforeUnloadEventListener] = useState(false);
+  const [hasChanged, setHasChanged] = useState(false);
   const [savedJSON, setSavedJSON] = useState(null);
 
   const [editSession, setEditSession] = useState(Math.random());
@@ -935,26 +935,26 @@ export default function PipelineEditor(props) {
   useEffect(() => {
     if (savedJSON === null) {
       if (nodes.length === 0) {
-        if (beforeUnloadEventListener) {
+        if (hasChanged) {
           window.removeEventListener('beforeunload', handleBeforeUnload);
-          setBeforeUnloadEventListener(false);
+          setHasChanged(false);
         }
       } else {
-        if (!beforeUnloadEventListener) {
+        if (!hasChanged) {
           window.addEventListener('beforeunload', handleBeforeUnload);
-          setBeforeUnloadEventListener(true);
+          setHasChanged(true);
         }
       }
     } else {
       if (savedJSON === generateSaveJSON()) {
-        if (beforeUnloadEventListener) {
+        if (hasChanged) {
           window.removeEventListener('beforeunload', handleBeforeUnload);
-          setBeforeUnloadEventListener(false);
+          setHasChanged(false);
         }
       } else {
-        if (!beforeUnloadEventListener) {
+        if (!hasChanged) {
           window.addEventListener('beforeunload', handleBeforeUnload);
-          setBeforeUnloadEventListener(true);
+          setHasChanged(true);
         }
       }
     }
