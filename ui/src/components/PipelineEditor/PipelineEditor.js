@@ -645,7 +645,7 @@ export default function PipelineEditor(props) {
     }
 
     return JSON.stringify(flow, null, 2);
-  }, [reactFlowInstance]);
+  }, [inputList, outputList, metadata, reactFlowInstance]);
 
   const onSave = useCallback((fileName) => {
     let saveJSON = generateSaveJSON();
@@ -685,7 +685,7 @@ export default function PipelineEditor(props) {
           });
       }
     }
-  }, [inputList, outputList, metadata, showAlert, generateSaveJSON]);
+  }, [showAlert, generateSaveJSON]);
 
   const onLoadFromFileBtnClick = () => inputFile.current.click(); // will call onLoad
 

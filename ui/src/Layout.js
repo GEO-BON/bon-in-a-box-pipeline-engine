@@ -24,7 +24,7 @@ export function Layout(props) {
 
   const handleNavLinkClick = (event) => {
     console.log(event)
-    if (location.pathname == '/pipeline-editor' && props.hasUnsavedChanges) {
+    if (location.pathname === '/pipeline-editor' && props.hasUnsavedChanges) {
       const confirmNavigation = window.confirm("Leaving the editor: any unsaved changes will be lost.");
       if (!confirmNavigation) {
         event.preventDefault();
