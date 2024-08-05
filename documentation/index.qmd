@@ -1,0 +1,9 @@
+---
+title: "BON in a Box: A tool for monitoring biodiversity"
+---
+
+The earth's biodiversity is declining at an alarming rate due to human activities, necessitating urgent coordinated action to halt this loss and restore biodiversity. Recognizing this need, 196 countries have signed the Kunming-Montreal Global Biodiversity Framework, committing to taking steps to halt this loss. Assessing progress towards the goals and targets of the Kunming-Montreal Global Biodiversity Framework (GBF) requires collaboration across scales to monitor biodiversity change. Current monitoring efforts and tools are developed by individual actors without being shared across organizations and borders, which can lead to the duplication of effort in some places while others have less resources to allocate to biodiversity reporting.
+
+BON in a Box can provide biodiversity monitoring tools and facilitate coordination and collaboration among countries. BON in a Box now provides an open-source, fully transparent platform that allows users to contribute data and analysis pipelines to calculate indicators which can then be used for reporting to assess progress towards biodiversity targets. BON in Box can integrate diverse data and expert knowledge, from Earth observation to genetic diversity metrics to calculate monitoring framework indicators.
+
+[BON in a Box Website](https://boninabox.geobon.org/)

@@ -2,8 +2,28 @@
 title: "About"
 ---
 
-About this site
+## What is BON in a Box?
 
-```{r}
-1 + 1
-```
+BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration. It's the ultimate ecosystem for harmonizing biodiversity observations, fostering efficiency, and amplifying the power of data-driven insights.
+
+## Why do we need this platform? 
+
+A platform that provides biodiversity monitoring tools and facilitates coordination and networking between countries is needed to face the global biodiversity crisis.
+
+Use BON in a Box to improve assessment of biodiversity status and guide better decisions.
+
+## What are the project benefits?
+
+a\. Academics/researchers/users (BONs) • Improve science further, through open and repeatable processes increasing research impact.
+
+• Complement your analysis processes with routines developed by other researchers and to be part of a global community that generates analysis of the state and trends of biodiversity.
+
+b\. Decision Makers
+
+With BON in a Box you will be able to:
+
+• Obtain insights and results from your own data as needed to report to multilateral agreements and other public policy commitments with validated tools and methodologies.
+
+• Optimize resources and efforts for quick and informed environmental decision-making
+
+## 

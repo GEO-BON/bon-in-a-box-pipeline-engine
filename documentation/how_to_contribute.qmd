@@ -4,10 +4,208 @@ title: "How to Contribute"
 
 ## Contributing
 
-If you wish to contribute your indicator or EBV code, please email us at web\@geobon.org.
+If you wish to contribute a pipeline, please email us at web\@geobon.org.
 
 The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup below. You can create a branch or fork to save your work. Make sure that the code is general, and will work when used with various parameters, such as in different regions around the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before acceptation.
 
 ## Is your analysis pipeline right for us?
 
+We are looking for pipelines that calculate biodiversity metrics that are relevant to policy and biodiversity reporting, such as Essential Biodiversity Variables (EBVs) and Indicators. These pipelines should be
+
+-   open source
+
+-   broadly applicable (not just a specific region)
+
+-   using data that is publicly available
+
 ## Instructions for adapting your code to an analysis pipeline
+
+Analysis workflows can be adapted to BON in a Box pipelines using a few simple steps. Once BON in a Box is installed on your computer, Pipelines can be edited and run locally by creating files in your local BON-in-a-box folder that was cloned from the GItHub repository. Workflows can be in a variety of languages, including R, Julia, and Python, and not all steps of the pipeline need to be in the same language.
+
+Analysis workflows can be converted to BON in a Box pipelines with a few steps:
+
+### Step 1: Creating a YAML file
+
+Each script should be accompanied by a YAML file (.yml extension) that specifies inputs and outputs of that step of the pipeline.
+
+YAML files should begin with a name, description, and authors of the script. The name should be the same as the script that it describes but with a .yml extension.
+
+Example:
+
+```         
+script: script_name.R
+name: Script Name
+description: Describe what the script does
+author:
+  - name: John Doe (john.doe@gmail.com)
+  - name: Jane Doe (jane.doe@gmail.com)
+```
+
+Next, the YAML file should specify the inputs of the script. These inputs will either be outputs from the previous script, which can be connected by lines in the pipeline editor, or specified by the user in the input form.
+
+Here is an example where the input is a raster file of land cover pulled from a public database and a coordinate reference system that is specified by the user.
+
+```         
+inputs:
+  landcover_raster:
+    label: Raster of landcover
+    description: Landcover data pulled from EarthEnv database with 1x1km resolution
+    type: application/geo+json
+  crs:
+    label: coordinate reference system for output
+    description: ESPG coordinate reference system for output
+    type: int
+    example: 4326
+  unit_distance:
+    label: unit for distance measurement
+    description: String value of 
+    type: options
+    options:
+      - "m2"
+      - "km2"
+```
+
+Specifying an example will autofill that input with the example unless changed by the user. Not specifying an example will leave that input blank.
+
+After specifying the inputs, you can specify what you want the script to output.
+
+Here is an example:
+
+```         
+outputs: 
+  result: 
+    label: Analysis result
+    description: The result of the analysis, in CSV form
+    type: text/csv 
+  result_plot: 
+    label: Result plot 
+    description: Plot of results
+    type: image/png
+```
+
+There are several different types of inputs/outputs that can be specified in the YAML file:
+
+-   "int" is an integer
+
+-   "string" is a string value (word or words)
+
+-   "text/csv" is a txt or csv file
+
+-   "application/geo+json" is a GeoJSON spatial file, if specified in outputs this will plot a map in leaflet
+
+-   "options" is a dropdown menu, and the options you want displayed can be written below.
+
+-   "image/png" is an image
+
+Here is an example of a complete YAML file with inputs and outputs:
+
+```         
+script: script_name.R
+name: Script Name
+description: Describe what the script does
+author:
+  - name: John Doe (john.doe@gmail.com)
+  - name: Jane Doe (jane.doe@gmail.com)
+inputs:
+  landcover_raster:
+    label: Raster of landcover
+    description: Landcover data pulled from EarthEnv database with 1x1km resolution
+    type: application/geo+json
+  crs:
+    label: coordinate reference system for output
+    description: ESPG coordinate reference system for output
+    type: int
+    example: 4326
+  unit_distance:
+    label: unit for distance measurement
+    description: String value of 
+    type: options
+    options:
+      - "m2"
+      - "km2"
+outputs: 
+  result: 
+    label: Analysis result
+    description: The result of the analysis, in CSV form
+    type: text/csv 
+  result_plot: 
+    label: Result plot 
+    description: Plot of results
+    type: image/png
+```
+
+YAML is a space sensitive format, so make sure all the tab sets are correct in the file.
+
+If inputs are outputs from a previous step in the pipeline, make sure to give the inputs and outputs the same name and they will be automatically linked in the pipeline.
+
+### Step 2: Integrating YAML inputs and outputs into your script
+
+Now that you have created your YAML file, the inputs and outputs need to be integrated into your scripts.
+
+First, set the environment for the script:
+
+``` R
+Sys.getenv("SCRIPT_LOCATION")
+```
+
+And then set the 'input' environment variables. The 'input' environment contains the specified inputs from the BON in a Box platform.
+
+The input file 'input.json' is automatically generated by executing the 'Run Script' command in the Bon in a Box platform.
+
+``` R
+input <- rjson::fromJSON(file=file.path(outputFolder, "input.json")) # Load input file
+```
+
+Next, for any functions that are using these inputs, they need to be specified.
+
+Inputs are specified by `input$input_name`.
+
+For example, to create a function to take the square root of a number that was input by the user in the UI:
+
+``` R
+result <- sqrt(input$number)
+```
+
+This means if the user inputs the number 144, this will be run in the function and output 12.
+
+Here is another example to read in an output from a previous step of the pipeline, which was output in csv format.
+
+``` R
+dat <- read.csv(input$csv_file)
+```
+
+Next, you have to specify the outputs, which can be saved in a variety of formats. The format must be accurately specified in the YAML file.
+
+Here is an example of an output with a csv file and a plot in png format.
+
+``` R
+result_path <- file.path(outputFolder, "result.csv")
+write.csv(result, result_path, row.names = F )
+
+result_plot_path <- file.path(outputFolder, "result_plot.png")
+ggsave(result_path, result)
+
+output <- list(result = result_path,
+result_plot = result_plot_path)
+```
+
+Lastly, write the output as a JSON file:
+
+``` R
+setwd(outputFolder)
+jsonlite::write_json(output, "output.json", auto_unbox = TRUE, pretty = TRUE)
+```
+
+### Step 3: Connect your scripts with the BON in a Box pipeline editor.
+
+Next, create your pipeline in the BON in a Box pipeline editor by connecting your inputs and outputs.
+
+Once you have saved your scripts and YAML files to your local computer in the Bon-in-a-box pipelines folder that was cloned from github, they will show up as scripts in the pipeline editor. You can drag the scripts into the editor and connect the inputs and outputs to create your pipeline.
+
+ADD PHOTOS.
+
+### Step 4: Run pipeline and troubleshoot
+
+The last step is to load your saved pipeline in BON and a Box and run it. The error log at the bottom of the page will show errors with the pipeline.
+
+ADD PHOTO
