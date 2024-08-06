@@ -710,23 +710,6 @@ export default function PipelineEditor(props) {
     }
   };
 
-  //when loading pipeline from the server, the data has no weights or different weights compared to the output of generateSaveJSON()
-  //this function does exactly what generateSaveJSON does to add weights, so that savedJSON and generateSaveJSON() can be compared to detect changes
-  const prepareServerData = (data) => {
-    let dataCopy = _lang.cloneDeep(data);
-    let i = 0;
-    for (let key in dataCopy.inputs){
-      dataCopy.inputs[key].weight = i;
-      i++;
-    }
-    let j = 0;
-    for (let key in dataCopy.outputs){
-      dataCopy.outputs[key].weight = j;
-      j++
-    }
-    return dataCopy;
-  };
-
   const onLoadFromServerBtnClick = (event) => {
     event.stopPropagation();
     event.preventDefault();
@@ -753,7 +736,7 @@ export default function PipelineEditor(props) {
                 )
               } else {
                 setCurrentFileName(descriptionFile);
-                setSavedJSON(JSON.stringify(prepareServerData(data), null, 2));
+                setSavedJSON(JSON.stringify(data, null, 2));
                 onLoadFlow(data);
               }
             });
@@ -775,7 +758,7 @@ export default function PipelineEditor(props) {
         )
       } else {
         setCurrentFileName(descriptionFile);
-        setSavedJSON(JSON.stringify(prepareServerData(data), null, 2));
+        setSavedJSON(JSON.stringify(data, null, 2));
         onLoadFlow(data);
       }
     });
