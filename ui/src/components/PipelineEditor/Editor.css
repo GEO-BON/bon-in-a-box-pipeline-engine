@@ -16,6 +16,7 @@
   width: max-content;
   max-width: 65%;
   z-index: 1300; /* Tooltip (gray zone top left) */
+  pointer-events: none;
 }
 
 .userInput {
