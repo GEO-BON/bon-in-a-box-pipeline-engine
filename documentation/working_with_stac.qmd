@@ -1,0 +1,218 @@
+---
+title: "Working with STAC"
+format: html
+editor: visual
+---
+
+## What is a STAC Catalog?
+
+[STAC](https://stacspec.org/en) stands for SpatioTemporal Asset Catalog. It is a common language to describe geospatial information, so it can be more easily worked with, indexed, and discovered. Spatial information is stored in a geoJSON format, which can be easily adapted to different domains. The goal of STAC is to enable a global index of all imagery derived data products with an easily implementable standard for organization to expose their data in a persistent and reliable way. STAC objects are hosted in geoJSON format as HTML pages.
+
+## GEO BON STAC Catalog
+
+Pipelines can be created using layers pulled from any STAC catalog, such as the [Planetary Computer](https://planetarycomputer.microsoft.com/). GEO BON hosts a STAC catalog that contains many commonly used data layers, which can be viewed in JSON format in an [HTML](https://stac.geobon.org/) or in a [viewer](https://stac.geobon.org/viewer/).
+
+There is R script to pull and filter data from a STAC catalog in BON in a Box called 'Load from STAC', where users can specify the layers, bounding box, projection system, and spatial resolution they are interested in, and save this as a GeoJSON file to input into a subsequent pipeline step.
+
+## Working with the STAC Catalog in R
+
+Data in STAC catalogs can be loaded directly into R and visualized using the `rstac` package.
+
+To start, install and load the following packages.
+
+```{r}
+# install.packages(c(('gdalcubes', 'rstac', 'knitr')))
+library(gdalcubes)
+library(rstac)
+library(knitr)
+library(stars)
+
+```
+
+Next, connect to the STAC catalog using the `stac` function in the `rstac` package
+
+```{r}
+stac_obj <- stac("https://stac.geobon.org/")
+```
+
+In the STAC catalog, layers are organized into collections. To make a list of the collections
+
+```{r}
+collections <- stac_obj |> collections() |> get_request()
+
+```
+
+And to view the collections and their descriptions in a table
+
+```{r}
+df<-data.frame(id=character(),title=character(),description=character())
+for (c in collections[['collections']]){
+  df<-rbind(df,data.frame(id=c$id,title=c$title,description=c$description))
+}
+kable(head(df))
+```
+
+To search for a specific collection. Here we will search for the land cover collection from EarthEnv
+
+```{r}
+it_obj <- stac_obj |>
+  stac_search(collections = "earthenv_landcover") |>
+  post_request() |> items_fetch()
+it_obj
+```
+
+View the available layers in this collection
+
+```{r}
+it_obj <- stac_obj |>
+  collections("earthenv_landcover") |> items() |>
+  get_request() |> items_fetch()
+it_obj
+```
+
+View the properties of the first item (layer).
+
+```{r}
+it_obj[['features']][[1]]$properties
+
+```
+
+We can summarize each layer in a table
+
+```{r}
+df<-data.frame(id=character(),datetime=character(), description=character())
+for (f in it_obj[['features']]){
+  df<-rbind(df,data.frame(id=f$id,datetime=f$properties$datetime,description=f$properties$description))
+}
+kable(head(df))
+```
+
+Now, you can load one of the items with the `stars` package, which allows access to files remotely in a fast and efficient way.
+
+Here we will select the layer representing the percentage of "Evergreen/Deciduous Needleleaf Trees", which is the 12th layer in the collection.
+
+```{r}
+
+lc1<-read_stars(paste0('/vsicurl/',it_obj[['features']][[12]]$assets$data$href), proxy = TRUE)
+plot(lc1)
+```
+
+You can crop the raster by a bounding box and visualize it.
+
+```{r}
+bbox<-st_bbox(c(xmin = -76, xmax = -70, ymax = 54, ymin = 50), crs = st_crs(4326))
+lc2 <- lc1 |> st_crop(bbox)
+
+pal <- colorRampPalette(c("black","darkblue","red","yellow","white"))
+plot(lc2,breaks=seq(0,100,10),col=pal(10))
+```
+
+You can now save this object to your computer in Cloud Optimized GeoTiff (COG) format. COG works on the cloud and allows the user to access just the part of the file that is needed because all relevant information is stored together in each tile.
+
+``` r
+# Replace " ~ " for the directory of your choice on your computer.
+write_stars(lc2,'~/lc2.tif',driver='COG',options=c('COMPRESS=DEFLATE'))
+```
+
+Note that for a layer with categorical variables, saving is more complex.
+
+``` r
+lc1 |> st_crop(bbox) |> write_stars('~/lc1.tif', driver='COG', RasterIO=c('resampling'='mode'), 
+options=c('COMPRESS=DEFLATE', 'OVERVIEW_RESAMPLING=MODE', 'LEVEL=6', 
+'OVERVIEW_COUNT=8', 'RESAMPLING=MODE', 'WARP_RESAMPLING=MODE', 'OVERVIEWS=IGNORE_EXISTING'))
+```
+
+## Working with GDAL Cubes
+
+The R package `gdalcubes` allows for the processing of four dimensional regular raster data cubes from irregular image collections, hiding complexities in he data such as different map projections and spatial overlaps of images or different spatial resolutions of spectral bands. This can be useful for working with many layers or time series of satellite imagery.
+
+This is a necessary step for GDAL cubes to work with STAC catalog data
+
+```{r}
+for (i in 1:length(it_obj$features)){
+  it_obj$features[[i]]$assets$data$roles='data'
+}
+```
+
+You can filter based on item properties and create a collection
+
+```{r}
+st <- stac_image_collection(it_obj$features, asset_names=c('data'), 
+             property_filter = function(f){f[['class']] %in% c('1','2','3','4')},srs='EPSG:4326')
+```
+
+Next, you can build a GDAL cube to process or visualize the data. This cube can be in a different CRS and resolution from those of the original elements/files. However, the time dimension must capture the temporal framework of the item. dt is expressed as a time period, P1M is a period of one month, P1Y is a period of one year. Resampling methods should be tailored to the data type. For categorical data, use "mode" or "nearest". For continuous data, use "bilinear". Aggregation is relevant only when multiple rasters overlap.
+
+Here is an example that sums the four forest categories using aggregation="sum", with a change of the reference system to use Quebec Lambert (EPSG:32198) and a resolution of 1 km.
+
+```{r, warning=FALSE}
+bbox<-st_bbox(c(xmin = -483695, xmax = -84643, ymin = 112704 , ymax = 684311), crs = st_crs(32198))
+
+v <- cube_view(srs = "EPSG:32198", extent = list(t0 = "2000-01-01", t1 = "2000-01-01",
+                                                left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin), 
+                                                dx=1000, dy=1000, dt="P1D", aggregation = "sum", resampling = "mean")
+```
+
+Create a raster cube
+
+```{r}
+lc_cube <- raster_cube(st, v)
+```
+
+Save the resulting file to your computer
+
+``` R
+# Replace " ~ " for the directory of your choice on your computer.
+lc_cube |> write_tif('~/',prefix='lc2',creation_options=list('COMPRESS'='DEFLATE'))
+```
+
+Plot the raster cube
+
+```{r}
+lc_cube |> plot(zlim=c(0,100),col=pal(10))
+```
+
+Use the accessibility from cities dataset, keeping the same CRS and extent
+
+```{r}
+it_obj <- stac_obj |>
+  collections("accessibility_to_cities") |> items() |>
+  get_request() |> items_fetch()
+v <- cube_view(srs = "EPSG:32198", extent = list(t0 = "2015-01-01", t1 = "2015-01-01",
+                                                left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin), 
+                                                dx=1000, dy=1000, dt="P1D", aggregation
+
+ = "mean", resampling = "bilinear")
+for (i in 1:length(it_obj$features)){
+  it_obj$features[[i]]$assets$data$roles='data'
+}
+st <- stac_image_collection(it_obj$features)
+lc_cube <- raster_cube(st, v)
+lc_cube |> plot(col=heat.colors)
+```
+
+Use the CHELSA dataset on climatologies and create an average map for the months of June, July, and August 2010 to 2019
+
+``` R
+it_obj <- s_obj |>
+  stac_search(collections = "chelsa-monthly", datetime="2010-06-01T00:00:00Z/2019-08-01T00:00:00Z") |> 
+  get_request() |> items_fetch()
+
+v <- cube_view(srs = "EPSG:32198", extent = list(t0 = "2010-06-01", t1 = "2019-08-31",
+                                                left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin),
+               dx=1000, dy=1000, dt="P10Y",
+               aggregation = "mean",
+               resampling = "bilinear")
+
+for (i in 1:length(it_obj$features)){
+  names(it_obj$features[[i]]$assets)='data'
+  it_obj$features[[i]]$assets$data$roles='data'
+}
+anames=unlist(lapply(it_obj$features,function(f){f['id']}))
+st <- stac_image_collection(it_obj$features, asset_names = 'data',  
+                       property_filter = function(f){f[['variable']] == 'tas' & (f[['month']] %in% c(6,7,8)) })
+c_cube <- raster_cube(st, v)
+c_cube |> plot(col=heat.colors)
+
+c_cube |> write_tif('~/',prefix='chelsa-monthly',creation_options=list('COMPRESS'='DEFLATE'))
+```

@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "bon-in-a-box-pipeline-engine"
+  title: "BON in a Box"
   navbar:
     left:
       - href: index.qmd
@@ -11,6 +11,7 @@ website:
       - about.qmd
       - how_to_install.qmd
       - how_to_contribute.qmd
+      - working_with_stac.qmd
 
 format:
   html:
