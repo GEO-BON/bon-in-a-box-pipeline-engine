@@ -4,6 +4,7 @@ import "./Editor.css";
 import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, AlertTitle, Snackbar, DialogContentText } from '@mui/material';
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { unstable_useBlocker } from "react-router-dom";
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
@@ -81,8 +82,7 @@ export default function PipelineEditor(props) {
   const [metadata, setMetadata] = useState("");
   const [currentFileName, setCurrentFileName] = useState("");
   const [savedJSON, setSavedJSON] = useState(null);
-  const hasUnsavedChanges = props.hasUnsavedChanges;
-  const setUnsavedChanges = props.setUnsavedChanges;
+  const [hasUnsavedChanges, setUnsavedChanges] = useState(false);
 
   const [editSession, setEditSession] = useState(Math.random());
 
@@ -955,6 +955,23 @@ export default function PipelineEditor(props) {
     };
   }, [handleBeforeUnload])
 
+  const blocker = unstable_useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      hasUnsavedChanges &&
+      currentLocation.pathname !== nextLocation.pathname
+  );
+
+  const handleLeavePageModalClose = () => {
+    blocker.reset(); 
+    hideModal('leavePage');
+  }
+
+  useEffect(()=> {
+    if (blocker.state === "blocked"){
+      setModal("leavePage");
+    }
+  }, [blocker.state])
+
   return (
     <div id="editorLayout">
       <p>
@@ -1033,6 +1050,22 @@ export default function PipelineEditor(props) {
           <Button onClick={() => {hideModal('overwrite'); onSave(currentFileName)}} autoFocus>
             Overwrite
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={modal === 'leavePage'}
+        onClose={handleLeavePageModalClose}
+      >
+        <DialogTitle>Leave Page?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Changes you made may not be saved.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleLeavePageModalClose}>Stay</Button>
+          <Button onClick={blocker.proceed}>Leave</Button>
         </DialogActions>
       </Dialog>
 
