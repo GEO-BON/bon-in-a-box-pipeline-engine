@@ -666,6 +666,7 @@ export default function PipelineEditor(props) {
             showAlert('warning', 'Pipeline saved with errors', response.text)
 
           } else {
+            localStorage.setItem("currentFileName", fileName);
             setSavedJSON(saveJSON);
             setModal('saveSuccess');
           }
@@ -704,7 +705,8 @@ export default function PipelineEditor(props) {
       setCurrentFileName(file.name);
 
       // TODO: Use loaded JSON and test
-      setSavedJSON(null);
+      setSavedJSON(null); //this file is not saved on the server
+      localStorage.setItem("currentFileName", '');
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
     }
@@ -736,6 +738,7 @@ export default function PipelineEditor(props) {
                 )
               } else {
                 setCurrentFileName(descriptionFile);
+                localStorage.setItem("currentFileName", descriptionFile);
                 setSavedJSON(JSON.stringify(data, null, 2));
                 onLoadFlow(data);
               }
@@ -758,6 +761,7 @@ export default function PipelineEditor(props) {
         )
       } else {
         setCurrentFileName(descriptionFile);
+        localStorage.setItem("currentFileName", descriptionFile);
         setSavedJSON(JSON.stringify(data, null, 2));
         onLoadFlow(data);
       }
@@ -771,22 +775,6 @@ export default function PipelineEditor(props) {
         onLoadFromLocalStorage(localStorage.getItem("currentFileName"));
     }
   }, [reactFlowInstance]);
-
-  /**
-    * saveJSON instead of currentFileName in dependencies: after a pipeline is loaded from a file, when it is saved,
-    * savedJSON changes but currentFileName doesn't and localStorage should be updated in this specific case.
-    * currentFileName should be added to these dependencies for a case where two different server files are identical
-    * except for their file names, but this seems redundant and inefficient for most cases.
-    */
-  useEffect(()=> {
-    if (reactFlowInstance != null) {
-      if (savedJSON !== null) { //when pipeline is loaded from file, it's not automatically saved to the server, but currentFileName is still set
-        localStorage.setItem("currentFileName", currentFileName);
-      } else {
-        localStorage.setItem("currentFileName", '');
-      }
-    }
-  }, [savedJSON]);
 
   const onLoadFlow = useCallback(async (flow) => {
     if (flow) {
