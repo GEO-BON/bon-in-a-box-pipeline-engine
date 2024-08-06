@@ -937,13 +937,19 @@ export default function PipelineEditor(props) {
     event.preventDefault();
     event.returnValue = '';
   }, []);
+  const handlePopstate = useCallback((event) => {
+    event.preventDefault();
+    event.returnValue = '';
+  }, []);
 
   useEffect(() => {
     if (hasUnsavedChanges && ((savedJSON === null && nodes.length === 0) || (savedJSON !== null && savedJSON === generateSaveJSON()))) {
       window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopstate);
       setUnsavedChanges(false);
     } else if (!hasUnsavedChanges && ((savedJSON === null && nodes.length !== 0) || (savedJSON !== null && savedJSON !== generateSaveJSON()))) {
       window.addEventListener('beforeunload', handleBeforeUnload);
+      window.addEventListener('popstate', handlePopstate);
       setUnsavedChanges(true);
     }
   }, [nodes, edges, savedJSON, handleBeforeUnload]);
@@ -954,6 +960,13 @@ export default function PipelineEditor(props) {
       window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
     };
   }, [handleBeforeUnload])
+
+  //removes event listener when PipelineEditor component unmounts
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('popstate', handlePopstate);
+    };
+  }, [handlePopstate])
 
   return (
     <div id="editorLayout">
