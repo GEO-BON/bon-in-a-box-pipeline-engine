@@ -38,7 +38,7 @@ export function Layout(props) {
           <NavLink to="/versions">Server info</NavLink>
         </nav>
 
-        {props.popupContent && 
+        {props.popupContent &&
           <div className='fullScreenPopup'>
             <div className='content'>
               {props.popupContent}

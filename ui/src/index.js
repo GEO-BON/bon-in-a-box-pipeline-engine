@@ -3,12 +3,10 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import {
-  BrowserRouter,
-  Routes,
-  Route,
+  createBrowserRouter, 
+  RouterProvider,
   useLocation,
-} from "react-router-dom";
-
+} from 'react-router-dom';
 
 import { PipelinePage } from "./components/PipelinePage";
 import StepChooser from "./components/PipelineEditor/StepChooser";
@@ -29,40 +27,42 @@ function NotFound() {
 function App() {
   const [popupContent, setPopupContent] = useState();
 
-  return <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<Layout />} />
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Layout />,
+    },
+    {
+      path: "script-form/:pipeline?/:runHash?",
+      element: <Layout right={<PipelinePage runType="script" />} />,
+    },
+    {
+      path: "pipeline-form/:pipeline?/:runHash?",
+      element: <Layout right={<PipelinePage runType="pipeline" />} />,
+    }, 
+    {
+      path: "pipeline-editor",
+      element: <Layout left={<StepChooser popupContent={popupContent} setPopupContent={setPopupContent} />}
+      right={
+        <Suspense fallback={<Spinner />}>
+          <PipelineEditor />
+        </Suspense>
+      }
+      popupContent={popupContent}
+      setPopupContent={setPopupContent} />,
+    },
+    {
+      path: "versions",
+      element: <Layout right={<Versions />} />,
+    },
+    {
+      path: "*",
+      element: <Layout right={<NotFound />} />,
+    }
+  ]);
 
-      <Route path="script-form/:pipeline?/:runHash?" element={
-        <Layout right={<PipelinePage runType="script" />} />
-      } />
-      
-      <Route path="pipeline-form/:pipeline?/:runHash?" element={
-        <Layout right={<PipelinePage runType="pipeline" />} />
-      } />
-
-      <Route path="pipeline-editor" element={
-        <Layout left={<StepChooser popupContent={popupContent} setPopupContent={setPopupContent} />}
-          right={
-            <Suspense fallback={<Spinner />}>
-              <PipelineEditor />
-            </Suspense>
-          }
-          popupContent={popupContent}
-          setPopupContent={setPopupContent} />
-      } />
-
-      <Route path="versions" element={
-        <Layout right={<Versions />} />
-      } />
-
-      <Route path="*" element={
-        <Layout right={<NotFound />} />
-      } />
-
-    </Routes>
-  </BrowserRouter>
-}
+  return <RouterProvider router={router} />;
+};
 
 const root = createRoot(document.getElementById('root'));
 root.render(<App />);
