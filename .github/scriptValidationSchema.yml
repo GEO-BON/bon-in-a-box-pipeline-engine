@@ -164,3 +164,17 @@ references:
       doi:
         required: false
         type: string
+
+conda:
+  required: false
+  type: dict
+  schema:
+    name:
+      required: true
+      type: string
+    channels:
+      required: true
+      type: list
+    dependencies:
+      required: true
+      type: list

@@ -247,13 +247,24 @@ class ApplicationTest {
         }
     }
 
+    /**
+     * This is not very testable in this environment, since the docker containers are not running.
+     * We can only test that it properly behaves when they are offline.
+     */
     @Test
     fun testGetVersion() = testApplication {
         application { configureRouting() }
 
         client.get("/api/versions").apply {
             assertEquals(HttpStatusCode.OK, status)
-            println(bodyAsText())
+            bodyAsText().also { body ->
+                assertContains(body, "UI: offline")
+                assertContains(body, "Script server: offline")
+                assertContains(body, "Conda runner: offline")
+                assertContains(body, "Julia runner: offline")
+                assertContains(body, "TiTiler: offline")
+                println(body)
+            }
         }
     }
 
