@@ -14,6 +14,7 @@ import ReactFlow, {
   MiniMap,
   Position,
 } from "react-flow-renderer/nocss";
+import ReactMarkdown from "react-markdown";
 
 import IONode from "./IONode";
 import ConstantNode from "./ConstantNode";
@@ -1004,7 +1005,7 @@ export default function PipelineEditor(props) {
               deleteKeyCode={['Backspace', 'Delete']}
               onMouseDownCapture={onPopupMenuHide}
             >
-              {toolTip && <div className="tooltip">{toolTip}</div>}
+              {toolTip && <div className="tooltip">{(typeof toolTip === 'string') ? <ReactMarkdown className='reactMarkdown noLink' children={toolTip} /> : toolTip}</div>}
 
               <div className="save__controls">
                 <button onClick={() => onLayout()}>Layout</button>
