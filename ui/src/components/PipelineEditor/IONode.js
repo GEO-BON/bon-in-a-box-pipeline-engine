@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Handle, Position } from 'react-flow-renderer/nocss';
 import isObject from '../../utils/isObject'
+import ReactMarkdown from 'react-markdown'
 
 import { fetchStepDescription } from './StepDescriptionStore'
 
@@ -84,7 +85,7 @@ function ScriptIO({children, desc, setToolTip, onDoubleClick, warning}) {
     setToolTip(<>
       {warning && <><span className='warning'>{warning}</span><br/></>}
       {desc.type && <>{renderType(desc.type)} <br /></>}
-      {desc.description && <>{desc.description} <br /></>}
+      {desc.description && <><ReactMarkdown className="reactMarkdown noLink" children={desc.description} /></>}
       {desc.example && <>Example: {renderExample(desc.example)}</>}
     </>)
   }

@@ -1,3 +1,5 @@
+import ReactMarkdown from 'react-markdown'
+
 const yaml = require('js-yaml');
 
 export function StepDescription({ descriptionFile, metadata }) {
@@ -55,7 +57,7 @@ export function GeneralDescription({ ymlPath, metadata }) {
                 </i>
             </p>
         }
-        {metadata.description && <p>{metadata.description}</p>}
+        {metadata.description && <ReactMarkdown className="reactMarkdown" children={metadata.description} />}
         {codeLink && <p>
                 Code: <a href={codeLink} target="_blank">{codeLink.substring(codeLink.search(/(scripts|pipelines)\//))}</a>
             </p>
