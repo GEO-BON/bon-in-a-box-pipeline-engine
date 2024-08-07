@@ -404,6 +404,8 @@ ul#popupMenu {
 
 #popupMenu {
   padding: 0;
+  max-height: 50vh;
+  overflow-y: scroll;
 }
 
 #popupMenu li {
