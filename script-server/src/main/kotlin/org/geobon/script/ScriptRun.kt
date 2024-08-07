@@ -218,13 +218,13 @@ class ScriptRun( // Constructor used in single script run
 
                     "r", "R" -> {
                         container = Containers.CONDA
-                        val loadEnvironment =
+                        val activateEnvironment =
                             if (condaEnvName?.isNotEmpty() == true && condaEnvFile?.isNotEmpty() == true) {
                                 """
                                     if [ -f "$condaEnvName.yml" ]; then
                                         echo "$condaEnvFile" > $condaEnvName.2.yml
                                         if cmp -s $condaEnvName.yml $condaEnvName.2.yml; then
-                                            echo "Loading existing conda environment $condaEnvName"
+                                            echo "Activating existing conda environment $condaEnvName"
                                             rm $condaEnvName.2.yml
                                         else
                                             echo "Updating existing conda environment $condaEnvName"
@@ -244,26 +244,30 @@ class ScriptRun( // Constructor used in single script run
                             }
 
                         command = container.dockerCommandList + listOf(
-                            "bash", "--login", // see https://stackoverflow.com/a/74017557/3519951
-                            "-c", """
-                            $loadEnvironment; Rscript -e '
-                            options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
+                            // eval and source commands to initialize mamba, see https://stackoverflow.com/a/75246428/3519951
+                            "bash", "-c",
+                            """
+                                eval "$(conda shell.bash hook)"
+                                source /opt/conda/etc/profile.d/mamba.sh
+                                $activateEnvironment
+                                Rscript -e '
+                                options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
 
-                            # Define repo for install.packages
-                            # repositories = getOption("repos")
-                            # repositories["CRAN"] = "https://cloud.r-project.org/"
-                            # options(repos = repositories)
+                                # Define repo for install.packages
+                                # repositories = getOption("repos")
+                                # repositories["CRAN"] = "https://cloud.r-project.org/"
+                                # options(repos = repositories)
 
-                            fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
-                            outputFolder<-"${context.outputFolder.absolutePath}";
-                            tryCatch(source("${scriptFile.absolutePath}"),
-                                error=function(e) if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
-                                        print("Suppressed: ignoring SIGPIPE signal");
-                                    } else {
-                                        stop(e);
-                                    });
-                            unlink("${pidFile.absolutePath}");
-                            gc();'
+                                fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
+                                outputFolder<-"${context.outputFolder.absolutePath}";
+                                tryCatch(source("${scriptFile.absolutePath}"),
+                                    error=function(e) if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
+                                            print("Suppressed: ignoring SIGPIPE signal");
+                                        } else {
+                                            stop(e);
+                                        });
+                                unlink("${pidFile.absolutePath}");
+                                gc();'
                             """.trimIndent()
                         )
                     }
