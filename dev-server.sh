@@ -19,7 +19,7 @@ function help {
 function command { # args appended to the docker compose command
     export DOCKER_GID="$(getent group docker | cut -d: -f3)"
 
-    # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
+    # On Windows and mac, getent will not work. We leave the default users (anyways permissions don't matter).
     if test -z $DOCKER_GID; then
         export DOCKER_GID=
         export MY_UID=
@@ -27,7 +27,18 @@ function command { # args appended to the docker compose command
         export MY_UID="$(id -u)"
     fi
 
-    docker compose -f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml \
+    # Apple M2 chip check, see https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/issues/85
+    composeFiles="-f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml"
+    macCPU=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
+    if ! [[ -z "$macCPU" ]]; then
+        # This is a Mac, check chip type
+        if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
+            echo "Apple M* chip detected"
+            composeFiles+=" -f compose.apple.yml"
+        fi
+    fi
+
+    docker compose $composeFiles \
         --env-file pipeline-repo/runner.env --env-file $@
 }
 
