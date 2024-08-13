@@ -876,6 +876,14 @@ export default function PipelineEditor(props) {
     });
   }, [onSave, showAlert]);
 
+  const clearPipelineEditor = useCallback(()=> {
+    setEditSession(Math.random());
+    setCurrentFileName("");
+    setNodes([]);
+    setEdges([]);
+    hideModal('clear');
+  }, [setEditSession, setCurrentFileName, setNodes, setEdges, hideModal])
+
   return (
     <div id="editorLayout">
       <p>
@@ -923,6 +931,17 @@ export default function PipelineEditor(props) {
         <DialogActions>
           <Button onClick={() => hideModal('saveAs')}>Cancel</Button>
           <Button type="submit">Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={modal === 'clear'}
+        onClose={() => hideModal('clear')}
+      >
+        <DialogTitle>Are you sure you want to clear the pipeline editor?</DialogTitle>
+        <DialogActions>
+          <Button onClick={() => {clearPipelineEditor()}}>Clear canvas</Button>
+          <Button onClick={() => hideModal('clear')}>Keep changes</Button>
         </DialogActions>
       </Dialog>
 
@@ -1004,6 +1023,7 @@ export default function PipelineEditor(props) {
                 {/^deny$/i.test(process.env.REACT_APP_SAVE_PIPELINE_TO_SERVER)
                   ? <button id="saveBtn" onClick={() => onSave()}>Save to clipboard</button>
                   : <>
+                    <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
                     <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
                     <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
                   </>

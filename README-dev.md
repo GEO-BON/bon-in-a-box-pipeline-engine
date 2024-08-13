@@ -17,8 +17,6 @@ The code in this repository runs an engine, but the engine needs content! Here a
 4. Create a runner.env file as per [user instructions](README-user.md#running-the-servers-locally).
 5. `cd ..`
 6. Pull the pre-compiled images: `./dev-server.sh pull`
-7. Build the remaining images: `./dev-server.sh build`
-8. Start the development server: `./dev-server.sh up`
 
 ## IDE setup
 
@@ -32,9 +30,10 @@ For the script-server (Kotlin code), IntelliJ Idea. Note that on Linux there wil
 
 ## Launching the dockers in development mode
 
-`docker compose -f compose.yml -f compose.dev.yml build`
+1. Build the remaining images: `./dev-server.sh build`
 
-`docker compose -f compose.yml -f compose.dev.yml up`
+2. Start the development server: `./dev-server.sh up`
+    - If there is a container name conflict, run `./dev-server.sh clean`
 
 This command enables:
 
