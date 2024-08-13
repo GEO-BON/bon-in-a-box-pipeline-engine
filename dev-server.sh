@@ -19,7 +19,7 @@ function help {
 function command { # args appended to the docker compose command
     export DOCKER_GID="$(getent group docker | cut -d: -f3)"
 
-    # On Windows and mac, getent will not work. We leave the default users (anyways permissions don't matter).
+    # On Windows and mac, getent will not work. We leave the default users.
     if test -z $DOCKER_GID; then
         export DOCKER_GID=
         export MY_UID=
