@@ -13,7 +13,6 @@ outputs:
     type: image/jpg
 
 conda:
-  name: condaEnvTest2
   channels:
     - r
   dependencies:
