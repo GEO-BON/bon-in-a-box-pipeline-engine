@@ -221,23 +221,29 @@ class ScriptRun( // Constructor used in single script run
                         val activateEnvironment =
                             if (condaEnvName?.isNotEmpty() == true && condaEnvFile?.isNotEmpty() == true) {
                                 """
+                                    function assertSuccess {
+                                        if [[ ${'$'}? -ne 0 ]] ; then
+                                            echo -e "FAILED" ; exit 1
+                                        fi
+                                    }
+
                                     if [ -f "$condaEnvName.yml" ]; then
-                                        echo "$condaEnvFile" > $condaEnvName.2.yml
+                                        echo "$condaEnvFile" > $condaEnvName.2.yml ; assertSuccess
                                         if cmp -s $condaEnvName.yml $condaEnvName.2.yml; then
-                                            echo "Activating existing conda environment $condaEnvName"
-                                            rm $condaEnvName.2.yml
+                                            echo "Activating existing conda environment $condaEnvName" ; assertSuccess
+                                            rm $condaEnvName.2.yml ; assertSuccess
                                         else
-                                            echo "Updating existing conda environment $condaEnvName"
-                                            mv $condaEnvName.2.yml $condaEnvName.yml
-                                            mamba env update --file $condaEnvName.yml --prune
+                                            echo "Updating existing conda environment $condaEnvName" ; assertSuccess
+                                            mv $condaEnvName.2.yml $condaEnvName.yml ; assertSuccess
+                                            mamba env update --file $condaEnvName.yml --prune ; assertSuccess
                                         fi
                                     else
-                                        echo "Creating new conda environment $condaEnvName"
-                                        echo "$condaEnvFile" > $condaEnvName.yml
-                                        mamba env create -f $condaEnvName.yml
+                                        echo "Creating new conda environment $condaEnvName" ; assertSuccess
+                                        echo "$condaEnvFile" > $condaEnvName.yml ; assertSuccess
+                                        mamba env create -f $condaEnvName.yml ; assertSuccess
                                     fi
 
-                                    mamba activate $condaEnvName
+                                    mamba activate $condaEnvName ; assertSuccess
                                 """.trimIndent()
                             } else {
                                 "mamba activate rbase"

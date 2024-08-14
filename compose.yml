@@ -39,6 +39,8 @@ services:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
+      - conda-dir:/.conda
+      - conda-cache:/.cache/conda
     user: ${MY_UID}:${DOCKER_GID}
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
@@ -87,3 +89,9 @@ services:
       TITILER_API_CORS_ORIGINS: '*'
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+volumes:
+  conda-dir:
+    name: "conda-dir"
+  conda-cache:
+    name: "conda-cache"

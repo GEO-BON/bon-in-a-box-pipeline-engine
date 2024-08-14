@@ -44,7 +44,7 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
                 runOwner = true
 
                 // Optional specific conda environment for this script
-                val condaEnvName = yamlFile.relativeTo(scriptRoot).path.replace("/", "__")
+                val condaEnvName = yamlFile.relativeTo(scriptRoot).path.replace("/", "__").removeSuffix(".yml")
                 val condaEnvFile = yamlParsed[CONDA]?.let { condaSection ->
                     try { @Suppress("UNCHECKED_CAST")
                         (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName
