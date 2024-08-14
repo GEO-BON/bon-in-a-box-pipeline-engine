@@ -8,10 +8,10 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
-      - how_to_install.qmd
-      - how_to_contribute.qmd
-      - working_with_stac.qmd
+      - documentation/about.qmd
+      - documentation/how_to_install.qmd
+      - documentation/how_to_contribute.qmd
+      - documentation/working_with_stac.qmd
 
 format:
   html:
