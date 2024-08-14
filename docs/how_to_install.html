@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>How to Install – bon-in-a-box-pipeline-engine</title>
+<title>How to Install – BON in a Box</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,40 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -113,7 +79,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">bon-in-a-box-pipeline-engine</span>
+    <span class="navbar-title">BON in a Box</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -138,6 +104,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="./how_to_contribute.html"> 
 <span class="menu-text">How to Contribute</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./working_with_stac.html"> 
+<span class="menu-text">Working with STAC</span></a>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -157,21 +127,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#running-the-servers-locally" id="toc-running-the-servers-locally" class="nav-link active" data-scroll-target="#running-the-servers-locally">Running the servers locally</a></li>
   <li><a href="#running-the-servers-remotely" id="toc-running-the-servers-remotely" class="nav-link" data-scroll-target="#running-the-servers-remotely">Running the servers remotely</a></li>
   <li><a href="#running-a-script-or-pipeline" id="toc-running-a-script-or-pipeline" class="nav-link" data-scroll-target="#running-a-script-or-pipeline">Running a script or pipeline</a></li>
-  <li><a href="#scripts" id="toc-scripts" class="nav-link" data-scroll-target="#scripts">Scripts</a>
-  <ul class="collapse">
-  <li><a href="#describing-a-script" id="toc-describing-a-script" class="nav-link" data-scroll-target="#describing-a-script">Describing a script</a></li>
-  <li><a href="#script-validation" id="toc-script-validation" class="nav-link" data-scroll-target="#script-validation">Script validation</a></li>
-  <li><a href="#reporting-problems" id="toc-reporting-problems" class="nav-link" data-scroll-target="#reporting-problems">Reporting problems</a></li>
-  <li><a href="#script-dependencies" id="toc-script-dependencies" class="nav-link" data-scroll-target="#script-dependencies">Script dependencies</a></li>
-  <li><a href="#receiving-inputs" id="toc-receiving-inputs" class="nav-link" data-scroll-target="#receiving-inputs">Receiving inputs</a></li>
-  <li><a href="#generating-outputs" id="toc-generating-outputs" class="nav-link" data-scroll-target="#generating-outputs">Generating outputs</a></li>
-  </ul></li>
-  <li><a href="#pipelines" id="toc-pipelines" class="nav-link" data-scroll-target="#pipelines">Pipelines</a>
-  <ul class="collapse">
-  <li><a href="#pipeline-editor" id="toc-pipeline-editor" class="nav-link" data-scroll-target="#pipeline-editor">Pipeline editor</a></li>
-  <li><a href="#pipeline-inputs-and-outputs" id="toc-pipeline-inputs-and-outputs" class="nav-link" data-scroll-target="#pipeline-inputs-and-outputs">Pipeline inputs and outputs</a></li>
-  <li><a href="#saving-and-loading" id="toc-saving-and-loading" class="nav-link" data-scroll-target="#saving-and-loading">Saving and loading</a></li>
-  </ul></li>
   </ul>
 </nav>
     </div>
@@ -197,21 +152,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<p>BON in a Box can be installed and run locally on your local computer. This allows the user to add scripts and create pipelines on their local computer to be run through BON in a Box. Here are the instructions for installing BON in a Box to run on a local computer.</p>
 <section id="running-the-servers-locally" class="level2">
 <h2 class="anchored" data-anchor-id="running-the-servers-locally">Running the servers locally</h2>
 <p>Prerequisites :</p>
 <ul>
 <li><p>Git - A github account, with an SSH key registered. See <a href="https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account">Adding a new SSH key to your GitHub account</a>.</p></li>
 <li><p>At least 6 GB of free space (this includes the installation of Docker Desktop) - RAM requirements will depend on the scripts that you run.</p></li>
-<li><p><strong>Windows:</strong></p></li>
-</ul>
-<p><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> - Note that it is not necessary to make an account</p>
+<li><p><strong>Windows:</strong></p>
 <ul>
+<li><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> - Note that it is not necessary to make an account</li>
+</ul></li>
 <li><p>A Linux shell (git bash, <a href="https://learn.microsoft.com/en-us/windows/wsl/install">Bash through PowerShell</a>, cygwin, etc.) necessary to run th <code>.sh</code> scripts in the instructions below.</p></li>
-<li><p><strong>Mac:</strong></p></li>
+<li><p><strong>Mac:</strong></p>
+<ul>
 <li><p><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> Note that it is not necessary to make an account</p></li>
 <li><p>Make sure docker is added to the path of your terminal. From a terminal, run command <code>docker run hello-world</code>. If there is an error message, see <a href="https://stackoverflow.com/a/71923962/3519951" class="uri">https://stackoverflow.com/a/71923962/3519951</a>.</p></li>
 <li><p>If you encounter error <code>no matching manifest for linux/arm64/v8 in the manifest list entries</code>, export DOCKER_DEFAULT_PLATFORM. See <a href="https://stackoverflow.com/a/76404045/3519951" class="uri">https://stackoverflow.com/a/76404045/3519951</a>.</p></li>
+</ul></li>
 <li><p><strong>Linux:</strong> Docker with Docker Compose installed. It is recommended to <a href="https://docs.docker.com/engine/install/linux-postinstall/">add your user to the docker group</a>.</p></li>
 </ul>
 <p>To run:</p>
@@ -242,282 +200,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>You have an instance of BON in a Box running, either <a href="#running-the-servers-locally">locally</a> or <a href="#running-the-servers-remotely">remotely</a>, and you want to run your first script or pipeline.</p>
 <p>There is one page to run scripts, and one to run pipelines. Select the script or pipelines from the dropdown and fill the form.</p>
 <p>The form might ask you for a file. In order to provide a file that you own locally, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders.</p>
-</section>
-<section id="scripts" class="level2">
-<h2 class="anchored" data-anchor-id="scripts">Scripts</h2>
-<p>The scripts perform the actual work behind the scenes. They are located in <a href=".\scripts">/scripts folder</a></p>
-<p>Currently supported : - R v4.3.1 - Julia v1.9.3 - Python3 v3.9.2 - sh</p>
-<p>Script lifecycle:</p>
-<ol type="1">
-<li><p>Script launched with output folder as a parameter. (In R, an <code>outputFolder</code> variable in the R session. In Julia, Shell and Python, the output folder is received as an argument.)</p></li>
-<li><p>Script reads <code>input.json</code> to get execution parameters (ex. species, area, data source, etc.)</p></li>
-<li><p>Script performs its task</p></li>
-<li><p>Script generates <code>output.json</code> containing links to result files, or native values (number, string, etc.)</p></li>
-</ol>
-<p>See <a href=".\scripts/helloWorld/empty.R">empty R script</a> for a minimal script lifecycle example.</p>
-<section id="describing-a-script" class="level3">
-<h3 class="anchored" data-anchor-id="describing-a-script">Describing a script</h3>
-<p>The script description is in a .yml file next to the script. It is necessary for the script to be found and connected to other scripts in a pipeline.</p>
-<p>Here is an empty commented sample:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">script</span><span class="kw">:</span><span class="co"> # script file with extension, such as "myScript.py".</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="co"> # short name, such as My Script</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">description</span><span class="kw">:</span><span class="co"> # Targetted to those who will interpret pipeline results and edit pipelines.</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span><span class="co"> # 1 to many</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="co"> # Full name</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">email</span><span class="kw">:</span><span class="co"> # Optional, email address of the author. This will be publicly available.</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">identifier</span><span class="kw">:</span><span class="co"> # Optional, full URL of a unique digital identifier, such as an ORCID.</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">license</span><span class="kw">:</span><span class="co"> # Optional. If unspecified, the project's MIT license will apply.</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">external_link</span><span class="kw">:</span><span class="co"> # Optional, link to a separate project, github repo, etc.</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">timeout</span><span class="kw">:</span><span class="co"> # Optional, in minutes. By defaults steps time out after 1h to avoid hung process to consume resources. It can be made longer for heavy processes.</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">inputs</span><span class="kw">:</span><span class="co"> # 0 to many</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">key</span><span class="kw">:</span><span class="co"> # replace the word "key" by a snake case identifier for this input</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">label</span><span class="kw">:</span><span class="co"> # Human-readable version of the name</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="co"> # Targetted to those who will interpret pipeline results and edit pipelines.</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="co"> # see below</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">example</span><span class="kw">:</span><span class="co"> # will also be used as default value, can be null</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">outputs</span><span class="kw">:</span><span class="co"> # 1 to many</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">key</span><span class="kw">:</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">label</span><span class="kw">:</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">example</span><span class="kw">:</span><span class="co"> # optional, for documentation purpose only</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">references</span><span class="kw">:</span><span class="co"> # 0 to many</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">text</span><span class="kw">:</span><span class="co"> # plain text reference</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">doi</span><span class="kw">:</span><span class="co"> # link</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>See <a href=".\scripts/helloWorld/helloR.yml">example</a></p>
-<section id="input-and-output-types" class="level4">
-<h4 class="anchored" data-anchor-id="input-and-output-types">Input and output types</h4>
-<p>Each input and output must declare a type, <em>in lowercase.</em> It can be a primitive or a file.</p>
-<p>The following primitive types are accepted:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>“Type” attribute in the yaml</th>
-<th>IU rendering</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>boolean</td>
-<td>Plain text</td>
-</tr>
-<tr class="even">
-<td>float, float[]</td>
-<td>Plain text</td>
-</tr>
-<tr class="odd">
-<td>int, int[]</td>
-<td>Plain text</td>
-</tr>
-<tr class="even">
-<td>options (INSERT FOOTNOTE)</td>
-<td>Plain text</td>
-</tr>
-<tr class="odd">
-<td>text, text[]</td>
-<td>Plain text</td>
-</tr>
-<tr class="even">
-<td>(any unknown type)</td>
-<td>Plain text</td>
-</tr>
-</tbody>
-</table>
-<p>Any <a href="https://en.wikipedia.org/wiki/Media_type">MIME type</a> is accepted. Here are a few common ones:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 30%">
-<col style="width: 36%">
-<col style="width: 33%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>File Type</th>
-<th>MIME type to use in the yaml</th>
-<th>UI rendering</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>CSV</td>
-<td>text/csv</td>
-<td>HTML table (partial content)</td>
-</tr>
-<tr class="even">
-<td>GeoJSON</td>
-<td>application/geo+json</td>
-<td>Map</td>
-</tr>
-<tr class="odd">
-<td>GeoTIFF (INSERT FOOTNOTE)</td>
-<td>application/geopackage+sqlite3</td>
-<td>Link</td>
-</tr>
-<tr class="even">
-<td>JPG</td>
-<td>image/tiff;application=geotiff</td>
-<td>Map widget (leaflet)</td>
-</tr>
-<tr class="odd">
-<td>JPG</td>
-<td>image/jpg</td>
-<td><img> tag</td>
-</tr>
-<tr class="even">
-<td>Shapefile</td>
-<td>application/dbf</td>
-<td>Link</td>
-</tr>
-<tr class="odd">
-<td>Text</td>
-<td>text/plain</td>
-<td>Plain text</td>
-</tr>
-<tr class="even">
-<td>TSV</td>
-<td>text/tab-separated-values</td>
-<td>HTML table (partial content)</td>
-</tr>
-<tr class="odd">
-<td></td>
-<td>(any unknown type)</td>
-<td>Plain text or link</td>
-</tr>
-</tbody>
-</table>
-<p>Search the web to find the appropriate MIME type for your content. Here are a few references: - <a href="http://www.iana.org/assignments/media-types/media-types.xhtml" class="uri">http://www.iana.org/assignments/media-types/media-types.xhtml</a> - <a href="http://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=markup" class="uri">http://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=markup</a></p>
-<p>When used as an output, <code>image/tiff;application=geotiff</code> type allows an additionnal <code>range</code> attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map</span><span class="kw">:</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">label</span><span class="kw">:</span><span class="at"> My map</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Some map that shows bla bla...</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> image/tiff;application=geotiff</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">range</span><span class="kw">:</span><span class="at"> </span><span class="kw">[</span><span class="fl">0.1</span><span class="kw">,</span><span class="at"> </span><span class="dv">254</span><span class="kw">]</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">example</span><span class="kw">:</span><span class="at"> https://example.com/mytiff.tif</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><code>options</code> type requires an additionnal <code>options</code> attribute to be added with the available options.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options_example</span><span class="kw">:</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">label</span><span class="kw">:</span><span class="at"> Options example</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">description</span><span class="kw">:</span><span class="at"> The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> options</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">options</span><span class="kw">:</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> first option</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> second option</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> third option</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">example</span><span class="kw">:</span><span class="at"> third option</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-</section>
-<section id="script-validation" class="level3">
-<h3 class="anchored" data-anchor-id="script-validation">Script validation</h3>
-<p>The syntax and structure of the script description file will be validated on push. To run the validation locally, run <code>validate.sh</code></p>
-<p>This validates that the syntax and structure are correct, but not that it’s content is correct. Hence, peer review of the scripts and the description files is mandatory before accepting a pull requests.</p>
-</section>
-<section id="reporting-problems" class="level3">
-<h3 class="anchored" data-anchor-id="reporting-problems">Reporting problems</h3>
-<p>The output keys <code>info</code>, <code>warning</code> and <code>error</code> can be used to report problems in script execution. They do not need to be described in the <code>outputs</code> section of the description. They will be displayed specially in the UI.</p>
-<p>Any <code>error</code> message will halt the rest of the pipeline.</p>
-</section>
-<section id="script-dependencies" class="level3">
-<h3 class="anchored" data-anchor-id="script-dependencies">Script dependencies</h3>
-<p>Scripts can install their own dependencies directly (<code>install.packages</code> in R, <code>Pkg.add</code> in Julia, etc). However, it will need to be reinstalled if the server is deployed on another computer or server.</p>
-<p>To pre-compile the dependency in the image, add it to <a href="runners/r-dockerfile">runners/r-dockerfile</a> or <a href="runners/julia-dockerfile">runners/julia-dockerfile</a>. When the pull request is merged to main, a new image will be available to <code>docker compose pull</code> with the added dependencies.</p>
-</section>
-<section id="receiving-inputs" class="level3">
-<h3 class="anchored" data-anchor-id="receiving-inputs">Receiving inputs</h3>
-<p>When running a script, a folder is created for each given set of parameters. The same parameters result in the same folder, different parameters result in a different folder. The inputs for a given script are saved in an <code>input.json</code> file in this unique run folder.</p>
-<p>The file contains the id of the parameters that were specified in the yaml script description, associated to the values for this run. Example:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"fc"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"L"</span><span class="ot">,</span> <span class="st">"LQ"</span><span class="ot">,</span> <span class="st">"LQHP"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"method_select_params"</span><span class="fu">:</span> <span class="st">"AUC"</span><span class="fu">,</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"n_folds"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"orientation_block"</span><span class="fu">:</span> <span class="st">"lat_lon"</span><span class="fu">,</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"partition_type"</span><span class="fu">:</span> <span class="st">"block"</span><span class="fu">,</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"predictors"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio1_75548ca61981-01-01.tif"</span><span class="ot">,</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio2_7333b3d111981-01-01.tif"</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"presence_background"</span><span class="fu">:</span> <span class="st">"/output/SDM/setupDataSdm/edb9492031df9e063a5ec5c325bacdb1/presence_background.tsv"</span><span class="fu">,</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"proj"</span><span class="fu">:</span> <span class="st">"EPSG:6623"</span><span class="fu">,</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"rm"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="er">.</span><span class="dv">5</span><span class="ot">,</span> <span class="fl">1.0</span><span class="ot">,</span> <span class="fl">2.0</span><span class="ot">]</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The script reads and uses inputs from the <code>input.json</code> file. Example in R:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Receiving arguments from input.json.</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="do">## outputFolder is already defined by server</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"rjson"</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>input <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="at">file=</span><span class="fu">file.path</span>(outputFolder, <span class="st">"input.json"</span>))</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Can now be accessed from the map</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(input<span class="sc">$</span>predictors)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The script should perform appropriate parameter validation.</p>
-<p>Note that the inputs will be <code>null</code> if the user left the text box empty.</p>
-</section>
-<section id="generating-outputs" class="level3">
-<h3 class="anchored" data-anchor-id="generating-outputs">Generating outputs</h3>
-<p>The output files generated by the script must be saved in the run folder. The script must also generate an <code>output.json</code> file in the same folder, that contains a map associating the output ids to their values. Example:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"sdm_pred"</span><span class="fu">:</span> <span class="st">"/output/SDM/runMaxent/b5937ba69418b65cae7c6cfcfa78b5e8/sdm_pred.tif"</span><span class="fu">,</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"sdm_runs"</span><span class="fu">:</span><span class="ot">[</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"/output/SDM/runMaxent/b5937ba69418b65cae7c6cfcfa78b5e8/sdm_runs_1.tif"</span><span class="ot">,</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"/output/SDM/runMaxent/b5937ba69418b65cae7c6cfcfa78b5e8/sdm_runs_2.tif"</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="ot">]</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-</section>
-<section id="pipelines" class="level2">
-<h2 class="anchored" data-anchor-id="pipelines">Pipelines</h2>
-<p>A pipeline is a collection of steps to acheive the desired processing. Each script becomes a pipeline step. <img src="https://user-images.githubusercontent.com/6223744/211096047-d1d205e3-2f5e-4af6-b8c5-015b002432cb.png" class="img-fluid" alt="image"></p>
-<p>Pipelines also have inputs and outputs. In order to run, a pipeline needs to specify at least one output (rightmost red box in image above). Pipeline IO supports <a href="#input-and-output-types">the same types and UI rendering</a> as individual steps, since its inputs are directly fed to the steps, and outputs come from the step outputs.</p>
-<p>For a general description of pipelines in software engineering, see <a href="https://en.wikipedia.org/wiki/Pipeline_%28software%29">Wikipedia</a>.</p>
-<section id="pipeline-editor" class="level3">
-<h3 class="anchored" data-anchor-id="pipeline-editor">Pipeline editor</h3>
-<p>The pipeline editor allows you to create pipelines by plugging steps together.</p>
-<p>The left pane shows the available steps, the main section shows the canvas.</p>
-<p>On the right side, a collapsible pane allows to edit the labels and descriptions of the pipeline inputs and outputs.</p>
-<p><strong>To add a step:</strong> drag and drop from the left pane to the canvas. Steps that are single scripts will display with a single border, while steps that are pipelines will display with a double border.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://github.com/GEO-BON/biab-2.0/assets/6223744/f590bd01-d333-4712-934b-242a0f925f58.png" class="img-fluid figure-img"></p>
-<figcaption>image</figcaption>
-</figure>
-</div>
-<p><strong>To connect steps:</strong> drag to connect an output and an input handle. Input handles are on the left, output handles are on the right.</p>
-<p><strong>To add a constant value:</strong> double-click on any input to add a constant value linked to this input. It is pre-filled with the example value.</p>
-<p><strong>To add an output:</strong> double-click on any <em>step</em> output to add a <em>pipeline</em> output linked to it, or drag and drop the red box from the left pane and link it manually.</p>
-<p><strong>To delete a step or a pipe:</strong> select it and press the Delete key on your keyboard.</p>
-<p><strong>To make an array out of single value outputs:</strong> if many outputs of the same type are connected to the same input, it will be received as an array by the script.</p>
-<p><img src="https://user-images.githubusercontent.com/6223744/181106359-c4194411-5789-4e55-84d5-24b9e029398f.png" width="300"></p>
-<p>A single value can also be combined with an array of the same type, to produce a single array.</p>
-<p><img src="https://user-images.githubusercontent.com/6223744/181106278-f6db6af5-764a-4775-b196-48feac940eec.png" width="300"></p>
-<p><strong>User inputs:</strong> To provide inputs at runtime, simply leave them unconnected in the pipeline editor. They will be added to the sample input file when running the pipeline.</p>
-<p>If an input is common to many step, a special user input node can be added to avoid duplication. First, link your nodes to a constant.</p>
-<p><img src="https://user-images.githubusercontent.com/6223744/218197354-8a7bb46d-dbaa-4d7f-ad8d-b4dd521fb28f.png" height="52"></p>
-<p>Then, use the down arrow to pop the node’s menu. Choose “Convert to user input”.</p>
-<p><img src="https://user-images.githubusercontent.com/6223744/218197468-142dcdfb-447f-4076-b6c5-59e8e448b32e.png" height="61"></p>
-<p>The node will change as below, and the details will appear on the right pane, along with the other user inputs.</p>
-<p><img src="https://user-images.githubusercontent.com/6223744/218197580-d5e21247-0492-40d7-b527-add323abd6b4.png" height="51"></p>
-</section>
-<section id="pipeline-inputs-and-outputs" class="level3">
-<h3 class="anchored" data-anchor-id="pipeline-inputs-and-outputs">Pipeline inputs and outputs</h3>
-<p>Any <strong>input</strong> with no constant value assigned will be considered a pipeline input and user will have to fill the value.</p>
-<p>Add an <strong>output</strong> node linked to a step output to specify that this output is an output of the pipeline. All other unmarked step outputs will still be available as intermediate results in the UI.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://user-images.githubusercontent.com/6223744/181108988-97d988ca-8f4b-45b1-b4a3-32e90821b68b.png" class="img-fluid figure-img"></p>
-<figcaption>image</figcaption>
-</figure>
-</div>
-<p>Pipeline inputs and outputs then appear in a collapsible pane on the right of the canvas, where their descriptions and labels can be edited.</p>
-<p><img src="https://github.com/GEO-BON/biab-2.0/assets/6223744/215b75db-7198-486d-880d-87c0b340668b" height="218"></p>
-<p>Once edited, make sure to save your work before leaving the page.</p>
-</section>
-<section id="saving-and-loading" class="level3">
-<h3 class="anchored" data-anchor-id="saving-and-loading">Saving and loading</h3>
-<p>The editor supports saving and loading on the server, unless explicitly disabled by host. This is done intuitively via the “Load from server” and “Save” buttons.</p>
-<p><em>In the event that saving has been disabled on your server instance,</em> the save button will display “Save to clipboard”. To save your modifications: 1. Click save: the content is copied to your clipboard. 2. Make sure you are up to date (e.g.&nbsp;<code>git pull --rebase</code>). 3. Remove all the content of the target file. 4. Paste content and save. 5. Commit and push on a branch using git. 6. To share your modifications, create a pull request for that branch through the github UI.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

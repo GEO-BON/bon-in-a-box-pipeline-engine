@@ -1,0 +1,26 @@
+"0","it_obj <- s_obj |>"
+"0","  collections(""accessibility_to_cities"") |> items() |>"
+"0","  get_request() |> items_fetch()"
+"0","v <- cube_view(srs = ""EPSG:32198"", extent = list(t0 = ""2015-01-01"", t1 = ""2015-01-01"","
+"0","                                                left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin), "
+"0","                                                dx=1000, dy=1000, dt=""P1D"", aggregation"
+"0",""
+"0"," = ""mean"", resampling = ""bilinear"")"
+"2","## Size of the cube in x direction does not align with dx, extent will be enlarged by 474.000000 at both sides.
+"
+"2","## Size of the cube in y direction does not align with dy, extent will be enlarged by 196.500000 at both sides.
+"
+"0","for (i in 1:length(it_obj$features)){"
+"0","  it_obj$features[[i]]$assets$data$roles='data'"
+"0","}"
+"0","st <- stac_image_collection(it_obj$features)"
+"0","lc_cube <- raster_cube(st, v)"
+"0","lc_cube |> plot(col=heat.colors)"
+"2","[>                                                 ] 0 %"
+"2","[============>                                     ] 25 %"
+"2","[=========================>                        ] 50 %"
+"2","[=====================================>            ] 75 %"
+"2","[==================================================>] 100 %"
+"2","[==================================================>] 100 %"
+"2","
+"
