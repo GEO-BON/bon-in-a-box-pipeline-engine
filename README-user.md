@@ -8,7 +8,7 @@ The recommended method is to setup an instance of BON in a Box somewhere you can
 ## Running the servers locally
 Prerequisites :
 - Git
-- A github account, with an SSH key registered. See [Adding a new SSH key to your GitHub account](https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). 
+- A github account, with an SSH key registered. See [Adding a new SSH key to your GitHub account](https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
 - At least 6 GB of free space (this includes the installation of Docker Desktop)
 - RAM requirements will depend on the scripts that you run.
 - **Windows:**
@@ -173,8 +173,8 @@ BON in a Box uses a central conda environment with commonly used libraries inclu
 <strong>If you need a library that is not yet included</strong>
 1. Look for it on [anaconda](https://anaconda.org/).
 2. If it is there
-    - Add it to the runners/r-environment.yml file (for others, once you merge).
-    - Add it to you local environment, replacing &lt;package name&gt; in:
+    - Add it to the runners/r-environment.yml file (for others, once your pull request is merged to main branch).
+    - Add it to your local environment, replacing &lt;package name&gt; in:<br>
       `docker exec -it biab-runner-conda mamba install -n rbase <package name>`
 3. If it is not found on anaconda
     - Add it to the install command in `runners/conda-dockerfile` (for others, once you merge)
