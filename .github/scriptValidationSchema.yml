@@ -169,9 +169,10 @@ conda:
   required: false
   type: dict
   schema:
-    name:
-      required: true
-      type: string
+    # The name, usually in conda spec, is overriden by BON in a Box to avoid name clashes.
+    # name:
+    #   required: true
+    #   type: string
     channels:
       required: true
       type: list
