@@ -12,7 +12,7 @@ BON in a Box now features a community-contributed and open-source data to essent
 
 Scientists around the world are developing tools to create workflows to calculate essential biodiversity variables and indicators to report on biodiversity change. However, there are almost no platforms to share these workflows and tools, leading to duplication of effort. BON in a Box is a platform to consolidate these tools and facilitate coordination and networking between scientists, organizations, and governments to face the global biodiversity crisis.
 
-## Why should you contribute? 
+## Why should you contribute?
 
 Contributing to BON in a Box will increase the impact of your research by allowing your analysis workflows to be used in broader areas and contexts for decision-making. Contributors will become part of a global community to generate analyses of the state and trends of biodiversity to inform management decisions.
 

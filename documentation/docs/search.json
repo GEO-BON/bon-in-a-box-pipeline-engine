@@ -74,21 +74,21 @@
     "href": "about.html",
     "title": "About",
     "section": "",
-    "text": "BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration. It’s the ultimate ecosystem for harmonizing biodiversity observations, fostering efficiency, and amplifying the power of data-driven insights."
+    "text": "BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration. It’s the ultimate ecosystem for harmonizing biodiversity observations, fostering efficiency, and amplifying the power of data-driven insights.\nBON in a Box now features a community-contributed and open-source data to essential biodiversity variable (EBV) and indicator workflow repository curated by GEO BON. Its engine allows to seamlessly connect steps in different languages (R, Julia, Python) through a modular pipeline approach that reads both from local and global data sources. These pipelines can calculate EBVs and indicators using publicaly available data or user-provided data."
   },
   {
     "objectID": "about.html#what-is-bon-in-a-box",
     "href": "about.html#what-is-bon-in-a-box",
     "title": "About",
     "section": "",
-    "text": "BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration. It’s the ultimate ecosystem for harmonizing biodiversity observations, fostering efficiency, and amplifying the power of data-driven insights."
+    "text": "BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration. It’s the ultimate ecosystem for harmonizing biodiversity observations, fostering efficiency, and amplifying the power of data-driven insights.\nBON in a Box now features a community-contributed and open-source data to essential biodiversity variable (EBV) and indicator workflow repository curated by GEO BON. Its engine allows to seamlessly connect steps in different languages (R, Julia, Python) through a modular pipeline approach that reads both from local and global data sources. These pipelines can calculate EBVs and indicators using publicaly available data or user-provided data."
   },
   {
     "objectID": "about.html#why-do-we-need-this-platform",
     "href": "about.html#why-do-we-need-this-platform",
     "title": "About",
     "section": "Why do we need this platform?",
-    "text": "Why do we need this platform?\nA platform that provides biodiversity monitoring tools and facilitates coordination and networking between countries is needed to face the global biodiversity crisis.\nUse BON in a Box to improve assessment of biodiversity status and guide better decisions."
+    "text": "Why do we need this platform?\nScientists around the world are developing tools to create workflows to calculate essential biodiversity variables and indicators to report on biodiversity change. However, there are almost no platforms to share these workflows and tools, leading to duplication of effort. BON in a Box is a platform to consolidate these tools and facilitate coordination and networking between scientists, organizations, and governments to face the global biodiversity crisis."
   },
   {
     "objectID": "about.html#what-are-the-project-benefits",
@@ -166,5 +166,12 @@
     "title": "How to Contribute",
     "section": "Step 4: Run pipeline and troubleshoot",
     "text": "Step 4: Run pipeline and troubleshoot\nThe last step is to load your saved pipeline in BON and a Box and run it. The error log at the bottom of the page will show errors with the pipeline.\nADD PHOTO"
+  },
+  {
+    "objectID": "about.html#why-should-you-contribute",
+    "href": "about.html#why-should-you-contribute",
+    "title": "About",
+    "section": "Why should you contribute?",
+    "text": "Why should you contribute?\nContributing to BON in a Box will increase the impact of your research by allowing your analysis workflows to be used in broader areas and contexts for decision-making. Contributors will become part of a global community to generate analyses of the state and trends of biodiversity to inform management decisions."
   }
 ]
