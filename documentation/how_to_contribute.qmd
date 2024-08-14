@@ -4,7 +4,7 @@ title: "How to Contribute"
 
 If you wish to contribute a pipeline, please email us at web\@geobon.org.
 
-The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup below. You can create a branch or fork to save your work. Make sure that the code is general, and will work when used with various parameters, such as in different regions around the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before acceptation.
+The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup below. You can create a branch or fork to save your work. Make sure that the code is general, and will work when used with various parameters, such as in different regions around the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before being accepted.
 
 # Is your analysis pipeline right for us?
 
@@ -15,6 +15,36 @@ We are looking for pipelines that calculate biodiversity metrics that are releva
 -   broadly applicable (not just a specific region)
 
 -   using data that is publicly available
+
+# Steps for contributing
+
+We strongly encourage those owning or developing code to calculate any biodiversity variable or indicator to share it through BON in a Box. It is the whole point of the pipeline engine: have state of the art processing pipelines shared across the community, for the benefit of all. We recommend to follow such process: 
+
+1.  Identify a workflow that has a good potential of reuse among other organisations, and that can be mostly automated.
+
+2.  Draw a high-level view of the pipeline that identifies each step.
+
+3.  Meet the BON in a Box team. We offer help to make sure that the steps are properly identified, leverage existing scripts, and identify places where the existing code would need to be modified. For example, using cloud-optimized approaches such as STAC and Parquet files instead of dowloading large files during the pipeline’s execution.
+
+4.  Secure the resources. If applying for funding, include BON in a Box in your proposal as a tool.
+
+5.  Do it. Write or adapt the code, write the yml script description files, the pipeline metadata. This step should be in constant collaboration with the GEO BON team and the stakeholders, using an incremental development approach. A illustration of this is to build a minimal working pipeline with that provides a useful product, maybe not the desired end-result. Validate it, then plan and implement the rest of a minimal “happy” path until the desired end-result. Validate it, then add options to cover alternate cases, more customizable, etc. in subsequent iterations. The benefits of this approach include to being on target with the stakeholder’s expectations, benefiting the most from GEO BON’s expertise, and ensuring that there is something working and publishable even if not all planned features were implemented.
+
+6.  Open a pull request to the BON in a Box pipelines repository. The pull request will be peer-reviewed for it’s scientific rigor, it’s reusability, and the quality of the documentation. While you are waiting, why not contribute by reviewing someone else’s contribution?
+
+7.  Make the necessary corrections.
+
+8.  The pipeline is published on BON in a Box’s trunk, website, and receives a DOI for identification. It’s time to share!
+
+# What is an analysis pipeline?
+
+A pipeline is a collection of steps needed to transform input data into valuable output for the stakeholder in an automated way. It can be an EBV, an indicator, or anything useful to analysis and decision-making in the context of biodiversity conservation and natural resource management.
+
+The smaller steps composing a pipeline are scripts. These scripts also convert input data into valuable outputs, just like pipelines, but at a finer scale: cleaning, augmenting, standardizing, deriving indices or compound variables, interpolating or extrapolating, making statistics, performing statistical analyses including running machine learning models, etc. Importantly, these scripts can be reused or repurposed across varied contexts. For instance, data cleaning scripts could be applied to multiple pipelines that utilize similar types of data, enhancing efficiency and consistency in data processing workflows. Since the outputs are in-between every step, the pipeline can make abstraction of the programming language, allowing a pipeline to mix R, python and Julia scripts without any interoperability issues.
+
+If a pipeline builds upon the results of another pipeline, this “inner pipeline” it can be included as a step in the “outer pipeline”; we call this a subpipeline. An SDM pipeline could serve to generate range maps inside a Species Habitat Index pipeline, or embedded in a Species Richness pipeline. We can thus define a step as “a script or a subpipeline performing an operation in the context of a pipeline”.
+
+![Simplified pipeline with steps (blue), intermediate results (grey), and final results (green)](pipeline.png.png)
 
 # Instructions for adapting your code to an analysis pipeline
 
@@ -84,7 +114,7 @@ outputs:
 There are several different types of user inputs that can be specified in the YAML file:
 
 | "Type" attribute in the yaml | IU rendering | Description                                        |
-|--------------------|----------------|------------------------------------|
+|--------------------|------------------|----------------------------------|
 | boolean                      | Plain text   | true/false                                         |
 | float, float\[\]             | Plain text   | positive and negative numbers with a decimal point |
 | int, int\[\]                 | Plain text   | integer                                            |
@@ -106,7 +136,7 @@ There are also several types of outputs that can be created
 | TSV        | text/tab-separated-values      | HTML table (partial content) |
 |            | (any unknown type)             | Plain text or link           |
 
-When used as an output, `image/tiff;application=geotiff` type allows an additionnal `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
+When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
 
 ```         
 map:
@@ -117,7 +147,7 @@ map:
   example: https://example.com/mytiff.tif
 ```
 
-`options` type requires an additionnal `options` attribute to be added with the available options.
+`options` type requires an additional `options` attribute to be added with the available options.
 
 ```         
 options_example:
@@ -175,7 +205,7 @@ If inputs are outputs from a previous step in the pipeline, make sure to give th
 Here is an empty commented sample that can be filled in
 
 ```         
-script: # script file with extension, such as "myScript.py".
+script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targetted to those who will interpret pipeline results and edit pipelines.
 author: # 1 to many
