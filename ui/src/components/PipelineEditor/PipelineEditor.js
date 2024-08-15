@@ -650,7 +650,6 @@ export default function PipelineEditor(props) {
   const onSave = useCallback((fileName) => {
     let saveJSON = generateSaveJSON();
     if (saveJSON) {
-      console.log(saveJSON)
       if (fileName) {
         let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
         fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
@@ -756,7 +755,7 @@ export default function PipelineEditor(props) {
         localStorage.setItem("currentFileName", '');
         showAlert(
           'error',
-          'Error loading the pipeline',
+          'Error while loading the previously opened pipeline "' + descriptionFile + '"',
           (response && response.text) ? response.text : error.toString()
         )
       } else {
@@ -939,14 +938,21 @@ export default function PipelineEditor(props) {
   }, []);
 
   useEffect(() => {
-    if (hasUnsavedChanges && ((savedJSON === null && nodes.length === 0) || (savedJSON !== null && savedJSON === generateSaveJSON()))) {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      setUnsavedChanges(false);
-    } else if (!hasUnsavedChanges && ((savedJSON === null && nodes.length !== 0) || (savedJSON !== null && savedJSON !== generateSaveJSON()))) {
+    setUnsavedChanges(
+      (savedJSON === null && nodes.length !== 0) // new and not empty
+      || (savedJSON !== null && savedJSON !== generateSaveJSON()) // existing and modified
+    )
+  }, [nodes, edges, savedJSON, inputList, outputList, metadata, handleBeforeUnload]);
+
+  useEffect(() => {
+    if(hasUnsavedChanges) {
       window.addEventListener('beforeunload', handleBeforeUnload);
-      setUnsavedChanges(true);
+    } else {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     }
-  }, [nodes, edges, savedJSON, handleBeforeUnload]);
+
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges])
 
   //removes event listener when PipelineEditor component unmounts
   useEffect(() => {
@@ -962,7 +968,7 @@ export default function PipelineEditor(props) {
   );
 
   const handleLeavePageModalClose = () => {
-    blocker.reset(); 
+    blocker.reset();
     hideModal('leavePage');
   }
 
@@ -1057,10 +1063,10 @@ export default function PipelineEditor(props) {
         open={modal === 'leavePage'}
         onClose={handleLeavePageModalClose}
       >
-        <DialogTitle>Leave Page?</DialogTitle>
+        <DialogTitle>Leaving the editor</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Changes you made may not be saved.
+            There are unsaved modifications that will be lost when leaving the page.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
