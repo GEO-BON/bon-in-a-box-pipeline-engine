@@ -159,6 +159,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#is-your-analysis-pipeline-right-for-us" id="toc-is-your-analysis-pipeline-right-for-us" class="nav-link active" data-scroll-target="#is-your-analysis-pipeline-right-for-us">Is your analysis pipeline right for us?</a></li>
+  <li><a href="#steps-for-contributing" id="toc-steps-for-contributing" class="nav-link" data-scroll-target="#steps-for-contributing">Steps for contributing</a></li>
+  <li><a href="#what-is-an-analysis-pipeline" id="toc-what-is-an-analysis-pipeline" class="nav-link" data-scroll-target="#what-is-an-analysis-pipeline">What is an analysis pipeline?</a></li>
   <li><a href="#instructions-for-adapting-your-code-to-an-analysis-pipeline" id="toc-instructions-for-adapting-your-code-to-an-analysis-pipeline" class="nav-link" data-scroll-target="#instructions-for-adapting-your-code-to-an-analysis-pipeline">Instructions for adapting your code to an analysis pipeline</a>
   <ul class="collapse">
   <li><a href="#step-1-creating-a-yaml-file" id="toc-step-1-creating-a-yaml-file" class="nav-link" data-scroll-target="#step-1-creating-a-yaml-file">Step 1: Creating a YAML file</a></li>
@@ -204,7 +206,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>If you wish to contribute a pipeline, please email us at web@geobon.org.</p>
-<p>The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup below. You can create a branch or fork to save your work. Make sure that the code is general, and will work when used with various parameters, such as in different regions around the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before acceptation.</p>
+<p>The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup below. You can create a branch or fork to save your work. Make sure that the code is general, and will work when used with various parameters, such as in different regions around the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before being accepted.</p>
 <section id="is-your-analysis-pipeline-right-for-us" class="level1">
 <h1>Is your analysis pipeline right for us?</h1>
 <p>We are looking for pipelines that calculate biodiversity metrics that are relevant to policy and biodiversity reporting, such as Essential Biodiversity Variables (EBVs) and Indicators. These pipelines should be</p>
@@ -213,6 +215,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>broadly applicable (not just a specific region)</p></li>
 <li><p>using data that is publicly available</p></li>
 </ul>
+</section>
+<section id="steps-for-contributing" class="level1">
+<h1>Steps for contributing</h1>
+<p>We strongly encourage those owning or developing code to calculate any biodiversity variable or indicator to share it through BON in a Box. It is the whole point of the pipeline engine: have state of the art processing pipelines shared across the community, for the benefit of all. We recommend to follow such process:&nbsp;</p>
+<ol type="1">
+<li><p>Identify a workflow that has a good potential of reuse among other organisations, and that can be mostly automated.</p></li>
+<li><p>Draw a high-level view of the pipeline that identifies each step.</p></li>
+<li><p>Meet the BON in a Box team. We offer help to make sure that the steps are properly identified, leverage existing scripts, and identify places where the existing code would need to be modified. For example, using cloud-optimized approaches such as STAC and Parquet files instead of dowloading large files during the pipeline’s execution.</p></li>
+<li><p>Secure the resources. If applying for funding, include BON in a Box in your proposal as a tool.</p></li>
+<li><p>Do it. Write or adapt the code, write the yml script description files, the pipeline metadata. This step should be in constant collaboration with the GEO BON team and the stakeholders, using an incremental development approach. A illustration of this is to build a minimal working pipeline with that provides a useful product, maybe not the desired end-result. Validate it, then plan and implement the rest of a minimal “happy” path until the desired end-result. Validate it, then add options to cover alternate cases, more customizable, etc. in subsequent iterations. The benefits of this approach include to being on target with the stakeholder’s expectations, benefiting the most from GEO BON’s expertise, and ensuring that there is something working and publishable even if not all planned features were implemented.</p></li>
+<li><p>Open a pull request to the BON in a Box pipelines repository. The pull request will be peer-reviewed for it’s scientific rigor, it’s reusability, and the quality of the documentation. While you are waiting, why not contribute by reviewing someone else’s contribution?</p></li>
+<li><p>Make the necessary corrections.</p></li>
+<li><p>The pipeline is published on BON in a Box’s trunk, website, and receives a DOI for identification. It’s time to share!</p></li>
+</ol>
+</section>
+<section id="what-is-an-analysis-pipeline" class="level1">
+<h1>What is an analysis pipeline?</h1>
+<p>A pipeline is a collection of steps needed to transform input data into valuable output for the stakeholder in an automated way. It can be an EBV, an indicator, or anything useful to analysis and decision-making in the context of biodiversity conservation and natural resource management.</p>
+<p>The smaller steps composing a pipeline are scripts. These scripts also convert input data into valuable outputs, just like pipelines, but at a finer scale: cleaning, augmenting, standardizing, deriving indices or compound variables, interpolating or extrapolating, making statistics, performing statistical analyses including running machine learning models, etc. Importantly, these scripts can be reused or repurposed across varied contexts. For instance, data cleaning scripts could be applied to multiple pipelines that utilize similar types of data, enhancing efficiency and consistency in data processing workflows. Since the outputs are in-between every step, the pipeline can make abstraction of the programming language, allowing a pipeline to mix R, python and Julia scripts without any interoperability issues.</p>
+<p>If a pipeline builds upon the results of another pipeline, this “inner pipeline” it can be included as a step in the “outer pipeline”; we call this a subpipeline. An SDM pipeline could serve to generate range maps inside a Species Habitat Index pipeline, or embedded in a Species Richness pipeline. We can thus define a step as “a script or a subpipeline performing an operation in the context of a pipeline”.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="pipeline.png.png" class="img-fluid figure-img"></p>
+<figcaption>Simplified pipeline with steps (blue), intermediate results (grey), and final results (green)</figcaption>
+</figure>
+</div>
 </section>
 <section id="instructions-for-adapting-your-code-to-an-analysis-pipeline" class="level1">
 <h1>Instructions for adapting your code to an analysis pipeline</h1>
@@ -369,14 +397,14 @@ author:
 </tr>
 </tbody>
 </table>
-<p>When used as an output, <code>image/tiff;application=geotiff</code> type allows an additionnal <code>range</code> attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.</p>
+<p>When used as an output, <code>image/tiff;application=geotiff</code> type allows an additional <code>range</code> attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.</p>
 <pre><code>map:
   label: My map
   description: Some map that shows bla bla...
   type: image/tiff;application=geotiff
   range: [0.1, 254]
   example: https://example.com/mytiff.tif</code></pre>
-<p><code>options</code> type requires an additionnal <code>options</code> attribute to be added with the available options.</p>
+<p><code>options</code> type requires an additional <code>options</code> attribute to be added with the available options.</p>
 <pre><code>options_example:
   label: Options example
   description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
@@ -422,7 +450,7 @@ outputs:
 <p>YAML is a space sensitive format, so make sure all the tab sets are correct in the file.</p>
 <p>If inputs are outputs from a previous step in the pipeline, make sure to give the inputs and outputs the same name and they will be automatically linked in the pipeline.</p>
 <p>Here is an empty commented sample that can be filled in</p>
-<pre><code>script: # script file with extension, such as "myScript.py".
+<pre><code>script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targetted to those who will interpret pipeline results and edit pipelines.
 author: # 1 to many
