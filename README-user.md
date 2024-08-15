@@ -80,7 +80,7 @@ Here is an empty commented sample:
 ``` yml
 script: # script file with extension, such as "myScript.py".
 name: # short name, such as My Script
-description: # Targetted to those who will interpret pipeline results and edit pipelines. *Markdown is supported.*
+description: # Targetted to those who will interpret pipeline results and edit pipelines. Markdown is supported.
 author: # 1 to many
   - name: # Full name
     email: # Optional, email address of the author. This will be publicly available.
@@ -92,14 +92,14 @@ timeout: # Optional, in minutes. By defaults steps time out after 1h to avoid hu
 inputs: # 0 to many
   key: # replace the word "key" by a snake case identifier for this input
     label: # Human-readable version of the name
-    description: # Targetted to those who will interpret pipeline results and edit pipelines. *Markdown is supported.*
+    description: # Targetted to those who will interpret pipeline results and edit pipelines. Markdown is supported.
     type: # see below
     example: # will also be used as default value, can be null
 
 outputs: # 1 to many
   key:
     label:
-    description: # *Markdown is supported.*
+    description: # Markdown is supported.
     type:
     example: # optional, for documentation purpose only
 
