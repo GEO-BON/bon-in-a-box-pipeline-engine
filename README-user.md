@@ -8,7 +8,7 @@ The recommended method is to setup an instance of BON in a Box somewhere you can
 ## Running the servers locally
 Prerequisites :
 - Git
-- A github account, with an SSH key registered. See [Adding a new SSH key to your GitHub account](https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). 
+- A github account, with an SSH key registered. See [Adding a new SSH key to your GitHub account](https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
 - At least 6 GB of free space (this includes the installation of Docker Desktop)
 - RAM requirements will depend on the scripts that you run.
 - **Windows:**
@@ -74,9 +74,9 @@ Script lifecycle:
 See [empty R script](/scripts/helloWorld/empty.R) for a minimal script lifecycle example.
 
 ### Describing a script
-The script description is in a .yml file next to the script. It is necessary for the script to be found and connected to other scripts in a pipeline. 
+The script description is in a .yml file next to the script. It is necessary for the script to be found and connected to other scripts in a pipeline.
 
-Markdown is supported for script, input and output descriptions.
+Markdown is supported for script, input and output descriptions. See this [CommonMark quick reference](https://commonmark.org/help/) for allowed markups.
 
 Here is an empty commented sample:
 ``` yml
