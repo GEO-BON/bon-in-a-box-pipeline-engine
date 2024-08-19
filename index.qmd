@@ -7,3 +7,5 @@ The earth's biodiversity is declining at an alarming rate due to human activitie
 BON in a Box can provide biodiversity monitoring tools and facilitate coordination and collaboration among countries. BON in a Box now provides an open-source, fully transparent platform that allows users to contribute data and analysis pipelines to calculate indicators which can then be used for reporting to assess progress towards biodiversity targets. BON in Box can integrate diverse data and expert knowledge, from Earth observation to genetic diversity metrics to calculate monitoring framework indicators.
 
 [BON in a Box Website](https://boninabox.geobon.org/)
+
+![](Infographic.jpg)

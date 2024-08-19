@@ -1,2 +1,0 @@
-"0","st <- stac_image_collection(it_obj$features, asset_names=c('data'), "
-"0","             property_filter = function(f){f[['class']] %in% c('1','2','3','4')},srs='EPSG:4326')"

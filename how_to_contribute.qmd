@@ -36,16 +36,6 @@ We strongly encourage those owning or developing code to calculate any biodivers
 
 8.  The pipeline is published on BON in a Box’s trunk, website, and receives a DOI for identification. It’s time to share!
 
-# What is an analysis pipeline?
-
-A pipeline is a collection of steps needed to transform input data into valuable output for the stakeholder in an automated way. It can be an EBV, an indicator, or anything useful to analysis and decision-making in the context of biodiversity conservation and natural resource management.
-
-The smaller steps composing a pipeline are scripts. These scripts also convert input data into valuable outputs, just like pipelines, but at a finer scale: cleaning, augmenting, standardizing, deriving indices or compound variables, interpolating or extrapolating, making statistics, performing statistical analyses including running machine learning models, etc. Importantly, these scripts can be reused or repurposed across varied contexts. For instance, data cleaning scripts could be applied to multiple pipelines that utilize similar types of data, enhancing efficiency and consistency in data processing workflows. Since the outputs are in-between every step, the pipeline can make abstraction of the programming language, allowing a pipeline to mix R, python and Julia scripts without any interoperability issues.
-
-If a pipeline builds upon the results of another pipeline, this “inner pipeline” it can be included as a step in the “outer pipeline”; we call this a subpipeline. An SDM pipeline could serve to generate range maps inside a Species Habitat Index pipeline, or embedded in a Species Richness pipeline. We can thus define a step as “a script or a subpipeline performing an operation in the context of a pipeline”.
-
-![Simplified pipeline with steps (blue), intermediate results (grey), and final results (green)](pipeline.png.png)
-
 # Instructions for adapting your code to an analysis pipeline
 
 Analysis workflows can be adapted to BON in a Box pipelines using a few simple steps. Once BON in a Box is installed on your computer, Pipelines can be edited and run locally by creating files in your local BON-in-a-box folder that was cloned from the GItHub repository. Workflows can be in a variety of languages, including R, Julia, and Python, and not all steps of the pipeline need to be in the same language.
@@ -114,7 +104,7 @@ outputs:
 There are several different types of user inputs that can be specified in the YAML file:
 
 | "Type" attribute in the yaml | IU rendering | Description                                        |
-|------------------------------|--------------|----------------------------------------------------|
+|--------------------|----------------|------------------------------------|
 | boolean                      | Plain text   | true/false                                         |
 | float, float\[\]             | Plain text   | positive and negative numbers with a decimal point |
 | int, int\[\]                 | Plain text   | integer                                            |
@@ -346,6 +336,33 @@ The output keys `info`, `warning` and `error` can be used to report problems in 
 
 Any `error` message will halt the rest of the pipeline.
 
+To code an error so it prints in the pipeline step, you will need to wrap your script in a try catch function and then code it to print errors.
+
+``` R
+{r}
+output<- tryCatch({
+
+SCRIPT BODY HERE
+
+}, error = function(e) { list(error= conditionMessage(e)) })
+```
+
+This will print any errors in the output of the script in the UI.
+
+You can also code specific error messages. For example, if a user wanted the analysis to stop if the result was less than 0:
+
+``` R
+output<- tryCatch({
+
+if (result < 0){
+stop("Analysis was halted because result is less than 0.")
+}
+
+}, error = function(e) { list(error= conditionMessage(e)) })
+```
+
+And then the customized error message would appear in the UI.
+
 ### Script dependencies
 
 Scripts can install their own dependencies directly (`install.packages` in R, `Pkg.add` in Julia, etc). However, it will need to be reinstalled if the server is deployed on another computer or server.
@@ -358,7 +375,7 @@ Next, create your pipeline in the BON in a Box pipeline editor by connecting you
 
 Once you have saved your scripts and YAML files to your local computer in the Bon-in-a-box pipelines folder that was cloned from github, they will show up as scripts in the pipeline editor. You can drag the scripts into the editor and connect the inputs and outputs to create your pipeline.
 
-A pipeline is a collection of steps to acheive the desired processing. Each script becomes a pipeline step.
+A pipeline is a collection of steps to achieve the desired processing. Each script becomes a pipeline step.
 
 Pipelines also have inputs and outputs. In order to run, a pipeline needs to specify at least one output (rightmost red box in image above). Pipeline IO supports [the same types and UI rendering](#input-and-output-types) as individual steps, since its inputs are directly fed to the steps, and outputs come from the step outputs.
 
@@ -430,11 +447,11 @@ The editor supports saving and loading on the server, unless explicitly disabled
 
 The last step is to load your saved pipeline in BON and a Box and run it. The error log at the bottom of the page will show errors with the pipeline.
 
-ADD PHOTO
+Once you change a script and save to your local computer, the changes will immediately be implemented when you run the script through BON in a Box. However, if you change the YAML file, you will need to reload the pipeline in the pipeline editor to see those changes. If this does not work, you may need to delete the script from the pipeline and re-drag it to the pipeline editor. Inputs and outputs can also be directly edited in the pipeline editor.
 
 # When is your pipeline complete?
 
--   The pipeline is generalizable (for example can be used with other species, in other regions)
+-   The pipeline is generalization (for example can be used with other species, in other regions)
 
 -   Each step has documentation for each input, output, references, etc. It should be easy enough to understand for a normal biologist (i.e. not a subject matter expert of this specific pipeline)
 

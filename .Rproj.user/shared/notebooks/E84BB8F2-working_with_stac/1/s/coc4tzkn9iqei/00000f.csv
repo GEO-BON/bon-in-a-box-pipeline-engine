@@ -1,9 +1,0 @@
-"0","bbox<-st_bbox(c(xmin = -483695, xmax = -84643, ymin = 112704 , ymax = 684311), crs = st_crs(32198))"
-"0",""
-"0","v <- cube_view(srs = ""EPSG:32198"", extent = list(t0 = ""2000-01-01"", t1 = ""2000-01-01"","
-"0","                                                left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin), "
-"0","                                                dx=1000, dy=1000, dt=""P1D"", aggregation = ""sum"", resampling = ""mean"")"
-"2","## Size of the cube in x direction does not align with dx, extent will be enlarged by 474.000000 at both sides.
-"
-"2","## Size of the cube in y direction does not align with dy, extent will be enlarged by 196.500000 at both sides.
-"
