@@ -1,6 +1,7 @@
 import YAMLTextArea from "./YAMLTextArea";
 import { InputsDescription } from "../StepDescription";
 import { Tabs, Tab, TabList, TabPanel } from "react-tabs";
+import ReactMarkdown from 'react-markdown'
 
 import "react-tabs/style/react-tabs.css";
 import "./react-tabs-dark.css";
@@ -77,7 +78,8 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                 />
               </td>
               <td className="descriptionCell">
-                {description + "\n" + yaml.dump(theRest)}
+                <ReactMarkdown className="reactMarkdown" children={description} />
+                {yaml.dump(theRest)}
                 {example && <>
                   Example:<br />
                   <ScriptInput

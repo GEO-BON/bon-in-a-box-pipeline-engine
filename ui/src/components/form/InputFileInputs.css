@@ -36,3 +36,7 @@ table.inputFileFields .example {
         display: block;
     }
 }
+
+.inputFileFields .reactMarkdown p {
+    margin: 0;
+}
