@@ -323,3 +323,9 @@ div.legendItemText {
 textarea.autoResize {
   overflow: hidden;
 }
+
+.yaml .ioDescription p {
+  white-space: pre-wrap;
+  margin: 0;
+  margin-left: 2rem;
+}
