@@ -3,8 +3,8 @@ import Select from "react-select";
 import InputFileInput from "./InputFileInput";
 import { useNavigate } from "react-router-dom";
 import { GeneralDescription, getFolderAndName } from "../StepDescription";
+import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 
-const BonInABoxScriptService = require("bon_in_a_box_script_service");
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export function PipelineForm({
@@ -14,7 +14,7 @@ export function PipelineForm({
   showHttpError,
   inputFileContent,
   setInputFileContent,
-  runType
+  runType,
 }) {
   const formRef = useRef();
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export function PipelineForm({
 
   const handlePipelineChange = (label, value) => {
     clearPreviousRequest();
-    let pipelineForUrl = value.replace(/.json$/i, "").replace(/.yml$/i, "")
+    let pipelineForUrl = value.replace(/.json$/i, "").replace(/.yml$/i, "");
     navigate("/" + runType + "-form/" + pipelineForUrl);
   };
 
@@ -44,9 +44,9 @@ export function PipelineForm({
       } else if (runId) {
         const parts = runId.split(">");
         let runHash = parts.at(-1);
-        let pipelineForUrl = parts.slice(0,-1).join(">")
-        if(pipStates.runHash === runHash) {
-          setPipStates({type: "rerun"});
+        let pipelineForUrl = parts.slice(0, -1).join(">");
+        if (pipStates.runHash === runHash) {
+          setPipStates({ type: "rerun" });
         }
 
         navigate("/" + runType + "-form/" + pipelineForUrl + "/" + runHash);
@@ -72,7 +72,7 @@ export function PipelineForm({
         Object.entries(data).forEach(([descriptionFile, pipelineName]) => {
           newOptions.push({
             label: getFolderAndName(descriptionFile, pipelineName),
-            value: descriptionFile
+            value: descriptionFile,
           });
         });
         setPipelineOptions(newOptions);
@@ -80,27 +80,42 @@ export function PipelineForm({
     });
   }, [runType, setPipelineOptions]);
 
-  return pipelineOptions.length > 0 && (
-    <form ref={formRef} onSubmit={handleSubmit} acceptCharset="utf-8">
-      <label htmlFor="pipelineChoice">{runType === "pipeline" ? "Pipeline:" : "Script:"}</label>
-      <Select
-        id="pipelineChoice"
-        name="pipelineChoice"
-        className="blackText"
-        options={pipelineOptions}
-        value={pipelineOptions.find(o => o.value === pipStates.descriptionFile)}
-        menuPortalTarget={document.body}
-        onChange={(v) => handlePipelineChange(v.label, v.value)}
-      />
-      <br />
-      {pipelineMetadata && <GeneralDescription ymlPath={pipStates.descriptionFile} metadata={pipelineMetadata} />}
-      <InputFileInput
-        metadata={pipelineMetadata}
-        inputFileContent={inputFileContent}
-        setInputFileContent={setInputFileContent}
-      />
-      <br />
-      <input type="submit" disabled={false} value={runType === "pipeline" ? "Run pipeline" : "Run script"} />
-    </form>
+  return (
+    pipelineOptions.length > 0 && (
+      <form ref={formRef} onSubmit={handleSubmit} acceptCharset="utf-8">
+        <label htmlFor="pipelineChoice">
+          {runType === "pipeline" ? "Pipeline:" : "Script:"}
+        </label>
+        <Select
+          id="pipelineChoice"
+          name="pipelineChoice"
+          className="blackText"
+          options={pipelineOptions}
+          value={pipelineOptions.find(
+            (o) => o.value === pipStates.descriptionFile
+          )}
+          menuPortalTarget={document.body}
+          onChange={(v) => handlePipelineChange(v.label, v.value)}
+        />
+        <br />
+        {pipelineMetadata && (
+          <GeneralDescription
+            ymlPath={pipStates.descriptionFile}
+            metadata={pipelineMetadata}
+          />
+        )}
+        <InputFileInput
+          metadata={pipelineMetadata}
+          inputFileContent={inputFileContent}
+          setInputFileContent={setInputFileContent}
+        />
+        <br />
+        <input
+          type="submit"
+          disabled={false}
+          value={runType === "pipeline" ? "Run pipeline" : "Run script"}
+        />
+      </form>
+    )
   );
 }

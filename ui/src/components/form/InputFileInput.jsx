@@ -7,7 +7,7 @@ import "./react-tabs-dark.css";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
 
-const yaml = require("js-yaml");
+import yaml from "js-yaml";
 
 /**
  * An input that we use to fill the input file's content.
@@ -59,7 +59,8 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
     <table className="inputFileFields">
       <tbody>
         {Object.entries(inputs).map(([inputId, inputDescription]) => {
-          const { label, description, options, example, ...theRest } = inputDescription;
+          const { label, description, options, example, ...theRest } =
+            inputDescription;
 
           return (
             <tr key={inputId}>
@@ -78,18 +79,21 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
               </td>
               <td className="descriptionCell">
                 {description + "\n" + yaml.dump(theRest)}
-                {example && <>
-                  Example:<br />
-                  <ScriptInput
-                    id={inputId}
-                    type={inputDescription.type}
-                    options={options}
-                    value={example}
-                    disabled={true}
-                    cols="50"
-                    className="example"
-                  />
-                </>}
+                {example && (
+                  <>
+                    Example:
+                    <br />
+                    <ScriptInput
+                      id={inputId}
+                      type={inputDescription.type}
+                      options={options}
+                      value={example}
+                      disabled={true}
+                      cols="50"
+                      className="example"
+                    />
+                  </>
+                )}
               </td>
             </tr>
           );

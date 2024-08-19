@@ -18,7 +18,7 @@ services:
       CHOKIDAR_USEPOLLING: true
       # https://github.com/facebook/create-react-app/issues/11779
       WDS_SOCKET_PORT: 0
-      REACT_APP_VIEWER_HOST: ${REACT_APP_VIEWER_HOST}
+      VITE_APP_VIEWER_HOST: ${VITE_APP_VIEWER_HOST}
 
   ## In the DEV version, using a volume and a single docker. To rebuild without restarting everything, use
   ## docker exec -it biab-script-server sh -c "cd /home/gradle/project/ && gradle build"
