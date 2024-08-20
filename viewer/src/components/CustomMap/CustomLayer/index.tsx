@@ -43,7 +43,7 @@ function CustomLayer(props: any) {
     stadiaDark:
       "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
     mapbox: `https://api.mapbox.com/styles/v1/glaroc/cl8eqr05i000416umaxkuc4sp/tiles/256/{z}/{x}/{y}@2x?access_token=${
-      import.meta.env.REACT_APP_MAPBOX_TOKEN
+      import.meta.env.VITE_APP_MAPBOX_TOKEN
     }`,
   };
 
