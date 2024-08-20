@@ -61,15 +61,11 @@ export function PipelineResults({
       <FoldableOutputContextProvider activeRenderer={activeRenderer} setActiveRenderer={setActiveRenderer}>
         <h2>Results</h2>
         {isPipeline && viewerHost && runHash && (
-          <button>
-            <a
-              href={`${viewerHost}/${pipeline}>${runHash}`}
-              target="_blank"
-              style={{ textDecoration: "none", color: "#333" }}
-            >
+          <a href={`${viewerHost}/${pipeline}>${runHash}`} target="_blank">
+            <button disabled={runningScripts.size > 0}>
               See in viewer
-            </a>
-          </button>
+            </button>
+          </a>
         )}
         {isPipeline && (
           <>
