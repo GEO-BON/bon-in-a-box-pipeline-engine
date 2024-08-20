@@ -12,9 +12,7 @@ We are looking for pipelines that calculate biodiversity metrics that are releva
 
 -   open source
 
--   broadly applicable (not just a specific region)
-
--   using data that is publicly available
+-   adaptable to many contexts (different species, countries, and regions)
 
 # Steps for contributing
 
@@ -104,7 +102,7 @@ outputs:
 There are several different types of user inputs that can be specified in the YAML file:
 
 | "Type" attribute in the yaml | IU rendering | Description                                        |
-|--------------------|----------------|------------------------------------|
+|--------------------|------------------|-----------------------------------|
 | boolean                      | Plain text   | true/false                                         |
 | float, float\[\]             | Plain text   | positive and negative numbers with a decimal point |
 | int, int\[\]                 | Plain text   | integer                                            |
@@ -338,7 +336,7 @@ Any `error` message will halt the rest of the pipeline.
 
 To code an error so it prints in the pipeline step, you will need to wrap your script in a try catch function and then code it to print errors.
 
-``` R
+``` r
 {r}
 output<- tryCatch({
 
@@ -351,7 +349,7 @@ This will print any errors in the output of the script in the UI.
 
 You can also code specific error messages. For example, if a user wanted the analysis to stop if the result was less than 0:
 
-``` R
+``` r
 output<- tryCatch({
 
 if (result < 0){

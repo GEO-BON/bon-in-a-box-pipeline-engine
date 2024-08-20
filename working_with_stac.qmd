@@ -29,20 +29,20 @@ library(stars)
 
 ```
 
-Next, connect to the STAC catalog using the `stac` function in the `rstac` package
+Next, connect to the STAC catalog using the `stac` function in the `rstac` package.
 
 ```{r}
 stac_obj <- stac("https://stac.geobon.org/")
 ```
 
-In the STAC catalog, layers are organized into collections. To make a list of the collections
+In the STAC catalog, layers are organized into collections. To make a list of the collections:
 
 ```{r}
 collections <- stac_obj |> collections() |> get_request()
 
 ```
 
-And to view the collections and their descriptions in a table
+And to view the collections and their descriptions in a table.
 
 ```{r}
 df<-data.frame(id=character(),title=character(),description=character())
@@ -52,7 +52,7 @@ for (c in collections[['collections']]){
 kable(head(df))
 ```
 
-To search for a specific collection. Here we will search for the land cover collection from EarthEnv
+To search for a specific collection. Here we will search for the land cover collection from EarthEnv.
 
 ```{r}
 it_obj <- stac_obj |>
@@ -61,7 +61,7 @@ it_obj <- stac_obj |>
 it_obj
 ```
 
-View the available layers in this collection
+View the available layers in this collection.
 
 ```{r}
 it_obj <- stac_obj |>
@@ -87,7 +87,7 @@ for (f in it_obj[['features']]){
 kable(head(df))
 ```
 
-Now, you can load one of the items with the `stars` package, which allows access to files remotely in a fast and efficient way.
+Now, you can load one of the items with the `stars` package, which allows access to files remotely in a fast and efficient way by only loading the areas that you need.
 
 Here we will select the layer representing the percentage of "Evergreen/Deciduous Needleleaf Trees", which is the 12th layer in the collection.
 
@@ -126,7 +126,7 @@ options=c('COMPRESS=DEFLATE', 'OVERVIEW_RESAMPLING=MODE', 'LEVEL=6',
 
 The R package `gdalcubes` allows for the processing of four dimensional regular raster data cubes from irregular image collections, hiding complexities in he data such as different map projections and spatial overlaps of images or different spatial resolutions of spectral bands. This can be useful for working with many layers or time series of satellite imagery.
 
-This is a necessary step for GDAL cubes to work with STAC catalog data
+This is a necessary step for GDAL cubes to work with STAC catalog data.
 
 ```{r}
 for (i in 1:length(it_obj$features)){
@@ -134,7 +134,7 @@ for (i in 1:length(it_obj$features)){
 }
 ```
 
-You can filter based on item properties and create a collection
+You can filter based on item properties and create a collection.
 
 ```{r}
 st <- stac_image_collection(it_obj$features, asset_names=c('data'), 
@@ -148,9 +148,8 @@ Here is an example that sums the four forest categories using aggregation="sum",
 ```{r, warning=FALSE}
 bbox<-st_bbox(c(xmin = -483695, xmax = -84643, ymin = 112704 , ymax = 684311), crs = st_crs(32198))
 
-v <- cube_view(srs = "EPSG:32198", extent = list(t0 = "2000-01-01", t1 = "2000-01-01",
-                                                left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin), 
-                                                dx=1000, dy=1000, dt="P1D", aggregation = "sum", resampling = "mean")
+v <- cube_view(srs = "EPSG:32198", extent = list(t0 = "2000-01-01", t1 = "2000-01-01", left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin), 
+dx=1000, dy=1000, dt="P1D", aggregation = "sum", resampling = "mean")
 ```
 
 Create a raster cube
@@ -161,7 +160,7 @@ lc_cube <- raster_cube(st, v)
 
 Save the resulting file to your computer
 
-``` R
+``` r
 # Replace " ~ " for the directory of your choice on your computer.
 lc_cube |> write_tif('~/',prefix='lc2',creation_options=list('COMPRESS'='DEFLATE'))
 ```
@@ -193,25 +192,24 @@ lc_cube |> plot(col=heat.colors)
 
 Use the CHELSA dataset on climatologies and create an average map for the months of June, July, and August 2010 to 2019
 
-``` R
+``` r
 it_obj <- s_obj |>
   stac_search(collections = "chelsa-monthly", datetime="2010-06-01T00:00:00Z/2019-08-01T00:00:00Z") |> 
   get_request() |> items_fetch()
 
-v <- cube_view(srs = "EPSG:32198", extent = list(t0 = "2010-06-01", t1 = "2019-08-31",
-                                                left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin),
-               dx=1000, dy=1000, dt="P10Y",
-               aggregation = "mean",
-               resampling = "bilinear")
+v <- cube_view(srs = "EPSG:32198", extent = list(t0 = "2010-06-01", t1 = "2019-08-31", left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin), dx=1000, dy=1000, dt="P10Y", aggregation = "mean",resampling = "bilinear")
 
 for (i in 1:length(it_obj$features)){
   names(it_obj$features[[i]]$assets)='data'
   it_obj$features[[i]]$assets$data$roles='data'
 }
+
 anames=unlist(lapply(it_obj$features,function(f){f['id']}))
-st <- stac_image_collection(it_obj$features, asset_names = 'data',  
-                       property_filter = function(f){f[['variable']] == 'tas' & (f[['month']] %in% c(6,7,8)) })
+
+st <- stac_image_collection(it_obj$features, asset_names = 'data', property_filter = function(f){f[['variable']] == 'tas' & (f[['month']] %in% c(6,7,8)) }) 
+
 c_cube <- raster_cube(st, v)
+
 c_cube |> plot(col=heat.colors)
 
 c_cube |> write_tif('~/',prefix='chelsa-monthly',creation_options=list('COMPRESS'='DEFLATE'))

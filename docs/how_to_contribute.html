@@ -160,7 +160,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#is-your-analysis-pipeline-right-for-us" id="toc-is-your-analysis-pipeline-right-for-us" class="nav-link active" data-scroll-target="#is-your-analysis-pipeline-right-for-us">Is your analysis pipeline right for us?</a></li>
   <li><a href="#steps-for-contributing" id="toc-steps-for-contributing" class="nav-link" data-scroll-target="#steps-for-contributing">Steps for contributing</a></li>
-  <li><a href="#what-is-an-analysis-pipeline" id="toc-what-is-an-analysis-pipeline" class="nav-link" data-scroll-target="#what-is-an-analysis-pipeline">What is an analysis pipeline?</a></li>
   <li><a href="#instructions-for-adapting-your-code-to-an-analysis-pipeline" id="toc-instructions-for-adapting-your-code-to-an-analysis-pipeline" class="nav-link" data-scroll-target="#instructions-for-adapting-your-code-to-an-analysis-pipeline">Instructions for adapting your code to an analysis pipeline</a>
   <ul class="collapse">
   <li><a href="#step-1-creating-a-yaml-file" id="toc-step-1-creating-a-yaml-file" class="nav-link" data-scroll-target="#step-1-creating-a-yaml-file">Step 1: Creating a YAML file</a></li>
@@ -212,8 +211,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>We are looking for pipelines that calculate biodiversity metrics that are relevant to policy and biodiversity reporting, such as Essential Biodiversity Variables (EBVs) and Indicators. These pipelines should be</p>
 <ul>
 <li><p>open source</p></li>
-<li><p>broadly applicable (not just a specific region)</p></li>
-<li><p>using data that is publicly available</p></li>
+<li><p>adaptable to many contexts (different species, countries, and regions)</p></li>
 </ul>
 </section>
 <section id="steps-for-contributing" class="level1">
@@ -229,18 +227,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Make the necessary corrections.</p></li>
 <li><p>The pipeline is published on BON in a Box’s trunk, website, and receives a DOI for identification. It’s time to share!</p></li>
 </ol>
-</section>
-<section id="what-is-an-analysis-pipeline" class="level1">
-<h1>What is an analysis pipeline?</h1>
-<p>A pipeline is a collection of steps needed to transform input data into valuable output for the stakeholder in an automated way. It can be an EBV, an indicator, or anything useful to analysis and decision-making in the context of biodiversity conservation and natural resource management.</p>
-<p>The smaller steps composing a pipeline are scripts. These scripts also convert input data into valuable outputs, just like pipelines, but at a finer scale: cleaning, augmenting, standardizing, deriving indices or compound variables, interpolating or extrapolating, making statistics, performing statistical analyses including running machine learning models, etc. Importantly, these scripts can be reused or repurposed across varied contexts. For instance, data cleaning scripts could be applied to multiple pipelines that utilize similar types of data, enhancing efficiency and consistency in data processing workflows. Since the outputs are in-between every step, the pipeline can make abstraction of the programming language, allowing a pipeline to mix R, python and Julia scripts without any interoperability issues.</p>
-<p>If a pipeline builds upon the results of another pipeline, this “inner pipeline” it can be included as a step in the “outer pipeline”; we call this a subpipeline. An SDM pipeline could serve to generate range maps inside a Species Habitat Index pipeline, or embedded in a Species Richness pipeline. We can thus define a step as “a script or a subpipeline performing an operation in the context of a pipeline”.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="pipeline.png.png" class="img-fluid figure-img"></p>
-<figcaption>Simplified pipeline with steps (blue), intermediate results (grey), and final results (green)</figcaption>
-</figure>
-</div>
 </section>
 <section id="instructions-for-adapting-your-code-to-an-analysis-pipeline" class="level1">
 <h1>Instructions for adapting your code to an analysis pipeline</h1>
@@ -291,9 +277,9 @@ author:
 <p>There are several different types of user inputs that can be specified in the YAML file:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 31%">
-<col style="width: 14%">
-<col style="width: 54%">
+<col style="width: 27%">
+<col style="width: 24%">
+<col style="width: 47%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -546,6 +532,23 @@ references: # 0 to many
 <h3 class="anchored" data-anchor-id="reporting-problems">Reporting problems</h3>
 <p>The output keys <code>info</code>, <code>warning</code> and <code>error</code> can be used to report problems in script execution. They do not need to be described in the <code>outputs</code> section of the description. They will be displayed specially in the UI.</p>
 <p>Any <code>error</code> message will halt the rest of the pipeline.</p>
+<p>To code an error so it prints in the pipeline step, you will need to wrap your script in a try catch function and then code it to print errors.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>{r}</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>output<span class="ot">&lt;-</span> <span class="fu">tryCatch</span>({</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>SCRIPT BODY HERE</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>}, <span class="at">error =</span> <span class="cf">function</span>(e) { <span class="fu">list</span>(<span class="at">error=</span> <span class="fu">conditionMessage</span>(e)) })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This will print any errors in the output of the script in the UI.</p>
+<p>You can also code specific error messages. For example, if a user wanted the analysis to stop if the result was less than 0:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>output<span class="ot">&lt;-</span> <span class="fu">tryCatch</span>({</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (result <span class="sc">&lt;</span> <span class="dv">0</span>){</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stop</span>(<span class="st">"Analysis was halted because result is less than 0."</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>}, <span class="at">error =</span> <span class="cf">function</span>(e) { <span class="fu">list</span>(<span class="at">error=</span> <span class="fu">conditionMessage</span>(e)) })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>And then the customized error message would appear in the UI.</p>
 </section>
 <section id="script-dependencies" class="level3">
 <h3 class="anchored" data-anchor-id="script-dependencies">Script dependencies</h3>
@@ -557,7 +560,7 @@ references: # 0 to many
 <h2 class="anchored" data-anchor-id="step-3-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor.">Step 3: Connect your scripts with the BON in a Box pipeline editor.</h2>
 <p>Next, create your pipeline in the BON in a Box pipeline editor by connecting your inputs and outputs.</p>
 <p>Once you have saved your scripts and YAML files to your local computer in the Bon-in-a-box pipelines folder that was cloned from github, they will show up as scripts in the pipeline editor. You can drag the scripts into the editor and connect the inputs and outputs to create your pipeline.</p>
-<p>A pipeline is a collection of steps to acheive the desired processing. Each script becomes a pipeline step.</p>
+<p>A pipeline is a collection of steps to achieve the desired processing. Each script becomes a pipeline step.</p>
 <p>Pipelines also have inputs and outputs. In order to run, a pipeline needs to specify at least one output (rightmost red box in image above). Pipeline IO supports <a href="#input-and-output-types">the same types and UI rendering</a> as individual steps, since its inputs are directly fed to the steps, and outputs come from the step outputs.</p>
 <p>For a general description of pipelines in software engineering, see <a href="https://en.wikipedia.org/wiki/Pipeline_%28software%29">Wikipedia</a>.</p>
 <section id="pipeline-editor" class="level3">
@@ -611,13 +614,13 @@ references: # 0 to many
 <section id="step-4-run-pipeline-and-troubleshoot" class="level2">
 <h2 class="anchored" data-anchor-id="step-4-run-pipeline-and-troubleshoot">Step 4: Run pipeline and troubleshoot</h2>
 <p>The last step is to load your saved pipeline in BON and a Box and run it. The error log at the bottom of the page will show errors with the pipeline.</p>
-<p>ADD PHOTO</p>
+<p>Once you change a script and save to your local computer, the changes will immediately be implemented when you run the script through BON in a Box. However, if you change the YAML file, you will need to reload the pipeline in the pipeline editor to see those changes. If this does not work, you may need to delete the script from the pipeline and re-drag it to the pipeline editor. Inputs and outputs can also be directly edited in the pipeline editor.</p>
 </section>
 </section>
 <section id="when-is-your-pipeline-complete" class="level1">
 <h1>When is your pipeline complete?</h1>
 <ul>
-<li><p>The pipeline is generalizable (for example can be used with other species, in other regions)</p></li>
+<li><p>The pipeline is generalization (for example can be used with other species, in other regions)</p></li>
 <li><p>Each step has documentation for each input, output, references, etc. It should be easy enough to understand for a normal biologist (i.e.&nbsp;not a subject matter expert of this specific pipeline)</p></li>
 <li><p>Each step validates its inputs for aberrations and its outputs for correctness. If an aberration is detected an “error” should be returned to halt the pipeline, or a “warning” to let it continue but alert the user.</p></li>
 <li><p>The GitHub actions pass.</p></li>

@@ -216,15 +216,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.3.1; sf_use_s2() is TRUE</code></pre>
 </div>
 </div>
-<p>Next, connect to the STAC catalog using the <code>stac</code> function in the <code>rstac</code> package</p>
+<p>Next, connect to the STAC catalog using the <code>stac</code> function in the <code>rstac</code> package.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>stac_obj <span class="ot">&lt;-</span> <span class="fu">stac</span>(<span class="st">"https://stac.geobon.org/"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>In the STAC catalog, layers are organized into collections. To make a list of the collections</p>
+<p>In the STAC catalog, layers are organized into collections. To make a list of the collections:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>collections <span class="ot">&lt;-</span> stac_obj <span class="sc">|&gt;</span> <span class="fu">collections</span>() <span class="sc">|&gt;</span> <span class="fu">get_request</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>And to view the collections and their descriptions in a table</p>
+<p>And to view the collections and their descriptions in a table.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df<span class="ot">&lt;-</span><span class="fu">data.frame</span>(<span class="at">id=</span><span class="fu">character</span>(),<span class="at">title=</span><span class="fu">character</span>(),<span class="at">description=</span><span class="fu">character</span>())</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (c <span class="cf">in</span> collections[[<span class="st">'collections'</span>]]){</span>
@@ -280,7 +280,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </div>
 </div>
-<p>To search for a specific collection. Here we will search for the land cover collection from EarthEnv</p>
+<p>To search for a specific collection. Here we will search for the land cover collection from EarthEnv.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>it_obj <span class="ot">&lt;-</span> stac_obj <span class="sc">|&gt;</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stac_search</span>(<span class="at">collections =</span> <span class="st">"earthenv_landcover"</span>) <span class="sc">|&gt;</span></span>
@@ -306,7 +306,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 assets, bbox, collection, geometry, id, links, properties, stac_extensions, stac_version, type</code></pre>
 </div>
 </div>
-<p>View the available layers in this collection</p>
+<p>View the available layers in this collection.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>it_obj <span class="ot">&lt;-</span> stac_obj <span class="sc">|&gt;</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collections</span>(<span class="st">"earthenv_landcover"</span>) <span class="sc">|&gt;</span> <span class="fu">items</span>() <span class="sc">|&gt;</span></span>
@@ -403,7 +403,7 @@ $full_filename
 </table>
 </div>
 </div>
-<p>Now, you can load one of the items with the <code>stars</code> package, which allows access to files remotely in a fast and efficient way.</p>
+<p>Now, you can load one of the items with the <code>stars</code> package, which allows access to files remotely in a fast and efficient way by only loading the areas that you need.</p>
 <p>Here we will select the layer representing the percentage of “Evergreen/Deciduous Needleleaf Trees”, which is the 12th layer in the collection.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>lc1<span class="ot">&lt;-</span><span class="fu">read_stars</span>(<span class="fu">paste0</span>(<span class="st">'/vsicurl/'</span>,it_obj[[<span class="st">'features'</span>]][[<span class="dv">12</span>]]<span class="sc">$</span>assets<span class="sc">$</span>data<span class="sc">$</span>href), <span class="at">proxy =</span> <span class="cn">TRUE</span>)</span>
@@ -445,13 +445,13 @@ $full_filename
 <section id="working-with-gdal-cubes" class="level2">
 <h2 class="anchored" data-anchor-id="working-with-gdal-cubes">Working with GDAL Cubes</h2>
 <p>The R package <code>gdalcubes</code> allows for the processing of four dimensional regular raster data cubes from irregular image collections, hiding complexities in he data such as different map projections and spatial overlaps of images or different spatial resolutions of spectral bands. This can be useful for working with many layers or time series of satellite imagery.</p>
-<p>This is a necessary step for GDAL cubes to work with STAC catalog data</p>
+<p>This is a necessary step for GDAL cubes to work with STAC catalog data.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(it_obj<span class="sc">$</span>features)){</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  it_obj<span class="sc">$</span>features[[i]]<span class="sc">$</span>assets<span class="sc">$</span>data<span class="sc">$</span>roles<span class="ot">=</span><span class="st">'data'</span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>You can filter based on item properties and create a collection</p>
+<p>You can filter based on item properties and create a collection.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>st <span class="ot">&lt;-</span> <span class="fu">stac_image_collection</span>(it_obj<span class="sc">$</span>features, <span class="at">asset_names=</span><span class="fu">c</span>(<span class="st">'data'</span>), </span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>             <span class="at">property_filter =</span> <span class="cf">function</span>(f){f[[<span class="st">'class'</span>]] <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'1'</span>,<span class="st">'2'</span>,<span class="st">'3'</span>,<span class="st">'4'</span>)},<span class="at">srs=</span><span class="st">'EPSG:4326'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -461,9 +461,8 @@ $full_filename
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>bbox<span class="ot">&lt;-</span><span class="fu">st_bbox</span>(<span class="fu">c</span>(<span class="at">xmin =</span> <span class="sc">-</span><span class="dv">483695</span>, <span class="at">xmax =</span> <span class="sc">-</span><span class="dv">84643</span>, <span class="at">ymin =</span> <span class="dv">112704</span> , <span class="at">ymax =</span> <span class="dv">684311</span>), <span class="at">crs =</span> <span class="fu">st_crs</span>(<span class="dv">32198</span>))</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">cube_view</span>(<span class="at">srs =</span> <span class="st">"EPSG:32198"</span>, <span class="at">extent =</span> <span class="fu">list</span>(<span class="at">t0 =</span> <span class="st">"2000-01-01"</span>, <span class="at">t1 =</span> <span class="st">"2000-01-01"</span>,</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                                                <span class="at">left =</span> bbox<span class="sc">$</span>xmin, <span class="at">right =</span>bbox<span class="sc">$</span>xmax, <span class="at">top =</span> bbox<span class="sc">$</span>ymax, <span class="at">bottom =</span> bbox<span class="sc">$</span>ymin), </span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                                                <span class="at">dx=</span><span class="dv">1000</span>, <span class="at">dy=</span><span class="dv">1000</span>, <span class="at">dt=</span><span class="st">"P1D"</span>, <span class="at">aggregation =</span> <span class="st">"sum"</span>, <span class="at">resampling =</span> <span class="st">"mean"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">cube_view</span>(<span class="at">srs =</span> <span class="st">"EPSG:32198"</span>, <span class="at">extent =</span> <span class="fu">list</span>(<span class="at">t0 =</span> <span class="st">"2000-01-01"</span>, <span class="at">t1 =</span> <span class="st">"2000-01-01"</span>, <span class="at">left =</span> bbox<span class="sc">$</span>xmin, <span class="at">right =</span>bbox<span class="sc">$</span>xmax, <span class="at">top =</span> bbox<span class="sc">$</span>ymax, <span class="at">bottom =</span> bbox<span class="sc">$</span>ymin), </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="at">dx=</span><span class="dv">1000</span>, <span class="at">dy=</span><span class="dv">1000</span>, <span class="at">dt=</span><span class="st">"P1D"</span>, <span class="at">aggregation =</span> <span class="st">"sum"</span>, <span class="at">resampling =</span> <span class="st">"mean"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Create a raster cube</p>
 <div class="cell">
@@ -512,23 +511,22 @@ $full_filename
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stac_search</span>(<span class="at">collections =</span> <span class="st">"chelsa-monthly"</span>, <span class="at">datetime=</span><span class="st">"2010-06-01T00:00:00Z/2019-08-01T00:00:00Z"</span>) <span class="sc">|&gt;</span> </span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_request</span>() <span class="sc">|&gt;</span> <span class="fu">items_fetch</span>()</span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">cube_view</span>(<span class="at">srs =</span> <span class="st">"EPSG:32198"</span>, <span class="at">extent =</span> <span class="fu">list</span>(<span class="at">t0 =</span> <span class="st">"2010-06-01"</span>, <span class="at">t1 =</span> <span class="st">"2019-08-31"</span>,</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                                                <span class="at">left =</span> bbox<span class="sc">$</span>xmin, <span class="at">right =</span>bbox<span class="sc">$</span>xmax, <span class="at">top =</span> bbox<span class="sc">$</span>ymax, <span class="at">bottom =</span> bbox<span class="sc">$</span>ymin),</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">dx=</span><span class="dv">1000</span>, <span class="at">dy=</span><span class="dv">1000</span>, <span class="at">dt=</span><span class="st">"P10Y"</span>,</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">aggregation =</span> <span class="st">"mean"</span>,</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">resampling =</span> <span class="st">"bilinear"</span>)</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(it_obj<span class="sc">$</span>features)){</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(it_obj<span class="sc">$</span>features[[i]]<span class="sc">$</span>assets)<span class="ot">=</span><span class="st">'data'</span></span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  it_obj<span class="sc">$</span>features[[i]]<span class="sc">$</span>assets<span class="sc">$</span>data<span class="sc">$</span>roles<span class="ot">=</span><span class="st">'data'</span></span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>anames<span class="ot">=</span><span class="fu">unlist</span>(<span class="fu">lapply</span>(it_obj<span class="sc">$</span>features,<span class="cf">function</span>(f){f[<span class="st">'id'</span>]}))</span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>st <span class="ot">&lt;-</span> <span class="fu">stac_image_collection</span>(it_obj<span class="sc">$</span>features, <span class="at">asset_names =</span> <span class="st">'data'</span>,  </span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">property_filter =</span> <span class="cf">function</span>(f){f[[<span class="st">'variable'</span>]] <span class="sc">==</span> <span class="st">'tas'</span> <span class="sc">&amp;</span> (f[[<span class="st">'month'</span>]] <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>)) })</span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>c_cube <span class="ot">&lt;-</span> <span class="fu">raster_cube</span>(st, v)</span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>c_cube <span class="sc">|&gt;</span> <span class="fu">plot</span>(<span class="at">col=</span>heat.colors)</span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>c_cube <span class="sc">|&gt;</span> <span class="fu">write_tif</span>(<span class="st">'~/'</span>,<span class="at">prefix=</span><span class="st">'chelsa-monthly'</span>,<span class="at">creation_options=</span><span class="fu">list</span>(<span class="st">'COMPRESS'</span><span class="ot">=</span><span class="st">'DEFLATE'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">cube_view</span>(<span class="at">srs =</span> <span class="st">"EPSG:32198"</span>, <span class="at">extent =</span> <span class="fu">list</span>(<span class="at">t0 =</span> <span class="st">"2010-06-01"</span>, <span class="at">t1 =</span> <span class="st">"2019-08-31"</span>, <span class="at">left =</span> bbox<span class="sc">$</span>xmin, <span class="at">right =</span>bbox<span class="sc">$</span>xmax, <span class="at">top =</span> bbox<span class="sc">$</span>ymax, <span class="at">bottom =</span> bbox<span class="sc">$</span>ymin), <span class="at">dx=</span><span class="dv">1000</span>, <span class="at">dy=</span><span class="dv">1000</span>, <span class="at">dt=</span><span class="st">"P10Y"</span>, <span class="at">aggregation =</span> <span class="st">"mean"</span>,<span class="at">resampling =</span> <span class="st">"bilinear"</span>)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(it_obj<span class="sc">$</span>features)){</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(it_obj<span class="sc">$</span>features[[i]]<span class="sc">$</span>assets)<span class="ot">=</span><span class="st">'data'</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  it_obj<span class="sc">$</span>features[[i]]<span class="sc">$</span>assets<span class="sc">$</span>data<span class="sc">$</span>roles<span class="ot">=</span><span class="st">'data'</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>anames<span class="ot">=</span><span class="fu">unlist</span>(<span class="fu">lapply</span>(it_obj<span class="sc">$</span>features,<span class="cf">function</span>(f){f[<span class="st">'id'</span>]}))</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>st <span class="ot">&lt;-</span> <span class="fu">stac_image_collection</span>(it_obj<span class="sc">$</span>features, <span class="at">asset_names =</span> <span class="st">'data'</span>, <span class="at">property_filter =</span> <span class="cf">function</span>(f){f[[<span class="st">'variable'</span>]] <span class="sc">==</span> <span class="st">'tas'</span> <span class="sc">&amp;</span> (f[[<span class="st">'month'</span>]] <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>)) }) </span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>c_cube <span class="ot">&lt;-</span> <span class="fu">raster_cube</span>(st, v)</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>c_cube <span class="sc">|&gt;</span> <span class="fu">plot</span>(<span class="at">col=</span>heat.colors)</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>c_cube <span class="sc">|&gt;</span> <span class="fu">write_tif</span>(<span class="st">'~/'</span>,<span class="at">prefix=</span><span class="st">'chelsa-monthly'</span>,<span class="at">creation_options=</span><span class="fu">list</span>(<span class="st">'COMPRESS'</span><span class="ot">=</span><span class="st">'DEFLATE'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 </section>

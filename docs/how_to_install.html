@@ -176,9 +176,10 @@ ul.task-list li input[type="checkbox"] {
 <ol type="1">
 <li><p>Clone repository (Windows users: do not clone the repo in a folder under OneDrive.) This can be done in terminal using the following code: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git</code> or in GitHub desktop.</p></li>
 <li><p>Provide the environment variables: - Open the newly cloned repository on your computer - Find the file called <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env"><code>runner-sample.env</code></a> - Duplicate the file and rename the copy to <code>runner.env</code>. - Fill the properties depending on what you intend to run. - Adjust any server option as you see fit.</p></li>
-<li><p>Using a linux terminal (terminal on Mac or Git Bash), navigate to top-level folder.</p></li>
+<li><p>Using a linux terminal (terminal on Mac or Git Bash), navigate to the folder of the cloned repository.</p></li>
 <li><p>In the linux terminal, type <code>./server-up.sh</code></p>
 <ul>
+<li><p>Make sure the server is started from a linux terminal that is in the same folder as the cloned repository so it can access the files.</p></li>
 <li><p>Make sure you have docker open and running on your computer.</p></li>
 <li><p>The first execution will be long, in order to download the micro-services. The next ones will be shorter or immediate, depending on the changes.</p></li>
 <li><p>Network problems may cause the process to fail. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.</p></li>
