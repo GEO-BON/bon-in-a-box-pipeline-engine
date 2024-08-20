@@ -53,7 +53,7 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
         }
 
         if (scriptRun.results.containsKey(ScriptRun.ERROR_KEY))
-            throw RuntimeException("Script run detected an error: ${scriptRun.results[ScriptRun.ERROR_KEY]}")
+            throw RuntimeException("${yamlFile.name} detected an error: ${scriptRun.results[ScriptRun.ERROR_KEY]}")
 
         return scriptRun.results
     }
