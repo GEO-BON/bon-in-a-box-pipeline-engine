@@ -84,6 +84,11 @@ services:
     environment:
       PORT: 8000
       WORKERS_PER_CORE: 1
-      TITILER_API_CORS_ORIGINS: '*'
+      TITILER_API_CORS_ORIGINS: "*"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  viewer:
+    container_name: biab-viewer
+    environment:
+      VITE_TILER_URL: /tiler

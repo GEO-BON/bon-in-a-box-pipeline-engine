@@ -3,11 +3,10 @@ import _ from "underscore";
 
 export const GetPipelineIO = async (pipeline_id: string) => {
   let result: any = { data: { outputs: [] } };
-  const base_url = import.meta.env.VITE_BIAB_HOST;
   try {
     result = await axios({
       method: "get",
-      baseURL: `${base_url}/pipeline/${pipeline_id}.json/info`,
+      baseURL: `/pipeline/${pipeline_id}.json/info`,
     });
   } catch (error) {
     result = { data: {} };
@@ -17,11 +16,10 @@ export const GetPipelineIO = async (pipeline_id: string) => {
 
 export const GetPipelineRunOutputs = async (pipeline_run_id: string) => {
   let result: any = { data: {} };
-  const base_url = import.meta.env.VITE_BIAB_HOST;
   try {
     result = await axios({
       method: "get",
-      baseURL: `${base_url}/pipeline/${pipeline_run_id}/outputs`,
+      baseURL: `/pipeline/${pipeline_run_id}/outputs`,
     });
   } catch (error) {
     result = { data: {} };
@@ -31,14 +29,10 @@ export const GetPipelineRunOutputs = async (pipeline_run_id: string) => {
 
 export const GetPipelineRunInputs = async (pipeline_run_id: string) => {
   let result: any = { data: {} };
-  const base_url = import.meta.env.VITE_BIAB_HOST;
   try {
     result = await axios({
       method: "get",
-      baseURL: `${base_url}/output/${pipeline_run_id.replaceAll(
-        ">",
-        "/"
-      )}/input.json`,
+      baseURL: `/output/${pipeline_run_id.replaceAll(">", "/")}/input.json`,
     });
   } catch (error) {
     result = { data: {} };
@@ -48,11 +42,10 @@ export const GetPipelineRunInputs = async (pipeline_run_id: string) => {
 
 export const GetScriptDescription = async (script_id: string) => {
   let result: any = { data: {} };
-  const base_url = import.meta.env.VITE_BIAB_HOST;
   try {
     result = await axios({
       method: "get",
-      baseURL: `${base_url}/script/${script_id}.yml/info`,
+      baseURL: `/script/${script_id}.yml/info`,
     });
   } catch (error) {
     result = { data: {} };
@@ -62,11 +55,10 @@ export const GetScriptDescription = async (script_id: string) => {
 
 export const GetScriptOutputs = async (script_run_output_path: string) => {
   let result = { data: {} };
-  const base_url = import.meta.env.VITE_BIAB_HOST;
   try {
     result = await axios({
       method: "get",
-      baseURL: `${base_url}/output/${script_run_output_path}/output.json`,
+      baseURL: `/output/${script_run_output_path}/output.json`,
     });
   } catch (error) {
     result = { data: {} };
@@ -76,7 +68,6 @@ export const GetScriptOutputs = async (script_run_output_path: string) => {
 
 export const createPipeline4Display = async (pipeline_run_id: string) => {
   const pipeline_id = pipeline_run_id.split(">").slice(0, -1).join(">");
-  const base_url = import.meta.env.VITE_BIAB_HOST_LOCAL;
 
   return GetPipelineIO(pipeline_id).then((po: any) => {
     return GetPipelineRunOutputs(pipeline_run_id).then((pro: any) => {
@@ -90,7 +81,7 @@ export const createPipeline4Display = async (pipeline_run_id: string) => {
               (out: any) => {
                 return {
                   ...po.outputs[p],
-                  outputs: `${base_url}${out[output]}`,
+                  outputs: `${out[output]}`,
                 };
               }
             );

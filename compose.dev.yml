@@ -21,7 +21,6 @@ services:
       REACT_APP_VIEWER_HOST: /viewer
 
   viewer:
-    container_name: biab-viewer
     image: node:current-alpine3.18
     #build:
     #  context: ./viewer
@@ -29,7 +28,7 @@ services:
     volumes:
       - "./viewer:/app:rw"
     working_dir: "/app"
-    #command: sh -c "npm install; npm run dev;"
+    command: sh -c "npm install; npm run dev;"
     expose:
       - "80"
 

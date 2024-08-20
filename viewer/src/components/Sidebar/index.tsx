@@ -80,22 +80,20 @@ export default function Sidebar(props: any) {
             crs = p[m];
           }
         }
-        CsvToGeojson(
-          `${import.meta.env.VITE_BIAB_HOST}${output}`,
-          "\t",
-          crs
-        ).then((r) => {
-          if (r?.features?.length > 0) {
-            setGeojsonOutput(r);
+        CsvToGeojson(`${window.location.hostname}${output}`, "\t", crs).then(
+          (r) => {
+            if (r?.features?.length > 0) {
+              setGeojsonOutput(r);
+            }
           }
-        });
+        );
       });
     } else if (
       type.includes("value") ||
       type.includes("csv") ||
       type.includes("tsv")
     ) {
-      CsvToObject(`${import.meta.env.VITE_BIAB_HOST}${output}`).then((r) => {
+      CsvToObject(`${window.location.hostname}${output}`).then((r) => {
         if (r) {
           setModalContent(<CustomTable tableData={r}></CustomTable>);
           setOpenModal(true);
@@ -105,7 +103,7 @@ export default function Sidebar(props: any) {
       setModalContent(
         <Grid
           sx={{
-            background: `url("${import.meta.env.VITE_BIAB_HOST}${output}")`,
+            background: `url("${window.location.hostname}${output}")`,
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
             width: "80vw",

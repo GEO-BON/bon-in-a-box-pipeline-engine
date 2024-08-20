@@ -12,7 +12,6 @@ services:
       - "80"
 
   viewer:
-    container_name: biab-viewer
     image: geobon/bon-in-a-box:viewer
     #build:
     #  context: ./viewer
