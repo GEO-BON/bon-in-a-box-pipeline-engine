@@ -2,8 +2,8 @@ name: Viewer, main branch
 
 on:
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
     paths:
       - "viewer/**"
 
