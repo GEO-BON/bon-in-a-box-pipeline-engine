@@ -18,7 +18,7 @@ services:
       CHOKIDAR_USEPOLLING: true
       # https://github.com/facebook/create-react-app/issues/11779
       WDS_SOCKET_PORT: 0
-      REACT_APP_VIEWER_HOST: /viewer
+      VITE_APP_VIEWER_HOST: /viewer
 
   viewer:
     image: node:current-alpine3.18

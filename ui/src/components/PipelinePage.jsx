@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useReducer } from "react";
-import {
-  FoldableOutput,
-} from "./FoldableOutput";
+import { FoldableOutput } from "./FoldableOutput";
 
 import { PipelineForm } from "./form/PipelineForm";
 import { useParams } from "react-router-dom";
 import { PipelineResults } from "./PipelineResults";
-
-var _lang = require('lodash/lang');
+import * as BonInABoxScriptService from "bon_in_a_box_script_service";
+import _lang from "lodash/lang";
 
 const pipelineConfig = { extension: ".json", defaultFile: "helloWorld.json" };
 const scriptConfig = {
@@ -15,7 +13,6 @@ const scriptConfig = {
   defaultFile: "helloWorld>helloR.yml",
 };
 
-const BonInABoxScriptService = require("bon_in_a_box_script_service");
 export const api = new BonInABoxScriptService.DefaultApi();
 
 function pipReducer(state, action) {
@@ -112,9 +109,9 @@ export function PipelinePage({ runType }) {
           if (error) {
             showHttpError(error, response);
           } else {
-            if(data.error) {
+            if (data.error) {
               setHttpError(data.error);
-              delete data.error
+              delete data.error;
             }
 
             let allOutputFoldersKnown = Object.values(data).every(
@@ -125,7 +122,9 @@ export function PipelinePage({ runType }) {
               timeout = setTimeout(loadPipelineOutputs, 1000);
             }
 
-            setResultsData(previousData => (_lang.isEqual(previousData, data)) ? previousData : data);
+            setResultsData((previousData) =>
+              _lang.isEqual(previousData, data) ? previousData : data
+            );
           }
         }
       );
@@ -227,7 +226,7 @@ export function PipelinePage({ runType }) {
   const stop = () => {
     setStoppable(false);
     api.stop(runType, pipStates.runId, (error, data, response) => {
-      if(error) {
+      if (error) {
         showHttpError(error, response);
       } else {
         setHttpError("Cancelled by user");

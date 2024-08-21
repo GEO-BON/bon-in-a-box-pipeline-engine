@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StepResult, SingleIOResult } from "./StepResult";
 import {
   FoldableOutput,
-  FoldableOutputContextProvider
+  FoldableOutputContextProvider,
 } from "./FoldableOutput";
 import errorImg from "../img/error.svg";
 import warningImg from "../img/warning.svg";
@@ -15,7 +15,7 @@ import { useInterval } from "../UseInterval";
 import { LogViewer } from "./LogViewer";
 import {
   getFolderAndNameFromMetadata,
-  GeneralDescription
+  GeneralDescription,
 } from "./StepDescription";
 import { getScript } from "../utils/IOId";
 import { api } from "./PipelinePage";
@@ -29,14 +29,14 @@ export function PipelineResults({
   pipeline,
   runHash,
   isPipeline,
-  displayTimeStamp
+  displayTimeStamp,
 }) {
   const [activeRenderer, setActiveRenderer] = useState({});
   const [pipelineOutputResults, setPipelineOutputResults] = useState({});
 
   let viewerHost = null;
-  if (process.env.REACT_APP_VIEWER_HOST) {
-    viewerHost = process.env.REACT_APP_VIEWER_HOST;
+  if (import.meta.env.VITE_APP_VIEWER_HOST) {
+    viewerHost = import.meta.env.VITE_APP_VIEWER_HOST;
   }
 
   useEffect(() => {
@@ -58,7 +58,10 @@ export function PipelineResults({
 
   if (resultsData) {
     return (
-      <FoldableOutputContextProvider activeRenderer={activeRenderer} setActiveRenderer={setActiveRenderer}>
+      <FoldableOutputContextProvider
+        activeRenderer={activeRenderer}
+        setActiveRenderer={setActiveRenderer}
+      >
         <h2>Results</h2>
         {isPipeline && viewerHost && runHash && (
           <a href={`${viewerHost}/${pipeline}>${runHash}`} target="_blank">
@@ -75,11 +78,12 @@ export function PipelineResults({
                 const [ioId, outputDescription] = entry;
                 const breadcrumbs = getBreadcrumbs(ioId);
                 const outputId = getScriptOutput(ioId);
-                let value = pipelineOutputResults[breadcrumbs] &&
+                let value =
+                  pipelineOutputResults[breadcrumbs] &&
                   pipelineOutputResults[breadcrumbs][outputId];
 
                 // If not in outputs, check if it was an input marked as output
-                if(!value) {
+                if (!value) {
                   value = inputFileContent[breadcrumbs];
                 }
 
@@ -94,7 +98,8 @@ export function PipelineResults({
                           <img
                             src={warningImg}
                             alt="Warning"
-                            className="error-inline" />
+                            className="error-inline"
+                          />
                           See detailed results
                         </>
                       )}
@@ -109,7 +114,8 @@ export function PipelineResults({
                     ioId={outputId}
                     componentId={ioId}
                     value={value}
-                    ioMetadata={outputDescription} />
+                    ioMetadata={outputDescription}
+                  />
                 );
               })}
 
@@ -126,7 +132,8 @@ export function PipelineResults({
               folder={value}
               displayTimeStamp={displayTimeStamp}
               setRunningScripts={setRunningScripts}
-              setPipelineOutputResults={setPipelineOutputResults} />
+              setPipelineOutputResults={setPipelineOutputResults}
+            />
           );
         })}
       </FoldableOutputContextProvider>
@@ -135,7 +142,11 @@ export function PipelineResults({
 }
 
 export function DelayedResult({
-  breadcrumbs, folder, setRunningScripts, setPipelineOutputResults, displayTimeStamp
+  breadcrumbs,
+  folder,
+  setRunningScripts,
+  setPipelineOutputResults,
+  displayTimeStamp,
 }) {
   const [inputData, setInputData] = useState(null);
   const [outputData, setOutputData] = useState(null);
@@ -177,22 +188,22 @@ export function DelayedResult({
 
   const interval = useInterval(
     () => {
-      if(!inputData && scriptMetadata) {
-        if(scriptMetadata.inputs) {
+      if (!inputData && scriptMetadata) {
+        if (scriptMetadata.inputs) {
           fetch("/output/" + folder + "/input.json")
             .then((response) => {
-              if (response.ok)
-                return response.json();
+              if (response.ok) return response.json();
 
               return Promise.reject(response);
             })
-            .then((json) => {setInputData(json);})
+            .then((json) => {
+              setInputData(json);
+            })
             .catch((response) => {
               setInputData({
                 error: response.status + " (" + response.statusText + ")",
               });
             });
-
         } else {
           setInputData({
             info: "No inputs",
@@ -247,17 +258,31 @@ export function DelayedResult({
     api.getInfo("script", script, callback);
   }, [script]);
 
-  let inputsContent, outputsContent, inline = null;
+  let inputsContent,
+    outputsContent,
+    inline = null;
   let className = "foldableScriptResult";
   if (folder && scriptMetadata) {
-    if(inputData){
-      inputsContent = <FoldableOutput title="Inputs" className="stepInputs">
-        <StepResult data={inputData} sectionMetadata={scriptMetadata.inputs} sectionName="input" />
-      </FoldableOutput>
+    if (inputData) {
+      inputsContent = (
+        <FoldableOutput title="Inputs" className="stepInputs">
+          <StepResult
+            data={inputData}
+            sectionMetadata={scriptMetadata.inputs}
+            sectionName="input"
+          />
+        </FoldableOutput>
+      );
     }
 
     if (outputData) {
-      outputsContent = <StepResult data={outputData} sectionMetadata={scriptMetadata.outputs} sectionName="output" />;
+      outputsContent = (
+        <StepResult
+          data={outputData}
+          sectionMetadata={scriptMetadata.outputs}
+          sectionName="output"
+        />
+      );
       inline = (
         <>
           {outputData.error && (
@@ -281,7 +306,8 @@ export function DelayedResult({
     className += " gray";
   }
 
-  let logsAddress = folder && "/output/" + folder + "/logs.txt?t=" + displayTimeStamp;
+  let logsAddress =
+    folder && "/output/" + folder + "/logs.txt?t=" + displayTimeStamp;
 
   return (
     <FoldableOutputWithContext

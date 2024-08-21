@@ -1,10 +1,21 @@
 import "react-flow-renderer/dist/style.css";
 import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
-import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, AlertTitle, Snackbar, DialogContentText } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Alert,
+  AlertTitle,
+  Snackbar,
+  DialogContentText,
+} from "@mui/material";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { unstable_useBlocker } from "react-router-dom";
+import { useBlocker } from "react-router-dom";
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
@@ -15,7 +26,6 @@ import ReactFlow, {
   MiniMap,
   Position,
 } from "react-flow-renderer/nocss";
-import ReactMarkdown from "react-markdown";
 
 import IONode from "./IONode";
 import ConstantNode from "./ConstantNode";
@@ -39,11 +49,11 @@ import {
 import sleep from "../../utils/Sleep";
 import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
+import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 
-const yaml = require('js-yaml');
-const _lang = require('lodash/lang');
+import yaml from "js-yaml";
+import _lang from "lodash/lang";
 
-const BonInABoxScriptService = require("bon_in_a_box_script_service");
 const api = new BonInABoxScriptService.DefaultApi();
 
 const customNodeTypes = {
@@ -962,7 +972,7 @@ export default function PipelineEditor(props) {
     };
   }, [handleBeforeUnload])
 
-  const blocker = unstable_useBlocker(
+  const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
       hasUnsavedChanges &&
       currentLocation.pathname !== nextLocation.pathname
@@ -1131,7 +1141,7 @@ export default function PipelineEditor(props) {
                 <button onClick={onLoadFromServerBtnClick}>
                   Load from server
                 </button>
-                {/^deny$/i.test(process.env.REACT_APP_SAVE_PIPELINE_TO_SERVER)
+                {/^deny$/i.test(import.meta.env.VITE_APP_SAVE_PIPELINE_TO_SERVER)
                   ? <button id="saveBtn" onClick={() => onSave()}>Save to clipboard</button>
                   : <>
                     <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>

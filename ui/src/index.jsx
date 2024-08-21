@@ -3,14 +3,14 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import {
-  createBrowserRouter, 
+  createBrowserRouter,
   RouterProvider,
   useLocation,
 } from 'react-router-dom';
 
 import { PipelinePage } from "./components/PipelinePage";
 import StepChooser from "./components/PipelineEditor/StepChooser";
-import { Layout } from './Layout.js';
+import { Layout } from './Layout';
 import Versions from './components/Versions';
 import { Spinner } from './components/Spinner';
 const PipelineEditor = lazy(() => import("./components/PipelineEditor/PipelineEditor"));
@@ -39,7 +39,7 @@ function App() {
     {
       path: "pipeline-form/:pipeline?/:runHash?",
       element: <Layout right={<PipelinePage runType="pipeline" />} />,
-    }, 
+    },
     {
       path: "pipeline-editor",
       element: <Layout left={<StepChooser popupContent={popupContent} setPopupContent={setPopupContent} />}
