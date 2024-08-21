@@ -163,12 +163,12 @@ export function OutputsDescription({ metadata }) {
 
 function jsonToYaml(jsonObj, indent = 0, lineWidth = 80) {
     return Object.keys(jsonObj).map((key) => {
-        return <>
+        return <div key={key}>
             {'  '.repeat(indent) + key + ':'}
             {key === 'description'
                 ? <> |<ReactMarkdown className='ioDescription' children={jsonObj[key]} /></>
                 : valuetoYaml(jsonObj[key], indent, lineWidth)}
-        </>
+        </div>
     })
 }
 
@@ -187,9 +187,7 @@ function valuetoYaml(value, indent = 0, lineWidth = 80) {
         if (value.includes('\n')) {
             return ' |\n' + '  '.repeat(indent + 1) + value.split('\n').join('\n' + '  '.repeat(indent + 1)) + '\n';
         } else if (value.length + indent * 2 > lineWidth) {
-            return <ReactMarkdown className="reactMarkdown" children={
-                ' >-\n' + '  '.repeat(indent + 1) + value.match(new RegExp('(.{1,'+lineWidth+'})(?: |$)', 'gm')).join('\n' + '  '.repeat(indent + 1)) + '\n'
-            } />;
+            return ' >-\n' + '  '.repeat(indent + 1) + value.match(new RegExp('(.{1,'+lineWidth+'})(?: |$)', 'gm')).join('\n' + '  '.repeat(indent + 1)) + '\n';
         }
     }
 

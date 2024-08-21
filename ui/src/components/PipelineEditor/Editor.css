@@ -18,6 +18,23 @@
   z-index: 1300; /* Tooltip (gray zone top left) */
 }
 
+.tooltip .reactMarkdown p {
+  padding: 0px;
+  margin: 0px;
+}
+
+.tooltip .reactMarkdown {
+  padding: 0px;
+  margin: 0px;
+}
+
+.noLink a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: normal;
+  cursor: default;
+}
+
 .userInput {
   padding: 1px 2px 1px 10px;
   border-color: #36eb5a;
@@ -383,23 +400,6 @@
   margin-left: 5px;
   margin-top: 2px;
   padding-bottom: 0.5rem;
-}
-
-.reactMarkdown p {
-  padding: 0px;
-  margin: 0px;
-}
-
-.reactMarkdown {
-  padding: 0px;
-  margin: 0px;
-}
-
-.noLink a {
-  text-decoration: none;
-  color: inherit;
-  font-weight: normal;
-  cursor: default;
 }
 
 ul#popupMenu {
