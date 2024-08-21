@@ -15,6 +15,7 @@ import ReactFlow, {
   MiniMap,
   Position,
 } from "react-flow-renderer/nocss";
+import ReactMarkdown from "react-markdown";
 
 import IONode from "./IONode";
 import ConstantNode from "./ConstantNode";
