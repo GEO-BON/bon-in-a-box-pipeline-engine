@@ -1,7 +1,5 @@
 import ReactMarkdown from 'react-markdown'
 
-const yaml = require('js-yaml');
-
 export function StepDescription({ descriptionFile, metadata }) {
     return <>
         <h2>{getFolderAndNameFromMetadata(descriptionFile, metadata)}</h2>

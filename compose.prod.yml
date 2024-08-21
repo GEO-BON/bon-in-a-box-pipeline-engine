@@ -2,7 +2,6 @@
 # Contains configurations specific to the production environment.
 
 services:
-
   ui:
     container_name: biab-ui
     image: geobon/bon-in-a-box:ui
@@ -10,7 +9,15 @@ services:
     #   context: ./ui
     #   dockerfile: Dockerfile.prod
     expose:
-      - '80'
+      - "80"
+
+  viewer:
+    image: geobon/bon-in-a-box:viewer
+    #build:
+    #  context: ./viewer
+    #  dockerfile: Dockerfile.prod
+    expose:
+      - "80"
 
   script-server:
     image: geobon/bon-in-a-box:script-server

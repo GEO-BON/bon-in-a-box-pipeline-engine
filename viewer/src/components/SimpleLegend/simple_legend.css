@@ -1,0 +1,19 @@
+div.legendItem {
+  display: flex;
+  justify-content: left;
+  background: transparent;
+  gap: 1em;
+}
+
+div.legendItemColorBox {
+  min-width: 20px;
+  min-height: 20px;
+}
+
+div.legendItemText {
+  flex-grow: 1;
+  text-align: left;
+  white-space: nowrap;
+  color: #aaa;
+  padding-right: 0.5em;
+}
