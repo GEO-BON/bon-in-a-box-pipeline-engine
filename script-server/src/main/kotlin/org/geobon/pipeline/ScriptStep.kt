@@ -42,7 +42,7 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
                 ScriptRun(scriptFile, context!!, specificTimeout ?: DEFAULT_TIMEOUT)
             }
         }
-        
+
         if(runOwner) {
             scriptRun.execute()
             synchronized(currentRuns) {
@@ -53,7 +53,7 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
         }
 
         if (scriptRun.results.containsKey(ScriptRun.ERROR_KEY))
-            throw RuntimeException("${yamlFile.name} detected an error: ${scriptRun.results[ScriptRun.ERROR_KEY]}")
+            throw RuntimeException("Script \"${toDisplayName()}\": ${scriptRun.results[ScriptRun.ERROR_KEY]}")
 
         return scriptRun.results
     }
