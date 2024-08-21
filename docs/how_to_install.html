@@ -175,7 +175,13 @@ ul.task-list li input[type="checkbox"] {
 <p>To run:</p>
 <ol type="1">
 <li><p>Clone repository (Windows users: do not clone the repo in a folder under OneDrive.) This can be done in terminal using the following code: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git</code> or in GitHub desktop.</p></li>
-<li><p>Provide the environment variables: - Open the newly cloned repository on your computer - Find the file called <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env"><code>runner-sample.env</code></a> - Duplicate the file and rename the copy to <code>runner.env</code>. - Fill the properties depending on what you intend to run. - Adjust any server option as you see fit.</p></li>
+<li><p>Provide the environment variables: - Open the newly cloned repository on your computer</p>
+<ol type="1">
+<li><p>Find the file called <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env"><code>runner-sample.env</code></a></p></li>
+<li><p>Duplicate the file and rename the copy to <code>runner.env</code>.</p></li>
+<li><p>Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g.&nbsp;GBIF or IUCN)</p></li>
+<li><p>Adjust any server option as you see fit.</p></li>
+</ol></li>
 <li><p>Using a linux terminal (terminal on Mac or Git Bash), navigate to the folder of the cloned repository.</p></li>
 <li><p>In the linux terminal, type <code>./server-up.sh</code></p>
 <ul>

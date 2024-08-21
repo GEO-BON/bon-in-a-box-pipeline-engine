@@ -44,6 +44,8 @@ Analysis workflows can be converted to BON in a Box pipelines with a few steps:
 
 Each script should be accompanied by a YAML file (.yml extension) that specifies inputs and outputs of that step of the pipeline.
 
+### Name and description
+
 YAML files should begin with a name, description, and authors of the script. The name should be the same as the script that it describes but with a .yml extension.
 
 Example:
@@ -57,9 +59,11 @@ author:
   - name: Jane Doe (jane.doe@gmail.com)
 ```
 
+### Inputs
+
 Next, the YAML file should specify the inputs of the script. These inputs will either be outputs from the previous script, which can be connected by lines in the pipeline editor, or specified by the user in the input form.
 
-Here is an example where the input is a raster file of land cover pulled from a public database and a coordinate reference system that is specified by the user.
+Here is an example where the input is a raster file of land cover pulled from a public database and a coordinate reference system that is specified by the user:
 
 ```         
 inputs:
@@ -81,7 +85,34 @@ inputs:
       - "km2"
 ```
 
-Specifying an example will autofill that input with the example unless changed by the user. Not specifying an example will leave that input blank.
+Specifying an example will autofill that input with the example unless changed by the user. Not specifying an example will leave that input blank (null).
+
+There are several different types of user inputs that can be specified in the YAML file:
+
+| "Type" attribute in the yaml | IU rendering | Description                                        |
+|--------------------|------------------|----------------------------------|
+| boolean                      | Plain text   | true/false                                         |
+| float, float\[\]             | Plain text   | positive and negative numbers with a decimal point |
+| int, int\[\]                 | Plain text   | integer                                            |
+| options^1^                   | Plain text   | dropdown menu                                      |
+| text, text\[\]               | Plain text   | text input (words)                                 |
+| (any unknown type)           | Plain text   |                                                    |
+
+^1^options type requires an additioal options attribute to be added with the available options.
+
+```         
+options_example:   
+  label: Options example   
+  description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.   
+  type: options   
+  options:     
+  - first option     
+  - second option     
+  - third option   
+  example: third option
+```
+
+### Outputs
 
 After specifying the inputs, you can specify what you want the script to output.
 
@@ -99,17 +130,6 @@ outputs:
     type: image/png
 ```
 
-There are several different types of user inputs that can be specified in the YAML file:
-
-| "Type" attribute in the yaml | IU rendering | Description                                        |
-|--------------------|------------------|-----------------------------------|
-| boolean                      | Plain text   | true/false                                         |
-| float, float\[\]             | Plain text   | positive and negative numbers with a decimal point |
-| int, int\[\]                 | Plain text   | integer                                            |
-| options (INSERT FOOTNOTE)    | Plain text   | dropdown menu                                      |
-| text, text\[\]               | Plain text   | text input (words)                                 |
-| (any unknown type)           | Plain text   |                                                    |
-
 There are also several types of outputs that can be created
 
 | File Type  | MIME type to use in the yaml   | UI rendering                 |
@@ -117,37 +137,93 @@ There are also several types of outputs that can be created
 | CSV        | text/csv                       | HTML table (partial content) |
 | GeoJSON    | application/geo+json           | Map                          |
 | GeoPackage | application/geopackage+sqlite3 | Link                         |
-| GeoTIFF    | image/tiff;application=geotiff | Map widget (leaflet)         |
+| GeoTIFF^2^ | image/tiff;application=geotiff | Map widget (leaflet)         |
 | JPG        | image/jpg                      | tag                          |
 | Shapefile  | application/dbf                | Link                         |
 | Text       | text/plain                     | Plain text                   |
 | TSV        | text/tab-separated-values      | HTML table (partial content) |
 |            | (any unknown type)             | Plain text or link           |
 
-When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
+^2^When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
 
 ```         
 map:
   label: My map
-  description: Some map that shows bla bla...
+  description: Some map that shows something
   type: image/tiff;application=geotiff
   range: [0.1, 254]
   example: https://example.com/mytiff.tif
 ```
 
-`options` type requires an additional `options` attribute to be added with the available options.
+### Specifying R package dependencies with docker
+
+"[Conda](https://docs.conda.io/projects/conda/en/latest/index.html) provides package, dependency, and environment management for any language." If a script is dependent on a specific package version, conda will load that package version to prevent breaking changes when packages are updated. BON in a Box uses a central conda environment that includes commonly used libraries, and supports dedicated environments for the scripts that need it.
+
+This means that instead of loading packages in R scripts, they are loaded in the R environment in conda.
+
+#### Check if the libraries you need are in conda
+
+-   To check if the packages you need are already in the R environment in conda, go to runners/r-environment.yml in the BON in a Box project folder. The list of packages already installed will be under "dependencies".
+
+#### Install any libraries that are not already in the environment
+
+-   If your package is not already in the R environment, you will need to add it.
+
+-   First, search for the package name on [anaconda](https://anaconda.org/). Packages that are in anaconda will be recognized and easily loaded by conda. If it is there:
+
+    -   Add it to the runners/r-environment.yml file
+
+    -   Add it to your local environment, replacing \<package name\> in: `docker exec -it biab-runner-conda mamba install -n rbase <package name>` in the terminal
+
+-   If it is not found in anaconda
+
+    -   Go to the runners/conda-dockerfile and add it to the install command (replace \<package\> with your package name).
+
+        ```         
+        RUN bash --login -c "mamba activate rbase; R -e 'install.packages(c(\<package 1>\", \
+                \"<package 2>\", \
+                \"<package 3>\"\
+            ), repos=\"https://cloud.r-project.org/\")'"
+        ```
+
+        Or for packages in development loaded from github.
+
+        ```         
+        RUN bash --login -c "mamba activate rbase; R -e 'devtools::install_github(\"<user>/<package>\")'"
+        ```
+
+    -   Install in in your local environment by typing this in the terminal, replacing \<packages\> (three commands should be pasted separately):
+
+        ```         
+        docker exec -it biab-runner-conda bash
+
+        mamba activate rbase
+
+        R -e 'install.packages(c(<packages>), repose="https://cloud.r-project.org/")
+        ```
+
+    -   You can use `devtools::install_github()` in a similar fashion
+
+#### Add any version dependencies to your yml file
+
+-   **If your script does not require a specific version,** you do not need to include a conda section to the yml file. The environment will be the default R environment.
+
+-   **If you need a specific version of an already installed library,** such as when a breaking change occurs and the script cannot be adapted to use the new version, you can use conda to specify a specific package version in your yml file.
+
+    -   If you include a conda section, make sure you list all your dependencies. This is creating a new separate environment, not a supplement to the base environment. This means that all of the packages that you need need to be specified in here, even if they are in the r-environment.yml file.
 
 ```         
-options_example:
-  label: Options example
-  description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
-  type: options
-  options:
-    - first option
-    - second option
-    - third option
-  example: third option
+conda: # Optional: if you script requires specific versions of packages.
+  channels:
+    - r
+  dependencies:
+    - r-rjson # read inputs and save outputs for R scripts
+    - package=version
 ```
+
+For more information, refer to the [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually).
+
+### Examples
 
 Here is an example of a complete YAML file with inputs and outputs:
 
@@ -184,6 +260,11 @@ outputs:
     label: Result plot 
     description: Plot of results
     type: image/png
+conda: # Optional, only needed if your script has specific package dependencies
+  channels:
+    - r
+  dependencies:
+    - r-rjson=0.2.22 #package=version
 ```
 
 YAML is a space sensitive format, so make sure all the tab sets are correct in the file.
@@ -195,7 +276,7 @@ Here is an empty commented sample that can be filled in
 ```         
 script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
-description: # Targetted to those who will interpret pipeline results and edit pipelines.
+description: # Targeted to those who will interpret pipeline results and edit pipelines.
 author: # 1 to many
   - name: # Full name
     email: # Optional, email address of the author. This will be publicly available.
@@ -221,15 +302,22 @@ outputs: # 1 to many
 references: # 0 to many
   - text: # plain text reference
     doi: # link
+    
+conda: # Optional, only needed if your script has specific package dependencies
+  channels: # programs that you need
+    - # list here
+  dependencies: # any packages that are dependent on a specfic version
+    - # list here
+  
 ```
 
-See [example](/scripts/helloWorld/helloR.yml)
+See [example](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/helloR.R)
 
 ## Step 2: Integrating YAML inputs and outputs into your script
 
 Now that you have created your YAML file, the inputs and outputs need to be integrated into your scripts.
 
-The scripts perform the actual work behind the scenes. They are located in [/scripts folder](/scripts)
+The scripts perform the actual work behind the scenes. They are located in [/scripts](https://github.com/GEO-BON/bon-in-a-box-pipelines/tree/main/scripts) folder
 
 Currently supported : - R v4.3.1 - Julia v1.9.3 - Python3 v3.9.2 - sh
 
@@ -243,7 +331,7 @@ Script lifecycle:
 
 4.  Script generates `output.json` containing links to result files, or native values (number, string, etc.)
 
-See [empty R script](/scripts/helloWorld/empty.R) for a minimal script lifecycle example.
+See [empty R script](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/empty.R) for a minimal script lifecycle example.
 
 ### Receiving inputs
 
@@ -360,12 +448,6 @@ stop("Analysis was halted because result is less than 0.")
 ```
 
 And then the customized error message would appear in the UI.
-
-### Script dependencies
-
-Scripts can install their own dependencies directly (`install.packages` in R, `Pkg.add` in Julia, etc). However, it will need to be reinstalled if the server is deployed on another computer or server.
-
-To pre-compile the dependency in the image, add it to [runners/r-dockerfile](runners/r-dockerfile) or [runners/julia-dockerfile](runners/julia-dockerfile). When the pull request is merged to main, a new image will be available to `docker compose pull` with the added dependencies.
 
 ## Step 3: Connect your scripts with the BON in a Box pipeline editor.
 
