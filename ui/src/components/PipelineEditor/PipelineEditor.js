@@ -4,6 +4,7 @@ import "./Editor.css";
 import { TextField, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, AlertTitle, Snackbar, DialogContentText } from '@mui/material';
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { unstable_useBlocker } from "react-router-dom";
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
@@ -14,6 +15,7 @@ import ReactFlow, {
   MiniMap,
   Position,
 } from "react-flow-renderer/nocss";
+import ReactMarkdown from "react-markdown";
 
 import IONode from "./IONode";
 import ConstantNode from "./ConstantNode";
@@ -80,6 +82,8 @@ export default function PipelineEditor(props) {
   const [outputList, setOutputList] = useState([]);
   const [metadata, setMetadata] = useState("");
   const [currentFileName, setCurrentFileName] = useState("");
+  const [savedJSON, setSavedJSON] = useState(null);
+  const [hasUnsavedChanges, setUnsavedChanges] = useState(false);
 
   const [editSession, setEditSession] = useState(Math.random());
 
@@ -584,65 +588,73 @@ export default function PipelineEditor(props) {
     );
   }, [reactFlowInstance, setNodes]);
 
+  const generateSaveJSON = useCallback(() => {
+    if (!reactFlowInstance)
+      return null
+
+    const flow = reactFlowInstance.toObject();
+
+    // react-flow properties that are not necessary to rebuild graph when loading
+    flow.nodes.forEach((node) => {
+      delete node.selected;
+      delete node.dragging;
+      delete node.positionAbsolute;
+      delete node.width;
+      delete node.height;
+      if (node.type === "userInput" || node.type === "constant")
+        delete node.data.label;
+
+      // These we will reinject when loading
+      delete node.targetPosition;
+      delete node.sourcePosition;
+    });
+
+    // No need to save the on-the-fly styling
+    flow.edges.forEach((edge) => {
+      delete edge.selected;
+      delete edge.style;
+    });
+
+    // Viewport is a source of merge conflicts
+    delete flow.viewport;
+
+    // Save pipeline inputs
+    flow.inputs = {};
+    inputList.forEach((input, i) => {
+      const id = toInputId(input)
+
+      // Destructuring copy to leave out fields that are not part of the input description spec.
+      const { file, nodeId, inputId, ...copy } = input;
+      copy.weight = i
+      flow.inputs[id] = copy;
+    });
+
+    // Save pipeline outputs
+    flow.outputs = {};
+    outputList.forEach((output, i) => {
+      const id = toOutputId(output)
+
+      // Destructuring copy to leave out fields that are not part of the output description spec.
+      let { file, nodeId, outputId, ...copy } = output;
+      copy.weight = i
+      flow.outputs[id] = copy;
+    });
+
+    // Save the metadata (only if metadata pane was edited)
+    if(metadata !== "") {
+      flow.metadata = yaml.load(metadata)
+    }
+
+    return JSON.stringify(flow, null, 2);
+  }, [inputList, outputList, metadata, reactFlowInstance]);
+
   const onSave = useCallback((fileName) => {
-    if (reactFlowInstance) {
-      const flow = reactFlowInstance.toObject();
-
-      // react-flow properties that are not necessary to rebuild graph when loading
-      flow.nodes.forEach((node) => {
-        delete node.selected;
-        delete node.dragging;
-        delete node.positionAbsolute;
-        delete node.width;
-        delete node.height;
-        if (node.type === "userInput" || node.type === "constant")
-          delete node.data.label;
-
-        // These we will reinject when loading
-        delete node.targetPosition;
-        delete node.sourcePosition;
-      });
-
-      // No need to save the on-the-fly styling
-      flow.edges.forEach((edge) => {
-        delete edge.selected;
-        delete edge.style;
-      });
-
-      // Viewport is a source of merge conflicts
-      delete flow.viewport;
-
-      // Save pipeline inputs
-      flow.inputs = {};
-      inputList.forEach((input, i) => {
-        const id = toInputId(input)
-
-        // Destructuring copy to leave out fields that are not part of the input description spec.
-        const { file, nodeId, inputId, ...copy } = input;
-        copy.weight = i
-        flow.inputs[id] = copy;
-      });
-
-      // Save pipeline outputs
-      flow.outputs = {};
-      outputList.forEach((output, i) => {
-        const id = toOutputId(output)
-
-        // Destructuring copy to leave out fields that are not part of the output description spec.
-        let { file, nodeId, outputId, ...copy } = output;
-        copy.weight = i
-        flow.outputs[id] = copy;
-      });
-
-      // Save the metadata (only if metadata pane was edited)
-      if(metadata !== "") {
-        flow.metadata = yaml.load(metadata)
-      }
-
+    let saveJSON = generateSaveJSON();
+    if (saveJSON) {
       if (fileName) {
         let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
         fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
-        api.savePipeline(fileNameWithoutExtension, JSON.stringify(flow, null, 2), (error, data, response) => {
+        api.savePipeline(fileNameWithoutExtension, saveJSON, (error, data, response) => {
           if (error) {
             showAlert(
               'error',
@@ -654,14 +666,17 @@ export default function PipelineEditor(props) {
             showAlert('warning', 'Pipeline saved with errors', response.text)
 
           } else {
+            localStorage.setItem("currentFileName", fileName);
+            setSavedJSON(saveJSON);
             setModal('saveSuccess');
           }
         });
 
       } else {
         navigator.clipboard
-          .writeText(JSON.stringify(flow, null, 2))
-          .then(() => {
+        .writeText(saveJSON)
+        .then(() => {
+            setSavedJSON(saveJSON);
             showAlert('info', 'Pipeline content copied to clipboard',
               'Use git to add the code to the BON in a Box repository.'
             );
@@ -671,7 +686,7 @@ export default function PipelineEditor(props) {
           });
       }
     }
-  }, [reactFlowInstance, inputList, outputList, metadata, showAlert]);
+  }, [showAlert, generateSaveJSON]);
 
   const onLoadFromFileBtnClick = () => inputFile.current.click(); // will call onLoad
 
@@ -688,6 +703,10 @@ export default function PipelineEditor(props) {
       }
 
       setCurrentFileName(file.name);
+
+      // TODO: Use loaded JSON and test
+      setSavedJSON(null); //this file is not saved on the server
+      localStorage.setItem("currentFileName", '');
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
     }
@@ -719,6 +738,8 @@ export default function PipelineEditor(props) {
                 )
               } else {
                 setCurrentFileName(descriptionFile);
+                localStorage.setItem("currentFileName", descriptionFile);
+                setSavedJSON(JSON.stringify(data, null, 2));
                 onLoadFlow(data);
               }
             });
@@ -728,6 +749,32 @@ export default function PipelineEditor(props) {
       }
     });
   };
+
+  const onLoadFromLocalStorage = (descriptionFile) => {
+    api.getPipeline(descriptionFile, (error, data, response) => {
+      if (error) {
+        localStorage.setItem("currentFileName", '');
+        showAlert(
+          'error',
+          'Error while loading the previously opened pipeline "' + descriptionFile + '"',
+          (response && response.text) ? response.text : error.toString()
+        )
+      } else {
+        setCurrentFileName(descriptionFile);
+        localStorage.setItem("currentFileName", descriptionFile);
+        setSavedJSON(JSON.stringify(data, null, 2));
+        onLoadFlow(data);
+      }
+    });
+  };
+
+  // Restores the last pipeline the user was editing from the localStorage.
+  // Executed once when opening the editor.
+  useEffect(()=> {
+    if(localStorage.getItem("currentFileName") && reactFlowInstance){
+        onLoadFromLocalStorage(localStorage.getItem("currentFileName"));
+    }
+  }, [reactFlowInstance]);
 
   const onLoadFlow = useCallback(async (flow) => {
     if (flow) {
@@ -882,7 +929,55 @@ export default function PipelineEditor(props) {
     setNodes([]);
     setEdges([]);
     hideModal('clear');
+    setSavedJSON(null);
   }, [setEditSession, setCurrentFileName, setNodes, setEdges, hideModal])
+
+  //useCallback with empty dependencies so that addEventListener and removeEventListener only work on this one function only created once
+  const handleBeforeUnload = useCallback((event) => {
+    event.preventDefault();
+    event.returnValue = '';
+  }, []);
+
+  useEffect(() => {
+    setUnsavedChanges(
+      (savedJSON === null && nodes.length !== 0) // new and not empty
+      || (savedJSON !== null && savedJSON !== generateSaveJSON()) // existing and modified
+    )
+  }, [nodes, edges, savedJSON, inputList, outputList, metadata, handleBeforeUnload]);
+
+  useEffect(() => {
+    if(hasUnsavedChanges) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    } else {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    }
+
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges])
+
+  //removes event listener when PipelineEditor component unmounts
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
+    };
+  }, [handleBeforeUnload])
+
+  const blocker = unstable_useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      hasUnsavedChanges &&
+      currentLocation.pathname !== nextLocation.pathname
+  );
+
+  const handleLeavePageModalClose = () => {
+    blocker.reset();
+    hideModal('leavePage');
+  }
+
+  useEffect(()=> {
+    if (blocker.state === "blocked"){
+      setModal("leavePage");
+    }
+  }, [blocker.state])
 
   return (
     <div id="editorLayout">
@@ -962,6 +1057,22 @@ export default function PipelineEditor(props) {
           <Button onClick={() => {hideModal('overwrite'); onSave(currentFileName)}} autoFocus>
             Overwrite
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={modal === 'leavePage'}
+        onClose={handleLeavePageModalClose}
+      >
+        <DialogTitle>Leaving the editor</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            There are unsaved modifications that will be lost when leaving the page.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleLeavePageModalClose}>Stay</Button>
+          <Button onClick={blocker.proceed}>Leave</Button>
         </DialogActions>
       </Dialog>
 
