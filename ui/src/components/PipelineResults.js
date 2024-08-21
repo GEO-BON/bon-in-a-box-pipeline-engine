@@ -63,7 +63,7 @@ export function PipelineResults({
         {isPipeline && viewerHost && runHash && (
           <a href={`${viewerHost}/${pipeline}>${runHash}`} target="_blank">
             <button disabled={runningScripts.size > 0}>
-              See in viewer
+              See in results viewer (beta)
             </button>
           </a>
         )}

@@ -1,4 +1,4 @@
-const yaml = require('js-yaml');
+import ReactMarkdown from 'react-markdown'
 
 export function StepDescription({ descriptionFile, metadata }) {
     return <>
@@ -55,7 +55,7 @@ export function GeneralDescription({ ymlPath, metadata }) {
                 </i>
             </p>
         }
-        {metadata.description && <p>{metadata.description}</p>}
+        {metadata.description && <ReactMarkdown className="reactMarkdown" children={metadata.description} />}
         {codeLink && <p>
                 Code: <a href={codeLink} target="_blank">{codeLink.substring(codeLink.search(/(scripts|pipelines)\//))}</a>
             </p>
@@ -140,7 +140,7 @@ export function InputsDescription({ metadata }) {
 
     return <>
         <h3>Inputs</h3>
-        <pre>{yaml.dump(metadata.inputs)}</pre>
+        <pre className='yaml'>{jsonToYaml(metadata.inputs)}</pre>
     </>
 }
 
@@ -154,6 +154,40 @@ export function OutputsDescription({ metadata }) {
 
     return <>
         <h3>Outputs</h3>
-        <pre>{yaml.dump(metadata.outputs)}</pre>
+        <pre className='yaml'>{jsonToYaml(metadata.outputs)}</pre>
     </>
+}
+
+
+function jsonToYaml(jsonObj, indent = 0, lineWidth = 80) {
+    return Object.keys(jsonObj).map((key) => {
+        return <div key={key}>
+            {'  '.repeat(indent) + key + ':'}
+            {key === 'description'
+                ? <> |<ReactMarkdown className='ioDescription' children={jsonObj[key]} /></>
+                : valuetoYaml(jsonObj[key], indent, lineWidth)}
+        </div>
+    })
+}
+
+function valuetoYaml(value, indent = 0, lineWidth = 80) {
+    if (typeof value === 'object' && !Array.isArray(value)) {
+        return <><br/>{jsonToYaml(value, indent + 1, lineWidth - (indent * 2))}</>
+
+    } else if (Array.isArray(value)) {
+        let yamlStr = '\n';
+        value.forEach(item => {
+            yamlStr += '  '.repeat(indent + 1) + '- ' + item + '\n';
+        });
+        return yamlStr
+
+    } else if (typeof value === 'string') {
+        if (value.includes('\n')) {
+            return ' |\n' + '  '.repeat(indent + 1) + value.split('\n').join('\n' + '  '.repeat(indent + 1)) + '\n';
+        } else if (value.length + indent * 2 > lineWidth) {
+            return ' >-\n' + '  '.repeat(indent + 1) + value.match(new RegExp('(.{1,'+lineWidth+'})(?: |$)', 'gm')).join('\n' + '  '.repeat(indent + 1)) + '\n';
+        }
+    }
+
+    return <>  {value}<br/></>
 }

@@ -3,6 +3,7 @@ import Map from './map/Map';
 import React from 'react';
 import RenderedCSV from './csv/RenderedCSV';
 import { FoldableOutputWithContext, FoldableOutput, FoldableOutputContextProvider } from "./FoldableOutput";
+import ReactMarkdown from 'react-markdown'
 
 export function StepResult({data, sectionName, sectionMetadata, logs}) {
     const [activeRenderer, setActiveRenderer] = useState({});
@@ -187,7 +188,7 @@ export const SingleIOResult = memo(({ ioId, value, ioMetadata, componentId, sect
             title = ioMetadata.label;
 
         if (ioMetadata.description)
-            description = <p className="outputDescription">{ioMetadata.description}</p>;
+            description = <p className="outputDescription"><ReactMarkdown className="reactMarkdown" children={ioMetadata.description} /></p>;
     }
 
     let isLink = isRelativeLink(value)

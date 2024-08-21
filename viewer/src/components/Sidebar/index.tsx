@@ -80,7 +80,7 @@ export default function Sidebar(props: any) {
             crs = p[m];
           }
         }
-        CsvToGeojson(`${window.location.hostname}${output}`, "\t", crs).then(
+        CsvToGeojson(`${output}`, "\t", crs).then(
           (r) => {
             if (r?.features?.length > 0) {
               setGeojsonOutput(r);
@@ -93,7 +93,7 @@ export default function Sidebar(props: any) {
       type.includes("csv") ||
       type.includes("tsv")
     ) {
-      CsvToObject(`${window.location.hostname}${output}`).then((r) => {
+      CsvToObject(output).then((r) => {
         if (r) {
           setModalContent(<CustomTable tableData={r}></CustomTable>);
           setOpenModal(true);
@@ -103,7 +103,7 @@ export default function Sidebar(props: any) {
       setModalContent(
         <Grid
           sx={{
-            background: `url("${window.location.hostname}${output}")`,
+            background: `url("${output}")`,
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
             width: "80vw",
@@ -130,7 +130,7 @@ export default function Sidebar(props: any) {
               overflowY: "scroll",
             }}
           >
-            <Typography sx={{ color: "#aaa", whiteSpace: "pre-line" }}>
+            <Typography sx={{ color: "#aaa", whiteSpace: "pre-wrap" }}>
               {doc.toString()}
             </Typography>
           </Grid>
