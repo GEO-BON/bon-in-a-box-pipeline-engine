@@ -130,7 +130,7 @@ export default function Sidebar(props: any) {
               overflowY: "scroll",
             }}
           >
-            <Typography sx={{ color: "#aaa", whiteSpace: "pre-line" }}>
+            <Typography sx={{ color: "#aaa", whiteSpace: "pre-wrap" }}>
               {doc.toString()}
             </Typography>
           </Grid>
