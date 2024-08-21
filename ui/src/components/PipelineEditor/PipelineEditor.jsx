@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useBlocker } from "react-router-dom";
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
@@ -36,10 +37,7 @@ import {
   getUpstreamNodes,
   getDownstreamNodes,
 } from "./react-flow-utils/getConnectedNodes";
-import {
-  fetchStepDescription,
-  getStepDescription,
-} from "./StepDescriptionStore";
+import { fetchStepDescription, getStepDescription } from "./StepDescriptionStore";
 import {
   getStepNodeId,
   getStepOutput,
@@ -68,18 +66,18 @@ let id = 0;
 const getId = () => `${id++}`;
 
 // Capture ctrl + s and ctrl + shift + s to quickly save the pipeline
-document.addEventListener("keydown", (e) => {
+document.addEventListener('keydown', e => {
   if (e.ctrlKey) {
     let button;
-    if (e.key === "s") {
-      button = document.getElementById("saveBtn");
-    } else if (e.key === "S") {
-      button = document.getElementById("saveAsBtn");
+    if (e.key === 's') {
+      button = document.getElementById("saveBtn")
+    } else if (e.key === 'S') {
+      button = document.getElementById("saveAsBtn")
     }
 
     if (button) {
       e.preventDefault();
-      button.click();
+      button.click()
     }
   }
 });
@@ -94,6 +92,8 @@ export default function PipelineEditor(props) {
   const [outputList, setOutputList] = useState([]);
   const [metadata, setMetadata] = useState("");
   const [currentFileName, setCurrentFileName] = useState("");
+  const [savedJSON, setSavedJSON] = useState(null);
+  const [hasUnsavedChanges, setUnsavedChanges] = useState(false);
 
   const [editSession, setEditSession] = useState(Math.random());
 
@@ -105,29 +105,21 @@ export default function PipelineEditor(props) {
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState();
 
-  const showAlert = useCallback(
-    (severity, title, message) => {
-      setAlertSeverity(severity);
-      setAlertTitle(title);
-      setAlertMessage(message);
-    },
-    [setAlertTitle, setAlertSeverity, setAlertMessage]
-  );
+  const showAlert = useCallback((severity, title, message) => {
+    setAlertSeverity(severity)
+    setAlertTitle(title)
+    setAlertMessage(message)
+  }, [setAlertTitle, setAlertSeverity, setAlertMessage])
 
   const clearAlert = useCallback(() => {
-    setAlertMessage("");
-    setAlertSeverity("");
-    setAlertTitle("");
-  }, [setAlertTitle, setAlertSeverity, setAlertMessage]);
+    setAlertMessage("")
+    setAlertSeverity("")
+    setAlertTitle("")
+  }, [setAlertTitle, setAlertSeverity, setAlertMessage])
 
-  const hideModal = useCallback(
-    (modalName) => {
-      setModal((currentModal) =>
-        currentModal === modalName ? null : currentModal
-      );
-    },
-    [setModal]
-  );
+  const hideModal = useCallback((modalName) => {
+    setModal(currentModal => currentModal === modalName ? null : currentModal)
+  }, [setModal])
 
   // We need this since the functions passed through node data retain their old selectedNodes state.
   // Note that the stratagem fails if trying to add edges from many sources at the same time.
@@ -379,31 +371,27 @@ export default function PipelineEditor(props) {
   );
 
   // Descriptions may vary between all steps connected, we pick the one from the first outgoing edge.
-  const getDescriptionFromConnection = useCallback(
-    (allNodes, allEdges, sourceNode) => {
-      const edgeFound = allEdges.find((edge) => sourceNode.id === edge.source);
+  const getDescriptionFromConnection = useCallback((allNodes, allEdges, sourceNode) => {
+    const edgeFound = allEdges.find(edge => sourceNode.id === edge.source)
 
-      if (edgeFound) {
-        const nodeFound = allNodes.find((n) => edgeFound.target === n.id);
-        const stepDescription = getStepDescription(
-          nodeFound.data.descriptionFile
-        );
+    if (edgeFound) {
+      const nodeFound = allNodes.find(n => edgeFound.target === n.id)
+      const stepDescription = getStepDescription(nodeFound.data.descriptionFile)
 
-        if (stepDescription && stepDescription.inputs) {
-          return stepDescription.inputs[edgeFound.targetHandle];
-        }
+      if (stepDescription && stepDescription.inputs) {
+        return stepDescription.inputs[edgeFound.targetHandle]
       }
-      return undefined;
-    },
-    []
-  );
+    }
+    return undefined
+  }, [])
 
   /**
    * Refresh the list of "dangling" inputs that the user will need to provide.
    */
   const refreshInputList = useCallback(
     (allNodes, allEdges) => {
-      if (allNodes.length === 0) return;
+      if (allNodes.length === 0)
+        return
 
       setInputList((previousInputs) => {
         let newUserInputs = [];
@@ -425,17 +413,13 @@ export default function PipelineEditor(props) {
                   description: "Description missing",
                   type: node.data.type,
                   example: node.data.value,
-                  nodeId: node.id,
-                };
+                  nodeId: node.id
+                }
 
-                const inputDescription = getDescriptionFromConnection(
-                  allNodes,
-                  allEdges,
-                  node
-                );
+                const inputDescription = getDescriptionFromConnection(allNodes, allEdges, node)
                 if (inputDescription) {
                   // This will fill label, description, and other fields.
-                  Object.assign(toAdd, inputDescription);
+                  Object.assign(toAdd, inputDescription)
                   node.data.label = inputDescription.label;
                 }
 
@@ -467,11 +451,11 @@ export default function PipelineEditor(props) {
                       previousInput && previousInput.label
                         ? previousInput
                         : {
-                            ...inputDescription,
-                            nodeId: node.id,
-                            inputId: inputId,
-                            file: node.data.descriptionFile,
-                          }
+                          ...inputDescription,
+                          nodeId: node.id,
+                          inputId: inputId,
+                          file: node.data.descriptionFile,
+                        }
                     );
                   }
                 });
@@ -480,9 +464,7 @@ export default function PipelineEditor(props) {
           }
         });
 
-        return _lang.isEqual(previousInputs, newUserInputs)
-          ? previousInputs
-          : newUserInputs;
+        return _lang.isEqual(previousInputs, newUserInputs) ? previousInputs : newUserInputs;
       });
     },
     [setInputList, getDescriptionFromConnection]
@@ -496,10 +478,12 @@ export default function PipelineEditor(props) {
    * Refresh the list of outputs on edge change.
    */
   useEffect(() => {
-    if (!reactFlowInstance) return;
+    if (!reactFlowInstance)
+      return
 
     const allNodes = reactFlowInstance.getNodes();
-    if (allNodes.length === 0) return;
+    if(allNodes.length === 0)
+      return
 
     let newPipelineOutputs = [];
     allNodes.forEach((node) => {
@@ -522,33 +506,32 @@ export default function PipelineEditor(props) {
           if (outputDescription === undefined) {
             let newNode = {
               nodeId: edge.source,
-              outputId: "defaultOutput",
+              outputId: "defaultOutput"
             };
 
-            if (sourceNode.type === "userInput") {
+            if (sourceNode.type === 'userInput') {
               // Rest of fields will be populated from userInput in below hook
               newPipelineOutputs.push(newNode);
-            } else if (sourceNode.type === "constant") {
-              newNode["description"] = "This constant has no description";
-              newNode["label"] = "This constant has no label";
-              newNode["example"] = sourceNode.data.value;
-              newNode["type"] = sourceNode.data.type;
-              newNode["options"] = sourceNode.data.options;
 
-              const inputDescription = getDescriptionFromConnection(
-                allNodes,
-                reactFlowInstance.getEdges(),
-                sourceNode
-              );
+            } else if (sourceNode.type === 'constant') {
+              newNode['description'] = 'This constant has no description'
+              newNode['label'] = 'This constant has no label'
+              newNode['example'] = sourceNode.data.value
+              newNode['type'] = sourceNode.data.type
+              newNode['options'] = sourceNode.data.options
+
+              const inputDescription = getDescriptionFromConnection(allNodes, reactFlowInstance.getEdges(), sourceNode)
               if (inputDescription) {
                 // This will fill label, description, and other fields.
-                Object.assign(newNode, inputDescription);
+                Object.assign(newNode, inputDescription)
               }
 
               newPipelineOutputs.push(newNode);
+
             } else {
-              console.error("Failed to load undefined output");
+              console.error("Failed to load undefined output")
             }
+
           } else {
             newPipelineOutputs.push({
               ...outputDescription, // shallow clone
@@ -572,39 +555,35 @@ export default function PipelineEditor(props) {
         return previousOutput && previousOutput.label
           ? previousOutput
           : newOutput;
-      });
+      })
 
-      return _lang.isEqual(previousOutputs, newPipelineOutputs)
-        ? previousOutputs
-        : newPipelineOutputs;
+      return _lang.isEqual(previousOutputs, newPipelineOutputs) ? previousOutputs : newPipelineOutputs
     });
     // Everytime the edge changes, there might be a new connection to an output block.
   }, [edges, reactFlowInstance, setOutputList, getDescriptionFromConnection]);
 
   // Fill newly connected outputs to userInputs
   useEffect(() => {
-    let newOutputFromUserInput = outputList.find((o) => o.label === undefined);
-    if (newOutputFromUserInput) {
-      let matchingInput = inputList.find(
-        (i) => i.nodeId === newOutputFromUserInput.nodeId
-      );
-      if (matchingInput) {
-        setOutputList((prevOutputs) =>
-          prevOutputs.map((prevOutput) => {
-            if (prevOutput.nodeId === newOutputFromUserInput.nodeId) {
+    let newOutputFromUserInput = outputList.find(o => o.label === undefined)
+    if(newOutputFromUserInput) {
+      let matchingInput = inputList.find(i => i.nodeId === newOutputFromUserInput.nodeId)
+      if(matchingInput) {
+        setOutputList(prevOutputs =>
+          prevOutputs.map(prevOutput => {
+            if(prevOutput.nodeId === newOutputFromUserInput.nodeId) {
               return {
                 ...prevOutput,
                 label: matchingInput.label,
                 description: matchingInput.description,
                 example: matchingInput.example,
                 type: matchingInput.type,
-                options: matchingInput.options,
-              };
+                options: matchingInput.options
+              }
             } else {
-              return prevOutput;
+              return prevOutput
             }
           })
-        );
+        )
       }
     }
   }, [inputList, outputList, setOutputList]);
@@ -619,113 +598,105 @@ export default function PipelineEditor(props) {
     );
   }, [reactFlowInstance, setNodes]);
 
-  const onSave = useCallback(
-    (fileName) => {
-      if (reactFlowInstance) {
-        const flow = reactFlowInstance.toObject();
+  const generateSaveJSON = useCallback(() => {
+    if (!reactFlowInstance)
+      return null
 
-        // react-flow properties that are not necessary to rebuild graph when loading
-        flow.nodes.forEach((node) => {
-          delete node.selected;
-          delete node.dragging;
-          delete node.positionAbsolute;
-          delete node.width;
-          delete node.height;
-          if (node.type === "userInput" || node.type === "constant")
-            delete node.data.label;
+    const flow = reactFlowInstance.toObject();
 
-          // These we will reinject when loading
-          delete node.targetPosition;
-          delete node.sourcePosition;
+    // react-flow properties that are not necessary to rebuild graph when loading
+    flow.nodes.forEach((node) => {
+      delete node.selected;
+      delete node.dragging;
+      delete node.positionAbsolute;
+      delete node.width;
+      delete node.height;
+      if (node.type === "userInput" || node.type === "constant")
+        delete node.data.label;
+
+      // These we will reinject when loading
+      delete node.targetPosition;
+      delete node.sourcePosition;
+    });
+
+    // No need to save the on-the-fly styling
+    flow.edges.forEach((edge) => {
+      delete edge.selected;
+      delete edge.style;
+    });
+
+    // Viewport is a source of merge conflicts
+    delete flow.viewport;
+
+    // Save pipeline inputs
+    flow.inputs = {};
+    inputList.forEach((input, i) => {
+      const id = toInputId(input)
+
+      // Destructuring copy to leave out fields that are not part of the input description spec.
+      const { file, nodeId, inputId, ...copy } = input;
+      copy.weight = i
+      flow.inputs[id] = copy;
+    });
+
+    // Save pipeline outputs
+    flow.outputs = {};
+    outputList.forEach((output, i) => {
+      const id = toOutputId(output)
+
+      // Destructuring copy to leave out fields that are not part of the output description spec.
+      let { file, nodeId, outputId, ...copy } = output;
+      copy.weight = i
+      flow.outputs[id] = copy;
+    });
+
+    // Save the metadata (only if metadata pane was edited)
+    if(metadata !== "") {
+      flow.metadata = yaml.load(metadata)
+    }
+
+    return JSON.stringify(flow, null, 2);
+  }, [inputList, outputList, metadata, reactFlowInstance]);
+
+  const onSave = useCallback((fileName) => {
+    let saveJSON = generateSaveJSON();
+    if (saveJSON) {
+      if (fileName) {
+        let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
+        fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
+        api.savePipeline(fileNameWithoutExtension, saveJSON, (error, data, response) => {
+          if (error) {
+            showAlert(
+              'error',
+              'Error saving the pipeline',
+              (response && response.text) ? response.text : error.toString()
+            )
+
+          } else if (response.text) {
+            showAlert('warning', 'Pipeline saved with errors', response.text)
+
+          } else {
+            localStorage.setItem("currentFileName", fileName);
+            setSavedJSON(saveJSON);
+            setModal('saveSuccess');
+          }
         });
 
-        // No need to save the on-the-fly styling
-        flow.edges.forEach((edge) => {
-          delete edge.selected;
-          delete edge.style;
-        });
-
-        // Viewport is a source of merge conflicts
-        delete flow.viewport;
-
-        // Save pipeline inputs
-        flow.inputs = {};
-        inputList.forEach((input, i) => {
-          const id = toInputId(input);
-
-          // Destructuring copy to leave out fields that are not part of the input description spec.
-          const { file, nodeId, inputId, ...copy } = input;
-          copy.weight = i;
-          flow.inputs[id] = copy;
-        });
-
-        // Save pipeline outputs
-        flow.outputs = {};
-        outputList.forEach((output, i) => {
-          const id = toOutputId(output);
-
-          // Destructuring copy to leave out fields that are not part of the output description spec.
-          let { file, nodeId, outputId, ...copy } = output;
-          copy.weight = i;
-          flow.outputs[id] = copy;
-        });
-
-        // Save the metadata (only if metadata pane was edited)
-        if (metadata !== "") {
-          flow.metadata = yaml.load(metadata);
-        }
-
-        if (fileName) {
-          let fileNameWithoutExtension = fileName.endsWith(".json")
-            ? fileName.slice(0, -5)
-            : fileName;
-          fileNameWithoutExtension = fileNameWithoutExtension.replaceAll(
-            "/",
-            ">"
-          );
-          api.savePipeline(
-            fileNameWithoutExtension,
-            JSON.stringify(flow, null, 2),
-            (error, data, response) => {
-              if (error) {
-                showAlert(
-                  "error",
-                  "Error saving the pipeline",
-                  response && response.text ? response.text : error.toString()
-                );
-              } else if (response.text) {
-                showAlert(
-                  "warning",
-                  "Pipeline saved with errors",
-                  response.text
-                );
-              } else {
-                setModal("saveSuccess");
-              }
-            }
-          );
-        } else {
-          navigator.clipboard
-            .writeText(JSON.stringify(flow, null, 2))
-            .then(() => {
-              showAlert(
-                "info",
-                "Pipeline content copied to clipboard",
-                "Use git to add the code to the BON in a Box repository."
-              );
-            })
-            .catch(() => {
-              showAlert(
-                "error",
-                "Error",
-                "Failed to copy content to clipboard."
-              );
-            });
-        }
+      } else {
+        navigator.clipboard
+        .writeText(saveJSON)
+        .then(() => {
+            setSavedJSON(saveJSON);
+            showAlert('info', 'Pipeline content copied to clipboard',
+              'Use git to add the code to the BON in a Box repository.'
+            );
+          })
+          .catch(() => {
+            showAlert('error', 'Error', 'Failed to copy content to clipboard.');
+          });
       }
-    },
-    [reactFlowInstance, inputList, outputList, metadata, showAlert]
-  );
+    }
+  }, [showAlert, generateSaveJSON]);
 
   const onLoadFromFileBtnClick = () => inputFile.current.click(); // will call onLoad
 
@@ -739,9 +710,13 @@ export default function PipelineEditor(props) {
       fr.readAsText(file);
       fr.onload = (loadEvent) => {
         onLoadFlow(JSON.parse(loadEvent.target.result));
-      };
+      }
 
       setCurrentFileName(file.name);
+
+      // TODO: Use loaded JSON and test
+      setSavedJSON(null); //this file is not saved on the server
+      localStorage.setItem("currentFileName", '');
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
     }
@@ -756,201 +731,263 @@ export default function PipelineEditor(props) {
     api.getListOf("pipeline", (error, pipelineMap, response) => {
       if (error) {
         showAlert(
-          "error",
-          "Error loading the pipeline list",
-          response && response.text ? response.text : error.toString()
-        );
+          'error',
+          'Error loading the pipeline list',
+          (response && response.text) ? response.text : error.toString()
+        )
       } else {
         let options = {};
-        Object.entries(pipelineMap).forEach(
-          ([descriptionFile, pipelineName]) =>
-            (options[descriptionFile + " (" + pipelineName + ")"] = () => {
-              api.getPipeline(descriptionFile, (error, data, response) => {
-                if (error) {
-                  showAlert(
-                    "error",
-                    "Error loading the pipeline",
-                    response && response.text ? response.text : error.toString()
-                  );
-                } else {
-                  setCurrentFileName(descriptionFile);
-                  onLoadFlow(data);
-                }
-              });
-            })
+        Object.entries(pipelineMap).forEach(([descriptionFile, pipelineName]) =>
+          (options[descriptionFile + ' (' + pipelineName + ')'] = () => {
+            api.getPipeline(descriptionFile, (error, data, response) => {
+              if (error) {
+                showAlert(
+                  'error',
+                  'Error loading the pipeline',
+                  (response && response.text) ? response.text : error.toString()
+                )
+              } else {
+                setCurrentFileName(descriptionFile);
+                localStorage.setItem("currentFileName", descriptionFile);
+                setSavedJSON(JSON.stringify(data, null, 2));
+                onLoadFlow(data);
+              }
+            });
+          })
         );
         setPopupMenuOptions(options);
       }
     });
   };
 
-  const onLoadFlow = useCallback(
-    async (flow) => {
-      if (flow) {
-        setEditSession(Math.random());
+  const onLoadFromLocalStorage = (descriptionFile) => {
+    api.getPipeline(descriptionFile, (error, data, response) => {
+      if (error) {
+        localStorage.setItem("currentFileName", '');
+        showAlert(
+          'error',
+          'Error while loading the previously opened pipeline "' + descriptionFile + '"',
+          (response && response.text) ? response.text : error.toString()
+        )
+      } else {
+        setCurrentFileName(descriptionFile);
+        localStorage.setItem("currentFileName", descriptionFile);
+        setSavedJSON(JSON.stringify(data, null, 2));
+        onLoadFlow(data);
+      }
+    });
+  };
 
-        // Load script descriptions (this has to be done before adding inputs and outputs or a few weird side-effects will occur)
-        let callbacksRemaining = 0;
-        flow.nodes.forEach((n) => {
-          if (n.data && n.data.descriptionFile) {
-            callbacksRemaining++;
-            fetchStepDescription(
-              n.data.descriptionFile,
-              () => callbacksRemaining--
-            );
-          }
-        });
+  // Restores the last pipeline the user was editing from the localStorage.
+  // Executed once when opening the editor.
+  useEffect(()=> {
+    if(localStorage.getItem("currentFileName") && reactFlowInstance){
+        onLoadFromLocalStorage(localStorage.getItem("currentFileName"));
+    }
+  }, [reactFlowInstance]);
 
-        let waitCount = 0; // Wait max 5s
-        while (callbacksRemaining > 0 && waitCount < 500) {
-          await sleep(10);
-          waitCount++;
+  const onLoadFlow = useCallback(async (flow) => {
+    if (flow) {
+      setEditSession(Math.random())
+
+      // Load script descriptions (this has to be done before adding inputs and outputs or a few weird side-effects will occur)
+      let callbacksRemaining = 0
+      flow.nodes.forEach(n => {
+        if(n.data && n.data.descriptionFile) {
+          callbacksRemaining++;
+          fetchStepDescription(n.data.descriptionFile, () => callbacksRemaining--);
         }
+      })
 
-        // Read metadata
-        setMetadata(flow.metadata ? yaml.dump(flow.metadata) : "");
+      let waitCount = 0 // Wait max 5s
+      while(callbacksRemaining > 0 && waitCount < 500){
+        await sleep(10)
+        waitCount++
+      }
 
-        // Read inputs
-        let inputsFromFile = [];
-        if (flow.inputs) {
-          Object.entries(flow.inputs).forEach((entry) => {
-            const [fullId, inputDescription] = entry;
+      // Read metadata
+      setMetadata(flow.metadata ? yaml.dump(flow.metadata) : "")
 
-            if (fullId.startsWith("pipeline@")) {
-              inputsFromFile.push({
-                nodeId: getStepNodeId(fullId),
-                ...inputDescription,
-              });
-            } else {
-              // Script input
-              inputsFromFile.push({
-                file: getStepFile(fullId),
-                nodeId: getStepNodeId(fullId),
-                inputId: getStepInput(fullId),
-                ...inputDescription,
-              });
-            }
-          });
-        }
-        setInputList(inputsFromFile);
+      // Read inputs
+      let inputsFromFile = [];
+      if (flow.inputs) {
+        Object.entries(flow.inputs).forEach((entry) => {
+          const [fullId, inputDescription] = entry;
 
-        // Read outputs
-        let outputsFromFile = [];
-        if (flow.outputs) {
-          Object.entries(flow.outputs).forEach((entry) => {
-            const [fullId, outputDescription] = entry;
-
-            outputsFromFile.push({
+          if (fullId.startsWith("pipeline@")) {
+            inputsFromFile.push({
+              nodeId: getStepNodeId(fullId),
+              ...inputDescription,
+            });
+          } else {
+            // Script input
+            inputsFromFile.push({
               file: getStepFile(fullId),
               nodeId: getStepNodeId(fullId),
-              outputId: getStepOutput(fullId),
-              ...outputDescription,
+              inputId: getStepInput(fullId),
+              ...inputDescription,
             });
-          });
-        }
-        setOutputList(outputsFromFile);
-
-        // Read nodes
-        id = 0;
-        flow.nodes.forEach((node) => {
-          // Make sure next id doesn't overlap
-          id = Math.max(id, parseInt(node.id));
-
-          // Reinjecting deleted properties
-          node.targetPosition = "left";
-          node.sourcePosition = "right";
-
-          // Reinjecting functions
-          switch (node.type) {
-            case "io":
-              node.data.setToolTip = setToolTip;
-              node.data.injectConstant = injectConstant;
-              node.data.injectOutput = injectOutput;
-              break;
-            case "constant":
-              node.data.onConstantValueChange = onConstantValueChange;
-              node.data.onPopupMenu = onPopupMenu;
-              break;
-            case "userInput":
-              node.data.onPopupMenu = onPopupMenu;
-              node.data.label = inputsFromFile.find(
-                (i) => i.nodeId === node.id
-              ).label;
-              break;
-            case "output":
-              break;
-            default:
-              showAlert(
-                "error",
-                "Pipeline loaded with errors",
-                "Unsupported node type " + node.type
-              );
           }
         });
-        id++;
-
-        // Load the graph
-        setEdges([]);
-        setNodes([]);
-        sleep(1).then(() => {
-          // Reset viewport to top left
-          reactFlowInstance.setViewport({ x: 0, y: 0, zoom: 1 });
-
-          setNodes(flow.nodes || []);
-          setEdges(flow.edges || []);
-        });
-      } else {
-        showAlert("error", "Error loading the pipeline", "No data received.");
       }
-    },
-    [
-      reactFlowInstance,
-      setMetadata,
-      setInputList,
-      setOutputList,
-      setEdges,
-      setNodes,
-      injectConstant,
-      injectOutput,
-      onConstantValueChange,
-      onPopupMenu,
-      showAlert,
-    ]
-  );
+      setInputList(inputsFromFile);
 
-  const saveFileToServer = useCallback(
-    (descriptionFile) => {
-      api.getListOf("pipeline", (error, pipelineList, response) => {
-        if (error) {
-          showAlert(
-            "error",
-            "Error saving the pipeline",
-            "Failed to retrieve pipeline list.\n" +
-              (response && response.text ? response.text : error.toString())
-          );
-        } else {
-          let sanitized = descriptionFile.trim().replace(/\s*(\/|>)\s*/, ">");
-          if (!sanitized.endsWith(".json")) sanitized += ".json";
+      // Read outputs
+      let outputsFromFile = [];
+      if (flow.outputs) {
+        Object.entries(flow.outputs).forEach((entry) => {
+          const [fullId, outputDescription] = entry;
 
-          const descriptionFiles = Object.keys(pipelineList);
-          if (descriptionFiles.includes(sanitized)) {
-            setModal("overwrite");
-            return;
-          }
-          onSave(descriptionFile);
+          outputsFromFile.push({
+            file: getStepFile(fullId),
+            nodeId: getStepNodeId(fullId),
+            outputId: getStepOutput(fullId),
+            ...outputDescription,
+          });
+        });
+      }
+      setOutputList(outputsFromFile);
+
+      // Read nodes
+      id = 0;
+      flow.nodes.forEach((node) => {
+        // Make sure next id doesn't overlap
+        id = Math.max(id, parseInt(node.id));
+
+        // Reinjecting deleted properties
+        node.targetPosition = "left";
+        node.sourcePosition = "right";
+
+        // Reinjecting functions
+        switch (node.type) {
+          case "io":
+            node.data.setToolTip = setToolTip;
+            node.data.injectConstant = injectConstant;
+            node.data.injectOutput = injectOutput;
+            break;
+          case "constant":
+            node.data.onConstantValueChange = onConstantValueChange;
+            node.data.onPopupMenu = onPopupMenu;
+            break;
+          case "userInput":
+            node.data.onPopupMenu = onPopupMenu;
+            node.data.label = inputsFromFile.find(
+              (i) => i.nodeId === node.id
+            ).label;
+            break;
+          case "output":
+            break;
+          default:
+            showAlert('error', 'Pipeline loaded with errors', 'Unsupported node type ' + node.type)
         }
       });
-    },
-    [onSave, showAlert]
-  );
+      id++;
 
-  const clearPipelineEditor = useCallback(() => {
+      // Load the graph
+      setEdges([]);
+      setNodes([]);
+      sleep(1).then(() => {
+        // Reset viewport to top left
+        reactFlowInstance.setViewport({ x: 0, y: 0, zoom: 1 });
+
+        setNodes(flow.nodes || []);
+        setEdges(flow.edges || []);
+      });
+    } else {
+      showAlert('error', 'Error loading the pipeline', 'No data received.')
+    }
+  }, [
+    reactFlowInstance,
+    setMetadata,
+    setInputList,
+    setOutputList,
+    setEdges,
+    setNodes,
+    injectConstant,
+    injectOutput,
+    onConstantValueChange,
+    onPopupMenu,
+    showAlert
+  ]);
+
+  const saveFileToServer = useCallback((descriptionFile) => {
+    api.getListOf("pipeline", (error, pipelineList, response) => {
+      if (error) {
+        showAlert(
+          'error',
+          'Error saving the pipeline',
+          'Failed to retrieve pipeline list.\n' +
+            ((response && response.text) ? response.text : error.toString())
+        )
+      } else {
+        let sanitized = descriptionFile.trim().replace(/\s*(\/|>)\s*/, '>')
+        if(!sanitized.endsWith('.json')) sanitized += '.json'
+
+        const descriptionFiles = Object.keys(pipelineList);
+        if (descriptionFiles.includes(sanitized)) {
+          setModal('overwrite')
+          return;
+        }
+        onSave(descriptionFile);
+      }
+    });
+  }, [onSave, showAlert]);
+
+  const clearPipelineEditor = useCallback(()=> {
     setEditSession(Math.random());
     setCurrentFileName("");
     setNodes([]);
     setEdges([]);
-    hideModal("clear");
-  }, [setEditSession, setCurrentFileName, setNodes, setEdges, hideModal]);
+    hideModal('clear');
+    setSavedJSON(null);
+  }, [setEditSession, setCurrentFileName, setNodes, setEdges, hideModal])
+
+  //useCallback with empty dependencies so that addEventListener and removeEventListener only work on this one function only created once
+  const handleBeforeUnload = useCallback((event) => {
+    event.preventDefault();
+    event.returnValue = '';
+  }, []);
+
+  useEffect(() => {
+    setUnsavedChanges(
+      (savedJSON === null && nodes.length !== 0) // new and not empty
+      || (savedJSON !== null && savedJSON !== generateSaveJSON()) // existing and modified
+    )
+  }, [nodes, edges, savedJSON, inputList, outputList, metadata, handleBeforeUnload]);
+
+  useEffect(() => {
+    if(hasUnsavedChanges) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    } else {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    }
+
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges])
+
+  //removes event listener when PipelineEditor component unmounts
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload); //so that this event listener doesn't persist when the component unmounts (e.g. React Router change)
+    };
+  }, [handleBeforeUnload])
+
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      hasUnsavedChanges &&
+      currentLocation.pathname !== nextLocation.pathname
+  );
+
+  const handleLeavePageModalClose = () => {
+    blocker.reset();
+    hideModal('leavePage');
+  }
+
+  useEffect(()=> {
+    if (blocker.state === "blocked"){
+      setModal("leavePage");
+    }
+  }, [blocker.state])
 
   return (
     <div id="editorLayout">
@@ -966,17 +1003,17 @@ export default function PipelineEditor(props) {
       </p>
 
       <Dialog
-        open={modal === "saveAs"}
-        onClose={() => hideModal("saveAs")}
+        open={modal === 'saveAs'}
+        onClose={() => hideModal('saveAs')}
         PaperProps={{
-          component: "form",
+          component: 'form',
           onSubmit: (event) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
 
-            hideModal("saveAs");
-            setCurrentFileName(formData.get("fileName"));
-            saveFileToServer(formData.get("fileName"));
+            hideModal('saveAs')
+            setCurrentFileName(formData.get('fileName'))
+            saveFileToServer(formData.get('fileName'))
           },
         }}
       >
@@ -992,85 +1029,83 @@ export default function PipelineEditor(props) {
             required
             variant="standard"
             sx={{
-              width: "400px",
+              width: '400px'
             }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => hideModal("saveAs")}>Cancel</Button>
+          <Button onClick={() => hideModal('saveAs')}>Cancel</Button>
           <Button type="submit">Save</Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={modal === "clear"} onClose={() => hideModal("clear")}>
-        <DialogTitle>
-          Are you sure you want to clear the pipeline editor?
-        </DialogTitle>
+      <Dialog
+        open={modal === 'clear'}
+        onClose={() => hideModal('clear')}
+      >
+        <DialogTitle>Are you sure you want to clear the pipeline editor?</DialogTitle>
         <DialogActions>
-          <Button
-            onClick={() => {
-              clearPipelineEditor();
-            }}
-          >
-            Clear canvas
-          </Button>
-          <Button onClick={() => hideModal("clear")}>Keep changes</Button>
+          <Button onClick={() => {clearPipelineEditor()}}>Clear canvas</Button>
+          <Button onClick={() => hideModal('clear')}>Keep changes</Button>
         </DialogActions>
       </Dialog>
 
       <Dialog
-        open={modal === "overwrite"}
-        onClose={() => hideModal("overwrite")}
+        open={modal === 'overwrite'}
+        onClose={() => hideModal('overwrite')}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          This file name already exists.
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">This file name already exists.</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Do you want to continue and overwrite the existing file?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setModal("saveAs")}>Cancel</Button>
-          <Button
-            onClick={() => {
-              hideModal("overwrite");
-              onSave(currentFileName);
-            }}
-            autoFocus
-          >
+          <Button onClick={() => setModal('saveAs')}>Cancel</Button>
+          <Button onClick={() => {hideModal('overwrite'); onSave(currentFileName)}} autoFocus>
             Overwrite
           </Button>
         </DialogActions>
       </Dialog>
 
-      {alertMessage &&
-        alertMessage !== "" && ( // when in open={...}, there was a flash frame while closing.
-          <Dialog open={true} onClose={clearAlert}>
-            <Alert
-              severity={alertSeverity}
-              id="alert-dialog-description"
-              style={{ whiteSpace: "pre-wrap" }}
-            >
-              <AlertTitle>{alertTitle}</AlertTitle>
-              {alertMessage}
-            </Alert>
-            <DialogActions>
-              <Button onClick={clearAlert}>OK</Button>
-            </DialogActions>
-          </Dialog>
-        )}
+      <Dialog
+        open={modal === 'leavePage'}
+        onClose={handleLeavePageModalClose}
+      >
+        <DialogTitle>Leaving the editor</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            There are unsaved modifications that will be lost when leaving the page.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleLeavePageModalClose}>Stay</Button>
+          <Button onClick={blocker.proceed}>Leave</Button>
+        </DialogActions>
+      </Dialog>
 
-      <Snackbar
-        open={modal === "saveSuccess"}
-        autoHideDuration={3000}
-        onClose={() => hideModal("saveSuccess")}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      {alertMessage && alertMessage !== '' && // when in open={...}, there was a flash frame while closing.
+        <Dialog open={true} onClose={clearAlert}>
+          <Alert severity={alertSeverity} id="alert-dialog-description" style={{ whiteSpace: "pre-wrap" }}>
+            <AlertTitle>{alertTitle}</AlertTitle>
+            {alertMessage}
+          </Alert>
+          <DialogActions>
+            <Button onClick={clearAlert}>OK</Button>
+          </DialogActions>
+        </Dialog>
+      }
+
+
+      <Snackbar open={modal === 'saveSuccess'}
+        autoHideDuration={3000} onClose={() => hideModal('saveSuccess')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert severity="success">Pipeline saved to server</Alert>
       </Snackbar>
+
 
       <div className="dndflow">
         <ReactFlowProvider>
@@ -1087,7 +1122,7 @@ export default function PipelineEditor(props) {
               onDragOver={onDragOver}
               onSelectionChange={onSelectionChange}
               onNodesDelete={onNodesDelete}
-              deleteKeyCode={["Backspace", "Delete"]}
+              deleteKeyCode={['Backspace', 'Delete']}
               onMouseDownCapture={onPopupMenuHide}
             >
               {toolTip && <div className="tooltip">{toolTip}</div>}
@@ -1106,35 +1141,14 @@ export default function PipelineEditor(props) {
                 <button onClick={onLoadFromServerBtnClick}>
                   Load from server
                 </button>
-                {/^deny$/i.test(
-                  import.meta.env.VITE_APP_SAVE_PIPELINE_TO_SERVER
-                ) ? (
-                  <button id="saveBtn" onClick={() => onSave()}>
-                    Save to clipboard
-                  </button>
-                ) : (
-                  <>
-                    <button
-                      id="clear"
-                      disabled={nodes.length === 0}
-                      onClick={() => setModal("clear")}
-                    >
-                      Clear
-                    </button>
-                    <button
-                      id="saveBtn"
-                      onClick={() => {
-                        if (currentFileName) onSave(currentFileName);
-                        else setModal("saveAs");
-                      }}
-                    >
-                      Save
-                    </button>
-                    <button id="saveAsBtn" onClick={() => setModal("saveAs")}>
-                      Save As...
-                    </button>
+                {/^deny$/i.test(import.meta.env.VITE_APP_SAVE_PIPELINE_TO_SERVER)
+                  ? <button id="saveBtn" onClick={() => onSave()}>Save to clipboard</button>
+                  : <>
+                    <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
+                    <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
+                    <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
                   </>
-                )}
+                }
               </div>
 
               <Controls />

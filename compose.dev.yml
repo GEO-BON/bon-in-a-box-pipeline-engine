@@ -18,7 +18,19 @@ services:
       CHOKIDAR_USEPOLLING: true
       # https://github.com/facebook/create-react-app/issues/11779
       WDS_SOCKET_PORT: 0
-      VITE_APP_VIEWER_HOST: ${VITE_APP_VIEWER_HOST}
+      VITE_APP_VIEWER_HOST: /viewer
+
+  viewer:
+    image: node:current-alpine3.18
+    #build:
+    #  context: ./viewer
+    #  dockerfile: Dockerfile.prod
+    volumes:
+      - "./viewer:/app:rw"
+    working_dir: "/app"
+    command: sh -c "npm install; npm run dev;"
+    expose:
+      - "80"
 
   ## In the DEV version, using a volume and a single docker. To rebuild without restarting everything, use
   ## docker exec -it biab-script-server sh -c "cd /home/gradle/project/ && gradle build"

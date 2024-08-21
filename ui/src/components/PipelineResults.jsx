@@ -64,15 +64,11 @@ export function PipelineResults({
       >
         <h2>Results</h2>
         {isPipeline && viewerHost && runHash && (
-          <button>
-            <a
-              href={`${viewerHost}/${pipeline}>${runHash}`}
-              target="_blank"
-              style={{ textDecoration: "none", color: "#333" }}
-            >
-              See in viewer
-            </a>
-          </button>
+          <a href={`${viewerHost}/${pipeline}>${runHash}`} target="_blank">
+            <button disabled={runningScripts.size > 0}>
+              See in results viewer (beta)
+            </button>
+          </a>
         )}
         {isPipeline && (
           <>
