@@ -22,7 +22,7 @@ CMD ["npm", "start"]
 # from https://www.bogotobogo.com/DevOps/Docker/Docker-React-App.php
 # production environment
 FROM nginx:stable-alpine
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Load a custom nginx config for compatibility with react-router
 RUN rm /etc/nginx/conf.d/default.conf
