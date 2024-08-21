@@ -17,6 +17,7 @@ abstract class Step(
 ) : IStep {
     private var validated = false
     private var executed = false
+    private var exception:Exception? = null
     private val executeMutex = Mutex()
 
     init {
@@ -25,8 +26,10 @@ abstract class Step(
 
     override suspend fun execute() {
         executeMutex.withLock {
-            if(executed)
-                return // this has already been executed! (success or failure)
+            if(executed) { // this has already been executed!
+                exception?.let { throw it } // (failure)
+                return // (success)
+            }
 
             try {
                 val resolvedInputs = resolveInputs()
@@ -38,6 +41,9 @@ abstract class Step(
                         output.value = value
                     }
                 }
+            } catch (ex:Exception) {
+                exception = ex
+                throw ex
             } finally {
                 executed = true
             }
