@@ -1005,7 +1005,7 @@ export default function PipelineEditor(props) {
               deleteKeyCode={['Backspace', 'Delete']}
               onMouseDownCapture={onPopupMenuHide}
             >
-              {toolTip && <div className="tooltip">{(typeof toolTip === 'string') ? <ReactMarkdown className='reactMarkdown noLink' children={toolTip} /> : toolTip}</div>}
+              {toolTip && <div className="tooltip">{toolTip}</div>}
 
               <div className="save__controls">
                 <button onClick={() => onLayout()}>Layout</button>
