@@ -177,7 +177,7 @@ function down {
 function clean {
     echo "Removing shared containers between dev and prod"
     docker container rm http-rev-prox biab-ui biab-script-server \
-        biab-tiler biab-runner-r biab-runner-julia
+        biab-tiler biab-runner-r biab-runner-julia biab-viewer
     assertSuccess
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
 }
