@@ -10,7 +10,6 @@ COPY package.json package-lock.jso[n] ./
 # add app
 COPY . ./
 
-ENV VITE_APP_VIEWER_HOST=${VITE_APP_VIEWER_HOST}
 RUN npm install && npm run build
 
 # from https://www.bogotobogo.com/DevOps/Docker/Docker-React-App.php
