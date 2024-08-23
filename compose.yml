@@ -9,7 +9,6 @@ services:
       - tiler
     environment:
       VITE_APP_SAVE_PIPELINE_TO_SERVER: ${SAVE_PIPELINE_TO_SERVER}
-      VITE_APP_VIEWER_HOST: /viewer
 
   # This can be accessed within the docker network with http://biab-script-server:8080/script/...
   script-server:

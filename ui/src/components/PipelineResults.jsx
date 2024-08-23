@@ -34,11 +34,6 @@ export function PipelineResults({
   const [activeRenderer, setActiveRenderer] = useState({});
   const [pipelineOutputResults, setPipelineOutputResults] = useState({});
 
-  let viewerHost = null;
-  if (import.meta.env.VITE_APP_VIEWER_HOST) {
-    viewerHost = import.meta.env.VITE_APP_VIEWER_HOST;
-  }
-
   useEffect(() => {
     if (!isPipeline && !isEmptyObject(resultsData)) {
       setActiveRenderer(Object.keys(resultsData)[0]);
@@ -63,8 +58,8 @@ export function PipelineResults({
         setActiveRenderer={setActiveRenderer}
       >
         <h2>Results</h2>
-        {isPipeline && viewerHost && runHash && (
-          <a href={`${viewerHost}/${pipeline}>${runHash}`} target="_blank">
+        {isPipeline && runHash && (
+          <a href={`/viewer/${pipeline}>${runHash}`} target="_blank">
             <button disabled={runningScripts.size > 0}>
               See in results viewer (beta)
             </button>

@@ -15,7 +15,6 @@ RUN cd BonInABoxScriptService; npm run build; cd ..; \
 # add app
 COPY . ./
 
-ENV VITE_APP_VIEWER_HOST=${VITE_APP_VIEWER_HOST}
 RUN npm run build
 CMD ["npm", "start"]
 
