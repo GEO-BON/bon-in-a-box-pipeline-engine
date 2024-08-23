@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'script-server/**'
+  workflow_dispatch:
 
 jobs:
   script-server:

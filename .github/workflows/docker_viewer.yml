@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "viewer/**"
+  workflow_dispatch:
 
 jobs:
   ui:
