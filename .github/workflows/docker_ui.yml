@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "ui/**"
+  workflow_dispatch:
 
 jobs:
   ui:
