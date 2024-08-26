@@ -155,7 +155,7 @@ map:
   example: https://example.com/mytiff.tif
 ```
 
-### Specifying R package dependencies with docker
+### Specifying R package dependencies with conda
 
 "[Conda](https://docs.conda.io/projects/conda/en/latest/index.html) provides package, dependency, and environment management for any language." If a script is dependent on a specific package version, conda will load that package version to prevent breaking changes when packages are updated. BON in a Box uses a central conda environment that includes commonly used libraries, and supports dedicated environments for the scripts that need it.
 
