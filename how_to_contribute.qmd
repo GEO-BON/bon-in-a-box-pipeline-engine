@@ -90,7 +90,7 @@ Specifying an example will autofill that input with the example unless changed b
 There are several different types of user inputs that can be specified in the YAML file:
 
 | "Type" attribute in the yaml | IU rendering | Description                                        |
-|--------------------|------------------|----------------------------------|
+|--------------------|-------------------|----------------------------------|
 | boolean                      | Plain text   | true/false                                         |
 | float, float\[\]             | Plain text   | positive and negative numbers with a decimal point |
 | int, int\[\]                 | Plain text   | integer                                            |
@@ -173,11 +173,11 @@ This means that instead of loading packages in R scripts, they are loaded in the
 
     -   Add it to the runners/r-environment.yml file
 
-    -   Add it to your local environment, replacing \<package name\> in: `docker exec -it biab-runner-conda mamba install -n rbase <package name>` in the terminal
+    -   Add it to your local environment, replacing \<package name\> in: `docker exec -it biab-runner-conda mamba install -n rbase <package name>` in the terminal. Make sure the program is in front of the package name (e.g. r-tidyverse)
 
 -   If it is not found in anaconda
 
-    -   Go to the runners/conda-dockerfile and add it to the install command (replace \<package\> with your package name).
+    -   Go to the runners/conda-dockerfile and add it to the install command. Replace \<package\> with your package name.
 
         ```         
         RUN bash --login -c "mamba activate rbase; R -e 'install.packages(c(\<package 1>\", \
