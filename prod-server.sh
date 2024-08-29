@@ -4,10 +4,10 @@ RED="\033[31m"
 GREEN="\033[32m"
 ENDCOLOR="\033[0m"
 
-if [ -d "pipeline-repo" ]; then
-  echo -e "${RED}ERROR: Do not run directly! This script is meant to be ran by validate.sh in the pipeline-repo folder.${ENDCOLOR}"
-  exit 1
-fi
+#if [ -d "pipeline-repo" ]; then
+#  echo -e "${RED}ERROR: Do not run directly! This script is meant to be ran by validate.sh in the pipeline-repo folder.${ENDCOLOR}"
+#  exit 1
+#fi
 
 which docker
 if [[ $? -ne 0 ]] ; then

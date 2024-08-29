@@ -113,7 +113,7 @@ export const GetCOGStats = async (link: any, logTransform: boolean) => {
     expression: expression,
     url: link,
   };
-  const base_url = `${import.meta.env.VITE_TILER_URL}/cog/statistics`;
+  const base_url = `/tiler/cog/statistics`;
   try {
     result = await axios({ method: "get", url: base_url, params: obj });
   } catch (error) {
@@ -126,7 +126,7 @@ export const GetCOGStats = async (link: any, logTransform: boolean) => {
 export const GetCOGStatsGeojson = async (link: any, geojson: any) => {
   let result;
   const obj = { url: link };
-  const base_url = `${import.meta.env.VITE_TILER_URL}/cog/statistics`;
+  const base_url = `/tiler/cog/statistics`;
   try {
     result = await axios({
       method: "post",
@@ -151,7 +151,7 @@ export const GetCOGBounds = async (link: any) => {
   const obj = {
     url: link,
   };
-  const base_url = `${import.meta.env.VITE_TILER_URL}/cog/bounds`;
+  const base_url = `/tiler/cog/bounds`;
   try {
     result = await axios({ method: "get", url: base_url, params: obj });
   } catch (error) {
@@ -278,7 +278,7 @@ export const GetMultipleCOGStatsGeojson2 = async (
     .all(
       cog_urls.map((cu: any) => {
         const obj = { url: cu.url, year: cu.year }; //Year is not a param but used here to be passed down
-        const base_url = `${import.meta.env.VITE_TILER_URL}cog/statistics`;
+        const base_url = `/tiler/cog/statistics`;
         let result: any = {};
         try {
           result = axios({

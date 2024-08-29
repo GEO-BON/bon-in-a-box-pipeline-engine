@@ -70,6 +70,7 @@ services:
       - ${GATEWAY_CONFIG}:/etc/nginx/conf.d:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ${PIPELINE_REPO_PATH}/output:/static/output:ro
+      - www-data-viewer:/var/www/viewer/:ro
     depends_on:
       - script-server
       - ui
@@ -93,3 +94,8 @@ services:
     container_name: biab-viewer
     environment:
       VITE_TILER_URL: /tiler
+    volumes:
+      - www-data-viewer:/app/dist:rw
+
+volumes:
+  www-data-viewer:
