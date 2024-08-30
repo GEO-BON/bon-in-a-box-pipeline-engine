@@ -4,6 +4,7 @@
 services:
   ## UI server to use when developing UI code
   ui:
+    container_name: biab-ui
     build:
       context: ./ui
       dockerfile: Dockerfile.dev
@@ -15,11 +16,16 @@ services:
     expose:
       - "3000"
     environment:
+      VITE_APP_SAVE_PIPELINE_TO_SERVER: ${SAVE_PIPELINE_TO_SERVER}
       CHOKIDAR_USEPOLLING: true
       # https://github.com/facebook/create-react-app/issues/11779
       WDS_SOCKET_PORT: 0
+    depends_on:
+      - script-server
+      - tiler
 
   viewer:
+    container_name: biab-viewer
     image: node:current-alpine3.18
     volumes:
       - "./viewer:/app:rw"
@@ -41,8 +47,11 @@ services:
     environment:
       DEV: true
 
-  http-gateway:
+  gateway:
+    image: nginxinc/nginx-unprivileged
     depends_on:
+      - ui
+      - viewer
       - openapi_swagger
 
   ## Server to use when making changes to the OpenAPI specification.

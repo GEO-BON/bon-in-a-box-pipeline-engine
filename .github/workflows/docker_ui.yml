@@ -2,14 +2,15 @@ name: UI, main branch
 
 on:
   push:
-    branches:
-      - main
+    # branches:
+    #   - main
     paths:
       - "ui/**"
+      - "viewer/**"
   workflow_dispatch:
 
 jobs:
-  ui:
+  gateway:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -27,13 +28,13 @@ jobs:
         with:
           images: geobon/bon-in-a-box
           tags: |
-            type=raw,value=ui
+            type=raw,value=gateway
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: ui
-          file: ui/Dockerfile.prod
+          context: .
+          file: Dockerfile.gateway.prod
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

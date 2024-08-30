@@ -2,13 +2,6 @@
 # Contains all that is common between production and development configurations.
 
 services:
-  ui:
-    container_name: biab-ui
-    depends_on:
-      - script-server
-      - tiler
-    environment:
-      VITE_APP_SAVE_PIPELINE_TO_SERVER: ${SAVE_PIPELINE_TO_SERVER}
 
   # This can be accessed within the docker network with http://biab-script-server:8080/script/...
   script-server:
@@ -61,20 +54,16 @@ services:
       USERDATA_LOCATION: /userdata
       OUTPUT_LOCATION: /output
 
-  http-gateway:
+  gateway:
     container_name: biab-gateway
-    image: nginxinc/nginx-unprivileged
     ports:
       - "127.0.0.1:${HTTP_PORT:-80}:80"
     volumes:
       - ${GATEWAY_CONFIG}:/etc/nginx/conf.d:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ${PIPELINE_REPO_PATH}/output:/static/output:ro
-      - www-data-viewer:/var/www/viewer/:ro
     depends_on:
       - script-server
-      - ui
-      - viewer
 
   tiler:
     container_name: biab-tiler
@@ -89,11 +78,3 @@ services:
       TITILER_API_CORS_ORIGINS: "*"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-  viewer:
-    container_name: biab-viewer
-    volumes:
-      - www-data-viewer:/app/dist:rw
-
-volumes:
-  www-data-viewer:
