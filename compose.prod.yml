@@ -13,11 +13,11 @@ services:
 
   viewer:
     #image: geobon/bon-in-a-box:viewer
-    build:
-      context: ./viewer
-      dockerfile: Dockerfile.prod
-    expose:
-      - "80"
+    #build:
+    #  context: ./viewer
+    #  dockerfile: Dockerfile.prod
+    #expose:
+    #  - "80"
 
   script-server:
     image: geobon/bon-in-a-box:script-server

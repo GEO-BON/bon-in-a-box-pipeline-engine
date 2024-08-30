@@ -10,7 +10,3 @@ COPY package.json package-lock.jso[n] ./
 # add app
 COPY . ./
 RUN npm install && npm run build
-
-#FROM scratch
-#COPY --from=builder /app/dist /app
-#CMD []
