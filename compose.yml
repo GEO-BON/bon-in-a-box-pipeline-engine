@@ -92,8 +92,6 @@ services:
 
   viewer:
     container_name: biab-viewer
-    environment:
-      VITE_TILER_URL: /tiler
     volumes:
       - www-data-viewer:/app/dist:rw
 
