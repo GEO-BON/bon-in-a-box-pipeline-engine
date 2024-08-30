@@ -20,14 +20,11 @@ services:
       WDS_SOCKET_PORT: 0
 
   viewer:
-    #image: node:current-alpine3.18
-    build:
-      context: ./viewer
-      dockerfile: Dockerfile.prod
-    #volumes:
-    #  - "./viewer:/app:rw"
-    #working_dir: "/app"
-    #command: sh -c "npm install; npm run dev;"
+    image: node:current-alpine3.18
+    volumes:
+      - "./viewer:/app:rw"
+    working_dir: "/app"
+    command: sh -c "npm install; npm run dev;"
     expose:
       - "80"
 
