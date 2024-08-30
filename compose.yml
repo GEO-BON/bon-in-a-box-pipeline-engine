@@ -62,7 +62,7 @@ services:
       OUTPUT_LOCATION: /output
 
   http-gateway:
-    container_name: http-rev-prox
+    container_name: biab-gateway
     image: nginxinc/nginx-unprivileged
     ports:
       - "127.0.0.1:${HTTP_PORT:-80}:80"
