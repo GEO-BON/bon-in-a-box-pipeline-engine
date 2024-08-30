@@ -22,7 +22,7 @@ The code in this repository runs an engine, but the engine needs content! Here a
 
 For the global project, Visual Studio Code. Recommended extensions:
 
-- GitLens
+- Git graph
 - Markdown Preview Mermaid
 - Mermaid Markdown Syntax Highlighting
 
@@ -44,6 +44,20 @@ This command enables:
 
 Once in a while you should use `docker compose -f compose.yml -f compose.dev.yml pull` to have the latest base images.
 
+## Debugging prod servers
+
+Yes, we all know problems occur in production that do not happen in dev mode. So in order to build and test production dockers locally, do the following:
+
+1. In pipeline-repo folder, delete the .server folder.
+2. Create a symbolic link from .server to the parent: `ln -s ../ .server`
+3. Build the server with `.server/prod-server.sh command build`
+4. Then run it with `.server/prod-server.sh command up`
+
+   (`.server/prod-server.sh clean` might be needed if you get the usual name conflict error)
+5. Stop the process with ctrl+c unless you used -d option in the previous command.
+
+_Warning: Undo this by removing the symlink if you are to use `./server-up.sh` for a regular launch of the production servers, otherwise it will checkout files in your parent pipeline engine repo though the symlink._
+
 ## Microservice infrastructure
 
 ```mermaid
@@ -56,6 +70,7 @@ stateDiagram-v2
 
     [*] --> ngnix
     ngnix --> ui
+    ngnix --> viewer
     ngnix --> script
     ngnix --> output
     script --> scripts
@@ -63,7 +78,7 @@ stateDiagram-v2
     script --> julia
 ```
 
-- ui: React front-end
+- ui and viewer: React front-end. In production, those are served statically in the NGINX gateway.
 - script-server: Running scripts and pipeline orchestration
 - R runner: Docker dedicated to runs R code, with most relevant packages pre-installed
 - Julia runner: Docker dedicated to runs Julia code
@@ -96,18 +111,18 @@ The [OpenApi specification file](../script-server/api/openapi.yaml) is used by t
 ```mermaid
 sequenceDiagram
     ui->>script_server: script/list
-    script_server-->>ui:
+    script_server-->>ui: json map of scripts -> names
 
-    ui->>script_server: script/info
-    script_server-->>ui:
+    ui->>script_server: script/{path}/info
+    script_server-->>ui: script info json
 
     ui->>script_server: script/run
     script_server->>script: launch
     script_server-->>ui: runId
 
     loop Until output.json file generated
-        ui->>script_server: output/{id}/logs.txt
-        script_server-->>ui:
+        ui->>script_server: output/{runId}/logs.txt
+        script_server-->>ui: logs text
 
         ui->>script_server: output/{id}/output.json
     end
@@ -115,8 +130,8 @@ sequenceDiagram
 
     script-->>script_server: output.json
 
-    ui->>script_server: output/{id}/output.json
-    script_server-->>ui:
+    ui->>script_server: output/{runId}/output.json
+    script_server-->>ui: script output json
 
 ```
 
@@ -125,18 +140,18 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     ui->>script_server: pipeline/list
-    script_server-->>ui:
+    script_server-->>ui: json map of pipeline -> names
 
-    ui->>script_server: pipeline/<path>/info
-    script_server-->>ui:
+    ui->>script_server: pipeline/{path}/info
+    script_server-->>ui: pipeline info json
 
-    ui->>script_server: pipeline/<path>/run
-    script_server-->>ui: id
+    ui->>script_server: pipeline/{path}/run
+    script_server-->>ui: runId
     loop For each step
         script_server->>script: run
         Note right of script: see previous diagram
         script-->>script_server: output.json (script)
-        ui->>script_server: pipeline/<id>/outputs
+        ui->>script_server: pipeline/{runId}/outputs
         script_server-->>ui: pipelineOutput.json (pipeline)
     end
 
