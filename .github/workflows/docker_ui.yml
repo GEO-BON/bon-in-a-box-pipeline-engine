@@ -2,8 +2,8 @@ name: UI, main branch
 
 on:
   push:
-    # branches:
-    #   - main
+    branches:
+      - main
     paths:
       - "ui/**"
       - "viewer/**"
