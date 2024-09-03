@@ -2,15 +2,21 @@
 title: "About"
 ---
 
-# What is BON in a Box?
+# What is BON in a Box's pipeline engine?
 
-BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration. It's the ultimate ecosystem for harmonizing biodiversity observations, fostering efficiency, and amplifying the power of data-driven insights.
 
-BON in a Box now features a community-contributed and open-source data to essential biodiversity variable (EBV) and indicator workflow repository curated by GEO BON. Its engine allows to seamlessly connect steps in different languages (R, Julia, Python) through a modular pipeline approach that reads both from local and global data sources. These pipelines can calculate EBVs and indicators using publicly available data or user-provided data.
+
+BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration, as well as a project catalogue. _For more information about BON in a Box in general, please refer to [BON in a Box's website](https://boninabox.geobon.org/about)_
+
+We present here the BON in a Box pipeline engine as the ultimate ecosystem for harmonizing biodiversity observations, fostering efficiency, and amplifying the power of data-driven insights.
+
+It is a community-contributed and open-source data to biodiversity indicator or data to Essential Biodiversity Variable (EBV) workflow repository curated by GEO BON. Its engine allows to seamlessly connect steps in different languages (R, Julia, Python) through a modular pipeline approach that reads both from user-provided and publicly available data sources. These pipelines combine local and global data sources in the EBVs and biodiversity indicators calculations.
 
 # Why do we need this platform?
 
-Scientists around the world are developing tools to create workflows to calculate essential biodiversity variables and indicators to report on biodiversity change. However, there are almost no platforms to share these workflows and tools, leading to duplication of effort. Additionally, decision makers sometimes lack the technical capabilities to calculate these indicators to monitor biodiversity. BON in a Box is a monitoring tool where users can convert data to EBVs and indicators using analysis pipelines.
+Scientists around the world are developing tools to create workflows to calculate essential biodiversity variables and indicators to report on biodiversity change. However, there are almost no platforms to share these workflows and tools, leading to duplication of effort. BON in a Box allows networks to share and enhance each other's work.
+
+Additionally, organisations often lack the technical capabilities to calculate these indicators to monitor biodiversity, which impairs decision-making. BON in a Box can bridge the gap between those knowing how to calculate, and those needing the indicators for monitoring and conservation.
 
 # What is a pipeline?
 
@@ -26,4 +32,3 @@ If a pipeline builds upon the results of another pipeline, this “inner pipelin
 
 Contributing to BON in a Box will increase the impact of your research by allowing your analysis workflows to be used in broader areas and contexts for decision-making. Contributors will become part of a global community to generate analyses of the state and trends of biodiversity to inform management decisions.
 
-##

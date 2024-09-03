@@ -2,9 +2,12 @@
 title: "How to Install"
 ---
 
-BON in a Box can be installed and run locally on your local computer. This allows the user to add scripts and create pipelines on their local computer to be run through BON in a Box. Here are the instructions for installing BON in a Box to run on a local computer.
+The user interface allows to run and edit pipelines. It is used through the browser, but doesn't need to be installed on a web server. This can all happen locally.
+The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.
 
-## Running the servers locally {#running-the-servers-locally}
+## Running BON in a Box locally {#running-the-servers-locally}
+
+BON in a Box can be installed and ran on a local computer. While personnal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.
 
 Prerequisites :
 
@@ -16,7 +19,7 @@ Prerequisites :
 
     -   [Docker Desktop](https://www.docker.com/products/docker-desktop/) - Note that it is not necessary to make an account
 
--   A Linux shell (git bash, [Bash through PowerShell](https://learn.microsoft.com/en-us/windows/wsl/install), cygwin, etc.) necessary to run th `.sh` scripts in the instructions below.
+    -   A Linux shell (git bash, [Bash through PowerShell](https://learn.microsoft.com/en-us/windows/wsl/install), cygwin, etc.) necessary to run th `.sh` scripts in the instructions below.
 
 -   **Mac:**
 
@@ -66,13 +69,15 @@ When modifying scripts in the `/scripts` folder, servers do not need to be resta
 
 When modifying pipelines in the /pipelines folder, servers do not need to be restarted: - In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the "pipeline run" page. - When adding or renaming pipelines, refresh the browser page.
 
-## Running the servers remotely {#running-the-servers-remotely}
+## Running BON in a Box on a server {#running-the-servers-remotely}
 
-Use the [ansible playbook](ansible/README.md) instructions.
+To share an instance or to have larger data processing capabilities, a server installation is recommended.
+
+Refer to the [ansible playbook](ansible/README.md) for instructions.
 
 ## Running a script or pipeline
 
-You have an instance of BON in a Box running, either [locally](#running-the-servers-locally) or [remotely](#running-the-servers-remotely), and you want to run your first script or pipeline.
+You now have an instance of BON in a Box running, either [locally](#running-the-servers-locally) or [remotely](#running-the-servers-remotely), and you want to run your first script or pipeline.
 
 There is one page to run scripts, and one to run pipelines. Select the script or pipelines from the dropdown and fill the form.
 
