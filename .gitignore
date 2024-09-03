@@ -1,2 +1,10 @@
+.env
 .quarto
 .Rproj.user
+.Rhistory
+.vscode
+**/.cache
+**/.config
+**/.DS_Store
+**/._*
+pipeline-repo
