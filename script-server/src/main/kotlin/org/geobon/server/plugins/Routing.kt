@@ -237,7 +237,7 @@ fun Application.configureRouting() {
 
         get("/api/versions") {
             call.respond("""
-                UI: ${"docker exec -i biab-ui cat /version.txt".runCommand()}
+                UI: ${"docker exec -i biab-gateway cat /version.txt".runCommand()}
                 Script server: ${"cat /version.txt".runCommand()}
                    ${"python3 --version".runCommand()}
                 R runner: ${"docker exec -i biab-runner-r cat /version.txt".runCommand()}
@@ -247,8 +247,6 @@ fun Application.configureRouting() {
                 TiTiler: ${
                     "docker inspect --type=image -f '{{ .Created }}' ghcr.io/developmentseed/titiler".runCommand()
                     ?.let { it.substring(0, it.lastIndexOf(':')).replace('T', ' ') }}
-
-                Viewer: ${"docker exec -i biab-viewer cat /version.txt".runCommand()}
                 """.trimIndent())
         }
 
