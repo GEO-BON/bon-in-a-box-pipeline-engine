@@ -114,6 +114,10 @@ abstract class YMLStep(
         }
     }
 
+    fun toDisplayName(): String {
+        return id.step.replace(">", " > ").replace(yamlFile.name, yamlParsed[NAME] as String)
+    }
+
     override fun toString(): String {
         return "${javaClass.simpleName} (id=$id, name=\"${yamlParsed[NAME]}\", file=${yamlFile.relativeTo(RunContext.scriptRoot)})"
     }

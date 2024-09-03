@@ -8,7 +8,7 @@ services:
       - script-server
       - tiler
     environment:
-      REACT_APP_SAVE_PIPELINE_TO_SERVER: ${SAVE_PIPELINE_TO_SERVER}
+      VITE_APP_SAVE_PIPELINE_TO_SERVER: ${SAVE_PIPELINE_TO_SERVER}
 
   # This can be accessed within the docker network with http://biab-script-server:8080/script/...
   script-server:
@@ -73,6 +73,7 @@ services:
     depends_on:
       - script-server
       - ui
+      - viewer
 
   tiler:
     container_name: biab-tiler
@@ -84,6 +85,11 @@ services:
     environment:
       PORT: 8000
       WORKERS_PER_CORE: 1
-      TITILER_API_CORS_ORIGINS: '*'
+      TITILER_API_CORS_ORIGINS: "*"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  viewer:
+    container_name: biab-viewer
+    environment:
+      VITE_TILER_URL: /tiler

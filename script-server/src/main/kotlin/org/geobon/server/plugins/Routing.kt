@@ -247,6 +247,8 @@ fun Application.configureRouting() {
                 TiTiler: ${
                     "docker inspect --type=image -f '{{ .Created }}' ghcr.io/developmentseed/titiler".runCommand()
                     ?.let { it.substring(0, it.lastIndexOf(':')).replace('T', ' ') }}
+
+                Viewer: ${"docker exec -i biab-viewer cat /version.txt".runCommand()}
                 """.trimIndent())
         }
 
