@@ -20,10 +20,10 @@ The smaller steps composing a pipeline are scripts. These scripts also convert i
 
 If a pipeline builds upon the results of another pipeline, this “inner pipeline” it can be included as a step in the “outer pipeline”; we call this a subpipeline. An SDM pipeline could serve to generate range maps inside a Species Habitat Index pipeline, or embedded in a Species Richness pipeline. We can thus define a step as “a script or a subpipeline performing an operation in the context of a pipeline”.
 
-![Simplified pipeline with steps (blue), intermediate results (grey), and final results (green)](pipeline.png.png)
+![Simplified pipeline with steps (blue), intermediate results (grey), and final results (green)](pipeline.png)
 
 # Why should you contribute?
 
 Contributing to BON in a Box will increase the impact of your research by allowing your analysis workflows to be used in broader areas and contexts for decision-making. Contributors will become part of a global community to generate analyses of the state and trends of biodiversity to inform management decisions.
 
-## 
+##
