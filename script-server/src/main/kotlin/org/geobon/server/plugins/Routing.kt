@@ -247,7 +247,7 @@ fun Application.configureRouting() {
                     TiTiler: ${Containers.TILER.version.let {
                         val end = it.lastIndexOf(':')
                         if (end == -1) it
-                        else it.substring(0, end).replace('T', ' ') 
+                        else it.substring(0, end).replace('T', ' ')
                     }}
                 """.trimIndent()
             )

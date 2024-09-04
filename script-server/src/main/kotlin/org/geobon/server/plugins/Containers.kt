@@ -25,9 +25,9 @@ enum class Containers(
     CONDA("biab-runner-conda", envCommand = "mamba --version"),
 
     /**
-     * Node server to display the client UI.
+     * NGINX proxy (dev+prod) and client UI (prod).
      */
-    UI("biab-ui"),
+    UI("biab-gateway"),
 
     /**
      * Tiling server used to serve GeoTIFF content.

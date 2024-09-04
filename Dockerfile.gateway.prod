@@ -1,0 +1,46 @@
+## UI build
+FROM node:current-alpine3.18 AS builder-ui
+
+WORKDIR /app
+ENV PATH=/app/node_modules/.bin:$PATH
+
+# Workaround with [] for file that is not always there : https://stackoverflow.com/a/46801962/3519951
+COPY ui/package.json ui/package-lock.jso[n] ./
+RUN npm ci
+
+# add BON in a Box script service
+COPY ui/BonInABoxScriptService ./BonInABoxScriptService
+RUN cd BonInABoxScriptService; npm run build; cd ..; \
+    npm install ./BonInABoxScriptService;
+
+# add app
+COPY ui ./
+RUN npm run build
+
+## Viewer build
+FROM node:current-alpine3.18 AS builder-viewer
+
+WORKDIR /app
+ENV PATH=/app/node_modules/.bin:$PATH
+
+# Workaround with [] for file that is not always there : https://stackoverflow.com/a/46801962/3519951
+COPY viewer/package.json viewer/package-lock.jso[n] ./
+
+RUN npm ci
+COPY viewer ./
+RUN npm run build
+
+## Package into NGINX gateway
+# from https://www.bogotobogo.com/DevOps/Docker/Docker-React-App.php
+# production environment
+FROM nginxinc/nginx-unprivileged
+COPY --from=builder-ui /app/dist /etc/nginx/html/ui
+COPY --from=builder-viewer /app/dist /etc/nginx/html/viewer
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+# Temp switch to root user and back to write version file
+USER root
+RUN date +"%Y-%m-%d %R" > /version.txt
+USER nginx

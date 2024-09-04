@@ -1,0 +1,9 @@
+.popup {
+  width: 100px;
+  height: 100px;
+  z-index: 999999;
+}
+
+#popup-id-down {
+  display: none;
+}
