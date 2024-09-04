@@ -56,6 +56,14 @@ function help {
 function command { # args appended to the docker compose command
     export DOCKER_GID="$(getent group docker | cut -d: -f3)"
 
+    # Set the branch suffix. This allows to use a staging build.
+    branch=$(git branch --show-current)
+    if [[ $branch == *"staging" ]]; then
+        DOCKER_SUFFIX="-$(git branch --show-current)"
+    else
+        DOCKER_SUFFIX=""
+    fi
+
     # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
     if test -z $DOCKER_GID; then
         export DOCKER_GID=
