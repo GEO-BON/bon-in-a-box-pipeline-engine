@@ -59,9 +59,9 @@ function command { # args appended to the docker compose command
     # Set the branch suffix. This allows to use a staging build.
     branch=$(git branch --show-current)
     if [[ $branch == *"staging" ]]; then
-        DOCKER_SUFFIX="-$(git branch --show-current)"
+        export DOCKER_SUFFIX="-$(git branch --show-current)"
     else
-        DOCKER_SUFFIX=""
+        export DOCKER_SUFFIX=""
     fi
 
     # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
