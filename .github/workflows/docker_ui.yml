@@ -1,4 +1,4 @@
-name: UI, main branch
+name: Publish UI to docker Hub
 
 on:
   push:
