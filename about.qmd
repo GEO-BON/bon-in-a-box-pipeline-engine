@@ -4,9 +4,7 @@ title: "About"
 
 # What is BON in a Box's pipeline engine?
 
-
-
-BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration, as well as a project catalogue. _For more information about BON in a Box in general, please refer to [BON in a Box's website](https://boninabox.geobon.org/about)_
+BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration, as well as a project catalogue. *For more information about BON in a Box in general, please refer to [BON in a Box's website](https://boninabox.geobon.org/about)*
 
 We present here the BON in a Box pipeline engine as the ultimate ecosystem for harmonizing biodiversity observations, fostering efficiency, and amplifying the power of data-driven insights.
 
@@ -31,4 +29,3 @@ If a pipeline builds upon the results of another pipeline, this “inner pipelin
 # Why should you contribute?
 
 Contributing to BON in a Box will increase the impact of your research by allowing your analysis workflows to be used in broader areas and contexts for decision-making. Contributors will become part of a global community to generate analyses of the state and trends of biodiversity to inform management decisions.
-

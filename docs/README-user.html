@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>readme-user – bon-in-a-box-pipeline-engine</title>
+<title>readme-user – BON in a Box</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -113,7 +113,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">bon-in-a-box-pipeline-engine</span>
+    <span class="navbar-title">BON in a Box</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -129,6 +129,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li class="nav-item">
     <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./how_to_install.html"> 
+<span class="menu-text">How to Install</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./how_to_contribute.html"> 
+<span class="menu-text">How to Contribute</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./working_with_stac.html"> 
+<span class="menu-text">Working with STAC</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -210,10 +222,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="describing-a-script" class="level3">
 <h3 class="anchored" data-anchor-id="describing-a-script">Describing a script</h3>
 <p>The script description is in a .yml file next to the script. It is necessary for the script to be found and connected to other scripts in a pipeline.</p>
+<p>Markdown is supported for script, input and output descriptions. See this <a href="https://commonmark.org/help/">CommonMark quick reference</a> for allowed markups.</p>
 <p>Here is an empty commented sample:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode yml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">script</span><span class="kw">:</span><span class="co"> # script file with extension, such as "myScript.py".</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">name</span><span class="kw">:</span><span class="co"> # short name, such as My Script</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">description</span><span class="kw">:</span><span class="co"> # Targetted to those who will interpret pipeline results and edit pipelines.</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">description</span><span class="kw">:</span><span class="co"> # Targetted to those who will interpret pipeline results and edit pipelines. Markdown is supported.</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span><span class="co"> # 1 to many</span></span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="co"> # Full name</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">email</span><span class="kw">:</span><span class="co"> # Optional, email address of the author. This will be publicly available.</span></span>
@@ -225,14 +238,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">inputs</span><span class="kw">:</span><span class="co"> # 0 to many</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">key</span><span class="kw">:</span><span class="co"> # replace the word "key" by a snake case identifier for this input</span></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">label</span><span class="kw">:</span><span class="co"> # Human-readable version of the name</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="co"> # Targetted to those who will interpret pipeline results and edit pipelines.</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="co"> # Targetted to those who will interpret pipeline results and edit pipelines. Markdown is supported.</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="co"> # see below</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">example</span><span class="kw">:</span><span class="co"> # will also be used as default value, can be null</span></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="fu">outputs</span><span class="kw">:</span><span class="co"> # 1 to many</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">key</span><span class="kw">:</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">label</span><span class="kw">:</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="co"> # Markdown is supported.</span></span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">example</span><span class="kw">:</span><span class="co"> # optional, for documentation purpose only</span></span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>

@@ -167,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#name-and-description" id="toc-name-and-description" class="nav-link" data-scroll-target="#name-and-description">Name and description</a></li>
   <li><a href="#inputs" id="toc-inputs" class="nav-link" data-scroll-target="#inputs">Inputs</a></li>
   <li><a href="#outputs" id="toc-outputs" class="nav-link" data-scroll-target="#outputs">Outputs</a></li>
-  <li><a href="#specifying-r-package-dependencies-with-docker" id="toc-specifying-r-package-dependencies-with-docker" class="nav-link" data-scroll-target="#specifying-r-package-dependencies-with-docker">Specifying R package dependencies with docker</a></li>
+  <li><a href="#specifying-r-package-dependencies-with-conda" id="toc-specifying-r-package-dependencies-with-conda" class="nav-link" data-scroll-target="#specifying-r-package-dependencies-with-conda">Specifying R package dependencies with conda</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   <li><a href="#step-2-integrating-yaml-inputs-and-outputs-into-your-script" id="toc-step-2-integrating-yaml-inputs-and-outputs-into-your-script" class="nav-link" data-scroll-target="#step-2-integrating-yaml-inputs-and-outputs-into-your-script">Step 2: Integrating YAML inputs and outputs into your script</a>
@@ -277,9 +277,9 @@ author:
 <p>There are several different types of user inputs that can be specified in the YAML file:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 27%">
-<col style="width: 25%">
-<col style="width: 47%">
+<col style="width: 31%">
+<col style="width: 14%">
+<col style="width: 54%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -415,8 +415,8 @@ author:
   range: [0.1, 254]
   example: https://example.com/mytiff.tif</code></pre>
 </section>
-<section id="specifying-r-package-dependencies-with-docker" class="level3">
-<h3 class="anchored" data-anchor-id="specifying-r-package-dependencies-with-docker">Specifying R package dependencies with docker</h3>
+<section id="specifying-r-package-dependencies-with-conda" class="level3">
+<h3 class="anchored" data-anchor-id="specifying-r-package-dependencies-with-conda">Specifying R package dependencies with conda</h3>
 <p>“<a href="https://docs.conda.io/projects/conda/en/latest/index.html">Conda</a> provides package, dependency, and environment management for any language.” If a script is dependent on a specific package version, conda will load that package version to prevent breaking changes when packages are updated. BON in a Box uses a central conda environment that includes commonly used libraries, and supports dedicated environments for the scripts that need it.</p>
 <p>This means that instead of loading packages in R scripts, they are loaded in the R environment in conda.</p>
 <section id="check-if-the-libraries-you-need-are-in-conda" class="level4">
@@ -432,11 +432,11 @@ author:
 <li><p>First, search for the package name on <a href="https://anaconda.org/">anaconda</a>. Packages that are in anaconda will be recognized and easily loaded by conda. If it is there:</p>
 <ul>
 <li><p>Add it to the runners/r-environment.yml file</p></li>
-<li><p>Add it to your local environment, replacing &lt;package name&gt; in: <code>docker exec -it biab-runner-conda mamba install -n rbase &lt;package name&gt;</code> in the terminal</p></li>
+<li><p>Add it to your local environment, replacing &lt;package name&gt; in: <code>docker exec -it biab-runner-conda mamba install -n rbase &lt;package name&gt;</code> in the terminal. Make sure the program is in front of the package name (e.g.&nbsp;r-tidyverse)</p></li>
 </ul></li>
 <li><p>If it is not found in anaconda</p>
 <ul>
-<li><p>Go to the runners/conda-dockerfile and add it to the install command (replace &lt;package&gt; with your package name).</p>
+<li><p>Go to the runners/conda-dockerfile and add it to the install command. Replace &lt;package&gt; with your package name.</p>
 <pre><code>RUN bash --login -c "mamba activate rbase; R -e 'install.packages(c(\&lt;package 1&gt;\", \
         \"&lt;package 2&gt;\", \
         \"&lt;package 3&gt;\"\
@@ -506,7 +506,7 @@ outputs:
     label: Result plot 
     description: Plot of results
     type: image/png
-conda: # Optional: if you script requires specific versions of packages.
+conda: # Optional, only needed if your script has specific package dependencies
   channels:
     - r
   dependencies:

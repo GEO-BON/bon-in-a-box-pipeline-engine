@@ -90,7 +90,7 @@ Specifying an example will autofill that input with the example unless changed b
 There are several different types of user inputs that can be specified in the YAML file:
 
 | "Type" attribute in the yaml | IU rendering | Description                                        |
-|--------------------|-------------------|----------------------------------|
+|------------------------------|--------------|----------------------------------------------------|
 | boolean                      | Plain text   | true/false                                         |
 | float, float\[\]             | Plain text   | positive and negative numbers with a decimal point |
 | int, int\[\]                 | Plain text   | integer                                            |

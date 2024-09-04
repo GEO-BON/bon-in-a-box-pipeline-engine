@@ -2,8 +2,7 @@
 title: "How to Install"
 ---
 
-The user interface allows to run and edit pipelines. It is used through the browser, but doesn't need to be installed on a web server. This can all happen locally.
-The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.
+The user interface allows to run and edit pipelines. It is used through the browser, but doesn't need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.
 
 ## Running BON in a Box locally {#running-the-servers-locally}
 

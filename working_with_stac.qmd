@@ -21,7 +21,6 @@ Data in STAC catalogs can be loaded directly into R and visualized using the `rs
 To start, install and load the following packages.
 
 ```{r}
-# install.packages(c(('gdalcubes', 'rstac', 'knitr')))
 library(gdalcubes)
 library(rstac)
 library(knitr)

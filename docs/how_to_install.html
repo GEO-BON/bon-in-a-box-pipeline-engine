@@ -124,8 +124,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#running-the-servers-locally" id="toc-running-the-servers-locally" class="nav-link active" data-scroll-target="#running-the-servers-locally">Running the servers locally</a></li>
-  <li><a href="#running-the-servers-remotely" id="toc-running-the-servers-remotely" class="nav-link" data-scroll-target="#running-the-servers-remotely">Running the servers remotely</a></li>
+  <li><a href="#running-the-servers-locally" id="toc-running-the-servers-locally" class="nav-link active" data-scroll-target="#running-the-servers-locally">Running BON in a Box locally</a></li>
+  <li><a href="#running-the-servers-remotely" id="toc-running-the-servers-remotely" class="nav-link" data-scroll-target="#running-the-servers-remotely">Running BON in a Box on a server</a></li>
   <li><a href="#running-a-script-or-pipeline" id="toc-running-a-script-or-pipeline" class="nav-link" data-scroll-target="#running-a-script-or-pipeline">Running a script or pipeline</a></li>
   </ul>
 </nav>
@@ -152,18 +152,19 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>BON in a Box can be installed and run locally on your local computer. This allows the user to add scripts and create pipelines on their local computer to be run through BON in a Box. Here are the instructions for installing BON in a Box to run on a local computer.</p>
+<p>The user interface allows to run and edit pipelines. It is used through the browser, but doesn’t need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.</p>
 <section id="running-the-servers-locally" class="level2">
-<h2 class="anchored" data-anchor-id="running-the-servers-locally">Running the servers locally</h2>
+<h2 class="anchored" data-anchor-id="running-the-servers-locally">Running BON in a Box locally</h2>
+<p>BON in a Box can be installed and ran on a local computer. While personnal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.</p>
 <p>Prerequisites :</p>
 <ul>
 <li><p>Git - A github account, with an SSH key registered. See <a href="https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account">Adding a new SSH key to your GitHub account</a>.</p></li>
 <li><p>At least 6 GB of free space (this includes the installation of Docker Desktop) - RAM requirements will depend on the scripts that you run.</p></li>
 <li><p><strong>Windows:</strong></p>
 <ul>
-<li><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> - Note that it is not necessary to make an account</li>
-</ul></li>
+<li><p><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> - Note that it is not necessary to make an account</p></li>
 <li><p>A Linux shell (git bash, <a href="https://learn.microsoft.com/en-us/windows/wsl/install">Bash through PowerShell</a>, cygwin, etc.) necessary to run th <code>.sh</code> scripts in the instructions below.</p></li>
+</ul></li>
 <li><p><strong>Mac:</strong></p>
 <ul>
 <li><p><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> Note that it is not necessary to make an account</p></li>
@@ -199,12 +200,13 @@ ul.task-list li input[type="checkbox"] {
 <p>When modifying pipelines in the /pipelines folder, servers do not need to be restarted: - In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the “pipeline run” page. - When adding or renaming pipelines, refresh the browser page.</p>
 </section>
 <section id="running-the-servers-remotely" class="level2">
-<h2 class="anchored" data-anchor-id="running-the-servers-remotely">Running the servers remotely</h2>
-<p>Use the <a href="ansible/README.md">ansible playbook</a> instructions.</p>
+<h2 class="anchored" data-anchor-id="running-the-servers-remotely">Running BON in a Box on a server</h2>
+<p>To share an instance or to have larger data processing capabilities, a server installation is recommended.</p>
+<p>Refer to the <a href="ansible/README.md">ansible playbook</a> for instructions.</p>
 </section>
 <section id="running-a-script-or-pipeline" class="level2">
 <h2 class="anchored" data-anchor-id="running-a-script-or-pipeline">Running a script or pipeline</h2>
-<p>You have an instance of BON in a Box running, either <a href="#running-the-servers-locally">locally</a> or <a href="#running-the-servers-remotely">remotely</a>, and you want to run your first script or pipeline.</p>
+<p>You now have an instance of BON in a Box running, either <a href="#running-the-servers-locally">locally</a> or <a href="#running-the-servers-remotely">remotely</a>, and you want to run your first script or pipeline.</p>
 <p>There is one page to run scripts, and one to run pipelines. Select the script or pipelines from the dropdown and fill the form.</p>
 <p>The form might ask you for a file. In order to provide a file that you own locally, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders.</p>
 

@@ -14,3 +14,5 @@ pipeline-repo
 # MAC temp files
 **/.DS_Store
 **/._*
+
+/.quarto/
