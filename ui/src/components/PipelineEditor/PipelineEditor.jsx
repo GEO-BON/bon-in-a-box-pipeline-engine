@@ -455,6 +455,7 @@ export default function PipelineEditor(props) {
                           nodeId: node.id,
                           inputId: inputId,
                           file: node.data.descriptionFile,
+                          weight: previousInputs.length
                         }
                     );
                   }
