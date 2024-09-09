@@ -57,11 +57,12 @@ function command { # args appended to the docker compose command
     export DOCKER_GID="$(getent group docker | cut -d: -f3)"
 
     # Set the branch suffix. This allows to use a staging build.
-    branch=$(git branch --show-current)
+    # We use remote.origin.fetch because of the partial checkout, see server-up.sh.
+    branch=$(git -C .server config remote.origin.fetch | sed 's/.*remotes\/origin\///')
     if [[ $branch == *"staging" ]]; then
-        DOCKER_SUFFIX="-$(git branch --show-current)"
+        export DOCKER_SUFFIX="-$branch"
     else
-        DOCKER_SUFFIX=""
+        export DOCKER_SUFFIX=""
     fi
 
     # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
