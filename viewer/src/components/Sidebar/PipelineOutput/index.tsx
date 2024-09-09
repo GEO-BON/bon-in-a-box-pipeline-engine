@@ -266,7 +266,9 @@ export function PipelineOutput(props: any) {
                 </Grid>
               </FormControl>
             )}
-          {!("type" in outputObj) && (
+          {(!("type" in outputObj) ||
+            outputObj.type == "text" ||
+            outputObj.type == "text[]") && (
             <Typography color="secondary.light">{outputObj.outputs}</Typography>
           )}
           {!Array.isArray(outs) &&
