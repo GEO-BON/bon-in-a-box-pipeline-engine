@@ -244,8 +244,8 @@ class ScriptRun( // Constructor used in single script run
                                         echo "$condaEnvYml" > $condaEnvFile.yml ; assertSuccess
                                         mamba env create -f $condaEnvFile.yml ; assertSuccess
                                     fi
-
-                                    mamba activate $condaEnvName ; assertSuccess
+                                    mamba activate rbase
+                                    mamba activate $condaEnvName --stack ; assertSuccess
                                 """.trimIndent()
                             } else {
                                 "mamba activate rbase"
@@ -259,7 +259,6 @@ class ScriptRun( // Constructor used in single script run
                                 $activateEnvironment
                                 Rscript -e '
                                 options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
-
                                 # Define repo for install.packages
                                 repositories = getOption("repos")
                                 repositories["CRAN"] = "https://cloud.r-project.org/"
@@ -267,6 +266,15 @@ class ScriptRun( // Constructor used in single script run
 
                                 fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
                                 outputFolder<-"${context.outputFolder.absolutePath}";
+                                library(rjson)
+                                biab_inputs <- function(){
+                                    input <- fromJSON(file=file.path(outputFolder, "input.json"))
+                                }
+                                biab_outputs <- function(output){
+                                    jsonData <- toJSON(output, indent=2)
+                                    write(jsonData, file.path(outputFolder,"output.json"))
+                                    print("Output file successfully written")
+                                }
                                 tryCatch(source("${scriptFile.absolutePath}"),
                                     error=function(e) if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
                                             print("Suppressed: ignoring SIGPIPE signal");
