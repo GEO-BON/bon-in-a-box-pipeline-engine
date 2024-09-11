@@ -16,3 +16,9 @@ services:
     #   dockerfile: Dockerfile.gateway.prod
     expose:
       - "80"
+
+volumes:
+  conda-dir:
+    name: "conda-dir"
+  conda-cache:
+    name: "conda-cache"

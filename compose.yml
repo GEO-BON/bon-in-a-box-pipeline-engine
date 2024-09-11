@@ -80,9 +80,3 @@ services:
       TITILER_API_CORS_ORIGINS: "*"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-volumes:
-  conda-dir:
-    name: "conda-dir"
-  conda-cache:
-    name: "conda-cache"

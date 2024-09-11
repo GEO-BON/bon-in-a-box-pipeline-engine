@@ -65,3 +65,9 @@ services:
       BASE_URL: /swagger
     volumes:
       - ./script-server/api/:/app
+
+volumes:
+  conda-dir:
+    name: "conda-dir-dev"
+  conda-cache:
+    name: "conda-cache-dev"
