@@ -4,13 +4,13 @@
 services:
 
   script-server:
-    image: geobon/bon-in-a-box:script-server
+    image: geobon/bon-in-a-box:script-server${DOCKER_SUFFIX}
     # build:
     #   context: ./script-server/
     #   dockerfile: Dockerfile.prod
 
   gateway:
-    image: geobon/bon-in-a-box:gateway
+    image: geobon/bon-in-a-box:gateway${DOCKER_SUFFIX}
     # build:
     #   context: .
     #   dockerfile: Dockerfile.gateway.prod

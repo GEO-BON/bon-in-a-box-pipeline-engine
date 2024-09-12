@@ -455,6 +455,7 @@ export default function PipelineEditor(props) {
                           nodeId: node.id,
                           inputId: inputId,
                           file: node.data.descriptionFile,
+                          weight: previousInputs.length
                         }
                     );
                   }
@@ -464,6 +465,7 @@ export default function PipelineEditor(props) {
           }
         });
 
+        newUserInputs = newUserInputs.sort((a, b) => a.weight - b.weight)
         return _lang.isEqual(previousInputs, newUserInputs) ? previousInputs : newUserInputs;
       });
     },
@@ -557,6 +559,7 @@ export default function PipelineEditor(props) {
           : newOutput;
       })
 
+      newPipelineOutputs = newPipelineOutputs.sort((a, b) => a.weight - b.weight)
       return _lang.isEqual(previousOutputs, newPipelineOutputs) ? previousOutputs : newPipelineOutputs
     });
     // Everytime the edge changes, there might be a new connection to an output block.
@@ -830,6 +833,7 @@ export default function PipelineEditor(props) {
           }
         });
       }
+      inputsFromFile = inputsFromFile.sort((a, b) => a.weight - b.weight)
       setInputList(inputsFromFile);
 
       // Read outputs
@@ -846,6 +850,7 @@ export default function PipelineEditor(props) {
           });
         });
       }
+      outputsFromFile = outputsFromFile.sort((a, b) => a.weight - b.weight)
       setOutputList(outputsFromFile);
 
       // Read nodes

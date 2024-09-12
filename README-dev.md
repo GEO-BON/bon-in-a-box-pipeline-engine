@@ -44,7 +44,30 @@ This command enables:
 
 Once in a while you should use `docker compose -f compose.yml -f compose.dev.yml pull` to have the latest base images.
 
-## Debugging prod servers
+## Releasing a server version
+
+The servers are versionned by date of build of the docker image. One can check the version in the version tab of the UI.
+
+### Creating a staging build
+1. Create a branch that ends with "staging" from the head of the main branch.
+2. Merge your changes to that branch. The docker hub GH action will trigger for branch main and any branch with name ending by "staging". The branch name is appended to the tag of the docker image. See
+    - [.github/workflows/docker_script-server.yml](.github/workflows/docker_ui.yml)
+    - [.github/workflows/docker_ui.yml](.github/workflows/docker_ui.yml)
+3. **Caveat:** this only compiles the image where the paths were modified. For example, if `viewer` folder is modified, only the gateway will be rebuilt. However, the server will look for both images with the same prefix. In this case `script-server-staging` might not exist, or might be outdated. It is possible to launch the build of the script-server manually to make sure it exists and is up to date.
+    1. On github website, navigate to the Actions tab
+    2. open the desired action
+    3. Click on the arrow next to "run workflow"
+    4. Select the desired staging branch
+    5. Run workflow
+    6. Wait for completion
+4. It is now possible to test the staging prod servers by running `./server-up.sh <branchname>`. The launch script will look for this special tag in the docker hub.For example, `./server-up.sh staging` will download and use both "gateway-staging" and "script-server-staging" images.
+5. Send the above command to a few beta users.
+
+### Public release
+The changes are live as soon as they are merged to main branch: the dockers are built, pushed to [geobon's docker hub](https://hub.docker.com/r/geobon/bon-in-a-box), and next time someone starts the server, the new dockers will be pulled.
+
+
+### Debugging prod servers
 
 Yes, we all know problems occur in production that do not happen in dev mode. So in order to build and test production dockers locally, do the following:
 
