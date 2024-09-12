@@ -157,9 +157,22 @@ function checkout {
 function up {
     echo "Pulling docker images..."
     cd .. # Back to pipeline-repo folder
-    command pull ; assertSuccess
+    output=$(command pull $@ 2>&1); returnCode=$?;
+    if [[ $output == *"service \"runner-conda\" has neither an image nor a build context specified"* ]] ; then
+        bold=$(tput bold)
+        normal=$(tput sgr0)
+        echo -e "${RED}Cannot start server until branch is updated${ENDCOLOR}"
+        echo "BON in a Box now supports conda dependencies!"
+        echo "${bold}Update your development branch or fork with the main branch from GEO-BON/bon-in-a-box-pipelines${normal}"
+        exit 1
+    else # No missing conda env, check the return code
+        if [[ $returnCode -ne 0 ]] ; then
+            echo $output
+            echo -e "${RED}FAILED${ENDCOLOR}" ; exit 1
+        fi
+    fi
 
-    echo "Building (if necessary)"
+    echo "Building (if necessary)..."
     command build ; assertSuccess
 
     echo "Starting the server..."
