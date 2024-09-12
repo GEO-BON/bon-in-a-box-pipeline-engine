@@ -24,7 +24,7 @@ class ScriptRun( // Constructor used in single script run
     private val context: RunContext,
     private val timeout: Duration = DEFAULT_TIMEOUT,
     private val condaEnvName:String? = null,
-    private val condaEnvFile:String? = null) {
+    private val condaEnvYml:String? = null) {
 
     // Constructor used in pipelines & tests
     constructor(
@@ -219,7 +219,9 @@ class ScriptRun( // Constructor used in single script run
                     "r", "R" -> {
                         container = Containers.CONDA
                         val activateEnvironment =
-                            if (condaEnvName?.isNotEmpty() == true && condaEnvFile?.isNotEmpty() == true) {
+                        if (condaEnvName?.isNotEmpty() == true && condaEnvYml?.isNotEmpty() == true) {
+                                val condaEnvFile = "/conda-env-yml/$condaEnvName"
+
                                 """
                                     function assertSuccess {
                                         if [[ ${'$'}? -ne 0 ]] ; then
@@ -227,20 +229,20 @@ class ScriptRun( // Constructor used in single script run
                                         fi
                                     }
 
-                                    if [ -f "$condaEnvName.yml" ]; then
-                                        echo "$condaEnvFile" > $condaEnvName.2.yml ; assertSuccess
-                                        if cmp -s $condaEnvName.yml $condaEnvName.2.yml; then
+                                    if [ -f "$condaEnvFile.yml" ]; then
+                                        echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
+                                        if cmp -s $condaEnvFile.yml $condaEnvFile.2.yml; then
                                             echo "Activating existing conda environment $condaEnvName" ; assertSuccess
-                                            rm $condaEnvName.2.yml ; assertSuccess
+                                            rm $condaEnvFile.2.yml ; assertSuccess
                                         else
                                             echo "Updating existing conda environment $condaEnvName" ; assertSuccess
-                                            mv $condaEnvName.2.yml $condaEnvName.yml ; assertSuccess
-                                            mamba env update --file $condaEnvName.yml --prune ; assertSuccess
+                                            mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
+                                            mamba env update --file $condaEnvFile.yml --prune ; assertSuccess
                                         fi
                                     else
                                         echo "Creating new conda environment $condaEnvName" ; assertSuccess
-                                        echo "$condaEnvFile" > $condaEnvName.yml ; assertSuccess
-                                        mamba env create -f $condaEnvName.yml ; assertSuccess
+                                        echo "$condaEnvYml" > $condaEnvFile.yml ; assertSuccess
+                                        mamba env create -f $condaEnvFile.yml ; assertSuccess
                                     fi
 
                                     mamba activate $condaEnvName ; assertSuccess

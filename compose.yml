@@ -34,6 +34,7 @@ services:
       - ${PIPELINE_REPO_PATH}/output:/output:rw
       - conda-dir:/.conda
       - conda-cache:/.cache/conda
+      - conda-env-yml:/conda-env-yml
       - r-libs-user:/r-libs-user:rw
     user: ${MY_UID}:${DOCKER_GID}
     env_file:
