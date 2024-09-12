@@ -22,3 +22,5 @@ volumes:
     name: "conda-dir"
   conda-cache:
     name: "conda-cache"
+  r-libs-user:
+    name: "r-libs-user"

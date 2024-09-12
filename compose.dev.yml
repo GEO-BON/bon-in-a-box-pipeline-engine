@@ -71,3 +71,5 @@ volumes:
     name: "conda-dir-dev"
   conda-cache:
     name: "conda-cache-dev"
+  r-libs-user:
+    name: "r-libs-user-dev"
