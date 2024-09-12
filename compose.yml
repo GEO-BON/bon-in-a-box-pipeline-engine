@@ -32,6 +32,7 @@ services:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
+      - ${PIPELINE_REPO_PATH}/runners/r-environment.yml:/data/r-environment.yml:ro
       - conda-dir:/.conda
       - conda-cache:/.cache/conda
       - conda-env-yml:/conda-env-yml
