@@ -235,7 +235,7 @@ The file contains the id of the parameters that were specified in the yaml scrip
         "/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio2_7333b3d111981-01-01.tif"
     ],
     "presence_background": "/output/SDM/setupDataSdm/edb9492031df9e063a5ec5c325bacdb1/presence_background.tsv",
-    "proj": "EPSG:6623",
+    "proj": "EPSG:6622",
     "rm": [0.5, 1.0, 2.0]
 }
 ```
