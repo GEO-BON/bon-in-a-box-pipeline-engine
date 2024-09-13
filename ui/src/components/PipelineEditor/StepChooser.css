@@ -1,7 +1,12 @@
+.left-pane {
+    resize: horizontal;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
 aside.stepChooser {
     padding: 15px 10px;
     flex: 1;
-    overflow: scroll;
 }
 
 aside.stepChooser .description {
@@ -9,7 +14,7 @@ aside.stepChooser .description {
 }
 
 .dndnode {
-    height: 20px;
+    min-height: 20px;
     padding: 4px;
     border: 1px solid #1a192b;
     border-radius: 2px;
@@ -35,4 +40,8 @@ aside.stepChooser .description {
 
 .stepChooser .selected {
     background-color: blanchedalmond;
+}
+
+.stepChooser h3 {
+    border-bottom: 1px solid #1a192b;
 }

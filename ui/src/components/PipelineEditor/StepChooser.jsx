@@ -126,7 +126,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
                 }
                 onClick={() => onStepClick(descriptionFile)}
               >
-                <pre>{stepName}</pre>
+                {stepName}
               </div>
             );
           });
@@ -157,8 +157,8 @@ export default function StepChooser({ popupContent, setPopupContent }) {
       </div>
       {pipelineFiles && (
         <div key="Pipelines">
-          <p>Pipelines</p>
-          <div className="inFolder">
+          <h3>Pipelines</h3>
+          <div>
             {renderTree(
               [],
               Object.entries(pipelineFiles).map((entry) => [
@@ -171,13 +171,17 @@ export default function StepChooser({ popupContent, setPopupContent }) {
       )}
 
       {scriptFiles &&
-        renderTree(
-          [],
-          Object.entries(scriptFiles).map((entry) => [
-            entry[0].split(">"),
-            entry[1],
-          ])
-        )}
+        <div key="Scripts">
+          <h3>Scripts</h3>
+          {renderTree(
+            [],
+            Object.entries(scriptFiles).map((entry) => [
+              entry[0].split(">"),
+              entry[1],
+            ])
+          )}
+        </div>
+      }
     </aside>
   );
 }
