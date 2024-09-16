@@ -255,8 +255,6 @@ class ScriptRun( // Constructor used in single script run
                             // eval and source commands to initialize mamba, see https://stackoverflow.com/a/75246428/3519951
                             "bash", "-c",
                             """
-                                eval "$(conda shell.bash hook)"
-                                source /opt/conda/etc/profile.d/mamba.sh
                                 $activateEnvironment
                                 Rscript -e '
                                 options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
