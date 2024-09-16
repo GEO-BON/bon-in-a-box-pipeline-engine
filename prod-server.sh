@@ -46,6 +46,8 @@ function help {
     echo "                         This is useful in development switching from prod to dev server,"
     echo "                         in cases when we get the following error:"
     echo "                         \"The container name ... is already in use by container ...\""
+    echo "    purge                Removes the volumes that store dependencies (conda, R)"
+    echo "                         in addition to the clean"
     echo "    command [ARGS...]    Run an arbitrary docker compose command,"
     echo "                         such as (pull|run|up|down|build|logs)"
     echo
@@ -60,6 +62,7 @@ function command { # args appended to the docker compose command
     # We use remote.origin.fetch because of the partial checkout, see server-up.sh.
     branch=$(git -C .server config remote.origin.fetch | sed 's/.*remotes\/origin\///')
     if [[ $branch == *"staging" ]]; then
+        echo 'Using staging containers with suffix "-$branch"'
         export DOCKER_SUFFIX="-$branch"
     else
         export DOCKER_SUFFIX=""
@@ -205,6 +208,17 @@ function clean {
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
 }
 
+function purge {
+    clean
+    echo "Removing dependency volumes"
+    docker volume rm \
+        conda-dir \
+        conda-cache \
+        conda-env-yml \
+        r-libs-user
+
+}
+
 case "$1" in
     help)
         help
@@ -229,6 +243,9 @@ case "$1" in
         ;;
     clean)
         clean
+        ;;
+    purge)
+        purge
         ;;
     *)
         help

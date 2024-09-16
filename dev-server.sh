@@ -49,12 +49,26 @@ function clean {
     echo "Clean complete."
 }
 
+function purge {
+    clean
+    echo "Removing dependency volumes"
+    docker volume rm \
+        conda-dir-dev \
+        conda-cache-dev \
+        conda-env-yml-dev \
+        r-libs-user-dev
+
+}
+
 case "$1" in
     help)
         help
         ;;
     clean)
         clean
+        ;;
+    purge)
+        purge
         ;;
     test-paths)
         shift 1
