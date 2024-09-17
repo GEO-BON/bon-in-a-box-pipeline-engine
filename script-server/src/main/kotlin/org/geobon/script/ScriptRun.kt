@@ -255,6 +255,7 @@ class ScriptRun( // Constructor used in single script run
                             // eval and source commands to initialize mamba, see https://stackoverflow.com/a/75246428/3519951
                             "bash", "-c",
                             """
+                                source /.bashrc
                                 $activateEnvironment
                                 Rscript -e '
                                 options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
