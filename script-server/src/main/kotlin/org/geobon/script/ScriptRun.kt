@@ -237,7 +237,7 @@ class ScriptRun( // Constructor used in single script run
                                         else
                                             echo "Updating existing conda environment $condaEnvName" ; assertSuccess
                                             mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
-                                            mamba env update --file $condaEnvFile.yml --prune ; assertSuccess
+                                            mamba env update --file $condaEnvFile.yml ; assertSuccess
                                         fi
                                     else
                                         echo "Creating new conda environment $condaEnvName" ; assertSuccess
