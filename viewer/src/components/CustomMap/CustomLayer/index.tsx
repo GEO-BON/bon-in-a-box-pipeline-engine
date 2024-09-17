@@ -70,7 +70,11 @@ function CustomLayer(props: any) {
   }, [selectedLayerTiles, opacity]);
 
   useEffect(() => {
-    if (geojsonOutput.features.length !== 0) {
+    if (
+      geojsonOutput.features.length !== 0 &&
+      (geojsonOutput.features[0].type === "Point" ||
+        geojsonOutput.features[0].type === "MultiPoint")
+    ) {
       var geojsonMarkerOptions = {
         radius: 2,
         fillColor: "#ff7800",
@@ -89,6 +93,22 @@ function CustomLayer(props: any) {
           },
         }
       );
+      l.addTo(map);
+      map.fitBounds(l.getBounds());
+    } else if (
+      geojsonOutput.features.length !== 0 &&
+      (geojsonOutput.features[0].geometry.type === "Polygon" ||
+        geojsonOutput.features[0].geometry.type === "MultiPolygon" ||
+        geojsonOutput.features[0].geometry.type === "LineString" ||
+        geojsonOutput.features[0].geometry.type === "MultiLineString")
+    ) {
+      clearLayers();
+      const style = {
+        color: "#ff7800",
+        weight: 5,
+        opacity: 0.65,
+      };
+      const l = L.geoJSON(geojsonOutput, { attribution: "io", style: style });
       l.addTo(map);
       map.fitBounds(l.getBounds());
     }

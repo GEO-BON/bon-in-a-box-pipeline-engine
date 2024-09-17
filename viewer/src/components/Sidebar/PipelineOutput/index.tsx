@@ -173,6 +173,20 @@ export function PipelineOutput(props: any) {
                 </CustomButtonGreen>
               </>
             )}
+          {!Array.isArray(outs) &&
+            outputObj?.type?.includes("geo+json") &&
+            "type" in outputObj && (
+              <>
+                <CustomButtonGreen
+                  key={`but-${outputObj.outputs}`}
+                  onClick={(event: any) => {
+                    handleClick(event, outputObj.outputs, "geojson");
+                  }}
+                >
+                  See on map
+                </CustomButtonGreen>
+              </>
+            )}
           {Array.isArray(outs) &&
             (outputObj?.type?.includes("value") ||
               outputObj?.type?.includes("tsv") ||
@@ -281,6 +295,7 @@ export function PipelineOutput(props: any) {
             )}
           {!Array.isArray(outs) &&
             outputObj?.type?.includes("json") &&
+            !outputObj?.type?.includes("geo+json") &&
             "type" in outputObj && (
               <CustomButtonGreen
                 key={`but-${outputObj.outputs}`}

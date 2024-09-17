@@ -12,7 +12,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import CustomTable from "../CustomTable";
 import CsvToGeojson, { CsvToObject } from "../../helpers/csv_processing";
 import { Item } from "./styles";
-import { GetPipelineRunInputs } from "../../helpers/biab_api";
+import { GetPipelineRunInputs, GetJSON } from "../../helpers/biab_api";
 import _ from "underscore";
 import { PipelineOutput } from "./PipelineOutput";
 
@@ -86,6 +86,10 @@ export default function Sidebar(props: any) {
           }
         });
       });
+    } else if (type === "geojson") {
+      GetJSON(output).then((res: any) => {
+        setGeojsonOutput(res);
+      });
     } else if (
       type.includes("value") ||
       type.includes("csv") ||
@@ -110,7 +114,7 @@ export default function Sidebar(props: any) {
         ></Grid>
       );
       setOpenModal(true);
-    } else if (type.includes("json")) {
+    } else if (type.includes("json") && !type.includes("geojson")) {
       axios({
         method: "get",
         baseURL: output,
