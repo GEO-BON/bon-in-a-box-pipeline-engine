@@ -86,7 +86,7 @@ export default function Sidebar(props: any) {
           }
         });
       });
-    } else if (type === "geojson") {
+    } else if (type.includes("geo+json")) {
       GetJSON(output).then((res: any) => {
         setGeojsonOutput(res);
       });
