@@ -7,8 +7,7 @@ website:
   navbar:
     left:
       - href: index.qmd
-        text: Home
-      - about.qmd
+        text: About
       - how_to_install.qmd
       - how_to_contribute.qmd
       - working_with_stac.qmd
