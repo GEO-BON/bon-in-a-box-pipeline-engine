@@ -19,6 +19,10 @@ proj4.defs([
     "EPSG:6623",
     "+proj=aea +lat_0=44 +lon_0=-68.5 +lat_1=60 +lat_2=46 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
   ],
+  [
+    "EPSG:6622",
+    "+proj=lcc +lat_0=44 +lon_0=-68.5 +lat_1=60 +lat_2=46 +x_0=0 +y_0=0 +ellps=GRS80 +units=m +no_defs",
+  ],
 ]);
 
 export default async function CsvToGeojson(

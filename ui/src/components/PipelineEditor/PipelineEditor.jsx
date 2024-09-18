@@ -938,14 +938,17 @@ export default function PipelineEditor(props) {
     });
   }, [onSave, showAlert]);
 
-  const clearPipelineEditor = useCallback(()=> {
+  const clearPipelineEditor = useCallback(() => {
     setEditSession(Math.random());
     setCurrentFileName("");
     setNodes([]);
     setEdges([]);
     hideModal('clear');
+    setMetadata('');
+    setInputList([]);
+    setOutputList([]);
     setSavedJSON(null);
-  }, [setEditSession, setCurrentFileName, setNodes, setEdges, hideModal])
+  })
 
   //useCallback with empty dependencies so that addEventListener and removeEventListener only work on this one function only created once
   const handleBeforeUnload = useCallback((event) => {

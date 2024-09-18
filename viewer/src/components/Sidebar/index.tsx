@@ -80,13 +80,11 @@ export default function Sidebar(props: any) {
             crs = p[m];
           }
         }
-        CsvToGeojson(`${output}`, "\t", crs).then(
-          (r) => {
-            if (r?.features?.length > 0) {
-              setGeojsonOutput(r);
-            }
+        CsvToGeojson(`${output}`, "\t", crs).then((r) => {
+          if (r?.features?.length > 0) {
+            setGeojsonOutput(r);
           }
-        );
+        });
       });
     } else if (
       type.includes("value") ||
@@ -190,7 +188,7 @@ export default function Sidebar(props: any) {
       for (let o in pipelineData.pipeline_outputs) {
         sortable.push(pipelineData.pipeline_outputs[o]);
       }
-      if (sortable[0].weight) {
+      if ("weight" in sortable[0]) {
         sortable.sort(function (a: any, b: any) {
           return a.weight - b.weight;
         });
