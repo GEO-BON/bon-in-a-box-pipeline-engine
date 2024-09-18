@@ -10,9 +10,9 @@ editor: visual
 
 ## GEO BON STAC Catalog
 
-Pipelines can be created using layers pulled from any STAC catalog, such as the [Planetary Computer](https://planetarycomputer.microsoft.com/). GEO BON hosts a STAC catalog that contains many commonly used data layers, which can be viewed in JSON format in an [HTML](https://stac.geobon.org/) or in a [viewer](https://stac.geobon.org/viewer/).
+Pipelines can be created using layers pulled from any STAC catalog, such as the [Planetary Computer](https://planetarycomputer.microsoft.com/). GEO BON hosts a STAC catalog that contains many commonly used data layers, which can be explored in [JSON format](https://stac.geobon.org/) or in a more user-friendly [viewer](https://stac.geobon.org/viewer/).
 
-There is R script to pull and filter data from a STAC catalog in BON in a Box called 'Load from STAC', where users can specify the layers, bounding box, projection system, and spatial resolution they are interested in, and save this as a GeoJSON file to input into a subsequent pipeline step.
+There is a step to pull and filter data from a STAC catalog in BON in a Box called 'Load from STAC', where users can specify the layers, bounding box, projection system, and spatial resolution they are interested in. It outputs a geoJSON file that becomes an input into a subsequent pipeline step.
 
 ## Working with the STAC Catalog in R
 
@@ -116,16 +116,16 @@ write_stars(lc2,'~/lc2.tif',driver='COG',options=c('COMPRESS=DEFLATE'))
 Note that for a layer with categorical variables, saving is more complex.
 
 ``` r
-lc1 |> st_crop(bbox) |> write_stars('~/lc1.tif', driver='COG', RasterIO=c('resampling'='mode'), 
-options=c('COMPRESS=DEFLATE', 'OVERVIEW_RESAMPLING=MODE', 'LEVEL=6', 
+lc1 |> st_crop(bbox) |> write_stars('~/lc1.tif', driver='COG', RasterIO=c('resampling'='mode'),
+options=c('COMPRESS=DEFLATE', 'OVERVIEW_RESAMPLING=MODE', 'LEVEL=6',
 'OVERVIEW_COUNT=8', 'RESAMPLING=MODE', 'WARP_RESAMPLING=MODE', 'OVERVIEWS=IGNORE_EXISTING'))
 ```
 
 ## Working with GDAL Cubes
 
-The R package `gdalcubes` allows for the processing of four dimensional regular raster data cubes from irregular image collections, hiding complexities in he data such as different map projections and spatial overlaps of images or different spatial resolutions of spectral bands. This can be useful for working with many layers or time series of satellite imagery.
+The R package `gdalcubes` allows for the processing of four dimensional regular raster data cubes from irregular image collections, hiding complexities in the data such as different map projections and spatial overlaps of images or different spatial resolutions of spectral bands. This can be useful for working with many layers or time series of satellite imagery.
 
-This is a necessary step for GDAL cubes to work with STAC catalog data.
+The following step is necessary for GDAL Cubes to work with STAC catalog data.
 
 ```{r}
 for (i in 1:length(it_obj$features)){
@@ -136,7 +136,7 @@ for (i in 1:length(it_obj$features)){
 You can filter based on item properties and create a collection.
 
 ```{r}
-st <- stac_image_collection(it_obj$features, asset_names=c('data'), 
+st <- stac_image_collection(it_obj$features, asset_names=c('data'),
              property_filter = function(f){f[['class']] %in% c('1','2','3','4')},srs='EPSG:4326')
 ```
 
@@ -147,7 +147,7 @@ Here is an example that sums the four forest categories using aggregation="sum",
 ```{r, warning=FALSE}
 bbox<-st_bbox(c(xmin = -483695, xmax = -84643, ymin = 112704 , ymax = 684311), crs = st_crs(32198))
 
-v <- cube_view(srs = "EPSG:32198", extent = list(t0 = "2000-01-01", t1 = "2000-01-01", left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin), 
+v <- cube_view(srs = "EPSG:32198", extent = list(t0 = "2000-01-01", t1 = "2000-01-01", left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin),
 dx=1000, dy=1000, dt="P1D", aggregation = "sum", resampling = "mean")
 ```
 
@@ -177,7 +177,7 @@ it_obj <- stac_obj |>
   collections("accessibility_to_cities") |> items() |>
   get_request() |> items_fetch()
 v <- cube_view(srs = "EPSG:32198", extent = list(t0 = "2015-01-01", t1 = "2015-01-01",
-                                                left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin), 
+                                                left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin),
                                                 dx=1000, dy=1000, dt="P1D", aggregation
 
  = "mean", resampling = "bilinear")
@@ -193,7 +193,7 @@ Use the CHELSA dataset on climatologies and create an average map for the months
 
 ``` r
 it_obj <- s_obj |>
-  stac_search(collections = "chelsa-monthly", datetime="2010-06-01T00:00:00Z/2019-08-01T00:00:00Z") |> 
+  stac_search(collections = "chelsa-monthly", datetime="2010-06-01T00:00:00Z/2019-08-01T00:00:00Z") |>
   get_request() |> items_fetch()
 
 v <- cube_view(srs = "EPSG:32198", extent = list(t0 = "2010-06-01", t1 = "2019-08-31", left = bbox$xmin, right =bbox$xmax, top = bbox$ymax, bottom = bbox$ymin), dx=1000, dy=1000, dt="P10Y", aggregation = "mean",resampling = "bilinear")
@@ -205,7 +205,7 @@ for (i in 1:length(it_obj$features)){
 
 anames=unlist(lapply(it_obj$features,function(f){f['id']}))
 
-st <- stac_image_collection(it_obj$features, asset_names = 'data', property_filter = function(f){f[['variable']] == 'tas' & (f[['month']] %in% c(6,7,8)) }) 
+st <- stac_image_collection(it_obj$features, asset_names = 'data', property_filter = function(f){f[['variable']] == 'tas' & (f[['month']] %in% c(6,7,8)) })
 
 c_cube <- raster_cube(st, v)
 
