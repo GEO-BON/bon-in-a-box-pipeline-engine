@@ -15,6 +15,14 @@ import "leaflet.markercluster";
 import ReactDOMServer from "react-dom/server";
 import "./MarkerCluster.Default.css";
 
+// Reimport default icon for markers (the Icon would otherwise not show up)
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+L.Marker.prototype.options.icon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+});
+
 // This is to make sure leaflet icons show up.
 // see https://github.com/PaulLeCam/react-leaflet/issues/453#issuecomment-410450387
 delete L.Icon.Default.prototype._getIconUrl;
