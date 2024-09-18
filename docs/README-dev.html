@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>readme-dev – bon-in-a-box-pipeline-engine</title>
+<title>readme-dev – BON in a Box</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -79,7 +79,7 @@ ul.task-list li input[type="checkbox"] {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">bon-in-a-box-pipeline-engine</span>
+    <span class="navbar-title">BON in a Box</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -90,15 +90,19 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
     <a class="nav-link" href="./index.html"> 
-<span class="menu-text">Home</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./how_to_install.html"> 
 <span class="menu-text">How to Install</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./how_to_contribute.html"> 
+<span class="menu-text">How to Contribute</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./working_with_stac.html"> 
+<span class="menu-text">Working with STAC</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -122,6 +126,12 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#getting-the-code" id="toc-getting-the-code" class="nav-link" data-scroll-target="#getting-the-code">Getting the code</a></li>
   <li><a href="#ide-setup" id="toc-ide-setup" class="nav-link" data-scroll-target="#ide-setup">IDE setup</a></li>
   <li><a href="#launching-the-dockers-in-development-mode" id="toc-launching-the-dockers-in-development-mode" class="nav-link" data-scroll-target="#launching-the-dockers-in-development-mode">Launching the dockers in development mode</a></li>
+  <li><a href="#releasing-a-server-version" id="toc-releasing-a-server-version" class="nav-link" data-scroll-target="#releasing-a-server-version">Releasing a server version</a>
+  <ul class="collapse">
+  <li><a href="#creating-a-staging-build" id="toc-creating-a-staging-build" class="nav-link" data-scroll-target="#creating-a-staging-build">Creating a staging build</a></li>
+  <li><a href="#public-release" id="toc-public-release" class="nav-link" data-scroll-target="#public-release">Public release</a></li>
+  <li><a href="#debugging-prod-servers" id="toc-debugging-prod-servers" class="nav-link" data-scroll-target="#debugging-prod-servers">Debugging prod servers</a></li>
+  </ul></li>
   <li><a href="#microservice-infrastructure" id="toc-microservice-infrastructure" class="nav-link" data-scroll-target="#microservice-infrastructure">Microservice infrastructure</a></li>
   <li><a href="#script-lifecycle-artifacts" id="toc-script-lifecycle-artifacts" class="nav-link" data-scroll-target="#script-lifecycle-artifacts">Script lifecycle &amp; artifacts</a></li>
   <li><a href="#openapi-specification" id="toc-openapi-specification" class="nav-link" data-scroll-target="#openapi-specification">OpenAPI specification</a>
@@ -156,7 +166,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Clone this repo: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipeline-engine.git pipeline-engine</code></li>
 <li><code>cd pipeline-engine</code></li>
 <li>Clone the BON in a Box repo (or any compatible repo of your choice) <strong>into the pipeline-repo folder</strong>: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git pipeline-repo</code></li>
-<li>Create a runner.env file as per <a href="./README-user.html#running-the-servers-locally">user instructions</a>.</li>
+<li>Create a runner.env file as per <a href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_install.html#deploying-the-servers-locally">user instructions</a>.</li>
 <li><code>cd ..</code></li>
 <li>Pull the pre-compiled images: <code>./dev-server.sh pull</code></li>
 </ol>
@@ -165,7 +175,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="ide-setup">IDE setup</h2>
 <p>For the global project, Visual Studio Code. Recommended extensions:</p>
 <ul>
-<li>GitLens</li>
+<li>Git graph</li>
 <li>Markdown Preview Mermaid</li>
 <li>Mermaid Markdown Syntax Highlighting</li>
 </ul>
@@ -189,6 +199,49 @@ ul.task-list li input[type="checkbox"] {
 </ul>
 <p>Once in a while you should use <code>docker compose -f compose.yml -f compose.dev.yml pull</code> to have the latest base images.</p>
 </section>
+<section id="releasing-a-server-version" class="level2">
+<h2 class="anchored" data-anchor-id="releasing-a-server-version">Releasing a server version</h2>
+<p>The servers are versionned by date of build of the docker image. One can check the version in the version tab of the UI.</p>
+<section id="creating-a-staging-build" class="level3">
+<h3 class="anchored" data-anchor-id="creating-a-staging-build">Creating a staging build</h3>
+<ol type="1">
+<li>Create a branch that ends with “staging” from the head of the main branch.</li>
+<li>Merge your changes to that branch. The docker hub GH action will trigger for branch main and any branch with name ending by “staging”. The branch name is appended to the tag of the docker image. See
+<ul>
+<li><a href=".github/workflows/docker_ui.yml">.github/workflows/docker_script-server.yml</a></li>
+<li><a href=".github/workflows/docker_ui.yml">.github/workflows/docker_ui.yml</a></li>
+</ul></li>
+<li><strong>Caveat:</strong> this only compiles the image where the paths were modified. For example, if <code>viewer</code> folder is modified, only the gateway will be rebuilt. However, the server will look for both images with the same prefix. In this case <code>script-server-staging</code> might not exist, or might be outdated. It is possible to launch the build of the script-server manually to make sure it exists and is up to date.
+<ol type="1">
+<li>On github website, navigate to the Actions tab</li>
+<li>open the desired action</li>
+<li>Click on the arrow next to “run workflow”</li>
+<li>Select the desired staging branch</li>
+<li>Run workflow</li>
+<li>Wait for completion</li>
+</ol></li>
+<li>It is now possible to test the staging prod servers by running <code>./server-up.sh &lt;branchname&gt;</code>. The launch script will look for this special tag in the docker hub.For example, <code>./server-up.sh staging</code> will download and use both “gateway-staging” and “script-server-staging” images.</li>
+<li>Send the above command to a few beta users.</li>
+</ol>
+</section>
+<section id="public-release" class="level3">
+<h3 class="anchored" data-anchor-id="public-release">Public release</h3>
+<p>The changes are live as soon as they are merged to main branch: the dockers are built, pushed to <a href="https://hub.docker.com/r/geobon/bon-in-a-box">geobon’s docker hub</a>, and next time someone starts the server, the new dockers will be pulled.</p>
+</section>
+<section id="debugging-prod-servers" class="level3">
+<h3 class="anchored" data-anchor-id="debugging-prod-servers">Debugging prod servers</h3>
+<p>Yes, we all know problems occur in production that do not happen in dev mode. So in order to build and test production dockers locally, do the following:</p>
+<ol type="1">
+<li><p>In pipeline-repo folder, delete the .server folder.</p></li>
+<li><p>Create a symbolic link from .server to the parent: <code>ln -s ../ .server</code></p></li>
+<li><p>Build the server with <code>.server/prod-server.sh command build</code></p></li>
+<li><p>Then run it with <code>.server/prod-server.sh command up</code></p>
+<p>(<code>.server/prod-server.sh clean</code> might be needed if you get the usual name conflict error)</p></li>
+<li><p>Stop the process with ctrl+c unless you used -d option in the previous command.</p></li>
+</ol>
+<p><em>Warning: Undo this by removing the symlink if you are to use <code>./server-up.sh</code> for a regular launch of the production servers, otherwise it will checkout files in your parent pipeline engine repo though the symlink.</em></p>
+</section>
+</section>
 <section id="microservice-infrastructure" class="level2">
 <h2 class="anchored" data-anchor-id="microservice-infrastructure">Microservice infrastructure</h2>
 <pre class="mermaid"><code>stateDiagram-v2
@@ -200,13 +253,14 @@ ul.task-list li input[type="checkbox"] {
 
     [*] --&gt; ngnix
     ngnix --&gt; ui
+    ngnix --&gt; viewer
     ngnix --&gt; script
     ngnix --&gt; output
     script --&gt; scripts
     script --&gt; r
     script --&gt; julia</code></pre>
 <ul>
-<li>ui: React front-end</li>
+<li>ui and viewer: React front-end. In production, those are served statically in the NGINX gateway.</li>
 <li>script-server: Running scripts and pipeline orchestration</li>
 <li>R runner: Docker dedicated to runs R code, with most relevant packages pre-installed</li>
 <li>Julia runner: Docker dedicated to runs Julia code</li>
@@ -236,18 +290,18 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="single-script-scenario">Single-script scenario</h3>
 <pre class="mermaid"><code>sequenceDiagram
     ui-&gt;&gt;script_server: script/list
-    script_server--&gt;&gt;ui:
+    script_server--&gt;&gt;ui: json map of scripts -&gt; names
 
-    ui-&gt;&gt;script_server: script/info
-    script_server--&gt;&gt;ui:
+    ui-&gt;&gt;script_server: script/{path}/info
+    script_server--&gt;&gt;ui: script info json
 
     ui-&gt;&gt;script_server: script/run
     script_server-&gt;&gt;script: launch
     script_server--&gt;&gt;ui: runId
 
     loop Until output.json file generated
-        ui-&gt;&gt;script_server: output/{id}/logs.txt
-        script_server--&gt;&gt;ui:
+        ui-&gt;&gt;script_server: output/{runId}/logs.txt
+        script_server--&gt;&gt;ui: logs text
 
         ui-&gt;&gt;script_server: output/{id}/output.json
     end
@@ -255,26 +309,26 @@ ul.task-list li input[type="checkbox"] {
 
     script--&gt;&gt;script_server: output.json
 
-    ui-&gt;&gt;script_server: output/{id}/output.json
-    script_server--&gt;&gt;ui:
+    ui-&gt;&gt;script_server: output/{runId}/output.json
+    script_server--&gt;&gt;ui: script output json
 </code></pre>
 </section>
 <section id="pipeline-scenario" class="level3">
 <h3 class="anchored" data-anchor-id="pipeline-scenario">Pipeline scenario</h3>
 <pre class="mermaid"><code>sequenceDiagram
     ui-&gt;&gt;script_server: pipeline/list
-    script_server--&gt;&gt;ui:
+    script_server--&gt;&gt;ui: json map of pipeline -&gt; names
 
-    ui-&gt;&gt;script_server: pipeline/&lt;path&gt;/info
-    script_server--&gt;&gt;ui:
+    ui-&gt;&gt;script_server: pipeline/{path}/info
+    script_server--&gt;&gt;ui: pipeline info json
 
-    ui-&gt;&gt;script_server: pipeline/&lt;path&gt;/run
-    script_server--&gt;&gt;ui: id
+    ui-&gt;&gt;script_server: pipeline/{path}/run
+    script_server--&gt;&gt;ui: runId
     loop For each step
         script_server-&gt;&gt;script: run
         Note right of script: see previous diagram
         script--&gt;&gt;script_server: output.json (script)
-        ui-&gt;&gt;script_server: pipeline/&lt;id&gt;/outputs
+        ui-&gt;&gt;script_server: pipeline/{runId}/outputs
         script_server--&gt;&gt;ui: pipelineOutput.json (pipeline)
     end
 </code></pre>

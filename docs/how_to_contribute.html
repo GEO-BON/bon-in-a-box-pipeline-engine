@@ -124,10 +124,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
     <a class="nav-link" href="./index.html"> 
-<span class="menu-text">Home</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
@@ -268,7 +264,7 @@ author:
     example: 4326
   unit_distance:
     label: unit for distance measurement
-    description: String value of 
+    description: String value of
     type: options
     options:
       - "m2"
@@ -322,27 +318,27 @@ author:
 </tbody>
 </table>
 <p><sup>1</sup>options type requires an additioal options attribute to be added with the available options.</p>
-<pre><code>options_example:   
-  label: Options example   
-  description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.   
-  type: options   
-  options:     
-  - first option     
-  - second option     
-  - third option   
+<pre><code>options_example:
+  label: Options example
+  description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
+  type: options
+  options:
+  - first option
+  - second option
+  - third option
   example: third option</code></pre>
 </section>
 <section id="outputs" class="level3">
 <h3 class="anchored" data-anchor-id="outputs">Outputs</h3>
 <p>After specifying the inputs, you can specify what you want the script to output.</p>
 <p>Here is an example:</p>
-<pre><code>outputs: 
-  result: 
+<pre><code>outputs:
+  result:
     label: Analysis result
     description: The result of the analysis, in CSV form
-    type: text/csv 
-  result_plot: 
-    label: Result plot 
+    type: text/csv
+  result_plot:
+    label: Result plot
     description: Plot of results
     type: image/png</code></pre>
 <p>There are also several types of outputs that can be created</p>
@@ -449,7 +445,12 @@ author:
 mamba activate rbase
 
 R -e 'install.packages(c(&lt;packages&gt;), repose="https://cloud.r-project.org/")</code></pre></li>
-<li><p>You can use <code>devtools::install_github()</code> in a similar fashion</p></li>
+<li><p>You can use <code>devtools::install_github()</code> in a similar fashion:</p>
+<pre><code>docker exec -it biab-runner-conda bash
+
+mamba activate rbase
+
+R -e 'devtools::install_github("&lt;user&gt;/&lt;package&gt;")'</code></pre></li>
 </ul></li>
 </ul>
 </section>
@@ -492,18 +493,18 @@ inputs:
     example: 4326
   unit_distance:
     label: unit for distance measurement
-    description: String value of 
+    description: String value of
     type: options
     options:
       - "m2"
       - "km2"
-outputs: 
-  result: 
+outputs:
+  result:
     label: Analysis result
     description: The result of the analysis, in CSV form
-    type: text/csv 
-  result_plot: 
-    label: Result plot 
+    type: text/csv
+  result_plot:
+    label: Result plot
     description: Plot of results
     type: image/png
 conda: # Optional, only needed if your script has specific package dependencies
@@ -542,13 +543,12 @@ outputs: # 1 to many
 references: # 0 to many
   - text: # plain text reference
     doi: # link
-    
+
 conda: # Optional, only needed if your script has specific package dependencies
   channels: # programs that you need
     - # list here
   dependencies: # any packages that are dependent on a specfic version
-    - # list here
-  </code></pre>
+    - # list here</code></pre>
 <p>See <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/helloR.R">example</a></p>
 </section>
 </section>
@@ -569,45 +569,45 @@ conda: # Optional, only needed if your script has specific package dependencies
 <h3 class="anchored" data-anchor-id="receiving-inputs">Receiving inputs</h3>
 <p>When running a script, a folder is created for each given set of parameters. The same parameters result in the same folder, different parameters result in a different folder. The inputs for a given script are saved in an <code>input.json</code> file in this unique run folder.</p>
 <p>The file contains the id of the parameters that were specified in the yaml script description, associated to the values for this run. Example:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"fc"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"L"</span><span class="ot">,</span> <span class="st">"LQ"</span><span class="ot">,</span> <span class="st">"LQHP"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"method_select_params"</span><span class="fu">:</span> <span class="st">"AUC"</span><span class="fu">,</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"n_folds"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"orientation_block"</span><span class="fu">:</span> <span class="st">"lat_lon"</span><span class="fu">,</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"partition_type"</span><span class="fu">:</span> <span class="st">"block"</span><span class="fu">,</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"predictors"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio1_75548ca61981-01-01.tif"</span><span class="ot">,</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio2_7333b3d111981-01-01.tif"</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"presence_background"</span><span class="fu">:</span> <span class="st">"/output/SDM/setupDataSdm/edb9492031df9e063a5ec5c325bacdb1/presence_background.tsv"</span><span class="fu">,</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"proj"</span><span class="fu">:</span> <span class="st">"EPSG:6623"</span><span class="fu">,</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"rm"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="er">.</span><span class="dv">5</span><span class="ot">,</span> <span class="fl">1.0</span><span class="ot">,</span> <span class="fl">2.0</span><span class="ot">]</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"fc"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"L"</span><span class="ot">,</span> <span class="st">"LQ"</span><span class="ot">,</span> <span class="st">"LQHP"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"method_select_params"</span><span class="fu">:</span> <span class="st">"AUC"</span><span class="fu">,</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"n_folds"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"orientation_block"</span><span class="fu">:</span> <span class="st">"lat_lon"</span><span class="fu">,</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"partition_type"</span><span class="fu">:</span> <span class="st">"block"</span><span class="fu">,</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"predictors"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio1_75548ca61981-01-01.tif"</span><span class="ot">,</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio2_7333b3d111981-01-01.tif"</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"presence_background"</span><span class="fu">:</span> <span class="st">"/output/SDM/setupDataSdm/edb9492031df9e063a5ec5c325bacdb1/presence_background.tsv"</span><span class="fu">,</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"proj"</span><span class="fu">:</span> <span class="st">"EPSG:6623"</span><span class="fu">,</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"rm"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="er">.</span><span class="dv">5</span><span class="ot">,</span> <span class="fl">1.0</span><span class="ot">,</span> <span class="fl">2.0</span><span class="ot">]</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The script reads the <code>input.json</code> file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline. Here is an example of how to read the input folder in the R script:</p>
 <p>First, set the environment for the script:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.getenv</span>(<span class="st">"SCRIPT_LOCATION"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.getenv</span>(<span class="st">"SCRIPT_LOCATION"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>And then set the ‘input’ environment variables. The ‘input’ environment contains the specified inputs from the BON in a Box platform.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>input <span class="ot">&lt;-</span> rjson<span class="sc">::</span><span class="fu">fromJSON</span>(<span class="at">file=</span><span class="fu">file.path</span>(outputFolder, <span class="st">"input.json"</span>)) <span class="co"># Load input file</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>input <span class="ot">&lt;-</span> rjson<span class="sc">::</span><span class="fu">fromJSON</span>(<span class="at">file=</span><span class="fu">file.path</span>(outputFolder, <span class="st">"input.json"</span>)) <span class="co"># Load input file</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Next, for any functions that are using these inputs, they need to be specified.</p>
 <p>Inputs are specified by <code>input$input_name</code>.</p>
 <p>For example, to create a function to take the square root of a number that was input by the user in the UI:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(input<span class="sc">$</span>number)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(input<span class="sc">$</span>number)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This means if the user inputs the number 144, this will be run in the function and output 12.</p>
 <p>Here is another example to read in an output from a previous step of the pipeline, which was output in csv format.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(input<span class="sc">$</span>csv_file)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(input<span class="sc">$</span>csv_file)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Next, you have to specify the outputs, which can be saved in a variety of formats. The format must be accurately specified in the YAML file.</p>
 <p>Here is an example of an output with a csv file and a plot in png format.</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>result_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(outputFolder, <span class="st">"result.csv"</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(result, result_path, <span class="at">row.names =</span> F )</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>result_plot_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(outputFolder, <span class="st">"result_plot.png"</span>)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(result_path, result)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">result =</span> result_path,</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="at">result_plot =</span> result_plot_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>result_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(outputFolder, <span class="st">"result.csv"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(result, result_path, <span class="at">row.names =</span> F )</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>result_plot_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(outputFolder, <span class="st">"result_plot.png"</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(result_path, result)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>output <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">result =</span> result_path,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="at">result_plot =</span> result_plot_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Lastly, write the output as a JSON file:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(outputFolder)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>jsonlite<span class="sc">::</span><span class="fu">write_json</span>(output, <span class="st">"output.json"</span>, <span class="at">auto_unbox =</span> <span class="cn">TRUE</span>, <span class="at">pretty =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(outputFolder)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>jsonlite<span class="sc">::</span><span class="fu">write_json</span>(output, <span class="st">"output.json"</span>, <span class="at">auto_unbox =</span> <span class="cn">TRUE</span>, <span class="at">pretty =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="script-validation" class="level3">
 <h3 class="anchored" data-anchor-id="script-validation">Script validation</h3>
@@ -619,21 +619,21 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>The output keys <code>info</code>, <code>warning</code> and <code>error</code> can be used to report problems in script execution. They do not need to be described in the <code>outputs</code> section of the description. They will be displayed specially in the UI.</p>
 <p>Any <code>error</code> message will halt the rest of the pipeline.</p>
 <p>To code an error so it prints in the pipeline step, you will need to wrap your script in a try catch function and then code it to print errors.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>{r}</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>output<span class="ot">&lt;-</span> <span class="fu">tryCatch</span>({</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>SCRIPT BODY HERE</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>}, <span class="at">error =</span> <span class="cf">function</span>(e) { <span class="fu">list</span>(<span class="at">error=</span> <span class="fu">conditionMessage</span>(e)) })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>{r}</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>output<span class="ot">&lt;-</span> <span class="fu">tryCatch</span>({</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>SCRIPT BODY HERE</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>}, <span class="at">error =</span> <span class="cf">function</span>(e) { <span class="fu">list</span>(<span class="at">error=</span> <span class="fu">conditionMessage</span>(e)) })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This will print any errors in the output of the script in the UI.</p>
 <p>You can also code specific error messages. For example, if a user wanted the analysis to stop if the result was less than 0:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>output<span class="ot">&lt;-</span> <span class="fu">tryCatch</span>({</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (result <span class="sc">&lt;</span> <span class="dv">0</span>){</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stop</span>(<span class="st">"Analysis was halted because result is less than 0."</span>)</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>}, <span class="at">error =</span> <span class="cf">function</span>(e) { <span class="fu">list</span>(<span class="at">error=</span> <span class="fu">conditionMessage</span>(e)) })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>output<span class="ot">&lt;-</span> <span class="fu">tryCatch</span>({</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (result <span class="sc">&lt;</span> <span class="dv">0</span>){</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="fu">stop</span>(<span class="st">"Analysis was halted because result is less than 0."</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>}, <span class="at">error =</span> <span class="cf">function</span>(e) { <span class="fu">list</span>(<span class="at">error=</span> <span class="fu">conditionMessage</span>(e)) })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>And then the customized error message would appear in the UI.</p>
 </section>
 </section>
@@ -701,7 +701,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <section id="when-is-your-pipeline-complete" class="level1">
 <h1>When is your pipeline complete?</h1>
 <ul>
-<li><p>The pipeline is generalization (for example can be used with other species, in other regions)</p></li>
+<li><p>The pipeline is generalizable (for example can be used with other species, in other regions)</p></li>
 <li><p>Each step has documentation for each input, output, references, etc. It should be easy enough to understand for a normal biologist (i.e.&nbsp;not a subject matter expert of this specific pipeline)</p></li>
 <li><p>Each step validates its inputs for aberrations and its outputs for correctness. If an aberration is detected an “error” should be returned to halt the pipeline, or a “warning” to let it continue but alert the user.</p></li>
 <li><p>The GitHub actions pass.</p></li>

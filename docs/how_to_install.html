@@ -90,10 +90,6 @@ ul.task-list li input[type="checkbox"] {
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
     <a class="nav-link" href="./index.html"> 
-<span class="menu-text">Home</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
@@ -124,8 +120,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#running-the-servers-locally" id="toc-running-the-servers-locally" class="nav-link active" data-scroll-target="#running-the-servers-locally">Running BON in a Box locally</a></li>
-  <li><a href="#running-the-servers-remotely" id="toc-running-the-servers-remotely" class="nav-link" data-scroll-target="#running-the-servers-remotely">Running BON in a Box on a server</a></li>
+  <li><a href="#deploying-the-servers-locally" id="toc-deploying-the-servers-locally" class="nav-link active" data-scroll-target="#deploying-the-servers-locally">Deploying BON in a Box locally</a></li>
+  <li><a href="#deploying-the-servers-remotely" id="toc-deploying-the-servers-remotely" class="nav-link" data-scroll-target="#deploying-the-servers-remotely">Deploying BON in a Box on a server</a></li>
   <li><a href="#running-a-script-or-pipeline" id="toc-running-a-script-or-pipeline" class="nav-link" data-scroll-target="#running-a-script-or-pipeline">Running a script or pipeline</a></li>
   </ul>
 </nav>
@@ -153,8 +149,8 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p>The user interface allows to run and edit pipelines. It is used through the browser, but doesn’t need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.</p>
-<section id="running-the-servers-locally" class="level2">
-<h2 class="anchored" data-anchor-id="running-the-servers-locally">Running BON in a Box locally</h2>
+<section id="deploying-the-servers-locally" class="level2">
+<h2 class="anchored" data-anchor-id="deploying-the-servers-locally">Deploying BON in a Box locally</h2>
 <p>BON in a Box can be installed and ran on a local computer. While personnal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.</p>
 <p>Prerequisites :</p>
 <ul>
@@ -199,15 +195,20 @@ ul.task-list li input[type="checkbox"] {
 <p>When modifying scripts in the <code>/scripts</code> folder, servers do not need to be restarted: - When modifying an existing script, simply re-run the script from the UI and the new version will be executed. - When adding or renaming scripts, refresh the browser page.</p>
 <p>When modifying pipelines in the /pipelines folder, servers do not need to be restarted: - In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the “pipeline run” page. - When adding or renaming pipelines, refresh the browser page.</p>
 </section>
-<section id="running-the-servers-remotely" class="level2">
-<h2 class="anchored" data-anchor-id="running-the-servers-remotely">Running BON in a Box on a server</h2>
-<p>To share an instance or to have larger data processing capabilities, a server installation is recommended.</p>
-<p>Refer to the <a href="ansible/README.md">ansible playbook</a> for instructions.</p>
+<section id="deploying-the-servers-remotely" class="level2">
+<h2 class="anchored" data-anchor-id="deploying-the-servers-remotely">Deploying BON in a Box on a server</h2>
+<p>Installation steps on a server are the same as installing on a Linux computer, but some additional configurations need to be changed:</p>
+<ul>
+<li><p>In <code>runner.env</code>, choose the appropriate <code>HTTP_ADDRESS</code> and <code>HTTP_PORT</code> for your server configuration. In a typical installation, use 0.0.0.0 as an HTTP address and default port (80).</p></li>
+<li><p>In <code>runner.env</code>, select the “partial” cache cleaning mode. This will allow for calculated results to be long-lived on the server, as long as they are not run again with a new version of the script. The results in the output folder are always accessible by URL.</p></li>
+<li><p>The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.</p></li>
+<li><p>By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy and activate https with certbot. How to do this is out of scope for this readme.</p></li>
+</ul>
 </section>
-<section id="running-a-script-or-pipeline" class="level2">
-<h2 class="anchored" data-anchor-id="running-a-script-or-pipeline">Running a script or pipeline</h2>
-<p>You now have an instance of BON in a Box running, either <a href="#running-the-servers-locally">locally</a> or <a href="#running-the-servers-remotely">remotely</a>, and you want to run your first script or pipeline.</p>
-<p>There is one page to run scripts, and one to run pipelines. Select the script or pipelines from the dropdown and fill the form.</p>
+<section id="running-a-script-or-pipeline" class="level1">
+<h1>Running a script or pipeline</h1>
+<p>You now have an instance of BON in a Box deployed, either <a href="#deploying-the-servers-locally">locally</a> or <a href="#deploying-the-servers-remotely">remotely</a>, and you want to run your first script or pipeline.</p>
+<p>There is one page to run scripts, and one to run pipelines. Once there, select the script or pipelines from the dropdown and fill the form.</p>
 <p>The form might ask you for a file. In order to provide a file that you own locally, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders.</p>
 
 
