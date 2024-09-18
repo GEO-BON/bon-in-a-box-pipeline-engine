@@ -1,15 +1,17 @@
-name: UI, main branch
+name: Publish UI to docker Hub
 
 on:
   push:
     branches:
       - main
+      - '**staging'
     paths:
       - "ui/**"
+      - "viewer/**"
   workflow_dispatch:
 
 jobs:
-  ui:
+  gateway:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -21,19 +23,29 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Set Docker tag
+        id: set-tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "TAG_NAME=gateway" >> $GITHUB_ENV
+          else
+            BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
+            echo "TAG_NAME=gateway-${BRANCH_NAME}" >> $GITHUB_ENV
+          fi
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: geobon/bon-in-a-box
           tags: |
-            type=raw,value=ui
+            type=raw,value=${{ env.TAG_NAME }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: ui
-          file: ui/Dockerfile.prod
+          context: .
+          file: Dockerfile.gateway.prod
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

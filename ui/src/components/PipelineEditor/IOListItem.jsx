@@ -24,21 +24,19 @@ export function IOListItem({ io, id, valueEdited, setter, className }) {
         <table>
             <tbody>
                 <tr>
-                    <td {...attributes} {...listeners} className="draggable">⣿</td>
+                    <td {...attributes} {...listeners} className="draggable reorder-drag">⣿</td>
                     <td className={className}>
                         <ControlledTextArea className="label" keepWidth={true}
                             onBlur={e => valueEdited(e.target.value, "label", io, setter)}
                             onInput={preventNewLines}
                             defaultValue={io.label} />
 
-                        <br />
                         <ControlledTextArea className="description" keepWidth={true}
                             onBlur={e => valueEdited(e.target.value, "description", io, setter)}
                             defaultValue={io.description} />
 
                         {io.type &&
                             <>
-                                <br />
                                 <span className="example-tag">Example: </span>
                                 <ScriptInput type={io.type} value={io.example} options={io.options}
                                     onValueUpdated={(value) => valueEdited(value, "example", io, setter)} />

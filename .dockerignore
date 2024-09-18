@@ -1,0 +1,14 @@
+# Ignore everything
+*
+
+# Include UI folder with exceptions
+!ui/
+ui/node_modules
+ui/build
+ui/dist
+
+# Include viewer folder with exceptions
+!viewer/
+viewer/node_modules
+viewer/build
+viewer/dist

@@ -56,6 +56,15 @@ function help {
 function command { # args appended to the docker compose command
     export DOCKER_GID="$(getent group docker | cut -d: -f3)"
 
+    # Set the branch suffix. This allows to use a staging build.
+    # We use remote.origin.fetch because of the partial checkout, see server-up.sh.
+    branch=$(git -C .server config remote.origin.fetch | sed 's/.*remotes\/origin\///')
+    if [[ $branch == *"staging" ]]; then
+        export DOCKER_SUFFIX="-$branch"
+    else
+        export DOCKER_SUFFIX=""
+    fi
+
     # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
     if test -z $DOCKER_GID; then
         export DOCKER_GID=
@@ -176,7 +185,7 @@ function down {
 
 function clean {
     echo "Removing shared containers between dev and prod"
-    docker container rm http-rev-prox biab-ui biab-script-server \
+    docker container rm biab-gateway biab-ui biab-script-server \
         biab-tiler biab-runner-r biab-runner-julia biab-viewer
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
 }
