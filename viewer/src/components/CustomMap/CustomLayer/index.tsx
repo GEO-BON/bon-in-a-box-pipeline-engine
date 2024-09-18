@@ -70,45 +70,35 @@ function CustomLayer(props: any) {
   }, [selectedLayerTiles, opacity]);
 
   useEffect(() => {
-    if (
-      geojsonOutput.features.length !== 0 &&
-      (geojsonOutput.features[0].type === "Point" ||
-        geojsonOutput.features[0].type === "MultiPoint")
-    ) {
-      var geojsonMarkerOptions = {
-        radius: 2,
+    if (geojsonOutput.features.length !== 0) {
+      const markerStyle = {
+        radius: 2.5,
         fillColor: "#ff7800",
         color: "#000",
         weight: 1,
         opacity: 0.3,
         fillOpacity: 0.5,
       };
-      clearLayers();
-      const l = L.geoJSON(
-        geojsonOutput.features.slice(0, geojsonOutput.features.length - 1),
-        {
-          attribution: "io",
-          pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, geojsonMarkerOptions);
-          },
-        }
-      );
-      l.addTo(map);
-      map.fitBounds(l.getBounds());
-    } else if (
-      geojsonOutput.features.length !== 0 &&
-      (geojsonOutput.features[0].geometry.type === "Polygon" ||
-        geojsonOutput.features[0].geometry.type === "MultiPolygon" ||
-        geojsonOutput.features[0].geometry.type === "LineString" ||
-        geojsonOutput.features[0].geometry.type === "MultiLineString")
-    ) {
-      clearLayers();
-      const style = {
-        color: "#ff7800",
-        weight: 5,
-        opacity: 0.65,
-      };
-      const l = L.geoJSON(geojsonOutput, { attribution: "io", style: style });
+      const l = L.geoJSON(geojsonOutput, {
+        attribution: "io",
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, markerStyle);
+        },
+        style: (feature: any) => {
+          switch (feature?.geometry.type) {
+            case "Point":
+            case "MultiPoint":
+              return markerStyle;
+            default:
+              return {
+                color: "#ff7800",
+                weight: 5,
+                opacity: 0.7,
+                fillOpacity: 0.3,
+              };
+          }
+        },
+      });
       l.addTo(map);
       map.fitBounds(l.getBounds());
     }
