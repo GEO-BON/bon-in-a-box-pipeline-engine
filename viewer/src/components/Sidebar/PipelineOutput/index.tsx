@@ -18,6 +18,7 @@ import {
   FormControl,
   Button,
   Tooltip,
+  Link,
 } from "@mui/material";
 import { Item } from "../styles";
 import _ from "underscore";
@@ -50,7 +51,7 @@ export function PipelineOutput(props: any) {
     setSelectedPaperItem(value);
   };
 
-  const handleClick = (event: any, out: string, ot: string) => {
+  const handleClick = (event: any, out: any, ot: string) => {
     event.stopPropagation();
     event.preventDefault();
     if (out !== "") {
@@ -129,7 +130,11 @@ export function PipelineOutput(props: any) {
                 <CustomButtonGreen
                   key={`but-${outputObj.outputs}`}
                   onClick={(event: any) => {
-                    handleClick(event, outputObj.outputs, outputObj.type);
+                    handleClick(
+                      event,
+                      { url: outputObj.outputs, band: "b1" },
+                      outputObj.type
+                    );
                   }}
                 >
                   See on map
@@ -213,7 +218,6 @@ export function PipelineOutput(props: any) {
                 </Grid>
               </FormControl>
             )}
-
           {!Array.isArray(outs) &&
             (outputObj?.type?.includes("png") ||
               outputObj?.type?.includes("jpeg")) &&
@@ -304,6 +308,15 @@ export function PipelineOutput(props: any) {
                 }}
               >
                 See results
+              </CustomButtonGreen>
+            )}
+          {!Array.isArray(outs) &&
+            outputObj?.type?.includes("text/html") &&
+            "type" in outputObj && (
+              <CustomButtonGreen key={`but-${outputObj.outputs}`}>
+                <Link href={outputObj.outputs} target="_blank" rel="noopener">
+                  Open in new Tab
+                </Link>
               </CustomButtonGreen>
             )}
         </Item>

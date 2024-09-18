@@ -53,6 +53,10 @@ export const CustomButtonGreen = styled(Button)(({ theme }) => ({
   marginTop: "10px",
   fontSize: "0.8rem",
   marginRight: "5px",
+  "& a": {
+    textDecoration: "none",
+    color: theme.palette.primary.dark,
+  },
 }));
 
 export const CustomAutocomplete = styled(Autocomplete)(({ theme }) => ({
