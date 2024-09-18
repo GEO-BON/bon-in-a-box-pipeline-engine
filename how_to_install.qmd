@@ -70,11 +70,25 @@ When modifying pipelines in the /pipelines folder, servers do not need to be res
 
 ## Running BON in a Box on a server {#running-the-servers-remotely}
 
-To share an instance or to have larger data processing capabilities, a server installation is recommended.
+Installation steps on a server are the same as installing on a Linux computer,
+but some additional configurations need to be changed:
 
-Refer to the [ansible playbook](ansible/README.md) for instructions.
+- In `runner.env`, choose the appropriate `HTTP_ADDRESS` and `HTTP_PORT` for your server configuration.
+  In a typical installation, use 0.0.0.0 as an HTTP address and default port (80).
 
-## Running a script or pipeline
+- In `runner.env`, select the "partial" cache cleaning mode.
+  This will allow for calculated results to be long-lived on the server,
+  as long as they are not run again with a new version of the script.
+  The results in the output folder are always accessible by URL.
+
+- The outputs are precious, while the server machine can be re-generated anytime.
+  Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.
+
+- By default, BON in a Box listens for http.
+  To enable https, we hide it behind a reverse proxy and activate https with certbot.
+  How to do this is out of scope for this readme.
+
+# Running a script or pipeline
 
 You now have an instance of BON in a Box running, either [locally](#running-the-servers-locally) or [remotely](#running-the-servers-remotely), and you want to run your first script or pipeline.
 
