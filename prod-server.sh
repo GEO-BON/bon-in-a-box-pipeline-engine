@@ -62,7 +62,7 @@ function command { # args appended to the docker compose command
     # We use remote.origin.fetch because of the partial checkout, see server-up.sh.
     branch=$(git -C .server config remote.origin.fetch | sed 's/.*remotes\/origin\///')
     if [[ $branch == *"staging" ]]; then
-        echo 'Using staging containers with suffix "-$branch"'
+        echo "Using staging containers with suffix \"-$branch\""
         export DOCKER_SUFFIX="-$branch"
     else
         export DOCKER_SUFFIX=""
