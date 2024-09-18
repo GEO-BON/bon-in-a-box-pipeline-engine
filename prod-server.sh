@@ -160,13 +160,13 @@ function up {
     command pull ; assertSuccess
 
     echo "Starting the server..."
-    output=$(command up -d $@ 2>&1); returnCode=$?;
+    output=$(command up $@ 2>&1); returnCode=$?;
 
     if [[ $output == *"is already in use by container"* ]] ; then
         # Container conflict, perform clean and try again.
         clean
         echo "Starting the server after a clean..."
-        command up -d $@ ; assertSuccess
+        command up $@ ; assertSuccess
     else # No container conflict, check the return code
         if [[ $returnCode -ne 0 ]] ; then
             echo $output
