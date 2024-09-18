@@ -4,7 +4,7 @@ title: "How to Install"
 
 The user interface allows to run and edit pipelines. It is used through the browser, but doesn't need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.
 
-## Running BON in a Box locally {#running-the-servers-locally}
+## Deploying BON in a Box locally {#deploying-the-servers-locally}
 
 BON in a Box can be installed and ran on a local computer. While personnal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.
 
@@ -68,7 +68,7 @@ When modifying scripts in the `/scripts` folder, servers do not need to be resta
 
 When modifying pipelines in the /pipelines folder, servers do not need to be restarted: - In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the "pipeline run" page. - When adding or renaming pipelines, refresh the browser page.
 
-## Running BON in a Box on a server {#running-the-servers-remotely}
+## Deploying BON in a Box on a server {#deploying-the-servers-remotely}
 
 Installation steps on a server are the same as installing on a Linux computer,
 but some additional configurations need to be changed:
@@ -90,8 +90,8 @@ but some additional configurations need to be changed:
 
 # Running a script or pipeline
 
-You now have an instance of BON in a Box running, either [locally](#running-the-servers-locally) or [remotely](#running-the-servers-remotely), and you want to run your first script or pipeline.
+You now have an instance of BON in a Box deployed, either [locally](#deploying-the-servers-locally) or [remotely](#deploying-the-servers-remotely), and you want to run your first script or pipeline.
 
-There is one page to run scripts, and one to run pipelines. Select the script or pipelines from the dropdown and fill the form.
+There is one page to run scripts, and one to run pipelines. Once there, select the script or pipelines from the dropdown and fill the form.
 
 The form might ask you for a file. In order to provide a file that you own locally, upload or copy it to the `userdata` folder. You can then refer to it with a url as such: `/userdata/myFile.shp`, or `/userdata/myFolder/myFile.shp` if there are subfolders.
