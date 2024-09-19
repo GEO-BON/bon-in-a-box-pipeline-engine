@@ -26,12 +26,17 @@ services:
       OUTPUT_LOCATION: /output
       PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
 
-  runner-r:
-    container_name: biab-runner-r
+  runner-conda:
+    container_name: biab-runner-conda
     volumes:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
+      - ${PIPELINE_REPO_PATH}/runners/r-environment.yml:/data/r-environment.yml:ro
+      - conda-dir:/.conda
+      - conda-cache:/.cache/conda
+      - conda-env-yml:/conda-env-yml
+      - r-libs-user:/r-libs-user:rw
     user: ${MY_UID}:${DOCKER_GID}
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
@@ -39,6 +44,7 @@ services:
       SCRIPT_LOCATION: /scripts
       USERDATA_LOCATION: /userdata
       OUTPUT_LOCATION: /output
+      R_LIBS_USER: /r-libs-user
 
   runner-julia:
     container_name: biab-runner-julia
@@ -57,7 +63,7 @@ services:
   gateway:
     container_name: biab-gateway
     ports:
-      - "127.0.0.1:${HTTP_PORT:-80}:80"
+      - "${HTTP_ADDRESS:-127.0.0.1}:${HTTP_PORT:-80}:80"
     volumes:
       - ${GATEWAY_CONFIG}:/etc/nginx/conf.d:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro

@@ -188,7 +188,7 @@ export const SingleIOResult = memo(({ ioId, value, ioMetadata, componentId, sect
             title = ioMetadata.label;
 
         if (ioMetadata.description)
-            description = <p className="outputDescription"><ReactMarkdown className="reactMarkdown" children={ioMetadata.description} /></p>;
+            description = <ReactMarkdown className="reactMarkdown outputDescription" children={ioMetadata.description} />;
     }
 
     let isLink = isRelativeLink(value)
