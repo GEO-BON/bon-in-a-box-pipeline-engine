@@ -44,6 +44,8 @@ Analysis workflows can be converted to BON in a Box pipelines with a few steps:
 
 Each script should be accompanied by a YAML file (.yml extension) that specifies inputs and outputs of that step of the pipeline.
 
+Markdown is supported for pipeline, script, input and output descriptions. See this [CommonMark quick reference](https://commonmark.org/help/) for allowed markups.
+
 ### Name and description
 
 YAML files should begin with a name, description, and authors of the script. The name should be the same as the script that it describes but with a .yml extension.
