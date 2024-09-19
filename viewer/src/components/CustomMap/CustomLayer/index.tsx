@@ -71,24 +71,34 @@ function CustomLayer(props: any) {
 
   useEffect(() => {
     if (geojsonOutput.features.length !== 0) {
-      var geojsonMarkerOptions = {
-        radius: 2,
+      const markerStyle = {
+        radius: 2.5,
         fillColor: "#ff7800",
         color: "#000",
         weight: 1,
         opacity: 0.3,
         fillOpacity: 0.5,
       };
-      clearLayers();
-      const l = L.geoJSON(
-        geojsonOutput.features.slice(0, geojsonOutput.features.length - 1),
-        {
-          attribution: "io",
-          pointToLayer: function (feature, latlng) {
-            return L.circleMarker(latlng, geojsonMarkerOptions);
-          },
-        }
-      );
+      const l = L.geoJSON(geojsonOutput, {
+        attribution: "io",
+        pointToLayer: function (feature, latlng) {
+          return L.circleMarker(latlng, markerStyle);
+        },
+        style: (feature: any) => {
+          switch (feature?.geometry.type) {
+            case "Point":
+            case "MultiPoint":
+              return markerStyle;
+            default:
+              return {
+                color: "#ff7800",
+                weight: 5,
+                opacity: 0.7,
+                fillOpacity: 0.3,
+              };
+          }
+        },
+      });
       l.addTo(map);
       map.fitBounds(l.getBounds());
     }

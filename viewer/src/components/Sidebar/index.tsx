@@ -12,7 +12,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import CustomTable from "../CustomTable";
 import CsvToGeojson, { CsvToObject } from "../../helpers/csv_processing";
 import { Item } from "./styles";
-import { GetPipelineRunInputs } from "../../helpers/biab_api";
+import { GetPipelineRunInputs, GetJSON } from "../../helpers/biab_api";
 import _ from "underscore";
 import { PipelineOutput } from "./PipelineOutput";
 
@@ -86,6 +86,10 @@ export default function Sidebar(props: any) {
           }
         });
       });
+    } else if (type.includes("geo+json")) {
+      GetJSON(output).then((res: any) => {
+        setGeojsonOutput(res);
+      });
     } else if (
       type.includes("value") ||
       type.includes("csv") ||
@@ -110,7 +114,7 @@ export default function Sidebar(props: any) {
         ></Grid>
       );
       setOpenModal(true);
-    } else if (type.includes("json")) {
+    } else if (type.includes("json") && !type.includes("geojson")) {
       axios({
         method: "get",
         baseURL: output,
@@ -159,27 +163,29 @@ export default function Sidebar(props: any) {
       if (pipelineData.author.length > 0) {
         const auths = pipelineData.author.map((a: any, i: number, arr: any) => {
           let divider = i < arr.length - 1 ? <>, </> : "";
+          let name = <Typography
+            fontSize={11}
+            color="primary.contrastText"
+            sx={{ display: "inline" }}
+          >
+            {a.name}
+            {divider}
+          </Typography>
+
           if (a.identifier) {
             return (
-              <Link target="_blank" href={`"${a.identifier}"`}>
-                <Typography
-                  fontSize={11}
-                  color="primary.contrastText"
-                  sx={{ display: "inline" }}
-                >
-                  {a.name}
-                  {divider}
-                </Typography>
+              <Link target="_blank" href={`${a.identifier}`}>
+                {name}
+              </Link>
+            );
+          } else if (a.email) {
+            return (
+              <Link target="_blank" href={`mailto:${a.email}`}>
+                {name}
               </Link>
             );
           } else {
-            return (
-              <Typography
-                fontSize={11}
-                color="primary.contrastText"
-                sx={{ display: "inline" }}
-              >{`${a.name}${divider}`}</Typography>
-            );
+            return name;
           }
         });
         setPipelineAuthors(auths);

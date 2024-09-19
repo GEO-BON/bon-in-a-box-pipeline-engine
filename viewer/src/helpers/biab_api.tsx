@@ -130,3 +130,16 @@ export const createPipeline4Display = async (pipeline_run_id: string) => {
     });
   });
 };
+
+export const GetJSON = async (path: string) => {
+  let result = { data: {} };
+  try {
+    result = await axios({
+      method: "get",
+      baseURL: path,
+    });
+  } catch (error) {
+    result = { data: {} };
+  }
+  return result.data;
+};

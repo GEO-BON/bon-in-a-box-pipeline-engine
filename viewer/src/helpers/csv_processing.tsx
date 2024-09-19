@@ -55,6 +55,7 @@ export default async function CsvToGeojson(
         };
       }
     });
+    features = features.slice(0, features.length - 1);
     return { type: "FeatureCollection", features: features };
   });
 }
