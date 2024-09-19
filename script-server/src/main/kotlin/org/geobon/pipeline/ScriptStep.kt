@@ -1,10 +1,13 @@
 package org.geobon.pipeline
 
 import org.geobon.pipeline.RunContext.Companion.scriptRoot
+import org.geobon.script.Description.CONDA
+import org.geobon.script.Description.CONDA__NAME
 import org.geobon.script.Description.SCRIPT
 import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.ScriptRun
 import org.geobon.script.ScriptRun.Companion.DEFAULT_TIMEOUT
+import org.yaml.snakeyaml.Yaml
 import java.io.File
 import kotlin.time.Duration.Companion.minutes
 
@@ -39,7 +42,25 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
         val scriptRun = synchronized(currentRuns) {
             currentRuns.getOrPut(context!!.runId) {
                 runOwner = true
-                ScriptRun(scriptFile, context!!, specificTimeout ?: DEFAULT_TIMEOUT)
+
+                // Optional specific conda environment for this script
+                val condaEnvName = yamlFile.relativeTo(scriptRoot).path.replace("/", "__").removeSuffix(".yml")
+                val condaEnvYml = yamlParsed[CONDA]?.let { condaSection ->
+                    try { @Suppress("UNCHECKED_CAST")
+                        (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName
+                        Yaml().dump(condaSection)
+                    } catch (_: Exception) {
+                        null
+                    }
+                }
+
+                ScriptRun(
+                    scriptFile,
+                    context!!,
+                    specificTimeout ?: DEFAULT_TIMEOUT,
+                    condaEnvName,
+                    condaEnvYml
+                )
             }
         }
 

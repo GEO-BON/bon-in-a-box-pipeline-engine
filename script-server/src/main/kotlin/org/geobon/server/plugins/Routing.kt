@@ -11,7 +11,6 @@ import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
 import org.geobon.pipeline.RunContext.Companion.scriptRoot
-import org.geobon.utils.runCommand
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -236,18 +235,22 @@ fun Application.configureRouting() {
         }
 
         get("/api/versions") {
-            call.respond("""
-                UI: ${"docker exec -i biab-gateway cat /version.txt".runCommand()}
-                Script server: ${"cat /version.txt".runCommand()}
-                   ${"python3 --version".runCommand()}
-                R runner: ${"docker exec -i biab-runner-r cat /version.txt".runCommand()}
-                   ${"docker exec -i biab-runner-r Rscript --version".runCommand()}
-                Julia runner: ${"docker exec -i biab-runner-julia cat /version.txt".runCommand()}
-                   ${"docker exec -i biab-runner-julia julia --version".runCommand()}
-                TiTiler: ${
-                    "docker inspect --type=image -f '{{ .Created }}' ghcr.io/developmentseed/titiler".runCommand()
-                    ?.let { it.substring(0, it.lastIndexOf(':')).replace('T', ' ') }}
-                """.trimIndent())
+            call.respond(
+                """
+                    UI: ${Containers.UI.version}
+                    Script server: ${Containers.SCRIPT_SERVER.version}
+                       ${Containers.SCRIPT_SERVER.environment}
+                    Conda runner: ${Containers.CONDA.version}
+                        ${Containers.CONDA.environment}
+                    Julia runner: ${Containers.JULIA.version}
+                       ${Containers.JULIA.environment}
+                    TiTiler: ${Containers.TILER.version.let {
+                        val end = it.lastIndexOf(':')
+                        if (end == -1) it
+                        else it.substring(0, end).replace('T', ' ')
+                    }}
+                """.trimIndent()
+            )
         }
 
 
