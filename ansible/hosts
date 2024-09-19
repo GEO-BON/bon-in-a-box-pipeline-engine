@@ -1,5 +1,0 @@
-[biabserver]
-your_remote_user@yourserver.com
-
-[all:vars]
-ansible_user=your_remote_user

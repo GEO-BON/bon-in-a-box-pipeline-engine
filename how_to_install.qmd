@@ -1,0 +1,97 @@
+---
+title: "How to Install"
+---
+
+The user interface allows to run and edit pipelines. It is used through the browser, but doesn't need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.
+
+## Deploying BON in a Box locally {#deploying-the-servers-locally}
+
+BON in a Box can be installed and ran on a local computer. While personnal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.
+
+Prerequisites :
+
+-   Git - A github account, with an SSH key registered. See [Adding a new SSH key to your GitHub account](https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
+
+-   At least 6 GB of free space (this includes the installation of Docker Desktop) - RAM requirements will depend on the scripts that you run.
+
+-   **Windows:**
+
+    -   [Docker Desktop](https://www.docker.com/products/docker-desktop/) - Note that it is not necessary to make an account
+
+    -   A Linux shell (git bash, [Bash through PowerShell](https://learn.microsoft.com/en-us/windows/wsl/install), cygwin, etc.) necessary to run th `.sh` scripts in the instructions below.
+
+-   **Mac:**
+
+    -   [Docker Desktop](https://www.docker.com/products/docker-desktop/) Note that it is not necessary to make an account
+
+    -   Make sure docker is added to the path of your terminal. From a terminal, run command `docker run hello-world`. If there is an error message, see <https://stackoverflow.com/a/71923962/3519951>.
+
+    -   If you encounter error `no matching manifest for linux/arm64/v8 in the manifest list entries`, export DOCKER_DEFAULT_PLATFORM. See <https://stackoverflow.com/a/76404045/3519951>.
+
+-   **Linux:** Docker with Docker Compose installed. It is recommended to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
+
+To run:
+
+1.  Clone repository (Windows users: do not clone the repo in a folder under OneDrive.) This can be done in terminal using the following code: `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git` or in GitHub desktop.
+
+2.  Provide the environment variables: - Open the newly cloned repository on your computer
+
+    1.  Find the file called [`runner-sample.env`](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env)
+
+    2.  Duplicate the file and rename the copy to `runner.env`.
+
+    3.  Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g. GBIF or IUCN)
+
+    4.  Adjust any server option as you see fit.
+
+3.  Using a linux terminal (terminal on Mac or Git Bash), navigate to the folder of the cloned repository.
+
+4.  In the linux terminal, type `./server-up.sh`
+
+    -   Make sure the server is started from a linux terminal that is in the same folder as the cloned repository so it can access the files.
+
+    -   Make sure you have docker open and running on your computer.
+
+    -   The first execution will be long, in order to download the micro-services. The next ones will be shorter or immediate, depending on the changes.
+
+    -   Network problems may cause the process to fail. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.
+
+    -   Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl ("wsl --update", see <https://docs.docker.com/desktop/troubleshoot/topics/#virtualization>. Access to the BIOS may be required to enable virtualization)
+
+5.  Type <http://localhost/> to open BON in a Box
+
+6.  Run `./server-down.sh` in a terminal to stop the server when done
+
+7.  On Windows, to completely stop the processes, you might have to run `wsl --shutdown`
+
+When modifying scripts in the `/scripts` folder, servers do not need to be restarted: - When modifying an existing script, simply re-run the script from the UI and the new version will be executed. - When adding or renaming scripts, refresh the browser page.
+
+When modifying pipelines in the /pipelines folder, servers do not need to be restarted: - In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the "pipeline run" page. - When adding or renaming pipelines, refresh the browser page.
+
+## Deploying BON in a Box on a server {#deploying-the-servers-remotely}
+
+Installation steps on a server are the same as installing on a Linux computer,
+but some additional configurations need to be changed:
+
+- In `runner.env`, choose the appropriate `HTTP_ADDRESS` and `HTTP_PORT` for your server configuration.
+  In a typical installation, use 0.0.0.0 as an HTTP address and default port (80).
+
+- In `runner.env`, select the "partial" cache cleaning mode.
+  This will allow for calculated results to be long-lived on the server,
+  as long as they are not run again with a new version of the script.
+  The results in the output folder are always accessible by URL.
+
+- The outputs are precious, while the server machine can be re-generated anytime.
+  Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.
+
+- By default, BON in a Box listens for http.
+  To enable https, we hide it behind a reverse proxy and activate https with certbot.
+  How to do this is out of scope for this readme.
+
+# Running a script or pipeline
+
+You now have an instance of BON in a Box deployed, either [locally](#deploying-the-servers-locally) or [remotely](#deploying-the-servers-remotely), and you want to run your first script or pipeline.
+
+There is one page to run scripts, and one to run pipelines. Once there, select the script or pipelines from the dropdown and fill the form.
+
+The form might ask you for a file. In order to provide a file that you own locally, upload or copy it to the `userdata` folder. You can then refer to it with a url as such: `/userdata/myFile.shp`, or `/userdata/myFolder/myFile.shp` if there are subfolders.

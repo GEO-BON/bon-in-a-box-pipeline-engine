@@ -1,0 +1,547 @@
+---
+title: "How to Contribute"
+---
+
+If you wish to contribute a pipeline, please email us at web\@geobon.org.
+
+The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup below. You can create a branch or fork to save your work. Make sure that the code is general, and will work when used with various parameters, such as in different regions around the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before being accepted.
+
+# Is your analysis pipeline right for us?
+
+We are looking for pipelines that calculate biodiversity metrics that are relevant to policy and biodiversity reporting, such as Essential Biodiversity Variables (EBVs) and Indicators. These pipelines should be
+
+-   open source
+
+-   adaptable to many contexts (different species, countries, and regions)
+
+# Steps for contributing
+
+We strongly encourage those owning or developing code to calculate any biodiversity variable or indicator to share it through BON in a Box. It is the whole point of the pipeline engine: have state of the art processing pipelines shared across the community, for the benefit of all. We recommend to follow such process: 
+
+1.  Identify a workflow that has a good potential of reuse among other organisations, and that can be mostly automated.
+
+2.  Draw a high-level view of the pipeline that identifies each step.
+
+3.  Meet the BON in a Box team. We offer help to make sure that the steps are properly identified, leverage existing scripts, and identify places where the existing code would need to be modified. For example, using cloud-optimized approaches such as STAC and Parquet files instead of dowloading large files during the pipeline’s execution.
+
+4.  Secure the resources. If applying for funding, include BON in a Box in your proposal as a tool.
+
+5.  Do it. Write or adapt the code, write the yml script description files, the pipeline metadata. This step should be in constant collaboration with the GEO BON team and the stakeholders, using an incremental development approach. A illustration of this is to build a minimal working pipeline with that provides a useful product, maybe not the desired end-result. Validate it, then plan and implement the rest of a minimal “happy” path until the desired end-result. Validate it, then add options to cover alternate cases, more customizable, etc. in subsequent iterations. The benefits of this approach include to being on target with the stakeholder’s expectations, benefiting the most from GEO BON’s expertise, and ensuring that there is something working and publishable even if not all planned features were implemented.
+
+6.  Open a pull request to the BON in a Box pipelines repository. The pull request will be peer-reviewed for it’s scientific rigor, it’s reusability, and the quality of the documentation. While you are waiting, why not contribute by reviewing someone else’s contribution?
+
+7.  Make the necessary corrections.
+
+8.  The pipeline is published on BON in a Box’s trunk, website, and receives a DOI for identification. It’s time to share!
+
+# Instructions for adapting your code to an analysis pipeline
+
+Analysis workflows can be adapted to BON in a Box pipelines using a few simple steps. Once BON in a Box is installed on your computer, Pipelines can be edited and run locally by creating files in your local BON-in-a-box folder that was cloned from the GItHub repository. Workflows can be in a variety of languages, including R, Julia, and Python, and not all steps of the pipeline need to be in the same language.
+
+Analysis workflows can be converted to BON in a Box pipelines with a few steps:
+
+## Step 1: Creating a YAML file
+
+Each script should be accompanied by a YAML file (.yml extension) that specifies inputs and outputs of that step of the pipeline.
+
+### Name and description
+
+YAML files should begin with a name, description, and authors of the script. The name should be the same as the script that it describes but with a .yml extension.
+
+Example:
+
+```
+script: script_name.R
+name: Script Name
+description: Describe what the script does
+author:
+  - name: John Doe (john.doe@gmail.com)
+  - name: Jane Doe (jane.doe@gmail.com)
+```
+
+### Inputs
+
+Next, the YAML file should specify the inputs of the script. These inputs will either be outputs from the previous script, which can be connected by lines in the pipeline editor, or specified by the user in the input form.
+
+Here is an example where the input is a raster file of land cover pulled from a public database and a coordinate reference system that is specified by the user:
+
+```
+inputs:
+  landcover_raster:
+    label: Raster of landcover
+    description: Landcover data pulled from EarthEnv database with 1x1km resolution
+    type: application/geo+json
+  crs:
+    label: coordinate reference system for output
+    description: ESPG coordinate reference system for output
+    type: int
+    example: 4326
+  unit_distance:
+    label: unit for distance measurement
+    description: String value of
+    type: options
+    options:
+      - "m2"
+      - "km2"
+```
+
+Specifying an example will autofill that input with the example unless changed by the user. Not specifying an example will leave that input blank (null).
+
+There are several different types of user inputs that can be specified in the YAML file:
+
+| "Type" attribute in the yaml | IU rendering | Description                                        |
+|------------------------------|--------------|----------------------------------------------------|
+| boolean                      | Plain text   | true/false                                         |
+| float, float\[\]             | Plain text   | positive and negative numbers with a decimal point |
+| int, int\[\]                 | Plain text   | integer                                            |
+| options^1^                   | Plain text   | dropdown menu                                      |
+| text, text\[\]               | Plain text   | text input (words)                                 |
+| (any unknown type)           | Plain text   |                                                    |
+
+^1^options type requires an additioal options attribute to be added with the available options.
+
+```
+options_example:
+  label: Options example
+  description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
+  type: options
+  options:
+  - first option
+  - second option
+  - third option
+  example: third option
+```
+
+### Outputs
+
+After specifying the inputs, you can specify what you want the script to output.
+
+Here is an example:
+
+```
+outputs:
+  result:
+    label: Analysis result
+    description: The result of the analysis, in CSV form
+    type: text/csv
+  result_plot:
+    label: Result plot
+    description: Plot of results
+    type: image/png
+```
+
+There are also several types of outputs that can be created
+
+| File Type  | MIME type to use in the yaml   | UI rendering                 |
+|------------|--------------------------------|------------------------------|
+| CSV        | text/csv                       | HTML table (partial content) |
+| GeoJSON    | application/geo+json           | Map                          |
+| GeoPackage | application/geopackage+sqlite3 | Link                         |
+| GeoTIFF^2^ | image/tiff;application=geotiff | Map widget (leaflet)         |
+| JPG        | image/jpg                      | tag                          |
+| Shapefile  | application/dbf                | Link                         |
+| Text       | text/plain                     | Plain text                   |
+| TSV        | text/tab-separated-values      | HTML table (partial content) |
+|            | (any unknown type)             | Plain text or link           |
+
+^2^When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
+
+```
+map:
+  label: My map
+  description: Some map that shows something
+  type: image/tiff;application=geotiff
+  range: [0.1, 254]
+  example: https://example.com/mytiff.tif
+```
+
+### Specifying R package dependencies with conda
+
+"[Conda](https://docs.conda.io/projects/conda/en/latest/index.html) provides package, dependency, and environment management for any language." If a script is dependent on a specific package version, conda will load that package version to prevent breaking changes when packages are updated. BON in a Box uses a central conda environment that includes commonly used libraries, and supports dedicated environments for the scripts that need it.
+
+This means that instead of loading packages in R scripts, they are loaded in the R environment in conda.
+
+#### Check if the libraries you need are in conda
+
+-   To check if the packages you need are already in the R environment in conda, go to runners/r-environment.yml in the BON in a Box project folder. The list of packages already installed will be under "dependencies".
+
+#### Install any libraries that are not already in the environment
+
+-   If your package is not already in the R environment, you will need to add it.
+
+-   First, search for the package name on [anaconda](https://anaconda.org/). Packages that are in anaconda will be recognized and easily loaded by conda. If it is there:
+
+    -   Add it to the runners/r-environment.yml file
+
+    -   Add it to your local environment, replacing \<package name\> in: `docker exec -it biab-runner-conda mamba install -n rbase <package name>` in the terminal. Make sure the program is in front of the package name (e.g. r-tidyverse)
+
+-   If it is not found in anaconda
+
+    -   Go to the runners/conda-dockerfile and add it to the install command. Replace \<package\> with your package name.
+
+        ```
+        RUN bash --login -c "mamba activate rbase; R -e 'install.packages(c(\<package 1>\", \
+                \"<package 2>\", \
+                \"<package 3>\"\
+            ), repos=\"https://cloud.r-project.org/\")'"
+        ```
+
+        Or for packages in development loaded from github.
+
+        ```
+        RUN bash --login -c "mamba activate rbase; R -e 'devtools::install_github(\"<user>/<package>\")'"
+        ```
+
+    -   Install in in your local environment by typing this in the terminal, replacing \<packages\> (three commands should be pasted separately):
+
+        ```
+        docker exec -it biab-runner-conda bash
+
+        mamba activate rbase
+
+        R -e 'install.packages(c(<packages>), repose="https://cloud.r-project.org/")
+        ```
+
+    -   You can use `devtools::install_github()` in a similar fashion:
+
+        ```
+        docker exec -it biab-runner-conda bash
+
+        mamba activate rbase
+
+        R -e 'devtools::install_github("<user>/<package>")'
+        ```
+
+#### Add any version dependencies to your yml file
+
+-   **If your script does not require a specific version,** you do not need to include a conda section to the yml file. The environment will be the default R environment.
+
+-   **If you need a specific version of an already installed library,** such as when a breaking change occurs and the script cannot be adapted to use the new version, you can use conda to specify a specific package version in your yml file.
+
+    -   If you include a conda section, make sure you list all your dependencies. This is creating a new separate environment, not a supplement to the base environment. This means that all of the packages that you need need to be specified in here, even if they are in the r-environment.yml file.
+
+```
+conda: # Optional: if you script requires specific versions of packages.
+  channels:
+    - r
+  dependencies:
+    - r-rjson # read inputs and save outputs for R scripts
+    - package=version
+```
+
+For more information, refer to the [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually).
+
+### Examples
+
+Here is an example of a complete YAML file with inputs and outputs:
+
+```
+script: script_name.R
+name: Script Name
+description: Describe what the script does
+author:
+  - name: John Doe (john.doe@gmail.com)
+  - name: Jane Doe (jane.doe@gmail.com)
+inputs:
+  landcover_raster:
+    label: Raster of landcover
+    description: Landcover data pulled from EarthEnv database with 1x1km resolution
+    type: application/geo+json
+  crs:
+    label: coordinate reference system for output
+    description: ESPG coordinate reference system for output
+    type: int
+    example: 4326
+  unit_distance:
+    label: unit for distance measurement
+    description: String value of
+    type: options
+    options:
+      - "m2"
+      - "km2"
+outputs:
+  result:
+    label: Analysis result
+    description: The result of the analysis, in CSV form
+    type: text/csv
+  result_plot:
+    label: Result plot
+    description: Plot of results
+    type: image/png
+conda: # Optional, only needed if your script has specific package dependencies
+  channels:
+    - r
+  dependencies:
+    - r-rjson=0.2.22 #package=version
+```
+
+YAML is a space sensitive format, so make sure all the tab sets are correct in the file.
+
+If inputs are outputs from a previous step in the pipeline, make sure to give the inputs and outputs the same name and they will be automatically linked in the pipeline.
+
+Here is an empty commented sample that can be filled in
+
+```
+script: # script file with extension, such as "myScript.R".
+name: # short name, such as My Script
+description: # Targeted to those who will interpret pipeline results and edit pipelines.
+author: # 1 to many
+  - name: # Full name
+    email: # Optional, email address of the author. This will be publicly available.
+    identifier: # Optional, full URL of a unique digital identifier, such as an ORCID.
+license: # Optional. If unspecified, the project's MIT license will apply.
+external_link: # Optional, link to a separate project, github repo, etc.
+timeout: # Optional, in minutes. By defaults steps time out after 1h to avoid hung process to consume resources. It can be made longer for heavy processes.
+
+inputs: # 0 to many
+  key: # replace the word "key" by a snake case identifier for this input
+    label: # Human-readable version of the name
+    description: # Targetted to those who will interpret pipeline results and edit pipelines.
+    type: # see below
+    example: # will also be used as default value, can be null
+
+outputs: # 1 to many
+  key:
+    label:
+    description:
+    type:
+    example: # optional, for documentation purpose only
+
+references: # 0 to many
+  - text: # plain text reference
+    doi: # link
+
+conda: # Optional, only needed if your script has specific package dependencies
+  channels: # programs that you need
+    - # list here
+  dependencies: # any packages that are dependent on a specfic version
+    - # list here
+```
+
+See [example](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/helloR.R)
+
+## Step 2: Integrating YAML inputs and outputs into your script
+
+Now that you have created your YAML file, the inputs and outputs need to be integrated into your scripts.
+
+The scripts perform the actual work behind the scenes. They are located in [/scripts](https://github.com/GEO-BON/bon-in-a-box-pipelines/tree/main/scripts) folder
+
+Currently supported : - R v4.3.1 - Julia v1.9.3 - Python3 v3.9.2 - sh
+
+Script lifecycle:
+
+1.  Script launched with output folder as a parameter. (In R, an `outputFolder` variable in the R session. In Julia, Shell and Python, the output folder is received as an argument.)
+
+2.  Script reads `input.json` to get execution parameters (ex. species, area, data source, etc.)
+
+3.  Script performs its task
+
+4.  Script generates `output.json` containing links to result files, or native values (number, string, etc.)
+
+See [empty R script](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/empty.R) for a minimal script lifecycle example.
+
+### Receiving inputs
+
+When running a script, a folder is created for each given set of parameters. The same parameters result in the same folder, different parameters result in a different folder. The inputs for a given script are saved in an `input.json` file in this unique run folder.
+
+The file contains the id of the parameters that were specified in the yaml script description, associated to the values for this run. Example:
+
+``` json
+{
+    "fc": ["L", "LQ", "LQHP"],
+    "method_select_params": "AUC",
+    "n_folds": 2,
+    "orientation_block": "lat_lon",
+    "partition_type": "block",
+    "predictors": [
+        "/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio1_75548ca61981-01-01.tif",
+        "/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio2_7333b3d111981-01-01.tif"
+    ],
+    "presence_background": "/output/SDM/setupDataSdm/edb9492031df9e063a5ec5c325bacdb1/presence_background.tsv",
+    "proj": "EPSG:6622",
+    "rm": [0.5, 1.0, 2.0]
+}
+```
+
+The script reads the `input.json` file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline. Here is an example of how to read the input folder in the R script:
+
+First, set the environment for the script:
+
+``` r
+Sys.getenv("SCRIPT_LOCATION")
+```
+
+And then set the 'input' environment variables. The 'input' environment contains the specified inputs from the BON in a Box platform.
+
+``` r
+input <- rjson::fromJSON(file=file.path(outputFolder, "input.json")) # Load input file
+```
+
+Next, for any functions that are using these inputs, they need to be specified.
+
+Inputs are specified by `input$input_name`.
+
+For example, to create a function to take the square root of a number that was input by the user in the UI:
+
+``` r
+result <- sqrt(input$number)
+```
+
+This means if the user inputs the number 144, this will be run in the function and output 12.
+
+Here is another example to read in an output from a previous step of the pipeline, which was output in csv format.
+
+``` r
+dat <- read.csv(input$csv_file)
+```
+
+Next, you have to specify the outputs, which can be saved in a variety of formats. The format must be accurately specified in the YAML file.
+
+Here is an example of an output with a csv file and a plot in png format.
+
+``` r
+result_path <- file.path(outputFolder, "result.csv")
+write.csv(result, result_path, row.names = F )
+
+result_plot_path <- file.path(outputFolder, "result_plot.png")
+ggsave(result_path, result)
+
+output <- list(result = result_path,
+result_plot = result_plot_path)
+```
+
+Lastly, write the output as a JSON file:
+
+``` r
+setwd(outputFolder)
+jsonlite::write_json(output, "output.json", auto_unbox = TRUE, pretty = TRUE)
+```
+
+### Script validation
+
+The syntax and structure of the script description file will be validated on push. To run the validation locally, run `validate.sh`
+
+This validates that the syntax and structure are correct, but not that it's content is correct. Hence, peer review of the scripts and the description files is mandatory before accepting a pull requests.
+
+### Reporting problems
+
+The output keys `info`, `warning` and `error` can be used to report problems in script execution. They do not need to be described in the `outputs` section of the description. They will be displayed specially in the UI.
+
+Any `error` message will halt the rest of the pipeline.
+
+To code an error so it prints in the pipeline step, you will need to wrap your script in a try catch function and then code it to print errors.
+
+``` r
+{r}
+output<- tryCatch({
+
+SCRIPT BODY HERE
+
+}, error = function(e) { list(error= conditionMessage(e)) })
+```
+
+This will print any errors in the output of the script in the UI.
+
+You can also code specific error messages. For example, if a user wanted the analysis to stop if the result was less than 0:
+
+``` r
+output<- tryCatch({
+
+if (result < 0){
+stop("Analysis was halted because result is less than 0.")
+}
+
+}, error = function(e) { list(error= conditionMessage(e)) })
+```
+
+And then the customized error message would appear in the UI.
+
+## Step 3: Connect your scripts with the BON in a Box pipeline editor.
+
+Next, create your pipeline in the BON in a Box pipeline editor by connecting your inputs and outputs.
+
+Once you have saved your scripts and YAML files to your local computer in the Bon-in-a-box pipelines folder that was cloned from github, they will show up as scripts in the pipeline editor. You can drag the scripts into the editor and connect the inputs and outputs to create your pipeline.
+
+A pipeline is a collection of steps to achieve the desired processing. Each script becomes a pipeline step.
+
+Pipelines also have inputs and outputs. In order to run, a pipeline needs to specify at least one output (rightmost red box in image above). Pipeline IO supports [the same types and UI rendering](#input-and-output-types) as individual steps, since its inputs are directly fed to the steps, and outputs come from the step outputs.
+
+For a general description of pipelines in software engineering, see [Wikipedia](https://en.wikipedia.org/wiki/Pipeline_%28software%29).
+
+### Pipeline editor
+
+The pipeline editor allows you to create pipelines by plugging steps together.
+
+The left pane shows the available steps, the main section shows the canvas.
+
+On the right side, a collapsible pane allows to edit the labels and descriptions of the pipeline inputs and outputs.
+
+**To add a step:** drag and drop from the left pane to the canvas. Steps that are single scripts will display with a single border, while steps that are pipelines will display with a double border.
+
+![image](https://github.com/GEO-BON/biab-2.0/assets/6223744/f590bd01-d333-4712-934b-242a0f925f58)
+
+**To connect steps:** drag to connect an output and an input handle. Input handles are on the left, output handles are on the right.
+
+**To add a constant value:** double-click on any input to add a constant value linked to this input. It is pre-filled with the example value.
+
+**To add an output:** double-click on any *step* output to add a *pipeline* output linked to it, or drag and drop the red box from the left pane and link it manually.
+
+**To delete a step or a pipe:** select it and press the Delete key on your keyboard.
+
+**To make an array out of single value outputs:** if many outputs of the same type are connected to the same input, it will be received as an array by the script.
+
+<img src="https://user-images.githubusercontent.com/6223744/181106359-c4194411-5789-4e55-84d5-24b9e029398f.png" width="300"/>
+
+A single value can also be combined with an array of the same type, to produce a single array.
+
+<img src="https://user-images.githubusercontent.com/6223744/181106278-f6db6af5-764a-4775-b196-48feac940eec.png" width="300"/>
+
+**User inputs:** To provide inputs at runtime, simply leave them unconnected in the pipeline editor. They will be added to the sample input file when running the pipeline.
+
+If an input is common to many step, a special user input node can be added to avoid duplication. First, link your nodes to a constant.
+
+<img src="https://user-images.githubusercontent.com/6223744/218197354-8a7bb46d-dbaa-4d7f-ad8d-b4dd521fb28f.png" height="52"/>
+
+Then, use the down arrow to pop the node's menu. Choose "Convert to user input".
+
+<img src="https://user-images.githubusercontent.com/6223744/218197468-142dcdfb-447f-4076-b6c5-59e8e448b32e.png" height="61"/>
+
+The node will change as below, and the details will appear on the right pane, along with the other user inputs.
+
+<img src="https://user-images.githubusercontent.com/6223744/218197580-d5e21247-0492-40d7-b527-add323abd6b4.png" height="51"/>
+
+### Pipeline inputs and outputs
+
+Any **input** with no constant value assigned will be considered a pipeline input and user will have to fill the value.
+
+Add an **output** node linked to a step output to specify that this output is an output of the pipeline. All other unmarked step outputs will still be available as intermediate results in the UI.
+
+![image](https://user-images.githubusercontent.com/6223744/181108988-97d988ca-8f4b-45b1-b4a3-32e90821b68b.png)
+
+Pipeline inputs and outputs then appear in a collapsible pane on the right of the canvas, where their descriptions and labels can be edited.
+
+<img src="https://github.com/GEO-BON/biab-2.0/assets/6223744/215b75db-7198-486d-880d-87c0b340668b" height="218"/>
+
+Once edited, make sure to save your work before leaving the page.
+
+### Saving and loading
+
+The editor supports saving and loading on the server, unless explicitly disabled by host. This is done intuitively via the "Load from server" and "Save" buttons.
+
+*In the event that saving has been disabled on your server instance,* the save button will display "Save to clipboard". To save your modifications: 1. Click save: the content is copied to your clipboard. 2. Make sure you are up to date (e.g. `git pull --rebase`). 3. Remove all the content of the target file. 4. Paste content and save. 5. Commit and push on a branch using git. 6. To share your modifications, create a pull request for that branch through the github UI.
+
+## Step 4: Run pipeline and troubleshoot
+
+The last step is to load your saved pipeline in BON and a Box and run it. The error log at the bottom of the page will show errors with the pipeline.
+
+Once you change a script and save to your local computer, the changes will immediately be implemented when you run the script through BON in a Box. However, if you change the YAML file, you will need to reload the pipeline in the pipeline editor to see those changes. If this does not work, you may need to delete the script from the pipeline and re-drag it to the pipeline editor. Inputs and outputs can also be directly edited in the pipeline editor.
+
+# When is your pipeline complete?
+
+-   The pipeline is generalizable (for example can be used with other species, in other regions)
+
+-   Each step has documentation for each input, output, references, etc. It should be easy enough to understand for a normal biologist (i.e. not a subject matter expert of this specific pipeline)
+
+-   Each step validates its inputs for aberrations and its outputs for correctness. If an aberration is detected an "error" should be returned to halt the pipeline, or a "warning" to let it continue but alert the user.
+
+-   The GitHub actions pass.
