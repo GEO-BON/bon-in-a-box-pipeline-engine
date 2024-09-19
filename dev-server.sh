@@ -45,8 +45,19 @@ function command { # args appended to the docker compose command
 function clean {
     echo "Removing shared containers between dev and prod"
     docker container rm biab-gateway biab-ui biab-script-server \
-        biab-tiler biab-runner-r biab-runner-julia biab-viewer swagger_editor
+        biab-tiler biab-runner-conda biab-runner-julia biab-viewer swagger_editor
     echo "Clean complete."
+}
+
+function purge {
+    clean
+    echo "Removing dependency volumes"
+    docker volume rm \
+        conda-dir-dev \
+        conda-cache-dev \
+        conda-env-yml-dev \
+        r-libs-user-dev
+
 }
 
 case "$1" in
@@ -55,6 +66,9 @@ case "$1" in
         ;;
     clean)
         clean
+        ;;
+    purge)
+        purge
         ;;
     test-paths)
         shift 1
