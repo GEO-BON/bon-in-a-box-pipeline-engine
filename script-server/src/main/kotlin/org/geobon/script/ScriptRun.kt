@@ -244,8 +244,8 @@ class ScriptRun( // Constructor used in single script run
                                         echo "$condaEnvYml" > $condaEnvFile.yml ; assertSuccess
                                         mamba env create -f $condaEnvFile.yml ; assertSuccess
                                     fi
-                                    mamba activate rbase
-                                    mamba activate $condaEnvName --stack ; assertSuccess
+
+                                    mamba activate $condaEnvName ; assertSuccess
                                 """.trimIndent()
                             } else {
                                 "mamba activate rbase"
@@ -259,6 +259,7 @@ class ScriptRun( // Constructor used in single script run
                                 $activateEnvironment
                                 Rscript -e '
                                 options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
+
                                 # Define repo for install.packages
                                 repositories = getOption("repos")
                                 repositories["CRAN"] = "https://cloud.r-project.org/"
