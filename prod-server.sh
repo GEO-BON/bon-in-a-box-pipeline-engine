@@ -168,6 +168,10 @@ function up {
         echo -e "${bold}${RED}Cannot start server until branch is updated:${ENDCOLOR}"
         echo "${bold}BON in a Box now supports conda dependencies!"
         echo "${bold}Update your development branch or fork with the main branch from GEO-BON/bon-in-a-box-pipelines and launch the server again${normal}"
+        echo ""
+        echo "${bold}${RED}Workaround for legacy branches:${ENDCOLOR}"
+        echo "Run the server with the following command"
+        echo "    ./server-up.sh pre-conda-staging"
         exit 1
     fi
 
