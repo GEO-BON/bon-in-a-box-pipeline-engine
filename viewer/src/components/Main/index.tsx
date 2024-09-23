@@ -35,7 +35,11 @@ export default function Main(props: any) {
   const [item, setItem] = useState("bio1");
   const [selectedLayerAssetName, setSelectedLayerAssetName] = useState("");
   const [logTransform, setLogTransform] = useState(false);
-  const [selectedLayer, setSelectedLayer] = useState({ url: "", band: "b1" });
+  const [selectedLayer, setSelectedLayer] = useState({
+    url: "",
+    band_id: "b1",
+    description: "",
+  });
   const [selectedLayerTiles, setSelectedLayerTiles] = useState("");
   const [legend, setLegend] = useState({});
   const [colormap, setColormap] = useState("inferno");
@@ -78,7 +82,7 @@ export default function Main(props: any) {
 
   useEffect(() => {
     if (selectedLayer.url !== "" && typeof selectedLayer.url !== "undefined") {
-      GetCOGStats(selectedLayer.url, selectedLayer.band, logTransform).then(
+      GetCOGStats(selectedLayer.url, selectedLayer.band_id, logTransform).then(
         (l: any) => {
           const tiler = `/tiler/cog/tiles/{z}/{x}/{y}`;
           let data = [];
@@ -87,9 +91,9 @@ export default function Main(props: any) {
           } else {
             data = l[selectedLayerAssetName][1];
           }
-          let expression = rasterBand;
+          let expression = selectedLayer.band_id;
           if (logTransform) {
-            expression = `sqrt(${rasterBand})`;
+            expression = `sqrt(${selectedLayer.band_id})`;
           }
           const obj = {
             assets: selectedLayerAssetName,
@@ -106,7 +110,7 @@ export default function Main(props: any) {
           const rescale = `${min},${max}`;
           const params = new URLSearchParams(obj).toString();
           setSelectedLayerTiles(
-            `${tiler}?url=${selectedLayer.url}&rescale=${rescale}&${params}&expression=${selectedLayer.band}`
+            `${tiler}?url=${selectedLayer.url}&rescale=${rescale}&${params}&expression=${expression}`
           );
           setLegend(createRangeLegendControl(min, max, cmap(colormap)));
         }
@@ -176,23 +180,24 @@ export default function Main(props: any) {
     }
   };
 
-  const generateStats = (layerUrl = "", band: string) => {
-    if (selectedLayer.url === "" && layerUrl !== "") {
-      setSelectedLayer({ url: layerUrl, band: band });
+  const generateStats = (layer: any) => {
+    if (layer.url === "") {
+      setSelectedLayer({ url: "", band_id: "b1", description: "" });
+    } else {
+      setRasterStats({});
+      setTimeSeriesStats({});
+      setOpenStatsModal(true);
+      let i = 0;
+      GetCOGStats(layer.url, layer.band_id, false).then((g: any) => {
+        const rs: any = {};
+        if (g.data) {
+          setRasterStats({
+            "Selected layer": { b1: g.data[Object.keys(g.data)[0]] },
+          });
+        }
+      });
+      setOpenStatsModal(true);
     }
-    setRasterStats({});
-    setTimeSeriesStats({});
-    setOpenStatsModal(true);
-    let i = 0;
-    GetCOGStats(layerUrl, band, false).then((g: any) => {
-      const rs: any = {};
-      if (g.data) {
-        setRasterStats({
-          "Selected layer": { b1: g.data[Object.keys(g.data)[0]] },
-        });
-      }
-    });
-    setOpenStatsModal(true);
   };
 
   const mapProps = {

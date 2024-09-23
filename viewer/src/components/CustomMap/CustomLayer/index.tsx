@@ -70,6 +70,7 @@ function CustomLayer(props: any) {
   }, [selectedLayerTiles, opacity]);
 
   useEffect(() => {
+    clearLayers();
     if (geojsonOutput.features.length !== 0) {
       const markerStyle = {
         radius: 2.5,

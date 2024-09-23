@@ -37,9 +37,11 @@ export function PipelineOutput(props: any) {
   } = props;
 
   const [selectedItem, setSelectedPaperItem] = useState("");
-
   let outs = "";
-  if (!Array.isArray(outputObj.outputs)) {
+  if (Array.isArray(outputObj.outputs)) {
+    outs = outputObj.outputs;
+  }
+  if (outputObj.outputs.includes(",") && outputObj.type.includes("[]")) {
     outs = outputObj.outputs.split(",");
   }
   if (outs.length === 1) {
@@ -97,7 +99,7 @@ export function PipelineOutput(props: any) {
               >
                 {outs.map((o: any) => (
                   <CustomMenuItem key={`it-${o}`} value={o}>
-                    {o.split("/").pop()}
+                    {o?.description}
                   </CustomMenuItem>
                 ))}
               </CustomSelect>
