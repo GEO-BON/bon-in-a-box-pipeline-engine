@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   CustomSelect,
   CustomMenuItem,
   CustomButton,
   CustomButtonGreen,
-  CustomAutocomplete,
 } from "../../CustomMUI";
 import {
-  TextField,
-  Box,
-  Container,
   Grid,
   Typography,
-  Stack,
-  InputBase,
   InputLabel,
   FormControl,
   Button,
@@ -23,7 +17,7 @@ import {
 import { Item } from "../styles";
 import _ from "underscore";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import yaml from "yaml";
+import Markdown from "markdown-to-jsx";
 
 export function PipelineOutput(props: any) {
   const {
@@ -71,13 +65,9 @@ export function PipelineOutput(props: any) {
             {`${outputObj?.label[0].toUpperCase()}${outputObj.label.slice(1)}`}
           </Typography>
           <Typography color="primary.light" fontSize={11}>
-            <div
-              dangerouslySetInnerHTML={{
-                __html:
-                  outputObj?.description[0].toUpperCase() +
-                  outputObj.description.slice(1),
-              }}
-            />
+              <Markdown>
+                {outputObj?.description[0].toUpperCase() + outputObj.description.slice(1)}
+              </Markdown>
           </Typography>
           {Array.isArray(outs) && outputObj?.type?.includes("tif") && (
             <FormControl

@@ -1,0 +1,22 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "BON in a Box"
+  navbar:
+    left:
+      - href: index.qmd
+        text: About
+      - how_to_install.qmd
+      - how_to_contribute.qmd
+      - working_with_stac.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+editor: visual
+

@@ -14,7 +14,7 @@ The code in this repository runs an engine, but the engine needs content! Here a
 1. Clone this repo: `git clone git@github.com:GEO-BON/bon-in-a-box-pipeline-engine.git pipeline-engine`
 2. `cd pipeline-engine`
 3. Clone the BON in a Box repo (or any compatible repo of your choice) **into the pipeline-repo folder**: `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git pipeline-repo`
-4. Create a runner.env file as per [user instructions](README-user.md#running-the-servers-locally).
+4. Create a runner.env file as per [user instructions](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_install.html#deploying-the-servers-locally).
 5. `cd ..`
 6. Pull the pre-compiled images: `./dev-server.sh pull`
 
@@ -196,6 +196,6 @@ Every second, the UI polls for:
 
 ## Debugging signal forwarding
 
-Since runner-r and runner-julia run in a separate docker, when the user stops the pipeline, the signal must go from the script-server, to the runner, to the running script. Docker does not allow this by default, this is why we save the PID in a file and use a separate exec command to kill the process.
+Since runner-conda and runner-julia run in a separate docker, when the user stops the pipeline, the signal must go from the script-server, to the runner, to the running script. Docker does not allow this by default, this is why we save the PID in a file and use a separate exec command to kill the process.
 
 The PID file is called `.pid` and is located in the output folder of the run. It is deleted when the script completes. For details, see [ScriptRun.kt](./script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt).

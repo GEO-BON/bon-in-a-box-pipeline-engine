@@ -1,9 +1,18 @@
 .env
-.Rproj.user
-.Rhistory
 .vscode
 **/.cache
 **/.config
+
+# This is a sub-repo with it's own git history
+pipeline-repo
+
+# Generated files by quarto documentation tools and R that supports it
+.quarto
+.Rproj.user
+.Rhistory
+
+# MAC temp files
 **/.DS_Store
 **/._*
-pipeline-repo
+
+/.quarto/

@@ -157,27 +157,29 @@ export default function Sidebar(props: any) {
       if (pipelineData.author.length > 0) {
         const auths = pipelineData.author.map((a: any, i: number, arr: any) => {
           let divider = i < arr.length - 1 ? <>, </> : "";
+          let name = <Typography
+            fontSize={11}
+            color="primary.contrastText"
+            sx={{ display: "inline" }}
+          >
+            {a.name}
+            {divider}
+          </Typography>
+
           if (a.identifier) {
             return (
-              <Link target="_blank" href={`"${a.identifier}"`}>
-                <Typography
-                  fontSize={11}
-                  color="primary.contrastText"
-                  sx={{ display: "inline" }}
-                >
-                  {a.name}
-                  {divider}
-                </Typography>
+              <Link target="_blank" href={`${a.identifier}`}>
+                {name}
+              </Link>
+            );
+          } else if (a.email) {
+            return (
+              <Link target="_blank" href={`mailto:${a.email}`}>
+                {name}
               </Link>
             );
           } else {
-            return (
-              <Typography
-                fontSize={11}
-                color="primary.contrastText"
-                sx={{ display: "inline" }}
-              >{`${a.name}${divider}`}</Typography>
-            );
+            return name;
           }
         });
         setPipelineAuthors(auths);
