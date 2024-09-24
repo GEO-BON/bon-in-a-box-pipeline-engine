@@ -73,7 +73,7 @@ services:
 
   tiler:
     container_name: biab-tiler
-    image: ghcr.io/developmentseed/titiler:latest
+    image: ghcr.io/developmentseed/titiler:0.18.7
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
