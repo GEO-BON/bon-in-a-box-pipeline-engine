@@ -268,7 +268,7 @@ input[type=number].input-float {
 
 .logs {
   border:1px solid #414855;
-  max-height: 30em;
+  height: 30em;
   overflow:auto;
   padding: 0.5em;
 }
