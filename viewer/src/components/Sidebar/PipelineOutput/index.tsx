@@ -31,7 +31,7 @@ export function PipelineOutput(props: any) {
   } = props;
 
   const [selectedItem, setSelectedPaperItem] = useState("");
-  let outs = "";
+  let outs: any = "";
   if (Array.isArray(outputObj.outputs)) {
     outs = outputObj.outputs;
   }
@@ -65,9 +65,10 @@ export function PipelineOutput(props: any) {
             {`${outputObj?.label[0].toUpperCase()}${outputObj.label.slice(1)}`}
           </Typography>
           <Typography color="primary.light" fontSize={11}>
-              <Markdown>
-                {outputObj?.description[0].toUpperCase() + outputObj.description.slice(1)}
-              </Markdown>
+            <Markdown>
+              {outputObj?.description[0].toUpperCase() +
+                outputObj.description.slice(1)}
+            </Markdown>
           </Typography>
           {Array.isArray(outs) && outputObj?.type?.includes("tif") && (
             <FormControl
@@ -120,12 +121,12 @@ export function PipelineOutput(props: any) {
             outputObj?.type?.includes("tif") && (
               <>
                 <CustomButtonGreen
-                  key={`but-${outputObj.outputs}`}
+                  key={`but-${outs.band_id}`}
                   onClick={(event: any) => {
                     handleClick(
                       event,
-                      { url: outputObj.outputs, band: "b1" },
-                      outputObj.type
+                      { url: outs.url, band_id: outs.band_id },
+                      outs.type
                     );
                   }}
                 >
@@ -136,7 +137,7 @@ export function PipelineOutput(props: any) {
                     sx={{
                       display: "inline",
                     }}
-                    onClick={() => generateStats(outputObj.outputs)}
+                    onClick={() => generateStats(outs)}
                   >
                     <BarChartIcon />
                   </CustomButton>

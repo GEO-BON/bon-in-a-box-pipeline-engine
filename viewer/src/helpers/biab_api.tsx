@@ -158,7 +158,7 @@ const preprocess = async (value: any) => {
     return await GetCOGInfo(value.outputs).then((res) => {
       const outs = res.data.band_descriptions.map((b: any) => {
         let desc = b[0];
-        if (b.length > 1 && typeof b[1] !== "object") {
+        if (b.length > 1 && typeof b[1] !== "object" && b[1] !== "") {
           desc = b[1];
         }
         return {
