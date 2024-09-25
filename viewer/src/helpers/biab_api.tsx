@@ -1,5 +1,7 @@
 import axios from "axios";
 import _ from "underscore";
+import { getBreadcrumbs, getScriptOutput } from "./IOId";
+import { GetCOGInfo } from "./api";
 
 export const GetPipelineIO = async (pipeline_id: string) => {
   let result: any = { data: { outputs: [] } };
@@ -73,8 +75,8 @@ export const createPipeline4Display = async (pipeline_run_id: string) => {
     return GetPipelineRunOutputs(pipeline_run_id).then((pro: any) => {
       return Promise.allSettled(
         Object.keys(po.outputs).map(async (p: any) => {
-          const script = p.split("|")[0];
-          const output = p.split("|")[1];
+          const script = getBreadcrumbs(p);
+          const output = getScriptOutput(p);
           if (script in pro) {
             const script_run_output_path = pro[script];
             return await GetScriptOutputs(script_run_output_path).then(
@@ -122,10 +124,16 @@ export const createPipeline4Display = async (pipeline_run_id: string) => {
             pipeline_inputs_desc: po.inputs,
           };
         }
-        prom.forEach((f: any) => {
-          desc.pipeline_outputs.push(f.value);
+        return Promise.allSettled(
+          prom.map(async (f: any) => {
+            return await preprocess(f.value).then((v) => {
+              return v;
+            });
+          })
+        ).then((pr: any) => {
+          desc.pipeline_outputs = pr.map((p: any) => p.value);
+          return desc;
         });
-        return desc;
       });
     });
   });
@@ -142,4 +150,41 @@ export const GetJSON = async (path: string) => {
     result = { data: {} };
   }
   return result.data;
+};
+
+const preprocess = async (value: any) => {
+  if (value.type.includes("tif")) {
+    if (value.outputs.includes(",")) {
+      // An array of tiffs
+      let outs = value.outputs.split(",").map((t: any) => {
+        return {
+          type: value.type,
+          url: t,
+          band_id: "b1",
+          description: t.split("/").pop(),
+        };
+      });
+      return { ...value, outputs: outs };
+    } else {
+      // Not an array of TIFFs, so single TIFF or multiband
+      return await GetCOGInfo(value.outputs).then((res) => {
+        const outs = res.data.band_descriptions.map((b: any) => {
+          let desc = b[0];
+          if (b.length > 1 && typeof b[1] !== "object" && b[1] !== "") {
+            desc = b[1];
+          }
+
+          return {
+            type: value.type,
+            url: value.outputs,
+            band_id: b[0],
+            description: desc,
+          };
+        });
+        return { ...value, outputs: outs };
+      });
+    }
+  }
+
+  return value;
 };

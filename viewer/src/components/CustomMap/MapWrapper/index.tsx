@@ -45,7 +45,6 @@ import {
  */
 function MapWrapper(props: any) {
   const {
-    selectedLayerURL,
     isTimeSeriesCollection,
     timeSeriesLayers,
     geojson,

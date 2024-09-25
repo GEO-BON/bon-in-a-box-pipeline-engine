@@ -12,25 +12,25 @@ export function FoldableOutputContextProvider({ activeRenderer, setActiveRendere
     </RenderContext.Provider>
 }
 
-export function FoldableOutputWithContext({className, title, componentId, inline, inlineCollapsed, children, keepWhenHidden}) {
+export function FoldableOutputWithContext({className, icon, title, componentId, inline, inlineCollapsed, children, keepWhenHidden}) {
     const renderContext = useContext(RenderContext);
     let active = renderContext.active === componentId;
 
     return <FoldableOutputInternal toggle={() => renderContext.toggleVisibility(componentId)} active={active}
-        className={className} title={title} inline={inline} inlineCollapsed={inlineCollapsed} children={children} keepWhenHidden={keepWhenHidden}/>
+        className={className} icon={icon} title={title} inline={inline} inlineCollapsed={inlineCollapsed} children={children} keepWhenHidden={keepWhenHidden}/>
 }
 
-export function FoldableOutput({className, title, inline, inlineCollapsed, children, isActive, keepWhenHidden}) {
+export function FoldableOutput({className, icon, title, inline, inlineCollapsed, children, isActive, keepWhenHidden}) {
     const [active, setActive] = useState(false)
     useEffect(() => {
         setActive(isActive)
     }, [isActive]);
 
     return <FoldableOutputInternal toggle={() => setActive(prev => !prev)} active={active}
-        className={className} title={title} inline={inline} inlineCollapsed={inlineCollapsed} children={children} keepWhenHidden={keepWhenHidden} />
+        className={className} icon={icon} title={title} inline={inline} inlineCollapsed={inlineCollapsed} children={children} keepWhenHidden={keepWhenHidden} />
 }
 
-function FoldableOutputInternal({toggle, active, className, title, inline, inlineCollapsed, children, keepWhenHidden}) {
+function FoldableOutputInternal({toggle, active, className, icon, title, inline, inlineCollapsed, children, keepWhenHidden}) {
     const titleRef = useRef(null);
 
     useEffect(() => {
@@ -42,7 +42,7 @@ function FoldableOutputInternal({toggle, active, className, title, inline, inlin
     return <div className={className}>
         <div className="outputTitle">
             <h3 ref={titleRef} onClick={toggle} className="clickable">
-                {active ? <b>–</b> : <b>+</b>} {title}
+                {active ? <b>–</b> : <b>+</b>} {icon}{title}
             </h3>
             {inline}
             {!active && inlineCollapsed}

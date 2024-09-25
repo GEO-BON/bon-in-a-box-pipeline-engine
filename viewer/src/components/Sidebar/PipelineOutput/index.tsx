@@ -10,6 +10,9 @@ import {
   Typography,
   InputLabel,
   FormControl,
+  Button,
+  Tooltip,
+  Link,
 } from "@mui/material";
 import { Item } from "../styles";
 import _ from "underscore";
@@ -28,9 +31,11 @@ export function PipelineOutput(props: any) {
   } = props;
 
   const [selectedItem, setSelectedPaperItem] = useState("");
-
-  let outs = "";
-  if (!Array.isArray(outputObj.outputs)) {
+  let outs: any = "";
+  if (Array.isArray(outputObj.outputs)) {
+    outs = outputObj.outputs;
+  }
+  if (outputObj.outputs.includes(",") && outputObj.type.includes("[]")) {
     outs = outputObj.outputs.split(",");
   }
   if (outs.length === 1) {
@@ -42,7 +47,7 @@ export function PipelineOutput(props: any) {
     setSelectedPaperItem(value);
   };
 
-  const handleClick = (event: any, out: string, ot: string) => {
+  const handleClick = (event: any, out: any, ot: string) => {
     event.stopPropagation();
     event.preventDefault();
     if (out !== "") {
@@ -60,9 +65,10 @@ export function PipelineOutput(props: any) {
             {`${outputObj?.label[0].toUpperCase()}${outputObj.label.slice(1)}`}
           </Typography>
           <Typography color="primary.light" fontSize={11}>
-              <Markdown>
-                {outputObj?.description[0].toUpperCase() + outputObj.description.slice(1)}
-              </Markdown>
+            <Markdown>
+              {outputObj?.description[0].toUpperCase() +
+                outputObj.description.slice(1)}
+            </Markdown>
           </Typography>
           {Array.isArray(outs) && outputObj?.type?.includes("tif") && (
             <FormControl
@@ -84,7 +90,7 @@ export function PipelineOutput(props: any) {
               >
                 {outs.map((o: any) => (
                   <CustomMenuItem key={`it-${o}`} value={o}>
-                    {o.split("/").pop()}
+                    {o?.description}
                   </CustomMenuItem>
                 ))}
               </CustomSelect>
@@ -115,9 +121,13 @@ export function PipelineOutput(props: any) {
             outputObj?.type?.includes("tif") && (
               <>
                 <CustomButtonGreen
-                  key={`but-${outputObj.outputs}`}
+                  key={`but-${outs.band_id}`}
                   onClick={(event: any) => {
-                    handleClick(event, outputObj.outputs, outputObj.type);
+                    handleClick(
+                      event,
+                      { url: outs.url, band_id: outs.band_id },
+                      outs.type
+                    );
                   }}
                 >
                   See on map
@@ -127,7 +137,7 @@ export function PipelineOutput(props: any) {
                     sx={{
                       display: "inline",
                     }}
-                    onClick={() => generateStats(outputObj.outputs)}
+                    onClick={() => generateStats(outs)}
                   >
                     <BarChartIcon />
                   </CustomButton>
@@ -201,7 +211,6 @@ export function PipelineOutput(props: any) {
                 </Grid>
               </FormControl>
             )}
-
           {!Array.isArray(outs) &&
             (outputObj?.type?.includes("png") ||
               outputObj?.type?.includes("jpeg")) &&
@@ -292,6 +301,15 @@ export function PipelineOutput(props: any) {
                 }}
               >
                 See results
+              </CustomButtonGreen>
+            )}
+          {!Array.isArray(outs) &&
+            outputObj?.type?.includes("text/html") &&
+            "type" in outputObj && (
+              <CustomButtonGreen key={`but-${outputObj.outputs}`}>
+                <Link href={outputObj.outputs} target="_blank" rel="noopener">
+                  Open in new Tab
+                </Link>
               </CustomButtonGreen>
             )}
         </Item>
