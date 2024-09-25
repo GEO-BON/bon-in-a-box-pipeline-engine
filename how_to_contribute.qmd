@@ -140,6 +140,7 @@ There are also several types of outputs that can be created
 | GeoJSON    | application/geo+json           | Map                          |
 | GeoPackage | application/geopackage+sqlite3 | Link                         |
 | GeoTIFF^2^ | image/tiff;application=geotiff | Map widget (leaflet)         |
+| HTML       | text/html                      | Open in new tab              |
 | JPG        | image/jpg                      | tag                          |
 | Shapefile  | application/dbf                | Link                         |
 | Text       | text/plain                     | Plain text                   |
