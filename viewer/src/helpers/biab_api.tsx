@@ -154,6 +154,7 @@ export const GetJSON = async (path: string) => {
 
 const preprocess = async (value: any) => {
   if (value.type.includes("tif") && !value.outputs.includes(",")) {
+    //NOT AN ARRAY OF TIFFS, SO SINGLE TIF OR MULTIBAND
     let bands = [];
     return await GetCOGInfo(value.outputs).then((res) => {
       const outs = res.data.band_descriptions.map((b: any) => {
@@ -172,6 +173,7 @@ const preprocess = async (value: any) => {
     });
   }
   if (value.type.includes("tif") && value.outputs.includes(",")) {
+    //AN ARRAY OF TIFFS
     let outs = value.outputs.split(",").map((t: any) => {
       return {
         type: value.type,
