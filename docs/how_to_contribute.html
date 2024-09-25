@@ -273,9 +273,9 @@ author:
 <p>There are several different types of user inputs that can be specified in the YAML file:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 31%">
-<col style="width: 14%">
-<col style="width: 54%">
+<col style="width: 27%">
+<col style="width: 22%">
+<col style="width: 50%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -414,7 +414,7 @@ author:
 <section id="specifying-r-package-dependencies-with-conda" class="level3">
 <h3 class="anchored" data-anchor-id="specifying-r-package-dependencies-with-conda">Specifying R package dependencies with conda</h3>
 <p>“<a href="https://docs.conda.io/projects/conda/en/latest/index.html">Conda</a> provides package, dependency, and environment management for any language.” If a script is dependent on a specific package version, conda will load that package version to prevent breaking changes when packages are updated. BON in a Box uses a central conda environment that includes commonly used libraries, and supports dedicated environments for the scripts that need it.</p>
-<p>This means that instead of loading packages in R scripts, they are loaded in the R environment in conda.</p>
+<p>This means that instead of installing packages in R scripts, they are installed in the R environment in conda. Note that you still need to load the packages in your scripts.</p>
 <section id="check-if-the-libraries-you-need-are-in-conda" class="level4">
 <h4 class="anchored" data-anchor-id="check-if-the-libraries-you-need-are-in-conda">Check if the libraries you need are in conda</h4>
 <ul>
@@ -444,7 +444,8 @@ author:
 
 mamba activate rbase
 
-R -e 'install.packages(c(&lt;packages&gt;), repose="https://cloud.r-project.org/")</code></pre></li>
+R -e 'install.packages(c(&lt;packages&gt;), repose="https://cloud.r-project.org/")</code></pre>
+<ul>
 <li><p>You can use <code>devtools::install_github()</code> in a similar fashion:</p>
 <pre><code>docker exec -it biab-runner-conda bash
 
@@ -452,6 +453,9 @@ mamba activate rbase
 
 R -e 'devtools::install_github("&lt;user&gt;/&lt;package&gt;")'</code></pre></li>
 </ul></li>
+<li><p>Do not add these packages to the r-environment file or the conda portion of the yml file because conda will not be able to recognize them</p></li>
+</ul></li>
+<li><p>To refresh the R environment to match the r-environment.yml file, run <code>docker exec -u root -it biab-runner-conda mamba env update –file r-environment.yml</code> in the terminal.</p></li>
 </ul>
 </section>
 <section id="add-any-version-dependencies-to-your-yml-file" class="level4">

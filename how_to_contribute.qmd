@@ -89,14 +89,14 @@ Specifying an example will autofill that input with the example unless changed b
 
 There are several different types of user inputs that can be specified in the YAML file:
 
-| "Type" attribute in the yaml | IU rendering | Description                                        |
-|------------------------------|--------------|----------------------------------------------------|
-| boolean                      | Plain text   | true/false                                         |
-| float, float\[\]             | Plain text   | positive and negative numbers with a decimal point |
-| int, int\[\]                 | Plain text   | integer                                            |
-| options^1^                   | Plain text   | dropdown menu                                      |
-| text, text\[\]               | Plain text   | text input (words)                                 |
-| (any unknown type)           | Plain text   |                                                    |
+| "Type" attribute in the yaml | IU rendering | Description |
+|--------------------|----------------|------------------------------------|
+| boolean | Plain text | true/false |
+| float, float\[\] | Plain text | positive and negative numbers with a decimal point |
+| int, int\[\] | Plain text | integer |
+| options^1^ | Plain text | dropdown menu |
+| text, text\[\] | Plain text | text input (words) |
+| (any unknown type) | Plain text |  |
 
 ^1^options type requires an additioal options attribute to be added with the available options.
 
@@ -159,7 +159,7 @@ map:
 
 "[Conda](https://docs.conda.io/projects/conda/en/latest/index.html) provides package, dependency, and environment management for any language." If a script is dependent on a specific package version, conda will load that package version to prevent breaking changes when packages are updated. BON in a Box uses a central conda environment that includes commonly used libraries, and supports dedicated environments for the scripts that need it.
 
-This means that instead of loading packages in R scripts, they are loaded in the R environment in conda.
+This means that instead of installing packages in R scripts, they are installed in the R environment in conda. Note that you still need to load the packages in your scripts.
 
 #### Check if the libraries you need are in conda
 
@@ -202,15 +202,19 @@ This means that instead of loading packages in R scripts, they are loaded in the
         R -e 'install.packages(c(<packages>), repose="https://cloud.r-project.org/")
         ```
 
-    -   You can use `devtools::install_github()` in a similar fashion:
+        -   You can use `devtools::install_github()` in a similar fashion:
 
-        ```         
-        docker exec -it biab-runner-conda bash
+            ```         
+            docker exec -it biab-runner-conda bash
 
-        mamba activate rbase
+            mamba activate rbase
 
-        R -e 'devtools::install_github("<user>/<package>")'
-        ```
+            R -e 'devtools::install_github("<user>/<package>")'
+            ```
+
+    -   Do not add these packages to the r-environment file or the conda portion of the yml file because conda will not be able to recognize them
+
+-   To refresh the R environment to match the r-environment.yml file, run `docker exec -u root -it biab-runner-conda mamba env update –file r-environment.yml` in the terminal.
 
 #### Add any version dependencies to your yml file
 
