@@ -255,7 +255,8 @@ export function DelayedResult({
 
   let inputsContent,
     outputsContent,
-    inline = null;
+    inline = null,
+    icon = null;
   let className = "foldableScriptResult";
   if (folder && scriptMetadata) {
     if (inputData) {
@@ -278,7 +279,7 @@ export function DelayedResult({
           sectionName="output"
         />
       );
-      inline = (
+      icon = (
         <>
           {outputData.error && (
             <img src={errorImg} alt="Error" className="error-inline" />
@@ -289,12 +290,12 @@ export function DelayedResult({
           {outputData.info && (
             <img src={infoImg} alt="Info" className="info-inline" />
           )}
-          {skippedMessage && <i>{skippedMessage}</i>}
         </>
       );
+      inline = skippedMessage && <i>{skippedMessage}</i>
     } else {
       outputsContent = <p>Running...</p>;
-      inline = <InlineSpinner />;
+      icon = <InlineSpinner />;
     }
   } else {
     outputsContent = <p>Waiting for previous steps to complete.</p>;
@@ -308,6 +309,7 @@ export function DelayedResult({
     <FoldableOutputWithContext
       title={getFolderAndNameFromMetadata(breadcrumbs, scriptMetadata)}
       componentId={breadcrumbs}
+      icon={icon}
       inline={inline}
       className={className}
     >

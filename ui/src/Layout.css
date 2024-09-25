@@ -80,8 +80,9 @@ img#logo {
 }
 
 .spinner-inline {
-  height: 1em;
+  height: 1rem;
   pointer-events: none;
+  margin: 0 0.5rem 0 0.3rem;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -119,7 +120,7 @@ img#logo {
   height: 2em;
   display:inline;
   /* Compensate for margins that are in the vector graphic */
-  margin: 0em 0em -0.55em -0.5em;
+  margin: 0em 0em -0.65em -0.3em;
 }
 
 .info-inline {
@@ -178,12 +179,6 @@ img#logo {
 
 .marker-cluster span {
   font-weight: bold;
-}
-
-.outputTitle {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .outputTitle h3 {
