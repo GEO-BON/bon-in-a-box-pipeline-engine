@@ -19,7 +19,7 @@ export default function IONode({ id, data }) {
   }, [descriptionFileLocation])
 
   function showScriptTooltip() {
-    data.setToolTip(metadata.description)
+    data.setToolTip(<ReactMarkdown className="reactMarkdown noLink" children={metadata.description} />)
   }
 
   function hideTooltip() {
