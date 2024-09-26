@@ -213,7 +213,8 @@ export function PipelineOutput(props: any) {
             )}
           {!Array.isArray(outs) &&
             (outputObj?.type?.includes("png") ||
-              outputObj?.type?.includes("jpeg")) &&
+              outputObj?.type?.includes("jpeg") ||
+              outputObj?.type?.includes("jpg")) &&
             "type" in outputObj && (
               <CustomButtonGreen
                 key={`but-${outputObj.outputs}`}
@@ -226,7 +227,8 @@ export function PipelineOutput(props: any) {
             )}
           {Array.isArray(outs) &&
             (outputObj?.type?.includes("png") ||
-              outputObj?.type?.includes("jpeg")) &&
+              outputObj?.type?.includes("jpeg") ||
+              outputObj?.type?.includes("jpg")) &&
             "type" in outputObj && (
               <FormControl
                 variant="standard"
