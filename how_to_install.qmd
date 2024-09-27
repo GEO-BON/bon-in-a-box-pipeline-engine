@@ -28,7 +28,7 @@ Prerequisites :
 
     -   If you encounter error `no matching manifest for linux/arm64/v8 in the manifest list entries`, export DOCKER_DEFAULT_PLATFORM. See <https://stackoverflow.com/a/76404045/3519951>.
 
--   **Linux:** Docker with Docker Compose installed. It is recommended to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
+-   **Linux:** Docker with Docker Compose installed. It is required to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
 
 To run:
 
