@@ -1020,8 +1020,12 @@ export default function PipelineEditor(props) {
             const formData = new FormData(event.currentTarget);
 
             hideModal('saveAs')
-            setCurrentFileName(formData.get('fileName'))
-            saveFileToServer(formData.get('fileName'))
+            let fileName = formData.get('fileName')
+            if (!fileName.endsWith('.json')) {
+              fileName += '.json'
+            }
+            setCurrentFileName(fileName)
+            saveFileToServer(fileName)
           },
         }}
       >
