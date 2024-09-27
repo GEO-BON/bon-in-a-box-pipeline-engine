@@ -1,7 +1,8 @@
+/* eslint-disable prettier/prettier */
 import YAMLTextArea from "./YAMLTextArea";
 import { InputsDescription } from "../StepDescription";
 import { Tabs, Tab, TabList, TabPanel } from "react-tabs";
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from "react-markdown";
 
 import "react-tabs/style/react-tabs.css";
 import "./react-tabs-dark.css";
@@ -59,44 +60,52 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   return (
     <table className="inputFileFields">
       <tbody>
-        {Object.entries(inputs).map(([inputId, inputDescription]) => {
-          const { label, description, options, example, ...theRest } =
-            inputDescription;
+        {Object.entries(inputs)
+          .sort((a, b) => a[1].weight - b[1].weight)
+          .map(([inputId, inputDescription]) => {
+            const { label, description, options, example, ...theRest } =
+              inputDescription;
 
-          return (
-            <tr key={inputId}>
-              <td className="inputCell">
-                <label htmlFor={inputId}>
-                  <strong>{label}</strong>
-                </label>
-                <ScriptInput
-                  id={inputId}
-                  type={inputDescription.type}
-                  options={options}
-                  value={inputFileContent && inputFileContent[inputId]}
-                  onValueUpdated={(value) => updateInputFile(inputId, value)}
-                  cols="50"
-                />
-              </td>
-              <td className="descriptionCell">
-                <ReactMarkdown className="reactMarkdown" children={description} />
-                {yaml.dump(theRest)}
-                {example && <>
-                  Example:<br />
+            return (
+              <tr key={inputId}>
+                <td className="inputCell">
+                  <label htmlFor={inputId}>
+                    <strong>{label}</strong>
+                  </label>
                   <ScriptInput
                     id={inputId}
                     type={inputDescription.type}
                     options={options}
-                    value={example}
-                    disabled={true}
+                    value={inputFileContent && inputFileContent[inputId]}
+                    onValueUpdated={(value) => updateInputFile(inputId, value)}
                     cols="50"
-                    className="example"
                   />
-                </>}
-              </td>
-            </tr>
-          );
-        })}
+                </td>
+                <td className="descriptionCell">
+                  <ReactMarkdown
+                    className="reactMarkdown"
+                    children={description}
+                  />
+                  {yaml.dump(theRest)}
+                  {example && (
+                    <>
+                      Example:
+                      <br />
+                      <ScriptInput
+                        id={inputId}
+                        type={inputDescription.type}
+                        options={options}
+                        value={example}
+                        disabled={true}
+                        cols="50"
+                        className="example"
+                      />
+                    </>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
       </tbody>
     </table>
   );

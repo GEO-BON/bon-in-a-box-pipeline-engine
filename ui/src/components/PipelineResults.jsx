@@ -70,7 +70,7 @@ export function PipelineResults({
             {pipelineOutputResults &&
               pipelineMetadata.outputs &&
               Object.entries(pipelineMetadata.outputs)
-                .sort((a, b) => a.weight - b.weight)
+                .sort((a, b) => a[1].weight - b[1].weight)
                 .map((entry) => {
                   const [ioId, outputDescription] = entry;
                   const breadcrumbs = getBreadcrumbs(ioId);
