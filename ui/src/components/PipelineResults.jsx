@@ -69,50 +69,52 @@ export function PipelineResults({
           <>
             {pipelineOutputResults &&
               pipelineMetadata.outputs &&
-              Object.entries(pipelineMetadata.outputs).map((entry) => {
-                const [ioId, outputDescription] = entry;
-                const breadcrumbs = getBreadcrumbs(ioId);
-                const outputId = getScriptOutput(ioId);
-                let value =
-                  pipelineOutputResults[breadcrumbs] &&
-                  pipelineOutputResults[breadcrumbs][outputId];
+              Object.entries(pipelineMetadata.outputs)
+                .sort((a, b) => a[1].weight - b[1].weight)
+                .map((entry) => {
+                  const [ioId, outputDescription] = entry;
+                  const breadcrumbs = getBreadcrumbs(ioId);
+                  const outputId = getScriptOutput(ioId);
+                  let value =
+                    pipelineOutputResults[breadcrumbs] &&
+                    pipelineOutputResults[breadcrumbs][outputId];
 
-                // If not in outputs, check if it was an input marked as output
-                if (!value) {
-                  value = inputFileContent[breadcrumbs];
-                }
+                  // If not in outputs, check if it was an input marked as output
+                  if (!value) {
+                    value = inputFileContent[breadcrumbs];
+                  }
 
-                if (!value) {
+                  if (!value) {
+                    return (
+                      <div key={ioId} className="outputTitle">
+                        <h3>{outputDescription.label}</h3>
+                        {runningScripts.size > 0 ? (
+                          <InlineSpinner />
+                        ) : (
+                          <>
+                            <img
+                              src={warningImg}
+                              alt="Warning"
+                              className="error-inline"
+                            />
+                            See detailed results
+                          </>
+                        )}
+                      </div>
+                    );
+                  }
+
                   return (
-                    <div key={ioId} className="outputTitle">
-                      <h3>{outputDescription.label}</h3>
-                      {runningScripts.size > 0 ? (
-                        <InlineSpinner />
-                      ) : (
-                        <>
-                          <img
-                            src={warningImg}
-                            alt="Warning"
-                            className="error-inline"
-                          />
-                          See detailed results
-                        </>
-                      )}
-                    </div>
+                    <SingleIOResult
+                      sectionName="output"
+                      key={ioId}
+                      ioId={outputId}
+                      componentId={ioId}
+                      value={value}
+                      ioMetadata={outputDescription}
+                    />
                   );
-                }
-
-                return (
-                  <SingleIOResult
-                    sectionName="output"
-                    key={ioId}
-                    ioId={outputId}
-                    componentId={ioId}
-                    value={value}
-                    ioMetadata={outputDescription}
-                  />
-                );
-              })}
+                })}
 
             <h2>Detailed results</h2>
           </>
