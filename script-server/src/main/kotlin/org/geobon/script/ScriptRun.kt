@@ -233,27 +233,34 @@ class ScriptRun( // Constructor used in single script run
 
                                 """
                                     $assertSuccessBash
-                                    if [ -f "$condaEnvFile.yml" ]; then
-                                        echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
-                                        if cmp -s $condaEnvFile.yml $condaEnvFile.2.yml; then
-                                            echo "Activating existing conda environment $condaEnvName" ; assertSuccess
-                                            rm $condaEnvFile.2.yml ; assertSuccess
-                                        else
-                                            echo "Updating existing conda environment $condaEnvName" ; assertSuccess
-                                            mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
-                                            mamba env update -f $condaEnvFile.yml ; assertSuccess
-                                        fi
-                                    else
-                                        echo "Creating new conda environment $condaEnvName" ; assertSuccess
-                                        echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
-                                        mamba env create -f $condaEnvFile.2.yml
+                                    set -o pipefail
+                                    echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
+
+                                    if [ ! -f "$condaEnvFile.yml" ]; then
+                                        echo "Creating new conda environment $condaEnvName..."
+                                        createLogs=$(mamba env create -f $condaEnvFile.2.yml 2>&1 | tee -a ${logFile.absolutePath})
                                         if [[ ${'$'}? -eq 0 ]] ; then
                                             mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
+                                            echo "Created successfully."
+                                        elif [[ ${'$'}createLogs == *"prefix already exists:"* ]]; then
+                                            echo "YML files out of sync, will attempt updating..."
                                         else
-                                            mamba remove --name $condaEnvFile --all
-                                            rm $condaEnvFile.2.yml 
+                                            echo "Cleaning up..."
+                                            mamba remove -n $condaEnvName --all
+                                            rm $condaEnvFile.2.yml
                                             echo -e "FAILED" ; exit 1
                                         fi
+                                    fi
+
+                                    if [ -f "$condaEnvFile.2.yml" ]; then
+                                        if cmp -s $condaEnvFile.yml $condaEnvFile.2.yml; then
+                                            echo "Activating existing conda environment $condaEnvName"
+                                        else
+                                            echo "Updating existing conda environment $condaEnvName"
+                                            mamba env update -f $condaEnvFile.2.yml ; assertSuccess
+                                        fi
+
+                                        mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
                                     fi
 
                                     mamba activate $condaEnvName ; assertSuccess
