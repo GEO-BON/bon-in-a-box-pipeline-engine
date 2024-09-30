@@ -33,12 +33,10 @@ paths:
                   "SHI.yml": "Species Habitat Index",
                   "Folder>SDM.yml": "Species distribution model"
                 }
-  /{type}/history:
+  /pipeline/history:
     get:
       summary: Get the history of runs for all pipelines on this server
       operationId: getHistory
-      parameters:
-        - $ref: '#/components/parameters/stepType'
       responses:
         "200":
           description: |
@@ -55,7 +53,7 @@ paths:
                     runId:
                       description: Where to find the pipeline outputs in ./output folder.
                       type: string
-                      example: path>to>script@hash
+                      example: path>to>script>hash
                     startTime:
                       description: UTC date and time when the run was started
                       type: string
@@ -64,20 +62,20 @@ paths:
                     status:
                       description: Information on the completion status
                       type: string
-                      enum: [running, warning, error, aborted, complete]
+                      enum: [running, error, cancelled, completed]
                     inputs:
                       description: Inputs that were given to the pipeline form for this run.
                       type: object
                 example:
                   [
                     {
-                      runId: path>to>script@hash,
+                      runId: path>to>script>hash,
                       startDate: 2024-01-01 00:00,
                       inputs: {
                         input1: value,
                         input2: value
                       },
-                      status: "warning/error/complete"
+                      status: "completed"
                     },
                   ]
 

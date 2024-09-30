@@ -6,6 +6,7 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.plugins.configureRouting
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
@@ -61,6 +62,11 @@ class ApplicationTest {
 
             val files = folder.listFiles()
             assertTrue(files!!.size == 3, "Expected input, output and log files to be there.\nFound ${files.toList()}")
+        }
+
+        client.get("/pipeline/history").apply {
+            println(bodyAsText())
+            assertContains(bodyAsText(), "helloWorld>")
         }
     }
 
