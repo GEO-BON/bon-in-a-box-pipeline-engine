@@ -269,7 +269,7 @@ class ScriptRun( // Constructor used in single script run
                                 outputFolder<-"${context.outputFolder.absolutePath}";
                                 library(rjson)
                                 biab_inputs <- function(){
-                                    input <- fromJSON(file=file.path(outputFolder, "input.json"))
+                                    fromJSON(file=file.path(outputFolder, "input.json"))
                                 }
                                 biab_outputs <- function(output){
                                     jsonData <- toJSON(output, indent=2)
