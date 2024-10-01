@@ -4,6 +4,7 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**getHistory**](DefaultApi.md#getHistory) | **GET** /pipeline/history | Get the history of runs for all pipelines on this server
 [**getInfo**](DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
 [**getListOf**](DefaultApi.md#getListOf) | **GET** /{type}/list | Get a list of available steps of given type and their names.
 [**getOutputFolders**](DefaultApi.md#getOutputFolders) | **GET** /{type}/{id}/outputs | Get the output folders of the scripts composing this pipeline
@@ -13,6 +14,45 @@ Method | HTTP request | Description
 [**savePipeline**](DefaultApi.md#savePipeline) | **POST** /pipeline/save/{filename} | Save a json file to the pipeline folder.
 [**stop**](DefaultApi.md#stop) | **GET** /{type}/{id}/stop | Stop the specified pipeline run.
 
+
+
+## getHistory
+
+> [GetHistory200ResponseInner] getHistory()
+
+Get the history of runs for all pipelines on this server
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+apiInstance.getHistory((error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**[GetHistory200ResponseInner]**](GetHistory200ResponseInner.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
 
 
 ## getInfo
@@ -116,7 +156,7 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script or pipeline
-let id = "id_example"; // String | Where to find the pipeline in ./script folder.
+let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
 apiInstance.getOutputFolders(type, id, (error, data, response) => {
   if (error) {
     console.error(error);
@@ -132,7 +172,7 @@ apiInstance.getOutputFolders(type, id, (error, data, response) => {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **type** | **String**| Script or pipeline | 
- **id** | **String**| Where to find the pipeline in ./script folder. | 
+ **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  | 
 
 ### Return type
 
@@ -337,7 +377,7 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script or pipeline
-let id = "id_example"; // String | Where to find the pipeline in ./script folder.
+let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
 apiInstance.stop(type, id, (error, data, response) => {
   if (error) {
     console.error(error);
@@ -353,7 +393,7 @@ apiInstance.stop(type, id, (error, data, response) => {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **type** | **String**| Script or pipeline | 
- **id** | **String**| Where to find the pipeline in ./script folder. | 
+ **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  | 
 
 ### Return type
 

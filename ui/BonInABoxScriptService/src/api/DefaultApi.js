@@ -13,6 +13,7 @@
 
 
 import ApiClient from "../ApiClient";
+import GetHistory200ResponseInner from '../model/GetHistory200ResponseInner';
 import Info from '../model/Info';
 
 /**
@@ -33,6 +34,42 @@ export default class DefaultApi {
         this.apiClient = apiClient || ApiClient.instance;
     }
 
+
+    /**
+     * Callback function to receive the result of the getHistory operation.
+     * @callback module:api/DefaultApi~getHistoryCallback
+     * @param {String} error Error message, if any.
+     * @param {Array.<module:model/GetHistory200ResponseInner>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get the history of runs for all pipelines on this server
+     * @param {module:api/DefaultApi~getHistoryCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<module:model/GetHistory200ResponseInner>}
+     */
+    getHistory(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = [GetHistory200ResponseInner];
+      return this.apiClient.callApi(
+        '/pipeline/history', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
 
     /**
      * Callback function to receive the result of the getInfo operation.
@@ -135,7 +172,7 @@ export default class DefaultApi {
     /**
      * Get the output folders of the scripts composing this pipeline
      * @param {module:model/String} type Script or pipeline
-     * @param {String} id Where to find the pipeline in ./script folder.
+     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
      * @param {module:api/DefaultApi~getOutputFoldersCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Object.<String, {String: String}>}
      */
@@ -359,7 +396,7 @@ export default class DefaultApi {
     /**
      * Stop the specified pipeline run.
      * @param {module:model/String} type Script or pipeline
-     * @param {String} id Where to find the pipeline in ./script folder.
+     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
      * @param {module:api/DefaultApi~stopCallback} callback The callback function, accepting three arguments: error, data, response
      */
     stop(type, id, callback) {

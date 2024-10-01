@@ -50,6 +50,10 @@ paths:
                 items:
                   type: object
                   properties:
+                    name:
+                      description: Human readable name of the pipeline.
+                      type: string
+                      example: Very interesting index
                     runId:
                       description: Where to find the pipeline outputs in ./output folder.
                       type: string
