@@ -1,0 +1,4 @@
+name: rbase
+channels:
+  - conda-forge
+dependencies:
