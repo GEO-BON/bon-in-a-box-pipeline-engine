@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 const Editor = React.lazy(() => import('@monaco-editor/react'));
 
 // TODO: See https://github.com/suren-atoyan/monaco-react for configuration
@@ -23,14 +23,53 @@ references: # 0 to many
  * @returns rendered view of the pipeline inputs and outputs
  */
 export const MetadataPane = ({
-  metadata, setMetadata
+  metadata, setMetadata, metadataError
 }) => {
   const [collapsedPane, setCollapsedPane] = useState(true);
   const [loaded, setLoaded] = useState(false);
+  const [isTyping, setTyping] = useState(false);
+
+  const monacoRef = useRef(null);
+
+  function handleEditorDidMount(_, monaco) {
+    monacoRef.current = monaco;
+  }
 
   function handleEditorChange(value, _) {
     setMetadata(value)
   }
+
+  useEffect(()=>{
+    setTyping(true)
+    const stopTypingTimer = setTimeout(() => {
+      setTyping(false)
+    }, 500)
+
+    return () => clearTimeout(stopTypingTimer)
+  }, [metadata])
+
+  useEffect(() => {
+    if (monacoRef.current) {
+      const monaco = monacoRef.current
+      let model = monaco.editor.getModels()[0]
+      if (model) {
+        if (metadataError) {
+          if (!isTyping) {
+            monaco.editor.setModelMarkers(model, "owner", [
+              {
+                startLineNumber: metadataError.line,
+                endColumn: model.getLineLength(metadataError.line) + 1,
+                message: metadataError.message,
+                severity: monaco.MarkerSeverity.Error
+              }
+            ]);
+          }
+        } else {
+          monaco.editor.setModelMarkers(model, "owner", []);
+        }
+      }
+    }
+  }, [monacoRef, metadataError, metadata, isTyping])
 
   // Avoid loading the editor until it's opened. Then we keep it open or else the sliding animation looks weird.
   useEffect(()=>{
@@ -56,6 +95,7 @@ export const MetadataPane = ({
             defaultLanguage="yaml"
             value={metadata === "" ? emptyMetadata : metadata}
             onChange={handleEditorChange}
+            onMount={handleEditorDidMount}
             options={{
               lineNumbers: "off",
               minimap: { enabled: false },
