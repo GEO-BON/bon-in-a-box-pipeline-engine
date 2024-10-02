@@ -14,8 +14,11 @@ fun getCompletionStatus(pipelineOutputs: File):String {
             (outputPath as? String)?.let {
                 val outputDir = File(outputRoot, outputPath)
                 if(outputDir.isDirectory) {
-                    val outputFile = File(outputDir, "output.json")
-                    if(outputFile.readText().contains("\"error\":")) {
+                    val outputText = File(outputDir, "output.json").readText()
+                    if(outputText.contains("\"error\":")) {
+                        if(outputText.contains("\"Cancelled by user\"")) {
+                            return "cancelled"
+                        }
                         return "error"
                     }
                 }

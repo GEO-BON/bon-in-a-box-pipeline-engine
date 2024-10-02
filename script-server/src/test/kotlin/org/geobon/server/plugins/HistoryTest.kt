@@ -4,7 +4,6 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.outputRoot
 import kotlin.test.*
 
@@ -25,8 +24,27 @@ class HistoryTest {
     }
 
     @Test
-    fun givenCancelledPipeline_whenGettingStatus_thenStatusCancelled()= runTest {
-        // TODO
+    fun givenCancelledPipeline_whenGettingStatus_thenStatusCancelled() = testApplication {
+        // This CANNOT be tested with this framework, since client.post waits for the call to complete,
+        // and doesn't continue once the response if finished.
+//        application { configureRouting() }
+//
+//        var id: String
+//        client.post("/script/sleep.yml/run") {
+//            setBody("""{"delay": 5}""")
+//        }.apply {
+//            assertEquals(HttpStatusCode.OK, status)
+//            id = bodyAsText()
+//        }
+//
+//        client.get("/script/$id/stop").apply {
+//            assertEquals(HttpStatusCode.OK, status)
+//        }
+//
+//        client.get("/pipeline/history").apply {
+//            println(bodyAsText())
+//            assertContains(bodyAsText(), """"status": "cancelled"""")
+//        }
     }
 
     @Test
