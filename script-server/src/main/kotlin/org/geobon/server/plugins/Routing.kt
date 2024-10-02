@@ -93,7 +93,6 @@ fun Application.configureRouting() {
 
         get("/history") {
             val history = JSONArray()
-            println(runningPipelines)
             outputRoot.walk().forEach { file ->
                 if (file.name == "pipelineOutput.json") {
                     val run = JSONObject()
@@ -113,6 +112,29 @@ fun Application.configureRouting() {
                             getCompletionStatus(file)
                         }
                     )
+
+                    val type:String
+                    val description:String
+                    val runFolder = file.parentFile
+                    if(File(runFolder, "output.json").exists()) {
+                        type = "script"
+                        val scriptDescription = File(scriptRoot, runFolder.relativeTo(outputRoot).path + ".yml")
+                        description = if(scriptDescription.isFile) {
+                            "working on it..."
+                        } else {
+                            "missing"
+                        }
+                    } else {
+                        type = "pipeline"
+                        val pipelineDescription = File(pipelinesRoot, runFolder.relativeTo(outputRoot).path + ".json")
+                        description = if(pipelineDescription.isFile) {
+                            "working on it..."
+                        } else {
+                            "missing"
+                        }
+                    }
+                    run.put("type", type)
+                    run.put("description", description)
 
                     history.put(run)
                 }
