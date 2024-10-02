@@ -53,6 +53,9 @@ class GetHistory200ResponseInner {
             if (data.hasOwnProperty('runId')) {
                 obj['runId'] = ApiClient.convertToType(data['runId'], 'String');
             }
+            if (data.hasOwnProperty('type')) {
+                obj['type'] = ApiClient.convertToType(data['type'], 'String');
+            }
             if (data.hasOwnProperty('startTime')) {
                 obj['startTime'] = ApiClient.convertToType(data['startTime'], 'Date');
             }
@@ -81,6 +84,10 @@ class GetHistory200ResponseInner {
             throw new Error("Expected the field `runId` to be a primitive type in the JSON string but got " + data['runId']);
         }
         // ensure the json data is a string
+        if (data['type'] && !(typeof data['type'] === 'string' || data['type'] instanceof String)) {
+            throw new Error("Expected the field `type` to be a primitive type in the JSON string but got " + data['type']);
+        }
+        // ensure the json data is a string
         if (data['status'] && !(typeof data['status'] === 'string' || data['status'] instanceof String)) {
             throw new Error("Expected the field `status` to be a primitive type in the JSON string but got " + data['status']);
         }
@@ -106,6 +113,12 @@ GetHistory200ResponseInner.prototype['name'] = undefined;
 GetHistory200ResponseInner.prototype['runId'] = undefined;
 
 /**
+ * If it's a script or a pipeline
+ * @member {module:model/GetHistory200ResponseInner.TypeEnum} type
+ */
+GetHistory200ResponseInner.prototype['type'] = undefined;
+
+/**
  * UTC date and time when the run was started
  * @member {Date} startTime
  */
@@ -125,6 +138,27 @@ GetHistory200ResponseInner.prototype['inputs'] = undefined;
 
 
 
+
+
+/**
+ * Allowed values for the <code>type</code> property.
+ * @enum {String}
+ * @readonly
+ */
+GetHistory200ResponseInner['TypeEnum'] = {
+
+    /**
+     * value: "script"
+     * @const
+     */
+    "script": "script",
+
+    /**
+     * value: "pipeline"
+     * @const
+     */
+    "pipeline": "pipeline"
+};
 
 
 /**

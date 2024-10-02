@@ -58,6 +58,11 @@ paths:
                       description: Where to find the pipeline outputs in ./output folder.
                       type: string
                       example: path>to>script>hash
+                    type:
+                      description: If it's a script or a pipeline
+                      type: string
+                      enum: [script, pipeline]
+                      example: pipeline
                     startTime:
                       description: UTC date and time when the run was started
                       type: string
@@ -74,6 +79,7 @@ paths:
                   [
                     {
                       runId: path>to>script>hash,
+                      type: script,
                       startDate: 2024-01-01 00:00,
                       inputs: {
                         input1: value,
