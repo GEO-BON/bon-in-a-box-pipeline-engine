@@ -33,7 +33,7 @@ paths:
                   "SHI.yml": "Species Habitat Index",
                   "Folder>SDM.yml": "Species distribution model"
                 }
-  /pipeline/history:
+  /history:
     get:
       summary: Get the history of runs for all pipelines on this server
       operationId: getHistory

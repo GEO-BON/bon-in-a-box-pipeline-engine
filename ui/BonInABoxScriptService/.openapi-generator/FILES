@@ -25,4 +25,3 @@ src/model/InfoInputsValueExampleOneOfInner.js
 src/model/InfoOutputsValue.js
 src/model/InfoOutputsValueExample.js
 src/model/InfoReferencesInner.js
-test/model/GetHistory200ResponseInner.spec.js
