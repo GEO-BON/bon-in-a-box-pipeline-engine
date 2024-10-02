@@ -365,7 +365,7 @@ The file contains the id of the parameters that were specified in the yaml scrip
 }
 ```
 
-The script reads the `input.json` file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline. A convenience function ``bian_inputs`` is loaded in R by default to load the file into a list named ``input``. Here is an example of how to read the input file in the R script:
+The script reads the `input.json` file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline. A convenience function ``biab_inputs`` is loaded in R by default to load the file into a list. Here is an example of how to read the input file in the R script:
 
 
 ``` r
