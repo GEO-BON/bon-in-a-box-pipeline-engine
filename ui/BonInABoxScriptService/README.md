@@ -120,7 +120,7 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*BonInABoxScriptService.DefaultApi* | [**getHistory**](docs/DefaultApi.md#getHistory) | **GET** /history | Get the history of runs for all pipelines on this server
+*BonInABoxScriptService.DefaultApi* | [**getHistory**](docs/DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server
 *BonInABoxScriptService.DefaultApi* | [**getInfo**](docs/DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
 *BonInABoxScriptService.DefaultApi* | [**getListOf**](docs/DefaultApi.md#getListOf) | **GET** /{type}/list | Get a list of available steps of given type and their names.
 *BonInABoxScriptService.DefaultApi* | [**getOutputFolders**](docs/DefaultApi.md#getOutputFolders) | **GET** /{type}/{id}/outputs | Get the output folders of the scripts composing this pipeline

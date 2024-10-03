@@ -65,7 +65,7 @@ export default class DefaultApi {
       let accepts = ['application/json'];
       let returnType = [GetHistory200ResponseInner];
       return this.apiClient.callApi(
-        '/history', 'GET',
+        '/api/history', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
