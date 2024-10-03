@@ -41,7 +41,7 @@ class HistoryTest {
 //            assertEquals(HttpStatusCode.OK, status)
 //        }
 //
-//        client.get("/history").apply {
+//        client.get("/api/history").apply {
 //            println(bodyAsText())
 //            assertContains(bodyAsText(), """"status": "cancelled"""")
 //        }
@@ -64,7 +64,7 @@ class HistoryTest {
             assertContains(result, "\"error\":")
         }
 
-        client.get("/history").apply {
+        client.get("/api/history").apply {
             println(bodyAsText())
             assertContains(bodyAsText(), """"status": "error"""")
         }
@@ -87,7 +87,7 @@ class HistoryTest {
             assertContains(result, "\"error\":")
         }
 
-        client.get("/history").apply {
+        client.get("/api/history").apply {
             println(bodyAsText())
             assertContains(bodyAsText(), """"status": "error"""")
         }
@@ -110,7 +110,7 @@ class HistoryTest {
             assertFalse(result.contains("\"error\":"))
         }
 
-        client.get("/history").apply {
+        client.get("/api/history").apply {
             println(bodyAsText())
             assertContains(bodyAsText(), """"status": "completed"""")
         }

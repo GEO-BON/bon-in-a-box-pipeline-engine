@@ -29,11 +29,12 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
-                example: {
-                  "SHI.yml": "Species Habitat Index",
-                  "Folder>SDM.yml": "Species distribution model"
-                }
-  /history:
+                example:
+                  {
+                    "SHI.yml": "Species Habitat Index",
+                    "Folder>SDM.yml": "Species distribution model",
+                  }
+  /api/history:
     get:
       summary: Get the history of runs for all pipelines on this server
       operationId: getHistory

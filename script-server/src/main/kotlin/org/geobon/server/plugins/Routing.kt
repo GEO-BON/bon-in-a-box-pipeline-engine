@@ -91,7 +91,7 @@ fun Application.configureRouting() {
             call.respond(possible.toSortedMap(String.CASE_INSENSITIVE_ORDER))
         }
 
-        get("/history") {
+        get("/api/history") {
             val history = JSONArray()
             outputRoot.walk().forEach { file ->
                 if (file.name == "pipelineOutput.json") {

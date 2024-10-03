@@ -64,7 +64,7 @@ class ApplicationTest {
             assertTrue(files!!.size == 3, "Expected input, output and log files to be there.\nFound ${files.toList()}")
         }
 
-        client.get("/history").apply {
+        client.get("/api/history").apply {
             println(bodyAsText())
             assertContains(bodyAsText(), "helloWorld>")
         }
