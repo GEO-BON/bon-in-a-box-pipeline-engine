@@ -66,5 +66,15 @@
       "type": "text",
       "weight": 0
     }
+  },
+  "metadata": {
+    "name": "Assert Text to Null",
+    "description": "Pipeline for automated tests.\nThis will fail either at first or second step depending on the chosen input.\n",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
   }
 }
