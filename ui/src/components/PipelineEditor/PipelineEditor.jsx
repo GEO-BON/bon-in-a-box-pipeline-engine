@@ -51,7 +51,7 @@ import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 
-import yaml from "js-yaml";
+import yaml, { YAMLException } from "js-yaml";
 import _lang from "lodash/lang";
 
 const api = new BonInABoxScriptService.DefaultApi();
@@ -91,6 +91,7 @@ export default function PipelineEditor(props) {
   const [inputList, setInputList] = useState([]);
   const [outputList, setOutputList] = useState([]);
   const [metadata, setMetadata] = useState("");
+  const [metadataError, setMetadataError] = useState(null);
   const [currentFileName, setCurrentFileName] = useState("");
   const [savedJSON, setSavedJSON] = useState(null);
   const [hasUnsavedChanges, setUnsavedChanges] = useState(false);
@@ -654,8 +655,23 @@ export default function PipelineEditor(props) {
     });
 
     // Save the metadata (only if metadata pane was edited)
-    if(metadata !== "") {
-      flow.metadata = yaml.load(metadata)
+    if (metadata !== "") {
+      try {
+        flow.metadata = yaml.load(metadata)
+        setMetadataError(null)
+      } catch (ex) {
+        if (ex instanceof YAMLException) {
+          setMetadataError((prevError) => {
+            const newError = {
+              line: ex.mark.line + 1,
+              message: "YAML Syntax: " + ex.reason
+            }
+            return _lang.isEqual(prevError, newError) ? prevError : newError;
+          })
+        } else {
+          console.error(ex)
+        }
+      }
     }
 
     return JSON.stringify(flow, null, 2);
@@ -1174,7 +1190,7 @@ export default function PipelineEditor(props) {
                 editSession={editSession}
               />
 
-              <MetadataPane metadata={metadata} setMetadata={setMetadata} />
+              <MetadataPane metadata={metadata} setMetadata={setMetadata} metadataError={metadataError} />
               <MiniMap
                 nodeStrokeColor={(n) => {
                   switch (n.type) {

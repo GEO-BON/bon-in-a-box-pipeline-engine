@@ -151,6 +151,7 @@ export function PipelineOutput(props: any) {
             "type" in outputObj && (
               <>
                 {(outputObj?.label?.toLowerCase().includes("presence") ||
+                  outputObj?.label?.toLowerCase().includes("pseudoabsence") ||
                   outputObj?.label?.toLowerCase().includes("occurrence")) && (
                   <CustomButtonGreen
                     key={`but-${outputObj.outputs}`}
