@@ -76,7 +76,7 @@ const ExpandMore = styled((props) => {
 })(({ theme }) => ({
   marginLeft: "auto",
   transition: theme.transitions.create("transform", {
-    duration: theme.transitions.duration.shortest,
+    duration: 50,
   }),
   variants: [
     {
@@ -97,6 +97,10 @@ const ExpandMore = styled((props) => {
 const RunCard = (props) => {
   const { run } = props;
   const [expanded, setExpanded] = useState(false);
+  const [desc, setDesc] = useState("");
+  const [inputs, setInputs] = useState({});
+  const [status, setStatus] = useState("");
+  const [name, setName] = useState("");
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -107,7 +111,20 @@ const RunCard = (props) => {
   const pipeline = run.runId.substring(0, ind);
   const runHash = run.runId.substring(ind + 1);
   const debug_url = `/pipeline-form/${pipeline}/${runHash}`;
-
+  useEffect(() => {
+    api.getInfo("pipeline", `${pipeline}.json`, (error, _, response) => {
+      if (response.status !== 404) {
+        const res = JSON.parse(response.text);
+        setDesc(res.description);
+        setInputs(res.inputs);
+        setStatus(run.status);
+        setName(res.name);
+      } else {
+        setInputs(run.inputs);
+        setStatus("unavailable");
+      }
+    });
+  }, [pipeline, run]);
   return (
     <Grid item size={{ md: 10, lg: 5 }}>
       <Card
@@ -131,20 +148,30 @@ const RunCard = (props) => {
           />
         </Tooltip>
         <CardContent>
+          <Tooltip title={desc}>
+            <Typography variant="body2" sx={{ color: "black" }}>
+              {name}
+            </Typography>
+          </Tooltip>
           <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-            Status: {run.status}
+            Status:{" "}
+            {status === "unavailable" && (
+              <>This pipeline is not available in the current branch</>
+            )}
+            {status !== "unavailable" && <>{status}</>}
           </Typography>
-          <Typography variant="body2" sx={{ color: "black" }}></Typography>
         </CardContent>
         <CardActions disableSpacing>
-          {run.status !== "error" && (
+          {status !== "error" && status !== "unavailable" && (
             <a href={`/viewer/${run.runId}`} target="_blank">
               <CustomButtonGreen>See in viewer</CustomButtonGreen>
             </a>
           )}
-          <a href={debug_url} target="_blank">
-            <CustomButtonGreen>See in debug UI</CustomButtonGreen>
-          </a>
+          {status !== "unavailable" && (
+            <a href={debug_url} target="_blank">
+              <CustomButtonGreen>See in debug UI</CustomButtonGreen>
+            </a>
+          )}
 
           <ExpandMore
             expand={expanded}
@@ -158,26 +185,35 @@ const RunCard = (props) => {
             <ExpandMoreIcon />
           </ExpandMore>
         </CardActions>
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <CardContent>
-            <Table size="small">
-              <TableBody>
-                {Object.entries(run.inputs).map((i) => {
-                  return (
-                    <TableRow>
-                      <TableCell
-                        sx={{ maxWidth: "300px", wordWrap: "break-word" }}
-                      >
-                        {i[0]}
-                      </TableCell>
-                      <TableCell>{i[1]}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Collapse>
+        {Object.entries(inputs).length > 0 && (
+          <Collapse in={expanded} timeout="auto" unmountOnExit>
+            <CardContent>
+              <Table size="small">
+                <TableBody>
+                  {Object.entries(run.inputs).map((i) => {
+                    return (
+                      <TableRow>
+                        <TableCell
+                          sx={{
+                            maxWidth: "300px",
+                            wordWrap: "break-word",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {inputs[i[0]] && (
+                            <Tooltip title={i[0]}>{inputs[i[0]].label}</Tooltip>
+                          )}
+                          {!inputs[i[0]] && <>{i[0]}</>}
+                        </TableCell>
+                        <TableCell>{i[1]}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Collapse>
+        )}
       </Card>
     </Grid>
   );
