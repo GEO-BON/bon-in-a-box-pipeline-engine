@@ -245,9 +245,9 @@ class ScriptRun( // Constructor used in single script run
                                         elif [[ ${'$'}createLogs == *"prefix already exists:"* ]]; then
                                             echo "YML files out of sync, will attempt updating..."
                                         else
-                                            echo "Cleaning up..."
-                                            mamba remove -n $condaEnvName --all
-                                            rm $condaEnvFile.2.yml
+                                            echo "Cleaning up after failure..."
+                                            mamba remove -n $condaEnvName --all > /dev/null 2>&1
+                                            rm $condaEnvFile.2.yml 2> /dev/null
                                             echo -e "FAILED" ; exit 1
                                         fi
                                     fi
@@ -263,7 +263,14 @@ class ScriptRun( // Constructor used in single script run
                                         mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
                                     fi
 
-                                    mamba activate $condaEnvName ; assertSuccess
+                                    mamba activate $condaEnvName
+                                    if [[ ${'$'}CONDA_DEFAULT_ENV == $condaEnvName ]]; then
+                                        echo "$condaEnvName activated"
+                                    else
+                                        echo "Activation failed, will attempt creating..."
+                                        mamba env create -f $condaEnvFile.yml
+                                        mamba activate $condaEnvName
+                                    fi
                                 """.trimIndent()
                             } else {
                                 """
