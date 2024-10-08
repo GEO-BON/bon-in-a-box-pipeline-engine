@@ -203,12 +203,7 @@ const RunCard = (props) => {
                           {i[0] in inputs && !!inputs[i[0]] && (
                             <Tooltip title={i[0]}>{inputs[i[0]].label}</Tooltip>
                           )}
-                          {!(i[0] in inputs) && (
-                            <>
-                              test
-                              {i[0]}
-                            </>
-                          )}
+                          {!(i[0] in inputs) && <>{i[0]}</>}
                         </TableCell>
                         <TableCell>{i[1]}</TableCell>
                       </TableRow>
