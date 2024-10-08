@@ -120,7 +120,7 @@ const RunCard = (props) => {
         setStatus(run.status);
         setName(res.name);
       } else {
-        setInputs(run.inputs);
+        setInputs({});
         setStatus("unavailable");
       }
     });
@@ -185,7 +185,7 @@ const RunCard = (props) => {
             <ExpandMoreIcon />
           </ExpandMore>
         </CardActions>
-        {Object.entries(inputs).length > 0 && (
+        {Object.entries(run.inputs).length > 0 && (
           <Collapse in={expanded} timeout="auto" unmountOnExit>
             <CardContent>
               <Table size="small">
@@ -200,10 +200,15 @@ const RunCard = (props) => {
                             fontWeight: "bold",
                           }}
                         >
-                          {inputs[i[0]] && (
+                          {i[0] in inputs && !!inputs[i[0]] && (
                             <Tooltip title={i[0]}>{inputs[i[0]].label}</Tooltip>
                           )}
-                          {!inputs[i[0]] && <>{i[0]}</>}
+                          {!(i[0] in inputs) && (
+                            <>
+                              test
+                              {i[0]}
+                            </>
+                          )}
                         </TableCell>
                         <TableCell>{i[1]}</TableCell>
                       </TableRow>
