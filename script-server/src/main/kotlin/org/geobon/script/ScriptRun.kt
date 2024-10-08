@@ -218,37 +218,65 @@ class ScriptRun( // Constructor used in single script run
 
                     "r", "R" -> {
                         container = Containers.CONDA
+                        val assertSuccessBash =
+                            """
+                                function assertSuccess {
+                                    if [[ ${'$'}? -ne 0 ]] ; then
+                                        echo -e "FAILED" ; exit 1
+                                    fi
+                                }
+                            """.trimIndent()
+
                         val activateEnvironment =
-                        if (condaEnvName?.isNotEmpty() == true && condaEnvYml?.isNotEmpty() == true) {
+                            if (condaEnvName?.isNotEmpty() == true && condaEnvYml?.isNotEmpty() == true) {
                                 val condaEnvFile = "/conda-env-yml/$condaEnvName"
 
                                 """
-                                    function assertSuccess {
-                                        if [[ ${'$'}? -ne 0 ]] ; then
+                                    $assertSuccessBash
+                                    set -o pipefail
+                                    echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
+
+                                    if [ ! -f "$condaEnvFile.yml" ]; then
+                                        echo "Creating new conda environment $condaEnvName..."
+                                        createLogs=$(mamba env create -f $condaEnvFile.2.yml 2>&1 | tee -a ${logFile.absolutePath})
+                                        if [[ ${'$'}? -eq 0 ]] ; then
+                                            mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
+                                            echo "Created successfully."
+                                        elif [[ ${'$'}createLogs == *"prefix already exists:"* ]]; then
+                                            echo "YML files out of sync, will attempt updating..."
+                                        else
+                                            echo "Cleaning up after failure..."
+                                            mamba remove -n $condaEnvName --all > /dev/null 2>&1
+                                            rm $condaEnvFile.2.yml 2> /dev/null
                                             echo -e "FAILED" ; exit 1
                                         fi
-                                    }
-
-                                    if [ -f "$condaEnvFile.yml" ]; then
-                                        echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
-                                        if cmp -s $condaEnvFile.yml $condaEnvFile.2.yml; then
-                                            echo "Activating existing conda environment $condaEnvName" ; assertSuccess
-                                            rm $condaEnvFile.2.yml ; assertSuccess
-                                        else
-                                            echo "Updating existing conda environment $condaEnvName" ; assertSuccess
-                                            mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
-                                            mamba env update --file $condaEnvFile.yml ; assertSuccess
-                                        fi
-                                    else
-                                        echo "Creating new conda environment $condaEnvName" ; assertSuccess
-                                        echo "$condaEnvYml" > $condaEnvFile.yml ; assertSuccess
-                                        mamba env create -f $condaEnvFile.yml ; assertSuccess
                                     fi
 
-                                    mamba activate $condaEnvName ; assertSuccess
+                                    if [ -f "$condaEnvFile.2.yml" ]; then
+                                        if cmp -s $condaEnvFile.yml $condaEnvFile.2.yml; then
+                                            echo "Activating existing conda environment $condaEnvName"
+                                        else
+                                            echo "Updating existing conda environment $condaEnvName"
+                                            mamba env update -f $condaEnvFile.2.yml ; assertSuccess
+                                        fi
+
+                                        mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
+                                    fi
+
+                                    mamba activate $condaEnvName
+                                    if [[ ${'$'}CONDA_DEFAULT_ENV == $condaEnvName ]]; then
+                                        echo "$condaEnvName activated"
+                                    else
+                                        echo "Activation failed, will attempt creating..."
+                                        mamba env create -f $condaEnvFile.yml
+                                        mamba activate $condaEnvName
+                                    fi
                                 """.trimIndent()
                             } else {
-                                "mamba activate rbase"
+                                """
+                                    $assertSuccessBash
+                                    mamba activate rbase ; assertSuccess
+                                """.trimIndent()
                             }
 
                         command = container.dockerCommandList + listOf(

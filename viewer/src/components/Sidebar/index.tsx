@@ -25,7 +25,7 @@ import Markdown from "markdown-to-jsx";
 export default function Sidebar(props: any) {
   const {
     t = (text: string) => text,
-    setSelectedLayerURL,
+    setSelectedLayer,
     pipelineData,
     setPipelineRunId,
     geojson,
@@ -60,15 +60,9 @@ export default function Sidebar(props: any) {
     setPipelineRunId(pipeline_run_id);
   }, [pipeline_run_id]);
 
-  useEffect(() => {
-    if (pathname === "/") {
-      navigate("/SDM>SDM_maxEnt>f5659e19be98b162509ba0f5e35e1326");
-    }
-  }, [pathname]);
-
-  const displayOutput = (output: string, type: string) => {
+  const displayOutput = (output: any, type: string) => {
     if (type.includes("geotiff")) {
-      setSelectedLayerURL(output);
+    setSelectedLayer(output);
     } else if (type.includes("points/")) {
       let crs = "EPSG:4326";
       GetPipelineRunInputs(pipeline_run_id).then((p: any) => {
@@ -200,7 +194,7 @@ export default function Sidebar(props: any) {
       for (let o in pipelineData.pipeline_outputs) {
         sortable.push(pipelineData.pipeline_outputs[o]);
       }
-      if ("weight" in sortable[0]) {
+      if (sortable[0] && "weight" in sortable[0]) {
         sortable.sort(function (a: any, b: any) {
           return a.weight - b.weight;
         });

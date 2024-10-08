@@ -56,7 +56,8 @@ function help {
 # Run your docker commands on the server manually.
 # `command <command>` with command such as pull/run/up/down/build/logs...
 function command { # args appended to the docker compose command
-    export DOCKER_GID="$(getent group docker | cut -d: -f3)"
+    # Get docker group. Will not work on Windows, silencing the warning with 2> /dev/null
+    export DOCKER_GID="$(getent group docker 2> /dev/null | cut -d: -f3)"
 
     # Set the branch suffix. This allows to use a staging build.
     # We use remote.origin.fetch because of the partial checkout, see server-up.sh.
@@ -118,12 +119,12 @@ function validate {
 
     echo "Validating pipeline metadata"
     docker run --rm  \
-        -v $(pwd)/pipelines:/toValidate \
-        -v $(pwd)/.server/.github/validateCerberusSchema.py:/validator/validateCerberusSchema.py:ro \
-        -v $(pwd)/.server/.github/pipelineValidationSchema.yml:/validator/pipelineValidationSchema.yml:ro \
-        -w /toValidate/ \
+        -v /$(pwd)/pipelines://toValidate \
+        -v /$(pwd)/.server/.github/validateCerberusSchema.py://validator/validateCerberusSchema.py:ro \
+        -v /$(pwd)/.server/.github/pipelineValidationSchema.yml://validator/pipelineValidationSchema.yml:ro \
+        -w //toValidate/ \
         geobon/bon-in-a-box:script-server \
-        python3 /validator/validateCerberusSchema.py /validator/pipelineValidationSchema.yml
+        python3 //validator/validateCerberusSchema.py //validator/pipelineValidationSchema.yml
     flagErrors
 
     # Final assessment

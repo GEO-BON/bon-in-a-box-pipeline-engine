@@ -103,17 +103,36 @@ export const GetStacSearch = async (searchObj: any) => {
   return result;
 };
 
-export const GetCOGStats = async (link: any, logTransform: boolean) => {
+export const GetCOGStats = async (
+  link: string,
+  band: string,
+  logTransform: boolean
+) => {
   let result;
-  let expression = "b1*(b1>0)";
+  let expression = `${band}*(${band}>0)`;
   if (logTransform) {
-    expression = "sqrt(b1)";
+    expression = `sqrt(${band})`;
   }
   const obj = {
     expression: expression,
     url: link,
   };
   const base_url = `/tiler/cog/statistics`;
+  try {
+    result = await axios({ method: "get", url: base_url, params: obj });
+  } catch (error) {
+    console.log(error);
+    result = { data: null };
+  }
+  return result;
+};
+
+export const GetCOGInfo = async (link: any) => {
+  let result;
+  const obj = {
+    url: link,
+  };
+  const base_url = `/tiler/cog/info`;
   try {
     result = await axios({ method: "get", url: base_url, params: obj });
   } catch (error) {
