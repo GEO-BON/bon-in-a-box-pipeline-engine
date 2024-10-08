@@ -29,10 +29,66 @@ paths:
                 type: object
                 additionalProperties:
                   type: string
-                example: {
-                  "SHI.yml": "Species Habitat Index",
-                  "Folder>SDM.yml": "Species distribution model"
-                }
+                example:
+                  {
+                    "SHI.yml": "Species Habitat Index",
+                    "Folder>SDM.yml": "Species distribution model",
+                  }
+  /api/history:
+    get:
+      summary: Get the history of runs for all pipelines on this server
+      operationId: getHistory
+      responses:
+        "200":
+          description: |
+            An object containing two lists: the currently running pipelines,
+            and the finished pipelines, with their inputs and status. The list
+            contains exclusively runs from this instance.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      description: Human readable name of the pipeline.
+                      type: string
+                      example: Very interesting index
+                    runId:
+                      description: Where to find the pipeline outputs in ./output folder.
+                      type: string
+                      example: path>to>script>hash
+                    type:
+                      description: If it's a script or a pipeline
+                      type: string
+                      enum: [script, pipeline]
+                      example: pipeline
+                    startTime:
+                      description: UTC date and time when the run was started
+                      type: string
+                      format: date-time
+                      example: 2024-01-01 T 00:00
+                    status:
+                      description: Information on the completion status
+                      type: string
+                      enum: [running, error, cancelled, completed]
+                    inputs:
+                      description: Inputs that were given to the pipeline form for this run.
+                      type: object
+                example:
+                  [
+                    {
+                      runId: path>to>script>hash,
+                      type: script,
+                      startDate: 2024-01-01 00:00,
+                      inputs: {
+                        input1: value,
+                        input2: value
+                      },
+                      status: "completed"
+                    },
+                  ]
 
   /pipeline/save/{filename}:
     post:
@@ -291,7 +347,9 @@ components:
     runId:
       name: id
       in: path
-      description: Where to find the pipeline in ./script folder.
+      description: |
+        Where to find the pipeline or step outputs in ./output folder.
+        It also acts as a handle to stop the run.
       required: true
       style: simple
       explode: false

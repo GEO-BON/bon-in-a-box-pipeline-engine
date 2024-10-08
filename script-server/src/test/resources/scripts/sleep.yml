@@ -1,0 +1,17 @@
+script: sleep.py
+name: Sleep
+description: Uses sleep command to wait
+author:
+  - name: Jean-Michel Lord
+inputs:
+  delay:
+    label: Delay
+    description: Number of seconds to sleep for
+    type: int
+    example: 3
+outputs:
+  elapsed:
+    label: Elapsed
+    description: The number of seconds that have elapsed
+    type: int
+    example: 3

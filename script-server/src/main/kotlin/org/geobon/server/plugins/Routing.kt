@@ -11,12 +11,14 @@ import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
 import org.geobon.pipeline.RunContext.Companion.scriptRoot
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import java.text.SimpleDateFormat
 
 /**
  * Used to transport paths through path param.
@@ -29,6 +31,8 @@ private val scriptStubsRoot = File(System.getenv("SCRIPT_STUBS_LOCATION"))
 
 private val runningPipelines = mutableMapOf<String, Pipeline>()
 private val logger: Logger = LoggerFactory.getLogger("Server")
+// Date format definition https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
+private val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
 fun Application.configureRouting() {
 
@@ -43,10 +47,12 @@ fun Application.configureRouting() {
                     roots = listOf(pipelinesRoot)
                     extension = "json"
                 }
+
                 "script" -> {
                     roots = listOf(scriptRoot, scriptStubsRoot)
                     extension = "yml"
                 }
+
                 else -> {
                     call.respondText(
                         text = "Invalid type $type. Must be either \"script\" or \"pipeline\".",
@@ -85,6 +91,58 @@ fun Application.configureRouting() {
             call.respond(possible.toSortedMap(String.CASE_INSENSITIVE_ORDER))
         }
 
+        get("/api/history") {
+            val history = JSONArray()
+            outputRoot.walk().forEach { file ->
+                if (file.name == "pipelineOutput.json") {
+                    val run = JSONObject()
+                    val runId = file.parentFile.relativeTo(outputRoot).path.replace('/', FILE_SEPARATOR)
+                    run.put("runId", runId)
+                    run.put("startTime", dateFormat.format(file.lastModified()))
+                    val inputFile = File(file.parentFile, "input.json")
+                    if (inputFile.isFile) {
+                        run.put("inputs", JSONObject(inputFile.readText()))
+                    }
+
+                    run.put(
+                        "status",
+                        if (runningPipelines.containsKey(runId)) {
+                            "running"
+                        } else {
+                            getCompletionStatus(file)
+                        }
+                    )
+
+                    val type:String
+                    val description:String
+                    val runFolder = file.parentFile
+                    if(File(runFolder, "output.json").exists()) {
+                        type = "script"
+                        val scriptDescription = File(scriptRoot, runFolder.relativeTo(outputRoot).path + ".yml")
+                        description = if(scriptDescription.isFile) {
+                            "working on it..."
+                        } else {
+                            "missing"
+                        }
+                    } else {
+                        type = "pipeline"
+                        val pipelineDescription = File(pipelinesRoot, runFolder.relativeTo(outputRoot).path + ".json")
+                        description = if(pipelineDescription.isFile) {
+                            "working on it..."
+                        } else {
+                            "missing"
+                        }
+                    }
+                    run.put("type", type)
+                    run.put("description", description)
+
+                    history.put(run)
+                }
+            }
+
+            call.respond(history.toString(2))
+        }
+
         get("/script/{scriptPath}/info") {
             try {
                 // Put back the slashes and replace extension by .yml
@@ -114,7 +172,8 @@ fun Application.configureRouting() {
         get("/pipeline/{descriptionPath}/info") {
             try {
                 // Put back the slashes before reading
-                val descriptionFile = File(pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
+                val descriptionFile =
+                    File(pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
                 if (descriptionFile.exists()) {
                     val descriptionJSON = JSONObject(descriptionFile.readText())
                     val metadataJSON = JSONObject()
@@ -189,7 +248,8 @@ fun Application.configureRouting() {
                     logger.trace("Pipeline outputting to {}", resultFile)
 
                     File(pipelineOutputFolder, "input.json").writeText(inputFileContent)
-                    val scriptOutputFolders = pipeline.pullFinalOutputs().mapKeys { it.key.replace('/', FILE_SEPARATOR) }
+                    val scriptOutputFolders =
+                        pipeline.pullFinalOutputs().mapKeys { it.key.replace('/', FILE_SEPARATOR) }
                     resultFile.writeText(gson.toJson(scriptOutputFolders))
                 } catch (ex: Exception) {
                     ex.printStackTrace()
@@ -244,20 +304,24 @@ fun Application.configureRouting() {
                         ${Containers.CONDA.environment}
                     Julia runner: ${Containers.JULIA.version}
                        ${Containers.JULIA.environment}
-                    TiTiler: ${Containers.TILER.version.let {
+                    TiTiler: ${
+                    Containers.TILER.version.let {
                         val end = it.lastIndexOf(':')
                         if (end == -1) it
                         else it.substring(0, end).replace('T', ' ')
-                    }}
+                    }
+                }
                 """.trimIndent()
             )
         }
 
 
         post("/pipeline/save/{filename}") {
-            if(System.getenv("SAVE_PIPELINE_TO_SERVER") == "deny") {
-                call.respond(HttpStatusCode.ServiceUnavailable, "This server does not allow \"Save to server\" API.\n" +
-                        "Use \"Save to clipboard\" and submit file through git.")
+            if (System.getenv("SAVE_PIPELINE_TO_SERVER") == "deny") {
+                call.respond(
+                    HttpStatusCode.ServiceUnavailable, "This server does not allow \"Save to server\" API.\n" +
+                            "Use \"Save to clipboard\" and submit file through git."
+                )
                 return@post
             }
 
@@ -267,7 +331,7 @@ fun Application.configureRouting() {
                 .trim() // Remove trailing whitespaces
 
             val file = File(pipelinesRoot, "$filename.json")
-            if(file.nameWithoutExtension.isEmpty()){
+            if (file.nameWithoutExtension.isEmpty()) {
                 call.respond(HttpStatusCode.BadRequest, "File name is empty.")
                 return@post
             }
@@ -276,9 +340,11 @@ fun Application.configureRouting() {
             val pipelineContent = call.receive<String>()
             val pipelineJSON = try {
                 JSONObject(pipelineContent)
-            } catch (e:JSONException) {
-                call.respond(HttpStatusCode.BadRequest, "Invalid JSON syntax.\n" +
-                        "${e.message}")
+            } catch (e: JSONException) {
+                call.respond(
+                    HttpStatusCode.BadRequest, "Invalid JSON syntax.\n" +
+                            "${e.message}"
+                )
                 return@post
             }
 
@@ -287,7 +353,7 @@ fun Application.configureRouting() {
             var message = ""
             try {
                 createRootPipeline(filename, pipelineJSON, fakeInputs)
-            } catch (e:Exception) {
+            } catch (e: Exception) {
                 message = "${e.message}"
             }
 
@@ -296,7 +362,7 @@ fun Application.configureRouting() {
                 file.parentFile.mkdirs()
                 file.delete()
                 file.writeText(pipelineContent)
-            } catch (ex:Exception) {
+            } catch (ex: Exception) {
                 logger.warn(ex.message)
                 call.respondText(text = "Failed to save pipeline.", status = HttpStatusCode.BadRequest)
                 return@post
