@@ -69,7 +69,8 @@ export default function Sidebar(props: any) {
         for (const m in pipelineData.pipeline_inputs_desc) {
           if (
             pipelineData.pipeline_inputs_desc[m].label.includes("proj") ||
-            pipelineData.pipeline_inputs_desc[m].label.includes("crs")
+            pipelineData.pipeline_inputs_desc[m].label.includes("crs") ||
+            pipelineData.pipeline_inputs_desc[m].label.toLowerCase().includes("coordinate reference system")
           ) {
             crs = p[m];
           }

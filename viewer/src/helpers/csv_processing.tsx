@@ -48,6 +48,8 @@ export default async function CsvToGeojson(
           // Assuming coordinates are really in lat/long. Temporary fix until we include CRS in GEOJSON
           crs = "EPSG:4326";
         }
+
+        console.log("Using CRS", crs)
         const coords = proj4(
           crs,
           "EPSG:4326",
