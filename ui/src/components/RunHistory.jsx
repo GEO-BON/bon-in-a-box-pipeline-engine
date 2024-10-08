@@ -169,7 +169,7 @@ const RunCard = (props) => {
           )}
           {status !== "unavailable" && (
             <a href={debug_url} target="_blank">
-              <CustomButtonGreen>See in debug UI</CustomButtonGreen>
+              <CustomButtonGreen>See in run UI</CustomButtonGreen>
             </a>
           )}
 
