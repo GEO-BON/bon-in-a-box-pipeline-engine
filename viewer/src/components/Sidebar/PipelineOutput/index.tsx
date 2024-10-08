@@ -5,15 +5,7 @@ import {
   CustomButton,
   CustomButtonGreen,
 } from "../../CustomMUI";
-import {
-  Grid,
-  Typography,
-  InputLabel,
-  FormControl,
-  Button,
-  Tooltip,
-  Link,
-} from "@mui/material";
+import { Grid, Typography, InputLabel, FormControl, Link } from "@mui/material";
 import { Item } from "../styles";
 import _ from "underscore";
 import BarChartIcon from "@mui/icons-material/BarChart";
@@ -151,12 +143,16 @@ export function PipelineOutput(props: any) {
             "type" in outputObj && (
               <>
                 {(outputObj?.label?.toLowerCase().includes("presence") ||
-                  outputObj?.label?.toLowerCase().includes("pseudoabsence") ||
-                  outputObj?.label?.toLowerCase().includes("occurrence")) && (
+                  outputObj?.label?.toLowerCase().includes("occurrence") ||
+                  outputObj?.label?.toLowerCase().includes("absence")) && (
                   <CustomButtonGreen
                     key={`but-${outputObj.outputs}`}
                     onClick={(event: any) => {
-                      handleClick(event, outputObj.outputs, "points");
+                      handleClick(
+                        event,
+                        outputObj.outputs,
+                        `points/${outputObj?.type}`
+                      );
                     }}
                   >
                     See on map

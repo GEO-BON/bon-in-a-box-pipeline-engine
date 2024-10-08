@@ -62,19 +62,24 @@ export default function Sidebar(props: any) {
 
   const displayOutput = (output: any, type: string) => {
     if (type.includes("geotiff")) {
-      setSelectedLayer(output);
-    } else if (type === "points") {
+    setSelectedLayer(output);
+    } else if (type.includes("points/")) {
       let crs = "EPSG:4326";
       GetPipelineRunInputs(pipeline_run_id).then((p: any) => {
         for (const m in pipelineData.pipeline_inputs_desc) {
           if (
             pipelineData.pipeline_inputs_desc[m].label.includes("proj") ||
-            pipelineData.pipeline_inputs_desc[m].label.includes("crs")
+            pipelineData.pipeline_inputs_desc[m].label.includes("crs") ||
+            pipelineData.pipeline_inputs_desc[m].label.toLowerCase().includes("coordinate reference system")
           ) {
             crs = p[m];
           }
         }
-        CsvToGeojson(`${output}`, "\t", crs).then((r) => {
+        let del = ",";
+        if (type.includes("tab-separated")) {
+          del = "\t";
+        }
+        CsvToGeojson(`${output}`, del, crs).then((r) => {
           if (r?.features?.length > 0) {
             setGeojsonOutput(r);
           }
@@ -157,14 +162,16 @@ export default function Sidebar(props: any) {
       if (pipelineData.author.length > 0) {
         const auths = pipelineData.author.map((a: any, i: number, arr: any) => {
           let divider = i < arr.length - 1 ? <>, </> : "";
-          let name = <Typography
-            fontSize={11}
-            color="primary.contrastText"
-            sx={{ display: "inline" }}
-          >
-            {a.name}
-            {divider}
-          </Typography>
+          let name = (
+            <Typography
+              fontSize={11}
+              color="primary.contrastText"
+              sx={{ display: "inline" }}
+            >
+              {a.name}
+              {divider}
+            </Typography>
+          );
 
           if (a.identifier) {
             return (
