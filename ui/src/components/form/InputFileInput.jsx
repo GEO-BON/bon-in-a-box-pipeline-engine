@@ -10,6 +10,7 @@ import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
 
 import yaml from "js-yaml";
+import { isEmptyObject } from "../../utils/isEmptyObject";
 
 /**
  * An input that we use to fill the input file's content.
@@ -91,7 +92,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                     : <p className='warning'>Missing description for input "{inputId}"</p>
                   }
 
-                  {yaml.dump(theRest)}
+                  {!isEmptyObject(theRest) && yaml.dump(theRest)}
                   {example
                     ? <>
                       Example:
