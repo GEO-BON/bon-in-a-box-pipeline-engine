@@ -36,11 +36,13 @@ function isGeotiff(subtype) {
 function FallbackDisplay({content}) {
     if(isRelativeLink(content) || (typeof content.startsWith === "function" && content.startsWith("http"))) {
         // Match for tiff, TIFF, tif or TIF extensions
-        if(content.search(/.tiff?$/i) !== -1)
+        if(/\.tiff?$/i.test(content))
             return <Map tiff={content} />
-        else if(content.search(/.csv$/i))
+        else if(/\.html$/i.test(content))
+            return <a href={content} target="_blank" rel="noreferrer">{content}</a>
+        else if(/\.csv$/i.test(content))
             return <RenderedCSV url={content} delimiter="," />
-        else if(content.search(/.tsv$/i))
+        else if(/\.tsv$/i.test(content))
             return <RenderedCSV url={content} delimiter="&#9;" />
         else
             return <img src={content} alt={content} />
