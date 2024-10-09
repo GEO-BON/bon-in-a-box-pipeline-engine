@@ -70,7 +70,8 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
               <tr key={inputId}>
                 <td className="inputCell">
                   <label htmlFor={inputId}>
-                    <strong>{label}</strong>
+                    {label ? <strong>{label}</strong> : <p className='error'>Missing label for input "{inputId}"</p>}
+                    {! /^[a-z]+(?:_[a-z]+)*$/.test(inputId) && <p className='warning'>{inputId} should be a snake_case id</p>}
                   </label>
                   <ScriptInput
                     id={inputId}
@@ -82,13 +83,17 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                   />
                 </td>
                 <td className="descriptionCell">
-                  <ReactMarkdown
-                    className="reactMarkdown"
-                    children={description}
-                  />
+                  {description
+                    ? <ReactMarkdown
+                      className="reactMarkdown"
+                      children={description}
+                    />
+                    : <p className='warning'>Missing description for input "{inputId}"</p>
+                  }
+
                   {yaml.dump(theRest)}
-                  {example && (
-                    <>
+                  {example
+                    ? <>
                       Example:
                       <br />
                       <ScriptInput
@@ -101,7 +106,8 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                         className="example"
                       />
                     </>
-                  )}
+                    : <p className='warning'>Missing example for input "{inputId}"</p>
+                  }
                 </td>
               </tr>
             );
