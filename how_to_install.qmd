@@ -70,23 +70,15 @@ When modifying pipelines in the /pipelines folder, servers do not need to be res
 
 ## Deploying BON in a Box on a server {#deploying-the-servers-remotely}
 
-Installation steps on a server are the same as installing on a Linux computer,
-but some additional configurations need to be changed:
+Installation steps on a server are the same as installing on a Linux computer, but some additional configurations need to be changed:
 
-- In `runner.env`, choose the appropriate `HTTP_ADDRESS` and `HTTP_PORT` for your server configuration.
-  In a typical installation, use 0.0.0.0 as an HTTP address and default port (80).
+-   In `runner.env`, choose the appropriate `HTTP_ADDRESS` and `HTTP_PORT` for your server configuration. In a typical installation, use 0.0.0.0 as an HTTP address and default port (80).
 
-- In `runner.env`, select the "partial" cache cleaning mode.
-  This will allow for calculated results to be long-lived on the server,
-  as long as they are not run again with a new version of the script.
-  The results in the output folder are always accessible by URL.
+-   In `runner.env`, select the "partial" cache cleaning mode. This will allow for calculated results to be long-lived on the server, as long as they are not run again with a new version of the script. The results in the output folder are always accessible by URL.
 
-- The outputs are precious, while the server machine can be re-generated anytime.
-  Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.
+-   The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.
 
-- By default, BON in a Box listens for http.
-  To enable https, we hide it behind a reverse proxy and activate https with certbot.
-  How to do this is out of scope for this readme.
+-   By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy and activate https with certbot. How to do this is out of scope for this readme.
 
 # Running a script or pipeline
 
