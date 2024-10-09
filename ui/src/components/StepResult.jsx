@@ -4,6 +4,8 @@ import React from 'react';
 import RenderedCSV from './csv/RenderedCSV';
 import { FoldableOutputWithContext, FoldableOutput, FoldableOutputContextProvider } from "./FoldableOutput";
 import ReactMarkdown from 'react-markdown'
+import errorImg from "../img/error.svg";
+import warningImg from "../img/warning.svg";
 
 export function StepResult({data, sectionName, sectionMetadata, logs}) {
     const [activeRenderer, setActiveRenderer] = useState({});
@@ -36,11 +38,13 @@ function isGeotiff(subtype) {
 function FallbackDisplay({content}) {
     if(isRelativeLink(content) || (typeof content.startsWith === "function" && content.startsWith("http"))) {
         // Match for tiff, TIFF, tif or TIF extensions
-        if(content.search(/.tiff?$/i) !== -1)
+        if(/\.tiff?$/i.test(content))
             return <Map tiff={content} />
-        else if(content.search(/.csv$/i))
+        else if(/\.html$/i.test(content))
+            return <a href={content} target="_blank" rel="noreferrer">{content}</a>
+        else if(/\.csv$/i.test(content))
             return <RenderedCSV url={content} delimiter="," />
-        else if(content.search(/.tsv$/i))
+        else if(/\.tsv$/i.test(content))
             return <RenderedCSV url={content} delimiter="&#9;" />
         else
             return <img src={content} alt={content} />
@@ -182,21 +186,45 @@ export const SingleIOResult = memo(({ ioId, value, ioMetadata, componentId, sect
     }
 
     let title = ioId;
+    let icon = null;
+    let errorMsg = null;
     let description = null;
     if (ioMetadata) {
-        if (ioMetadata.label)
+        if (ioMetadata.label) {
             title = ioMetadata.label;
+        } else {
+            errorMsg = <p className="warning">No label was provided for input "{ioId}"</p>
+            icon = <img src={warningImg} alt="Warning" className="error-inline" />
+        }
 
-        if (ioMetadata.description)
+        if (ioMetadata.description) {
             description = <ReactMarkdown className="reactMarkdown outputDescription" children={ioMetadata.description} />;
+        } else {
+            errorMsg = <p className="warning">No description was provided for input "{ioId}"</p>
+            icon = <img src={warningImg} alt="Warning" className="error-inline" />
+        }
+
+        if(!ioMetadata.type) {
+            // error message taken care by children
+            icon = <img src={errorImg} alt="Error" className="error-inline" />
+        }
+
+        if(! /^[a-z]+(?:_[a-z]+)*$/.test(ioId)) {
+            errorMsg = <p className='warning'>{ioId} should be a snake_case id</p>
+            icon = <img src={warningImg} alt="Warning" className="error-inline" />
+        }
+    } else {
+        // error message taken care by children
+        icon = <img src={errorImg} alt="Error" className="error-inline" />
     }
 
     let isLink = isRelativeLink(value)
     return (
-        <FoldableOutputWithContext key={ioId} title={title} componentId={componentId}
+        <FoldableOutputWithContext key={ioId} title={title} componentId={componentId} icon={icon}
             inline={isLink && <a href={value} target="_blank" rel="noreferrer">{value}</a>}
             inlineCollapsed={!isLink && renderInline(value)}
             className="foldableOutput">
+            {errorMsg}
             {description}
             {renderContent(value)}
         </FoldableOutputWithContext>

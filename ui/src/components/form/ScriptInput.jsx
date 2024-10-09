@@ -17,6 +17,10 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
     setFieldValue(value || '')
   }, [value])
 
+  if(!type) {
+    return <p className='error'>Input does not declare a type!</p>
+  }
+
   if (type.endsWith('[]')) {
     return <AutoResizeTextArea {...passedProps}
       value={joinIfArray(fieldValue)}
