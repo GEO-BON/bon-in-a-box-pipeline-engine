@@ -44,13 +44,15 @@ Analysis workflows can be converted to BON in a Box pipelines with a few steps:
 
 Each script should be accompanied by a YAML file (.yml extension) that specifies inputs and outputs of that step of the pipeline.
 
+Markdown is supported for pipeline, script, input and output descriptions. See this [CommonMark quick reference](https://commonmark.org/help/) for allowed markups.
+
 ### Name and description
 
 YAML files should begin with a name, description, and authors of the script. The name should be the same as the script that it describes but with a .yml extension.
 
 Example:
 
-```         
+```
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -65,7 +67,7 @@ Next, the YAML file should specify the inputs of the script. These inputs will e
 
 Here is an example where the input is a raster file of land cover pulled from a public database and a coordinate reference system that is specified by the user:
 
-```         
+```
 inputs:
   landcover_raster:
     label: Raster of landcover
@@ -89,18 +91,18 @@ Specifying an example will autofill that input with the example unless changed b
 
 There are several different types of user inputs that can be specified in the YAML file:
 
-| "Type" attribute in the yaml | IU rendering | Description |
-|--------------------|------------------|-----------------------------------|
-| boolean | Plain text | true/false |
-| float, float\[\] | Plain text | positive and negative numbers with a decimal point |
-| int, int\[\] | Plain text | integer |
-| options^1^ | Plain text | dropdown menu |
-| text, text\[\] | Plain text | text input (words) |
-| (any unknown type) | Plain text |  |
+| "Type" attribute in the yaml | IU rendering | Description                                        |
+|------------------------------|--------------|----------------------------------------------------|
+| boolean                      | Plain text   | true/false                                         |
+| float, float\[\]             | Plain text   | positive and negative numbers with a decimal point |
+| int, int\[\]                 | Plain text   | integer                                            |
+| options^1^                   | Plain text   | dropdown menu                                      |
+| text, text\[\]               | Plain text   | text input (words)                                 |
+| (any unknown type)           | Plain text   |                                                    |
 
 ^1^options type requires an additioal options attribute to be added with the available options.
 
-```         
+```
 options_example:
   label: Options example
   description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
@@ -118,7 +120,7 @@ After specifying the inputs, you can specify what you want the script to output.
 
 Here is an example:
 
-```         
+```
 outputs:
   result:
     label: Analysis result
@@ -138,6 +140,7 @@ There are also several types of outputs that can be created
 | GeoJSON    | application/geo+json           | Map                          |
 | GeoPackage | application/geopackage+sqlite3 | Link                         |
 | GeoTIFF^2^ | image/tiff;application=geotiff | Map widget (leaflet)         |
+| HTML       | text/html                      | Open in new tab              |
 | JPG        | image/jpg                      | tag                          |
 | Shapefile  | application/dbf                | Link                         |
 | Text       | text/plain                     | Plain text                   |
@@ -146,7 +149,7 @@ There are also several types of outputs that can be created
 
 ^2^When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
 
-```         
+```
 map:
   label: My map
   description: Some map that shows something
@@ -159,7 +162,7 @@ map:
 
 "[Conda](https://docs.conda.io/projects/conda/en/latest/index.html) provides package, dependency, and environment management for any language." If a script is dependent on a specific package version, conda will load that package version to prevent breaking changes when packages are updated. BON in a Box uses a central conda environment that includes commonly used libraries, and supports dedicated environments for the scripts that need it.
 
-This means that instead of installing packages in R scripts, they are installed in the R environment in conda. Note that you still need to load the packages in your scripts.
+This means that instead of installing packages in R scripts, they are installed in the R environment in Conda. Note that you still need to load the packages in your scripts.
 
 #### Check if the libraries you need are in conda
 
@@ -179,7 +182,7 @@ This means that instead of installing packages in R scripts, they are installed 
 
     -   Go to the runners/conda-dockerfile and add it to the install command. Replace \<package\> with your package name.
 
-        ```         
+        ```
         RUN bash --login -c "mamba activate rbase; R -e 'install.packages(c(\<package 1>\", \
                 \"<package 2>\", \
                 \"<package 3>\"\
@@ -188,13 +191,13 @@ This means that instead of installing packages in R scripts, they are installed 
 
         Or for packages in development loaded from github.
 
-        ```         
+        ```
         RUN bash --login -c "mamba activate rbase; R -e 'devtools::install_github(\"<user>/<package>\")'"
         ```
 
     -   Install in in your local environment by typing this in the terminal, replacing \<packages\> (three commands should be pasted separately):
 
-        ```         
+        ```
         docker exec -it biab-runner-conda bash
 
         mamba activate rbase
@@ -204,7 +207,7 @@ This means that instead of installing packages in R scripts, they are installed 
 
         -   You can use `devtools::install_github()` in a similar fashion:
 
-            ```         
+            ```
             docker exec -it biab-runner-conda bash
 
             mamba activate rbase
@@ -224,7 +227,7 @@ This means that instead of installing packages in R scripts, they are installed 
 
     -   If you include a conda section, make sure you list all your dependencies. This is creating a new separate environment, not a supplement to the base environment. This means that all of the packages that you need need to be specified in here, even if they are in the r-environment.yml file.
 
-```         
+```
 conda: # Optional: if you script requires specific versions of packages.
   channels:
     - conda-forge
@@ -240,7 +243,7 @@ For more information, refer to the [conda documentation](https://docs.conda.io/p
 
 Here is an example of a complete YAML file with inputs and outputs:
 
-```         
+```
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -286,7 +289,7 @@ If inputs are outputs from a previous step in the pipeline, make sure to give th
 
 Here is an empty commented sample that can be filled in
 
-```         
+```
 script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targeted to those who will interpret pipeline results and edit pipelines.
@@ -363,7 +366,7 @@ The file contains the id of the parameters that were specified in the yaml scrip
         "/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio2_7333b3d111981-01-01.tif"
     ],
     "presence_background": "/output/SDM/setupDataSdm/edb9492031df9e063a5ec5c325bacdb1/presence_background.tsv",
-    "proj": "EPSG:6623",
+    "proj": "EPSG:6622",
     "rm": [0.5, 1.0, 2.0]
 }
 ```

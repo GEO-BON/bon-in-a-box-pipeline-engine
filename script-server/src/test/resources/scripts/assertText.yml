@@ -1,0 +1,17 @@
+script: assertText.py
+name: Assert Text
+description: Test python script that fails if it doesn't receive a string. It also crashes when receiving null.
+author:
+  - name: Jean-Michel Lord
+inputs:
+  input:
+    label: Text input
+    description: Some text input
+    type: text
+    example: Bonjour
+outputs:
+  the_same:
+    label: Same value
+    description: The same value as in the inputs. But this crashes if null or not a string!
+    type: text
+    example: Bonjour

@@ -35,7 +35,11 @@ export default function Main(props: any) {
   const [item, setItem] = useState("bio1");
   const [selectedLayerAssetName, setSelectedLayerAssetName] = useState("");
   const [logTransform, setLogTransform] = useState(false);
-  const [selectedLayerURL, setSelectedLayerURL] = useState("");
+  const [selectedLayer, setSelectedLayer] = useState({
+    url: "",
+    band_id: "b1",
+    description: "",
+  });
   const [selectedLayerTiles, setSelectedLayerTiles] = useState("");
   const [legend, setLegend] = useState({});
   const [colormap, setColormap] = useState("inferno");
@@ -45,6 +49,7 @@ export default function Main(props: any) {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [rasterStats, setRasterStats] = useState({});
+  const [rasterBand, setRasterBand] = useState("b1");
   const [timeSeriesStats, setTimeSeriesStats] = useState({});
   const [openStatsModal, setOpenStatsModal] = useState(false);
   const [showStatsButton, setShowStatsButton] = useState(true);
@@ -76,39 +81,41 @@ export default function Main(props: any) {
   }, [pipelineRunId]);
 
   useEffect(() => {
-    if (selectedLayerURL !== "" && typeof selectedLayerURL !== "undefined") {
-      GetCOGStats(selectedLayerURL, logTransform).then((l: any) => {
-        const tiler = `/tiler/cog/tiles/{z}/{x}/{y}`;
-        let data = [];
-        if (Object.keys(l).includes("data")) {
-          data = l.data[Object.keys(l.data)[0]];
-        } else {
-          data = l[selectedLayerAssetName][1];
+    if (selectedLayer.url !== "" && typeof selectedLayer.url !== "undefined") {
+      GetCOGStats(selectedLayer.url, selectedLayer.band_id, logTransform).then(
+        (l: any) => {
+          const tiler = `/tiler/cog/tiles/{z}/{x}/{y}`;
+          let data = [];
+          if (Object.keys(l).includes("data")) {
+            data = l.data[Object.keys(l.data)[0]];
+          } else {
+            data = l[selectedLayerAssetName][1];
+          }
+          let expression = selectedLayer.band_id;
+          if (logTransform) {
+            expression = `sqrt(${selectedLayer.band_id})`;
+          }
+          const obj = {
+            assets: selectedLayerAssetName,
+            colormap_name: colormap,
+            bidx: "1",
+            expression: expression,
+          };
+          let min = data.percentile_2;
+          let max = data.percentile_98;
+          if (min === max) {
+            min = data.min;
+            max = data.max;
+          }
+          const rescale = `${min},${max}`;
+          const params = new URLSearchParams(obj).toString();
+          setSelectedLayerTiles(
+            `${tiler}?url=${selectedLayer.url}&rescale=${rescale}&${params}&expression=${expression}`
+          );
+          setLegend(createRangeLegendControl(min, max, cmap(colormap)));
         }
-        let expression = "b1";
-        if (logTransform) {
-          expression = "sqrt(b1)";
-        }
-        const obj = {
-          assets: selectedLayerAssetName,
-          colormap_name: colormap,
-          bidx: "1",
-          expression: expression,
-        };
-        let min = data.percentile_2;
-        let max = data.percentile_98;
-        if (min === max) {
-          min = data.min;
-          max = data.max;
-        }
-        const rescale = `${min},${max}`;
-        const params = new URLSearchParams(obj).toString();
-        setSelectedLayerTiles(
-          `${tiler}?url=${selectedLayerURL}&rescale=${rescale}&${params}`
-        );
-        setLegend(createRangeLegendControl(min, max, cmap(colormap)));
-      });
-      GetCOGBounds(selectedLayerURL).then((b: any) => {
+      );
+      GetCOGBounds(selectedLayer.url).then((b: any) => {
         b = b.data.bounds;
         var mapBounds = L.latLngBounds([
           [b[1], b[0]],
@@ -120,7 +127,7 @@ export default function Main(props: any) {
       setSelectedLayerTiles("");
       clearLayers();
     }
-  }, [selectedLayerURL, logTransform, colormap]);
+  }, [selectedLayer, logTransform, colormap, rasterBand]);
 
   const clearLayers = () => {
     map.eachLayer(function (layer: any) {
@@ -167,34 +174,35 @@ export default function Main(props: any) {
         }
       });
     }
-    if (selectedCountry && selectedLayerURL) {
+    if (selectedCountry && selectedLayer.url) {
       setOpenStatsModal(true);
       setShowStatsButton(true);
     }
   };
 
-  const generateStats = (layerUrl = "") => {
-    if (selectedLayerURL === "" && layerUrl !== "") {
-      setSelectedLayerURL(layerUrl);
+  const generateStats = (layer: any) => {
+    if (layer.url === "") {
+      setSelectedLayer({ url: "", band_id: "b1", description: "" });
+    } else {
+      setRasterStats({});
+      setTimeSeriesStats({});
+      setOpenStatsModal(true);
+      let i = 0;
+      GetCOGStats(layer.url, layer.band_id, false).then((g: any) => {
+        const rs: any = {};
+        if (g.data) {
+          setRasterStats({
+            "Selected layer": { b1: g.data[Object.keys(g.data)[0]] },
+          });
+        }
+      });
+      setOpenStatsModal(true);
     }
-    setRasterStats({});
-    setTimeSeriesStats({});
-    setOpenStatsModal(true);
-    let i = 0;
-    GetCOGStats(layerUrl, false).then((g: any) => {
-      const rs: any = {};
-      if (g.data) {
-        setRasterStats({
-          "Selected layer": { b1: g.data[Object.keys(g.data)[0]] },
-        });
-      }
-    });
-    setOpenStatsModal(true);
   };
 
   const mapProps = {
     selectedLayerTiles,
-    selectedLayerURL,
+    selectedLayer,
     legend,
     setColormap,
     setCollection,
@@ -216,7 +224,7 @@ export default function Main(props: any) {
     collection,
     pipelineData,
     setPipelineRunId,
-    setSelectedLayerURL,
+    setSelectedLayer,
     setSelectedLayerAssetName,
     setColormap,
     setColormapList,

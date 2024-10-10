@@ -1,28 +1,15 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   CustomSelect,
   CustomMenuItem,
   CustomButton,
   CustomButtonGreen,
-  CustomAutocomplete,
 } from "../../CustomMUI";
-import {
-  TextField,
-  Box,
-  Container,
-  Grid,
-  Typography,
-  Stack,
-  InputBase,
-  InputLabel,
-  FormControl,
-  Button,
-  Tooltip,
-} from "@mui/material";
+import { Grid, Typography, InputLabel, FormControl, Link } from "@mui/material";
 import { Item } from "../styles";
 import _ from "underscore";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import yaml from "yaml";
+import Markdown from "markdown-to-jsx";
 
 export function PipelineOutput(props: any) {
   const {
@@ -36,9 +23,11 @@ export function PipelineOutput(props: any) {
   } = props;
 
   const [selectedItem, setSelectedPaperItem] = useState("");
-
-  let outs = "";
-  if (!Array.isArray(outputObj.outputs)) {
+  let outs: any = "";
+  if (Array.isArray(outputObj.outputs)) {
+    outs = outputObj.outputs;
+  }
+  if (outputObj.outputs.includes(",") && outputObj.type.includes("[]")) {
     outs = outputObj.outputs.split(",");
   }
   if (outs.length === 1) {
@@ -50,7 +39,7 @@ export function PipelineOutput(props: any) {
     setSelectedPaperItem(value);
   };
 
-  const handleClick = (event: any, out: string, ot: string) => {
+  const handleClick = (event: any, out: any, ot: string) => {
     event.stopPropagation();
     event.preventDefault();
     if (out !== "") {
@@ -68,13 +57,10 @@ export function PipelineOutput(props: any) {
             {`${outputObj?.label[0].toUpperCase()}${outputObj.label.slice(1)}`}
           </Typography>
           <Typography color="primary.light" fontSize={11}>
-            <div
-              dangerouslySetInnerHTML={{
-                __html:
-                  outputObj?.description[0].toUpperCase() +
-                  outputObj.description.slice(1),
-              }}
-            />
+            <Markdown>
+              {outputObj?.description[0].toUpperCase() +
+                outputObj.description.slice(1)}
+            </Markdown>
           </Typography>
           {Array.isArray(outs) && outputObj?.type?.includes("tif") && (
             <FormControl
@@ -96,7 +82,7 @@ export function PipelineOutput(props: any) {
               >
                 {outs.map((o: any) => (
                   <CustomMenuItem key={`it-${o}`} value={o}>
-                    {o.split("/").pop()}
+                    {o?.description}
                   </CustomMenuItem>
                 ))}
               </CustomSelect>
@@ -127,9 +113,13 @@ export function PipelineOutput(props: any) {
             outputObj?.type?.includes("tif") && (
               <>
                 <CustomButtonGreen
-                  key={`but-${outputObj.outputs}`}
+                  key={`but-${outs.band_id}`}
                   onClick={(event: any) => {
-                    handleClick(event, outputObj.outputs, outputObj.type);
+                    handleClick(
+                      event,
+                      { url: outs.url, band_id: outs.band_id },
+                      outs.type
+                    );
                   }}
                 >
                   See on map
@@ -139,7 +129,7 @@ export function PipelineOutput(props: any) {
                     sx={{
                       display: "inline",
                     }}
-                    onClick={() => generateStats(outputObj.outputs)}
+                    onClick={() => generateStats(outs)}
                   >
                     <BarChartIcon />
                   </CustomButton>
@@ -153,11 +143,16 @@ export function PipelineOutput(props: any) {
             "type" in outputObj && (
               <>
                 {(outputObj?.label?.toLowerCase().includes("presence") ||
-                  outputObj?.label?.toLowerCase().includes("occurrence")) && (
+                  outputObj?.label?.toLowerCase().includes("occurrence") ||
+                  outputObj?.label?.toLowerCase().includes("absence")) && (
                   <CustomButtonGreen
                     key={`but-${outputObj.outputs}`}
                     onClick={(event: any) => {
-                      handleClick(event, outputObj.outputs, "points");
+                      handleClick(
+                        event,
+                        outputObj.outputs,
+                        `points/${outputObj?.type}`
+                      );
                     }}
                   >
                     See on map
@@ -213,10 +208,10 @@ export function PipelineOutput(props: any) {
                 </Grid>
               </FormControl>
             )}
-
           {!Array.isArray(outs) &&
-            (outputObj?.type?.includes("png") ||
-              outputObj?.type?.includes("jpeg")) &&
+            ["image/png", "image/jpeg", "image/jpg", "image/svg", "image/gif", "image/bmp"].includes(
+              outputObj?.type
+            ) &&
             "type" in outputObj && (
               <CustomButtonGreen
                 key={`but-${outputObj.outputs}`}
@@ -228,8 +223,9 @@ export function PipelineOutput(props: any) {
               </CustomButtonGreen>
             )}
           {Array.isArray(outs) &&
-            (outputObj?.type?.includes("png") ||
-              outputObj?.type?.includes("jpeg")) &&
+            ["image/png", "image/jpeg", "image/jpg", "image/svg", "image/gif", "image/bmp"].includes(
+              outputObj?.type
+            ) &&
             "type" in outputObj && (
               <FormControl
                 variant="standard"
@@ -280,7 +276,22 @@ export function PipelineOutput(props: any) {
               </Typography>
             )}
           {!Array.isArray(outs) &&
+            outputObj?.type?.includes("geo+json") &&
+            "type" in outputObj && (
+              <>
+                <CustomButtonGreen
+                  key={`but-${outputObj.outputs}`}
+                  onClick={(event: any) => {
+                    handleClick(event, outputObj.outputs, "geo+json");
+                  }}
+                >
+                  See on map
+                </CustomButtonGreen>
+              </>
+            )}
+          {!Array.isArray(outs) &&
             outputObj?.type?.includes("json") &&
+            !outputObj?.type?.includes("geo+json") &&
             "type" in outputObj && (
               <CustomButtonGreen
                 key={`but-${outputObj.outputs}`}
@@ -289,6 +300,15 @@ export function PipelineOutput(props: any) {
                 }}
               >
                 See results
+              </CustomButtonGreen>
+            )}
+          {!Array.isArray(outs) &&
+            outputObj?.type?.includes("text/html") &&
+            "type" in outputObj && (
+              <CustomButtonGreen key={`but-${outputObj.outputs}`}>
+                <Link href={outputObj.outputs} target="_blank" rel="noopener">
+                  Open in new Tab
+                </Link>
               </CustomButtonGreen>
             )}
         </Item>

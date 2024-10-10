@@ -46,6 +46,8 @@ function help {
     echo "                         This is useful in development switching from prod to dev server,"
     echo "                         in cases when we get the following error:"
     echo "                         \"The container name ... is already in use by container ...\""
+    echo "    purge                Removes the volumes that store dependencies (conda, R)"
+    echo "                         in addition to the clean"
     echo "    command [ARGS...]    Run an arbitrary docker compose command,"
     echo "                         such as (pull|run|up|down|build|logs)"
     echo
@@ -54,12 +56,14 @@ function help {
 # Run your docker commands on the server manually.
 # `command <command>` with command such as pull/run/up/down/build/logs...
 function command { # args appended to the docker compose command
-    export DOCKER_GID="$(getent group docker | cut -d: -f3)"
+    # Get docker group. Will not work on Windows, silencing the warning with 2> /dev/null
+    export DOCKER_GID="$(getent group docker 2> /dev/null | cut -d: -f3)"
 
     # Set the branch suffix. This allows to use a staging build.
     # We use remote.origin.fetch because of the partial checkout, see server-up.sh.
     branch=$(git -C .server config remote.origin.fetch | sed 's/.*remotes\/origin\///')
     if [[ $branch == *"staging" ]]; then
+        echo "Using staging containers with suffix \"-$branch\""
         export DOCKER_SUFFIX="-$branch"
     else
         export DOCKER_SUFFIX=""
@@ -115,12 +119,12 @@ function validate {
 
     echo "Validating pipeline metadata"
     docker run --rm  \
-        -v $(pwd)/pipelines:/toValidate \
-        -v $(pwd)/.server/.github/validateCerberusSchema.py:/validator/validateCerberusSchema.py:ro \
-        -v $(pwd)/.server/.github/pipelineValidationSchema.yml:/validator/pipelineValidationSchema.yml:ro \
-        -w /toValidate/ \
+        -v /$(pwd)/pipelines://toValidate \
+        -v /$(pwd)/.server/.github/validateCerberusSchema.py://validator/validateCerberusSchema.py:ro \
+        -v /$(pwd)/.server/.github/pipelineValidationSchema.yml://validator/pipelineValidationSchema.yml:ro \
+        -w //toValidate/ \
         geobon/bon-in-a-box:script-server \
-        python3 /validator/validateCerberusSchema.py /validator/pipelineValidationSchema.yml
+        python3 //validator/validateCerberusSchema.py //validator/pipelineValidationSchema.yml
     flagErrors
 
     # Final assessment
@@ -155,9 +159,28 @@ function checkout {
 }
 
 function up {
-    echo "Pulling docker images..."
     cd .. # Back to pipeline-repo folder
+
+    echo "Checking requirements..."
+    output=$(command ps $@ 2>&1); returnCode=$?;
+    if [[ $output == *"service \"runner-conda\" has neither an image nor a build context specified"* ]] ; then
+        bold=$(tput bold)
+        normal=$(tput sgr0)
+        echo -e "${bold}${RED}Cannot start server until branch is updated:${ENDCOLOR}"
+        echo "${bold}BON in a Box now supports conda dependencies!"
+        echo "${bold}Update your development branch or fork with the main branch from GEO-BON/bon-in-a-box-pipelines and launch the server again${normal}"
+        echo ""
+        echo "${bold}${RED}Workaround for legacy branches:${ENDCOLOR}"
+        echo "Run the server with the following command"
+        echo "    ./server-up.sh pre-conda-staging"
+        exit 1
+    fi
+
+    echo "Pulling docker images..."
     command pull ; assertSuccess
+
+    echo "Building (if necessary)..."
+    command build ; assertSuccess
 
     echo "Starting the server..."
     output=$(command up -d $@ 2>&1); returnCode=$?;
@@ -186,8 +209,19 @@ function down {
 function clean {
     echo "Removing shared containers between dev and prod"
     docker container rm biab-gateway biab-ui biab-script-server \
-        biab-tiler biab-runner-r biab-runner-julia biab-viewer
+        biab-tiler biab-runner-conda biab-runner-julia biab-viewer
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
+}
+
+function purge {
+    clean
+    echo "Removing dependency volumes"
+    docker volume rm \
+        conda-dir \
+        conda-cache \
+        conda-env-yml \
+        r-libs-user
+
 }
 
 case "$1" in
@@ -214,6 +248,9 @@ case "$1" in
         ;;
     clean)
         clean
+        ;;
+    purge)
+        purge
         ;;
     *)
         help

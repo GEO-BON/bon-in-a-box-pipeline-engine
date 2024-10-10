@@ -6,6 +6,7 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.plugins.configureRouting
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
@@ -61,6 +62,11 @@ class ApplicationTest {
 
             val files = folder.listFiles()
             assertTrue(files!!.size == 3, "Expected input, output and log files to be there.\nFound ${files.toList()}")
+        }
+
+        client.get("/api/history").apply {
+            println(bodyAsText())
+            assertContains(bodyAsText(), "helloWorld>")
         }
     }
 
@@ -247,13 +253,24 @@ class ApplicationTest {
         }
     }
 
+    /**
+     * This is not very testable in this environment, since the docker containers are not running.
+     * We can only test that it properly behaves when they are offline.
+     */
     @Test
     fun testGetVersion() = testApplication {
         application { configureRouting() }
 
         client.get("/api/versions").apply {
             assertEquals(HttpStatusCode.OK, status)
-            println(bodyAsText())
+            bodyAsText().also { body ->
+                assertContains(body, "UI: offline")
+                assertContains(body, "Script server: offline")
+                assertContains(body, "Conda runner: offline")
+                assertContains(body, "Julia runner: offline")
+                assertContains(body, "TiTiler: offline")
+                println(body)
+            }
         }
     }
 

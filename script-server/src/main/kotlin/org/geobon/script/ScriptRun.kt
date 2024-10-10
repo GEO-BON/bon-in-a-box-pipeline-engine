@@ -3,6 +3,7 @@ package org.geobon.script
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import org.geobon.pipeline.RunContext
+import org.geobon.server.plugins.Containers
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -21,7 +22,9 @@ import kotlin.time.measureTime
 class ScriptRun( // Constructor used in single script run
     private val scriptFile: File,
     private val context: RunContext,
-    private val timeout: Duration = DEFAULT_TIMEOUT) {
+    private val timeout: Duration = DEFAULT_TIMEOUT,
+    private val condaEnvName:String? = null,
+    private val condaEnvYml:String? = null) {
 
     // Constructor used in pipelines & tests
     constructor(
@@ -172,6 +175,7 @@ class ScriptRun( // Constructor used in single script run
         var error = false
         var outputs: Map<String, Any>? = null
 
+        var container: Containers = Containers.SCRIPT_SERVER
         val elapsed = measureTime {
             val pidFile = File(context.outputFolder.absolutePath, ".pid")
 
@@ -198,13 +202,11 @@ class ScriptRun( // Constructor used in single script run
                     }
                 }
 
-
-                var runner = ""
                 val command:List<String>
                 when (scriptFile.extension) {
                     "jl", "JL" ->  {
-                        runner = "biab-runner-julia"
-                        command = listOf("/usr/local/bin/docker", "exec", "-i", runner, "julia", "-e",
+                        container = Containers.JULIA
+                        command = container.dockerCommandList + listOf("julia", "-e",
                             """
                             open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
                             ARGS=["${context.outputFolder.absolutePath}"];
@@ -215,22 +217,93 @@ class ScriptRun( // Constructor used in single script run
                     }
 
                     "r", "R" -> {
-                        runner = "biab-runner-r"
-                        command = listOf(
-                            "/usr/local/bin/docker", "exec", "-i", runner, "Rscript", "-e",
+                        container = Containers.CONDA
+                        val assertSuccessBash =
                             """
-                            options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
-                            fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
-                            outputFolder<-"${context.outputFolder.absolutePath}";
-                            tryCatch(source("${scriptFile.absolutePath}"),
-                                error=function(e) if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
-                                        print("Suppressed: 'ignoring SIGPIPE signal'");
-                                    } else {
-                                        stop(e);
-                                    });
-                            unlink("${pidFile.absolutePath}");
-                            gc();
+                                function assertSuccess {
+                                    if [[ ${'$'}? -ne 0 ]] ; then
+                                        echo -e "FAILED" ; exit 1
+                                    fi
+                                }
+                            """.trimIndent()
+
+                        val activateEnvironment =
+                            if (condaEnvName?.isNotEmpty() == true && condaEnvYml?.isNotEmpty() == true) {
+                                val condaEnvFile = "/conda-env-yml/$condaEnvName"
+
+                                """
+                                    $assertSuccessBash
+                                    set -o pipefail
+                                    echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
+
+                                    if [ ! -f "$condaEnvFile.yml" ]; then
+                                        echo "Creating new conda environment $condaEnvName..."
+                                        createLogs=$(mamba env create -f $condaEnvFile.2.yml 2>&1 | tee -a ${logFile.absolutePath})
+                                        if [[ ${'$'}? -eq 0 ]] ; then
+                                            mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
+                                            echo "Created successfully."
+                                        elif [[ ${'$'}createLogs == *"prefix already exists:"* ]]; then
+                                            echo "YML files out of sync, will attempt updating..."
+                                        else
+                                            echo "Cleaning up after failure..."
+                                            mamba remove -n $condaEnvName --all > /dev/null 2>&1
+                                            rm $condaEnvFile.2.yml 2> /dev/null
+                                            echo -e "FAILED" ; exit 1
+                                        fi
+                                    fi
+
+                                    if [ -f "$condaEnvFile.2.yml" ]; then
+                                        if cmp -s $condaEnvFile.yml $condaEnvFile.2.yml; then
+                                            echo "Activating existing conda environment $condaEnvName"
+                                        else
+                                            echo "Updating existing conda environment $condaEnvName"
+                                            mamba env update -f $condaEnvFile.2.yml ; assertSuccess
+                                        fi
+
+                                        mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
+                                    fi
+
+                                    mamba activate $condaEnvName
+                                    if [[ ${'$'}CONDA_DEFAULT_ENV == $condaEnvName ]]; then
+                                        echo "$condaEnvName activated"
+                                    else
+                                        echo "Activation failed, will attempt creating..."
+                                        mamba env create -f $condaEnvFile.yml
+                                        mamba activate $condaEnvName
+                                    fi
+                                """.trimIndent()
+                            } else {
+                                """
+                                    $assertSuccessBash
+                                    mamba activate rbase ; assertSuccess
+                                """.trimIndent()
+                            }
+
+                        command = container.dockerCommandList + listOf(
+                            // eval and source commands to initialize mamba, see https://stackoverflow.com/a/75246428/3519951
+                            "bash", "-c",
                             """
+                                source /.bashrc
+                                $activateEnvironment
+                                Rscript -e '
+                                options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
+
+                                # Define repo for install.packages
+                                repositories = getOption("repos")
+                                repositories["CRAN"] = "https://cloud.r-project.org/"
+                                options(repos = repositories)
+
+                                fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
+                                outputFolder<-"${context.outputFolder.absolutePath}";
+                                tryCatch(source("${scriptFile.absolutePath}"),
+                                    error=function(e) if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
+                                            print("Suppressed: ignoring SIGPIPE signal");
+                                        } else {
+                                            stop(e);
+                                        });
+                                unlink("${pidFile.absolutePath}");
+                                gc();'
+                            """.trimIndent()
                         )
                     }
 
@@ -259,18 +332,16 @@ class ScriptRun( // Constructor used in single script run
                                     if (process.isAlive) {
                                         val event = ex.message ?: ex.javaClass.name
 
-                                        if (pidFile.exists() && runner.isNotEmpty()) {
+                                        if (pidFile.exists() && container.isExternal()) {
                                             val pid = pidFile.readText().trim()
                                             log(logger::debug, "$event: killing runner process '$pid'")
 
-                                            ProcessBuilder(listOf(
-                                                    "/usr/local/bin/docker", "exec", "-i", runner,
+                                            ProcessBuilder(container.dockerCommandList + listOf(
                                                     "kill", "-s", "TERM", pid
                                             )).start()
 
                                             if (!process.waitFor(10, TimeUnit.SECONDS)) {
-                                                ProcessBuilder(listOf(
-                                                        "/usr/local/bin/docker", "exec", "-i", runner,
+                                                ProcessBuilder(container.dockerCommandList + listOf(
                                                         "kill", "-s", "KILL", pid
                                                 )).start()
                                             }
@@ -355,6 +426,8 @@ class ScriptRun( // Constructor used in single script run
 
             pidFile.delete()
         }
+
+        log(logger::debug,"Runner: ${container.containerName} version ${container.version}")
         log(logger::info, "Elapsed: $elapsed")
 
         // Format log output

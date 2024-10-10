@@ -12,7 +12,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import CustomTable from "../CustomTable";
 import CsvToGeojson, { CsvToObject } from "../../helpers/csv_processing";
 import { Item } from "./styles";
-import { GetPipelineRunInputs } from "../../helpers/biab_api";
+import { GetPipelineRunInputs, GetJSON } from "../../helpers/biab_api";
 import _ from "underscore";
 import { PipelineOutput } from "./PipelineOutput";
 
@@ -25,7 +25,7 @@ import Markdown from "markdown-to-jsx";
 export default function Sidebar(props: any) {
   const {
     t = (text: string) => text,
-    setSelectedLayerURL,
+    setSelectedLayer,
     pipelineData,
     setPipelineRunId,
     geojson,
@@ -60,31 +60,34 @@ export default function Sidebar(props: any) {
     setPipelineRunId(pipeline_run_id);
   }, [pipeline_run_id]);
 
-  useEffect(() => {
-    if (pathname === "/") {
-      navigate("/SDM>SDM_maxEnt>f5659e19be98b162509ba0f5e35e1326");
-    }
-  }, [pathname]);
-
-  const displayOutput = (output: string, type: string) => {
+  const displayOutput = (output: any, type: string) => {
     if (type.includes("geotiff")) {
-      setSelectedLayerURL(output);
-    } else if (type === "points") {
+    setSelectedLayer(output);
+    } else if (type.includes("points/")) {
       let crs = "EPSG:4326";
       GetPipelineRunInputs(pipeline_run_id).then((p: any) => {
         for (const m in pipelineData.pipeline_inputs_desc) {
           if (
             pipelineData.pipeline_inputs_desc[m].label.includes("proj") ||
-            pipelineData.pipeline_inputs_desc[m].label.includes("crs")
+            pipelineData.pipeline_inputs_desc[m].label.includes("crs") ||
+            pipelineData.pipeline_inputs_desc[m].label.toLowerCase().includes("coordinate reference system")
           ) {
             crs = p[m];
           }
         }
-        CsvToGeojson(`${output}`, "\t", crs).then((r) => {
+        let del = ",";
+        if (type.includes("tab-separated")) {
+          del = "\t";
+        }
+        CsvToGeojson(`${output}`, del, crs).then((r) => {
           if (r?.features?.length > 0) {
             setGeojsonOutput(r);
           }
         });
+      });
+    } else if (type.includes("geo+json")) {
+      GetJSON(output).then((res: any) => {
+        setGeojsonOutput(res);
       });
     } else if (
       type.includes("value") ||
@@ -110,7 +113,7 @@ export default function Sidebar(props: any) {
         ></Grid>
       );
       setOpenModal(true);
-    } else if (type.includes("json")) {
+    } else if (type.includes("json") && !type.includes("geojson")) {
       axios({
         method: "get",
         baseURL: output,
@@ -159,27 +162,31 @@ export default function Sidebar(props: any) {
       if (pipelineData.author.length > 0) {
         const auths = pipelineData.author.map((a: any, i: number, arr: any) => {
           let divider = i < arr.length - 1 ? <>, </> : "";
+          let name = (
+            <Typography
+              fontSize={11}
+              color="primary.contrastText"
+              sx={{ display: "inline" }}
+            >
+              {a.name}
+              {divider}
+            </Typography>
+          );
+
           if (a.identifier) {
             return (
-              <Link target="_blank" href={`"${a.identifier}"`}>
-                <Typography
-                  fontSize={11}
-                  color="primary.contrastText"
-                  sx={{ display: "inline" }}
-                >
-                  {a.name}
-                  {divider}
-                </Typography>
+              <Link target="_blank" href={`${a.identifier}`}>
+                {name}
+              </Link>
+            );
+          } else if (a.email) {
+            return (
+              <Link target="_blank" href={`mailto:${a.email}`}>
+                {name}
               </Link>
             );
           } else {
-            return (
-              <Typography
-                fontSize={11}
-                color="primary.contrastText"
-                sx={{ display: "inline" }}
-              >{`${a.name}${divider}`}</Typography>
-            );
+            return name;
           }
         });
         setPipelineAuthors(auths);
@@ -188,7 +195,7 @@ export default function Sidebar(props: any) {
       for (let o in pipelineData.pipeline_outputs) {
         sortable.push(pipelineData.pipeline_outputs[o]);
       }
-      if ("weight" in sortable[0]) {
+      if (sortable[0] && "weight" in sortable[0]) {
         sortable.sort(function (a: any, b: any) {
           return a.weight - b.weight;
         });

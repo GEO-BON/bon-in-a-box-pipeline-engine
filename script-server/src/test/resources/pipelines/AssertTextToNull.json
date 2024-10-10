@@ -1,0 +1,80 @@
+{
+  "nodes": [
+    {
+      "id": "2",
+      "type": "io",
+      "position": {
+        "x": 666.7366568614135,
+        "y": 301.6713068494392
+      },
+      "data": {
+        "descriptionFile": "assertNull.yml"
+      }
+    },
+    {
+      "id": "3",
+      "type": "output",
+      "position": {
+        "x": 950.3074654555312,
+        "y": 299.4785725653078
+      },
+      "data": {
+        "label": "Output"
+      }
+    },
+    {
+      "id": "4",
+      "type": "io",
+      "position": {
+        "x": 298.98333740234375,
+        "y": 299
+      },
+      "data": {
+        "descriptionFile": "assertText.yml"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "2",
+      "sourceHandle": "the_same",
+      "target": "3",
+      "targetHandle": null,
+      "id": "reactflow__edge-2the_same-3"
+    },
+    {
+      "source": "4",
+      "sourceHandle": "the_same",
+      "target": "2",
+      "targetHandle": "input",
+      "id": "reactflow__edge-4the_same-2input"
+    }
+  ],
+  "inputs": {
+    "assertText.yml@4|input": {
+      "description": "Some text input",
+      "label": "Text input",
+      "type": "text",
+      "example": "Bonjour",
+      "weight": 0
+    }
+  },
+  "outputs": {
+    "assertNull.yml@2|the_same": {
+      "description": "The same value as in the inputs. But this crashes if not null!",
+      "label": "Same value",
+      "type": "text",
+      "weight": 0
+    }
+  },
+  "metadata": {
+    "name": "Assert Text to Null",
+    "description": "Pipeline for automated tests.\nThis will fail either at first or second step depending on the chosen input.\n",
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
+  }
+}
