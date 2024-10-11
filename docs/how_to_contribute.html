@@ -17,7 +17,7 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
 /* CSS for syntax highlighting */
@@ -123,21 +123,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html">
+    <a class="nav-link" href="./index.html"> 
 <span class="menu-text">About</span></a>
-  </li>
+  </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./how_to_install.html">
+    <a class="nav-link" href="./how_to_install.html"> 
 <span class="menu-text">How to Install</span></a>
-  </li>
+  </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./how_to_contribute.html" aria-current="page">
+    <a class="nav-link active" href="./how_to_contribute.html" aria-current="page"> 
 <span class="menu-text">How to Contribute</span></a>
-  </li>
+  </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./working_with_stac.html">
+    <a class="nav-link" href="./working_with_stac.html"> 
 <span class="menu-text">Working with STAC</span></a>
-  </li>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -152,7 +152,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
-
+   
   <ul>
   <li><a href="#is-your-analysis-pipeline-right-for-us" id="toc-is-your-analysis-pipeline-right-for-us" class="nav-link active" data-scroll-target="#is-your-analysis-pipeline-right-for-us">Is your analysis pipeline right for us?</a></li>
   <li><a href="#steps-for-contributing" id="toc-steps-for-contributing" class="nav-link" data-scroll-target="#steps-for-contributing">Steps for contributing</a></li>
@@ -196,11 +196,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <div class="quarto-title-meta">
 
-
-
-
+    
+  
+    
   </div>
-
+  
 
 
 </header>
@@ -273,9 +273,9 @@ author:
 <p>There are several different types of user inputs that can be specified in the YAML file:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 31%">
-<col style="width: 14%">
-<col style="width: 54%">
+<col style="width: 27%">
+<col style="width: 24%">
+<col style="width: 47%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -414,7 +414,7 @@ author:
 <section id="specifying-r-package-dependencies-with-conda" class="level3">
 <h3 class="anchored" data-anchor-id="specifying-r-package-dependencies-with-conda">Specifying R package dependencies with conda</h3>
 <p>“<a href="https://docs.conda.io/projects/conda/en/latest/index.html">Conda</a> provides package, dependency, and environment management for any language.” If a script is dependent on a specific package version, conda will load that package version to prevent breaking changes when packages are updated. BON in a Box uses a central conda environment that includes commonly used libraries, and supports dedicated environments for the scripts that need it.</p>
-<p>This means that instead of loading packages in R scripts, they are loaded in the R environment in conda.</p>
+<p>This means that instead of installing packages in R scripts, they are installed in the R environment in conda. Note that you still need to load the packages in your scripts.</p>
 <section id="check-if-the-libraries-you-need-are-in-conda" class="level4">
 <h4 class="anchored" data-anchor-id="check-if-the-libraries-you-need-are-in-conda">Check if the libraries you need are in conda</h4>
 <ul>
@@ -444,7 +444,8 @@ author:
 
 mamba activate rbase
 
-R -e 'install.packages(c(&lt;packages&gt;), repose="https://cloud.r-project.org/")</code></pre></li>
+R -e 'install.packages(c(&lt;packages&gt;), repose="https://cloud.r-project.org/")</code></pre>
+<ul>
 <li><p>You can use <code>devtools::install_github()</code> in a similar fashion:</p>
 <pre><code>docker exec -it biab-runner-conda bash
 
@@ -452,6 +453,9 @@ mamba activate rbase
 
 R -e 'devtools::install_github("&lt;user&gt;/&lt;package&gt;")'</code></pre></li>
 </ul></li>
+<li><p>Do not add these packages to the r-environment file or the conda portion of the yml file because conda will not be able to recognize them</p></li>
+</ul></li>
+<li><p>To refresh the R environment to match the r-environment.yml file, run <code>docker exec -u root -it biab-runner-conda mamba env update –file r-environment.yml</code> in the terminal.</p></li>
 </ul>
 </section>
 <section id="add-any-version-dependencies-to-your-yml-file" class="level4">
@@ -465,6 +469,7 @@ R -e 'devtools::install_github("&lt;user&gt;/&lt;package&gt;")'</code></pre></li
 </ul>
 <pre><code>conda: # Optional: if you script requires specific versions of packages.
   channels:
+    - conda-forge
     - r
   dependencies:
     - r-rjson # read inputs and save outputs for R scripts
@@ -580,7 +585,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio2_7333b3d111981-01-01.tif"</span></span>
 <span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
 <span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"presence_background"</span><span class="fu">:</span> <span class="st">"/output/SDM/setupDataSdm/edb9492031df9e063a5ec5c325bacdb1/presence_background.tsv"</span><span class="fu">,</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"proj"</span><span class="fu">:</span> <span class="st">"EPSG:6622"</span><span class="fu">,</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"proj"</span><span class="fu">:</span> <span class="st">"EPSG:6623"</span><span class="fu">,</span></span>
 <span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"rm"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="er">.</span><span class="dv">5</span><span class="ot">,</span> <span class="fl">1.0</span><span class="ot">,</span> <span class="fl">2.0</span><span class="ot">]</span></span>
 <span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The script reads the <code>input.json</code> file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline. Here is an example of how to read the input folder in the R script:</p>
@@ -730,7 +735,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       toggleBodyColorMode(bsSheetEl);
     }
   }
-  toggleBodyColorPrimary();
+  toggleBodyColorPrimary();  
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
@@ -740,7 +745,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   anchorJS.add('.anchored');
   const isCodeAnnotation = (el) => {
     for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {
+      if (clz.startsWith('code-annotation-')) {                     
         return true;
       }
     }
@@ -760,11 +765,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       button.setAttribute("data-bs-toggle", "tooltip");
       button.setAttribute("data-bs-placement", "left");
       button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button,
-        { trigger: "manual",
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
           customClass: "code-copy-button-tooltip",
           offset: [0, -8]});
-      tooltip.show();
+      tooltip.show();    
     }
     setTimeout(function() {
       if (tooltip) {
@@ -842,7 +847,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     if (onUntriggerFn) {
       config.onUntrigger = onUntriggerFn;
     }
-    window.tippy(el, config);
+    window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
   for (var i=0; i<noterefs.length; i++) {
@@ -918,7 +923,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     tippyHover(xref, undefined, function(instance) {
       instance.disable();
       let url = xref.getAttribute('href');
-      let hash = undefined;
+      let hash = undefined; 
       if (url.startsWith('#')) {
         hash = url;
       } else {
@@ -946,7 +951,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             if (note !== null) {
               const html = processXRef(id, note);
               instance.setContent(html);
-            }
+            } 
           }).finally(() => {
             instance.enable();
             instance.show();
@@ -970,7 +975,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             const html = processXRef(null, note);
             instance.setContent(html);
-          }
+          } 
         }).finally(() => {
           instance.enable();
           instance.show();
@@ -1010,7 +1015,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             height = bottom - top;
           }
           if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it
+            // cook up a div (if necessary) and position it 
             let div = window.document.getElementById("code-annotation-line-highlight");
             if (div === null) {
               div = window.document.createElement("div");
