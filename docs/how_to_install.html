@@ -166,8 +166,9 @@ ul.task-list li input[type="checkbox"] {
 <li><p><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> Note that it is not necessary to make an account</p></li>
 <li><p>Make sure docker is added to the path of your terminal. From a terminal, run command <code>docker run hello-world</code>. If there is an error message, see <a href="https://stackoverflow.com/a/71923962/3519951" class="uri">https://stackoverflow.com/a/71923962/3519951</a>.</p></li>
 <li><p>If you encounter error <code>no matching manifest for linux/arm64/v8 in the manifest list entries</code>, export DOCKER_DEFAULT_PLATFORM. See <a href="https://stackoverflow.com/a/76404045/3519951" class="uri">https://stackoverflow.com/a/76404045/3519951</a>.</p></li>
+<li><p>If you have a Silicon chip, check “Use Rosetta for x86_64/amd64 emulation on Apple Silicon”. See <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/issues/175">issue #175</a>.</p></li>
 </ul></li>
-<li><p><strong>Linux:</strong> Docker with Docker Compose installed. It is recommended to <a href="https://docs.docker.com/engine/install/linux-postinstall/">add your user to the docker group</a>.</p></li>
+<li><p><strong>Linux:</strong> Docker with Docker Compose installed. It is required to <a href="https://docs.docker.com/engine/install/linux-postinstall/">add your user to the docker group</a>.</p></li>
 </ul>
 <p>To run:</p>
 <ol type="1">

@@ -52,7 +52,7 @@ YAML files should begin with a name, description, and authors of the script. The
 
 Example:
 
-```
+```         
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -67,7 +67,7 @@ Next, the YAML file should specify the inputs of the script. These inputs will e
 
 Here is an example where the input is a raster file of land cover pulled from a public database and a coordinate reference system that is specified by the user:
 
-```
+```         
 inputs:
   landcover_raster:
     label: Raster of landcover
@@ -91,18 +91,18 @@ Specifying an example will autofill that input with the example unless changed b
 
 There are several different types of user inputs that can be specified in the YAML file:
 
-| "Type" attribute in the yaml | IU rendering | Description                                        |
-|------------------------------|--------------|----------------------------------------------------|
-| boolean                      | Plain text   | true/false                                         |
-| float, float\[\]             | Plain text   | positive and negative numbers with a decimal point |
-| int, int\[\]                 | Plain text   | integer                                            |
-| options^1^                   | Plain text   | dropdown menu                                      |
-| text, text\[\]               | Plain text   | text input (words)                                 |
-| (any unknown type)           | Plain text   |                                                    |
+| "Type" attribute in the yaml | IU rendering | Description |
+|----|----|----|
+| boolean | Plain text | true/false |
+| float, float\[\] | Plain text | positive and negative numbers with a decimal point |
+| int, int\[\] | Plain text | integer |
+| options^1^ | Plain text | dropdown menu |
+| text, text\[\] | Plain text | text input (words) |
+| (any unknown type) | Plain text |  |
 
 ^1^options type requires an additioal options attribute to be added with the available options.
 
-```
+```         
 options_example:
   label: Options example
   description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
@@ -120,7 +120,7 @@ After specifying the inputs, you can specify what you want the script to output.
 
 Here is an example:
 
-```
+```         
 outputs:
   result:
     label: Analysis result
@@ -149,7 +149,7 @@ There are also several types of outputs that can be created
 
 ^2^When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
 
-```
+```         
 map:
   label: My map
   description: Some map that shows something
@@ -182,7 +182,7 @@ This means that instead of installing packages in R scripts, they are installed 
 
     -   Go to the runners/conda-dockerfile and add it to the install command. Replace \<package\> with your package name.
 
-        ```
+        ```         
         RUN bash --login -c "mamba activate rbase; R -e 'install.packages(c(\<package 1>\", \
                 \"<package 2>\", \
                 \"<package 3>\"\
@@ -191,13 +191,13 @@ This means that instead of installing packages in R scripts, they are installed 
 
         Or for packages in development loaded from github.
 
-        ```
+        ```         
         RUN bash --login -c "mamba activate rbase; R -e 'devtools::install_github(\"<user>/<package>\")'"
         ```
 
     -   Install in in your local environment by typing this in the terminal, replacing \<packages\> (three commands should be pasted separately):
 
-        ```
+        ```         
         docker exec -it biab-runner-conda bash
 
         mamba activate rbase
@@ -207,7 +207,7 @@ This means that instead of installing packages in R scripts, they are installed 
 
         -   You can use `devtools::install_github()` in a similar fashion:
 
-            ```
+            ```         
             docker exec -it biab-runner-conda bash
 
             mamba activate rbase
@@ -227,7 +227,7 @@ This means that instead of installing packages in R scripts, they are installed 
 
     -   If you include a conda section, make sure you list all your dependencies. This is creating a new separate environment, not a supplement to the base environment. This means that all of the packages that you need need to be specified in here, even if they are in the r-environment.yml file.
 
-```
+```         
 conda: # Optional: if you script requires specific versions of packages.
   channels:
     - conda-forge
@@ -243,7 +243,7 @@ For more information, refer to the [conda documentation](https://docs.conda.io/p
 
 Here is an example of a complete YAML file with inputs and outputs:
 
-```
+```         
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -289,7 +289,7 @@ If inputs are outputs from a previous step in the pipeline, make sure to give th
 
 Here is an empty commented sample that can be filled in
 
-```
+```         
 script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targeted to those who will interpret pipeline results and edit pipelines.
