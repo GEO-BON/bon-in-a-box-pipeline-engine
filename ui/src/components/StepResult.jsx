@@ -209,7 +209,7 @@ export const SingleIOResult = memo(({ ioId, value, ioMetadata, componentId, sect
             icon = <img src={errorImg} alt="Error" className="error-inline" />
         }
 
-        if(! /^(.*\|)?[a-z]+(?:_[a-z]+)*$/.test(ioId)) {
+        if(! /^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(ioId) && !ioId.startsWith("pipeline@")) {
             errorMsg = <p className='warning'>{ioId} should be a snake_case id</p>
             icon = <img src={warningImg} alt="Warning" className="error-inline" />
         }

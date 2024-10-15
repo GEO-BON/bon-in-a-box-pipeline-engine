@@ -125,12 +125,12 @@ export function getStepNodeId(ioId) {
  * returns pipeline.json@23|script.yml@31|output
  *
  * from pipeline@12
- * returns defaultOutput
+ * returns default_output
  */
 export function getStepOutput(ioId) {
     const pipeIndex = ioId.lastIndexOf('|')
     if (pipeIndex === -1)
-        return 'defaultOutput'
+        return 'default_output'
     else
         return ioId.substring(ioId.indexOf('|') + 1)
 }
@@ -142,13 +142,13 @@ export function getStepOutput(ioId) {
  * returns output
  *
  * from pipeline.json@12|pipeline.json@23|script.yml@31
- * returns defaultOutput
+ * returns default_output
  *
  * from script.yml@31|output
  * returns output
  *
  * from script.yml@31
- * returns defaultOutput
+ * returns default_output
  */
 export function getScriptOutput(ioId) {
     const lastPipe = ioId.lastIndexOf('|')
@@ -157,7 +157,7 @@ export function getScriptOutput(ioId) {
         return ioId.substring(lastPipe + 1)
     }
 
-    return 'defaultOutput'
+    return 'default_output'
 }
 
 /**

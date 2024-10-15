@@ -509,7 +509,7 @@ export default function PipelineEditor(props) {
           if (outputDescription === undefined) {
             let newNode = {
               nodeId: edge.source,
-              outputId: "defaultOutput"
+              outputId: "default_output"
             };
 
             if (sourceNode.type === 'userInput') {
