@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>defaultapi – bon-in-a-box-pipeline-engine</title>
+<title>defaultapi – BON in a Box</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -113,7 +113,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../../index.html">
-    <span class="navbar-title">bon-in-a-box-pipeline-engine</span>
+    <span class="navbar-title">BON in a Box</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -124,11 +124,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
     <a class="nav-link" href="../../../index.html"> 
-<span class="menu-text">Home</span></a>
+<span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../../about.html"> 
-<span class="menu-text">About</span></a>
+    <a class="nav-link" href="../../../how_to_install.html"> 
+<span class="menu-text">How to Install</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../how_to_contribute.html"> 
+<span class="menu-text">How to Contribute</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../working_with_stac.html"> 
+<span class="menu-text">Working with STAC</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -148,7 +156,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#boninaboxscriptservice.defaultapi" id="toc-boninaboxscriptservice.defaultapi" class="nav-link active" data-scroll-target="#boninaboxscriptservice.defaultapi">BonInABoxScriptService.DefaultApi</a>
   <ul class="collapse">
-  <li><a href="#getinfo" id="toc-getinfo" class="nav-link" data-scroll-target="#getinfo">getInfo</a>
+  <li><a href="#gethistory" id="toc-gethistory" class="nav-link" data-scroll-target="#gethistory">getHistory</a>
   <ul class="collapse">
   <li><a href="#example" id="toc-example" class="nav-link" data-scroll-target="#example">Example</a></li>
   <li><a href="#parameters" id="toc-parameters" class="nav-link" data-scroll-target="#parameters">Parameters</a></li>
@@ -156,7 +164,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#authorization" id="toc-authorization" class="nav-link" data-scroll-target="#authorization">Authorization</a></li>
   <li><a href="#http-request-headers" id="toc-http-request-headers" class="nav-link" data-scroll-target="#http-request-headers">HTTP request headers</a></li>
   </ul></li>
-  <li><a href="#getlistof" id="toc-getlistof" class="nav-link" data-scroll-target="#getlistof">getListOf</a>
+  <li><a href="#getinfo" id="toc-getinfo" class="nav-link" data-scroll-target="#getinfo">getInfo</a>
   <ul class="collapse">
   <li><a href="#example-1" id="toc-example-1" class="nav-link" data-scroll-target="#example-1">Example</a></li>
   <li><a href="#parameters-1" id="toc-parameters-1" class="nav-link" data-scroll-target="#parameters-1">Parameters</a></li>
@@ -164,7 +172,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#authorization-1" id="toc-authorization-1" class="nav-link" data-scroll-target="#authorization-1">Authorization</a></li>
   <li><a href="#http-request-headers-1" id="toc-http-request-headers-1" class="nav-link" data-scroll-target="#http-request-headers-1">HTTP request headers</a></li>
   </ul></li>
-  <li><a href="#getoutputfolders" id="toc-getoutputfolders" class="nav-link" data-scroll-target="#getoutputfolders">getOutputFolders</a>
+  <li><a href="#getlistof" id="toc-getlistof" class="nav-link" data-scroll-target="#getlistof">getListOf</a>
   <ul class="collapse">
   <li><a href="#example-2" id="toc-example-2" class="nav-link" data-scroll-target="#example-2">Example</a></li>
   <li><a href="#parameters-2" id="toc-parameters-2" class="nav-link" data-scroll-target="#parameters-2">Parameters</a></li>
@@ -172,7 +180,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#authorization-2" id="toc-authorization-2" class="nav-link" data-scroll-target="#authorization-2">Authorization</a></li>
   <li><a href="#http-request-headers-2" id="toc-http-request-headers-2" class="nav-link" data-scroll-target="#http-request-headers-2">HTTP request headers</a></li>
   </ul></li>
-  <li><a href="#getpipeline" id="toc-getpipeline" class="nav-link" data-scroll-target="#getpipeline">getPipeline</a>
+  <li><a href="#getoutputfolders" id="toc-getoutputfolders" class="nav-link" data-scroll-target="#getoutputfolders">getOutputFolders</a>
   <ul class="collapse">
   <li><a href="#example-3" id="toc-example-3" class="nav-link" data-scroll-target="#example-3">Example</a></li>
   <li><a href="#parameters-3" id="toc-parameters-3" class="nav-link" data-scroll-target="#parameters-3">Parameters</a></li>
@@ -180,7 +188,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#authorization-3" id="toc-authorization-3" class="nav-link" data-scroll-target="#authorization-3">Authorization</a></li>
   <li><a href="#http-request-headers-3" id="toc-http-request-headers-3" class="nav-link" data-scroll-target="#http-request-headers-3">HTTP request headers</a></li>
   </ul></li>
-  <li><a href="#getversions" id="toc-getversions" class="nav-link" data-scroll-target="#getversions">getVersions</a>
+  <li><a href="#getpipeline" id="toc-getpipeline" class="nav-link" data-scroll-target="#getpipeline">getPipeline</a>
   <ul class="collapse">
   <li><a href="#example-4" id="toc-example-4" class="nav-link" data-scroll-target="#example-4">Example</a></li>
   <li><a href="#parameters-4" id="toc-parameters-4" class="nav-link" data-scroll-target="#parameters-4">Parameters</a></li>
@@ -188,7 +196,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#authorization-4" id="toc-authorization-4" class="nav-link" data-scroll-target="#authorization-4">Authorization</a></li>
   <li><a href="#http-request-headers-4" id="toc-http-request-headers-4" class="nav-link" data-scroll-target="#http-request-headers-4">HTTP request headers</a></li>
   </ul></li>
-  <li><a href="#run" id="toc-run" class="nav-link" data-scroll-target="#run">run</a>
+  <li><a href="#getversions" id="toc-getversions" class="nav-link" data-scroll-target="#getversions">getVersions</a>
   <ul class="collapse">
   <li><a href="#example-5" id="toc-example-5" class="nav-link" data-scroll-target="#example-5">Example</a></li>
   <li><a href="#parameters-5" id="toc-parameters-5" class="nav-link" data-scroll-target="#parameters-5">Parameters</a></li>
@@ -196,7 +204,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#authorization-5" id="toc-authorization-5" class="nav-link" data-scroll-target="#authorization-5">Authorization</a></li>
   <li><a href="#http-request-headers-5" id="toc-http-request-headers-5" class="nav-link" data-scroll-target="#http-request-headers-5">HTTP request headers</a></li>
   </ul></li>
-  <li><a href="#savepipeline" id="toc-savepipeline" class="nav-link" data-scroll-target="#savepipeline">savePipeline</a>
+  <li><a href="#run" id="toc-run" class="nav-link" data-scroll-target="#run">run</a>
   <ul class="collapse">
   <li><a href="#example-6" id="toc-example-6" class="nav-link" data-scroll-target="#example-6">Example</a></li>
   <li><a href="#parameters-6" id="toc-parameters-6" class="nav-link" data-scroll-target="#parameters-6">Parameters</a></li>
@@ -204,13 +212,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#authorization-6" id="toc-authorization-6" class="nav-link" data-scroll-target="#authorization-6">Authorization</a></li>
   <li><a href="#http-request-headers-6" id="toc-http-request-headers-6" class="nav-link" data-scroll-target="#http-request-headers-6">HTTP request headers</a></li>
   </ul></li>
-  <li><a href="#stop" id="toc-stop" class="nav-link" data-scroll-target="#stop">stop</a>
+  <li><a href="#savepipeline" id="toc-savepipeline" class="nav-link" data-scroll-target="#savepipeline">savePipeline</a>
   <ul class="collapse">
   <li><a href="#example-7" id="toc-example-7" class="nav-link" data-scroll-target="#example-7">Example</a></li>
   <li><a href="#parameters-7" id="toc-parameters-7" class="nav-link" data-scroll-target="#parameters-7">Parameters</a></li>
   <li><a href="#return-type-7" id="toc-return-type-7" class="nav-link" data-scroll-target="#return-type-7">Return type</a></li>
   <li><a href="#authorization-7" id="toc-authorization-7" class="nav-link" data-scroll-target="#authorization-7">Authorization</a></li>
   <li><a href="#http-request-headers-7" id="toc-http-request-headers-7" class="nav-link" data-scroll-target="#http-request-headers-7">HTTP request headers</a></li>
+  </ul></li>
+  <li><a href="#stop" id="toc-stop" class="nav-link" data-scroll-target="#stop">stop</a>
+  <ul class="collapse">
+  <li><a href="#example-8" id="toc-example-8" class="nav-link" data-scroll-target="#example-8">Example</a></li>
+  <li><a href="#parameters-8" id="toc-parameters-8" class="nav-link" data-scroll-target="#parameters-8">Parameters</a></li>
+  <li><a href="#return-type-8" id="toc-return-type-8" class="nav-link" data-scroll-target="#return-type-8">Return type</a></li>
+  <li><a href="#authorization-8" id="toc-authorization-8" class="nav-link" data-scroll-target="#authorization-8">Authorization</a></li>
+  <li><a href="#http-request-headers-8" id="toc-http-request-headers-8" class="nav-link" data-scroll-target="#http-request-headers-8">HTTP request headers</a></li>
   </ul></li>
   </ul></li>
   </ul>
@@ -235,70 +251,114 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </thead>
 <tbody>
 <tr class="odd">
+<td><a href="../../../ui/BonInABoxScriptService/docs/DefaultApi.html#getHistory"><strong>getHistory</strong></a></td>
+<td><strong>GET</strong> /api/history</td>
+<td>Get the history of runs for all pipelines on this server</td>
+</tr>
+<tr class="even">
 <td><a href="../../../ui/BonInABoxScriptService/docs/DefaultApi.html#getInfo"><strong>getInfo</strong></a></td>
 <td><strong>GET</strong> /{type}/{descriptionPath}/info</td>
 <td>Get metadata about this script or pipeline.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../../../ui/BonInABoxScriptService/docs/DefaultApi.html#getListOf"><strong>getListOf</strong></a></td>
 <td><strong>GET</strong> /{type}/list</td>
 <td>Get a list of available steps of given type and their names.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="../../../ui/BonInABoxScriptService/docs/DefaultApi.html#getOutputFolders"><strong>getOutputFolders</strong></a></td>
 <td><strong>GET</strong> /{type}/{id}/outputs</td>
 <td>Get the output folders of the scripts composing this pipeline</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../../../ui/BonInABoxScriptService/docs/DefaultApi.html#getPipeline"><strong>getPipeline</strong></a></td>
 <td><strong>GET</strong> /pipeline/{descriptionPath}/get</td>
 <td>Get JSON file that describes the pipeline.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="../../../ui/BonInABoxScriptService/docs/DefaultApi.html#getVersions"><strong>getVersions</strong></a></td>
 <td><strong>GET</strong> /api/versions</td>
 <td>Returns the version of system components.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../../../ui/BonInABoxScriptService/docs/DefaultApi.html#run"><strong>run</strong></a></td>
 <td><strong>POST</strong> /{type}/{descriptionPath}/run</td>
 <td>Runs the script or pipeline matching `descriptionPath`.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><a href="../../../ui/BonInABoxScriptService/docs/DefaultApi.html#savePipeline"><strong>savePipeline</strong></a></td>
 <td><strong>POST</strong> /pipeline/save/{filename}</td>
 <td>Save a json file to the pipeline folder.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><a href="../../../ui/BonInABoxScriptService/docs/DefaultApi.html#stop"><strong>stop</strong></a></td>
 <td><strong>GET</strong> /{type}/{id}/stop</td>
 <td>Stop the specified pipeline run.</td>
 </tr>
 </tbody>
 </table>
+<section id="gethistory" class="level2">
+<h2 class="anchored" data-anchor-id="gethistory">getHistory</h2>
+<blockquote class="blockquote">
+<p>[GetHistory200ResponseInner] getHistory()</p>
+</blockquote>
+<p>Get the history of runs for all pipelines on this server</p>
+<section id="example" class="level3">
+<h3 class="anchored" data-anchor-id="example">Example</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">getHistory</span>((error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="parameters" class="level3">
+<h3 class="anchored" data-anchor-id="parameters">Parameters</h3>
+<p>This endpoint does not need any parameter.</p>
+</section>
+<section id="return-type" class="level3">
+<h3 class="anchored" data-anchor-id="return-type">Return type</h3>
+<p><a href="../../../ui/BonInABoxScriptService/docs/GetHistory200ResponseInner.html"><strong>[GetHistory200ResponseInner]</strong></a></p>
+</section>
+<section id="authorization" class="level3">
+<h3 class="anchored" data-anchor-id="authorization">Authorization</h3>
+<p>No authorization required</p>
+</section>
+<section id="http-request-headers" class="level3">
+<h3 class="anchored" data-anchor-id="http-request-headers">HTTP request headers</h3>
+<ul>
+<li><strong>Content-Type</strong>: Not defined</li>
+<li><strong>Accept</strong>: application/json</li>
+</ul>
+</section>
+</section>
 <section id="getinfo" class="level2">
 <h2 class="anchored" data-anchor-id="getinfo">getInfo</h2>
 <blockquote class="blockquote">
 <p>Info getInfo(type, descriptionPath)</p>
 </blockquote>
 <p>Get metadata about this script or pipeline.</p>
-<section id="example" class="level3">
-<h3 class="anchored" data-anchor-id="example">Example</h3>
-<div class="sourceCode" id="cb1"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> type <span class="op">=</span> <span class="st">"type_example"</span><span class="op">;</span> <span class="co">// String | Script or pipeline</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> descriptionPath <span class="op">=</span> <span class="st">"descriptionPath_example"</span><span class="op">;</span> <span class="co">// String | Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">getInfo</span>(type<span class="op">,</span> descriptionPath<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="example-1" class="level3">
+<h3 class="anchored" data-anchor-id="example-1">Example</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> type <span class="op">=</span> <span class="st">"type_example"</span><span class="op">;</span> <span class="co">// String | Script or pipeline</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> descriptionPath <span class="op">=</span> <span class="st">"descriptionPath_example"</span><span class="op">;</span> <span class="co">// String | Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">getInfo</span>(type<span class="op">,</span> descriptionPath<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="parameters" class="level3">
-<h3 class="anchored" data-anchor-id="parameters">Parameters</h3>
+<section id="parameters-1" class="level3">
+<h3 class="anchored" data-anchor-id="parameters-1">Parameters</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 25%">
@@ -330,66 +390,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="return-type" class="level3">
-<h3 class="anchored" data-anchor-id="return-type">Return type</h3>
-<p><a href="../../../ui/BonInABoxScriptService/docs/Info.html"><strong>Info</strong></a></p>
-</section>
-<section id="authorization" class="level3">
-<h3 class="anchored" data-anchor-id="authorization">Authorization</h3>
-<p>No authorization required</p>
-</section>
-<section id="http-request-headers" class="level3">
-<h3 class="anchored" data-anchor-id="http-request-headers">HTTP request headers</h3>
-<ul>
-<li><strong>Content-Type</strong>: Not defined</li>
-<li><strong>Accept</strong>: application/json</li>
-</ul>
-</section>
-</section>
-<section id="getlistof" class="level2">
-<h2 class="anchored" data-anchor-id="getlistof">getListOf</h2>
-<blockquote class="blockquote">
-<p>{String: String} getListOf(type)</p>
-</blockquote>
-<p>Get a list of available steps of given type and their names.</p>
-<section id="example-1" class="level3">
-<h3 class="anchored" data-anchor-id="example-1">Example</h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> type <span class="op">=</span> <span class="st">"type_example"</span><span class="op">;</span> <span class="co">// String | Script or pipeline</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">getListOf</span>(type<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="parameters-1" class="level3">
-<h3 class="anchored" data-anchor-id="parameters-1">Parameters</h3>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Name</th>
-<th>Type</th>
-<th>Description</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><strong>type</strong></td>
-<td><strong>String</strong></td>
-<td>Script or pipeline</td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
 <section id="return-type-1" class="level3">
 <h3 class="anchored" data-anchor-id="return-type-1">Return type</h3>
-<p><strong>{String: String}</strong></p>
+<p><a href="../../../ui/BonInABoxScriptService/docs/Info.html"><strong>Info</strong></a></p>
 </section>
 <section id="authorization-1" class="level3">
 <h3 class="anchored" data-anchor-id="authorization-1">Authorization</h3>
@@ -403,26 +406,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 </section>
 </section>
-<section id="getoutputfolders" class="level2">
-<h2 class="anchored" data-anchor-id="getoutputfolders">getOutputFolders</h2>
+<section id="getlistof" class="level2">
+<h2 class="anchored" data-anchor-id="getlistof">getListOf</h2>
 <blockquote class="blockquote">
-<p>{String: String} getOutputFolders(type, id)</p>
+<p>{String: String} getListOf(type)</p>
 </blockquote>
-<p>Get the output folders of the scripts composing this pipeline</p>
+<p>Get a list of available steps of given type and their names.</p>
 <section id="example-2" class="level3">
 <h3 class="anchored" data-anchor-id="example-2">Example</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> type <span class="op">=</span> <span class="st">"type_example"</span><span class="op">;</span> <span class="co">// String | Script or pipeline</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> id <span class="op">=</span> <span class="st">"id_example"</span><span class="op">;</span> <span class="co">// String | Where to find the pipeline in ./script folder.</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">getOutputFolders</span>(type<span class="op">,</span> id<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">getListOf</span>(type<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="parameters-2" class="level3">
 <h3 class="anchored" data-anchor-id="parameters-2">Parameters</h3>
@@ -440,12 +442,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><strong>type</strong></td>
 <td><strong>String</strong></td>
 <td>Script or pipeline</td>
-<td></td>
-</tr>
-<tr class="even">
-<td><strong>id</strong></td>
-<td><strong>String</strong></td>
-<td>Where to find the pipeline in ./script folder.</td>
 <td></td>
 </tr>
 </tbody>
@@ -467,28 +463,98 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 </section>
 </section>
+<section id="getoutputfolders" class="level2">
+<h2 class="anchored" data-anchor-id="getoutputfolders">getOutputFolders</h2>
+<blockquote class="blockquote">
+<p>{String: String} getOutputFolders(type, id)</p>
+</blockquote>
+<p>Get the output folders of the scripts composing this pipeline</p>
+<section id="example-3" class="level3">
+<h3 class="anchored" data-anchor-id="example-3">Example</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> type <span class="op">=</span> <span class="st">"type_example"</span><span class="op">;</span> <span class="co">// String | Script or pipeline</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> id <span class="op">=</span> <span class="st">"id_example"</span><span class="op">;</span> <span class="co">// String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. </span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">getOutputFolders</span>(type<span class="op">,</span> id<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="parameters-3" class="level3">
+<h3 class="anchored" data-anchor-id="parameters-3">Parameters</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>type</strong></td>
+<td><strong>String</strong></td>
+<td>Script or pipeline</td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>id</strong></td>
+<td><strong>String</strong></td>
+<td>Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="return-type-3" class="level3">
+<h3 class="anchored" data-anchor-id="return-type-3">Return type</h3>
+<p><strong>{String: String}</strong></p>
+</section>
+<section id="authorization-3" class="level3">
+<h3 class="anchored" data-anchor-id="authorization-3">Authorization</h3>
+<p>No authorization required</p>
+</section>
+<section id="http-request-headers-3" class="level3">
+<h3 class="anchored" data-anchor-id="http-request-headers-3">HTTP request headers</h3>
+<ul>
+<li><strong>Content-Type</strong>: Not defined</li>
+<li><strong>Accept</strong>: application/json</li>
+</ul>
+</section>
+</section>
 <section id="getpipeline" class="level2">
 <h2 class="anchored" data-anchor-id="getpipeline">getPipeline</h2>
 <blockquote class="blockquote">
 <p>Object getPipeline(descriptionPath)</p>
 </blockquote>
 <p>Get JSON file that describes the pipeline.</p>
-<section id="example-3" class="level3">
-<h3 class="anchored" data-anchor-id="example-3">Example</h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> descriptionPath <span class="op">=</span> <span class="st">"descriptionPath_example"</span><span class="op">;</span> <span class="co">// String | Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">getPipeline</span>(descriptionPath<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="example-4" class="level3">
+<h3 class="anchored" data-anchor-id="example-4">Example</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> descriptionPath <span class="op">=</span> <span class="st">"descriptionPath_example"</span><span class="op">;</span> <span class="co">// String | Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">getPipeline</span>(descriptionPath<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="parameters-3" class="level3">
-<h3 class="anchored" data-anchor-id="parameters-3">Parameters</h3>
+<section id="parameters-4" class="level3">
+<h3 class="anchored" data-anchor-id="parameters-4">Parameters</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 25%">
@@ -514,16 +580,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="return-type-3" class="level3">
-<h3 class="anchored" data-anchor-id="return-type-3">Return type</h3>
+<section id="return-type-4" class="level3">
+<h3 class="anchored" data-anchor-id="return-type-4">Return type</h3>
 <p><strong>Object</strong></p>
 </section>
-<section id="authorization-3" class="level3">
-<h3 class="anchored" data-anchor-id="authorization-3">Authorization</h3>
+<section id="authorization-4" class="level3">
+<h3 class="anchored" data-anchor-id="authorization-4">Authorization</h3>
 <p>No authorization required</p>
 </section>
-<section id="http-request-headers-3" class="level3">
-<h3 class="anchored" data-anchor-id="http-request-headers-3">HTTP request headers</h3>
+<section id="http-request-headers-4" class="level3">
+<h3 class="anchored" data-anchor-id="http-request-headers-4">HTTP request headers</h3>
 <ul>
 <li><strong>Content-Type</strong>: Not defined</li>
 <li><strong>Accept</strong>: application/json</li>
@@ -536,33 +602,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>String getVersions()</p>
 </blockquote>
 <p>Returns the version of system components.</p>
-<section id="example-4" class="level3">
-<h3 class="anchored" data-anchor-id="example-4">Example</h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">getVersions</span>((error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="example-5" class="level3">
+<h3 class="anchored" data-anchor-id="example-5">Example</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">getVersions</span>((error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="parameters-4" class="level3">
-<h3 class="anchored" data-anchor-id="parameters-4">Parameters</h3>
+<section id="parameters-5" class="level3">
+<h3 class="anchored" data-anchor-id="parameters-5">Parameters</h3>
 <p>This endpoint does not need any parameter.</p>
 </section>
-<section id="return-type-4" class="level3">
-<h3 class="anchored" data-anchor-id="return-type-4">Return type</h3>
+<section id="return-type-5" class="level3">
+<h3 class="anchored" data-anchor-id="return-type-5">Return type</h3>
 <p><strong>String</strong></p>
 </section>
-<section id="authorization-4" class="level3">
-<h3 class="anchored" data-anchor-id="authorization-4">Authorization</h3>
+<section id="authorization-5" class="level3">
+<h3 class="anchored" data-anchor-id="authorization-5">Authorization</h3>
 <p>No authorization required</p>
 </section>
-<section id="http-request-headers-4" class="level3">
-<h3 class="anchored" data-anchor-id="http-request-headers-4">HTTP request headers</h3>
+<section id="http-request-headers-5" class="level3">
+<h3 class="anchored" data-anchor-id="http-request-headers-5">HTTP request headers</h3>
 <ul>
 <li><strong>Content-Type</strong>: Not defined</li>
 <li><strong>Accept</strong>: text/plain</li>
@@ -575,26 +641,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>String run(type, descriptionPath, opts)</p>
 </blockquote>
 <p>Runs the script or pipeline matching `descriptionPath`.</p>
-<section id="example-5" class="level3">
-<h3 class="anchored" data-anchor-id="example-5">Example</h3>
-<div class="sourceCode" id="cb6"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> type <span class="op">=</span> <span class="st">"type_example"</span><span class="op">;</span> <span class="co">// String | Script or pipeline</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> descriptionPath <span class="op">=</span> <span class="st">"descriptionPath_example"</span><span class="op">;</span> <span class="co">// String | Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> opts <span class="op">=</span> {</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">'body'</span><span class="op">:</span> <span class="st">"body_example"</span> <span class="co">// String | Content of input.json for this run</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">run</span>(type<span class="op">,</span> descriptionPath<span class="op">,</span> opts<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="example-6" class="level3">
+<h3 class="anchored" data-anchor-id="example-6">Example</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> type <span class="op">=</span> <span class="st">"type_example"</span><span class="op">;</span> <span class="co">// String | Script or pipeline</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> descriptionPath <span class="op">=</span> <span class="st">"descriptionPath_example"</span><span class="op">;</span> <span class="co">// String | Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> opts <span class="op">=</span> {</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">'body'</span><span class="op">:</span> <span class="st">"body_example"</span> <span class="co">// String | Content of input.json for this run</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>}<span class="op">;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">run</span>(type<span class="op">,</span> descriptionPath<span class="op">,</span> opts<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="parameters-5" class="level3">
-<h3 class="anchored" data-anchor-id="parameters-5">Parameters</h3>
+<section id="parameters-6" class="level3">
+<h3 class="anchored" data-anchor-id="parameters-6">Parameters</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 25%">
@@ -632,16 +698,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="return-type-5" class="level3">
-<h3 class="anchored" data-anchor-id="return-type-5">Return type</h3>
+<section id="return-type-6" class="level3">
+<h3 class="anchored" data-anchor-id="return-type-6">Return type</h3>
 <p><strong>String</strong></p>
 </section>
-<section id="authorization-5" class="level3">
-<h3 class="anchored" data-anchor-id="authorization-5">Authorization</h3>
+<section id="authorization-6" class="level3">
+<h3 class="anchored" data-anchor-id="authorization-6">Authorization</h3>
 <p>No authorization required</p>
 </section>
-<section id="http-request-headers-5" class="level3">
-<h3 class="anchored" data-anchor-id="http-request-headers-5">HTTP request headers</h3>
+<section id="http-request-headers-6" class="level3">
+<h3 class="anchored" data-anchor-id="http-request-headers-6">HTTP request headers</h3>
 <ul>
 <li><strong>Content-Type</strong>: text/plain</li>
 <li><strong>Accept</strong>: text/plain</li>
@@ -654,23 +720,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>String savePipeline(filename, requestBody)</p>
 </blockquote>
 <p>Save a json file to the pipeline folder.</p>
-<section id="example-6" class="level3">
-<h3 class="anchored" data-anchor-id="example-6">Example</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> filename <span class="op">=</span> <span class="st">"filename_example"</span><span class="op">;</span> <span class="co">// String | The name of the JSON file (without extension).</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> requestBody <span class="op">=</span> {<span class="dt">key</span><span class="op">:</span> <span class="kw">null</span>}<span class="op">;</span> <span class="co">// {String: Object} | Content of pipeline.json to save</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">savePipeline</span>(filename<span class="op">,</span> requestBody<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="example-7" class="level3">
+<h3 class="anchored" data-anchor-id="example-7">Example</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> filename <span class="op">=</span> <span class="st">"filename_example"</span><span class="op">;</span> <span class="co">// String | The name of the JSON file (without extension).</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> requestBody <span class="op">=</span> {<span class="dt">key</span><span class="op">:</span> <span class="kw">null</span>}<span class="op">;</span> <span class="co">// {String: Object} | Content of pipeline.json to save</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">savePipeline</span>(filename<span class="op">,</span> requestBody<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully. Returned data: '</span> <span class="op">+</span> data)<span class="op">;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="parameters-6" class="level3">
-<h3 class="anchored" data-anchor-id="parameters-6">Parameters</h3>
+<section id="parameters-7" class="level3">
+<h3 class="anchored" data-anchor-id="parameters-7">Parameters</h3>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -696,16 +762,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 </section>
-<section id="return-type-6" class="level3">
-<h3 class="anchored" data-anchor-id="return-type-6">Return type</h3>
+<section id="return-type-7" class="level3">
+<h3 class="anchored" data-anchor-id="return-type-7">Return type</h3>
 <p><strong>String</strong></p>
 </section>
-<section id="authorization-6" class="level3">
-<h3 class="anchored" data-anchor-id="authorization-6">Authorization</h3>
+<section id="authorization-7" class="level3">
+<h3 class="anchored" data-anchor-id="authorization-7">Authorization</h3>
 <p>No authorization required</p>
 </section>
-<section id="http-request-headers-6" class="level3">
-<h3 class="anchored" data-anchor-id="http-request-headers-6">HTTP request headers</h3>
+<section id="http-request-headers-7" class="level3">
+<h3 class="anchored" data-anchor-id="http-request-headers-7">HTTP request headers</h3>
 <ul>
 <li><strong>Content-Type</strong>: application/json</li>
 <li><strong>Accept</strong>: text/plain</li>
@@ -718,24 +784,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>stop(type, id)</p>
 </blockquote>
 <p>Stop the specified pipeline run.</p>
-<section id="example-7" class="level3">
-<h3 class="anchored" data-anchor-id="example-7">Example</h3>
-<div class="sourceCode" id="cb8"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> type <span class="op">=</span> <span class="st">"type_example"</span><span class="op">;</span> <span class="co">// String | Script or pipeline</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> id <span class="op">=</span> <span class="st">"id_example"</span><span class="op">;</span> <span class="co">// String | Where to find the pipeline in ./script folder.</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">stop</span>(type<span class="op">,</span> id<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully.'</span>)<span class="op">;</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="example-8" class="level3">
+<h3 class="anchored" data-anchor-id="example-8">Example</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> BonInABoxScriptService <span class="im">from</span> <span class="st">'bon_in_a_box_script_service'</span><span class="op">;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> apiInstance <span class="op">=</span> <span class="kw">new</span> BonInABoxScriptService<span class="op">.</span><span class="fu">DefaultApi</span>()<span class="op">;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> type <span class="op">=</span> <span class="st">"type_example"</span><span class="op">;</span> <span class="co">// String | Script or pipeline</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> id <span class="op">=</span> <span class="st">"id_example"</span><span class="op">;</span> <span class="co">// String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. </span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>apiInstance<span class="op">.</span><span class="fu">stop</span>(type<span class="op">,</span> id<span class="op">,</span> (error<span class="op">,</span> data<span class="op">,</span> response) <span class="kw">=&gt;</span> {</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (error) {</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">error</span>(error)<span class="op">;</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(<span class="st">'API called successfully.'</span>)<span class="op">;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-<section id="parameters-7" class="level3">
-<h3 class="anchored" data-anchor-id="parameters-7">Parameters</h3>
+<section id="parameters-8" class="level3">
+<h3 class="anchored" data-anchor-id="parameters-8">Parameters</h3>
 <table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>Name</th>
@@ -754,22 +826,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td><strong>id</strong></td>
 <td><strong>String</strong></td>
-<td>Where to find the pipeline in ./script folder.</td>
+<td>Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.</td>
 <td></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="return-type-7" class="level3">
-<h3 class="anchored" data-anchor-id="return-type-7">Return type</h3>
+<section id="return-type-8" class="level3">
+<h3 class="anchored" data-anchor-id="return-type-8">Return type</h3>
 <p>null (empty response body)</p>
 </section>
-<section id="authorization-7" class="level3">
-<h3 class="anchored" data-anchor-id="authorization-7">Authorization</h3>
+<section id="authorization-8" class="level3">
+<h3 class="anchored" data-anchor-id="authorization-8">Authorization</h3>
 <p>No authorization required</p>
 </section>
-<section id="http-request-headers-7" class="level3">
-<h3 class="anchored" data-anchor-id="http-request-headers-7">HTTP request headers</h3>
+<section id="http-request-headers-8" class="level3">
+<h3 class="anchored" data-anchor-id="http-request-headers-8">HTTP request headers</h3>
 <ul>
 <li><strong>Content-Type</strong>: Not defined</li>
 <li><strong>Accept</strong>: Not defined</li>
