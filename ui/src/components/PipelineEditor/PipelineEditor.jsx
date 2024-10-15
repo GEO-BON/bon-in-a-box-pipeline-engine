@@ -640,6 +640,9 @@ export default function PipelineEditor(props) {
       // Destructuring copy to leave out fields that are not part of the input description spec.
       const { file, nodeId, inputId, ...copy } = input;
       copy.weight = i
+      if(copy.example === undefined)
+        copy.example = null;
+
       flow.inputs[id] = copy;
     });
 

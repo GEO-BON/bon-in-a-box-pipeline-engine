@@ -96,7 +96,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                   }
 
                   {!isEmptyObject(theRest) && yaml.dump(theRest)}
-                  {example
+                  {example !== undefined
                     ? <>
                       Example:
                       <br />
