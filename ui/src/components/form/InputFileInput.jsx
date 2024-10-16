@@ -73,8 +73,8 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                   <label htmlFor={inputId}>
                     {label ? <strong>{label}</strong> : <p className='error'>Missing label for input "{inputId}"</p>}
                     {! /^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId)
-                      && !inputId.startsWith("pipeline@")
-                      && <p className='warning'>{inputId} should be a snake_case id</p>
+                      && !/pipeline@\d+$/.test(inputId)
+                      && <p className='warning'>Input id {inputId.replace(/^(.*\|)/, '')} should be a snake_case id</p>
                     }
                   </label>
                   <ScriptInput
