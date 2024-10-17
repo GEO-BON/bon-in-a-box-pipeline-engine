@@ -95,24 +95,32 @@ export default function Main(props: any) {
           if (logTransform) {
             expression = `sqrt(${selectedLayer.band_id})`;
           }
-          const obj = {
-            assets: selectedLayerAssetName,
-            colormap_name: colormap,
-            bidx: "1",
-            expression: expression,
-          };
+
           let min = data.percentile_2;
           let max = data.percentile_98;
+          let colmap = colormap;
           if (min === max) {
             min = data.min;
             max = data.max;
+            if (data.min == data.max) {
+              if (colormap == "inferno" || colormap == "hot") {
+                colmap = "spectral";
+                setColormap(colmap);
+              }
+            }
           }
+          const obj = {
+            assets: selectedLayerAssetName,
+            colormap_name: colmap,
+            bidx: "1",
+            expression: expression,
+          };
           const rescale = `${min},${max}`;
           const params = new URLSearchParams(obj).toString();
           setSelectedLayerTiles(
             `${tiler}?url=${selectedLayer.url}&rescale=${rescale}&${params}&expression=${expression}`
           );
-          setLegend(createRangeLegendControl(min, max, cmap(colormap)));
+          setLegend(createRangeLegendControl(min, max, cmap(colmap)));
         }
       );
       GetCOGBounds(selectedLayer.url).then((b: any) => {
