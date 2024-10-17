@@ -62,7 +62,7 @@ export default function Sidebar(props: any) {
 
   const displayOutput = (output: any, type: string) => {
     if (type.includes("geotiff")) {
-    setSelectedLayer(output);
+      setSelectedLayer(output);
     } else if (type.includes("points/")) {
       let crs = "EPSG:4326";
       GetPipelineRunInputs(pipeline_run_id).then((p: any) => {
@@ -70,7 +70,9 @@ export default function Sidebar(props: any) {
           if (
             pipelineData.pipeline_inputs_desc[m].label.includes("proj") ||
             pipelineData.pipeline_inputs_desc[m].label.includes("crs") ||
-            pipelineData.pipeline_inputs_desc[m].label.toLowerCase().includes("coordinate reference system")
+            pipelineData.pipeline_inputs_desc[m].label
+              .toLowerCase()
+              .includes("coordinate reference system")
           ) {
             crs = p[m];
           }
@@ -105,9 +107,10 @@ export default function Sidebar(props: any) {
         <Grid
           sx={{
             background: `url("${output}")`,
+            backgroundColor: "#444",
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
-            width: "80vw",
+            width: "60vw",
             height: "80vh",
           }}
         ></Grid>
@@ -351,7 +354,9 @@ export default function Sidebar(props: any) {
         onClose={modalClose}
         sx={{ width: "60vw", height: "80vh", margin: "auto" }}
       >
-        <Box sx={{ width: "60vw", height: "80vh" }}>{modalContent}</Box>
+        <Box sx={{ width: "60vw", height: "80vh", margin: "auto" }}>
+          {modalContent}
+        </Box>
       </Modal>
     </Box>
   );
