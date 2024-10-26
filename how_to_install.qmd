@@ -70,6 +70,9 @@ When modifying scripts in the `/scripts` folder, servers do not need to be resta
 
 When modifying pipelines in the /pipelines folder, servers do not need to be restarted: - In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the "pipeline run" page. - When adding or renaming pipelines, refresh the browser page.
 
+### Deploying without pulling the new server
+If the server has already been deployed at least once, and low bandwith does not allow to download the latest version (this can be a few gigabytes), the server can be started with option `./server-up.sh --offline`. Use with caution, since this may create errors if elements of the repository depend on new server features.
+
 ## Deploying BON in a Box on a server {#deploying-the-servers-remotely}
 
 Installation steps on a server are the same as installing on a Linux computer, but some additional configurations need to be changed:
