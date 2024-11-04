@@ -64,7 +64,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
         {Object.entries(inputs)
           .sort((a, b) => a[1].weight - b[1].weight)
           .map(([inputId, inputDescription]) => {
-            const { label, description, options, example, ...theRest } =
+            const { label, description, options, example, weight, ...theRest } =
               inputDescription;
 
             return (
