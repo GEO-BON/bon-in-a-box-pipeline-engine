@@ -98,9 +98,10 @@ fun Application.configureRouting() {
                     val run = JSONObject()
                     val runId = file.parentFile.relativeTo(outputRoot).path.replace('/', FILE_SEPARATOR)
                     run.put("runId", runId)
-                    run.put("startTime", dateFormat.format(file.lastModified()))
+
                     val inputFile = File(file.parentFile, "input.json")
                     if (inputFile.isFile) {
+                        run.put("startTime", dateFormat.format(inputFile.lastModified()))
                         run.put("inputs", JSONObject(inputFile.readText()))
                     }
 
