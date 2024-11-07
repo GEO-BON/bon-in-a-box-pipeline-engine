@@ -558,10 +558,14 @@ export default function PipelineEditor(props) {
             prev.nodeId === newOutput.nodeId &&
             prev.outputId === newOutput.outputId
         );
-        // The label and description of previous outputs might have been modified, so we keep them as is.
-        return previousOutput && previousOutput.label
-          ? previousOutput
-          : newOutput;
+
+        if(previousOutput && previousOutput.label) {
+          // The label and description of previous outputs might have been modified, so we keep them as is.
+          return previousOutput;
+        }
+
+        newOutput.weight = previousOutputs.length;
+        return newOutput
       })
 
       newPipelineOutputs = newPipelineOutputs.sort((a, b) => a.weight - b.weight)
