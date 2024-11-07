@@ -614,7 +614,7 @@ export default function PipelineEditor(props) {
     if (!reactFlowInstance)
       return null
 
-    const flow = reactFlowInstance.toObject();
+    const flow = _lang.cloneDeep(reactFlowInstance.toObject());
 
     // react-flow properties that are not necessary to rebuild graph when loading
     flow.nodes.forEach((node) => {
