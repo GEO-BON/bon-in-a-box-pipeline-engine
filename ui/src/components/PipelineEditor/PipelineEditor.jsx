@@ -122,6 +122,10 @@ export default function PipelineEditor(props) {
     setModal(currentModal => currentModal === modalName ? null : currentModal)
   }, [setModal])
 
+  const hideCurrentModal = useCallback(() => {
+    setModal(null)
+  }, [setModal])
+
   // We need this since the functions passed through node data retain their old selectedNodes state.
   // Note that the stratagem fails if trying to add edges from many sources at the same time.
   const [pendingEdgeParams, addEdgeWithHighlight] = useState(null);
@@ -720,7 +724,13 @@ export default function PipelineEditor(props) {
     }
   }, [showAlert, generateSaveJSON]);
 
-  const onLoadFromFileBtnClick = () => inputFile.current.click(); // will call onLoad
+  const onLoadFromFileBtnClick = useCallback(() => {
+    if(hasUnsavedChanges) {
+      setModal("unsavedLoadFromFile")
+    } else {
+      inputFile.current.click(); // will call onLoad
+    }
+  }, [inputFile, hasUnsavedChanges])
 
   const onLoadFromFile = (clickEvent) => {
     clickEvent.stopPropagation();
@@ -761,20 +771,11 @@ export default function PipelineEditor(props) {
         let options = {};
         Object.entries(pipelineMap).forEach(([descriptionFile, pipelineName]) =>
           (options[descriptionFile + ' (' + pipelineName + ')'] = () => {
-            api.getPipeline(descriptionFile, (error, data, response) => {
-              if (error) {
-                showAlert(
-                  'error',
-                  'Error loading the pipeline',
-                  (response && response.text) ? response.text : error.toString()
-                )
-              } else {
-                setCurrentFileName(descriptionFile);
-                localStorage.setItem("currentFileName", descriptionFile);
-                setSavedJSON(JSON.stringify(data, null, 2));
-                onLoadFlow(data);
-              }
-            });
+            if (hasUnsavedChanges) {
+              setModal("unsavedLoadFromServer:" + descriptionFile)
+            } else {
+              loadFromServer(descriptionFile)
+            }
           })
         );
         setPopupMenuOptions(options);
@@ -933,6 +934,23 @@ export default function PipelineEditor(props) {
     onPopupMenu,
     showAlert
   ]);
+
+  const loadFromServer = useCallback((descriptionFile) => {
+    api.getPipeline(descriptionFile, (error, data, response) => {
+      if (error) {
+        showAlert(
+          'error',
+          'Error loading the pipeline',
+          (response && response.text) ? response.text : error.toString()
+        )
+      } else {
+        setCurrentFileName(descriptionFile);
+        localStorage.setItem("currentFileName", descriptionFile);
+        setSavedJSON(JSON.stringify(data, null, 2));
+        onLoadFlow(data);
+      }
+    });
+  }, [showAlert, setCurrentFileName, setSavedJSON, onLoadFlow])
 
   const saveFileToServer = useCallback((descriptionFile) => {
     api.getListOf("pipeline", (error, pipelineList, response) => {
@@ -1095,7 +1113,7 @@ export default function PipelineEditor(props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setModal('saveAs')}>Cancel</Button>
-          <Button onClick={() => {hideModal('overwrite'); onSave(currentFileName)}} autoFocus>
+          <Button onClick={() => { hideModal('overwrite'); onSave(currentFileName) }} autoFocus>
             Overwrite
           </Button>
         </DialogActions>
@@ -1114,6 +1132,29 @@ export default function PipelineEditor(props) {
         <DialogActions>
           <Button onClick={handleLeavePageModalClose}>Stay</Button>
           <Button onClick={blocker.proceed}>Leave</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={(modal ?? false) &&
+          (modal === "unsavedLoadFromFile" || modal.startsWith("unsavedLoadFromServer:"))}
+        onClose={hideCurrentModal}
+      >
+        <DialogTitle>Unsaved changes</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            There are unsaved modifications that will be lost when loading the new pipeline.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={hideCurrentModal}>Stay</Button>
+          <Button onClick={() => {
+            hideCurrentModal();
+            if (modal === "unsavedLoadFromFile") inputFile.current.click()
+            else loadFromServer(modal.substring("unsavedLoadFromServer:".length))
+          }}>
+            Leave
+          </Button>
         </DialogActions>
       </Dialog>
 
