@@ -22,20 +22,23 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
   }
 
   if (type.endsWith('[]')) {
+    const onUpdateArray = event => {
+      const newValue = event.target.value
+      if (!newValue || newValue === "") {
+        onValueUpdated([])
+      } else {
+        onValueUpdated(event.target.value.split(',').map(v => v.trim()))
+      }
+    }
+
     return <AutoResizeTextArea {...passedProps}
       value={joinIfArray(fieldValue)}
       onChange={e => setFieldValue(e.target.value)}
       placeholder={ARRAY_PLACEHOLDER}
       keepWidth={true}
       cols={cols}
-      onBlur={e => {
-        const newValue = e.target.value
-        if (!newValue || newValue === "") {
-          onValueUpdated([])
-        } else {
-          onValueUpdated(e.target.value.split(',').map(v => v.trim()))
-        }
-      }}
+      onBlur={onUpdateArray}
+      onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
     />
   }
 
@@ -98,10 +101,11 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
       }
 
       if (fieldValue && fieldValue.includes("\n")) {
+        props.onKeyDown = (e) => e.ctrlKey && updateValue(e)
         return <AutoResizeTextArea keepWidth={true} cols={cols} {...props} />
       } else {
         return <input type='text' {...props}
-          onKeyDown={e => { if (e.key === "Enter") updateValue(e) }} />
+          onKeyDown={e => { if (e.key === "Enter" || e.ctrlKey) updateValue(e) }} />
       }
   }
 }
