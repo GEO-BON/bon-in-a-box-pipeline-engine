@@ -236,6 +236,9 @@ class ScriptRun( // Constructor used in single script run
                                     set -o pipefail
                                     echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
 
+                                    trap "rm -rf $condaEnvFile.lock 2>/dev/null" SIGINT SIGTERM EXIT
+                                    while ! mkdir $condaEnvFile.lock 2>/dev/null; do echo "waiting for conda lockfile..."; sleep 2s; done;
+
                                     if [ ! -f "$condaEnvFile.yml" ]; then
                                         echo "Creating new conda environment $condaEnvName..."
                                         createLogs=$(mamba env create -f $condaEnvFile.2.yml 2>&1 | tee -a ${logFile.absolutePath})
@@ -271,6 +274,8 @@ class ScriptRun( // Constructor used in single script run
                                         mamba env create -f $condaEnvFile.yml
                                         mamba activate $condaEnvName
                                     fi
+
+                                    rm -rf $condaEnvFile.lock 2>/dev/null
                                 """.trimIndent()
                             } else {
                                 """
