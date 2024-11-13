@@ -236,8 +236,9 @@ class ScriptRun( // Constructor used in single script run
                                     set -o pipefail
                                     echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
 
-                                    trap "rm -rf $condaEnvFile.lock 2>/dev/null" SIGINT SIGTERM EXIT
                                     while ! mkdir $condaEnvFile.lock 2>/dev/null; do echo "waiting for conda lockfile..."; sleep 2s; done;
+                                    trap "echo 'Removing conda lock file for interrupted process'; rm -rf $condaEnvFile.lock 2>/dev/null; exit 1" SIGINT SIGTERM
+                                    echo "Conda lock file acquired"
 
                                     if [ ! -f "$condaEnvFile.yml" ]; then
                                         echo "Creating new conda environment $condaEnvName..."
@@ -275,7 +276,9 @@ class ScriptRun( // Constructor used in single script run
                                         mamba activate $condaEnvName
                                     fi
 
+                                    echo "Removing conda lock file"
                                     rm -rf $condaEnvFile.lock 2>/dev/null
+                                    trap - SIGINT SIGTERM
                                 """.trimIndent()
                             } else {
                                 """
