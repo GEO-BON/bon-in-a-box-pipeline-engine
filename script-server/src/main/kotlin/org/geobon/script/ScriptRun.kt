@@ -361,7 +361,7 @@ class ScriptRun( // Constructor used in single script run
                                             process.destroy()
                                         }
 
-                                        if (!process.waitFor(10, TimeUnit.SECONDS)) {
+                                        if (!process.waitFor(30, TimeUnit.SECONDS)) {
                                             log(logger::info, "$event: cancellation timeout elapsed.")
                                             process.destroyForcibly()
                                         }
