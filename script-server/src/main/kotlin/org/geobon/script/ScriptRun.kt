@@ -340,13 +340,14 @@ class ScriptRun( // Constructor used in single script run
 
                                         if (pidFile.exists() && container.isExternal()) {
                                             val pid = pidFile.readText().trim()
-                                            log(logger::debug, "$event: killing runner process '$pid'")
+                                            log(logger::debug, "$event: gracefully stopping runner process '$pid'")
 
                                             ProcessBuilder(container.dockerCommandList + listOf(
                                                     "kill", "-s", "TERM", pid
                                             )).start()
 
-                                            if (!process.waitFor(10, TimeUnit.SECONDS)) {
+                                            if (!process.waitFor(30, TimeUnit.SECONDS)) {
+                                                log(logger::debug, "$event: forcefully stopping runner process '$pid' after 30 seconds")
                                                 ProcessBuilder(container.dockerCommandList + listOf(
                                                         "kill", "-s", "KILL", pid
                                                 )).start()
