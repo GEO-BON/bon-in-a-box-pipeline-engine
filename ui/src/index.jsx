@@ -11,7 +11,7 @@ import {
 import { PipelinePage } from "./components/PipelinePage";
 import StepChooser from "./components/PipelineEditor/StepChooser";
 import { Layout } from "./Layout";
-import Versions from "./components/Versions";
+import InfoPage from "./components/InfoPage";
 import RunHistory from "./components/RunHistory";
 import { Spinner } from "./components/Spinner";
 const PipelineEditor = lazy(() =>
@@ -70,8 +70,8 @@ function App() {
       element: <Layout right={<RunHistory />} />,
     },
     {
-      path: "versions",
-      element: <Layout right={<Versions />} />,
+      path: "info",
+      element: <Layout right={<InfoPage />} />,
     },
     {
       path: "*",
