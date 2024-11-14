@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>readme-dev – BON in a Box</title>
+<title>About – BON in a Box</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -89,7 +89,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
@@ -120,243 +120,64 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#developer-documentation" id="toc-developer-documentation" class="nav-link active" data-scroll-target="#developer-documentation">Developer documentation</a>
-  <ul class="collapse">
-  <li><a href="#contributing" id="toc-contributing" class="nav-link" data-scroll-target="#contributing">Contributing</a></li>
-  <li><a href="#getting-the-code" id="toc-getting-the-code" class="nav-link" data-scroll-target="#getting-the-code">Getting the code</a></li>
-  <li><a href="#ide-setup" id="toc-ide-setup" class="nav-link" data-scroll-target="#ide-setup">IDE setup</a></li>
-  <li><a href="#launching-the-dockers-in-development-mode" id="toc-launching-the-dockers-in-development-mode" class="nav-link" data-scroll-target="#launching-the-dockers-in-development-mode">Launching the dockers in development mode</a></li>
-  <li><a href="#releasing-a-server-version" id="toc-releasing-a-server-version" class="nav-link" data-scroll-target="#releasing-a-server-version">Releasing a server version</a>
-  <ul class="collapse">
-  <li><a href="#creating-a-staging-build" id="toc-creating-a-staging-build" class="nav-link" data-scroll-target="#creating-a-staging-build">Creating a staging build</a></li>
-  <li><a href="#public-release" id="toc-public-release" class="nav-link" data-scroll-target="#public-release">Public release</a></li>
-  <li><a href="#debugging-prod-servers" id="toc-debugging-prod-servers" class="nav-link" data-scroll-target="#debugging-prod-servers">Debugging prod servers</a></li>
-  </ul></li>
-  <li><a href="#microservice-infrastructure" id="toc-microservice-infrastructure" class="nav-link" data-scroll-target="#microservice-infrastructure">Microservice infrastructure</a></li>
-  <li><a href="#script-lifecycle-artifacts" id="toc-script-lifecycle-artifacts" class="nav-link" data-scroll-target="#script-lifecycle-artifacts">Script lifecycle &amp; artifacts</a></li>
-  <li><a href="#openapi-specification" id="toc-openapi-specification" class="nav-link" data-scroll-target="#openapi-specification">OpenAPI specification</a>
-  <ul class="collapse">
-  <li><a href="#single-script-scenario" id="toc-single-script-scenario" class="nav-link" data-scroll-target="#single-script-scenario">Single-script scenario</a></li>
-  <li><a href="#pipeline-scenario" id="toc-pipeline-scenario" class="nav-link" data-scroll-target="#pipeline-scenario">Pipeline scenario</a></li>
-  <li><a href="#editing-the-openapi-specification-of-the-script-server" id="toc-editing-the-openapi-specification-of-the-script-server" class="nav-link" data-scroll-target="#editing-the-openapi-specification-of-the-script-server">Editing the OpenAPI specification of the script-server</a></li>
-  </ul></li>
-  <li><a href="#debugging-signal-forwarding" id="toc-debugging-signal-forwarding" class="nav-link" data-scroll-target="#debugging-signal-forwarding">Debugging signal forwarding</a></li>
-  </ul></li>
+  <li><a href="#what-is-bon-in-a-boxs-pipeline-engine" id="toc-what-is-bon-in-a-boxs-pipeline-engine" class="nav-link active" data-scroll-target="#what-is-bon-in-a-boxs-pipeline-engine">What is BON in a Box’s pipeline engine?</a></li>
+  <li><a href="#why-do-we-need-this-platform" id="toc-why-do-we-need-this-platform" class="nav-link" data-scroll-target="#why-do-we-need-this-platform">Why do we need this platform?</a></li>
+  <li><a href="#what-is-a-pipeline" id="toc-what-is-a-pipeline" class="nav-link" data-scroll-target="#what-is-a-pipeline">What is a pipeline?</a></li>
+  <li><a href="#why-should-you-contribute" id="toc-why-should-you-contribute" class="nav-link" data-scroll-target="#why-should-you-contribute">Why should you contribute?</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">About</h1>
+</div>
 
 
 
-<section id="developer-documentation" class="level1">
-<h1>Developer documentation</h1>
-<section id="contributing" class="level2">
-<h2 class="anchored" data-anchor-id="contributing">Contributing</h2>
-<p>If you wish to contribute code to this pipeline engine, please let us know at web@geobon.org.</p>
-<p>The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup in the user documentation. You can create a branch or fork to save your work. Once complete, open a pull request to this repository. The pull request will be peer-reviewed before acceptation.</p>
-</section>
-<section id="getting-the-code" class="level2">
-<h2 class="anchored" data-anchor-id="getting-the-code">Getting the code</h2>
-<p>The code in this repository runs an engine, but the engine needs content! Here are the steps to start the server in development mode with the BON in a Box scripts and pipelines:</p>
-<ol start="0" type="1">
-<li>docker and docker compose must be installed.</li>
-<li>Clone this repo: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipeline-engine.git pipeline-engine</code></li>
-<li><code>cd pipeline-engine</code></li>
-<li>Clone the BON in a Box repo (or any compatible repo of your choice) <strong>into the pipeline-repo folder</strong>: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git pipeline-repo</code></li>
-<li>Create a runner.env file as per <a href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_install.html#deploying-the-servers-locally">user instructions</a>.</li>
-<li><code>cd ..</code></li>
-<li>Pull the pre-compiled images: <code>./dev-server.sh pull</code></li>
-</ol>
-</section>
-<section id="ide-setup" class="level2">
-<h2 class="anchored" data-anchor-id="ide-setup">IDE setup</h2>
-<p>For the global project, Visual Studio Code. Recommended extensions:</p>
-<ul>
-<li>Git graph</li>
-<li>Markdown Preview Mermaid</li>
-<li>Mermaid Markdown Syntax Highlighting</li>
-</ul>
-<p>For the script-server (Kotlin code), IntelliJ Idea. Note that on Linux there will be an ownership conflict between gradle files generated by the development docker and those from the IDE. To solve this, make sure to stop the dockers and run <code>sudo chown -R &lt;yourinfo&gt;:&lt;yourinfo&gt; .</code> before running the tests in IntelliJ.</p>
-</section>
-<section id="launching-the-dockers-in-development-mode" class="level2">
-<h2 class="anchored" data-anchor-id="launching-the-dockers-in-development-mode">Launching the dockers in development mode</h2>
-<ol type="1">
-<li><p>Build the remaining images: <code>./dev-server.sh build</code></p></li>
-<li><p>Start the development server: <code>./dev-server.sh up</code></p>
-<ul>
-<li>If there is a container name conflict, run <code>./dev-server.sh clean</code></li>
-</ul></li>
-</ol>
-<p>This command enables:</p>
-<ul>
-<li>OpenAPI editor at http://localhost/swagger/</li>
-<li>UI server: React automatic hot-swapping</li>
-<li>Script-server: Kotlin hot-swapping by launching <a href="../script-server/hotswap.sh">./script-server/hotswap.sh</a></li>
-<li>NGINX: <a href="../http-proxy/conf.d/ngnix.conf">http-proxy/conf.d/ngnix.conf</a> will be loaded</li>
-</ul>
-<p>Once in a while you should use <code>docker compose -f compose.yml -f compose.dev.yml pull</code> to have the latest base images.</p>
-</section>
-<section id="releasing-a-server-version" class="level2">
-<h2 class="anchored" data-anchor-id="releasing-a-server-version">Releasing a server version</h2>
-<p>The servers are versionned by date of build of the docker image. One can check the version in the version tab of the UI.</p>
-<section id="creating-a-staging-build" class="level3">
-<h3 class="anchored" data-anchor-id="creating-a-staging-build">Creating a staging build</h3>
-<ol type="1">
-<li>Create a branch that ends with “staging” from the head of the main branch.</li>
-<li>Merge your changes to that branch. The docker hub GH action will trigger for branch main and any branch with name ending by “staging”. The branch name is appended to the tag of the docker image. See
-<ul>
-<li><a href=".github/workflows/docker_ui.yml">.github/workflows/docker_script-server.yml</a></li>
-<li><a href=".github/workflows/docker_ui.yml">.github/workflows/docker_ui.yml</a></li>
-</ul></li>
-<li><strong>Caveat:</strong> this only compiles the image where the paths were modified. For example, if <code>viewer</code> folder is modified, only the gateway will be rebuilt. However, the server will look for both images with the same prefix. In this case <code>script-server-staging</code> might not exist, or might be outdated. It is possible to launch the build of the script-server manually to make sure it exists and is up to date.
-<ol type="1">
-<li>On github website, navigate to the Actions tab</li>
-<li>open the desired action</li>
-<li>Click on the arrow next to “run workflow”</li>
-<li>Select the desired staging branch</li>
-<li>Run workflow</li>
-<li>Wait for completion</li>
-</ol></li>
-<li>It is now possible to test the staging prod servers by running <code>./server-up.sh &lt;branchname&gt;</code>. The launch script will look for this special tag in the docker hub.For example, <code>./server-up.sh staging</code> will download and use both “gateway-staging” and “script-server-staging” images.</li>
-<li>Send the above command to a few beta users.</li>
-</ol>
-</section>
-<section id="public-release" class="level3">
-<h3 class="anchored" data-anchor-id="public-release">Public release</h3>
-<p>The changes are live as soon as they are merged to main branch: the dockers are built, pushed to <a href="https://hub.docker.com/r/geobon/bon-in-a-box">geobon’s docker hub</a>, and next time someone starts the server, the new dockers will be pulled.</p>
-</section>
-<section id="debugging-prod-servers" class="level3">
-<h3 class="anchored" data-anchor-id="debugging-prod-servers">Debugging prod servers</h3>
-<p>Yes, we all know problems occur in production that do not happen in dev mode. So in order to build and test production dockers locally, do the following:</p>
-<ol type="1">
-<li><p>In pipeline-repo folder, delete the .server folder.</p></li>
-<li><p>Create a symbolic link from .server to the parent: <code>ln -s ../ .server</code></p></li>
-<li><p>Build the server with <code>.server/prod-server.sh command build</code></p></li>
-<li><p>Then run it with <code>.server/prod-server.sh command up</code></p>
-<p>(<code>.server/prod-server.sh clean</code> might be needed if you get the usual name conflict error)</p></li>
-<li><p>Stop the process with ctrl+c unless you used -d option in the previous command.</p></li>
-</ol>
-<p><em>Warning: Undo this by removing the symlink if you are to use <code>./server-up.sh</code> for a regular launch of the production servers, otherwise it will checkout files in your parent pipeline engine repo though the symlink.</em></p>
-</section>
-</section>
-<section id="microservice-infrastructure" class="level2">
-<h2 class="anchored" data-anchor-id="microservice-infrastructure">Microservice infrastructure</h2>
-<pre class="mermaid"><code>stateDiagram-v2
-    state "script-server" as script
-    state "scripts (static)" as scripts
-    state "output (static)" as output
-    state "R runner" as r
-    state "Julia runner" as julia
+<div class="quarto-title-meta">
 
-    [*] --&gt; ngnix
-    ngnix --&gt; ui
-    ngnix --&gt; viewer
-    ngnix --&gt; script
-    ngnix --&gt; output
-    script --&gt; scripts
-    script --&gt; r
-    script --&gt; julia</code></pre>
-<ul>
-<li>ui and viewer: React front-end. In production, those are served statically in the NGINX gateway.</li>
-<li>script-server: Running scripts and pipeline orchestration</li>
-<li>R runner: Docker dedicated to runs R code, with most relevant packages pre-installed</li>
-<li>Julia runner: Docker dedicated to runs Julia code</li>
-</ul>
-<p>In addition to these services,</p>
-<ul>
-<li><a href="../scripts/">scripts</a> folder contains all the scripts that can be run.</li>
-<li><a href="../output/">output</a> folder contains all scripts result.</li>
-</ul>
-</section>
-<section id="script-lifecycle-artifacts" class="level2">
-<h2 class="anchored" data-anchor-id="script-lifecycle-artifacts">Script lifecycle &amp; artifacts</h2>
-<pre class="mermaid"><code>flowchart TD
- never[Never ran] --&gt; running[Running]
- running --&gt; input[(- run folder\n- input.json)]
- running --&gt; log[(log file)]
- running --&gt; success{Success?}
- success --&gt; |Yes| Done
- Done --&gt; output[(output.json)]
- success --&gt; |No| Failed
- Failed --&gt; |Add error flag|output</code></pre>
-</section>
-<section id="openapi-specification" class="level2">
-<h2 class="anchored" data-anchor-id="openapi-specification">OpenAPI specification</h2>
-<p>The <a href="../script-server/api/openapi.yaml">OpenApi specification file</a> is used by the UI to launch runs and track them until completion.</p>
-<section id="single-script-scenario" class="level3">
-<h3 class="anchored" data-anchor-id="single-script-scenario">Single-script scenario</h3>
-<pre class="mermaid"><code>sequenceDiagram
-    ui-&gt;&gt;script_server: script/list
-    script_server--&gt;&gt;ui: json map of scripts -&gt; names
-
-    ui-&gt;&gt;script_server: script/{path}/info
-    script_server--&gt;&gt;ui: script info json
-
-    ui-&gt;&gt;script_server: script/run
-    script_server-&gt;&gt;script: launch
-    script_server--&gt;&gt;ui: runId
-
-    loop Until output.json file generated
-        ui-&gt;&gt;script_server: output/{runId}/logs.txt
-        script_server--&gt;&gt;ui: logs text
-
-        ui-&gt;&gt;script_server: output/{id}/output.json
-    end
+    
+  
+    
+  </div>
+  
 
 
-    script--&gt;&gt;script_server: output.json
-
-    ui-&gt;&gt;script_server: output/{runId}/output.json
-    script_server--&gt;&gt;ui: script output json
-</code></pre>
-</section>
-<section id="pipeline-scenario" class="level3">
-<h3 class="anchored" data-anchor-id="pipeline-scenario">Pipeline scenario</h3>
-<pre class="mermaid"><code>sequenceDiagram
-    ui-&gt;&gt;script_server: pipeline/list
-    script_server--&gt;&gt;ui: json map of pipeline -&gt; names
-
-    ui-&gt;&gt;script_server: pipeline/{path}/info
-    script_server--&gt;&gt;ui: pipeline info json
-
-    ui-&gt;&gt;script_server: pipeline/{path}/run
-    script_server--&gt;&gt;ui: runId
-    loop For each step
-        script_server-&gt;&gt;script: run
-        Note right of script: see previous diagram
-        script--&gt;&gt;script_server: output.json (script)
-        ui-&gt;&gt;script_server: pipeline/{runId}/outputs
-        script_server--&gt;&gt;ui: pipelineOutput.json (pipeline)
-    end
-</code></pre>
-<p>Every second, the UI polls for:</p>
-<ul>
-<li>pipelineOutput.json from the pipeline, to get the output folders of individual scripts. Stops polling when pipeline stops.</li>
-<li>logs.txt of individual scripts, for realtime logging, only if log section is opened. Stops when individual script completes, or when log section closed.</li>
-<li>output.json of individual scripts, to know when script completes and display its outputs. Stops when script stops.</li>
-</ul>
-</section>
-<section id="editing-the-openapi-specification-of-the-script-server" class="level3">
-<h3 class="anchored" data-anchor-id="editing-the-openapi-specification-of-the-script-server">Editing the OpenAPI specification of the script-server</h3>
-<ol type="1">
-<li>Using http://localhost/swagger, edit the specification.</li>
-<li>Copy the result to <a href="../script-server/api/openapi.yaml">script-server/api/openapi.yaml</a></li>
-<li>Use <a href="../ui/BonInABoxScriptService/generate-client.sh">ui/BonInABoxScriptService/generate-client.sh</a> and <a href="../script-server/generate-server-openapitools.sh">script-server/generate-server-openapitools.sh</a> to regenerate the client and the server.</li>
-<li>Merge carefully, not all generated code is to be kept.</li>
-<li>Implement the gaps.</li>
-</ol>
-</section>
-</section>
-<section id="debugging-signal-forwarding" class="level2">
-<h2 class="anchored" data-anchor-id="debugging-signal-forwarding">Debugging signal forwarding</h2>
-<p>Since runner-conda and runner-julia run in a separate docker, when the user stops the pipeline, the signal must go from the script-server, to the runner, to the running script. Docker does not allow this by default, this is why we save the PID in a file and use a separate exec command to kill the process.</p>
-<p>The PID file is called <code>.pid</code> and is located in the output folder of the run. It is deleted when the script completes. For details, see <a href="./script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt">ScriptRun.kt</a>.</p>
+</header>
 
 
+<p>BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration, as well as a project catalogue. <em>For more information about BON in a Box in general, please refer to <a href="https://boninabox.geobon.org/about">BON in a Box’s website</a></em></p>
+<section id="what-is-bon-in-a-boxs-pipeline-engine" class="level1">
+<h1>What is BON in a Box’s pipeline engine?</h1>
+<p>BON in a Box now provides an open-source, fully transparent platform that allows users to contribute data and analysis pipelines to calculate indicators which can then be used for reporting to assess progress towards biodiversity targets. BON in Box can integrate diverse data and expert knowledge, from Earth observation to genetic diversity metrics to calculate monitoring framework indicators.</p>
+<p>We present here the BON in a Box pipeline engine as the ultimate ecosystem for harmonizing biodiversity observations, fostering efficiency, and amplifying the power of data-driven insights.</p>
+<p>It is a community-contributed and open-source data to biodiversity indicator or data to Essential Biodiversity Variable (EBV) workflow repository curated by GEO BON. Its engine allows to seamlessly connect steps in different languages (R, Julia, Python) through a modular pipeline approach that reads both from user-provided and publicly available data sources. These pipelines combine local and global data sources in the EBVs and biodiversity indicators calculations.</p>
 </section>
+<section id="why-do-we-need-this-platform" class="level1">
+<h1>Why do we need this platform?</h1>
+<p>Scientists around the world are developing tools to create workflows to calculate essential biodiversity variables and indicators to report on biodiversity change. However, there are almost no platforms to share these workflows and tools, leading to duplication of effort. BON in a Box allows networks to share and enhance each other’s work.</p>
+<p>Additionally, organisations often lack the technical capabilities to calculate these indicators to monitor biodiversity, which impairs decision-making. BON in a Box can bridge the gap between those knowing how to calculate, and those needing the indicators for monitoring and conservation.</p>
+</section>
+<section id="what-is-a-pipeline" class="level1">
+<h1>What is a pipeline?</h1>
+<p>A pipeline is a collection of steps needed to transform input data into valuable output for the stakeholder in an automated way. It can be an EBV, an indicator, or anything useful to analysis and decision-making in the context of biodiversity conservation and natural resource management.</p>
+<p>The smaller steps composing a pipeline are scripts. These scripts also convert input data into valuable outputs, just like pipelines, but at a finer scale: cleaning, augmenting, standardizing, or performing statistical analyses. Importantly, these scripts can be reused or repurposed across varied contexts. For instance, data cleaning scripts could be applied to multiple pipelines that utilize similar types of data, enhancing efficiency and consistency in data processing workflows. Since the outputs are in-between every step, the pipeline can make abstraction of the programming language, allowing a pipeline to mix R, python and Julia scripts without any interoperability issues.</p>
+<p>If a pipeline builds upon the results of another pipeline, this “inner pipeline” it can be included as a step in the “outer pipeline”; we call this a subpipeline. An SDM pipeline could serve to generate range maps inside a Species Habitat Index pipeline, or embedded in a Species Richness pipeline. We can thus define a step as “a script or a subpipeline performing an operation in the context of a pipeline”.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="pipeline.png" class="img-fluid figure-img"></p>
+<figcaption>Simplified pipeline with steps (blue), intermediate results (grey), and final results (green)</figcaption>
+</figure>
+</div>
+</section>
+<section id="why-should-you-contribute" class="level1">
+<h1>Why should you contribute?</h1>
+<p>Contributing to BON in a Box will increase the impact of your research by allowing your analysis workflows to be used in broader areas and contexts for decision-making. Contributors will become part of a global community to generate analyses of the state and trends of biodiversity to inform management decisions.</p>
+
+
 </section>
 
 </main> <!-- /main -->

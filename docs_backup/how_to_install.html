@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>readme-dev – BON in a Box</title>
+<title>How to Install – BON in a Box</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -93,7 +93,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./how_to_install.html"> 
+    <a class="nav-link active" href="./how_to_install.html" aria-current="page"> 
 <span class="menu-text">How to Install</span></a>
   </li>  
   <li class="nav-item">
@@ -120,243 +120,99 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#developer-documentation" id="toc-developer-documentation" class="nav-link active" data-scroll-target="#developer-documentation">Developer documentation</a>
-  <ul class="collapse">
-  <li><a href="#contributing" id="toc-contributing" class="nav-link" data-scroll-target="#contributing">Contributing</a></li>
-  <li><a href="#getting-the-code" id="toc-getting-the-code" class="nav-link" data-scroll-target="#getting-the-code">Getting the code</a></li>
-  <li><a href="#ide-setup" id="toc-ide-setup" class="nav-link" data-scroll-target="#ide-setup">IDE setup</a></li>
-  <li><a href="#launching-the-dockers-in-development-mode" id="toc-launching-the-dockers-in-development-mode" class="nav-link" data-scroll-target="#launching-the-dockers-in-development-mode">Launching the dockers in development mode</a></li>
-  <li><a href="#releasing-a-server-version" id="toc-releasing-a-server-version" class="nav-link" data-scroll-target="#releasing-a-server-version">Releasing a server version</a>
-  <ul class="collapse">
-  <li><a href="#creating-a-staging-build" id="toc-creating-a-staging-build" class="nav-link" data-scroll-target="#creating-a-staging-build">Creating a staging build</a></li>
-  <li><a href="#public-release" id="toc-public-release" class="nav-link" data-scroll-target="#public-release">Public release</a></li>
-  <li><a href="#debugging-prod-servers" id="toc-debugging-prod-servers" class="nav-link" data-scroll-target="#debugging-prod-servers">Debugging prod servers</a></li>
-  </ul></li>
-  <li><a href="#microservice-infrastructure" id="toc-microservice-infrastructure" class="nav-link" data-scroll-target="#microservice-infrastructure">Microservice infrastructure</a></li>
-  <li><a href="#script-lifecycle-artifacts" id="toc-script-lifecycle-artifacts" class="nav-link" data-scroll-target="#script-lifecycle-artifacts">Script lifecycle &amp; artifacts</a></li>
-  <li><a href="#openapi-specification" id="toc-openapi-specification" class="nav-link" data-scroll-target="#openapi-specification">OpenAPI specification</a>
-  <ul class="collapse">
-  <li><a href="#single-script-scenario" id="toc-single-script-scenario" class="nav-link" data-scroll-target="#single-script-scenario">Single-script scenario</a></li>
-  <li><a href="#pipeline-scenario" id="toc-pipeline-scenario" class="nav-link" data-scroll-target="#pipeline-scenario">Pipeline scenario</a></li>
-  <li><a href="#editing-the-openapi-specification-of-the-script-server" id="toc-editing-the-openapi-specification-of-the-script-server" class="nav-link" data-scroll-target="#editing-the-openapi-specification-of-the-script-server">Editing the OpenAPI specification of the script-server</a></li>
-  </ul></li>
-  <li><a href="#debugging-signal-forwarding" id="toc-debugging-signal-forwarding" class="nav-link" data-scroll-target="#debugging-signal-forwarding">Debugging signal forwarding</a></li>
-  </ul></li>
+  <li><a href="#deploying-the-servers-locally" id="toc-deploying-the-servers-locally" class="nav-link active" data-scroll-target="#deploying-the-servers-locally">Deploying BON in a Box locally</a></li>
+  <li><a href="#deploying-the-servers-remotely" id="toc-deploying-the-servers-remotely" class="nav-link" data-scroll-target="#deploying-the-servers-remotely">Deploying BON in a Box on a server</a></li>
+  <li><a href="#running-a-script-or-pipeline" id="toc-running-a-script-or-pipeline" class="nav-link" data-scroll-target="#running-a-script-or-pipeline">Running a script or pipeline</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">How to Install</h1>
+</div>
 
 
 
-<section id="developer-documentation" class="level1">
-<h1>Developer documentation</h1>
-<section id="contributing" class="level2">
-<h2 class="anchored" data-anchor-id="contributing">Contributing</h2>
-<p>If you wish to contribute code to this pipeline engine, please let us know at web@geobon.org.</p>
-<p>The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup in the user documentation. You can create a branch or fork to save your work. Once complete, open a pull request to this repository. The pull request will be peer-reviewed before acceptation.</p>
-</section>
-<section id="getting-the-code" class="level2">
-<h2 class="anchored" data-anchor-id="getting-the-code">Getting the code</h2>
-<p>The code in this repository runs an engine, but the engine needs content! Here are the steps to start the server in development mode with the BON in a Box scripts and pipelines:</p>
-<ol start="0" type="1">
-<li>docker and docker compose must be installed.</li>
-<li>Clone this repo: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipeline-engine.git pipeline-engine</code></li>
-<li><code>cd pipeline-engine</code></li>
-<li>Clone the BON in a Box repo (or any compatible repo of your choice) <strong>into the pipeline-repo folder</strong>: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git pipeline-repo</code></li>
-<li>Create a runner.env file as per <a href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_install.html#deploying-the-servers-locally">user instructions</a>.</li>
-<li><code>cd ..</code></li>
-<li>Pull the pre-compiled images: <code>./dev-server.sh pull</code></li>
-</ol>
-</section>
-<section id="ide-setup" class="level2">
-<h2 class="anchored" data-anchor-id="ide-setup">IDE setup</h2>
-<p>For the global project, Visual Studio Code. Recommended extensions:</p>
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The user interface allows to run and edit pipelines. It is used through the browser, but doesn’t need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.</p>
+<section id="deploying-the-servers-locally" class="level2">
+<h2 class="anchored" data-anchor-id="deploying-the-servers-locally">Deploying BON in a Box locally</h2>
+<p>BON in a Box can be installed and ran on a local computer. While personnal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.</p>
+<p>Prerequisites :</p>
 <ul>
-<li>Git graph</li>
-<li>Markdown Preview Mermaid</li>
-<li>Mermaid Markdown Syntax Highlighting</li>
-</ul>
-<p>For the script-server (Kotlin code), IntelliJ Idea. Note that on Linux there will be an ownership conflict between gradle files generated by the development docker and those from the IDE. To solve this, make sure to stop the dockers and run <code>sudo chown -R &lt;yourinfo&gt;:&lt;yourinfo&gt; .</code> before running the tests in IntelliJ.</p>
-</section>
-<section id="launching-the-dockers-in-development-mode" class="level2">
-<h2 class="anchored" data-anchor-id="launching-the-dockers-in-development-mode">Launching the dockers in development mode</h2>
-<ol type="1">
-<li><p>Build the remaining images: <code>./dev-server.sh build</code></p></li>
-<li><p>Start the development server: <code>./dev-server.sh up</code></p>
+<li><p>Git - A github account, with an SSH key registered. See <a href="https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account">Adding a new SSH key to your GitHub account</a>.</p></li>
+<li><p>At least 6 GB of free space (this includes the installation of Docker Desktop) - RAM requirements will depend on the scripts that you run.</p></li>
+<li><p><strong>Windows:</strong></p>
 <ul>
-<li>If there is a container name conflict, run <code>./dev-server.sh clean</code></li>
+<li><p><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> - Note that it is not necessary to make an account</p></li>
+<li><p>A Linux shell (git bash, <a href="https://learn.microsoft.com/en-us/windows/wsl/install">Bash through PowerShell</a>, cygwin, etc.) necessary to run th <code>.sh</code> scripts in the instructions below.</p></li>
 </ul></li>
-</ol>
-<p>This command enables:</p>
+<li><p><strong>Mac:</strong></p>
 <ul>
-<li>OpenAPI editor at http://localhost/swagger/</li>
-<li>UI server: React automatic hot-swapping</li>
-<li>Script-server: Kotlin hot-swapping by launching <a href="../script-server/hotswap.sh">./script-server/hotswap.sh</a></li>
-<li>NGINX: <a href="../http-proxy/conf.d/ngnix.conf">http-proxy/conf.d/ngnix.conf</a> will be loaded</li>
-</ul>
-<p>Once in a while you should use <code>docker compose -f compose.yml -f compose.dev.yml pull</code> to have the latest base images.</p>
-</section>
-<section id="releasing-a-server-version" class="level2">
-<h2 class="anchored" data-anchor-id="releasing-a-server-version">Releasing a server version</h2>
-<p>The servers are versionned by date of build of the docker image. One can check the version in the version tab of the UI.</p>
-<section id="creating-a-staging-build" class="level3">
-<h3 class="anchored" data-anchor-id="creating-a-staging-build">Creating a staging build</h3>
-<ol type="1">
-<li>Create a branch that ends with “staging” from the head of the main branch.</li>
-<li>Merge your changes to that branch. The docker hub GH action will trigger for branch main and any branch with name ending by “staging”. The branch name is appended to the tag of the docker image. See
-<ul>
-<li><a href=".github/workflows/docker_ui.yml">.github/workflows/docker_script-server.yml</a></li>
-<li><a href=".github/workflows/docker_ui.yml">.github/workflows/docker_ui.yml</a></li>
+<li><p><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> Note that it is not necessary to make an account</p></li>
+<li><p>Make sure docker is added to the path of your terminal. From a terminal, run command <code>docker run hello-world</code>. If there is an error message, see <a href="https://stackoverflow.com/a/71923962/3519951" class="uri">https://stackoverflow.com/a/71923962/3519951</a>.</p></li>
+<li><p>If you encounter error <code>no matching manifest for linux/arm64/v8 in the manifest list entries</code>, export DOCKER_DEFAULT_PLATFORM. See <a href="https://stackoverflow.com/a/76404045/3519951" class="uri">https://stackoverflow.com/a/76404045/3519951</a>.</p></li>
+<li><p>If you have a Silicon chip, check “Use Rosetta for x86_64/amd64 emulation on Apple Silicon”. See <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/issues/175">issue #175</a>.</p></li>
 </ul></li>
-<li><strong>Caveat:</strong> this only compiles the image where the paths were modified. For example, if <code>viewer</code> folder is modified, only the gateway will be rebuilt. However, the server will look for both images with the same prefix. In this case <code>script-server-staging</code> might not exist, or might be outdated. It is possible to launch the build of the script-server manually to make sure it exists and is up to date.
+<li><p><strong>Linux:</strong> Docker with Docker Compose installed. It is required to <a href="https://docs.docker.com/engine/install/linux-postinstall/">add your user to the docker group</a>.</p></li>
+</ul>
+<p>To run:</p>
 <ol type="1">
-<li>On github website, navigate to the Actions tab</li>
-<li>open the desired action</li>
-<li>Click on the arrow next to “run workflow”</li>
-<li>Select the desired staging branch</li>
-<li>Run workflow</li>
-<li>Wait for completion</li>
+<li><p>Clone repository (Windows users: do not clone the repo in a folder under OneDrive.) This can be done in terminal using the following code: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git</code> or in GitHub desktop.</p></li>
+<li><p>Provide the environment variables: - Open the newly cloned repository on your computer</p>
+<ol type="1">
+<li><p>Find the file called <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env"><code>runner-sample.env</code></a></p></li>
+<li><p>Duplicate the file and rename the copy to <code>runner.env</code>.</p></li>
+<li><p>Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g.&nbsp;GBIF or IUCN)</p></li>
+<li><p>Adjust any server option as you see fit.</p></li>
 </ol></li>
-<li>It is now possible to test the staging prod servers by running <code>./server-up.sh &lt;branchname&gt;</code>. The launch script will look for this special tag in the docker hub.For example, <code>./server-up.sh staging</code> will download and use both “gateway-staging” and “script-server-staging” images.</li>
-<li>Send the above command to a few beta users.</li>
-</ol>
-</section>
-<section id="public-release" class="level3">
-<h3 class="anchored" data-anchor-id="public-release">Public release</h3>
-<p>The changes are live as soon as they are merged to main branch: the dockers are built, pushed to <a href="https://hub.docker.com/r/geobon/bon-in-a-box">geobon’s docker hub</a>, and next time someone starts the server, the new dockers will be pulled.</p>
-</section>
-<section id="debugging-prod-servers" class="level3">
-<h3 class="anchored" data-anchor-id="debugging-prod-servers">Debugging prod servers</h3>
-<p>Yes, we all know problems occur in production that do not happen in dev mode. So in order to build and test production dockers locally, do the following:</p>
-<ol type="1">
-<li><p>In pipeline-repo folder, delete the .server folder.</p></li>
-<li><p>Create a symbolic link from .server to the parent: <code>ln -s ../ .server</code></p></li>
-<li><p>Build the server with <code>.server/prod-server.sh command build</code></p></li>
-<li><p>Then run it with <code>.server/prod-server.sh command up</code></p>
-<p>(<code>.server/prod-server.sh clean</code> might be needed if you get the usual name conflict error)</p></li>
-<li><p>Stop the process with ctrl+c unless you used -d option in the previous command.</p></li>
-</ol>
-<p><em>Warning: Undo this by removing the symlink if you are to use <code>./server-up.sh</code> for a regular launch of the production servers, otherwise it will checkout files in your parent pipeline engine repo though the symlink.</em></p>
-</section>
-</section>
-<section id="microservice-infrastructure" class="level2">
-<h2 class="anchored" data-anchor-id="microservice-infrastructure">Microservice infrastructure</h2>
-<pre class="mermaid"><code>stateDiagram-v2
-    state "script-server" as script
-    state "scripts (static)" as scripts
-    state "output (static)" as output
-    state "R runner" as r
-    state "Julia runner" as julia
-
-    [*] --&gt; ngnix
-    ngnix --&gt; ui
-    ngnix --&gt; viewer
-    ngnix --&gt; script
-    ngnix --&gt; output
-    script --&gt; scripts
-    script --&gt; r
-    script --&gt; julia</code></pre>
+<li><p>Using a linux terminal (terminal on Mac or Git Bash), navigate to the folder of the cloned repository.</p></li>
+<li><p>In the linux terminal, type <code>./server-up.sh</code></p>
 <ul>
-<li>ui and viewer: React front-end. In production, those are served statically in the NGINX gateway.</li>
-<li>script-server: Running scripts and pipeline orchestration</li>
-<li>R runner: Docker dedicated to runs R code, with most relevant packages pre-installed</li>
-<li>Julia runner: Docker dedicated to runs Julia code</li>
-</ul>
-<p>In addition to these services,</p>
+<li><p>Make sure the server is started from a linux terminal that is in the same folder as the cloned repository so it can access the files.</p></li>
+<li><p>Make sure you have docker open and running on your computer.</p></li>
+<li><p>The first execution will be long, in order to download the micro-services. The next ones will be shorter or immediate, depending on the changes.</p></li>
+<li><p>Network problems may cause the process to fail. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.</p></li>
+<li><p>Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl (“wsl –update”, see <a href="https://docs.docker.com/desktop/troubleshoot/topics/#virtualization" class="uri">https://docs.docker.com/desktop/troubleshoot/topics/#virtualization</a>. Access to the BIOS may be required to enable virtualization)</p></li>
+</ul></li>
+<li><p>Type <a href="http://localhost/" class="uri">http://localhost/</a> to open BON in a Box</p></li>
+<li><p>Run <code>./server-down.sh</code> in a terminal to stop the server when done</p></li>
+<li><p>On Windows, to completely stop the processes, you might have to run <code>wsl --shutdown</code></p></li>
+</ol>
+<p>When modifying scripts in the <code>/scripts</code> folder, servers do not need to be restarted: - When modifying an existing script, simply re-run the script from the UI and the new version will be executed. - When adding or renaming scripts, refresh the browser page.</p>
+<p>When modifying pipelines in the /pipelines folder, servers do not need to be restarted: - In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the “pipeline run” page. - When adding or renaming pipelines, refresh the browser page.</p>
+</section>
+<section id="deploying-the-servers-remotely" class="level2">
+<h2 class="anchored" data-anchor-id="deploying-the-servers-remotely">Deploying BON in a Box on a server</h2>
+<p>Installation steps on a server are the same as installing on a Linux computer, but some additional configurations need to be changed:</p>
 <ul>
-<li><a href="../scripts/">scripts</a> folder contains all the scripts that can be run.</li>
-<li><a href="../output/">output</a> folder contains all scripts result.</li>
+<li><p>In <code>runner.env</code>, choose the appropriate <code>HTTP_ADDRESS</code> and <code>HTTP_PORT</code> for your server configuration. In a typical installation, use 0.0.0.0 as an HTTP address and default port (80).</p></li>
+<li><p>In <code>runner.env</code>, select the “partial” cache cleaning mode. This will allow for calculated results to be long-lived on the server, as long as they are not run again with a new version of the script. The results in the output folder are always accessible by URL.</p></li>
+<li><p>The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.</p></li>
+<li><p>By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy and activate https with certbot. How to do this is out of scope for this readme.</p></li>
 </ul>
 </section>
-<section id="script-lifecycle-artifacts" class="level2">
-<h2 class="anchored" data-anchor-id="script-lifecycle-artifacts">Script lifecycle &amp; artifacts</h2>
-<pre class="mermaid"><code>flowchart TD
- never[Never ran] --&gt; running[Running]
- running --&gt; input[(- run folder\n- input.json)]
- running --&gt; log[(log file)]
- running --&gt; success{Success?}
- success --&gt; |Yes| Done
- Done --&gt; output[(output.json)]
- success --&gt; |No| Failed
- Failed --&gt; |Add error flag|output</code></pre>
-</section>
-<section id="openapi-specification" class="level2">
-<h2 class="anchored" data-anchor-id="openapi-specification">OpenAPI specification</h2>
-<p>The <a href="../script-server/api/openapi.yaml">OpenApi specification file</a> is used by the UI to launch runs and track them until completion.</p>
-<section id="single-script-scenario" class="level3">
-<h3 class="anchored" data-anchor-id="single-script-scenario">Single-script scenario</h3>
-<pre class="mermaid"><code>sequenceDiagram
-    ui-&gt;&gt;script_server: script/list
-    script_server--&gt;&gt;ui: json map of scripts -&gt; names
-
-    ui-&gt;&gt;script_server: script/{path}/info
-    script_server--&gt;&gt;ui: script info json
-
-    ui-&gt;&gt;script_server: script/run
-    script_server-&gt;&gt;script: launch
-    script_server--&gt;&gt;ui: runId
-
-    loop Until output.json file generated
-        ui-&gt;&gt;script_server: output/{runId}/logs.txt
-        script_server--&gt;&gt;ui: logs text
-
-        ui-&gt;&gt;script_server: output/{id}/output.json
-    end
+<section id="running-a-script-or-pipeline" class="level1">
+<h1>Running a script or pipeline</h1>
+<p>You now have an instance of BON in a Box deployed, either <a href="#deploying-the-servers-locally">locally</a> or <a href="#deploying-the-servers-remotely">remotely</a>, and you want to run your first script or pipeline.</p>
+<p>There is one page to run scripts, and one to run pipelines. Once there, select the script or pipelines from the dropdown and fill the form.</p>
+<p>The form might ask you for a file. In order to provide a file that you own locally, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders.</p>
 
 
-    script--&gt;&gt;script_server: output.json
-
-    ui-&gt;&gt;script_server: output/{runId}/output.json
-    script_server--&gt;&gt;ui: script output json
-</code></pre>
-</section>
-<section id="pipeline-scenario" class="level3">
-<h3 class="anchored" data-anchor-id="pipeline-scenario">Pipeline scenario</h3>
-<pre class="mermaid"><code>sequenceDiagram
-    ui-&gt;&gt;script_server: pipeline/list
-    script_server--&gt;&gt;ui: json map of pipeline -&gt; names
-
-    ui-&gt;&gt;script_server: pipeline/{path}/info
-    script_server--&gt;&gt;ui: pipeline info json
-
-    ui-&gt;&gt;script_server: pipeline/{path}/run
-    script_server--&gt;&gt;ui: runId
-    loop For each step
-        script_server-&gt;&gt;script: run
-        Note right of script: see previous diagram
-        script--&gt;&gt;script_server: output.json (script)
-        ui-&gt;&gt;script_server: pipeline/{runId}/outputs
-        script_server--&gt;&gt;ui: pipelineOutput.json (pipeline)
-    end
-</code></pre>
-<p>Every second, the UI polls for:</p>
-<ul>
-<li>pipelineOutput.json from the pipeline, to get the output folders of individual scripts. Stops polling when pipeline stops.</li>
-<li>logs.txt of individual scripts, for realtime logging, only if log section is opened. Stops when individual script completes, or when log section closed.</li>
-<li>output.json of individual scripts, to know when script completes and display its outputs. Stops when script stops.</li>
-</ul>
-</section>
-<section id="editing-the-openapi-specification-of-the-script-server" class="level3">
-<h3 class="anchored" data-anchor-id="editing-the-openapi-specification-of-the-script-server">Editing the OpenAPI specification of the script-server</h3>
-<ol type="1">
-<li>Using http://localhost/swagger, edit the specification.</li>
-<li>Copy the result to <a href="../script-server/api/openapi.yaml">script-server/api/openapi.yaml</a></li>
-<li>Use <a href="../ui/BonInABoxScriptService/generate-client.sh">ui/BonInABoxScriptService/generate-client.sh</a> and <a href="../script-server/generate-server-openapitools.sh">script-server/generate-server-openapitools.sh</a> to regenerate the client and the server.</li>
-<li>Merge carefully, not all generated code is to be kept.</li>
-<li>Implement the gaps.</li>
-</ol>
-</section>
-</section>
-<section id="debugging-signal-forwarding" class="level2">
-<h2 class="anchored" data-anchor-id="debugging-signal-forwarding">Debugging signal forwarding</h2>
-<p>Since runner-conda and runner-julia run in a separate docker, when the user stops the pipeline, the signal must go from the script-server, to the runner, to the running script. Docker does not allow this by default, this is why we save the PID in a file and use a separate exec command to kill the process.</p>
-<p>The PID file is called <code>.pid</code> and is located in the output folder of the run. It is deleted when the script completes. For details, see <a href="./script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt">ScriptRun.kt</a>.</p>
-
-
-</section>
 </section>
 
 </main> <!-- /main -->
