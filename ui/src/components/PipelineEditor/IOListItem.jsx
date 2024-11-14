@@ -28,11 +28,14 @@ export function IOListItem({ io, id, valueEdited, setter, className }) {
                     <td className={className}>
                         <ControlledTextArea className="label" keepWidth={true}
                             onBlur={e => valueEdited(e.target.value, "label", io, setter)}
+                            onKeyDown={(e) => { if (e.ctrlKey) valueEdited(e.target.value, "label", io, setter) }}
                             onInput={preventNewLines}
-                            defaultValue={io.label} />
+                            defaultValue={io.label}
+                        />
 
                         <ControlledTextArea className="description" keepWidth={true}
                             onBlur={e => valueEdited(e.target.value, "description", io, setter)}
+                            onKeyDown={(e) => { if (e.ctrlKey) valueEdited(e.target.value, "description", io, setter) }}
                             defaultValue={io.description} />
 
                         {io.type &&

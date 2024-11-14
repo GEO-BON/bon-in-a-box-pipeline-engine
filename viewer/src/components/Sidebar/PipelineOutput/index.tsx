@@ -182,13 +182,13 @@ export function PipelineOutput(props: any) {
                 }}
               >
                 <InputLabel id="collection-label">
-                  <Typography color="primary.light">Choose layer</Typography>
+                  <Typography color="primary.light">Choose table</Typography>
                 </InputLabel>
                 <CustomSelect
                   key="table-select"
                   value={selectedItem}
                   onChange={(event: any) => handleSelect(event.target.value)}
-                  label="Layer"
+                  label="Table"
                 >
                   {outs.map((o: any) => (
                     <CustomMenuItem key={`it-${o}`} value={o}>
@@ -200,7 +200,7 @@ export function PipelineOutput(props: any) {
                   <CustomButtonGreen
                     key={`but-${outputObj.outputs}`}
                     onClick={(event: any) => {
-                      handleClick(event, "", "table");
+                      handleClick(event, "", outputObj?.type);
                     }}
                   >
                     See table
@@ -209,9 +209,14 @@ export function PipelineOutput(props: any) {
               </FormControl>
             )}
           {!Array.isArray(outs) &&
-            ["image/png", "image/jpeg", "image/jpg", "image/svg", "image/gif", "image/bmp"].includes(
-              outputObj?.type
-            ) &&
+            [
+              "image/png",
+              "image/jpeg",
+              "image/jpg",
+              "image/svg",
+              "image/gif",
+              "image/bmp",
+            ].includes(outputObj?.type) &&
             "type" in outputObj && (
               <CustomButtonGreen
                 key={`but-${outputObj.outputs}`}
@@ -223,9 +228,14 @@ export function PipelineOutput(props: any) {
               </CustomButtonGreen>
             )}
           {Array.isArray(outs) &&
-            ["image/png", "image/jpeg", "image/jpg", "image/svg", "image/gif", "image/bmp"].includes(
-              outputObj?.type
-            ) &&
+            [
+              "image/png[]",
+              "image/jpeg[]",
+              "image/jpg[]",
+              "image/svg[]",
+              "image/gif[]",
+              "image/bmp[]",
+            ].includes(outputObj?.type) &&
             "type" in outputObj && (
               <FormControl
                 variant="standard"
@@ -264,6 +274,7 @@ export function PipelineOutput(props: any) {
             )}
           {(!("type" in outputObj) ||
             outputObj.type == "text" ||
+            outputObj.type == "options" ||
             outputObj.type == "text[]") && (
             <Typography color="secondary.light">{outputObj.outputs}</Typography>
           )}

@@ -64,7 +64,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
         {Object.entries(inputs)
           .sort((a, b) => a[1].weight - b[1].weight)
           .map(([inputId, inputDescription]) => {
-            const { label, description, options, example, ...theRest } =
+            const { label, description, options, example, weight, ...theRest } =
               inputDescription;
 
             return (
@@ -73,8 +73,8 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                   <label htmlFor={inputId}>
                     {label ? <strong>{label}</strong> : <p className='error'>Missing label for input "{inputId}"</p>}
                     {! /^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId)
-                      && !inputId.startsWith("pipeline@")
-                      && <p className='warning'>{inputId} should be a snake_case id</p>
+                      && !/pipeline@\d+$/.test(inputId)
+                      && <p className='warning'>Input id {inputId.replace(/^(.*\|)/, '')} should be a snake_case id</p>
                     }
                   </label>
                   <ScriptInput
@@ -96,7 +96,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                   }
 
                   {!isEmptyObject(theRest) && yaml.dump(theRest)}
-                  {example
+                  {example !== undefined
                     ? <>
                       Example:
                       <br />

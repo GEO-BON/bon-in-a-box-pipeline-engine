@@ -17,9 +17,11 @@ export function toInputId(props) {
  * @returns the IO id: step@nodeId|output
  */
 export function toOutputId(props) {
-    return props.file === undefined
-            ? toIOId("pipeline", props.nodeId)
-            : toIOId(props.file, props.nodeId, props.outputId);
+    return toIOId(
+        props.file === undefined ? "pipeline" : props.file,
+        props.nodeId,
+        props.outputId
+    );
 }
 
 /**
