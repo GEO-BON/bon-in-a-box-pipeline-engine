@@ -38,7 +38,7 @@ export function Layout(props) {
           &nbsp;|&nbsp;
           <NavLink to="/history">Run history</NavLink>
           &nbsp;|&nbsp;
-          <NavLink to="/versions">Server info</NavLink>
+          <NavLink to="/info">Info</NavLink>
         </nav>
 
         {props.popupContent && (
