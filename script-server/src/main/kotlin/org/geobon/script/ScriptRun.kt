@@ -236,6 +236,10 @@ class ScriptRun( // Constructor used in single script run
                                     set -o pipefail
                                     echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
 
+                                    while ! mkdir $condaEnvFile.lock 2>/dev/null; do echo "waiting for conda lockfile..."; sleep 2s; done;
+                                    trap "echo 'Removing conda lock file for interrupted process'; rm -rf $condaEnvFile.lock 2>/dev/null; exit 1" SIGINT SIGTERM
+                                    echo "Conda lock file acquired"
+
                                     if [ ! -f "$condaEnvFile.yml" ]; then
                                         echo "Creating new conda environment $condaEnvName..."
                                         createLogs=$(mamba env create -f $condaEnvFile.2.yml 2>&1 | tee -a ${logFile.absolutePath})
@@ -271,6 +275,10 @@ class ScriptRun( // Constructor used in single script run
                                         mamba env create -f $condaEnvFile.yml
                                         mamba activate $condaEnvName
                                     fi
+
+                                    echo "Removing conda lock file"
+                                    rm -rf $condaEnvFile.lock 2>/dev/null
+                                    trap - SIGINT SIGTERM
                                 """.trimIndent()
                             } else {
                                 """
@@ -283,6 +291,7 @@ class ScriptRun( // Constructor used in single script run
                             // eval and source commands to initialize mamba, see https://stackoverflow.com/a/75246428/3519951
                             "bash", "-c",
                             """
+                                echo $$ > ${pidFile.absolutePath}
                                 source /.bashrc
                                 $activateEnvironment
                                 Rscript -e '
@@ -334,13 +343,14 @@ class ScriptRun( // Constructor used in single script run
 
                                         if (pidFile.exists() && container.isExternal()) {
                                             val pid = pidFile.readText().trim()
-                                            log(logger::debug, "$event: killing runner process '$pid'")
+                                            log(logger::debug, "$event: gracefully stopping runner process '$pid'")
 
                                             ProcessBuilder(container.dockerCommandList + listOf(
                                                     "kill", "-s", "TERM", pid
                                             )).start()
 
-                                            if (!process.waitFor(10, TimeUnit.SECONDS)) {
+                                            if (!process.waitFor(30, TimeUnit.SECONDS)) {
+                                                log(logger::debug, "$event: forcefully stopping runner process '$pid' after 30 seconds")
                                                 ProcessBuilder(container.dockerCommandList + listOf(
                                                         "kill", "-s", "KILL", pid
                                                 )).start()
@@ -351,7 +361,7 @@ class ScriptRun( // Constructor used in single script run
                                             process.destroy()
                                         }
 
-                                        if (!process.waitFor(10, TimeUnit.SECONDS)) {
+                                        if (!process.waitFor(30, TimeUnit.SECONDS)) {
                                             log(logger::info, "$event: cancellation timeout elapsed.")
                                             process.destroyForcibly()
                                         }
