@@ -66,7 +66,7 @@ const color = (status) => {
     case "error":
       return "red";
     case "running":
-      return "#BAA100";
+      return "#6e5384";
     // default gray (applies to cancelled pipelines)
   }
 };
@@ -163,11 +163,13 @@ const RunCard = (props) => {
           </Typography>
         </CardContent>
         <CardActions disableSpacing>
-          {status !== "error" && status !== "unavailable" && status !== "running" && (
-            <a href={`/viewer/${run.runId}`} target="_blank">
-              <CustomButtonGreen>See in viewer</CustomButtonGreen>
-            </a>
-          )}
+          {status !== "error" &&
+            status !== "unavailable" &&
+            status !== "running" && (
+              <a href={`/viewer/${run.runId}`} target="_blank">
+                <CustomButtonGreen>See in viewer</CustomButtonGreen>
+              </a>
+            )}
           {status !== "unavailable" && (
             <a href={debug_url} target="_blank">
               <CustomButtonGreen>See in run UI</CustomButtonGreen>
