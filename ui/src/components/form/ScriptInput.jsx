@@ -38,8 +38,10 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
         menuPortalTarget={document.body}
         className='react-select'
         styles={passedProps.disabled ? {
-          control: (baseStyles, state) => ({ ...baseStyles, backgroundColor: "transparent" }),
-          multiValueRemove: (baseStyles, state) => ({ ...baseStyles, display: "none" }),
+          control: (baseStyles) => ({ ...baseStyles, backgroundColor: "transparent" }),
+          multiValueRemove: (baseStyles) => ({ ...baseStyles, display: "none" }),
+          container: (baseStyles ) => ({ ...baseStyles, width: 'max-content'}),
+          menu: (baseStyles) => ({ ...baseStyles, width: 'max-content'}),
           menuPortal
         } : {
           menuPortal
