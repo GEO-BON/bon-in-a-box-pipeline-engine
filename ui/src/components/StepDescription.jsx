@@ -171,7 +171,6 @@ function jsonToYaml(jsonObj, indent = 0, lineWidth = 80) {
 }
 
 function valuetoYaml(value, indent = 0, lineWidth = 80) {
-    console.log(value, typeof value)
     if(! value)
         return "null"
 
@@ -184,7 +183,6 @@ function valuetoYaml(value, indent = 0, lineWidth = 80) {
             yamlStr += '  '.repeat(indent + 1) + '- ' + item + '\n';
         });
         return yamlStr
-
     }
 
     if (typeof value === 'string') {

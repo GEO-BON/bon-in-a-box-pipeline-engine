@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AutoResizeTextArea from './AutoResizeTextArea'
+import Select from 'react-select';
 
 export const ARRAY_PLACEHOLDER = 'Array (comma-separated)';
 export const CONSTANT_PLACEHOLDER = 'Constant';
@@ -19,6 +20,40 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
 
   if(!type) {
     return <p className='error'>Input does not declare a type!</p>
+  }
+
+  if (type.startsWith("options")) {
+    if (options) {
+      const optionObjects = options.map(choice => {return {value: choice, label: choice}} )
+      const menuPortal = (baseStyles, state) => ({
+        ...baseStyles,
+        zIndex: 2000 /* z-index options dropdown */
+      })
+
+      return <Select {...passedProps}
+        value={optionObjects.filter((option) => fieldValue.includes(option.value))}
+        isMulti={type === "options[]"}
+        options={optionObjects}
+        isDisabled={passedProps.disabled}
+        menuPortalTarget={document.body}
+        className='react-select'
+        styles={passedProps.disabled ? {
+          control: (baseStyles, state) => ({ ...baseStyles, backgroundColor: "transparent" }),
+          multiValueRemove: (baseStyles, state) => ({ ...baseStyles, display: "none" }),
+          menuPortal
+        } : {
+          menuPortal
+        }}
+        onChange={chosen => {
+          const newValue = Array.isArray(chosen) ? chosen.map(option => option.value) : chosen.value
+          setFieldValue(newValue)
+          onValueUpdated(newValue)
+        }}
+      />
+
+    } else {
+      return <span className='ioWarning'>Options not defined</span>
+    }
   }
 
   if (type.endsWith('[]')) {
@@ -43,23 +78,6 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
   }
 
   switch (type) {
-    case 'options':
-      if (options) {
-        return <select {...passedProps}
-          value={fieldValue}
-          onChange={e => {
-            setFieldValue(e.target.value)
-            onValueUpdated(e.target.value)
-          }}>
-          <option hidden></option> {/* Allows the box to be empty when value not set */}
-          {options.map(choice =>
-            <option key={choice} value={choice}>{choice}</option>
-          )}
-        </select>
-
-      } else {
-        return <span className='ioWarning'>Options not defined</span>
-      }
 
     case 'boolean':
       return <input type='checkbox' {...passedProps}

@@ -211,7 +211,7 @@
   position: absolute;
   right: 10px;
   top: 10px;
-  z-index: 4;
+  z-index: 4; /* Save controls */
   font-size: 12px;
 }
 
