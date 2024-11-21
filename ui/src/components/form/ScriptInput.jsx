@@ -40,11 +40,11 @@ export default function ScriptInput({ type, value, options, onValueUpdated, cols
         styles={passedProps.disabled ? {
           control: (baseStyles) => ({ ...baseStyles, backgroundColor: "transparent" }),
           multiValueRemove: (baseStyles) => ({ ...baseStyles, display: "none" }),
-          container: (baseStyles ) => ({ ...baseStyles, width: 'max-content'}),
-          menu: (baseStyles) => ({ ...baseStyles, width: 'max-content'}),
+          container: (baseStyles ) => ({ ...baseStyles, width: 'max-content', maxWidth: '500px'}),
           menuPortal
         } : {
-          menuPortal
+          menuPortal,
+          container: (baseStyles ) => ({ ...baseStyles, maxWidth: '500px'}),
         }}
         onChange={chosen => {
           const newValue = Array.isArray(chosen) ? chosen.map(option => option.value) : chosen.value
