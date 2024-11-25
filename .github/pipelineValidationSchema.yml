@@ -68,8 +68,8 @@ inputs:
         required: true
         type: string
         oneof:
-        - forbidden: [options, object, "object[]"]
-        - allowed: [options]
+        - forbidden: [options, "options[]", object, "object[]"]
+        - allowed: [options, "options[]"]
           dependencies: options
         - allowed: [object, "object[]"]
           dependencies: properties
@@ -77,7 +77,7 @@ inputs:
         required: false
         type: list
         dependencies:
-          type: options
+          type: [options, "options[]"]
       properties:
         required: false
         type: list
@@ -120,8 +120,8 @@ outputs:
         required: true
         type: string
         oneof:
-        - forbidden: [options, object, "object[]"]
-        - allowed: [options]
+        - forbidden: [options, "options[]", object, "object[]"]
+        - allowed: [options, "options[]"]
           dependencies: options
         - allowed: [object, "object[]"]
           dependencies: properties
@@ -129,7 +129,7 @@ outputs:
         required: false
         type: list
         dependencies:
-          type: options
+          type: [options, "options[]"]
       properties:
         required: false
         type: list

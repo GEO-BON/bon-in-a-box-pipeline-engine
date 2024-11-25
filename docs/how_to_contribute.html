@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -270,7 +270,7 @@ author:
     options:
       - "m2"
       - "km2"</code></pre>
-<p>Specifying an example will autofill that input with the example unless changed by the user. Not specifying an example will leave that input blank (null).</p>
+<p>Specifying an example will auto-fill that input with the example unless changed by the user. Not specifying an example will leave that input blank (null).</p>
 <p>There are several different types of user inputs that can be specified in the YAML file:</p>
 <table class="caption-top table">
 <colgroup>
@@ -281,7 +281,7 @@ author:
 <thead>
 <tr class="header">
 <th>“Type” attribute in the yaml</th>
-<th>IU rendering</th>
+<th>UI rendering</th>
 <th>Description</th>
 </tr>
 </thead>
@@ -294,7 +294,7 @@ author:
 <tr class="even">
 <td>float, float[]</td>
 <td>Plain text</td>
-<td>positive and negative numbers with a decimal point</td>
+<td>positive or negative numbers with a decimal point, accepts int and a valid input.</td>
 </tr>
 <tr class="odd">
 <td>int, int[]</td>
@@ -303,22 +303,27 @@ author:
 </tr>
 <tr class="even">
 <td>options<sup>1</sup></td>
-<td>Plain text</td>
-<td>dropdown menu</td>
+<td>Dropdown menu</td>
+<td>Select one from defined options</td>
 </tr>
 <tr class="odd">
+<td>options[]<sup>1</sup></td>
+<td>Multi-select dropdown menu</td>
+<td>Select 0 to many from defined options</td>
+</tr>
+<tr class="even">
 <td>text, text[]</td>
 <td>Plain text</td>
 <td>text input (words)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>(any unknown type)</td>
 <td>Plain text</td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<p><sup>1</sup>options type requires an additioal options attribute to be added with the available options.</p>
+<p><sup>1</sup>options type requires an additional options attribute to be added with the available options.</p>
 <pre><code>options_example:
   label: Options example
   description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
