@@ -372,18 +372,11 @@ The file contains the id of the parameters that were specified in the yaml scrip
 }
 ```
 
-The script reads the `input.json` file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline. Here is an example of how to read the input folder in the R script:
+The script reads the `input.json` file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline. A convenience function ``biab_inputs`` is loaded in R by default to load the file into a list. Here is an example of how to read the input file in the R script:
 
-First, set the environment for the script:
-
-``` r
-Sys.getenv("SCRIPT_LOCATION")
-```
-
-And then set the 'input' environment variables. The 'input' environment contains the specified inputs from the BON in a Box platform.
 
 ``` r
-input <- rjson::fromJSON(file=file.path(outputFolder, "input.json")) # Load input file
+input <- biab_inputs()
 ```
 
 Next, for any functions that are using these inputs, they need to be specified.
@@ -404,7 +397,7 @@ Here is another example to read in an output from a previous step of the pipelin
 dat <- read.csv(input$csv_file)
 ```
 
-Next, you have to specify the outputs, which can be saved in a variety of formats. The format must be accurately specified in the YAML file.
+Next, you have to specify the outputs, which can be saved in a variety of formats. The format must be accurately specified in the YAML file. A variable named ``outputFolder`` is loaded when R load that specifies where to save the output files. 
 
 Here is an example of an output with a csv file and a plot in png format.
 
@@ -419,11 +412,11 @@ output <- list(result = result_path,
 result_plot = result_plot_path)
 ```
 
-Lastly, write the output as a JSON file:
+Lastly, write the output as a JSON file using the convenience function ``biab_outputs()``
 
 ``` r
 setwd(outputFolder)
-jsonlite::write_json(output, "output.json", auto_unbox = TRUE, pretty = TRUE)
+biab_outputs(output)
 ```
 
 ### Script validation
