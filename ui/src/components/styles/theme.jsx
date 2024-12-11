@@ -18,7 +18,7 @@ const theme = {
       dark: "#ddd",
     },
     background: {
-      paper: "#444",
+      paper: "#fff",
     },
     info: {
       main: "#aaa",

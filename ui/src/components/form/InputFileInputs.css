@@ -1,42 +1,64 @@
-
 table.inputFileFields {
-    width: 100%;
+  width: 100%;
 }
 
 table.inputFileFields label {
-    display: block;
-    margin-bottom: 0.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
 table.inputFileFields tr:hover {
-    background-color: #f3f3f111;
+  background-color: #f3f3f111;
 }
 
 table.inputFileFields td {
-    padding: 0.5rem;
-    vertical-align: top;
-    border: none;
+  padding: 0.5rem;
+  vertical-align: top;
+  border: none;
 }
 
 table.inputFileFields td.inputCell {
-    width: fit-content;
+  width: 300px;
+  color: var(--biab-green-main);
 }
 
 table.inputFileFields td.descriptionCell {
-    white-space: pre-wrap;
+  white-space: pre-wrap;
+  font-size: 0.8em;
+  color: #444;
 }
 
 table.inputFileFields .example {
-    color: #f3f3f1;
-    background-color: transparent;
+  color: #444;
+  background-color: transparent;
 }
 
 @media all and (max-width: 599px) {
-    table, thead, tbody, th, td, tr {
-        display: block;
-    }
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+  }
 }
 
 .inputFileFields .reactMarkdown p {
-    margin: 0;
+  margin: 0;
+  color: var(--biab-purple-main);
+  font-weight: bold;
+}
+
+.MuiInputBase-input {
+  font-size: 0.85em !important;
+  font-family: "Roboto" !important;
+  max-width: 350px !important;
+  min-width: 300px !important;
+}
+
+.MuiAutocomplete-popper li {
+  color: #333;
+  font-size: 0.8em;
+  font-family: "Roboto" !important;
 }

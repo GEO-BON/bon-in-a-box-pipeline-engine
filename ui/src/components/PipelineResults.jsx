@@ -294,7 +294,7 @@ export function DelayedResult({
           )}
         </>
       );
-      inline = skippedMessage && <i>{skippedMessage}</i>
+      inline = skippedMessage && <i>{skippedMessage}</i>;
     } else {
       outputsContent = <p>Running...</p>;
       icon = <InlineSpinner />;

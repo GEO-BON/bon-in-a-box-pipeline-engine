@@ -82,7 +82,12 @@ export function PipelineForm({
 
   return (
     pipelineOptions.length > 0 && (
-      <form ref={formRef} onSubmit={handleSubmit} acceptCharset="utf-8">
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        acceptCharset="utf-8"
+        class="inputForm"
+      >
         <label htmlFor="pipelineChoice">
           {runType === "pipeline" ? "Pipeline:" : "Script:"}
         </label>

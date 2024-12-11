@@ -180,7 +180,7 @@ const RunCard = (props) => {
             aria-label="show more"
           >
             {!expanded && (
-              <Typography sx={{ fontFamily: "Roboto" }}>Inputs</Typography>
+              <Typography sx={{ fontFamily: "Lato" }}>Inputs</Typography>
             )}
             <ExpandMoreIcon />
           </ExpandMore>

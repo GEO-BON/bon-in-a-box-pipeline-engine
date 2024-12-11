@@ -11,6 +11,7 @@ import ScriptInput from "./ScriptInput";
 
 import yaml from "js-yaml";
 import { isEmptyObject } from "../../utils/isEmptyObject";
+import Divider from "@mui/material/Divider";
 
 /**
  * An input that we use to fill the input file's content.
@@ -70,48 +71,70 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
             return (
               <tr key={inputId}>
                 <td className="inputCell">
-                  <label htmlFor={inputId}>
-                    {label ? <strong>{label}</strong> : <p className='error'>Missing label for input "{inputId}"</p>}
-                    {! /^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId)
-                      && !/pipeline@\d+$/.test(inputId)
-                      && <p className='warning'>Input id {inputId.replace(/^(.*\|)/, '')} should be a snake_case id</p>
-                    }
-                  </label>
+                  {false && (
+                    <label htmlFor={inputId}>
+                      {label ? (
+                        <strong>{label}</strong>
+                      ) : (
+                        <p className="error">
+                          Missing label for input "{inputId}"
+                        </p>
+                      )}
+                      {!/^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId) &&
+                        !/pipeline@\d+$/.test(inputId) && (
+                          <p className="warning">
+                            Input id {inputId.replace(/^(.*\|)/, "")} should be
+                            a snake_case id
+                          </p>
+                        )}
+                    </label>
+                  )}
                   <ScriptInput
                     id={inputId}
                     type={inputDescription.type}
                     options={options}
                     value={inputFileContent && inputFileContent[inputId]}
                     onValueUpdated={(value) => updateInputFile(inputId, value)}
+                    label={label}
                     cols="50"
                   />
                 </td>
                 <td className="descriptionCell">
-                  {description
-                    ? <ReactMarkdown
+                  {description ? (
+                    <ReactMarkdown
                       className="reactMarkdown"
                       children={description}
                     />
-                    : <p className='warning'>Missing description for input "{inputId}"</p>
-                  }
+                  ) : (
+                    <p className="warning">
+                      Missing description for input "{inputId}"
+                    </p>
+                  )}
 
                   {!isEmptyObject(theRest) && yaml.dump(theRest)}
-                  {example !== undefined
-                    ? <>
-                      Example:
-                      <br />
-                      <ScriptInput
-                        id={inputId}
-                        type={inputDescription.type}
-                        options={options}
-                        value={example}
-                        disabled={true}
-                        cols="50"
-                        className="example"
-                      />
+                  {false && (
+                    <>
+                      {example !== undefined ? (
+                        <>
+                          Example:
+                          <br />
+                          <ScriptInput
+                            id={inputId}
+                            type={inputDescription.type}
+                            options={options}
+                            value={example}
+                            disabled={true}
+                            cols="50"
+                            className="example"
+                          />
+                        </>
+                      ) : (
+                        <p className="warning">
+                          Missing example for input "{inputId}"
+                        </p>
+                      )}
                     </>
-                    : <p className='warning'>Missing example for input "{inputId}"</p>
-                  }
+                  )}
                 </td>
               </tr>
             );
