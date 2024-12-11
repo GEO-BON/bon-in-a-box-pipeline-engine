@@ -313,11 +313,19 @@ class ScriptRun( // Constructor used in single script run
                                     write(jsonData, file.path(outputFolder,"output.json"))
                                     print("Output file successfully written")
                                 }
+                                biab_error <- function(condition, error){
+                                if(cond){
+                                stop(err)
+                                }
+                                }
                                 tryCatch(source("${scriptFile.absolutePath}"),
                                     error=function(e) if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
                                             print("Suppressed: ignoring SIGPIPE signal");
                                         } else {
-                                            stop(e);
+                                            list(error=conditionMessage(e))
+                                            jsonData <- toJSON(output, indent=2)
+                                            write(jsonData, file.path(outputFolder,"output.json"))
+                                          #  stop(e);
                                         });
                                 unlink("${pidFile.absolutePath}");
                                 gc();'
