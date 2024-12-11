@@ -314,8 +314,8 @@ class ScriptRun( // Constructor used in single script run
                                     print("Output file successfully written")
                                 }
                                 biab_error <- function(condition, error){
-                                if(cond){
-                                stop(err)
+                                if(condition){
+                                stop(error)
                                 }
                                 }
                                 tryCatch(source("${scriptFile.absolutePath}"),
