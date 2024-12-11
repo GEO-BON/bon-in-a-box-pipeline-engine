@@ -308,25 +308,28 @@ class ScriptRun( // Constructor used in single script run
                                 biab_inputs <- function(){
                                     fromJSON(file=file.path(outputFolder, "input.json"))
                                 }
-                                biab_outputs <- function(output){
-                                    jsonData <- toJSON(output, indent=2)
-                                    write(jsonData, file.path(outputFolder,"output.json"))
-                                    print("Output file successfully written")
+                                biab_output_list <- list()
+                                biab_outputs <- function(key, value){
+                                    biab_output_list[[ key ]] <<- value
+                                    print("Output added")
+                                    print(biab_output_list)
                                 }
-                                biab_error <- function(condition, error){
-                                if(condition){
-                                stop(error)
-                                }
+                                biab_error_stop <- function(errorMessage){
+                                    biab_output_list[[ "error" ]] <<- errorMessage
+                                    print(paste("Calling stop on error", biab_output_list))
+                                    stop(errorMessage)
                                 }
                                 tryCatch(source("${scriptFile.absolutePath}"),
                                     error=function(e) if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
                                             print("Suppressed: ignoring SIGPIPE signal");
                                         } else {
-                                            list(error=conditionMessage(e))
-                                            jsonData <- toJSON(output, indent=2)
-                                            write(jsonData, file.path(outputFolder,"output.json"))
-                                          #  stop(e);
+                                            biab_output_list[["error"]] <- conditionMessage(e)
                                         });
+
+                                cat("Writing outputs")
+                                jsonData <- toJSON(biab_output_list, indent=2)
+                                write(jsonData, file.path(outputFolder,"output.json"))
+                                print("Output file successfully written")
                                 unlink("${pidFile.absolutePath}");
                                 gc();'
                             """.trimIndent()
