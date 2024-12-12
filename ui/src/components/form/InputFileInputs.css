@@ -1,5 +1,8 @@
 table.inputFileFields {
   width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  margin-top: -10px; /* correct offset on first border spacing if desired */
 }
 
 table.inputFileFields label {
@@ -11,15 +14,40 @@ table.inputFileFields tr:hover {
   background-color: #f3f3f111;
 }
 
+table.inputFileFields tr {
+  background-color: #f3f3f111;
+  padding: 8rem;
+}
+
 table.inputFileFields td {
-  padding: 0.5rem;
+  padding: 15px;
   vertical-align: top;
-  border: none;
+  background-color: #fff;
+  border: solid 2px #eee;
+  border-style: solid none;
+}
+
+table.inputFileFields td:first-child {
+  border-left-style: solid;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+table.inputFileFields td:last-child {
+  border-right-style: solid;
+  border-bottom-right-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 table.inputFileFields td.inputCell {
   width: 300px;
   color: var(--biab-green-main);
+}
+
+table.inputFileFields td.inputCell label {
+  width: 300px;
+  color: var(--biab-green-main);
+  font-family: "Roboto";
+  font-weight: 1000;
 }
 
 table.inputFileFields td.descriptionCell {

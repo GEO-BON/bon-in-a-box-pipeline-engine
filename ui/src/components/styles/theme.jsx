@@ -49,13 +49,13 @@ const theme = {
         renderOption: (props, option, state, ownerState) => (
           <Box
             sx={{
-              borderRadius: "8px",
+              borderRadius: "28px",
               margin: "5px",
               [`&.${autocompleteClasses.option}`]: {
                 padding: "8px",
               },
-              color: "primary.contrastText",
-              borderColor: "primary.light",
+              color: "var(--biab-green-main)",
+              borderColor: "var(--biab-green-trans-main)",
             }}
             component="li"
             {...props}

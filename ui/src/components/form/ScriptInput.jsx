@@ -5,8 +5,10 @@ import TextField from "@mui/material/TextField";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Autocomplete from "@mui/material/Autocomplete";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Box from "@mui/material/Box";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
 export const CONSTANT_PLACEHOLDER = "Constant";
@@ -14,6 +16,40 @@ export const CONSTANT_PLACEHOLDER = "Constant";
 function joinIfArray(value) {
   return value && typeof value.join === "function" ? value.join(", ") : value;
 }
+
+const InputField = (props) => {
+  const { label } = props;
+  return (
+    <FormControl>
+      <InputLabel
+        htmlFor="component-simple"
+        sx={{
+          fontFamily: "Roboto",
+          color: "var(--biab-green-main)",
+          fontWeight: 1000,
+        }}
+      >
+        {label}
+      </InputLabel>
+      <OutlinedInput
+        id="component-simple"
+        size="small"
+        {...props}
+        sx={{
+          fontSize: "1em",
+          fontFamily: "Roboto",
+          "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: "var(--biab-green-trans-main)",
+          },
+          "&:hover > .MuiOutlinedInput-notchedOutline": {
+            borderColor: "var(--biab-green-trans-main)",
+          },
+        }}
+        shrink
+      />
+    </FormControl>
+  );
+};
 
 export default function ScriptInput({
   type,
@@ -55,12 +91,29 @@ export default function ScriptInput({
           renderInput={(params) => (
             <TextField
               {...params}
-              focused
               fullWidth={false}
               label={label}
-              sx={{ width: "328px" }}
+              sx={{
+                fontSize: "1em",
+                fontFamily: "Roboto",
+                width: 328,
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "var(--biab-green-trans-main)",
+                },
+                "&:hover > .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "var(--biab-green-trans-main)",
+                },
+                "&. MuiInputLabel-formControl": {
+                  color: "var(---biab-green-trans-main)",
+                },
+              }}
             />
           )}
+          sx={{
+            "&. MuiInputLabel-formControl": {
+              color: "var(---biab-green-trans-main)",
+            },
+          }}
           disabled={passedProps.disabled}
           //menuPortalTarget={document.body}
           //className="react-select"
@@ -123,7 +176,6 @@ export default function ScriptInput({
     return (
       <TextField
         multiline
-        focused
         variant="outlined"
         label={label}
         {...passedProps}
@@ -133,6 +185,7 @@ export default function ScriptInput({
         keepWidth={true}
         cols={cols}
         onBlur={onUpdateArray}
+        inputProps={{ style: { resize: "vertical" } }}
         onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
       />
     );
@@ -143,7 +196,6 @@ export default function ScriptInput({
       return (
         <TextField
           type="checkbox"
-          focused
           label={label}
           variant="outlined"
           {...passedProps}
@@ -159,7 +211,6 @@ export default function ScriptInput({
       return (
         <TextField
           type="number"
-          focused
           label={label}
           variant="outlined"
           {...passedProps}
@@ -176,7 +227,6 @@ export default function ScriptInput({
       return (
         <TextField
           type="number"
-          focused
           variant="outlined"
           label={label}
           step="any"
@@ -210,14 +260,12 @@ export default function ScriptInput({
 
       if (fieldValue && fieldValue.includes("\n")) {
         props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
-        return <Input multiline keepWidth={true} cols={cols} {...props} />;
+        return <InputField multiline keepWidth={true} cols={cols} {...props} />;
       } else {
         return (
           <TextField
             type="text"
-            focused
             label={label}
-            variant="outlined"
             {...props}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.ctrlKey) updateValue(e);
