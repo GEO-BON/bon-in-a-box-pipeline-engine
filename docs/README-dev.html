@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -353,7 +353,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="debugging-signal-forwarding" class="level2">
 <h2 class="anchored" data-anchor-id="debugging-signal-forwarding">Debugging signal forwarding</h2>
 <p>Since runner-conda and runner-julia run in a separate docker, when the user stops the pipeline, the signal must go from the script-server, to the runner, to the running script. Docker does not allow this by default, this is why we save the PID in a file and use a separate exec command to kill the process.</p>
-<p>The PID file is called <code>.pid</code> and is located in the output folder of the run. It is deleted when the script completes. For details, see <a href="./script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt">ScriptRun.kt</a>.</p>
+<p>The PID file is called <code>.pid</code> and is located in the output folder of the run. It is deleted when the script completes. For details, see <a href="https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/blob/main/script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt">ScriptRun.kt</a>.</p>
 
 
 </section>
