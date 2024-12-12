@@ -478,7 +478,9 @@ class ScriptRun( // Constructor used in single script run
         if (error || results.isEmpty()) {
             if (!results.containsKey(ERROR_KEY)) {
                 val outputs = results.toMutableMap()
-                outputs[ERROR_KEY] = "An error occurred. Check logs for details."
+                outputs[ERROR_KEY] =
+                    if (results.isEmpty()) "Script produced no results. Check log for errors."
+                    else "An error occurred. Check log for details."
 
                 // Rewrite output file with error
                 resultFile.writeText(RunContext.gson.toJson(outputs))
