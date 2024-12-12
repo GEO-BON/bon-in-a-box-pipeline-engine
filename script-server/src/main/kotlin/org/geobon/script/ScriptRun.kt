@@ -303,7 +303,7 @@ class ScriptRun( // Constructor used in single script run
                                 options(repos = repositories)
 
                                 fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
-                                outputFolder<-"${context.outputFolder.absolutePath}";
+                                outputFolder<-"${context.outputFolder.absolutePath}"
                                 library(rjson)
                                 biab_inputs <- function(){
                                     fromJSON(file=file.path(outputFolder, "input.json"))
@@ -311,27 +311,34 @@ class ScriptRun( // Constructor used in single script run
                                 biab_output_list <- list()
                                 biab_outputs <- function(key, value){
                                     biab_output_list[[ key ]] <<- value
-                                    print("Output added")
-                                    print(biab_output_list)
+                                    cat("Output added for \"", key, "\"\n")
                                 }
+                                biab_info <- function(message) biab_outputs("info", message)
+                                biab_warning <- function(message) biab_outputs("warning", message)
                                 biab_error_stop <- function(errorMessage){
                                     biab_output_list[[ "error" ]] <<- errorMessage
-                                    print(paste("Calling stop on error", biab_output_list))
+                                    cat("ERROR stopping script: \"", errorMessage, "\"\n")
                                     stop(errorMessage)
                                 }
                                 tryCatch(source("${scriptFile.absolutePath}"),
-                                    error=function(e) if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
-                                            print("Suppressed: ignoring SIGPIPE signal");
+                                    error=function(e){
+                                        if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
+                                            cat("Suppressed: ignoring SIGPIPE signal\n");
                                         } else {
-                                            biab_output_list[["error"]] <- conditionMessage(e)
-                                        });
-
-                                cat("Writing outputs")
-                                jsonData <- toJSON(biab_output_list, indent=2)
-                                write(jsonData, file.path(outputFolder,"output.json"))
-                                print("Output file successfully written")
-                                unlink("${pidFile.absolutePath}");
-                                gc();'
+                                            print("Caught error")
+                                            biab_output_list[["error"]] <<- conditionMessage(e)
+                                            stop(e)
+                                        }
+                                    },
+                                    finally = {
+                                        cat("Writing outputs to BON in a Box...")
+                                        jsonData <- toJSON(biab_output_list, indent=2)
+                                        write(jsonData, file.path(outputFolder,"output.json"))
+                                        cat(" Done.\n")
+                                        unlink("${pidFile.absolutePath}")
+                                        gc()
+                                    }
+                                )'
                             """.trimIndent()
                         )
                     }
