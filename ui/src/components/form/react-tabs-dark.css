@@ -1,10 +1,10 @@
 .react-tabs__tab--selected {
-  background: #282c34; /*Matches our bg color*/
-  color: #f3f3f1;
-
+  background: #333;
+  color: #fff;
   /* We use this to create a border (wider on top, and no bevel at the bottom)*/
-  box-shadow: inset 0 1px 0 1px #f3f3f1;
+  box-shadow: inset 0 1px 0 1px #fff;
   border: none;
+  margin-bottom: 2px;
 }
 
 .react-tabs__tab:focus:after {
@@ -22,5 +22,5 @@
   border: 3px solid #f3f3f1;
   border-radius: 10px;
   padding: 10px;
-  background: white;
+  background: #f3f3f3f1;
 }

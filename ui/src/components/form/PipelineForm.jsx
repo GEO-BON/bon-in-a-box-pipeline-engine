@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Select from "react-select";
 import InputFileInput from "./InputFileInput";
 import { useNavigate } from "react-router-dom";
+import Button from "@mui/material/Button";
 import { GeneralDescription, getFolderAndName } from "../StepDescription";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 
@@ -115,11 +116,9 @@ export function PipelineForm({
           setInputFileContent={setInputFileContent}
         />
         <br />
-        <input
-          type="submit"
-          disabled={false}
-          value={runType === "pipeline" ? "Run pipeline" : "Run script"}
-        />
+        <Button type="submit" disabled={false} variant="contained">
+          {runType === "pipeline" ? "Run pipeline" : "Run script"}
+        </Button>
       </form>
     )
   );

@@ -6,8 +6,10 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Autocomplete from "@mui/material/Autocomplete";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import Box from "@mui/material/Box";
+import Checkbox from "@mui/material/Checkbox";
 import FormControl from "@mui/material/FormControl";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import InputLabel from "@mui/material/InputLabel";
 
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
@@ -16,40 +18,6 @@ export const CONSTANT_PLACEHOLDER = "Constant";
 function joinIfArray(value) {
   return value && typeof value.join === "function" ? value.join(", ") : value;
 }
-
-const InputField = (props) => {
-  const { label } = props;
-  return (
-    <FormControl>
-      <InputLabel
-        htmlFor="component-simple"
-        sx={{
-          fontFamily: "Roboto",
-          color: "var(--biab-green-main)",
-          fontWeight: 1000,
-        }}
-      >
-        {label}
-      </InputLabel>
-      <OutlinedInput
-        id="component-simple"
-        size="small"
-        {...props}
-        sx={{
-          fontSize: "1em",
-          fontFamily: "Roboto",
-          "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: "var(--biab-green-trans-main)",
-          },
-          "&:hover > .MuiOutlinedInput-notchedOutline": {
-            borderColor: "var(--biab-green-trans-main)",
-          },
-        }}
-        shrink
-      />
-    </FormControl>
-  );
-};
 
 export default function ScriptInput({
   type,
@@ -75,18 +43,12 @@ export default function ScriptInput({
       const optionObjects = options.map((choice) => {
         return { value: choice, label: choice };
       });
-      const menuPortal = (baseStyles, state) => ({
-        ...baseStyles,
-        zIndex: 2000 /* z-index options dropdown */,
-      });
-
       return (
         <Autocomplete
-          //{...passedProps}
-          //defaultValue={optionObjects[0].value}
-          //size="small"
+          defaultValue={[]}
           label={label}
-          //isMulti={type === "options[]"}
+          multiple={type === "options[]"}
+          filterSelectedOptions={type === "options[]"}
           options={optionObjects}
           renderInput={(params) => (
             <TextField
@@ -115,44 +77,8 @@ export default function ScriptInput({
             },
           }}
           disabled={passedProps.disabled}
-          //menuPortalTarget={document.body}
-          //className="react-select"
-          /*styles={
-            passedProps.disabled
-              ? {
-                  control: (baseStyles) => ({
-                    ...baseStyles,
-                    backgroundColor: "transparent",
-                  }),
-                  multiValueRemove: (baseStyles) => ({
-                    ...baseStyles,
-                    display: "none",
-                  }),
-                  container: (baseStyles) => ({
-                    ...baseStyles,
-                    width: "max-content",
-                  }),
-                  menu: (baseStyles) => ({
-                    ...baseStyles,
-                    width: "max-content",
-                  }),
-                  menuPortal,
-                }
-              : {
-                  menuPortal,
-                }
-          }*/
-          /*onChange={(chosen) => {
-            if (chosen !== null) {
-              const newValue = Array.isArray(chosen)
-                ? chosen.map((option) => option.value)
-                : chosen.value;
-              setFieldValue(newValue);
-              onValueUpdated(newValue);
-            }
-          }}*/
           value={fieldValue}
-          onValueChange={(event, newValue) => {
+          onChange={(event, newValue) => {
             setFieldValue(newValue);
             onValueUpdated(newValue);
           }}
@@ -185,7 +111,7 @@ export default function ScriptInput({
         keepWidth={true}
         cols={cols}
         onBlur={onUpdateArray}
-        inputProps={{ style: { resize: "vertical" } }}
+        slotProps={{ htmlInput: { style: { resize: "vertical" } } }}
         onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
       />
     );
@@ -194,17 +120,23 @@ export default function ScriptInput({
   switch (type) {
     case "boolean":
       return (
-        <TextField
-          type="checkbox"
-          label={label}
-          variant="outlined"
-          {...passedProps}
-          checked={fieldValue}
-          onChange={(e) => {
-            setFieldValue(e.target.checked);
-            onValueUpdated(e.target.checked);
-          }}
-        />
+        <FormGroup>
+          <FormControlLabel
+            control={
+              <Checkbox
+                type="checkbox"
+                {...passedProps}
+                checked={fieldValue}
+                onChange={(e) => {
+                  setFieldValue(e.target.checked);
+                  onValueUpdated(e.target.checked);
+                }}
+              />
+            }
+            label={label}
+            sx={{ fontFamily: "Roboto" }}
+          />
+        </FormGroup>
       );
 
     case "int":
@@ -260,7 +192,7 @@ export default function ScriptInput({
 
       if (fieldValue && fieldValue.includes("\n")) {
         props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
-        return <InputField multiline keepWidth={true} cols={cols} {...props} />;
+        return <TextField multiline keepWidth={true} cols={cols} {...props} />;
       } else {
         return (
           <TextField

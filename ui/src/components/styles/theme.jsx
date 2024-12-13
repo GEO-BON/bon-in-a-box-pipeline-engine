@@ -65,6 +65,25 @@ const theme = {
         ),
       },
     },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          padding: "8px 16px",
+          textTransform: "none", // Disable uppercase transformation
+        },
+        containedPrimary: {
+          backgroundColor: "var(--biab-green-main)",
+          fontFamily: "Roboto",
+          color: "#fff",
+          "&:hover": {
+            backgroundColor: "#fff",
+            color: "var(--biab-green-main)",
+          },
+          boxShadow: "3px 3px 3px #0004",
+          borderRadius: "8px",
+        },
+      },
+    },
   },
 };
 

@@ -1,4 +1,4 @@
-import AutoResizeTextArea from "./AutoResizeTextArea";
+import TextField from "@mui/material/TextField";
 import { isEmptyObject } from "../../utils/isEmptyObject";
 import yaml from "js-yaml";
 
@@ -8,10 +8,20 @@ export default function YAMLTextArea({ data, setData }) {
   }
 
   return (
-    <AutoResizeTextArea
-      className="inputFile"
-      defaultValue={yaml.dump(data, { lineWidth: 124, sortKeys: true })}
+    <TextField
+      multiline
+      fullWidth
+      sx={{
+        width: "95%",
+        background: "#fff",
+        fontFamily: "Roboto",
+      }}
+      defaultValue={yaml.dump(data, {
+        lineWidth: -1,
+        sortKeys: true,
+      })}
       onBlur={(e) => setData(yaml.load(e.target.value))}
+      //slotProps={{ htmlInput: { style: { resize: "vertical" } } }}
     />
   );
 }
