@@ -163,7 +163,6 @@ img#logo {
   background: #444;
   border-radius: 15px;
   padding: 15px;
-  margin-bottom: 20px;
 }
 
 .references ul {
@@ -341,8 +340,4 @@ textarea.autoResize {
   white-space: pre-wrap;
   margin: 0;
   margin-left: 2rem;
-}
-
-.inputForm {
-  max-width: 850px;
 }
