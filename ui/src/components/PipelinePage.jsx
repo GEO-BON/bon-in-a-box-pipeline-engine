@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { PipelineResults } from "./PipelineResults";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import _lang from "lodash/lang";
+import Button from "@mui/material/Button";
 
 const pipelineConfig = { extension: ".json", defaultFile: "helloWorld.json" };
 const scriptConfig = {
@@ -255,9 +256,14 @@ export function PipelinePage({ runType }) {
       </FoldableOutput>
 
       {pipStates.runId && (
-        <button onClick={stop} disabled={!stoppable}>
+        <Button
+          onClick={stop}
+          disabled={!stoppable}
+          variant="contained"
+          sx={{ margin: "10px 0 10px 0" }}
+        >
           Stop
-        </button>
+        </Button>
       )}
       {httpError && (
         <p key="httpError" className="error">

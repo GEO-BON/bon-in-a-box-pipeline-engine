@@ -79,6 +79,10 @@ const theme = {
             backgroundColor: "#fff",
             color: "var(--biab-green-main)",
           },
+          "&:disabled": {
+            backgroundColor: "var(--biab-green-trans-main)",
+            color: "#fffa",
+          },
           boxShadow: "3px 3px 3px #0004",
           borderRadius: "8px",
         },

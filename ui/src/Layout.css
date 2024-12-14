@@ -341,3 +341,44 @@ textarea.autoResize {
   margin: 0;
   margin-left: 2rem;
 }
+
+.pipelineResults {
+  background: #444;
+  border-radius: 15px;
+  padding: 15px;
+  border: 2px solid #fff4;
+  margin-top: 15px;
+}
+
+.pipelineResults {
+  max-width: 1200px;
+}
+
+.pipelineResults h2 {
+  color: #fff;
+}
+
+.pipelineResults h3 {
+  color: var(--biab-green-main);
+}
+
+.pipelineResults p {
+  color: #444;
+}
+
+.pipelineResults .outputTitle {
+  color: #444;
+}
+
+.pipelineResults a {
+  color: var(--biab-purple-main);
+}
+
+.pipelineResults .stepDescription {
+  background: #fff;
+}
+.resultsBox {
+  background: #fff;
+  border-radius: 15px;
+  padding: 10px;
+}
