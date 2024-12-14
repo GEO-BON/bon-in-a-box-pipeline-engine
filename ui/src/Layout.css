@@ -370,6 +370,10 @@ textarea.autoResize {
   color: #444;
 }
 
+.pipelineResults table {
+  color: #555;
+}
+
 .pipelineResults a {
   color: var(--biab-purple-main);
 }
