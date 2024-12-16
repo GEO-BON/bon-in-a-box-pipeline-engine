@@ -25,6 +25,7 @@ services:
       PIPELINES_LOCATION: /pipelines
       OUTPUT_LOCATION: /output
       PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
+      USE_RUNNERS: true
 
   runner-conda:
     container_name: biab-runner-conda
