@@ -105,8 +105,16 @@ table.inputFileFields .MuiInputBase-input {
   font-family: "Roboto" !important;
 }
 
+.inputFormDiv {
+  background: #f3f3f3f1;
+  padding: 10px;
+  border-radius: 15px;
+}
+
 .yamlInput {
   border-radius: 15px;
+  background: #f3f3f3f1;
+  padding: 10px;
 }
 .yamlInput .MuiInputBase-input {
   font-size: 0.95em !important;

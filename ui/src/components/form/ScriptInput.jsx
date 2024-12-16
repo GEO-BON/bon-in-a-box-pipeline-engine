@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
-import AutoResizeTextArea from "./AutoResizeTextArea";
-//import Select from "react-select";
 import TextField from "@mui/material/TextField";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
 import Autocomplete from "@mui/material/Autocomplete";
-import OutlinedInput from "@mui/material/OutlinedInput";
 import Checkbox from "@mui/material/Checkbox";
-import FormControl from "@mui/material/FormControl";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import InputLabel from "@mui/material/InputLabel";
-
+import Alert from "@mui/material/Alert";
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
 export const CONSTANT_PLACEHOLDER = "Constant";
 
@@ -35,7 +28,11 @@ export default function ScriptInput({
   }, [value]);
 
   if (!type) {
-    return <p className="error">Input does not declare a type!</p>;
+    return (
+      <Alert severity="error" className="error">
+        Input does not declare a type!
+      </Alert>
+    );
   }
 
   if (type.startsWith("options")) {

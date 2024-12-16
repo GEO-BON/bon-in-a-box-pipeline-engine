@@ -7,6 +7,7 @@ import { PipelineResults } from "./PipelineResults";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import _lang from "lodash/lang";
 import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
 
 const pipelineConfig = { extension: ".json", defaultFile: "helloWorld.json" };
 const scriptConfig = {
@@ -266,9 +267,9 @@ export function PipelinePage({ runType }) {
         </Button>
       )}
       {httpError && (
-        <p key="httpError" className="error">
+        <Alert severity="error" key="httpError">
           {httpError}
-        </p>
+        </Alert>
       )}
       {pipelineMetadata && (
         <PipelineResults

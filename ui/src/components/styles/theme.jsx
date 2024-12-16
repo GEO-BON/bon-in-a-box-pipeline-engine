@@ -20,17 +20,6 @@ const theme = {
     background: {
       paper: "#fff",
     },
-    info: {
-      main: "#aaa",
-    },
-    error: {
-      main: "#aaa",
-      contrastText: "#bbb",
-      dark: "#bbb",
-    },
-    success: {
-      main: "#1d7368",
-    },
   },
   typography: {
     fontFamily: "Montserrat",
@@ -86,6 +75,14 @@ const theme = {
           boxShadow: "3px 3px 3px #0004",
           borderRadius: "8px",
         },
+      },
+    },
+    MuiAlert: {
+      styleOverrides: {
+        standardSuccess: { maxWidth: "1200px" },
+        standardError: { maxWidth: "1200px" },
+        standardWarning: { maxWidth: "1200px" },
+        standardInfo: { maxWidth: "1200px" },
       },
     },
   },

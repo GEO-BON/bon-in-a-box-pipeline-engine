@@ -2,21 +2,18 @@
 import { useState } from "react";
 import YAMLTextArea from "./YAMLTextArea";
 import { InputsDescription } from "../StepDescription";
-//import { Tabs, Tab, TabList, TabPanel } from "react-tabs";
 import ReactMarkdown from "react-markdown";
-
-//import "react-tabs/style/react-tabs.css";
-//import "./react-tabs-dark.css";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
 
 import yaml from "js-yaml";
 import { isEmptyObject } from "../../utils/isEmptyObject";
-import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
+import Alert from "@mui/material/Alert";
+
 import { styled } from "@mui/material";
 
 /**
@@ -66,13 +63,7 @@ export default function InputFileInput({
         <BTab label="Input yaml"></BTab>
       </Tabs>
       {selectedTab == 0 && (
-        <Box
-          sx={{
-            background: "#f3f3f3f1",
-            padding: "10px",
-            borderRadius: "15px",
-          }}
-        >
+        <Box addClass="inputFormDiv">
           {metadata && (
             <InputForm
               inputs={metadata.inputs}
@@ -83,10 +74,7 @@ export default function InputFileInput({
         </Box>
       )}
       {selectedTab == 1 && (
-        <Box
-          className="yamlInput"
-          sx={{ background: "#f3f3f3f1", padding: "10px" }}
-        >
+        <Box className="yamlInput">
           <YAMLTextArea data={inputFileContent} setData={setInputFileContent} />
           <Box className="inputsDescription">
             <InputsDescription metadata={metadata} />
@@ -125,16 +113,16 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                       {label ? (
                         <strong>{label}</strong>
                       ) : (
-                        <p className="error">
+                        <Alert severity="error" className="error">
                           Missing label for input "{inputId}"
-                        </p>
+                        </Alert>
                       )}
                       {!/^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId) &&
                         !/pipeline@\d+$/.test(inputId) && (
-                          <p className="warning">
+                          <Alert severity="warning">
                             Input id {inputId.replace(/^(.*\|)/, "")} should be
                             a snake_case id
-                          </p>
+                          </Alert>
                         )}
                     </label>
                   )}
@@ -172,9 +160,9 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                       children={description}
                     />
                   ) : (
-                    <p className="warning">
+                    <Alert severity="warning">
                       Missing description for input "{inputId}"
-                    </p>
+                    </Alert>
                   )}
                   {!isEmptyObject(theRest) && yaml.dump(theRest)}
                 </td>

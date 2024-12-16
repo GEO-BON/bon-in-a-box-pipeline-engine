@@ -10,6 +10,7 @@ import infoImg from "../img/info.svg";
 import Box from "@mui/material/Box";
 
 import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
 import { getScriptOutput, getBreadcrumbs } from "../utils/IOId";
 import { isEmptyObject } from "../utils/isEmptyObject";
 import { InlineSpinner } from "./Spinner";
@@ -99,14 +100,9 @@ export function PipelineResults({
                           {runningScripts.size > 0 ? (
                             <InlineSpinner />
                           ) : (
-                            <>
-                              <img
-                                src={warningImg}
-                                alt="Warning"
-                                className="error-inline"
-                              />
+                            <Alert severity="warning">
                               See detailed results
-                            </>
+                            </Alert>
                           )}
                         </div>
                       );

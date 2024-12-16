@@ -105,7 +105,7 @@ img#logo {
   justify-content: center;
   font-size: calc(10px + 2vmin);
 }
-
+/*
 .error,
 .warning,
 .info {
@@ -120,7 +120,7 @@ img#logo {
 
   background-size: 2em 2em;
   background-repeat: no-repeat;
-}
+}*/
 
 .error-inline {
   height: 2em;
@@ -141,9 +141,14 @@ img#logo {
   font-weight: bold;
 }
 
-.error {
+/*.error {
   color: hsl(0, 100%, 27%);
   background-image: url(img/error.svg);
+  max-width: 850px;
+  padding: 15px 35px;
+  border-radius: 15px;
+  border: 3px solid #ddd;
+  width: auto;
 }
 
 .warning {
@@ -157,7 +162,7 @@ img#logo {
   background-position: 0.3em;
   background-size: 1.4em 1.6em;
 }
-
+*/
 .outputContent .stepDescription {
   font-size: small;
   background: #444;
@@ -280,6 +285,7 @@ input[type="number"].input-float {
   height: 30em;
   overflow: auto;
   padding: 0.5em;
+  color: #444;
 }
 
 @keyframes spin {
