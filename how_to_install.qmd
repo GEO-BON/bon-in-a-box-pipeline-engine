@@ -6,37 +6,59 @@ The user interface allows to run and edit pipelines. It is used through the brow
 
 ## Deploying BON in a Box locally {#deploying-the-servers-locally}
 
-BON in a Box can be installed and ran on a local computer. While personnal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.
+BON in a Box can be installed and ran on a local computer. While personal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.
 
-Prerequisites :
+Prerequisites:
 
--   Git - A github account, with an SSH key registered. See [Adding a new SSH key to your GitHub account](https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account).
+-   A GitHub account, and git installed on your computer
 
--   At least 6 GB of free space (this includes the installation of Docker Desktop) - RAM requirements will depend on the scripts that you run.
+-   At least 6GB of free space (RAM requirements depend on the script that is being run)
 
--   **Windows:**
+-   A linux shell
 
-    -   [Docker Desktop](https://www.docker.com/products/docker-desktop/) - Note that it is not necessary to make an account
+    -   This can be Terminal on a Mac or Git Bash on a PC
 
-    -   A Linux shell (git bash, [Bash through PowerShell](https://learn.microsoft.com/en-us/windows/wsl/install), cygwin, etc.) necessary to run th `.sh` scripts in the instructions below.
+### Step 1: Install Docker
 
--   **Mac:**
+-   Install Docker [here](https://www.docker.com/products/docker-desktop/)
 
-    -   [Docker Desktop](https://www.docker.com/products/docker-desktop/) Note that it is not necessary to make an account
+    -   Note: It is not necessary to make an account
+    -   To test whether docker is added to the path of your terminal, run `docker run --rm hello-world`
+    -   **For Mac users:** Make sure to check the chip of your machine and download the correct version.
+        -   If there is an error message when running `docker run --rm hello-world`, see <https://stackoverflow.com/a/71923962/3519951>
+        -   If you encounter error `no matching manifest for linux/arm64/v8 in the manifest list entries`, export DOCKER_DEFAULT_PLATFORM. See <https://stackoverflow.com/a/76404045/3519951>.
+        -   If you have a Silicon chip, check "Use Rosetta for x86_64/amd64 emulation on Apple Silicon". See [issue #175](https://github.com/GEO-BON/bon-in-a-box-pipelines/issues/175).
+    -   **For linux users:** Make sure to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/)
 
-    -   Make sure docker is added to the path of your terminal. From a terminal, run command `docker run hello-world`. If there is an error message, see <https://stackoverflow.com/a/71923962/3519951>.
+### Step 2: Generate SSH Key
 
-    -   If you encounter error `no matching manifest for linux/arm64/v8 in the manifest list entries`, export DOCKER_DEFAULT_PLATFORM. See <https://stackoverflow.com/a/76404045/3519951>.
+1.  First, make sure that you do not already have an SSH key registered to your computer by running `ls -al ~/.ssh` in your terminal.
 
-    -   If you have a Silicon chip, check "Use Rosetta for x86_64/amd64 emulation on Apple Silicon". See [issue #175](https://github.com/GEO-BON/bon-in-a-box-pipelines/issues/175).
+    -   If you already have a key it will be called one of the following:
 
--   **Linux:** Docker with Docker Compose installed. It is required to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
+        -   id_rsa.pub
 
-To run:
+        -   id\_\_ecdsa.pub
+
+        -   id_ed25519.pub
+
+2.  If you do not already have a key, generate one by running `ssh-keygen ed25519 -C "your_email@example.com"` replacing the email with the email address associated with your GitHub account.
+
+    -   This will prompt you to make a password. We recommend skipping this because it becomes a hassle. You can keep pressing enter to skip these steps.
+
+3.  To check if you successfully generated the SSH key, you can run `ls -al ~/.ssh` in the terminal. Your SSH key should be there now.
+
+4.  Now, open the file with your SSH key by running `cat ~/.ssh/<name of SSH key>` e.g. `cat ~/.ssh/id_ed25519.pub` and copy your SSH key.
+
+5.  Now, add your SSH key to your GitHub account by going to GitHub settings \> SSH and GPG keys and "New SSH key". You can name this whatever you want and paste your SSH key into the "Key" field.
+
+### Step 3: Clone repository
 
 1.  Clone repository (Windows users: do not clone the repo in a folder under OneDrive.) This can be done in terminal using the following code: `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git` or in GitHub desktop.
 
-2.  Provide the environment variables: - Open the newly cloned repository on your computer
+### Step 4: Set environment file
+
+1.  Provide the environment variables: - Open the newly cloned repository on your computer
 
     1.  Find the file called [`runner-sample.env`](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env)
 
@@ -46,9 +68,9 @@ To run:
 
     4.  Adjust any server option as you see fit.
 
-3.  Using a linux terminal (terminal on Mac or Git Bash), navigate to the folder of the cloned repository.
+2.  Using a linux terminal (terminal on Mac or Git Bash), navigate to the folder of the cloned repository.
 
-4.  In the linux terminal, type `./server-up.sh`
+3.  In the linux terminal, type `./server-up.sh`
 
     -   Make sure the server is started from a linux terminal that is in the same folder as the cloned repository so it can access the files.
 
@@ -60,17 +82,20 @@ To run:
 
     -   Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl ("wsl --update", see <https://docs.docker.com/desktop/troubleshoot/topics/#virtualization>. Access to the BIOS may be required to enable virtualization)
 
-5.  Type <http://localhost/> to open BON in a Box
+### Step 5: Connect to server
 
-6.  Run `./server-down.sh` in a terminal to stop the server when done
+1.  Type <http://localhost/> to open BON in a Box
 
-7.  On Windows, to completely stop the processes, you might have to run `wsl --shutdown`
+2.  Run `./server-down.sh` in a terminal to stop the server when done
+
+3.  On Windows, to completely stop the processes, you might have to run `wsl --shutdown`
 
 When modifying scripts in the `/scripts` folder, servers do not need to be restarted: - When modifying an existing script, simply re-run the script from the UI and the new version will be executed. - When adding or renaming scripts, refresh the browser page.
 
 When modifying pipelines in the /pipelines folder, servers do not need to be restarted: - In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the "pipeline run" page. - When adding or renaming pipelines, refresh the browser page.
 
 ### Deploying without pulling the new server
+
 If the server has already been deployed at least once, and low bandwith does not allow to download the latest version (this can be a few gigabytes), the server can be started with option `./server-up.sh --offline`. Use with caution, since this may create errors if elements of the repository depend on new server features.
 
 ## Deploying BON in a Box on a server {#deploying-the-servers-remotely}
@@ -81,7 +106,7 @@ Installation steps on a server are the same as installing on a Linux computer, b
 
 -   In `runner.env`, select the "partial" cache cleaning mode. This will allow for calculated results to be long-lived on the server, as long as they are not run again with a new version of the script. The results in the output folder are always accessible by URL.
 
-- In the case where a server is used for demonstration purpose only, set environment variable `BLOCK_RUNS=true`
+-   In the case where a server is used for demonstration purpose only, set environment variable `BLOCK_RUNS=true`
 
 -   The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.
 

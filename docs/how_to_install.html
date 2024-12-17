@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.57">
+<meta name="generator" content="quarto-1.5.56">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -71,7 +71,7 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -89,11 +89,11 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./how_to_install.html" aria-current="page"> 
+    <a class="nav-link" href="./how_to_install.html"> 
 <span class="menu-text">How to Install</span></a>
   </li>  
   <li class="nav-item">
@@ -110,10 +110,36 @@ ul.task-list li input[type="checkbox"] {
 </div>
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">How to Install</li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+      <a href="./index.html" class="sidebar-logo-link">
+      <img src="./Biab_large.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
+      </a>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -122,6 +148,11 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#deploying-the-servers-locally" id="toc-deploying-the-servers-locally" class="nav-link active" data-scroll-target="#deploying-the-servers-locally">Deploying BON in a Box locally</a>
   <ul class="collapse">
+  <li><a href="#step-1-install-docker" id="toc-step-1-install-docker" class="nav-link" data-scroll-target="#step-1-install-docker">Step 1: Install Docker</a></li>
+  <li><a href="#step-2-generate-ssh-key" id="toc-step-2-generate-ssh-key" class="nav-link" data-scroll-target="#step-2-generate-ssh-key">Step 2: Generate SSH Key</a></li>
+  <li><a href="#step-3-clone-repository" id="toc-step-3-clone-repository" class="nav-link" data-scroll-target="#step-3-clone-repository">Step 3: Clone repository</a></li>
+  <li><a href="#step-4-set-environment-file" id="toc-step-4-set-environment-file" class="nav-link" data-scroll-target="#step-4-set-environment-file">Step 4: Set environment file</a></li>
+  <li><a href="#step-5-connect-to-server" id="toc-step-5-connect-to-server" class="nav-link" data-scroll-target="#step-5-connect-to-server">Step 5: Connect to server</a></li>
   <li><a href="#deploying-without-pulling-the-new-server" id="toc-deploying-without-pulling-the-new-server" class="nav-link" data-scroll-target="#deploying-without-pulling-the-new-server">Deploying without pulling the new server</a></li>
   </ul></li>
   <li><a href="#deploying-the-servers-remotely" id="toc-deploying-the-servers-remotely" class="nav-link" data-scroll-target="#deploying-the-servers-remotely">Deploying BON in a Box on a server</a></li>
@@ -154,28 +185,63 @@ ul.task-list li input[type="checkbox"] {
 <p>The user interface allows to run and edit pipelines. It is used through the browser, but doesn’t need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.</p>
 <section id="deploying-the-servers-locally" class="level2">
 <h2 class="anchored" data-anchor-id="deploying-the-servers-locally">Deploying BON in a Box locally</h2>
-<p>BON in a Box can be installed and ran on a local computer. While personnal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.</p>
-<p>Prerequisites :</p>
+<p>BON in a Box can be installed and ran on a local computer. While personal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.</p>
+<p>Prerequisites:</p>
 <ul>
-<li><p>Git - A github account, with an SSH key registered. See <a href="https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account">Adding a new SSH key to your GitHub account</a>.</p></li>
-<li><p>At least 6 GB of free space (this includes the installation of Docker Desktop) - RAM requirements will depend on the scripts that you run.</p></li>
-<li><p><strong>Windows:</strong></p>
+<li><p>A GitHub account, and git installed on your computer</p></li>
+<li><p>At least 6GB of free space (RAM requirements depend on the script that is being run)</p></li>
+<li><p>A linux shell</p>
 <ul>
-<li><p><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> - Note that it is not necessary to make an account</p></li>
-<li><p>A Linux shell (git bash, <a href="https://learn.microsoft.com/en-us/windows/wsl/install">Bash through PowerShell</a>, cygwin, etc.) necessary to run th <code>.sh</code> scripts in the instructions below.</p></li>
+<li>This can be Terminal on a Mac or Git Bash on a PC</li>
 </ul></li>
-<li><p><strong>Mac:</strong></p>
-<ul>
-<li><p><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> Note that it is not necessary to make an account</p></li>
-<li><p>Make sure docker is added to the path of your terminal. From a terminal, run command <code>docker run hello-world</code>. If there is an error message, see <a href="https://stackoverflow.com/a/71923962/3519951" class="uri">https://stackoverflow.com/a/71923962/3519951</a>.</p></li>
-<li><p>If you encounter error <code>no matching manifest for linux/arm64/v8 in the manifest list entries</code>, export DOCKER_DEFAULT_PLATFORM. See <a href="https://stackoverflow.com/a/76404045/3519951" class="uri">https://stackoverflow.com/a/76404045/3519951</a>.</p></li>
-<li><p>If you have a Silicon chip, check “Use Rosetta for x86_64/amd64 emulation on Apple Silicon”. See <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/issues/175">issue #175</a>.</p></li>
-</ul></li>
-<li><p><strong>Linux:</strong> Docker with Docker Compose installed. It is required to <a href="https://docs.docker.com/engine/install/linux-postinstall/">add your user to the docker group</a>.</p></li>
 </ul>
-<p>To run:</p>
+<section id="step-1-install-docker" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-install-docker">Step 1: Install Docker</h3>
+<ul>
+<li><p>Install Docker <a href="https://www.docker.com/products/docker-desktop/">here</a></p>
+<ul>
+<li>Note: It is not necessary to make an account</li>
+<li>To test whether docker is added to the path of your terminal, run <code>docker run --rm hello-world</code></li>
+<li><strong>For Mac users:</strong> Make sure to check the chip of your machine and download the correct version.
+<ul>
+<li>If there is an error message when running <code>docker run --rm hello-world</code>, see <a href="https://stackoverflow.com/a/71923962/3519951" class="uri">https://stackoverflow.com/a/71923962/3519951</a></li>
+<li>If you encounter error <code>no matching manifest for linux/arm64/v8 in the manifest list entries</code>, export DOCKER_DEFAULT_PLATFORM. See <a href="https://stackoverflow.com/a/76404045/3519951" class="uri">https://stackoverflow.com/a/76404045/3519951</a>.</li>
+<li>If you have a Silicon chip, check “Use Rosetta for x86_64/amd64 emulation on Apple Silicon”. See <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/issues/175">issue #175</a>.</li>
+</ul></li>
+<li><strong>For linux users:</strong> Make sure to <a href="https://docs.docker.com/engine/install/linux-postinstall/">add your user to the docker group</a></li>
+</ul></li>
+</ul>
+</section>
+<section id="step-2-generate-ssh-key" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-generate-ssh-key">Step 2: Generate SSH Key</h3>
 <ol type="1">
-<li><p>Clone repository (Windows users: do not clone the repo in a folder under OneDrive.) This can be done in terminal using the following code: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git</code> or in GitHub desktop.</p></li>
+<li><p>First, make sure that you do not already have an SSH key registered to your computer by running <code>ls -al ~/.ssh</code> in your terminal.</p>
+<ul>
+<li><p>If you already have a key it will be called one of the following:</p>
+<ul>
+<li><p>id_rsa.pub</p></li>
+<li><p>id__ecdsa.pub</p></li>
+<li><p>id_ed25519.pub</p></li>
+</ul></li>
+</ul></li>
+<li><p>If you do not already have a key, generate one by running <code>ssh-keygen ed25519 -C "your_email@example.com"</code> replacing the email with the email address associated with your GitHub account.</p>
+<ul>
+<li>This will prompt you to make a password. We recommend skipping this because it becomes a hassle. You can keep pressing enter to skip these steps.</li>
+</ul></li>
+<li><p>To check if you successfully generated the SSH key, you can run <code>ls -al ~/.ssh</code> in the terminal. Your SSH key should be there now.</p></li>
+<li><p>Now, open the file with your SSH key by running <code>cat ~/.ssh/&lt;name of SSH key&gt;</code> e.g.&nbsp;<code>cat ~/.ssh/id_ed25519.pub</code> and copy your SSH key.</p></li>
+<li><p>Now, add your SSH key to your GitHub account by going to GitHub settings &gt; SSH and GPG keys and “New SSH key”. You can name this whatever you want and paste your SSH key into the “Key” field.</p></li>
+</ol>
+</section>
+<section id="step-3-clone-repository" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-clone-repository">Step 3: Clone repository</h3>
+<ol type="1">
+<li>Clone repository (Windows users: do not clone the repo in a folder under OneDrive.) This can be done in terminal using the following code: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git</code> or in GitHub desktop.</li>
+</ol>
+</section>
+<section id="step-4-set-environment-file" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-set-environment-file">Step 4: Set environment file</h3>
+<ol type="1">
 <li><p>Provide the environment variables: - Open the newly cloned repository on your computer</p>
 <ol type="1">
 <li><p>Find the file called <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env"><code>runner-sample.env</code></a></p></li>
@@ -192,12 +258,18 @@ ul.task-list li input[type="checkbox"] {
 <li><p>Network problems may cause the process to fail. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.</p></li>
 <li><p>Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl (“wsl –update”, see <a href="https://docs.docker.com/desktop/troubleshoot/topics/#virtualization" class="uri">https://docs.docker.com/desktop/troubleshoot/topics/#virtualization</a>. Access to the BIOS may be required to enable virtualization)</p></li>
 </ul></li>
+</ol>
+</section>
+<section id="step-5-connect-to-server" class="level3">
+<h3 class="anchored" data-anchor-id="step-5-connect-to-server">Step 5: Connect to server</h3>
+<ol type="1">
 <li><p>Type <a href="http://localhost/" class="uri">http://localhost/</a> to open BON in a Box</p></li>
 <li><p>Run <code>./server-down.sh</code> in a terminal to stop the server when done</p></li>
 <li><p>On Windows, to completely stop the processes, you might have to run <code>wsl --shutdown</code></p></li>
 </ol>
 <p>When modifying scripts in the <code>/scripts</code> folder, servers do not need to be restarted: - When modifying an existing script, simply re-run the script from the UI and the new version will be executed. - When adding or renaming scripts, refresh the browser page.</p>
 <p>When modifying pipelines in the /pipelines folder, servers do not need to be restarted: - In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the “pipeline run” page. - When adding or renaming pipelines, refresh the browser page.</p>
+</section>
 <section id="deploying-without-pulling-the-new-server" class="level3">
 <h3 class="anchored" data-anchor-id="deploying-without-pulling-the-new-server">Deploying without pulling the new server</h3>
 <p>If the server has already been deployed at least once, and low bandwith does not allow to download the latest version (this can be a few gigabytes), the server can be started with option <code>./server-up.sh --offline</code>. Use with caution, since this may create errors if elements of the repository depend on new server features.</p>
