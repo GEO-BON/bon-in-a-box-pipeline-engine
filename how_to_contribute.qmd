@@ -2,7 +2,7 @@
 title: "How to Contribute"
 ---
 
-If you wish to contribute a pipeline, please email us at web\@geobon.org.
+If you wish to contribute a pipeline, please email us at boninabox\@geobon.org.
 
 The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup below. You can create a branch or fork to save your work. Make sure that the code is general, and will work when used with various parameters, such as in different regions around the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before being accepted.
 
