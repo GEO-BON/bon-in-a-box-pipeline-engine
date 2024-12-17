@@ -188,7 +188,7 @@ internal class ScriptRunTest {
 
     @Test
     fun `given script has spaces_when scripts executed_then still works`() = runTest {
-        val run = ScriptRun(File(scriptRoot, "folder with spaces/assert boolean.yml"),
+        val run = ScriptRun(File(scriptRoot, "folder with spaces/assert boolean.py"),
             mapOf("input_bool" to false)
         )
         run.execute()
