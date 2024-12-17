@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>How to Install – BON in a Box</title>
+<title>code_of_conduct – BON in a Box</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -93,7 +93,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./how_to_install.html" aria-current="page"> 
+    <a class="nav-link" href="./how_to_install.html"> 
 <span class="menu-text">How to Install</span></a>
   </li>  
   <li class="nav-item">
@@ -115,113 +115,18 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#deploying-the-servers-locally" id="toc-deploying-the-servers-locally" class="nav-link active" data-scroll-target="#deploying-the-servers-locally">Deploying BON in a Box locally</a>
-  <ul class="collapse">
-  <li><a href="#deploying-without-pulling-the-new-server" id="toc-deploying-without-pulling-the-new-server" class="nav-link" data-scroll-target="#deploying-without-pulling-the-new-server">Deploying without pulling the new server</a></li>
-  </ul></li>
-  <li><a href="#deploying-the-servers-remotely" id="toc-deploying-the-servers-remotely" class="nav-link" data-scroll-target="#deploying-the-servers-remotely">Deploying BON in a Box on a server</a></li>
-  <li><a href="#running-a-script-or-pipeline" id="toc-running-a-script-or-pipeline" class="nav-link" data-scroll-target="#running-a-script-or-pipeline">Running a script or pipeline</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">How to Install</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
+<p>Refer to the <a href="https://geobon.org/wp-content/uploads/2023/05/Code-of-Conduct-GEO-BON.pdf">GEO BON Code of conduct</a></p>
 
 
-</header>
-
-
-<p>The user interface allows to run and edit pipelines. It is used through the browser, but doesn’t need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.</p>
-<section id="deploying-the-servers-locally" class="level2">
-<h2 class="anchored" data-anchor-id="deploying-the-servers-locally">Deploying BON in a Box locally</h2>
-<p>BON in a Box can be installed and ran on a local computer. While personnal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.</p>
-<p>Prerequisites :</p>
-<ul>
-<li><p>Git - A github account, with an SSH key registered. See <a href="https://docs.github.com/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account">Adding a new SSH key to your GitHub account</a>.</p></li>
-<li><p>At least 6 GB of free space (this includes the installation of Docker Desktop) - RAM requirements will depend on the scripts that you run.</p></li>
-<li><p><strong>Windows:</strong></p>
-<ul>
-<li><p><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> - Note that it is not necessary to make an account</p></li>
-<li><p>A Linux shell (git bash, <a href="https://learn.microsoft.com/en-us/windows/wsl/install">Bash through PowerShell</a>, cygwin, etc.) necessary to run th <code>.sh</code> scripts in the instructions below.</p></li>
-</ul></li>
-<li><p><strong>Mac:</strong></p>
-<ul>
-<li><p><a href="https://www.docker.com/products/docker-desktop/">Docker Desktop</a> Note that it is not necessary to make an account</p></li>
-<li><p>Make sure docker is added to the path of your terminal. From a terminal, run command <code>docker run hello-world</code>. If there is an error message, see <a href="https://stackoverflow.com/a/71923962/3519951" class="uri">https://stackoverflow.com/a/71923962/3519951</a>.</p></li>
-<li><p>If you encounter error <code>no matching manifest for linux/arm64/v8 in the manifest list entries</code>, export DOCKER_DEFAULT_PLATFORM. See <a href="https://stackoverflow.com/a/76404045/3519951" class="uri">https://stackoverflow.com/a/76404045/3519951</a>.</p></li>
-<li><p>If you have a Silicon chip, check “Use Rosetta for x86_64/amd64 emulation on Apple Silicon”. See <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/issues/175">issue #175</a>.</p></li>
-</ul></li>
-<li><p><strong>Linux:</strong> Docker with Docker Compose installed. It is required to <a href="https://docs.docker.com/engine/install/linux-postinstall/">add your user to the docker group</a>.</p></li>
-</ul>
-<p>To run:</p>
-<ol type="1">
-<li><p>Clone repository (Windows users: do not clone the repo in a folder under OneDrive.) This can be done in terminal using the following code: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git</code> or in GitHub desktop.</p></li>
-<li><p>Provide the environment variables: - Open the newly cloned repository on your computer</p>
-<ol type="1">
-<li><p>Find the file called <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env"><code>runner-sample.env</code></a></p></li>
-<li><p>Duplicate the file and rename the copy to <code>runner.env</code>.</p></li>
-<li><p>Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g.&nbsp;GBIF or IUCN)</p></li>
-<li><p>Adjust any server option as you see fit.</p></li>
-</ol></li>
-<li><p>Using a linux terminal (terminal on Mac or Git Bash), navigate to the folder of the cloned repository.</p></li>
-<li><p>In the linux terminal, type <code>./server-up.sh</code></p>
-<ul>
-<li><p>Make sure the server is started from a linux terminal that is in the same folder as the cloned repository so it can access the files.</p></li>
-<li><p>Make sure you have docker open and running on your computer.</p></li>
-<li><p>The first execution will be long, in order to download the micro-services. The next ones will be shorter or immediate, depending on the changes.</p></li>
-<li><p>Network problems may cause the process to fail. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.</p></li>
-<li><p>Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl (“wsl –update”, see <a href="https://docs.docker.com/desktop/troubleshoot/topics/#virtualization" class="uri">https://docs.docker.com/desktop/troubleshoot/topics/#virtualization</a>. Access to the BIOS may be required to enable virtualization)</p></li>
-</ul></li>
-<li><p>Type <a href="http://localhost/" class="uri">http://localhost/</a> to open BON in a Box</p></li>
-<li><p>Run <code>./server-down.sh</code> in a terminal to stop the server when done</p></li>
-<li><p>On Windows, to completely stop the processes, you might have to run <code>wsl --shutdown</code></p></li>
-</ol>
-<p>When modifying scripts in the <code>/scripts</code> folder, servers do not need to be restarted: - When modifying an existing script, simply re-run the script from the UI and the new version will be executed. - When adding or renaming scripts, refresh the browser page.</p>
-<p>When modifying pipelines in the /pipelines folder, servers do not need to be restarted: - In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the “pipeline run” page. - When adding or renaming pipelines, refresh the browser page.</p>
-<section id="deploying-without-pulling-the-new-server" class="level3">
-<h3 class="anchored" data-anchor-id="deploying-without-pulling-the-new-server">Deploying without pulling the new server</h3>
-<p>If the server has already been deployed at least once, and low bandwith does not allow to download the latest version (this can be a few gigabytes), the server can be started with option <code>./server-up.sh --offline</code>. Use with caution, since this may create errors if elements of the repository depend on new server features.</p>
-</section>
-</section>
-<section id="deploying-the-servers-remotely" class="level2">
-<h2 class="anchored" data-anchor-id="deploying-the-servers-remotely">Deploying BON in a Box on a server</h2>
-<p>Installation steps on a server are the same as installing on a Linux computer, but some additional configurations need to be changed:</p>
-<ul>
-<li><p>In <code>runner.env</code>, choose the appropriate <code>HTTP_ADDRESS</code> and <code>HTTP_PORT</code> for your server configuration. In a typical installation, use 0.0.0.0 as an HTTP address and default port (80).</p></li>
-<li><p>In <code>runner.env</code>, select the “partial” cache cleaning mode. This will allow for calculated results to be long-lived on the server, as long as they are not run again with a new version of the script. The results in the output folder are always accessible by URL.</p></li>
-<li><p>In the case where a server is used for demonstration purpose only, set environment variable <code>BLOCK_RUNS=true</code></p></li>
-<li><p>The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.</p></li>
-<li><p>By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy and activate https with certbot. How to do this is out of scope for this readme.</p></li>
-</ul>
-</section>
-<section id="running-a-script-or-pipeline" class="level1">
-<h1>Running a script or pipeline</h1>
-<p>You now have an instance of BON in a Box deployed, either <a href="#deploying-the-servers-locally">locally</a> or <a href="#deploying-the-servers-remotely">remotely</a>, and you want to run your first script or pipeline.</p>
-<p>There is one page to run scripts, and one to run pipelines. Once there, select the script or pipelines from the dropdown and fill the form.</p>
-<p>The form might ask you for a file. In order to provide a file that you own locally, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders.</p>
-
-
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

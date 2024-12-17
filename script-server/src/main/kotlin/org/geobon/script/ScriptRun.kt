@@ -241,24 +241,42 @@ class ScriptRun( // Constructor used in single script run
                                 options(repos = repositories)
 
                                 fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
-                                outputFolder<-"${context.outputFolder.absolutePath}";
+                                outputFolder<-"${context.outputFolder.absolutePath}"
                                 library(rjson)
                                 biab_inputs <- function(){
                                     fromJSON(file=file.path(outputFolder, "input.json"))
                                 }
-                                biab_outputs <- function(output){
-                                    jsonData <- toJSON(output, indent=2)
-                                    write(jsonData, file.path(outputFolder,"output.json"))
-                                    print("Output file successfully written")
+                                biab_output_list <- list()
+                                biab_output <- function(key, value){
+                                    biab_output_list[[ key ]] <<- value
+                                    cat("Output added for \"", key, "\"\n")
                                 }
-                                tryCatch(source("${scriptFile.absolutePath}"),
-                                    error=function(e) if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
-                                            print("Suppressed: ignoring SIGPIPE signal");
-                                        } else {
-                                            stop(e);
-                                        });
-                                unlink("${pidFile.absolutePath}");
-                                gc();'
+                                biab_info <- function(message) biab_output("info", message)
+                                biab_warning <- function(message) biab_output("warning", message)
+                                biab_error_stop <- function(errorMessage){
+                                    biab_output_list[[ "error" ]] <<- errorMessage
+                                    stop(errorMessage)
+                                }
+                                withCallingHandlers(source("${scriptFile.absolutePath}"),
+                                    error=function(e){
+                                        if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
+                                            cat("Suppressed: ignoring SIGPIPE signal\n");
+                                        } else if (is.null(biab_output_list[["error"]])) {
+                                            biab_output_list[["error"]] <<- conditionMessage(e)
+                                            cat("Caught error, stack trace:\n")
+                                            print(sys.calls()[-seq(1:5)])
+                                        }
+                                    }
+                                )
+
+                                if(length(biab_output_list) > 0) {
+                                    cat("Writing outputs to BON in a Box...")
+                                    jsonData <- toJSON(biab_output_list, indent=2)
+                                    write(jsonData, file.path(outputFolder,"output.json"))
+                                    cat(" done.\n")
+                                }
+                                unlink("${pidFile.absolutePath}")
+                                gc()'
                             """.trimIndent()
                         )
                     }
@@ -419,7 +437,9 @@ class ScriptRun( // Constructor used in single script run
         if (error || results.isEmpty()) {
             if (!results.containsKey(ERROR_KEY)) {
                 val outputs = results.toMutableMap()
-                outputs[ERROR_KEY] = "An error occurred. Check logs for details."
+                outputs[ERROR_KEY] =
+                    if (results.isEmpty()) "Script produced no results. Check log for errors."
+                    else "An error occurred. Check log for details."
 
                 // Rewrite output file with error
                 resultFile.writeText(RunContext.gson.toJson(outputs))

@@ -55,17 +55,18 @@ function FallbackDisplay({content}) {
 }
 
 function AllSectionResults({ results, sectionMetadata, sectionName }) {
-    return results && Object.entries(results).map(entry => {
-        const [key, value] = entry;
+    if(!results) return null
 
-        if (key === "warning" || key === "error" || key === "info") {
-            return value && <p key={key} className={key}>{value}</p>;
-        }
-
-        const ioMetadata = sectionMetadata && sectionMetadata[key]
-
-        return <SingleIOResult key={key} ioId={key} value={value} ioMetadata={ioMetadata} sectionName={sectionName} />
-    });
+    const {error, warning, info, ...rest} = results
+    return <>
+        {error && <p key="error" className="error">{error}</p>}
+        {warning && <p key="warning" className="warning">{warning}</p>}
+        {info && <p key="info" className="info">{info}</p>}
+        {Object.entries(rest).map(([key, value]) => {
+            const ioMetadata = sectionMetadata && sectionMetadata[key]
+            return <SingleIOResult key={key} ioId={key} value={value} ioMetadata={ioMetadata} sectionName={sectionName} />
+        })}
+    </>
 }
 
 export const SingleIOResult = memo(({ ioId, value, ioMetadata, componentId, sectionName }) => {
