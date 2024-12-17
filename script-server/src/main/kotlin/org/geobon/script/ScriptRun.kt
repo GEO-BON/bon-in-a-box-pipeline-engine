@@ -331,10 +331,12 @@ class ScriptRun( // Constructor used in single script run
                                     }
                                 )
 
-                                cat("Writing outputs to BON in a Box...")
-                                jsonData <- toJSON(biab_output_list, indent=2)
-                                write(jsonData, file.path(outputFolder,"output.json"))
-                                cat(" done.\n")
+                                if(length(biab_output_list) > 0) {
+                                    cat("Writing outputs to BON in a Box...")
+                                    jsonData <- toJSON(biab_output_list, indent=2)
+                                    write(jsonData, file.path(outputFolder,"output.json"))
+                                    cat(" done.\n")
+                                }
                                 unlink("${pidFile.absolutePath}")
                                 gc()'
                             """.trimIndent()
