@@ -8,6 +8,11 @@ import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import _lang from "lodash/lang";
 import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import Box from "@mui/material/Box";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const pipelineConfig = { extension: ".json", defaultFile: "helloWorld.json" };
 const scriptConfig = {
@@ -239,23 +244,30 @@ export function PipelinePage({ runType }) {
   return (
     <>
       <h2>{runType === "pipeline" ? "Pipeline" : "Script"} run</h2>
-      <FoldableOutput
-        title="Input form"
-        isActive={!pipStates.runHash}
-        keepWhenHidden={true}
-      >
-        <PipelineForm
-          pipelineMetadata={pipelineMetadata}
-          setInputFileContent={setInputFileContent}
-          inputFileContent={inputFileContent}
-          pipStates={pipStates}
-          setPipStates={setPipStates}
-          showHttpError={showHttpError}
-          setResultsData={setResultsData}
-          runType={runType}
-        />
-      </FoldableOutput>
-
+      <Box className="inputsTop">
+        <Accordion>
+          <AccordionSummary
+            expanded={!pipStates.runHash}
+            keepWhenHidden={true}
+            className="outputTitle"
+            expandIcon={<ExpandMoreIcon />}
+          >
+            Input form
+          </AccordionSummary>
+          <AccordionDetails className="outputContent">
+            <PipelineForm
+              pipelineMetadata={pipelineMetadata}
+              setInputFileContent={setInputFileContent}
+              inputFileContent={inputFileContent}
+              pipStates={pipStates}
+              setPipStates={setPipStates}
+              showHttpError={showHttpError}
+              setResultsData={setResultsData}
+              runType={runType}
+            />
+          </AccordionDetails>
+        </Accordion>
+      </Box>
       {pipStates.runId && (
         <Button
           onClick={stop}

@@ -168,6 +168,23 @@ img#logo {
   background: #444;
   border-radius: 15px;
   padding: 15px;
+  color: #fff;
+}
+
+.outputContent {
+  -webkit-animation: slide-in-top 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    both;
+  animation: slide-in-top 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  overflow: hidden;
+}
+
+@keyframes slide-in-top {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .references ul {
@@ -349,14 +366,11 @@ textarea.autoResize {
 }
 
 .pipelineResults {
-  background: #444;
+  background: #20232b;
   border-radius: 15px;
   padding: 15px;
-  border: 2px solid #fff4;
+  border: 2px solid #87cefa45;
   margin-top: 15px;
-}
-
-.pipelineResults {
   max-width: 1200px;
 }
 
@@ -391,4 +405,32 @@ textarea.autoResize {
   background: #fff;
   border-radius: 15px;
   padding: 10px;
+}
+
+.inputsTop h3 {
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.inputsTop .MuiAccordion-root.Mui-expanded {
+  width: 850px;
+}
+.inputsTop .MuiAccordion-root {
+  width: 250px;
+}
+
+.inputsTop .MuiAccordion-root {
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    height 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+.inputsTop .MuiAccordion-gutters {
+  border: 2px solid #87cefa45;
+  background: #20232b;
+  border-radius: 10px !important;
+}
+
+.inputsTop .MuiAccordionSummary-expandIconWrapper {
+  color: #fff;
 }

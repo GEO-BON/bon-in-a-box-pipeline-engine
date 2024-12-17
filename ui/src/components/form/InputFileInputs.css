@@ -2,8 +2,10 @@ table.inputFileFields {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0 10px;
-  margin-top: -10px; /* correct offset on first border spacing if desired */
+  margin-top: -2px; /* correct offset on first border spacing if desired */
   background: #f3f3f3f1;
+  border-radius: 10px;
+  padding: 10px;
 }
 
 table.inputFileFields label {
@@ -86,10 +88,14 @@ table.inputFileFields .example {
 
 .inputForm {
   max-width: 850px;
-  background: #444;
   padding: 25px;
-  border: 1px solid #fff4;
-  border-radius: 15px;
+  transition: display 4s allow-discrete;
+}
+
+.inputForm label {
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 table.inputFileFields .MuiInputBase-input {
@@ -123,4 +129,8 @@ table.inputFileFields .MuiInputBase-input {
 
 .inputsDescription {
   color: #333;
+}
+
+.inputsDescription h3 {
+  color: #333 !important;
 }
