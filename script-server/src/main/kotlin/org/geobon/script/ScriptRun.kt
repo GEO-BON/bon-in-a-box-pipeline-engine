@@ -266,7 +266,7 @@ class ScriptRun( // Constructor used in single script run
                     "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
                     "py", "PY" -> {
                         if(useRunners) {
-                            val runner = CondaRunner(logFile, pidFile, "r", condaEnvName, condaEnvYml)
+                            val runner = CondaRunner(logFile, pidFile, "python", condaEnvName, condaEnvYml)
                             container = CondaRunner.container
 
                             val escapedScript = scriptFile.absolutePath.replace(" ", "\\ ")
