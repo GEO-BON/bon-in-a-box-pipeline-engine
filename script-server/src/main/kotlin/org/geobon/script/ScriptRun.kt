@@ -309,12 +309,12 @@ class ScriptRun( // Constructor used in single script run
                                     fromJSON(file=file.path(outputFolder, "input.json"))
                                 }
                                 biab_output_list <- list()
-                                biab_outputs <- function(key, value){
+                                biab_output <- function(key, value){
                                     biab_output_list[[ key ]] <<- value
                                     cat("Output added for \"", key, "\"\n")
                                 }
-                                biab_info <- function(message) biab_outputs("info", message)
-                                biab_warning <- function(message) biab_outputs("warning", message)
+                                biab_info <- function(message) biab_output("info", message)
+                                biab_warning <- function(message) biab_output("warning", message)
                                 biab_error_stop <- function(errorMessage){
                                     biab_output_list[[ "error" ]] <<- errorMessage
                                     stop(errorMessage)
