@@ -55,6 +55,7 @@ class CondaRunner(
                 else
                     echo "Cleaning up after failure..."
                     mamba remove -n $condaEnvName --all > /dev/null 2>&1
+                    rm -rf $condaEnvFile.lock 2>/dev/null
                     rm $condaEnvFile.2.yml 2> /dev/null
                     echo -e "FAILED" ; exit 1
                 fi
