@@ -9,6 +9,7 @@ import {
 } from "./FoldableOutput";
 import ReactMarkdown from "react-markdown";
 import Alert from "@mui/material/Alert";
+import errorImg from "../img/error.svg";
 
 export function StepResult({ data, sectionName, sectionMetadata, logs }) {
   const [activeRenderer, setActiveRenderer] = useState({});
