@@ -12,7 +12,7 @@ export default function YAMLTextArea({ data, setData }) {
       multiline
       fullWidth
       sx={{
-        width: "95%",
+        width: "100%",
         background: "#fff",
         fontFamily: "Roboto",
       }}
@@ -21,7 +21,6 @@ export default function YAMLTextArea({ data, setData }) {
         sortKeys: true,
       })}
       onBlur={(e) => setData(yaml.load(e.target.value))}
-      //slotProps={{ htmlInput: { style: { resize: "vertical" } } }}
     />
   );
 }
