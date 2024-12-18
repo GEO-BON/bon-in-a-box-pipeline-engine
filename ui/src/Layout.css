@@ -269,7 +269,8 @@ input[type="number"].input-float {
   height: 30em;
   overflow: auto;
   padding: 0.5em;
-  color: #444;
+  color: #eee;
+  background: #333;
 }
 
 @keyframes spin {
