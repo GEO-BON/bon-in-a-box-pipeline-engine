@@ -63,7 +63,7 @@ export default function InputFileInput({
         <BTab label="Input yaml"></BTab>
       </Tabs>
       {selectedTab == 0 && (
-        <Box addClass="inputFormDiv">
+        <Box className="inputFormDiv">
           {metadata && (
             <InputForm
               inputs={metadata.inputs}
