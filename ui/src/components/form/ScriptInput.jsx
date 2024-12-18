@@ -19,6 +19,7 @@ export default function ScriptInput({
   onValueUpdated,
   cols,
   label,
+  size="medium",
   ...passedProps
 }) {
   const [fieldValue, setFieldValue] = useState(value || "");
@@ -44,6 +45,7 @@ export default function ScriptInput({
         <Autocomplete
           defaultValue={[]}
           label={label}
+          size={size}
           multiple={type === "options[]"}
           filterSelectedOptions={type === "options[]"}
           options={optionObjects}
@@ -52,6 +54,7 @@ export default function ScriptInput({
               {...params}
               fullWidth={false}
               label={label}
+              size={size}
               sx={{
                 fontSize: "1em",
                 fontFamily: "Roboto",
@@ -100,6 +103,7 @@ export default function ScriptInput({
       <TextField
         multiline
         variant="outlined"
+        size={size}
         label={label}
         {...passedProps}
         value={joinIfArray(fieldValue)}
@@ -117,11 +121,12 @@ export default function ScriptInput({
   switch (type) {
     case "boolean":
       return (
-        <FormGroup>
+        <FormGroup size={size}>
           <FormControlLabel
             control={
               <Checkbox
                 type="checkbox"
+                size={size}
                 {...passedProps}
                 checked={fieldValue}
                 onChange={(e) => {
@@ -142,6 +147,7 @@ export default function ScriptInput({
           type="number"
           label={label}
           variant="outlined"
+          size={size}
           {...passedProps}
           value={fieldValue}
           onChange={(e) => {
@@ -157,6 +163,7 @@ export default function ScriptInput({
         <TextField
           type="number"
           variant="outlined"
+          size={size}
           label={label}
           step="any"
           {...passedProps}
@@ -189,12 +196,13 @@ export default function ScriptInput({
 
       if (fieldValue && fieldValue.includes("\n")) {
         props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
-        return <TextField multiline keepWidth={true} cols={cols} {...props} />;
+        return <TextField multiline size={size} keepWidth={true} cols={cols} {...props} />;
       } else {
         return (
           <TextField
             type="text"
             label={label}
+            size={size}
             {...props}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.ctrlKey) updateValue(e);

@@ -341,6 +341,20 @@
   background-color: white;
 }
 
+.ioListItem .MuiInputBase-input{
+  font-size: 0.7em;
+  padding: 2px;
+}
+
+.ioListItem .MuiInputBase-root{
+  padding: 5px;
+}
+
+.ioListItem .MuiInputBase-input{
+  font-size:0.7em;
+  padding: 2px;
+}
+
 .collapseTab {
   text-align: center;
 }

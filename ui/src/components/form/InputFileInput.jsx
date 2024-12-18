@@ -133,6 +133,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                     value={inputFileContent && inputFileContent[inputId]}
                     onValueUpdated={(value) => updateInputFile(inputId, value)}
                     label={label}
+                    size="medium"
                     cols="50"
                   />
                   {(inputFileContent[inputId] == "" ||
