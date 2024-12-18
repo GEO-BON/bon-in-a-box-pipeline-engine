@@ -265,12 +265,12 @@ input[type="number"].input-float {
 }
 
 .logs {
-  border: 1px solid #414855;
+  border: 2px solid #87cefa45;
   height: 30em;
   overflow: auto;
   padding: 0.5em;
-  color: #eee;
-  background: #333;
+  color: #222;
+  background: #00000008;
 }
 
 @keyframes spin {
