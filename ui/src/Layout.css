@@ -79,6 +79,7 @@ a.active {
 
 img#logo {
   max-width: 10vw;
+  padding: 5px 10px;
 }
 
 .spinner {

@@ -245,10 +245,8 @@ export function PipelinePage({ runType }) {
     <>
       <h2>{runType === "pipeline" ? "Pipeline" : "Script"} run</h2>
       <Box className="inputsTop">
-        <Accordion>
+        <Accordion defaultExpanded expanded={!pipStates.runHash}>
           <AccordionSummary
-            expanded={!pipStates.runHash}
-            keepWhenHidden={true}
             className="outputTitle"
             expandIcon={<ExpandMoreIcon />}
           >
