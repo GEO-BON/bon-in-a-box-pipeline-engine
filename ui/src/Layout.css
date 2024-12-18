@@ -406,3 +406,7 @@ textarea.autoResize {
 .inputsTop .MuiAccordionSummary-expandIconWrapper {
   color: #fff;
 }
+
+h2.MuiDialogTitle-root{
+  color: var(--biab-green-main)
+}
