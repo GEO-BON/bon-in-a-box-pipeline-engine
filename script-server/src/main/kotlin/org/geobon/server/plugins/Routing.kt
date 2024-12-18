@@ -31,8 +31,6 @@ private val scriptStubsRoot = File(System.getenv("SCRIPT_STUBS_LOCATION"))
 
 private val runningPipelines = mutableMapOf<String, Pipeline>()
 private val logger: Logger = LoggerFactory.getLogger("Server")
-// Date format definition https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
-private val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
 fun Application.configureRouting() {
 
@@ -93,50 +91,14 @@ fun Application.configureRouting() {
 
         get("/api/history") {
             val history = JSONArray()
+            runningPipelines.keys.forEach { runId ->
+                val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
+                history.put(getHistoryFromFolder(pipelineOutputFolder, true))
+            }
+
             outputRoot.walk().forEach { file ->
                 if (file.name == "pipelineOutput.json") {
-                    val run = JSONObject()
-                    val runId = file.parentFile.relativeTo(outputRoot).path.replace('/', FILE_SEPARATOR)
-                    run.put("runId", runId)
-                    run.put("startTime", dateFormat.format(file.lastModified()))
-                    val inputFile = File(file.parentFile, "input.json")
-                    if (inputFile.isFile) {
-                        run.put("inputs", JSONObject(inputFile.readText()))
-                    }
-
-                    run.put(
-                        "status",
-                        if (runningPipelines.containsKey(runId)) {
-                            "running"
-                        } else {
-                            getCompletionStatus(file)
-                        }
-                    )
-
-                    val type:String
-                    val description:String
-                    val runFolder = file.parentFile
-                    if(File(runFolder, "output.json").exists()) {
-                        type = "script"
-                        val scriptDescription = File(scriptRoot, runFolder.relativeTo(outputRoot).path + ".yml")
-                        description = if(scriptDescription.isFile) {
-                            "working on it..."
-                        } else {
-                            "missing"
-                        }
-                    } else {
-                        type = "pipeline"
-                        val pipelineDescription = File(pipelinesRoot, runFolder.relativeTo(outputRoot).path + ".json")
-                        description = if(pipelineDescription.isFile) {
-                            "working on it..."
-                        } else {
-                            "missing"
-                        }
-                    }
-                    run.put("type", type)
-                    run.put("description", description)
-
-                    history.put(run)
+                    history.put(getHistoryFromFolder(file.parentFile, false))
                 }
             }
 

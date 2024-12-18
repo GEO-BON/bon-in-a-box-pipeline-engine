@@ -37,6 +37,10 @@ a.active {
   color: hsl(0, 0%, 20%);
 }
 
+.react-select {
+  color: hsl(0, 0%, 20%);
+}
+
 .fullScreenPopup {
   position: absolute;
   top: 100px;

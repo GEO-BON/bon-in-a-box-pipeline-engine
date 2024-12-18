@@ -2,7 +2,7 @@
 title: "How to Contribute"
 ---
 
-If you wish to contribute a pipeline, please email us at web\@geobon.org.
+If you wish to contribute a pipeline, please email us at boninabox\@geobon.org.
 
 The recommended method is to setup an instance of BON in a Box somewhere you can easily play with the script files, using the local or remote setup below. You can create a branch or fork to save your work. Make sure that the code is general, and will work when used with various parameters, such as in different regions around the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before being accepted.
 
@@ -351,9 +351,9 @@ See [empty R script](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main
 
 ### Receiving inputs
 
-When running a script, a folder is created for each given set of parameters. The same parameters result in the same folder, different parameters result in a different folder. The inputs for a given script are saved in an `input.json` file in this unique run folder.
+When running a script, a folder is created for each given set of parameters. The same parameters result in the same folder, different parameters result in a different folder. The inputs for a given script are saved in a generated `input.json` file in this unique run folder.
 
-The file contains the id of the parameters that were specified in the yaml script description, associated to the values for this run. Example:
+This file contains the id of the parameters that were specified in the yaml script description, associated to the values for this run. Example:
 
 ``` json
 {
@@ -372,18 +372,10 @@ The file contains the id of the parameters that were specified in the yaml scrip
 }
 ```
 
-The script reads the `input.json` file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline. Here is an example of how to read the input folder in the R script:
-
-First, set the environment for the script:
+The script reads the `input.json` file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline. A convenience function `biab_inputs` is loaded in R by default to load the file into a list. Here is an example of how to read the input file in the R script:
 
 ``` r
-Sys.getenv("SCRIPT_LOCATION")
-```
-
-And then set the 'input' environment variables. The 'input' environment contains the specified inputs from the BON in a Box platform.
-
-``` r
-input <- rjson::fromJSON(file=file.path(outputFolder, "input.json")) # Load input file
+input <- biab_inputs()
 ```
 
 Next, for any functions that are using these inputs, they need to be specified.
@@ -404,27 +396,33 @@ Here is another example to read in an output from a previous step of the pipelin
 dat <- read.csv(input$csv_file)
 ```
 
-Next, you have to specify the outputs, which can be saved in a variety of formats. The format must be accurately specified in the YAML file.
+### Writing outputs
 
-Here is an example of an output with a csv file and a plot in png format.
+The outputs can be saved in a variety of formats. The format must be accurately specified in the YAML file. A variable named `outputFolder` is loaded when R load that specifies where to save the output files.
+
+In R, a convenience function `biab_output` allow to save the outputs. Here is an example in R of an output with a csv file and a plot in png format.
 
 ``` r
 result_path <- file.path(outputFolder, "result.csv")
 write.csv(result, result_path, row.names = F )
+biab_output("result", result_path)
 
 result_plot_path <- file.path(outputFolder, "result_plot.png")
 ggsave(result_path, result)
-
-output <- list(result = result_path,
-result_plot = result_plot_path)
+biab_output("result_plot", result_plot_path)
 ```
 
-Lastly, write the output as a JSON file:
+For other languages, the script needs to write the output JSON file. The format is the same as for input file above:
 
-``` r
-setwd(outputFolder)
-jsonlite::write_json(output, "output.json", auto_unbox = TRUE, pretty = TRUE)
+``` json
+{
+    "some_array": [1, 55, 67],
+    "some_string": "This is my output",
+    "some_file": "/output/folder/script/hash/file.ext",
+}
 ```
+
+Where `/output/folder/script/hash/` is the value of `outputFolder`.
 
 ### Script validation
 
@@ -436,34 +434,25 @@ This validates that the syntax and structure are correct, but not that it's cont
 
 The output keys `info`, `warning` and `error` can be used to report problems in script execution. They do not need to be described in the `outputs` section of the description. They will be displayed specially in the UI.
 
-Any `error` message will halt the rest of the pipeline.
+Any `error` message will also halt the rest of the pipeline. It is recommended to output specific error messages to avoid crashes when errors can be foreseen. This can be done by writing an "error" attribute to the `output.json` file, or by using the R helper functions.
 
-To code an error so it prints in the pipeline step, you will need to wrap your script in a try catch function and then code it to print errors.
-
-``` r
-{r}
-output<- tryCatch({
-
-SCRIPT BODY HERE
-
-}, error = function(e) { list(error= conditionMessage(e)) })
-```
-
-This will print any errors in the output of the script in the UI.
-
-You can also code specific error messages. For example, if a user wanted the analysis to stop if the result was less than 0:
+For example, if a user wanted the analysis to stop if the result was less than 0:
 
 ``` r
-output<- tryCatch({
-
+# R helper function for errors
 if (result < 0){
-stop("Analysis was halted because result is less than 0.")
+    biab_error_stop("Analysis was halted because result is less than 0.")
+    # Script stops here
 }
 
-}, error = function(e) { list(error= conditionMessage(e)) })
+# Other R helper functions
+biab_warning("This warning will appear in the UI, but does not stop the pipeline.")
+biab_info("This message will appear in the UI.")
 ```
 
-And then the customized error message would appear in the UI.
+And then the customized message will appear in the UI.
+
+A crash will have the same behavior as an `error` output, stopping the pipeline and appearing in the UI.
 
 ## Step 3: Connect your scripts with the BON in a Box pipeline editor.
 

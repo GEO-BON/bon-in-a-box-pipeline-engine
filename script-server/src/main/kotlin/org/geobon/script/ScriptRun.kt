@@ -236,6 +236,10 @@ class ScriptRun( // Constructor used in single script run
                                     set -o pipefail
                                     echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
 
+                                    while ! mkdir $condaEnvFile.lock 2>/dev/null; do echo "waiting for conda lockfile..."; sleep 2s; done;
+                                    trap "echo 'Removing conda lock file for interrupted process'; rm -rf $condaEnvFile.lock 2>/dev/null; exit 1" SIGINT SIGTERM
+                                    echo "Conda lock file acquired"
+
                                     if [ ! -f "$condaEnvFile.yml" ]; then
                                         echo "Creating new conda environment $condaEnvName..."
                                         createLogs=$(mamba env create -f $condaEnvFile.2.yml 2>&1 | tee -a ${logFile.absolutePath})
@@ -271,6 +275,10 @@ class ScriptRun( // Constructor used in single script run
                                         mamba env create -f $condaEnvFile.yml
                                         mamba activate $condaEnvName
                                     fi
+
+                                    echo "Removing conda lock file"
+                                    rm -rf $condaEnvFile.lock 2>/dev/null
+                                    trap - SIGINT SIGTERM
                                 """.trimIndent()
                             } else {
                                 """
@@ -283,6 +291,7 @@ class ScriptRun( // Constructor used in single script run
                             // eval and source commands to initialize mamba, see https://stackoverflow.com/a/75246428/3519951
                             "bash", "-c",
                             """
+                                echo $$ > ${pidFile.absolutePath}
                                 source /.bashrc
                                 $activateEnvironment
                                 Rscript -e '
@@ -294,15 +303,42 @@ class ScriptRun( // Constructor used in single script run
                                 options(repos = repositories)
 
                                 fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
-                                outputFolder<-"${context.outputFolder.absolutePath}";
-                                tryCatch(source("${scriptFile.absolutePath}"),
-                                    error=function(e) if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
-                                            print("Suppressed: ignoring SIGPIPE signal");
-                                        } else {
-                                            stop(e);
-                                        });
-                                unlink("${pidFile.absolutePath}");
-                                gc();'
+                                outputFolder<-"${context.outputFolder.absolutePath}"
+                                library(rjson)
+                                biab_inputs <- function(){
+                                    fromJSON(file=file.path(outputFolder, "input.json"))
+                                }
+                                biab_output_list <- list()
+                                biab_output <- function(key, value){
+                                    biab_output_list[[ key ]] <<- value
+                                    cat("Output added for \"", key, "\"\n")
+                                }
+                                biab_info <- function(message) biab_output("info", message)
+                                biab_warning <- function(message) biab_output("warning", message)
+                                biab_error_stop <- function(errorMessage){
+                                    biab_output_list[[ "error" ]] <<- errorMessage
+                                    stop(errorMessage)
+                                }
+                                withCallingHandlers(source("${scriptFile.absolutePath}"),
+                                    error=function(e){
+                                        if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
+                                            cat("Suppressed: ignoring SIGPIPE signal\n");
+                                        } else if (is.null(biab_output_list[["error"]])) {
+                                            biab_output_list[["error"]] <<- conditionMessage(e)
+                                            cat("Caught error, stack trace:\n")
+                                            print(sys.calls()[-seq(1:5)])
+                                        }
+                                    }
+                                )
+
+                                if(length(biab_output_list) > 0) {
+                                    cat("Writing outputs to BON in a Box...")
+                                    jsonData <- toJSON(biab_output_list, indent=2)
+                                    write(jsonData, file.path(outputFolder,"output.json"))
+                                    cat(" done.\n")
+                                }
+                                unlink("${pidFile.absolutePath}")
+                                gc()'
                             """.trimIndent()
                         )
                     }
@@ -334,13 +370,14 @@ class ScriptRun( // Constructor used in single script run
 
                                         if (pidFile.exists() && container.isExternal()) {
                                             val pid = pidFile.readText().trim()
-                                            log(logger::debug, "$event: killing runner process '$pid'")
+                                            log(logger::debug, "$event: gracefully stopping runner process '$pid'")
 
                                             ProcessBuilder(container.dockerCommandList + listOf(
                                                     "kill", "-s", "TERM", pid
                                             )).start()
 
-                                            if (!process.waitFor(10, TimeUnit.SECONDS)) {
+                                            if (!process.waitFor(30, TimeUnit.SECONDS)) {
+                                                log(logger::debug, "$event: forcefully stopping runner process '$pid' after 30 seconds")
                                                 ProcessBuilder(container.dockerCommandList + listOf(
                                                         "kill", "-s", "KILL", pid
                                                 )).start()
@@ -351,7 +388,7 @@ class ScriptRun( // Constructor used in single script run
                                             process.destroy()
                                         }
 
-                                        if (!process.waitFor(10, TimeUnit.SECONDS)) {
+                                        if (!process.waitFor(30, TimeUnit.SECONDS)) {
                                             log(logger::info, "$event: cancellation timeout elapsed.")
                                             process.destroyForcibly()
                                         }
@@ -443,7 +480,9 @@ class ScriptRun( // Constructor used in single script run
         if (error || results.isEmpty()) {
             if (!results.containsKey(ERROR_KEY)) {
                 val outputs = results.toMutableMap()
-                outputs[ERROR_KEY] = "An error occurred. Check logs for details."
+                outputs[ERROR_KEY] =
+                    if (results.isEmpty()) "Script produced no results. Check log for errors."
+                    else "An error occurred. Check log for details."
 
                 // Rewrite output file with error
                 resultFile.writeText(RunContext.gson.toJson(outputs))
