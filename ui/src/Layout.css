@@ -11,6 +11,10 @@ a.active {
   text-decoration: none;
 }
 
+h2{
+  color: var(--biab-green-main)
+}
+
 .clickable {
   cursor: pointer;
 }
