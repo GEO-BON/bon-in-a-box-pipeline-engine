@@ -9,6 +9,7 @@ import {
 } from "./FoldableOutput";
 import ReactMarkdown from "react-markdown";
 import Alert from "@mui/material/Alert";
+import Error from "@mui/icons-material/Error";
 import errorImg from "../img/error.svg";
 
 export function StepResult({ data, sectionName, sectionMetadata, logs }) {
@@ -251,7 +252,7 @@ export const SingleIOResult = memo(
 
       if (!ioMetadata.type) {
         // error message taken care by children
-        icon = <img src={errorImg} alt="Error" className="error-inline" />;
+        icon = <Error color="error"/>
       }
 
       if (
@@ -267,6 +268,7 @@ export const SingleIOResult = memo(
     } else {
       // error message taken care by children
       icon = <img src={errorImg} alt="Error" className="error-inline" />;
+      icon = <Error color="error"/>
     }
 
     let isLink = isRelativeLink(value);

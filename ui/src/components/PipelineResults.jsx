@@ -7,6 +7,10 @@ import {
 import errorImg from "../img/error.svg";
 import warningImg from "../img/warning.svg";
 import infoImg from "../img/info.svg";
+import Error from "@mui/icons-material/Error"
+import Warning from "@mui/icons-material/Warning"
+import Info from "@mui/icons-material/Info"
+
 import Box from "@mui/material/Box";
 
 import Button from "@mui/material/Button";
@@ -290,13 +294,13 @@ export function DelayedResult({
       icon = (
         <>
           {outputData.error && (
-            <img src={errorImg} alt="Error" className="error-inline" />
+            <Error color="error"/>
           )}
           {outputData.warning && (
-            <img src={warningImg} alt="Warning" className="error-inline" />
+            <Warning color="warning"/>
           )}
           {outputData.info && (
-            <img src={infoImg} alt="Info" className="info-inline" />
+            <Info color="info" />
           )}
         </>
       );
