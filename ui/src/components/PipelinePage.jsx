@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useRef } from "react";
+import React, { useState, useEffect, useReducer, useCallback } from "react";
 import { FoldableOutput } from "./FoldableOutput";
 
 import { PipelineForm } from "./form/PipelineForm";
@@ -88,7 +88,6 @@ export function PipelinePage({ runType }) {
   const [httpError, setHttpError] = useState(null);
   const [pipelineMetadata, setPipelineMetadata] = useState(null);
   const [expandInputs, setExpandInputs] = useState(true);
-  const accRef = useRef(0);
 
   /**
    * String: Content of input.json for this run
@@ -243,23 +242,22 @@ export function PipelinePage({ runType }) {
     });
   };
 
-  
   useEffect(()=>{
     if(pipStates.runHash){
       setExpandInputs(false)
     }
   },[pipStates.runHash])
 
-  const toggleAccord  = (panel) => (event, isExpanded) => {
-    setExpandInputs(!expandInputs);
-  }
+  const toggleAccord  = useCallback(() => {
+    setExpandInputs(prev => !prev);
+  }, [setExpandInputs])
 
 
   return (
     <>
       <h2>{runType === "pipeline" ? "Pipeline" : "Script"} run</h2>
       <Box className="inputsTop" >
-        <Accordion expanded={expandInputs===true} onChange={toggleAccord()}>
+        <Accordion expanded={expandInputs} onChange={toggleAccord}>
           <AccordionSummary
             className="outputTitle"
             expandIcon={<ExpandMoreIcon />}
