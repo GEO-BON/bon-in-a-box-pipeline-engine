@@ -14,10 +14,11 @@ import TiTilerLayer from "./TiTilerLayer";
 import "leaflet.markercluster";
 import ReactDOMServer from "react-dom/server";
 import "./MarkerCluster.Default.css";
+import Alert from "@mui/material/Alert";
 
 // Reimport default icon for markers (the Icon would otherwise not show up)
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
 L.Marker.prototype.options.icon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
@@ -125,7 +126,7 @@ export default function MapResult({ tiff, range, json, markers }) {
     }
   }, [json]);
 
-  if (error) return <p className="error">{error}</p>;
+  if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
     <MapContainer className="map" center={[0, 0]} zoom={5}>

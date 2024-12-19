@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 
 import { NavLink } from "react-router-dom";
 
-import BiaBLogo from "./img/boninabox.jpg";
+import BiaBLogo from "./img/boninabox_logo.jpg";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./components/styles/theme";
 import useWindowDimensions from "./utils/WindowDimensions";

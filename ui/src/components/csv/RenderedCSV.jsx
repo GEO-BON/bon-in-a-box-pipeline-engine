@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import CsvToHtmlTable, { parseCsvToRowsAndColumn } from "./CsvToHtmlTable";
 import MapResult from "../map/Map";
 import { Spinner } from "../Spinner";
+import Alert from "@mui/material/Alert";
 
 /**
  * Properties
@@ -62,7 +63,7 @@ function CsvToTable({ url, delimiter }) {
   if (data || error)
     return (
       <>
-        {error && <p className="error">{error}</p>}
+        {error && <Alert severity="error">{error}</Alert>}
         {data && <CsvToHtmlTable data={data} csvDelimiter={delimiter} />}
         {partial && (
           <p>
@@ -136,7 +137,7 @@ function CsvToMap({ url, delimiter }) {
   if (data || error)
     return (
       <>
-        {error && <p className="error">{error}</p>}
+        {error && <Alert severity="error">{error}</Alert>}
         {!error && data && (
           <MapResult markers={readCoordinates(data, delimiter)} />
         )}
