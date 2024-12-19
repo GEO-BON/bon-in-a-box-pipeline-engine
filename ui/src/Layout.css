@@ -210,6 +210,30 @@ img#logo {
   border-left: 0.4em solid #115ca2;
 }
 
+.outputTitle .clickable {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.outputTitle .expandIcon {
+  margin-left: -7px;
+  padding-top: 4px;
+  flex-shrink: 0;
+}
+
+.outputTitle h3 {
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.outputTitle .inlinePreview {
+  flex-grow: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .stepInputs .outputContent {
   border-left: 0.4em solid #eaa222;
 }

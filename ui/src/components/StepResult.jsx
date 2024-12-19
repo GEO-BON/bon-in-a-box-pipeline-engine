@@ -280,7 +280,7 @@ export const SingleIOResult = memo(
         icon={icon}
         inline={
           isLink && (
-            <a href={value} target="_blank" rel="noreferrer">
+            <a href={value} style={{ fontSize: "0.8rem", paddingBottom: "1px" }} target="_blank" rel="noreferrer">
               {value}
             </a>
           )

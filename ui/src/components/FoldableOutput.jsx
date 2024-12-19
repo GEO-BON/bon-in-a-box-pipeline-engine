@@ -113,7 +113,7 @@ function FoldableOutputInternal({
     <div className={className}>
       <div className="outputTitle">
         <div className="clickable" onClick={toggle}>
-          <div style={{ display: "inline", paddingTop: "4px" }}>
+          <div className="expandIcon">
             {active ? (
               <ExpandLessIcon
                 sx={{
@@ -136,13 +136,7 @@ function FoldableOutputInternal({
             {icon}
           </div>
           <h3 ref={titleRef}>{title}</h3>
-          <div
-            style={{
-              fontSize: "0.7em",
-              display: "inline",
-              lineHeight: "0em",
-            }}
-          >
+          <div className="inlinePreview">
             {inline}
             {!active && inlineCollapsed}
           </div>
