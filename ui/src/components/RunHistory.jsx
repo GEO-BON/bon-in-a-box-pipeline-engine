@@ -22,14 +22,6 @@ import { CustomButtonGreen } from "./CustomMUI";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
-var callback = function (error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log("API called successfully. Returned data: " + data);
-  }
-};
-
 export default function RunHistory() {
   let [runHistory, setRunHistory] = useState();
   useEffect(() => {
