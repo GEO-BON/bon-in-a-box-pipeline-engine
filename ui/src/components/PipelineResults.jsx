@@ -64,17 +64,19 @@ export function PipelineResults({
           activeRenderer={activeRenderer}
           setActiveRenderer={setActiveRenderer}
         >
-          <h2>Results</h2>
           {isPipeline && runHash && (
-            <a href={`/viewer/${pipeline}>${runHash}`} target="_blank">
-              <Button
-                disabled={runningScripts.size > 0}
-                variant="contained"
-                sx={{ marginBottom: "10px" }}
-              >
-                See in results viewer
-              </Button>
-            </a>
+            <>
+              <h2>Results</h2>
+              <a href={`/viewer/${pipeline}>${runHash}`} target="_blank">
+                <Button
+                  disabled={runningScripts.size > 0}
+                  variant="contained"
+                  sx={{ marginBottom: "10px" }}
+                >
+                  See in results viewer
+                </Button>
+              </a>
+            </>
           )}
           {isPipeline && (
             <Box className="resultsBox">
