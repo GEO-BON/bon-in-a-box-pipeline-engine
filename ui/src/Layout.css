@@ -4,15 +4,15 @@ nav {
 }
 
 a {
-  color: lightskyblue;
+  color: var(--biab-yellow-light);
 }
 a.active {
   color: white;
   text-decoration: none;
 }
 
-h2{
-  color: var(--biab-green-light)
+h2 {
+  color: #bbb;
 }
 
 .clickable {
@@ -388,12 +388,20 @@ textarea.autoResize {
 }
 
 .pipelineResults a {
-  color: var(--biab-purple-main);
+  color: var(--biab-blue-main);
 }
 
 .pipelineResults .stepDescription {
   background: #fff;
   color: #444;
+}
+
+.stepInputs h3 {
+  color: var(--biab-yellow-main);
+}
+
+.stepInputs svg {
+  color: var(--biab-yellow-main);
 }
 
 .resultsBox {
@@ -430,6 +438,6 @@ textarea.autoResize {
   color: #fff;
 }
 
-h2.MuiDialogTitle-root{
-  color: var(--biab-green-main)
+h2.MuiDialogTitle-root {
+  color: var(--biab-green-main);
 }
