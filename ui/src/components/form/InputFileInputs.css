@@ -98,6 +98,10 @@ table.inputFileFields .example {
   margin-bottom: 10px;
 }
 
+.inputForm .MuiTabs-indicator {
+  height: 5px;
+}
+
 table.inputFileFields .MuiInputBase-input {
   font-size: 0.85em !important;
   font-family: "Roboto" !important;

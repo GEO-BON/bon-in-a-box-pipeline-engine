@@ -51,9 +51,9 @@ export default function StepChooser({ popupContent, setPopupContent }) {
         fetchStepDescription(descriptionFile, (metadata) => {
           if (!metadata) {
             setPopupContent(
-              <p className="error">
+              <Alert className="error">
                 Failed to fetch script description for {descriptionFile}
-              </p>
+              </Alert>
             );
             return;
           }
@@ -170,7 +170,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
         </div>
       )}
 
-      {scriptFiles &&
+      {scriptFiles && (
         <div key="Scripts">
           <h3>Scripts</h3>
           {renderTree(
@@ -181,7 +181,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
             ])
           )}
         </div>
-      }
+      )}
     </aside>
   );
 }

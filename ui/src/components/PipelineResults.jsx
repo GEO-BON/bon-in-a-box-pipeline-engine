@@ -4,12 +4,10 @@ import {
   FoldableOutput,
   FoldableOutputContextProvider,
 } from "./FoldableOutput";
-import errorImg from "../img/error.svg";
-import warningImg from "../img/warning.svg";
-import infoImg from "../img/info.svg";
-import Error from "@mui/icons-material/Error"
-import Warning from "@mui/icons-material/Warning"
-import Info from "@mui/icons-material/Info"
+
+import Error from "@mui/icons-material/Error";
+import Warning from "@mui/icons-material/Warning";
+import Info from "@mui/icons-material/Info";
 
 import Box from "@mui/material/Box";
 
@@ -293,15 +291,9 @@ export function DelayedResult({
       );
       icon = (
         <>
-          {outputData.error && (
-            <Error color="error"/>
-          )}
-          {outputData.warning && (
-            <Warning color="warning"/>
-          )}
-          {outputData.info && (
-            <Info color="info" />
-          )}
+          {outputData.error && <Error color="error" />}
+          {outputData.warning && <Warning color="warning" />}
+          {outputData.info && <Info color="info" />}
         </>
       );
       inline = skippedMessage && <i>{skippedMessage}</i>;
