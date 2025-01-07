@@ -62,6 +62,7 @@ table.inputFileFields td.descriptionCell {
   white-space: pre-wrap;
   font-size: 0.8em;
   color: #444;
+  word-break: break-word;
 }
 
 table.inputFileFields .example {
