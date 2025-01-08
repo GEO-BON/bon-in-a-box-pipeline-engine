@@ -47,7 +47,7 @@ export default function RunHistory() {
 
   return (
     <p style={{ whiteSpace: "pre-wrap" }}>
-      {runHistory ? runHistory : <Spinner />}
+      {runHistory ? runHistory : <Spinner variant='light'/>}
     </p>
   );
 }

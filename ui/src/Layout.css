@@ -1,10 +1,13 @@
 nav {
   padding-top: 1em;
   padding-bottom: 1em;
+  font-family: Lato, sans-serif;
+  font-weight: 500;
+  font-size: 1.1em;
 }
 
 a {
-  color: var(--biab-yellow-light);
+  color: var(--biab-blue-light);
 }
 a.active {
   color: white;
@@ -79,6 +82,15 @@ h2 {
 .fullScreenPopup .content {
   flex-grow: 1;
   overflow-y: auto;
+}
+
+.fullScreenPopup a{
+    color: var(--biab-green-main);
+
+}
+
+.fullScreenPopup h2{
+    color: var(--biab-green-main);
 }
 
 img#logo {

@@ -58,7 +58,7 @@ export default function ScriptInput({
               sx={{
                 fontSize: "1em",
                 fontFamily: "Roboto",
-                width: 328,
+                width: size=='small'?220:328,
                 "& .MuiOutlinedInput-notchedOutline": {
                   borderColor: "var(--biab-green-trans-main)",
                 },
@@ -75,7 +75,7 @@ export default function ScriptInput({
             "&. MuiInputLabel-formControl": {
               color: "var(---biab-green-trans-main)",
             },
-          }}
+              }}
           disabled={passedProps.disabled}
           value={fieldValue}
           onChange={(event, newValue) => {
@@ -109,11 +109,11 @@ export default function ScriptInput({
         value={joinIfArray(fieldValue)}
         onChange={(e) => setFieldValue(e.target.value)}
         placeholder={ARRAY_PLACEHOLDER}
-        keepWidth={true}
         cols={cols}
         onBlur={onUpdateArray}
         slotProps={{ htmlInput: { style: { resize: "vertical" } } }}
         onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
+        sx={{width: size=='small'?220:328}}
       />
     );
   }
@@ -155,6 +155,7 @@ export default function ScriptInput({
             onValueUpdated(parseInt(e.target.value));
           }}
           placeholder={CONSTANT_PLACEHOLDER}
+          sx={{width: size=='small'?220:328}}
         />
       );
 
@@ -176,6 +177,7 @@ export default function ScriptInput({
             passedProps.className ? passedProps.className : ""
           }`}
           placeholder={CONSTANT_PLACEHOLDER}
+          sx={{width: size=='small'?220:328}}
         />
       );
 
@@ -207,6 +209,7 @@ export default function ScriptInput({
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.ctrlKey) updateValue(e);
             }}
+            sx={{width: size=='small'?220:328}}
           />
         );
       }

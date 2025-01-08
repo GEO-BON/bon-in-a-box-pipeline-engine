@@ -1,8 +1,6 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Montserrat",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: "Montserrat", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -17,7 +15,7 @@ code {
   --biab-green-trans-main: #1d736888;
   --biab-purple-main: #3d1b40;
   --biab-blue-main: #28457a;
-  --biab-blue-light: #647ca8;
+  --biab-blue-light: #76d2ff;
   --biab-orange-main: #b7672e;
   --biab-yellow-main: #b7872e;
   --biab-yellow-light: #fdd58c;

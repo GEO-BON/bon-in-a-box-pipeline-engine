@@ -16,7 +16,7 @@ export default function Versions() {
 
   return (
     <p style={{ whiteSpace: "pre-wrap" }}>
-      {versions ? versions : <Spinner />}
+      {versions ? versions : <Spinner variant='light' />}
     </p>
   );
 }
