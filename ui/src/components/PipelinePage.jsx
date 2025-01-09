@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { PipelineResults } from "./PipelineResults";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import _lang from "lodash/lang";
-import Button from "@mui/material/Button";
+import { CustomButtonGreen } from "./CustomMUI";
 import Alert from "@mui/material/Alert";
 import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -279,14 +279,14 @@ export function PipelinePage({ runType }) {
         </Accordion>
       </Box>
       {pipStates.runId && (
-        <Button
+        <CustomButtonGreen
           onClick={stop}
           disabled={!stoppable}
           variant="contained"
           sx={{ margin: "10px 0 10px 0" }}
         >
           Stop
-        </Button>
+        </CustomButtonGreen>
       )}
       {httpError && (
         <Alert severity="error" key="httpError">

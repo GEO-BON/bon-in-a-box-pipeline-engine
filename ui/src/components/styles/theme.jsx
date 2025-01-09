@@ -62,7 +62,7 @@ const theme = {
         },
         containedPrimary: {
           backgroundColor: "var(--biab-green-main)",
-          fontFamily: "Roboto",
+          fontFamily: "Lato",
           color: "#fff",
           "&:hover": {
             backgroundColor: "#fff",
@@ -74,6 +74,7 @@ const theme = {
           },
           boxShadow: "3px 3px 3px #0004",
           borderRadius: "8px",
+          fontSize: "1em",
         },
       },
     },

@@ -38,6 +38,7 @@ export const CustomButton = styled(Button)(({ theme }) => ({
   padding: "2px 2px 3px 2px",
   width: "20px",
   height: "35px",
+  fontSize: "1.5em",
   margin: "15px 15px 6px 15px",
   minWidth: "40px",
   "& hover:": {
@@ -46,17 +47,21 @@ export const CustomButton = styled(Button)(({ theme }) => ({
 }));
 
 export const CustomButtonGreen = styled(Button)(({ theme }) => ({
-  color: theme.palette.primary.dark,
-  border: `1px solid ${theme.palette.primary.contrastText}`,
-  padding: "4px 10px",
-  background: theme.palette.primary.main,
-  marginTop: "10px",
-  fontSize: "0.8rem",
-  marginRight: "5px",
-  "& a": {
-    textDecoration: "none",
-    color: theme.palette.primary.dark,
+  backgroundColor: "var(--biab-green-main)",
+  fontFamily: "Lato",
+  color: "#fff",
+  "&:hover": {
+    backgroundColor: "#fff",
+    color: "var(--biab-green-main)",
   },
+  "&:disabled": {
+    backgroundColor: "var(--biab-green-trans-main)",
+    color: "#fffa",
+  },
+  boxShadow: "3px 3px 3px #0004",
+  borderRadius: "8px",
+  fontSize: "1em",
+  margin: "5px"
 }));
 
 export const CustomAutocomplete = styled(Autocomplete)(({ theme }) => ({

@@ -12,6 +12,7 @@ import Info from "@mui/icons-material/Info";
 import Box from "@mui/material/Box";
 
 import Button from "@mui/material/Button";
+import { CustomButtonGreen } from "./CustomMUI";
 import Alert from "@mui/material/Alert";
 import { getScriptOutput, getBreadcrumbs } from "../utils/IOId";
 import { isEmptyObject } from "../utils/isEmptyObject";
@@ -68,13 +69,13 @@ export function PipelineResults({
             <>
               <h2>Results</h2>
               <a href={`/viewer/${pipeline}>${runHash}`} target="_blank">
-                <Button
+                <CustomButtonGreen
                   disabled={runningScripts.size > 0}
                   variant="contained"
                   sx={{ marginBottom: "10px" }}
                 >
                   See in results viewer
-                </Button>
+                </CustomButtonGreen>
               </a>
             </>
           )}
