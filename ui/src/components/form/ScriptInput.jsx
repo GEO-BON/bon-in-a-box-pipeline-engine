@@ -5,6 +5,7 @@ import Checkbox from "@mui/material/Checkbox";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
+import AutoResizeTextArea from "./AutoResizeTextArea";
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
 export const CONSTANT_PLACEHOLDER = "Constant";
 
@@ -198,7 +199,7 @@ export default function ScriptInput({
 
       if (fieldValue && fieldValue.includes("\n")) {
         props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
-        return <TextField multiline size={size} keepWidth={true} cols={cols} {...props} />;
+        return <AutoResizeTextArea size={size} cols={cols} {...props} />;
       } else {
         return (
           <TextField

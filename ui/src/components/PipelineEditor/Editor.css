@@ -298,7 +298,6 @@
 .ioList textarea:focus {
   border:1px solid #0c947b;
   background-color: unset;
-  resize: both;
   padding: 2px 5px;
 }
 

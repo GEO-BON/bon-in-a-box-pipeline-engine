@@ -41,8 +41,13 @@ export function IOListItem({ io, id, valueEdited, setter, className }) {
                         {io.type &&
                             <>
                                 <span className="example-tag">Example: </span>
-                                <ScriptInput type={io.type} value={io.example} options={io.options}
-                                    onValueUpdated={(value) => valueEdited(value, "example", io, setter)} size="small"/>
+                                <ScriptInput type={io.type}
+                                    value={io.example}
+                                    options={io.options}
+                                    onValueUpdated={(value) => valueEdited(value, "example", io, setter)}
+                                    size="small"
+                                    keepWidth={true}
+                                />
                             </>
                         }
                     </td>

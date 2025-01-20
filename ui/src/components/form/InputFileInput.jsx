@@ -135,6 +135,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                     label={label}
                     size="medium"
                     cols="50"
+                    keepWidth={true}
                   />
                   {(inputFileContent[inputId] == "" ||
                     inputFileContent[inputId] == null) &&

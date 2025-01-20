@@ -362,8 +362,20 @@ div.legendItemText {
   padding-right: 0.5em;
 }
 
-textarea.autoResize {
+textarea {
+  font-family: "Montserrat", sans-serif;
+  border-radius: 4px;
+}
+
+textarea.autoResizeHeight {
   overflow: hidden;
+  resize: none;
+}
+
+textarea.autoResizeWidth {
+  overflow: hidden;
+  white-space: nowrap;
+  resize: none;
 }
 
 .yaml .ioDescription p {
