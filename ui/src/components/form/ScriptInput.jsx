@@ -13,18 +13,22 @@ function joinIfArray(value) {
   return value && typeof value.join === "function" ? value.join(", ") : value;
 }
 
-const smallPadding = {
-  paddingTop: 0,
-  paddingRight: 10,
-  paddingBottom: 0,
-  paddingLeft: 10,
+const smallPadding = () => {
+  return {
+    paddingTop: 0,
+    paddingRight: 10,
+    paddingBottom: 0,
+    paddingLeft: 10,
+  }
 }
 
-const smallPaddingNumeric = {
-  paddingTop: 0,
-  paddingRight: 0,
-  paddingBottom: 0,
-  paddingLeft: 10,
+const smallPaddingNumeric = () => {
+  return {
+    paddingTop: 0,
+    paddingRight: 0,
+    paddingBottom: 0,
+    paddingLeft: 10,
+  }
 }
 
 export default function ScriptInput({
@@ -72,27 +76,33 @@ export default function ScriptInput({
               fullWidth={false}
               label={label}
               size={size}
-              sx={{
-                fontSize: "1em",
-                fontFamily: "Roboto",
-                width: small ? 220 : 328,
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "var(--biab-green-trans-main)",
-                },
-                "&:hover > .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "var(--biab-green-trans-main)",
-                },
-                "&. MuiInputLabel-formControl": {
-                  color: "var(---biab-green-trans-main)",
-                },
-              }}
+              sx={
+                small ? {
+                  fontSize: "1em",
+                  fontFamily: "Roboto",
+                  width: 220,
+                  "& .MuiAutocomplete-inputRoot": {
+                    paddingTop: "0 !important",
+                    paddingBottom: "0 !important",
+                    paddingLeft: "0 !important",
+                  },
+                } : {
+                  width: 328,
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "var(--biab-green-trans-main)",
+                  },
+                  "&:hover > .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "var(--biab-green-trans-main)",
+                  },
+                }
+              }
             />
           )}
           sx={{
             "&. MuiInputLabel-formControl": {
               color: "var(---biab-green-trans-main)",
-            },
-              }}
+            }
+          }}
           disabled={passedProps.disabled}
           value={fieldValue}
           onChange={(event, newValue) => {
@@ -128,7 +138,7 @@ export default function ScriptInput({
         placeholder={ARRAY_PLACEHOLDER}
         cols={cols}
         onBlur={onUpdateArray}
-        slotProps={{ input: { style: small ? smallPadding : null } }}
+        slotProps={{ input: { style: small ? smallPadding() : null } }}
         onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
         sx={{ width: small ? 220 : 328 }}
       />
@@ -172,7 +182,7 @@ export default function ScriptInput({
             onValueUpdated(parseInt(e.target.value));
           }}
           placeholder={CONSTANT_PLACEHOLDER}
-          slotProps={{ htmlInput: { style: small ? smallPaddingNumeric : null } }}
+          slotProps={{ htmlInput: { style: small ? smallPaddingNumeric() : null } }}
           sx={{ width: small ? 220 : 328 }}
         />
       );
@@ -195,7 +205,7 @@ export default function ScriptInput({
             passedProps.className ? passedProps.className : ""
           }`}
           placeholder={CONSTANT_PLACEHOLDER}
-          slotProps={{ htmlInput: { style: small ? smallPaddingNumeric : null } }}
+          slotProps={{ htmlInput: { style: small ? smallPaddingNumeric() : null } }}
           sx={{ width: small ? 220 : 328 }}
         />
       );
@@ -230,7 +240,7 @@ export default function ScriptInput({
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.ctrlKey) updateValue(e);
             }}
-            slotProps={{ input: { style: small ? smallPadding : null } }}
+            slotProps={{ input: { style: small ? smallPadding() : null } }}
             sx={{ width: small ? 220 : 328 }}
           />
         );
