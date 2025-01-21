@@ -227,9 +227,7 @@ export default function ScriptInput({
 
       if (fieldValue && fieldValue.includes("\n")) {
         props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
-        return <AutoResizeTextArea size={size} cols={cols} keepWidth={keepWidth} {...props}
-          style={{padding: small ? "2px 10px" : "16.5px 14px"}}
-        />;
+        return <AutoResizeTextArea size={size} cols={cols} keepWidth={keepWidth} {...props} />;
       } else {
         return (
           <TextField

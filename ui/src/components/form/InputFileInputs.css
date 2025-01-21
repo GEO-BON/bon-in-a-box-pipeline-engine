@@ -75,7 +75,8 @@ table.inputFileFields textarea.autoResizeHeight {
   font-family: 'Roboto';
   font-size: 0.85rem;
   outline: 1px solid var(--biab-green-trans-main);
-  border: 1px solid #fff0;
+  border: 1px solid transparent;
+  padding: 16.5px 14px;
 }
 
 table.inputFileFields textarea.autoResizeHeight:focus {

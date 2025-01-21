@@ -271,19 +271,25 @@
   font-size: small;
 }
 
+.ioList .example {
+  font-size: small;
+}
+
 .ioList .ioListItem td.reorder-drag {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
 }
 
-.ioList textarea {
+.ioList textarea.label,
+.ioList textarea.description,
+.ioList textarea.example {
   /* Removing the width of the dragHandle from 100% */
-  width: calc(100% - 1rem);
+  width: calc(100% - 1.1rem);
   background-color: transparent;
-  border: none;
+  border: 1px solid transparent;
   resize: none;
   font-family: inherit;
-  padding: 3px 6px;
+  padding: 2px 5px;
 }
 
 .ioList textarea.label:hover,
@@ -292,15 +298,14 @@
   background-repeat: no-repeat;
   background-position: right;
   background-size: 1.5em;
-  border: 1px solid  #bbb;
-  padding: 2px 5px;
+  outline: 1px solid #bbb;
 }
 
 .ioList textarea.label:focus,
 .ioList textarea.description:focus  {
-  border:1px solid #0c947b;
+  outline: 1px solid var(--biab-green-trans-main);
+  border: 1px solid var(--biab-green-trans-main);
   background-color: unset;
-  padding: 2px 5px;
 }
 
 .ioList textarea.label:hover:focus,
@@ -308,7 +313,12 @@
   background: none;
 }
 
-.ioList .MuiAutocomplete-root {
+.ioList textarea.autoResizeHeight.example  {
+  border: 1px solid #bbb;
+  display: block;
+}
+
+.ioList .MuiFormGroup-root {
   display: inline;
 }
 

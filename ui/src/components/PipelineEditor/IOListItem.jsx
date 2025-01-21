@@ -42,6 +42,7 @@ export function IOListItem({ io, id, valueEdited, setter, className }) {
                             <>
                                 <span className="example-tag">Example: </span>
                                 <ScriptInput type={io.type}
+                                    className="example"
                                     value={io.example}
                                     options={io.options}
                                     onValueUpdated={(value) => valueEdited(value, "example", io, setter)}
