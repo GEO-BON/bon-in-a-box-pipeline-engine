@@ -36,6 +36,14 @@ We strongly encourage those who have created or are developing code to calculate
 
 # Instructions for adapting your code to an analysis pipeline
 
+## How to write a script video tutorial
+
+{{< video https://www.youtube.com/watch?v=nvYMC_xuOpE >}}
+
+## How to create a pipeline video tutorial
+
+{{< video https://www.youtube.com/watch?v=LwncUuc4WeM&t=4s >}}
+
 Analysis workflows can be adapted to BON in a Box pipelines using a few simple steps. Once BON in a Box is installed on your computer, Pipelines can be edited and run locally by creating files in your local BON-in-a-box folder that was cloned from the GItHub repository. Workflows can be in a variety of languages, including R, Julia, and Python, and not all steps of the pipeline need to be in the same language.
 
 Analysis workflows can be converted to BON in a Box pipelines with a few steps:
@@ -92,7 +100,7 @@ Specifying an example will auto-fill that input with the example unless changed 
 There are several different types of user inputs that can be specified in the YAML file:
 
 | "Type" attribute in the yaml | UI rendering | Description |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | boolean | Plain text | true/false |
 | float, float\[\] | Plain text | positive or negative numbers with a decimal point, accepts int and a valid input. |
 | int, int\[\] | Plain text | integer |
