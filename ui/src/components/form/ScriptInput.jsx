@@ -240,7 +240,7 @@ export default function ScriptInput({
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.ctrlKey) updateValue(e);
             }}
-            slotProps={{ input: { style: small ? smallPadding() : null } }}
+            slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
             sx={{ width: small ? 220 : 328 }}
           />
         );
