@@ -70,6 +70,18 @@ table.inputFileFields .example {
   background-color: transparent;
 }
 
+table.inputFileFields textarea.autoResizeHeight {
+  width: 300px;
+  font-family: 'Roboto';
+  font-size: 0.85rem;
+  outline: 1px solid var(--biab-green-trans-main);
+  border: 1px solid #fff0;
+}
+
+table.inputFileFields textarea.autoResizeHeight:focus {
+  border: 1px solid var(--biab-green-trans-main);
+}
+
 @media all and (max-width: 599px) {
   table,
   thead,
