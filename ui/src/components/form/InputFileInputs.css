@@ -140,8 +140,12 @@ table.inputFileFields .MuiInputBase-input {
   padding: 10px;
 }
 .yamlInput .MuiInputBase-input {
-  font-size: 0.95em !important;
-  font-family: "Roboto" !important;
+  font-size: 0.95rem !important;
+  font-family: "Roboto Mono" !important;
+}
+.yamlInput pre {
+  font-family: "Roboto Mono" !important;
+  font-size: 0.85rem !important;
 }
 
 .inputsDescription {
