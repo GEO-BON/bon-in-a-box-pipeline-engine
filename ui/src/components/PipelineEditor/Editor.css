@@ -247,6 +247,7 @@
 
 .ioList {
   border-radius: 0px 0px 0px 3px;
+  min-height: 15rem;
 }
 
 .ioList .rightPaneInner {
@@ -401,6 +402,7 @@
 
 .rightPane.metadataPane {
   left: max(2em, calc(100% - 850px));
+  min-height: 22rem;
 }
 
 .rightPane.metadataPane.paneCollapsed {
