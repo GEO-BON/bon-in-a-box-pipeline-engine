@@ -303,10 +303,10 @@
 }
 
 .ioList textarea.label:focus,
-.ioList textarea.description:focus  {
+.ioList textarea.description:focus,
+.ioList textarea.autoResizeHeight:focus  {
   outline: 1px solid var(--biab-green-trans-main);
   border: 1px solid var(--biab-green-trans-main);
-  background-color: unset;
 }
 
 .ioList textarea.label:hover:focus,
@@ -315,7 +315,7 @@
 }
 
 .ioList textarea.autoResizeHeight.example  {
-  border: 1px solid #bbb;
+  outline: 1px solid #bbb;
   display: block;
 }
 
