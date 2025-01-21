@@ -286,7 +286,8 @@
   padding: 3px 6px;
 }
 
-.ioList textarea:hover {
+.ioList textarea.label:hover,
+.ioList textarea.description:hover {
   background: url("../../img/pen.svg");
   background-repeat: no-repeat;
   background-position: right;
@@ -295,14 +296,20 @@
   padding: 2px 5px;
 }
 
-.ioList textarea:focus {
+.ioList textarea.label:focus,
+.ioList textarea.description:focus  {
   border:1px solid #0c947b;
   background-color: unset;
   padding: 2px 5px;
 }
 
-.ioList textarea:hover:focus {
+.ioList textarea.label:hover:focus,
+.ioList textarea.description:hover:focus  {
   background: none;
+}
+
+.ioList .MuiAutocomplete-root {
+  display: inline;
 }
 
 .ioList .draggable {
