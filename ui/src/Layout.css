@@ -1,14 +1,21 @@
 nav {
   padding-top: 1em;
   padding-bottom: 1em;
+  font-family: Lato, sans-serif;
+  font-weight: 500;
+  font-size: 1.1em;
 }
 
 a {
-  color:lightskyblue;
+  color: var(--biab-blue-light);
 }
 a.active {
-  color:white;
-  text-decoration: none
+  color: white;
+  text-decoration: none;
+}
+
+h2 {
+  color: #bbb;
 }
 
 .clickable {
@@ -29,8 +36,12 @@ a.active {
   height: 100vh;
   color: #f3f3f1;
   overflow: auto;
-  padding-left:30px;
-  padding-right:30px;
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+.react-select {
+  color: hsl(0, 0%, 20%);
 }
 
 .react-select {
@@ -58,8 +69,8 @@ a.active {
 
 .fullScreenPopup button.close {
   vertical-align: top;
-  margin-top:-25px;
-  height:fit-content;
+  margin-top: -25px;
+  height: fit-content;
 
   color: rgb(0, 0, 0);
   border: none;
@@ -73,8 +84,17 @@ a.active {
   overflow-y: auto;
 }
 
+.fullScreenPopup a{
+    color: var(--biab-green-main);
+}
+
+.fullScreenPopup h2{
+    color: var(--biab-green-main);
+}
+
 img#logo {
   max-width: 10vw;
+  padding: 5px 10px;
 }
 
 .spinner {
@@ -90,7 +110,8 @@ img#logo {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .spinner, .spinner-inline {
+  .spinner,
+  .spinner-inline {
     animation: spin infinite 4s linear;
   }
 }
@@ -105,33 +126,18 @@ img#logo {
   font-size: calc(10px + 2vmin);
 }
 
-.error, .warning, .info {
-  background-color: lightgray;
-  font-weight: bold;
-  white-space: pre-wrap;
-  min-height: 1.6em;
-
-  padding-left: 2em;
-  padding-top: 0.4em;
-  padding-right: 0.4em;
-
-  background-size: 2em 2em;
-  background-repeat: no-repeat;
-}
-
-
 .error-inline {
   height: 2em;
-  display:inline;
+  display: inline;
   /* Compensate for margins that are in the vector graphic */
   margin: 0em 0em -0.65em -0.3em;
 }
 
 .info-inline {
   height: 1.5em;
-  display:inline;
+  display: inline;
   /* Compensate for margins that are in the vector graphic */
-  margin: 0em .5em -.3em -.5em;
+  margin: 0em 0.5em -0.3em -0.5em;
 }
 
 .errorText {
@@ -139,25 +145,28 @@ img#logo {
   font-weight: bold;
 }
 
-.error {
-  color: hsl(0, 100%, 27%);
-  background-image: url(img/error.svg);
-}
-
-.warning {
-  color: rgb(0, 0, 0);
-  background-image: url(img/warning.svg);
-}
-
-.info {
-  color: #115CA2;
-  background-image: url(img/info.svg);
-  background-position: 0.3em;
-  background-size: 1.4em 1.6em;
-}
-
 .outputContent .stepDescription {
   font-size: small;
+  background: #444;
+  border-radius: 15px;
+  padding: 15px;
+  color: #fff;
+}
+
+.outputContent {
+  -webkit-animation: slide-in-top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    both;
+  animation: slide-in-top 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  overflow: hidden;
+}
+
+@keyframes slide-in-top {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .references ul {
@@ -196,7 +205,7 @@ img#logo {
 }
 
 .outputContent p {
-  margin-top:0px;
+  margin-top: 0px;
 }
 
 .outputContent img {
@@ -205,15 +214,39 @@ img#logo {
 }
 
 .foldableScriptResult .outputContent {
-  border-left: 0.4em solid #71AAB0;
+  border-left: 0.4em solid #71aab0;
 }
 
 .foldableOutput .outputContent {
-  border-left: 0.4em solid #115CA2;
+  border-left: 0.4em solid #115ca2;
+}
+
+.outputTitle .clickable {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.outputTitle .expandIcon {
+  margin-left: -7px;
+  padding-top: 4px;
+  flex-shrink: 0;
+}
+
+.outputTitle h3 {
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.outputTitle .inlinePreview {
+  flex-grow: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .stepInputs .outputContent {
-  border-left: 0.4em solid #EAA222;
+  border-left: 0.4em solid #eaa222;
 }
 
 .stepInputs .outputContent .outputContent {
@@ -225,16 +258,10 @@ table {
   margin-bottom: 0.5em;
 }
 
-th, td {
+th,
+td {
   border: 1px solid #f3f3f1;
   padding: 3px 5px;
-}
-
-.inputFile {
-  overflow: hidden;
-  white-space: pre; /*don't break horizontal lines in two*/
-  padding:1em;
-  padding-bottom: 0em;
 }
 
 /**
@@ -249,10 +276,9 @@ input.input-float::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type=number].input-float {
+input[type="number"].input-float {
   -moz-appearance: textfield;
 }
-
 
 .blackText {
   color: black;
@@ -261,7 +287,7 @@ input[type=number].input-float {
 .dot-green {
   height: 1em;
   width: 1em;
-  background-color: #168D78;
+  background-color: #168d78;
   border-radius: 50%;
   display: inline-block;
 }
@@ -271,20 +297,30 @@ input[type=number].input-float {
 }
 
 .logs {
-  border:1px solid #414855;
+  border: 2px solid #87cefa45;
   height: 30em;
-  overflow:auto;
+  overflow: auto;
   padding: 0.5em;
+  color: #222;
+  background: #00000008;
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes inflate {
-  from { transform: scale(0); }
-  to { transform: scale(1); }
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
 }
 
 div.legend {
@@ -319,12 +355,105 @@ div.legendItemText {
   padding-right: 0.5em;
 }
 
-textarea.autoResize {
+textarea {
+  font-family: "Montserrat", sans-serif;
+  border-radius: 4px;
+}
+
+textarea.autoResizeHeight {
   overflow: hidden;
+  resize: none;
+}
+
+textarea.autoResizeWidth {
+  overflow: hidden;
+  white-space: nowrap;
+  resize: none;
 }
 
 .yaml .ioDescription p {
   white-space: pre-wrap;
   margin: 0;
   margin-left: 2rem;
+}
+
+.pipelineResults {
+  background: #20232b;
+  border-radius: 15px;
+  padding: 15px;
+  border: 2px solid #87cefa45;
+  margin-top: 15px;
+  max-width: 1200px;
+  color: #444;
+}
+
+.pipelineResults h2 {
+  color: #fff;
+}
+
+.pipelineResults h3 {
+  color: var(--biab-green-main);
+}
+
+.pipelineResults .outputTitle {
+  color: #444;
+}
+
+.pipelineResults table {
+  color: #555;
+}
+
+.pipelineResults a {
+  color: var(--biab-blue-main);
+}
+
+.pipelineResults .stepDescription {
+  background: #f3f3f1;
+  color: #444;
+}
+
+.stepInputs h3 {
+  color: var(--biab-yellow-main);
+}
+
+.stepInputs svg {
+  color: var(--biab-yellow-main);
+}
+
+.resultsBox {
+  background: #f3f3f1;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.inputsTop h3 {
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.inputsTop .MuiAccordion-root.Mui-expanded {
+  width: 850px;
+}
+.inputsTop .MuiAccordion-root {
+  width: 250px;
+}
+
+.inputsTop .MuiAccordion-root {
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
+    height 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+.inputsTop .MuiAccordion-gutters {
+  border: 2px solid #87cefa45;
+  background: #20232b;
+  border-radius: 10px !important;
+}
+
+.inputsTop .MuiAccordionSummary-expandIconWrapper {
+  color: #fff;
+}
+
+h2.MuiDialogTitle-root {
+  color: var(--biab-green-main);
 }

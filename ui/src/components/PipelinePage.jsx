@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer } from "react";
+import React, { useState, useEffect, useReducer, useCallback } from "react";
 import { FoldableOutput } from "./FoldableOutput";
 
 import { PipelineForm } from "./form/PipelineForm";
@@ -6,6 +6,13 @@ import { useParams } from "react-router-dom";
 import { PipelineResults } from "./PipelineResults";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import _lang from "lodash/lang";
+import { CustomButtonGreen } from "./CustomMUI";
+import Alert from "@mui/material/Alert";
+import Accordion from "@mui/material/Accordion";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import Box from "@mui/material/Box";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const pipelineConfig = { extension: ".json", defaultFile: "helloWorld.json" };
 const scriptConfig = {
@@ -80,6 +87,7 @@ export function PipelinePage({ runType }) {
   const [resultsData, setResultsData] = useState(null);
   const [httpError, setHttpError] = useState(null);
   const [pipelineMetadata, setPipelineMetadata] = useState(null);
+  const [expandInputs, setExpandInputs] = useState(true);
 
   /**
    * String: Content of input.json for this run
@@ -234,35 +242,56 @@ export function PipelinePage({ runType }) {
     });
   };
 
+  useEffect(()=>{
+    if(pipStates.runHash){
+      setExpandInputs(false)
+    }
+  },[pipStates.runHash])
+
+  const toggleAccord  = useCallback(() => {
+    setExpandInputs(prev => !prev);
+  }, [setExpandInputs])
+
+
   return (
     <>
       <h2>{runType === "pipeline" ? "Pipeline" : "Script"} run</h2>
-      <FoldableOutput
-        title="Input form"
-        isActive={!pipStates.runHash}
-        keepWhenHidden={true}
-      >
-        <PipelineForm
-          pipelineMetadata={pipelineMetadata}
-          setInputFileContent={setInputFileContent}
-          inputFileContent={inputFileContent}
-          pipStates={pipStates}
-          setPipStates={setPipStates}
-          showHttpError={showHttpError}
-          setResultsData={setResultsData}
-          runType={runType}
-        />
-      </FoldableOutput>
-
+      <Box className="inputsTop" >
+        <Accordion expanded={expandInputs} onChange={toggleAccord}>
+          <AccordionSummary
+            className="outputTitle"
+            expandIcon={<ExpandMoreIcon />}
+          >
+            Input form
+          </AccordionSummary>
+          <AccordionDetails className="outputContent">
+            <PipelineForm
+              pipelineMetadata={pipelineMetadata}
+              setInputFileContent={setInputFileContent}
+              inputFileContent={inputFileContent}
+              pipStates={pipStates}
+              setPipStates={setPipStates}
+              showHttpError={showHttpError}
+              setResultsData={setResultsData}
+              runType={runType}
+            />
+          </AccordionDetails>
+        </Accordion>
+      </Box>
       {pipStates.runId && (
-        <button onClick={stop} disabled={!stoppable}>
+        <CustomButtonGreen
+          onClick={stop}
+          disabled={!stoppable}
+          variant="contained"
+          sx={{ margin: "10px 0 10px 0" }}
+        >
           Stop
-        </button>
+        </CustomButtonGreen>
       )}
       {httpError && (
-        <p key="httpError" className="error">
+        <Alert severity="error" key="httpError">
           {httpError}
-        </p>
+        </Alert>
       )}
       {pipelineMetadata && (
         <PipelineResults

@@ -12,7 +12,7 @@ export default function ConstantNode({ id, data, type }) {
             <td className='dragHandle'><p>{data.type}</p></td>
             <td>
               <ScriptInput id={id} type={data.type} value={data.value} options={data.options}
-              onValueUpdated={v => data.onConstantValueChange(id, v)} />
+              onValueUpdated={v => data.onConstantValueChange(id, v)} size="small" keepWidth={false}/>
             </td>
             <td className='dragHandle'>
               <button className='arrowDownButton' title='options' onClick={(e) => data.onPopupMenu(e, id, type)} />

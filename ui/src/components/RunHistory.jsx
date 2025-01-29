@@ -19,16 +19,9 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { styled } from "@mui/material/styles";
 import { CustomButtonGreen } from "./CustomMUI";
+import ReactMarkdown from "react-markdown";
 
 export const api = new BonInABoxScriptService.DefaultApi();
-
-var callback = function (error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log("API called successfully. Returned data: " + data);
-  }
-};
 
 export default function RunHistory() {
   let [runHistory, setRunHistory] = useState();
@@ -54,7 +47,7 @@ export default function RunHistory() {
 
   return (
     <p style={{ whiteSpace: "pre-wrap" }}>
-      {runHistory ? runHistory : <Spinner />}
+      {runHistory ? runHistory : <Spinner variant='light'/>}
     </p>
   );
 }
@@ -76,9 +69,13 @@ const ExpandMore = styled((props) => {
   return <IconButton {...other} />;
 })(({ theme }) => ({
   marginLeft: "auto",
+  fontSize: "2em",
   transition: theme.transitions.create("transform", {
-    duration: 50,
+    duration: 10,
   }),
+  "& hover": {
+    background: "transparent",
+  },
   variants: [
     {
       props: ({ expand }) => !expand,
@@ -182,15 +179,24 @@ const RunCard = (props) => {
             aria-expanded={expanded}
             aria-label="show more"
           >
-            {!expanded && (
-              <Typography sx={{ fontFamily: "Roboto" }}>Inputs</Typography>
-            )}
-            <ExpandMoreIcon />
+            <ExpandMoreIcon
+              sx={{ fontSize: "1.2em", color: "var(--biab-green-trans-main)" }}
+            />
           </ExpandMore>
         </CardActions>
         {Object.entries(run.inputs).length > 0 && (
           <Collapse in={expanded} timeout="auto" unmountOnExit>
             <CardContent>
+              <Typography
+                sx={{
+                  color: "#444",
+                  fontSize: "0.9em",
+                  marginBottom: "10px",
+                }}
+              >
+                {desc}
+              </Typography>
+              <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>
               <Table size="small">
                 <TableBody>
                   {Object.entries(run.inputs).map((i) => {

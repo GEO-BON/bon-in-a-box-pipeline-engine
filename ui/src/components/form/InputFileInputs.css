@@ -1,42 +1,158 @@
-
 table.inputFileFields {
-    width: 100%;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  margin-top: -2px; /* correct offset on first border spacing if desired */
+  background: #f3f3f3f1;
+  border-radius: 10px;
+  padding: 10px;
 }
 
 table.inputFileFields label {
-    display: block;
-    margin-bottom: 0.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
 }
 
 table.inputFileFields tr:hover {
-    background-color: #f3f3f111;
+  background-color: #f3f3f111;
+}
+
+table.inputFileFields tr {
+  background-color: #f3f3f111;
+  padding: 8rem;
 }
 
 table.inputFileFields td {
-    padding: 0.5rem;
-    vertical-align: top;
-    border: none;
+  padding: 15px;
+  vertical-align: top;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-style: solid none;
+  box-shadow: 2px 2px 1px #35353554;
+}
+
+table.inputFileFields td:first-child {
+  border-left-style: solid;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+table.inputFileFields td:last-child {
+  border-right-style: solid;
+  border-bottom-right-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 table.inputFileFields td.inputCell {
-    width: fit-content;
+  width: 300px;
+  color: var(--biab-green-main);
+}
+
+table.inputFileFields td.inputCell label {
+  width: 300px;
+  color: var(--biab-green-main);
+  font-family: "Roboto";
+  font-weight: 1000;
+}
+
+table.inputFileFields td.inputCell .MuiOutlinedInput-notchedOutline {
+  border-color: var(--biab-green-trans-main);
 }
 
 table.inputFileFields td.descriptionCell {
-    white-space: pre-wrap;
+  white-space: pre-wrap;
+  font-size: 0.8em;
+  color: #444;
+  word-break: break-word;
 }
 
 table.inputFileFields .example {
-    color: #f3f3f1;
-    background-color: transparent;
+  color: #444;
+  background-color: transparent;
+}
+
+table.inputFileFields textarea.autoResizeHeight {
+  width: 300px;
+  font-family: 'Roboto';
+  font-size: 0.85rem;
+  outline: 1px solid var(--biab-green-trans-main);
+  border: 1px solid transparent;
+  padding: 16.5px 14px;
+}
+
+table.inputFileFields textarea.autoResizeHeight:focus {
+  border: 1px solid var(--biab-green-trans-main);
 }
 
 @media all and (max-width: 599px) {
-    table, thead, tbody, th, td, tr {
-        display: block;
-    }
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+  }
 }
 
 .inputFileFields .reactMarkdown p {
-    margin: 0;
+  margin: 0;
+  color: var(--biab-blue-main);
+  font-weight: bold;
+}
+
+.inputForm {
+  max-width: 850px;
+  padding: 25px;
+  transition: display 4s allow-discrete;
+}
+
+.inputForm label {
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.inputForm .MuiTabs-indicator {
+  height: 5px;
+}
+
+table.inputFileFields .MuiInputBase-input {
+  font-size: 0.85em !important;
+  font-family: "Roboto" !important;
+  max-width: 350px !important;
+  min-width: 300px !important;
+}
+
+.MuiAutocomplete-popper li {
+  color: #333;
+  font-size: 0.8em;
+  font-family: "Roboto" !important;
+}
+
+.inputFormDiv {
+  background: #f3f3f3f1;
+  padding: 10px;
+  border-radius: 15px;
+}
+
+.yamlInput {
+  border-radius: 15px;
+  background: #f3f3f3f1;
+  padding: 10px;
+}
+.yamlInput .MuiInputBase-input {
+  font-size: 0.95rem !important;
+  font-family: monospace !important;
+}
+.yamlInput pre {
+  font-family: monospace !important;
+  font-size: 0.85rem !important;
+}
+
+.inputsDescription {
+  color: #333;
+}
+
+.inputsDescription h3 {
+  color: #333 !important;
 }

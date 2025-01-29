@@ -18,18 +18,7 @@ const theme = {
       dark: "#ddd",
     },
     background: {
-      paper: "#444",
-    },
-    info: {
-      main: "#aaa",
-    },
-    error: {
-      main: "#aaa",
-      contrastText: "#bbb",
-      dark: "#bbb",
-    },
-    success: {
-      main: "#1d7368",
+      paper: "#fff",
     },
   },
   typography: {
@@ -49,13 +38,13 @@ const theme = {
         renderOption: (props, option, state, ownerState) => (
           <Box
             sx={{
-              borderRadius: "8px",
+              borderRadius: "28px",
               margin: "5px",
               [`&.${autocompleteClasses.option}`]: {
                 padding: "8px",
               },
-              color: "primary.contrastText",
-              borderColor: "primary.light",
+              color: "var(--biab-green-main)",
+              borderColor: "var(--biab-green-trans-main)",
             }}
             component="li"
             {...props}
@@ -63,6 +52,38 @@ const theme = {
             {ownerState.getOptionLabel(option)}
           </Box>
         ),
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          padding: "8px 16px",
+          textTransform: "none", // Disable uppercase transformation
+        },
+        containedPrimary: {
+          backgroundColor: "var(--biab-green-main)",
+          fontFamily: "Lato",
+          color: "#fff",
+          "&:hover": {
+            backgroundColor: "#fff",
+            color: "var(--biab-green-main)",
+          },
+          "&:disabled": {
+            backgroundColor: "var(--biab-green-trans-main)",
+            color: "#fffa",
+          },
+          boxShadow: "3px 3px 3px #0004",
+          borderRadius: "8px",
+          fontSize: "1em",
+        },
+      },
+    },
+    MuiAlert: {
+      styleOverrides: {
+        standardSuccess: { maxWidth: "1200px" },
+        standardError: { maxWidth: "1200px" },
+        standardWarning: { maxWidth: "1200px" },
+        standardInfo: { maxWidth: "1200px" },
       },
     },
   },

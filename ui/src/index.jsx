@@ -39,11 +39,11 @@ function App() {
     },
     {
       path: "script-form/:pipeline?/:runHash?",
-      element: <Layout right={<PipelinePage runType="script" />} />,
+      element: <Layout right={<PipelinePage key="singleScriptRun" runType="script" />} />,
     },
     {
       path: "pipeline-form/:pipeline?/:runHash?",
-      element: <Layout right={<PipelinePage runType="pipeline" />} />,
+      element: <Layout right={<PipelinePage key="pipelineRun" runType="pipeline" />} />,
     },
     {
       path: "pipeline-editor",
