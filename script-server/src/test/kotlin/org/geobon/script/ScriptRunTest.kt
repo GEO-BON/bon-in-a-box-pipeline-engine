@@ -27,7 +27,6 @@ internal class ScriptRunTest {
         assertTrue(outputRoot.deleteRecursively())
     }
 
-
     @Test
     fun `given script has been run previously_when running again_then cache is used`() = runTest {
         val run1 = ScriptRun(File(scriptRoot, "1in1out.py"), mapOf("some_int" to 5))
@@ -185,6 +184,16 @@ internal class ScriptRunTest {
 
         // Cache should have been bypassed
         assertNotEquals(run1Time, run2Time)
+    }
+
+    @Test
+    fun `given script has spaces_when scripts executed_then still works`() = runTest {
+        val run = ScriptRun(File(scriptRoot, "folder with spaces/assert boolean.py"),
+            mapOf("input_bool" to false)
+        )
+        run.execute()
+        assertNotNull(run.results["the_same"], "the_same key not found in ${run.results}")
+        assertEquals(false, run.results["the_same"]!!)
     }
 
 }

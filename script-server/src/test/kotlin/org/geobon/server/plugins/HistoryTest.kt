@@ -48,7 +48,7 @@ class HistoryTest {
     }
 
     @Test
-    fun givenPipelineFailed_whenGettingStatus_thenStatusError() = testApplication {
+    fun givenPipelineHasError_whenGettingStatus_thenStatusError() = testApplication {
         application { configureRouting() }
 
         var id: String
@@ -71,7 +71,7 @@ class HistoryTest {
     }
 
     @Test
-    fun givenPipelineFailedLastScript_whenGettingStatus_thenStatusError() = testApplication {
+    fun givenLastScriptHasError_whenGettingStatus_thenStatusError() = testApplication {
         application { configureRouting() }
 
         var id: String
