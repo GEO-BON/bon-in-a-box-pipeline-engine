@@ -18,8 +18,8 @@ aside.stepChooser .description {
 .dndnode {
     min-height: 20px;
     padding: 4px;
-    border: 1px solid #1a192b;
-    border-radius: 5px;
+    border: 1px solid #83829b;
+    border-radius: 4px;
     margin-bottom: 10px;
     display: flex;
     justify-content: center;
@@ -28,10 +28,8 @@ aside.stepChooser .description {
     background: #fcfcfc;
     font-size: 14px;
     text-align: center;
-    margin:10px auto 10px 0px;
-    max-width: 390px;
-    width: 19vw;
-    box-shadow: 2px 2px 2px #bbb;
+    margin:10px 20px 10px 0px;
+    box-shadow: 2px 2px 2px #ccc;
 }
 
 .dndnode.input {
@@ -54,8 +52,6 @@ aside.stepChooser .description {
 
 .inFolder .dndnode{
     padding-left: 1em;
-    max-width: 350px;
-    width: 15vw;
 }
 
 .stepChooser .selected {
