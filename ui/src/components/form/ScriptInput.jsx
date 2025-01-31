@@ -19,8 +19,8 @@ const smallPadding = () => {
     paddingRight: 10,
     paddingBottom: 0,
     paddingLeft: 10,
-  }
-}
+  };
+};
 
 const smallPaddingNumeric = () => {
   return {
@@ -28,8 +28,8 @@ const smallPaddingNumeric = () => {
     paddingRight: 0,
     paddingBottom: 0,
     paddingLeft: 10,
-  }
-}
+  };
+};
 
 export default function ScriptInput({
   type,
@@ -38,12 +38,12 @@ export default function ScriptInput({
   onValueUpdated,
   cols,
   label,
-  size="medium",
+  size = "medium",
   keepWidth,
   ...passedProps
 }) {
   const [fieldValue, setFieldValue] = useState(value || "");
-  const small = size == 'small';
+  const small = size == "small";
 
   useEffect(() => {
     setFieldValue(value || "");
@@ -77,37 +77,42 @@ export default function ScriptInput({
               label={label}
               size={size}
               sx={
-                small ? {
-                  fontSize: "1em",
-                  fontFamily: "Roboto",
-                  width: 220,
-                  "& .MuiAutocomplete-inputRoot": {
-                    paddingTop: "0 !important",
-                    paddingBottom: "0 !important",
-                    paddingLeft: "0 !important",
-                  },
-                } : {
-                  width: 328,
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "var(--biab-green-trans-main)",
-                  },
-                  "&:hover > .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "var(--biab-green-trans-main)",
-                  },
-                }
+                small
+                  ? {
+                      fontSize: "1em",
+                      fontFamily: "Roboto",
+                      width: 220,
+                      "& .MuiAutocomplete-inputRoot": {
+                        paddingTop: "0 !important",
+                        paddingBottom: "0 !important",
+                        paddingLeft: "0 !important",
+                      },
+                    }
+                  : {
+                      width: 328,
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "var(--biab-green-trans-main)",
+                      },
+                      "&:hover > .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "var(--biab-green-trans-main)",
+                      },
+                    }
               }
             />
           )}
           sx={{
             "&. MuiInputLabel-formControl": {
               color: "var(---biab-green-trans-main)",
-            }
+            },
           }}
           disabled={passedProps.disabled}
           value={fieldValue}
           onChange={(event, newValue) => {
-            setFieldValue(newValue);
-            onValueUpdated(newValue);
+            const vals = newValue.map((option) =>
+              option?.value ? option.value : option
+            );
+            setFieldValue(vals);
+            onValueUpdated(vals);
           }}
         ></Autocomplete>
       );
@@ -182,7 +187,9 @@ export default function ScriptInput({
             onValueUpdated(parseInt(e.target.value));
           }}
           placeholder={CONSTANT_PLACEHOLDER}
-          slotProps={{ htmlInput: { style: small ? smallPaddingNumeric() : null } }}
+          slotProps={{
+            htmlInput: { style: small ? smallPaddingNumeric() : null },
+          }}
           sx={{ width: small ? 220 : 328 }}
         />
       );
@@ -205,7 +212,9 @@ export default function ScriptInput({
             passedProps.className ? passedProps.className : ""
           }`}
           placeholder={CONSTANT_PLACEHOLDER}
-          slotProps={{ htmlInput: { style: small ? smallPaddingNumeric() : null } }}
+          slotProps={{
+            htmlInput: { style: small ? smallPaddingNumeric() : null },
+          }}
           sx={{ width: small ? 220 : 328 }}
         />
       );
@@ -227,7 +236,14 @@ export default function ScriptInput({
 
       if (fieldValue && fieldValue.includes("\n")) {
         props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
-        return <AutoResizeTextArea size={size} cols={cols} keepWidth={keepWidth} {...props} />;
+        return (
+          <AutoResizeTextArea
+            size={size}
+            cols={cols}
+            keepWidth={keepWidth}
+            {...props}
+          />
+        );
       } else {
         return (
           <TextField
