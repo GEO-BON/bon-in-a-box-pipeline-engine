@@ -46,7 +46,7 @@ class ScriptRun( // Constructor used in single script run
 
     companion object {
         const val ERROR_KEY = "error"
-        val DEFAULT_TIMEOUT = 1.hours
+        val DEFAULT_TIMEOUT = 24.hours
         private val TIMESTAMP_FORMAT: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
         private val useRunners = System.getenv("USE_RUNNERS").equals("true", ignoreCase = true)
     }
