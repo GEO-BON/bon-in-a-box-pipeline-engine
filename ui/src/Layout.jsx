@@ -30,15 +30,15 @@ export function Layout(props) {
 
       <div className="right-content">
         <nav>
-          <NavLink to="/script-form">Single script run</NavLink>
-          &nbsp;|&nbsp;
-          <NavLink to="/pipeline-form">Pipeline run</NavLink>
-          &nbsp;|&nbsp;
-          <NavLink to="/pipeline-editor">Pipeline editor</NavLink>
-          &nbsp;|&nbsp;
-          <NavLink to="/history">Run history</NavLink>
-          &nbsp;|&nbsp;
-          <NavLink to="/versions">Server info</NavLink>
+          <NavLink to="/script-form">Single&nbsp;script&nbsp;run</NavLink>
+          <span className="separator">&nbsp;|&nbsp;</span>
+          <NavLink to="/pipeline-form">Pipeline&nbsp;run</NavLink>
+          <span className="separator">&nbsp;|&nbsp;</span>
+          <NavLink to="/pipeline-editor">Pipeline&nbsp;editor</NavLink>
+          <span className="separator">&nbsp;|&nbsp;</span>
+          <NavLink to="/history">Run&nbsp;history</NavLink>
+          <span className="separator">&nbsp;|&nbsp;</span>
+          <NavLink to="/versions">Server&nbsp;info</NavLink>
         </nav>
 
         {props.popupContent && (

@@ -457,3 +457,105 @@ textarea.autoResizeWidth {
 h2.MuiDialogTitle-root {
   color: var(--biab-green-main);
 }
+
+.narrowWarning,
+.previewMode {
+  display: none;
+}
+
+@media (max-width: 739px) or (max-height: 549px) {
+
+  button#clear,
+  button#saveBtn,
+  button#saveAsBtn,
+  button#loadFromFileBtn,
+  .stepChooser,
+  .documentationLink {
+    display: none;
+  }
+
+  div.left-pane:has(.stepChooser) img#logo {
+    max-width: 60px;
+    padding: 0;
+  }
+
+  .previewMode {
+    display: inline;
+  }
+
+  .previewMode p {
+    margin-block-start: 0.3em;
+    margin-block-end: 0.3em;
+  }
+
+  div.right-content nav {
+    padding: 5px 0;
+  }
+
+  div.right-content {
+    padding: 5px;
+  }
+
+}
+
+@media (max-width: 600px) {
+  div.left-pane {
+    width: 0px;
+    overflow: visible;
+    position: relative;
+    z-index: 100001;/*cellphone left pane logo*/
+  }
+
+  img#logo{
+    max-width: 80px;
+    padding: 5px;
+  }
+
+  div.right-content {
+    padding: 0;
+  }
+
+  div.right-content nav {
+    padding: 0 0 5px 95px;
+    background-color: #222;
+    position: fixed;
+    width: 100vw;
+    z-index: 100000;/*cellphone nav*/
+    border-bottom: 2px solid #87cefa45;
+  }
+
+  div.right-content nav .separator {
+    display: block;
+    height: 0px;
+    visibility: collapse;
+  }
+
+  div.right-content main {
+    padding: 7em 10px 10px 10px;
+  }
+
+  .outputTitle .clickable {
+    flex-wrap: wrap
+  }
+
+  .outputTitle h3 {
+    flex-shrink: unset;
+  }
+
+  .stepChooser,
+  .reactflow-wrapper {
+    visibility: collapse;
+    display: none;
+  }
+
+  .documentationLink,
+  .previewMode {
+    display: none;
+  }
+
+  .narrowWarning {
+    display: inline;
+  }
+
+}
+

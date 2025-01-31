@@ -1040,7 +1040,7 @@ export default function PipelineEditor(props) {
 
   return (
     <div id="editorLayout">
-      <p>
+      <p className="documentationLink">
         Need help? Check out{" "}
         <a
           href="https://github.com/GEO-BON/biab-2.0/#pipelines"
@@ -1050,6 +1050,15 @@ export default function PipelineEditor(props) {
           the documentation
         </a>
       </p>
+      <div className="narrowWarning">
+        <p>The pipeline engine cannot be used on a narrow display.</p>
+        <p><strong>A computer is recommended for pipeline edition.</strong></p>
+        <p>A phone can be used horizontally to preview a pipeline.</p>
+      </div>
+
+      <div className="previewMode">
+        <p>Currently in <strong>preview mode</strong>. Use a larger screen to edit.</p>
+      </div>
 
       <Dialog
         open={modal === 'saveAs'}
@@ -1213,7 +1222,7 @@ export default function PipelineEditor(props) {
                   onChange={onLoadFromFile}
                   style={{ display: "none" }}
                 />
-                <button onClick={onLoadFromFileBtnClick}>Load from file</button>
+                <button id="loadFromFileBtn" onClick={onLoadFromFileBtnClick}>Load from file</button>
                 <button onClick={onLoadFromServerBtnClick}>
                   Load from server
                 </button>
