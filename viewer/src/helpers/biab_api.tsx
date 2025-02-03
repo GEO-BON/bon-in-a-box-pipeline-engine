@@ -126,7 +126,7 @@ export const createPipeline4Display = async (pipeline_run_id: string) => {
         }
         return Promise.allSettled(
           prom.map(async (f: any) => {
-            return await preprocess2(f.value).then((v) => {
+            return await preprocess(f.value).then((v) => {
               return v;
             });
           })
