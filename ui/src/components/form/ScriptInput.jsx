@@ -59,16 +59,18 @@ export default function ScriptInput({
 
   if (type.startsWith("options")) {
     if (options) {
+      const multiple = type === "options[]";
       const optionObjects = options.map((choice) => {
         return { value: choice, label: choice };
       });
+
       return (
         <Autocomplete
           defaultValue={[]}
           label={label}
           size={size}
-          multiple={type === "options[]"}
-          filterSelectedOptions={type === "options[]"}
+          multiple={multiple}
+          filterSelectedOptions={multiple}
           options={optionObjects}
           renderInput={(params) => (
             <TextField
@@ -106,13 +108,21 @@ export default function ScriptInput({
             },
           }}
           disabled={passedProps.disabled}
-          value={fieldValue}
-          onChange={(event, newValue) => {
-            const vals = newValue.map((option) =>
-              option?.value ? option.value : option
-            );
-            setFieldValue(vals);
-            onValueUpdated(vals);
+          value={
+            multiple
+            ? fieldValue && optionObjects.filter((opt)=>fieldValue.includes(opt.value))
+            : fieldValue
+          }
+          onChange={(event, newOptions) => {
+            var newValue;
+            if (typeof newOptions.map === 'function') {
+              newValue = newOptions.map((option) => option?.value ?? option);
+            } else {
+              newValue = newOptions?.value ?? newOptions;
+            }
+
+            setFieldValue(newValue);
+            onValueUpdated(newValue);
           }}
         ></Autocomplete>
       );
