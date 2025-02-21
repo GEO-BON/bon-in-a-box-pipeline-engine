@@ -146,9 +146,9 @@ There are also several types of outputs that can be created
 | File Type  | MIME type to use in the yaml   | UI rendering                 |
 |------------|--------------------------------|------------------------------|
 | CSV        | text/csv                       | HTML table (partial content) |
-| GeoJSON    | application/geo+json           | Map                          |
+| GeoJSON^2^ | application/geo+json           | Map                          |
 | GeoPackage | application/geopackage+sqlite3 | Link                         |
-| GeoTIFF^2^ | image/tiff;application=geotiff | Map widget (leaflet)         |
+| GeoTIFF^3^ | image/tiff;application=geotiff | Map widget (leaflet)         |
 | HTML       | text/html                      | Open in new tab              |
 | JPG        | image/jpg                      | tag                          |
 | Shapefile  | application/dbf                | Link                         |
@@ -156,7 +156,9 @@ There are also several types of outputs that can be created
 | TSV        | text/tab-separated-values      | HTML table (partial content) |
 |            | (any unknown type)             | Plain text or link           |
 
-^2^When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
+^2^ GeoJSON coordinates *must* be in WGS 84. See [specification section 4](https://datatracker.ietf.org/doc/html/rfc7946#section-4) for details.
+
+^3^ When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
 
 ```
 map:
