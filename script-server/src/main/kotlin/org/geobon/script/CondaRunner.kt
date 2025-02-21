@@ -26,6 +26,7 @@ class CondaRunner(
             source /.bashrc
             $assertSuccessBash
             $activateEnvironment
+            echo "Conda environment ready."
         """.trimIndent()
     }
 
