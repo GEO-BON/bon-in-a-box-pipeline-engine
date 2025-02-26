@@ -1,5 +1,4 @@
 .left-pane {
-    resize: horizontal;
     overflow-y: scroll;
     overflow-x: hidden;
 }
