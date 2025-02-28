@@ -154,37 +154,26 @@ export const GetJSON = async (path: string) => {
 
 const preprocess = async (value: any) => {
   if (value.type.includes("tif")) {
-    if (value.outputs.includes(",")) {
-      // An array of tiffs
-      let outs = value.outputs.split(",").map((t: any) => {
-        return {
-          type: value.type,
-          url: t,
-          band_id: "b1",
-          description: t.split("/").pop(),
-        };
-      });
-      return { ...value, outputs: outs };
-    } else {
-      // Not an array of TIFFs, so single TIFF or multiband
-      return await GetCOGInfo(value.outputs).then((res) => {
-        const outs = res.data.band_descriptions.map((b: any) => {
-          let desc = b[0];
-          if (b.length > 1 && typeof b[1] !== "object" && b[1] !== "") {
-            desc = b[1];
-          }
-
-          return {
-            type: value.type,
-            url: value.outputs,
-            band_id: b[0],
-            description: desc,
-          };
+    let out = await Promise.all(
+      value.outputs.split(",").map(async (t: any) => {
+        return await GetCOGInfo(t).then((res) => {
+          const outs = res.data.band_descriptions.map((b: any) => {
+            let desc = b[0];
+            if (b.length > 1 && typeof b[1] !== "object" && b[1] !== "") {
+              desc = b[1];
+            }
+            return {
+              type: value.type,
+              url: t,
+              band_id: b[0],
+              description: `${t.split("/").pop()} - ${desc}`,
+            };
+          });
+          return outs;
         });
-        return { ...value, outputs: outs };
-      });
-    }
+      })
+    );
+    return { ...value, outputs: out.flat() };
   }
-
   return value;
 };

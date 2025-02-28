@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.6.41">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -69,10 +69,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-48ffa3e5b9d089919c6712c39e5b00f2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-87edd68557743b7c59846ba2f8eca337.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -477,7 +477,7 @@ author:
 <td>HTML table (partial content)</td>
 </tr>
 <tr class="even">
-<td>GeoJSON</td>
+<td>GeoJSON<sup>2</sup></td>
 <td>application/geo+json</td>
 <td>Map</td>
 </tr>
@@ -487,7 +487,7 @@ author:
 <td>Link</td>
 </tr>
 <tr class="even">
-<td>GeoTIFF<sup>2</sup></td>
+<td>GeoTIFF<sup>3</sup></td>
 <td>image/tiff;application=geotiff</td>
 <td>Map widget (leaflet)</td>
 </tr>
@@ -523,7 +523,8 @@ author:
 </tr>
 </tbody>
 </table>
-<p><sup>2</sup>When used as an output, <code>image/tiff;application=geotiff</code> type allows an additional <code>range</code> attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.</p>
+<p><sup>2</sup> GeoJSON coordinates <em>must</em> be in WGS 84. See <a href="https://datatracker.ietf.org/doc/html/rfc7946#section-4">specification section 4</a> for details.</p>
+<p><sup>3</sup> When used as an output, <code>image/tiff;application=geotiff</code> type allows an additional <code>range</code> attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.</p>
 <pre><code>map:
   label: My map
   description: Some map that shows something
@@ -654,7 +655,7 @@ author: # 1 to many
     identifier: # Optional, full URL of a unique digital identifier, such as an ORCID.
 license: # Optional. If unspecified, the project's MIT license will apply.
 external_link: # Optional, link to a separate project, github repo, etc.
-timeout: # Optional, in minutes. By defaults steps time out after 1h to avoid hung process to consume resources. It can be made longer for heavy processes.
+timeout: # Optional, in minutes. By defaults scripts time out after 24h to avoid hung process to consume resources. It can be made longer for heavy processes.
 
 inputs: # 0 to many
   key: # replace the word "key" by a snake case identifier for this input
@@ -945,8 +946,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1057,7 +1056,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

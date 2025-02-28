@@ -190,7 +190,7 @@ Every second, the UI polls for:
 
 1. Using http://localhost/swagger, edit the specification.
 2. Copy the result to [script-server/api/openapi.yaml](../script-server/api/openapi.yaml)
-3. Use [ui/BonInABoxScriptService/generate-client.sh](../ui/BonInABoxScriptService/generate-client.sh) and [script-server/generate-server-openapitools.sh](../script-server/generate-server-openapitools.sh) to regenerate the client and the server.
+3. Use [ui/BonInABoxScriptService/generate-client.sh](../ui/BonInABoxScriptService/generate-client.sh) to regenerate the client.
 4. Merge carefully, not all generated code is to be kept.
 5. Implement the gaps.
 

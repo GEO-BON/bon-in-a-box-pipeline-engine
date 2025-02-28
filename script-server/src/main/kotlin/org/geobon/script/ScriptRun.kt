@@ -23,8 +23,9 @@ class ScriptRun( // Constructor used in single script run
     private val scriptFile: File,
     private val context: RunContext,
     private val timeout: Duration = DEFAULT_TIMEOUT,
-    private val condaEnvName:String? = null,
-    private val condaEnvYml:String? = null) {
+    private val condaEnvName: String? = null,
+    private val condaEnvYml: String? = null
+) {
 
     // Constructor used in pipelines & tests
     constructor(
@@ -45,8 +46,9 @@ class ScriptRun( // Constructor used in single script run
 
     companion object {
         const val ERROR_KEY = "error"
-        val DEFAULT_TIMEOUT = 1.hours
+        val DEFAULT_TIMEOUT = 24.hours
         private val TIMESTAMP_FORMAT: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
+        private val useRunners = System.getenv("USE_RUNNERS").equals("true", ignoreCase = true)
     }
 
     suspend fun execute() {
@@ -63,7 +65,7 @@ class ScriptRun( // Constructor used in single script run
      */
     suspend fun waitForResults() {
         logger.debug("Waiting for run completion... {}", context.outputFolder)
-        while(!this::results.isInitialized) {
+        while (!this::results.isInitialized) {
             delay(100L)
         }
     }
@@ -80,7 +82,7 @@ class ScriptRun( // Constructor used in single script run
                 }.onSuccess { previousOutputs ->
                     // Use this result only if there was no error and inputs have not changed
                     if (previousOutputs[ERROR_KEY] == null) {
-                        if(inputsOlderThanCache()) {
+                        if (inputsOlderThanCache()) {
                             logger.debug("Loading from cache")
                             return previousOutputs
                         }
@@ -95,15 +97,16 @@ class ScriptRun( // Constructor used in single script run
                 val cleanOption = System.getenv("SCRIPT_SERVER_CACHE_CLEANER")
                 logBuffer += (
                         "Script was updated, flushing the cache for this script with option $cleanOption.\n" +
-                        "Script timestamp: ${TIMESTAMP_FORMAT.format(Date(scriptFile.lastModified()))}\n" +
-                        "Result timestamp: ${TIMESTAMP_FORMAT.format(Date(resultFile.lastModified()))}\n"
+                                "Script timestamp: ${TIMESTAMP_FORMAT.format(Date(scriptFile.lastModified()))}\n" +
+                                "Result timestamp: ${TIMESTAMP_FORMAT.format(Date(resultFile.lastModified()))}\n"
                         ).also { logger.debug(it) }
 
-                when(cleanOption) {
+                when (cleanOption) {
                     "partial" ->
                         if (!context.outputFolder.deleteRecursively()) {
                             throw RuntimeException("Failed to delete cache for modified script at ${context.outputFolder.parentFile.path}")
                         }
+
                     else -> // "full" or unset
                         if (!context.outputFolder.parentFile.deleteRecursively()) {
                             throw RuntimeException("Failed to delete cache for modified script at ${context.outputFolder.parentFile.path}")
@@ -136,11 +139,15 @@ class ScriptRun( // Constructor used in single script run
                             with(File(stringValue)) {
                                 // check if missing or newer than cache
                                 if (!exists()) {
-                                    logBuffer += "Cannot reuse cache: input file $this does not exist.\n".also { logger.warn(it) }
+                                    logBuffer += "Cannot reuse cache: input file $this does not exist.\n".also {
+                                        logger.warn(
+                                            it
+                                        )
+                                    }
                                     return false
                                 }
 
-                                if(cacheTime < lastModified()) {
+                                if (cacheTime < lastModified()) {
                                     logBuffer += ("Cannot reuse cache: input file has been modified.\n" +
                                             "Cache time: $cacheTime\n" +
                                             "File time:  ${lastModified()}\n" +
@@ -202,11 +209,12 @@ class ScriptRun( // Constructor used in single script run
                     }
                 }
 
-                val command:List<String>
+                val command: List<String>
                 when (scriptFile.extension) {
-                    "jl", "JL" ->  {
+                    "jl", "JL" -> {
                         container = Containers.JULIA
-                        command = container.dockerCommandList + listOf("julia", "-e",
+                        command = container.dockerCommandList + listOf(
+                            "julia", "-e",
                             """
                             open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
                             ARGS=["${context.outputFolder.absolutePath}"];
@@ -217,83 +225,13 @@ class ScriptRun( // Constructor used in single script run
                     }
 
                     "r", "R" -> {
-                        container = Containers.CONDA
-                        val assertSuccessBash =
-                            """
-                                function assertSuccess {
-                                    if [[ ${'$'}? -ne 0 ]] ; then
-                                        echo -e "FAILED" ; exit 1
-                                    fi
-                                }
-                            """.trimIndent()
-
-                        val activateEnvironment =
-                            if (condaEnvName?.isNotEmpty() == true && condaEnvYml?.isNotEmpty() == true) {
-                                val condaEnvFile = "/conda-env-yml/$condaEnvName"
-
-                                """
-                                    $assertSuccessBash
-                                    set -o pipefail
-                                    echo "$condaEnvYml" > $condaEnvFile.2.yml ; assertSuccess
-
-                                    while ! mkdir $condaEnvFile.lock 2>/dev/null; do echo "waiting for conda lockfile..."; sleep 2s; done;
-                                    trap "echo 'Removing conda lock file for interrupted process'; rm -rf $condaEnvFile.lock 2>/dev/null; exit 1" SIGINT SIGTERM
-                                    echo "Conda lock file acquired"
-
-                                    if [ ! -f "$condaEnvFile.yml" ]; then
-                                        echo "Creating new conda environment $condaEnvName..."
-                                        createLogs=$(mamba env create -f $condaEnvFile.2.yml 2>&1 | tee -a ${logFile.absolutePath})
-                                        if [[ ${'$'}? -eq 0 ]] ; then
-                                            mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
-                                            echo "Created successfully."
-                                        elif [[ ${'$'}createLogs == *"prefix already exists:"* ]]; then
-                                            echo "YML files out of sync, will attempt updating..."
-                                        else
-                                            echo "Cleaning up after failure..."
-                                            mamba remove -n $condaEnvName --all > /dev/null 2>&1
-                                            rm $condaEnvFile.2.yml 2> /dev/null
-                                            echo -e "FAILED" ; exit 1
-                                        fi
-                                    fi
-
-                                    if [ -f "$condaEnvFile.2.yml" ]; then
-                                        if cmp -s $condaEnvFile.yml $condaEnvFile.2.yml; then
-                                            echo "Activating existing conda environment $condaEnvName"
-                                        else
-                                            echo "Updating existing conda environment $condaEnvName"
-                                            mamba env update -f $condaEnvFile.2.yml ; assertSuccess
-                                        fi
-
-                                        mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
-                                    fi
-
-                                    mamba activate $condaEnvName
-                                    if [[ ${'$'}CONDA_DEFAULT_ENV == $condaEnvName ]]; then
-                                        echo "$condaEnvName activated"
-                                    else
-                                        echo "Activation failed, will attempt creating..."
-                                        mamba env create -f $condaEnvFile.yml
-                                        mamba activate $condaEnvName
-                                    fi
-
-                                    echo "Removing conda lock file"
-                                    rm -rf $condaEnvFile.lock 2>/dev/null
-                                    trap - SIGINT SIGTERM
-                                """.trimIndent()
-                            } else {
-                                """
-                                    $assertSuccessBash
-                                    mamba activate rbase ; assertSuccess
-                                """.trimIndent()
-                            }
+                        val runner = CondaRunner(logFile, pidFile, "r", condaEnvName, condaEnvYml)
+                        container = CondaRunner.container
 
                         command = container.dockerCommandList + listOf(
-                            // eval and source commands to initialize mamba, see https://stackoverflow.com/a/75246428/3519951
                             "bash", "-c",
                             """
-                                echo $$ > ${pidFile.absolutePath}
-                                source /.bashrc
-                                $activateEnvironment
+                                ${runner.getSetupBash()}
                                 Rscript -e '
                                 options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
 
@@ -344,7 +282,25 @@ class ScriptRun( // Constructor used in single script run
                     }
 
                     "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
-                    "py", "PY" -> command = listOf("python3", scriptFile.absolutePath, context.outputFolder.absolutePath)
+                    "py", "PY" -> {
+                        if(useRunners) {
+                            val runner = CondaRunner(logFile, pidFile, "python", condaEnvName, condaEnvYml)
+                            container = CondaRunner.container
+
+                            val escapedScript = scriptFile.absolutePath.replace(" ", "\\ ")
+                            val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
+                            command = container.dockerCommandList + listOf(
+                                "bash", "-c",
+                                """
+                                    ${runner.getSetupBash()}
+                                    python3 $escapedScript $escapedOutputFolder
+                                """.trimIndent()
+                            )
+                        } else {
+                            command = listOf("python3", scriptFile.absolutePath, context.outputFolder.absolutePath)
+                        }
+                    }
+
                     else -> {
                         log(logger::warn, "Unsupported script extension ${scriptFile.extension}")
                         return flagError(mapOf(), true)
@@ -453,6 +409,7 @@ class ScriptRun( // Constructor used in single script run
                         outputs = mapOf(ERROR_KEY to event)
                         resultFile.writeText(RunContext.gson.toJson(outputs))
                     }
+
                     else -> {
                         log(logger::warn, "An error occurred when running the script: ${ex.message}")
                         logger.warn(ex.stackTraceToString())
@@ -464,7 +421,7 @@ class ScriptRun( // Constructor used in single script run
             pidFile.delete()
         }
 
-        log(logger::debug,"Runner: ${container.containerName} version ${container.version}")
+        log(logger::debug, "Runner: ${container.containerName} version ${container.version}")
         log(logger::info, "Elapsed: $elapsed")
 
         // Format log output

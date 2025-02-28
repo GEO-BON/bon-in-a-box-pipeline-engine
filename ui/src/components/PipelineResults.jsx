@@ -4,9 +4,16 @@ import {
   FoldableOutput,
   FoldableOutputContextProvider,
 } from "./FoldableOutput";
-import errorImg from "../img/error.svg";
-import warningImg from "../img/warning.svg";
-import infoImg from "../img/info.svg";
+
+import Error from "@mui/icons-material/Error";
+import Warning from "@mui/icons-material/Warning";
+import Info from "@mui/icons-material/Info";
+
+import Box from "@mui/material/Box";
+
+import Button from "@mui/material/Button";
+import { CustomButtonGreen } from "./CustomMUI";
+import Alert from "@mui/material/Alert";
 import { getScriptOutput, getBreadcrumbs } from "../utils/IOId";
 import { isEmptyObject } from "../utils/isEmptyObject";
 import { InlineSpinner } from "./Spinner";
@@ -53,87 +60,91 @@ export function PipelineResults({
 
   if (resultsData) {
     return (
-      <FoldableOutputContextProvider
-        activeRenderer={activeRenderer}
-        setActiveRenderer={setActiveRenderer}
-      >
-        <h2>Results</h2>
-        {isPipeline && runHash && (
-          <a href={`/viewer/${pipeline}>${runHash}`} target="_blank">
-            <button disabled={runningScripts.size > 0}>
-              See in results viewer (beta)
-            </button>
-          </a>
-        )}
-        {isPipeline && (
-          <>
-            {pipelineOutputResults &&
-              pipelineMetadata.outputs &&
-              Object.entries(pipelineMetadata.outputs)
-                .sort((a, b) => a[1].weight - b[1].weight)
-                .map((entry) => {
-                  const [ioId, outputDescription] = entry;
-                  const breadcrumbs = getBreadcrumbs(ioId);
-                  const outputId = getScriptOutput(ioId);
-                  let value =
-                    pipelineOutputResults[breadcrumbs] &&
-                    pipelineOutputResults[breadcrumbs][outputId];
+      <Box className="pipelineResults">
+        <FoldableOutputContextProvider
+          activeRenderer={activeRenderer}
+          setActiveRenderer={setActiveRenderer}
+        >
+          {isPipeline && runHash && (
+            <>
+              <h2>Results</h2>
+              <a href={`/viewer/${pipeline}>${runHash}`} target="_blank">
+                <CustomButtonGreen
+                  disabled={runningScripts.size > 0}
+                  variant="contained"
+                  sx={{ marginBottom: "10px" }}
+                >
+                  See in results viewer
+                </CustomButtonGreen>
+              </a>
+            </>
+          )}
+          {isPipeline && (
+            <Box className="resultsBox">
+              {pipelineOutputResults &&
+                pipelineMetadata.outputs &&
+                Object.entries(pipelineMetadata.outputs)
+                  .sort((a, b) => a[1].weight - b[1].weight)
+                  .map((entry) => {
+                    const [ioId, outputDescription] = entry;
+                    const breadcrumbs = getBreadcrumbs(ioId);
+                    const outputId = getScriptOutput(ioId);
+                    let value =
+                      pipelineOutputResults[breadcrumbs] &&
+                      pipelineOutputResults[breadcrumbs][outputId];
 
-                  // If not in outputs, check if it was an input marked as output
-                  if (!value) {
-                    value = inputFileContent[breadcrumbs];
-                  }
+                    // If not in outputs, check if it was an input marked as output
+                    if (!value) {
+                      value = inputFileContent[breadcrumbs];
+                    }
 
-                  if (!value) {
+                    if (!value) {
+                      return (
+                        <div key={ioId} className="outputTitle">
+                          <h3>{outputDescription.label}</h3>
+                          {runningScripts.size > 0 ? (
+                            <InlineSpinner />
+                          ) : (
+                            <Alert severity="warning">
+                              See detailed results
+                            </Alert>
+                          )}
+                        </div>
+                      );
+                    }
+
                     return (
-                      <div key={ioId} className="outputTitle">
-                        <h3>{outputDescription.label}</h3>
-                        {runningScripts.size > 0 ? (
-                          <InlineSpinner />
-                        ) : (
-                          <>
-                            <img
-                              src={warningImg}
-                              alt="Warning"
-                              className="error-inline"
-                            />
-                            See detailed results
-                          </>
-                        )}
-                      </div>
+                      <SingleIOResult
+                        sectionName="output"
+                        key={ioId}
+                        ioId={outputId}
+                        componentId={ioId}
+                        value={value}
+                        ioMetadata={outputDescription}
+                      />
                     );
-                  }
+                  })}
+            </Box>
+          )}
+          <h2>Detailed results</h2>
+          <Box className="resultsBox">
+            {Object.entries(resultsData).map((entry) => {
+              const [key, value] = entry;
 
-                  return (
-                    <SingleIOResult
-                      sectionName="output"
-                      key={ioId}
-                      ioId={outputId}
-                      componentId={ioId}
-                      value={value}
-                      ioMetadata={outputDescription}
-                    />
-                  );
-                })}
-
-            <h2>Detailed results</h2>
-          </>
-        )}
-        {Object.entries(resultsData).map((entry) => {
-          const [key, value] = entry;
-
-          return (
-            <DelayedResult
-              key={key}
-              breadcrumbs={key}
-              folder={value}
-              displayTimeStamp={displayTimeStamp}
-              setRunningScripts={setRunningScripts}
-              setPipelineOutputResults={setPipelineOutputResults}
-            />
-          );
-        })}
-      </FoldableOutputContextProvider>
+              return (
+                <DelayedResult
+                  key={key}
+                  breadcrumbs={key}
+                  folder={value}
+                  displayTimeStamp={displayTimeStamp}
+                  setRunningScripts={setRunningScripts}
+                  setPipelineOutputResults={setPipelineOutputResults}
+                />
+              );
+            })}
+          </Box>
+        </FoldableOutputContextProvider>
+      </Box>
     );
   } else return null;
 }
@@ -283,18 +294,12 @@ export function DelayedResult({
       );
       icon = (
         <>
-          {outputData.error && (
-            <img src={errorImg} alt="Error" className="error-inline" />
-          )}
-          {outputData.warning && (
-            <img src={warningImg} alt="Warning" className="error-inline" />
-          )}
-          {outputData.info && (
-            <img src={infoImg} alt="Info" className="info-inline" />
-          )}
+          {outputData.error && <Error color="error" />}
+          {outputData.warning && <Warning color="warning" />}
+          {outputData.info && <Info color="info" />}
         </>
       );
-      inline = skippedMessage && <i>{skippedMessage}</i>
+      inline = skippedMessage && <i>{skippedMessage}</i>;
     } else {
       outputsContent = <p>Running...</p>;
       icon = <InlineSpinner />;

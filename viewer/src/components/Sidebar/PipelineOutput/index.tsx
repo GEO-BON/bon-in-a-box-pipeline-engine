@@ -275,6 +275,7 @@ export function PipelineOutput(props: any) {
           {(!("type" in outputObj) ||
             outputObj.type == "text" ||
             outputObj.type == "options" ||
+            outputObj.type == "options[]" ||
             outputObj.type == "text[]") && (
             <Typography color="secondary.light">{outputObj.outputs}</Typography>
           )}

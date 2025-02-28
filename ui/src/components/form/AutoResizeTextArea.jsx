@@ -14,7 +14,7 @@ function resize(input, keepWidth) {
   }
 }
 
-export default function AutoResizeTextArea({ keepWidth, className, onChange, defaultValue, value, ...props }) {
+export default function AutoResizeTextArea({ keepWidth=false, className, onChange, defaultValue, value, ...props }) {
 
   const textAreaRef = useRef(null);
 
@@ -27,7 +27,11 @@ export default function AutoResizeTextArea({ keepWidth, className, onChange, def
     <textarea
       value={value}
       defaultValue={defaultValue}
-      className={(className ? className + ' ' : '') + 'autoResize'}
+      className={
+        (className ? className + ' ' : '')
+        + 'autoResizeHeight'
+        + (keepWidth ? '' : ' autoResizeWidth')
+      }
       ref={textAreaRef}
       onChange={(e) => {
         resize(e.target, keepWidth);

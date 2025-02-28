@@ -6,6 +6,7 @@ import { fetchStepDescription } from "./StepDescriptionStore";
 import { StepDescription } from "../StepDescription";
 import { Spinner } from "../Spinner";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
+import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 
 const api = new BonInABoxScriptService.DefaultApi();
 
@@ -51,9 +52,9 @@ export default function StepChooser({ popupContent, setPopupContent }) {
         fetchStepDescription(descriptionFile, (metadata) => {
           if (!metadata) {
             setPopupContent(
-              <p className="error">
+              <Alert className="error">
                 Failed to fetch script description for {descriptionFile}
-              </p>
+              </Alert>
             );
             return;
           }
@@ -135,7 +136,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
         // branch
         return (
           <div key={key}>
-            <p>{key}</p>
+            <p class="dnd-head"><SubdirectoryArrowRightIcon sx={{fontSize: "0.85em"}} />{key}</p>
             <div className="inFolder">
               {renderTree([...splitPathBefore, key], groupedFiles.get(key))}
             </div>
@@ -170,7 +171,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
         </div>
       )}
 
-      {scriptFiles &&
+      {scriptFiles && (
         <div key="Scripts">
           <h3>Scripts</h3>
           {renderTree(
@@ -181,7 +182,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
             ])
           )}
         </div>
-      }
+      )}
     </aside>
   );
 }

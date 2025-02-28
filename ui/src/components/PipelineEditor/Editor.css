@@ -81,8 +81,9 @@
 
 .reactflow-wrapper {
   flex-grow: 1;
-  height: 100%;
-  background-color: #fcfcfc99;
+  height: 98%;
+  background-color: #8f94a0;
+  border-radius:10px;
 }
 
 .selectall {
@@ -113,7 +114,7 @@
   background-color: whitesmoke;
 
   border-width: 2px;
-  border-radius: 3px;
+  border-radius: 4px;
   border-style: solid;
 }
 
@@ -145,6 +146,17 @@
 
 .ioNode td.name {
   padding: 0.5em;
+}
+
+.ioNode .ioNode-folder, .ioNode .ioNode-script{
+  display: block;
+}
+.ioNode .ioNode-folder{
+    font-size: 0.6em;
+}
+.ioNode .ioNode-script{
+    font-weight: 700;
+    color: var(--biab-green-main)
 }
 
 .inputs,
@@ -247,6 +259,7 @@
 
 .ioList {
   border-radius: 0px 0px 0px 3px;
+  min-height: 15rem;
 }
 
 .ioList .rightPaneInner {
@@ -271,39 +284,55 @@
   font-size: small;
 }
 
+.ioList .example {
+  font-size: small;
+}
+
 .ioList .ioListItem td.reorder-drag {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
 }
 
-.ioList textarea {
+.ioList textarea.label,
+.ioList textarea.description,
+.ioList textarea.example {
   /* Removing the width of the dragHandle from 100% */
-  width: calc(100% - 1rem);
+  width: calc(100% - 1.1rem);
   background-color: transparent;
-  border: none;
+  border: 1px solid transparent;
   resize: none;
   font-family: inherit;
-  padding: 3px 6px;
+  padding: 2px 5px;
 }
 
-.ioList textarea:hover {
+.ioList textarea.label:hover,
+.ioList textarea.description:hover {
   background: url("../../img/pen.svg");
   background-repeat: no-repeat;
   background-position: right;
   background-size: 1.5em;
-  border: 1px solid  #bbb;
-  padding: 2px 5px;
+  outline: 1px solid #bbb;
 }
 
-.ioList textarea:focus {
-  border:1px solid #0c947b;
-  background-color: unset;
-  resize: both;
-  padding: 2px 5px;
+.ioList textarea.label:focus,
+.ioList textarea.description:focus,
+.ioList textarea.autoResizeHeight:focus  {
+  outline: 1px solid var(--biab-green-trans-main);
+  border: 1px solid var(--biab-green-trans-main);
 }
 
-.ioList textarea:hover:focus {
+.ioList textarea.label:hover:focus,
+.ioList textarea.description:hover:focus  {
   background: none;
+}
+
+.ioList textarea.autoResizeHeight.example  {
+  outline: 1px solid #bbb;
+  display: block;
+}
+
+.ioList .MuiFormGroup-root {
+  display: inline;
 }
 
 .ioList .draggable {
@@ -341,6 +370,20 @@
   background-color: white;
 }
 
+.ioListItem .MuiInputBase-input{
+  font-size: 0.7em;
+  padding: 2px;
+}
+
+.ioListItem .MuiInputBase-root{
+  padding: 5px;
+}
+
+.ioListItem .MuiInputBase-input{
+  font-size:0.7em;
+  padding: 2px;
+}
+
 .collapseTab {
   text-align: center;
 }
@@ -371,6 +414,7 @@
 
 .rightPane.metadataPane {
   left: max(2em, calc(100% - 850px));
+  min-height: 22rem;
 }
 
 .rightPane.metadataPane.paneCollapsed {
@@ -434,6 +478,7 @@ ul#popupMenu {
 #popupMenu li {
   padding: 3px;
   list-style-type: none;
+  font-size: 0.75em;
 }
 
 #popupMenu li:hover {
