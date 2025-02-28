@@ -102,7 +102,9 @@ When modifying scripts in the `/scripts` folder, servers do not need to be resta
 
 -   When adding or renaming scripts, refresh the browser page.
 
-When modifying pipelines in the /pipelines folder, servers do not need to be restarted: - In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the "pipeline run" page.
+When modifying pipelines in the /pipelines folder, servers do not need to be restarted:
+
+-   In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the "pipeline run" page.
 
 -   When adding or renaming pipelines, refresh the browser page.
 

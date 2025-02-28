@@ -195,7 +195,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#inputs" id="toc-inputs" class="nav-link" data-scroll-target="#inputs">Inputs</a></li>
   <li><a href="#outputs" id="toc-outputs" class="nav-link" data-scroll-target="#outputs">Outputs</a></li>
   <li><a href="#specifying-r-package-dependencies-with-conda" id="toc-specifying-r-package-dependencies-with-conda" class="nav-link" data-scroll-target="#specifying-r-package-dependencies-with-conda">Specifying R package dependencies with conda</a></li>
-  <li><a href="#loading-packages-that-are-not-available-in-conda" id="toc-loading-packages-that-are-not-available-in-conda" class="nav-link" data-scroll-target="#loading-packages-that-are-not-available-in-conda">Loading packages that are not available in conda</a></li>
   <li><a href="#examples" id="toc-examples" class="nav-link" data-scroll-target="#examples">Examples</a></li>
   </ul></li>
   <li><a href="#step-4-integrating-yaml-inputs-and-outputs-into-your-script" id="toc-step-4-integrating-yaml-inputs-and-outputs-into-your-script" class="nav-link" data-scroll-target="#step-4-integrating-yaml-inputs-and-outputs-into-your-script">Step 4: Integrating YAML inputs and outputs into your script</a>
@@ -278,7 +277,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="before-you-start" class="level2">
 <h2 class="anchored" data-anchor-id="before-you-start">Before you start</h2>
-<p>Make sure that you are working in the right environment when you are running code in BON in a Box. This can be in your code editor of choice, such as visual studio code opened to the BON in a Box pipelines folder that has been cloned to your computer from github or an R studio project that is set up with the BON in a Box github repository. This will make it easier to pull and push to the github repository later.</p>
+<p>Make sure that you are working in the right environment when you are running code in BON in a Box. This can be in your code editor of choice, such as Visual Studio Code opened to the BON in a Box pipelines folder that has been cloned to your computer from GitHub or an R Studio project that is set up with the BON in a Box GitHub repository. This will make it easier to pull and push to the GitHub repository later.</p>
 </section>
 <section id="step-1-plan-your-pipeline" class="level2">
 <h2 class="anchored" data-anchor-id="step-1-plan-your-pipeline">Step 1: Plan your pipeline</h2>
@@ -289,15 +288,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="step-2-break-up-your-scripts" class="level2">
 <h2 class="anchored" data-anchor-id="step-2-break-up-your-scripts">Step 2: Break up your scripts</h2>
-<p>You can start writing the individual scripts in your pipeline. If you already have an analysis workflow, break this up into individual scripts representing the steps of the pipeline. Plan what you want the inputs and outputs to be for the script.</p>
+<p>You can start writing the individual scripts in your pipeline. If you already have an analysis workflow, break this up into individual scripts representing the steps of the pipeline. Plan what you want the inputs and outputs to be for each script.</p>
 </section>
 <section id="step-3-create-a-yaml-file" class="level2">
 <h2 class="anchored" data-anchor-id="step-3-create-a-yaml-file">Step 3: Create a YAML file</h2>
 <p>Each script should be accompanied by a YAML file (.yml extension) that specifies inputs and outputs of that step of the pipeline.</p>
-<p>Markdown is supported for pipeline, script, input and output descriptions. See this <a href="https://commonmark.org/help/">CommonMark quick reference</a> for allowed markups. These can include special characters, links, and photos.</p>
+<p>Markdown is supported for pipeline, script, input and output descriptions. See this <a href="https://commonmark.org/help/">CommonMark quick reference</a> for allowed markups. These can include special characters, links, and images.</p>
 <section id="name-and-description" class="level3">
 <h3 class="anchored" data-anchor-id="name-and-description">Name and description</h3>
-<p>YAML files should begin with a name, description, and authors of the script. The name should be the name of the script described by the yml file. Save the file with the same name as the script that it describes but with a .yml extension.</p>
+<p>YAML files should begin with a name, description, and authors of the script. The name should be the name of the script described by the YAML file. Save the file with the same name as the script that it describes but with a .yml extension.</p>
 <p>Example:</p>
 <pre><code>script: script_name.R
 name: Script Name
@@ -309,7 +308,7 @@ author:
 <section id="inputs" class="level3">
 <h3 class="anchored" data-anchor-id="inputs">Inputs</h3>
 <p>Next, the YAML file should specify the inputs of the script. These inputs will either be outputs from the previous script, which can be connected by lines in the pipeline editor, or specified by the user in the input form.</p>
-<p>All input and output names should follow the snake case naming conventions. Names should be all lowercase with underscores instead of spaces.</p>
+<p>All input and output ids should follow the snake case naming conventions. Names should be all lowercase with underscores instead of spaces. For example, an input labelled “Species name” would cear the snake case id of “species_name”. This id will be the name of the input parameter in your code.</p>
 <p>Here is an example where the input a coordinate reference system and a distance that is specified by the user:</p>
 <pre><code>inputs:
   crs:
@@ -322,7 +321,7 @@ author:
     description: Some distance measurement (in meters) for a parameter
     type: int
     example: 1000</code></pre>
-<p>Specifying an example will auto-fill that input with the example unless changed by the user. If you do not want there to be an example that auto-fills in the script, write “example: null”. This will leave the input blank unless the user adds one. Not specifying any example will cause an error.</p>
+<p>Specifying an example will auto-fill that input with the example unless changed by the user. If you do not want an example that auto-fills the input write “example: null”. This will leave the input blank unless the user adds one. Not specifying any example will cause an error. It is mandatory that a script can be run successfully by leaving all the examples and simply pressing Run.</p>
 <p>There are several different types of user inputs that can be specified in the YAML file:</p>
 <table class="caption-top table">
 <colgroup>
@@ -532,14 +531,14 @@ author:
   range: [0.1, 254]
   example: https://example.com/mytiff.tif</code></pre>
 <p>Here is an example output:</p>
-<pre><code>outputs:   
-  result:     
+<pre><code>outputs:
+  result:
     label: Analysis result
     description: The result of the analysis, in CSV form
-    type: text/csv   
-  result_plot:     
-    label: Result plot     
-    description: Plot of results     
+    type: text/csv
+  result_plot:
+    label: Result plot
+    description: Plot of results
     type: image/png</code></pre>
 </section>
 <section id="specifying-r-package-dependencies-with-conda" class="level3">
@@ -574,43 +573,24 @@ author:
     - openeo
     - pandas</code></pre>
 </section>
-</section>
-<section id="loading-packages-that-are-not-available-in-conda" class="level3">
-<h3 class="anchored" data-anchor-id="loading-packages-that-are-not-available-in-conda">Loading packages that are not available in conda</h3>
-<p>Go to the runners/conda-dockerfile and add it to the install command. Replace &lt;package&gt; with your package name.</p>
-<pre><code>RUN bash --login -c "mamba activate rbase; R -e 'install.packages(c(\&lt;package 1&gt;\", \
-        \"&lt;package 2&gt;\", \
-        \"&lt;package 3&gt;\"\
-    ), repos=\"https://cloud.r-project.org/\")'"</code></pre>
-<p>Or for packages in development loaded from github.</p>
-<pre><code>RUN bash --login -c "mamba activate rbase; R -e 'devtools::install_github(\"&lt;user&gt;/&lt;package&gt;\")'"</code></pre>
-<p>Install in in your local environment by typing this in the terminal, replacing &lt;packages&gt; (three commands should be pasted separately):</p>
-<pre><code>docker exec -it biab-runner-conda bash
-
-mamba activate rbase
-
-R -e 'install.packages(c("&lt;packages&gt;""), repos="https://cloud.r-project.org/")'</code></pre>
-<ul>
-<li>You can use <code>devtools::install_github()</code> in a similar fashion:</li>
-</ul>
-<pre><code>docker exec -it biab-runner-conda bash
-
-mamba activate rbase
-
-R -e 'devtools::install_github("&lt;user&gt;/&lt;package&gt;")'</code></pre>
-<p>Do not add these packages to the r-environment file or the conda portion of the yml file because conda will not be able to recognize them</p>
-<p>If this does not work and the script still does not recognize the packages, you can load them directly in the script.</p>
+<section id="loading-packages-that-are-not-available-in-conda" class="level4">
+<h4 class="anchored" data-anchor-id="loading-packages-that-are-not-available-in-conda">Loading packages that are not available in conda</h4>
+<p>If you need a package that is not available in conda, such as one downloaded from GitHub, install the package directly in the script. Do not add these packages to the conda portion of the yml file because conda will not be able to recognize them.</p>
 <p>For more information, refer to the <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually">conda documentation</a>.</p>
+</section>
 </section>
 <section id="examples" class="level3">
 <h3 class="anchored" data-anchor-id="examples">Examples</h3>
-<p>Here is an example of a complete YAML file with inputs and outputs:</p>
+<section id="full-example-of-a-yaml-file" class="level4">
+<h4 class="anchored" data-anchor-id="full-example-of-a-yaml-file">Full example of a YAML file:</h4>
 <pre><code>script: script_name.R
 name: Script Name
 description: Describe what the script does
 author:
-  - name: John Doe (john.doe@gmail.com)
-  - name: Jane Doe (jane.doe@gmail.com)
+  - name: John Doe
+    email: john.doe@gmail.com
+  - name: Jane Doe
+    email: jane.doe@gmail.com
 inputs:
   landcover_raster:
     label: Raster of landcover
@@ -637,15 +617,21 @@ outputs:
     label: Result plot
     description: Plot of results
     type: image/png
-conda: # Optional, only needed if your script has specific package dependencies
+conda: # Optional, only needed if you need packages not in the central environment
   channels:
     - conda-forge
     - r
   dependencies:
-    - r-rjson=0.2.22 #package=version</code></pre>
+    - r-rjson=0.2.22 #package=version
+    - r-rredlist
+    - r-ggplot2
+    - r-sf
+    - r-terra</code></pre>
 <p>YAML is a space sensitive format, so make sure all the tab sets are correct in the file.</p>
 <p>If inputs are outputs from a previous step in the pipeline, make sure to give the inputs and outputs the same name and they will be automatically linked in the pipeline.</p>
-<p>Here is an empty commented sample that can be filled in</p>
+</section>
+<section id="empty-commented-sample-to-fill-in" class="level4">
+<h4 class="anchored" data-anchor-id="empty-commented-sample-to-fill-in">Empty commented sample to fill in:</h4>
 <pre><code>script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targeted to those who will interpret pipeline results and edit pipelines.
@@ -654,7 +640,7 @@ author: # 1 to many
     email: # Optional, email address of the author. This will be publicly available
     identifier: # Optional, full URL of a unique digital identifier, such as an ORCID.
 license: # Optional. If unspecified, the project's MIT license will apply.
-external_link: # Optional, link to a separate project, github repo, etc.
+external_link: # Optional, link to a separate project, GitHub repo, etc.
 timeout: # Optional, in minutes. By defaults scripts time out after 24h to avoid hung process to consume resources. It can be made longer for heavy processes.
 
 inputs: # 0 to many
@@ -680,14 +666,15 @@ conda: # Optional, only needed if your script has specific package dependencies
     - # list here
   dependencies: # any packages that are dependent on a specfic version
     - # list here</code></pre>
-<p>See <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/helloR.R">example</a></p>
+<p>See <a href="https://GitHub.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/helloR.R">example</a></p>
+</section>
 </section>
 </section>
 <section id="step-4-integrating-yaml-inputs-and-outputs-into-your-script" class="level2">
 <h2 class="anchored" data-anchor-id="step-4-integrating-yaml-inputs-and-outputs-into-your-script">Step 4: Integrating YAML inputs and outputs into your script</h2>
 <p>Now that you have created your YAML file, the inputs and outputs need to be integrated into your scripts.</p>
-<p>The scripts perform the actual work behind the scenes. They are located in <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/tree/main/scripts">/scripts</a> folder</p>
-<p>Currently supported : - R v4.3.1 - Julia v1.9.3 - Python3 v3.9.2 - sh</p>
+<p>The scripts perform the actual work behind the scenes. They are located in <a href="https://GitHub.com/GEO-BON/bon-in-a-box-pipelines/tree/main/scripts">/scripts</a> folder</p>
+<p>Currently supported version of R, Julia, Python and shell are displayed in the server info tab of the user interface.</p>
 <p>Script life cycle:</p>
 <ol type="1">
 <li><p>Script launched with output folder as a parameter. (In R, an <code>outputFolder</code> variable in the R session. In Julia, Shell and Python, the output folder is received as an argument.)</p></li>
@@ -695,34 +682,34 @@ conda: # Optional, only needed if your script has specific package dependencies
 <li><p>Script performs its task</p></li>
 <li><p>Script generates <code>output.json</code> containing links to result files, or native values (number, string, etc.)</p></li>
 </ol>
-<p>See <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/empty.R">empty R script</a> for a minimal script life cycle example.</p>
+<p>See <a href="https://GitHub.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/empty.R">empty R script</a> for a minimal script life cycle example.</p>
 <section id="receiving-inputs" class="level3">
 <h3 class="anchored" data-anchor-id="receiving-inputs">Receiving inputs</h3>
 <p>When running a script, a folder is created for each given set of parameters. The same parameters result in the same folder, different parameters result in a different folder. The inputs for a given script are saved in a generated <code>input.json</code> file in this unique run folder.</p>
 <p>This file contains the id of the parameters that were specified in the yaml script description, associated to the values for this run. Example:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"fc"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"L"</span><span class="ot">,</span> <span class="st">"LQ"</span><span class="ot">,</span> <span class="st">"LQHP"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"method_select_params"</span><span class="fu">:</span> <span class="st">"AUC"</span><span class="fu">,</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"n_folds"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"orientation_block"</span><span class="fu">:</span> <span class="st">"lat_lon"</span><span class="fu">,</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"partition_type"</span><span class="fu">:</span> <span class="st">"block"</span><span class="fu">,</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"predictors"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio1_75548ca61981-01-01.tif"</span><span class="ot">,</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio2_7333b3d111981-01-01.tif"</span></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"presence_background"</span><span class="fu">:</span> <span class="st">"/output/SDM/setupDataSdm/edb9492031df9e063a5ec5c325bacdb1/presence_background.tsv"</span><span class="fu">,</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"proj"</span><span class="fu">:</span> <span class="st">"EPSG:6622"</span><span class="fu">,</span></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"rm"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="er">.</span><span class="dv">5</span><span class="ot">,</span> <span class="fl">1.0</span><span class="ot">,</span> <span class="fl">2.0</span><span class="ot">]</span></span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"fc"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"L"</span><span class="ot">,</span> <span class="st">"LQ"</span><span class="ot">,</span> <span class="st">"LQHP"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"method_select_params"</span><span class="fu">:</span> <span class="st">"AUC"</span><span class="fu">,</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"n_folds"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"orientation_block"</span><span class="fu">:</span> <span class="st">"lat_lon"</span><span class="fu">,</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"partition_type"</span><span class="fu">:</span> <span class="st">"block"</span><span class="fu">,</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"predictors"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio1_75548ca61981-01-01.tif"</span><span class="ot">,</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"/output/data/loadFromStac/6af2ccfcd4b0ffe243ff01e3b7eccdc3/bio2_7333b3d111981-01-01.tif"</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"presence_background"</span><span class="fu">:</span> <span class="st">"/output/SDM/setupDataSdm/edb9492031df9e063a5ec5c325bacdb1/presence_background.tsv"</span><span class="fu">,</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"proj"</span><span class="fu">:</span> <span class="st">"EPSG:6622"</span><span class="fu">,</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"rm"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="er">.</span><span class="dv">5</span><span class="ot">,</span> <span class="fl">1.0</span><span class="ot">,</span> <span class="fl">2.0</span><span class="ot">]</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The script reads the <code>input.json</code> file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline. A convenience function <code>biab_inputs</code> is loaded in R by default to load the file into a list. Here is an example of how to read the input file in the R script:</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>input <span class="ot">&lt;-</span> <span class="fu">biab_inputs</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>input <span class="ot">&lt;-</span> <span class="fu">biab_inputs</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Next, for any functions that are using these inputs, they need to be specified.</p>
 <p>Inputs are specified by <code>input$input_name</code>.</p>
 <p>For example, to create a function to take the square root of a number that was input by the user in the UI:</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(input<span class="sc">$</span>number)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(input<span class="sc">$</span>number)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This means if the user inputs the number 144, this will be run in the function and output 12.</p>
 <p>Here is another example to read in an output from a previous step of the pipeline, which was output in csv format.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(input<span class="sc">$</span>csv_file)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(input<span class="sc">$</span>csv_file)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The input that is specified in the script needs to match the name that is in the YML file. For example, to load the landcover rasters that I used as an example above, I would write:</p>
 <pre><code>landcover &lt;- rast(input)</code></pre>
 <p>And to project it using the CRS that the user specified:</p>
@@ -732,19 +719,19 @@ conda: # Optional, only needed if your script has specific package dependencies
 <h3 class="anchored" data-anchor-id="writing-outputs">Writing outputs</h3>
 <p>The outputs can be saved in a variety of formats. The format must be accurately specified in the YAML file. A variable named <code>outputFolder</code> is loaded when R load that specifies where to save the output files.</p>
 <p>In R, a convenience function <code>biab_output</code> allow to save the outputs. Here is an example in R of an output with a csv file and a plot in png format.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>result_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(outputFolder, <span class="st">"result.csv"</span>)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(result, result_path, <span class="at">row.names =</span> F )</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">biab_output</span>(<span class="st">"result"</span>, result_path)</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>result_plot_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(outputFolder, <span class="st">"result_plot.png"</span>)</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(result_path, result)</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="fu">biab_output</span>(<span class="st">"result_plot"</span>, result_plot_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>result_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(outputFolder, <span class="st">"result.csv"</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(result, result_path, <span class="at">row.names =</span> F )</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">biab_output</span>(<span class="st">"result"</span>, result_path)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>result_plot_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(outputFolder, <span class="st">"result_plot.png"</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(result_path, result)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">biab_output</span>(<span class="st">"result_plot"</span>, result_plot_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>For other languages, the script needs to write the output JSON file. The format is the same as for input file above:</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"some_array"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">,</span> <span class="dv">55</span><span class="ot">,</span> <span class="dv">67</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"some_string"</span><span class="fu">:</span> <span class="st">"This is my output"</span><span class="fu">,</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"some_file"</span><span class="fu">:</span> <span class="st">"/output/folder/script/hash/file.ext"</span><span class="fu">,</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"some_array"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">,</span> <span class="dv">55</span><span class="ot">,</span> <span class="dv">67</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"some_string"</span><span class="fu">:</span> <span class="st">"This is my output"</span><span class="fu">,</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"some_file"</span><span class="fu">:</span> <span class="st">"/output/folder/script/hash/file.ext"</span><span class="fu">,</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Where <code>/output/folder/script/hash/</code> is the value of <code>outputFolder</code>.</p>
 </section>
 <section id="script-validation" class="level3">
@@ -757,15 +744,15 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>The output keys <code>info</code>, <code>warning</code> and <code>error</code> can be used to report problems in script execution. They do not need to be described in the <code>outputs</code> section of the description. They will be displayed specially in the UI.</p>
 <p>Any <code>error</code> message will also halt the rest of the pipeline. It is recommended to output specific error messages to avoid crashes when errors can be foreseen. This can be done by writing an “error” attribute to the <code>output.json</code> file, or by using the R helper functions.</p>
 <p>For example, if a user wanted the analysis to stop if the result was less than 0:</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R helper function for errors</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (result <span class="sc">&lt;</span> <span class="dv">0</span>){</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">biab_error_stop</span>(<span class="st">"Analysis was halted because result is less than 0."</span>)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Script stops here</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Other R helper functions</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="fu">biab_warning</span>(<span class="st">"This warning will appear in the UI, but does not stop the pipeline."</span>)</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="fu">biab_info</span>(<span class="st">"This message will appear in the UI."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># R helper function for errors</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (result <span class="sc">&lt;</span> <span class="dv">0</span>){</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">biab_error_stop</span>(<span class="st">"Analysis was halted because result is less than 0."</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Script stops here</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Other R helper functions</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="fu">biab_warning</span>(<span class="st">"This warning will appear in the UI, but does not stop the pipeline."</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="fu">biab_info</span>(<span class="st">"This message will appear in the UI."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>And then the customized message will appear in the UI.</p>
 <p>A crash will have the same behavior as an <code>error</code> output, stopping the pipeline and appearing in the UI.</p>
 </section>
@@ -777,7 +764,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <section id="step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor." class="level2">
 <h2 class="anchored" data-anchor-id="step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor.">Step 5: Connect your scripts with the BON in a Box pipeline editor.</h2>
 <p>Next, create your pipeline in the BON in a Box pipeline editor by connecting your inputs and outputs.</p>
-<p>Once you have saved your scripts and YAML files to your local computer in the Bon-in-a-box pipelines folder that was cloned from github, they will show up as scripts in the pipeline editor. You can drag the scripts into the editor and connect the inputs and outputs to create your pipeline.</p>
+<p>Once you have saved your scripts and YAML files to your local computer in the Bon-in-a-box pipelines folder that was cloned from GitHub, they will show up as scripts in the pipeline editor. You can drag the scripts into the editor and connect the inputs and outputs to create your pipeline.</p>
 <p>A pipeline is a collection of steps that are connected to automate an analysis workflow. Each script becomes a pipeline step.</p>
 <p>Pipelines also have inputs and outputs. In order to run, a pipeline needs to specify at least one output.</p>
 <p>For a general description of pipelines in software engineering, see <a href="https://en.wikipedia.org/wiki/Pipeline_%28software%29">Wikipedia</a>.</p>
@@ -792,41 +779,31 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>Below that pane, there is a pane for writing the metadata of the pipeline.</p>
 <p><img src="images/Screenshot 2025-02-26 154507.png" class="img-fluid"></p>
 <p><strong>To add a step:</strong> drag and drop from the left pane to the canvas. Steps that are single scripts will display with a single border, while steps that are pipelines will display with a double border.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://github.com/GEO-BON/biab-2.0/assets/6223744/f590bd01-d333-4712-934b-242a0f925f58.png" class="img-fluid figure-img"></p>
-<figcaption>image</figcaption>
-</figure>
-</div>
+<p><img src="https://GitHub.com/GEO-BON/biab-2.0/assets/6223744/f590bd01-d333-4712-934b-242a0f925f58.png" class="img-fluid" width="355"></p>
 <p><strong>To connect steps:</strong> drag to connect an output and an input handle. Input handles are on the left, output handles are on the right.</p>
 <p><strong>To add a constant value:</strong> double-click on any input to add a constant value linked to this input. It is pre-filled with the example value.</p>
 <p><strong>To add an output:</strong> double-click on any <em>step</em> output to add a <em>pipeline</em> output linked to it, or drag and drop the red box from the left pane and link it manually.</p>
 <p><strong>To delete a step or a pipe:</strong> select it and press the Delete key on your keyboard.</p>
 <p><strong>To make an array out of single value outputs:</strong> if many outputs of the same type are connected to the same input, it will be received as an array by the script.</p>
-<p><img src="https://user-images.githubusercontent.com/6223744/181106359-c4194411-5789-4e55-84d5-24b9e029398f.png" width="300"></p>
+<p><img src="https://user-images.GitHubusercontent.com/6223744/181106359-c4194411-5789-4e55-84d5-24b9e029398f.png" width="300"></p>
 <p>A single value can also be combined with an array of the same type, to produce a single array.</p>
-<p><img src="https://user-images.githubusercontent.com/6223744/181106278-f6db6af5-764a-4775-b196-48feac940eec.png" width="300"></p>
+<p><img src="https://user-images.GitHubusercontent.com/6223744/181106278-f6db6af5-764a-4775-b196-48feac940eec.png" width="300"></p>
 <p><strong>User inputs:</strong> To provide inputs at runtime, simply leave them unconnected in the pipeline editor. They will be added to the sample input file when running the pipeline.</p>
 <p>If an input is common to many step, a special user input node can be added to avoid duplication. First, link your nodes to a constant.</p>
-<p><img src="https://user-images.githubusercontent.com/6223744/218197354-8a7bb46d-dbaa-4d7f-ad8d-b4dd521fb28f.png" height="52"></p>
+<p><img src="https://user-images.GitHubusercontent.com/6223744/218197354-8a7bb46d-dbaa-4d7f-ad8d-b4dd521fb28f.png" height="52"></p>
 <p>Then, use the down arrow to pop the node’s menu. Choose “Convert to user input”.</p>
-<p><img src="https://user-images.githubusercontent.com/6223744/218197468-142dcdfb-447f-4076-b6c5-59e8e448b32e.png" height="61"></p>
+<p><img src="https://user-images.GitHubusercontent.com/6223744/218197468-142dcdfb-447f-4076-b6c5-59e8e448b32e.png" height="61"></p>
 <p>The node will change as below, and the details will appear on the right pane, along with the other user inputs.</p>
-<p><img src="https://user-images.githubusercontent.com/6223744/218197580-d5e21247-0492-40d7-b527-add323abd6b4.png" height="51"></p>
+<p><img src="https://user-images.GitHubusercontent.com/6223744/218197580-d5e21247-0492-40d7-b527-add323abd6b4.png" height="51"></p>
 </section>
 <section id="pipeline-inputs-and-outputs" class="level3">
 <h3 class="anchored" data-anchor-id="pipeline-inputs-and-outputs">Pipeline inputs and outputs</h3>
 <p>Any <strong>input</strong> with no constant value assigned will be considered a pipeline input and user will have to fill the value.</p>
 <p><img src="images/Screenshot 2025-02-26 154439.png" class="img-fluid"></p>
 <p>Add an <strong>output</strong> node linked to a step output to specify that this output is an output of the pipeline. All other unmarked step outputs will still be available as intermediate results in the UI.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://user-images.githubusercontent.com/6223744/181108988-97d988ca-8f4b-45b1-b4a3-32e90821b68b.png" class="img-fluid figure-img"></p>
-<figcaption>image</figcaption>
-</figure>
-</div>
+<p><img src="https://user-images.GitHubusercontent.com/6223744/181108988-97d988ca-8f4b-45b1-b4a3-32e90821b68b.png" class="img-fluid"></p>
 <p>Pipeline inputs and outputs then appear in a collapsible pane on the right of the canvas, where their descriptions and labels can be edited.</p>
-<p><img src="https://github.com/GEO-BON/biab-2.0/assets/6223744/215b75db-7198-486d-880d-87c0b340668b" height="218"></p>
+<p><img src="https://GitHub.com/GEO-BON/biab-2.0/assets/6223744/215b75db-7198-486d-880d-87c0b340668b" height="218"></p>
 <p>Once edited, make sure to save your work before leaving the page.</p>
 </section>
 <section id="saving-and-loading" class="level3">
@@ -838,7 +815,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>3. Remove all the content of the target file.</p>
 <p>4. Paste content and save.</p>
 <p>5. Commit and push on a branch using git.</p>
-<p>6. To share your modifications, create a pull request for that branch through the github UI.</p>
+<p>6. To share your modifications, create a pull request for that branch through the GitHub UI.</p>
 </section>
 </section>
 <section id="step-6-run-pipeline-and-troubleshoot" class="level2">
@@ -848,7 +825,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p><img src="images/Screenshot 2025-02-05 111618.png" class="img-fluid"></p>
 <p>You can look at the log of each of your scripts to read errors and debug.</p>
 <p><img src="images/Screenshot 2025-02-10 034124-02.png" class="img-fluid"></p>
-<p>Once you change a script and save to your local computer, the changes will immediately be implemented when you run the script through BON in a Box. <strong>However, if you change the YAML file, you will need to reload the pipeline in the pipeline editor to see those changes.</strong> If this does not work, you may need to delete the script from the pipeline and re-drag it to the pipeline editor. Inputs and outputs can also be directly edited in the pipeline editor.</p>
+<p>Once you change a script and save to your local computer, the changes will immediately be implemented when you run the script through BON in a Box. <strong>However, if you change the YAML file, you will need to reload the page in the pipeline editor to see those changes.</strong> If this does not work, you may need to delete the script from the pipeline and re-drag it to the pipeline editor. Inputs and outputs can also be directly edited in the pipeline editor.</p>
 </section>
 </section>
 <section id="when-is-your-pipeline-complete" class="level1">
