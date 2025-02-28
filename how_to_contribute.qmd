@@ -58,7 +58,7 @@ The first step is to sketch out what your pipeline will look like. This includes
 
 Here is an example:
 
-![](images/Screenshot 2025-02-26 161306.png)
+![](images/Screenshot%202025-02-26%20161306.png)
 
 Check if any of the steps you need are already available in BON in a Box to avoid having to rewrite them.
 
@@ -74,7 +74,7 @@ Markdown is supported for pipeline, script, input and output descriptions. See t
 
 ### Name and description
 
-YAML files should begin with a name, description, and authors of the script. The name should be the name of the script described by the YAML file. Save the file with the same name as the script that it describes but with a .yml extension.
+YAML files should begin with a name, description, and authors of the script. The name should be the name of the script described by the YAML file (script_name.R below). Save the file with the same name as the script that it describes but with a .yml extension (e.g. if the script is called my_script.R the YAML should be called my_script.yml)..
 
 Example:
 
@@ -142,7 +142,7 @@ options_example:
 The user inputs can also be file types if you want to upload a file or connect the script to a previous one that outputs a specific file type. There are several file types that you can specify:
 
 | File Type | MIME type to use in the yaml | Description |
-|----------------|-----------------------------|---------------------------|
+|------------------|----------------------------|--------------------------|
 | CSV | text/csv | Comma separated values file format (.csv) |
 | GeoJSON | application/geo+json | GeoJSON file format (.geojson) |
 | GeoPackage | application/geopackage+sqlite3 | GeoPackage file format (.gpkg) |
@@ -429,13 +429,13 @@ dat <- read.csv(input$csv_file)
 
 The input that is specified in the script needs to match the name that is in the YML file. For example, to load the landcover rasters that I used as an example above, I would write:
 
-```
-landcover <- rast(input)
+``` r
+landcover <- rast(input$landcover_raster)
 ```
 
 And to project it using the CRS that the user specified:
 
-```
+``` r
 landcover_projected <- project(landcover, input$crs)
 ```
 
@@ -519,17 +519,17 @@ The pipeline editor allows the user to create pipelines by connecting individual
 
 The left pane shows the available steps, which can be dragged onto the pipeline editor canvas.
 
-![](images/Screenshot 2025-02-26 154357-01.png)
+![](images/Screenshot%202025-02-26%20154357-01.png)
 
-![](images/Screenshot 2025-02-26 154424.png)
+![](images/Screenshot%202025-02-26%20154424.png)
 
 On the right side, a collapsible pane allows the user to edit the labels and descriptions of the pipeline inputs and outputs.
 
-![](images/Screenshot 2025-02-26 154455.png)
+![](images/Screenshot%202025-02-26%20154455.png)
 
 Below that pane, there is a pane for writing the metadata of the pipeline.
 
-![](images/Screenshot 2025-02-26 154507.png)
+![](images/Screenshot%202025-02-26%20154507.png)
 
 **To add a step:** drag and drop from the left pane to the canvas. Steps that are single scripts will display with a single border, while steps that are pipelines will display with a double border.
 
@@ -569,7 +569,7 @@ The node will change as below, and the details will appear on the right pane, al
 
 Any **input** with no constant value assigned will be considered a pipeline input and user will have to fill the value.
 
-![](images/Screenshot 2025-02-26 154439.png)
+![](images/Screenshot%202025-02-26%20154439.png)
 
 Add an **output** node linked to a step output to specify that this output is an output of the pipeline. All other unmarked step outputs will still be available as intermediate results in the UI.
 
@@ -585,31 +585,17 @@ Once edited, make sure to save your work before leaving the page.
 
 The editor supports saving and loading on the server, unless explicitly disabled by host. This is done intuitively via the "Load from server" and "Save" buttons.
 
-*In the event that saving has been disabled on your server instance,* the save button will display "Save to clipboard". To save your modifications:
-
-1\. Click save: the content is copied to your clipboard.
-
-2\. Make sure you are up to date (e.g. `git pull --rebase`).
-
-3\. Remove all the content of the target file.
-
-4\. Paste content and save.
-
-5\. Commit and push on a branch using git.
-
-6\. To share your modifications, create a pull request for that branch through the GitHub UI.
-
 ## Step 6: Run pipeline and troubleshoot
 
 The last step is to load your saved pipeline in BON and a Box and run it in the "run pipelines" tab.
 
 Your pipeline should generate a form, which you can fill and click run.
 
-![](images/Screenshot 2025-02-05 111618.png)
+![](images/Screenshot%202025-02-05%20111618.png)
 
 You can look at the log of each of your scripts to read errors and debug.
 
-![](images/Screenshot 2025-02-10 034124-02.png)
+![](images/Screenshot%202025-02-10%20034124-02.png)
 
 Once you change a script and save to your local computer, the changes will immediately be implemented when you run the script through BON in a Box. **However, if you change the YAML file, you will need to reload the page in the pipeline editor to see those changes.** If this does not work, you may need to delete the script from the pipeline and re-drag it to the pipeline editor. Inputs and outputs can also be directly edited in the pipeline editor.
 
