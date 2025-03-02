@@ -4,6 +4,10 @@ import { CircleMarker, Tooltip, useMap, GeoJSON } from "react-leaflet";
 import L from "leaflet";
 import { ColorPicker } from "../../ColormapPicker";
 import type { FeatureCollection } from "geojson";
+import "@ngageoint/geopackage";
+//import "@ngageoint/leaflet-geopackage";
+//import { GeoPackageAPI } from "@ngageoint/leaflet-geopackage";
+import { GeoPackageAPI } from "@ngageoint/geopackage";
 
 /**
  *
@@ -20,6 +24,7 @@ function CustomLayer(props: any) {
     bounds,
     map,
     geojsonOutput,
+    geoPackage,
     clearLayers,
   } = props;
   const [tiles, setTiles] = useState(<></>);
@@ -45,6 +50,48 @@ function CustomLayer(props: any) {
     mapbox: `https://api.mapbox.com/styles/v1/glaroc/cl8eqr05i000416umaxkuc4sp/tiles/256/{z}/{x}/{y}@2x?access_token=${
       import.meta.env.VITE_APP_MAPBOX_TOKEN
     }`,
+  };
+
+  async function getGeoPackageLayers(file: any) {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const geoPackage = await GeoPackageAPI.open(arrayBuffer);
+      const featureTables = geoPackage.getFeatureTables();
+      const tileTables = geoPackage.getTileTables();
+      console.log("Feature Layers:", featureTables);
+      console.log("Tile Layers:", tileTables);
+      return { featureTables, tileTables };
+    } catch (error) {
+      console.error("Error reading GeoPackage:", error);
+    }
+  }
+
+  const fetchGeoPackageLayers = async (
+    url: string
+  ): Promise<{ featureTables: string[]; tileTables: string[] } | null> => {
+    try {
+      // Fetch the remote GeoPackage file as an ArrayBuffer
+      const response = await fetch(url);
+      if (!response.ok)
+        throw new Error(`Failed to fetch GeoPackage: ${response.statusText}`);
+
+      const arrayBuffer: ArrayBuffer = await response.arrayBuffer();
+
+      // Open the GeoPackage from the ArrayBuffer
+      const geoPackage = await GeoPackageAPI.open(arrayBuffer);
+
+      // Extract feature (vector) and tile (raster) layer names
+      const featureTables: string[] = geoPackage.getFeatureTables();
+      const tileTables: string[] = geoPackage.getTileTables();
+
+      console.log("Feature Layers:", featureTables);
+      console.log("Tile Layers:", tileTables);
+
+      return { featureTables, tileTables };
+    } catch (error) {
+      console.error("Error processing GeoPackage:", error);
+      return null;
+    }
   };
 
   useEffect(() => {
@@ -104,6 +151,38 @@ function CustomLayer(props: any) {
       map.fitBounds(l.getBounds());
     }
   }, [geojsonOutput]);
+
+  useEffect(() => {
+    clearLayers();
+    if (geoPackage !== "") {
+      const markerStyle = {
+        radius: 2.5,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 0.3,
+        fillOpacity: 0.5,
+      };
+      const url = encodeURI(`http://localhost${geoPackage}`);
+      fetchGeoPackageLayers(url).then((geop) => {
+        // get the info for the table
+        const featureTables = geop.getFeatureTables();
+        featureTables.forEach((table) => {
+          // get the feature dao
+          const featureDao = geop.getFeatureDao(table);
+
+          // get the info for the table
+          const tableInfo = geop.geoPackage.getInfoForTable(featureDao);
+        });
+        const l = L.geoPackageFeatureLayer([], {
+          geoPackageUrl: url,
+          layerName: layers?.featureTables[0],
+        });
+        l.addTo(map);
+        map.fitBounds(l.getBounds());
+      });
+    }
+  }, [geoPackage]);
 
   useEffect(() => {
     const layer = L.tileLayer(basemaps[basemap], {

@@ -301,6 +301,24 @@ export function PipelineOutput(props: any) {
                 </CustomButtonGreen>
               </>
             )}
+          {Array.isArray(outs) &&
+            outputObj?.type?.includes("geopackage") &&
+            "type" in outputObj && (
+              <>
+                <CustomButtonGreen
+                  key={`but-${outputObj.outputs}`}
+                  onClick={(event: any) => {
+                    handleClick(
+                      event,
+                      outputObj.outputs.split(",")[0],
+                      "geopackage"
+                    );
+                  }}
+                >
+                  See on map
+                </CustomButtonGreen>
+              </>
+            )}
           {!Array.isArray(outs) &&
             outputObj?.type?.includes("json") &&
             !outputObj?.type?.includes("geo+json") &&

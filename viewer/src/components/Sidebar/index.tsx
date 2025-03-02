@@ -31,6 +31,7 @@ export default function Sidebar(props: any) {
     geojson,
     setGeojson,
     setGeojsonOutput,
+    setGeoPackage,
     generateStats,
     map,
   } = props;
@@ -91,6 +92,8 @@ export default function Sidebar(props: any) {
       GetJSON(output).then((res: any) => {
         setGeojsonOutput(res);
       });
+    } else if (type.includes("geopackage")) {
+      setGeoPackage(output);
     } else if (
       type.includes("value") ||
       type.includes("csv") ||
