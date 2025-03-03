@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.41">
+<meta name="generator" content="quarto-1.5.56">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -69,10 +69,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-48ffa3e5b9d089919c6712c39e5b00f2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-87edd68557743b7c59846ba2f8eca337.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -296,11 +296,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Markdown is supported for pipeline, script, input and output descriptions. See this <a href="https://commonmark.org/help/">CommonMark quick reference</a> for allowed markups. These can include special characters, links, and images.</p>
 <section id="name-and-description" class="level3">
 <h3 class="anchored" data-anchor-id="name-and-description">Name and description</h3>
-<<<<<<< HEAD
-<p>YAML files should begin with a name, description, and authors of the script. The name should be the name of the script described by the YAML file. Save the file with the same name as the script that it describes but with a .yml extension.</p>
-=======
-<p>YAML files should begin with a name, description, and authors of the script. The name in the YAML file should be the name of the script it described (script_name.R below). Save the file with the same name as the script that it describes but with a .yml extension (e.g.&nbsp;if the script is called my_script.R the YAML file should be my_script.yml).</p>
->>>>>>> 8b30b2b (Made suggested changes)
+<p>YAML files should begin with a name, description, and authors of the script. The name should be the name of the script described by the YAML file (script_name.R below). Save the file with the same name as the script that it describes but with a .yml extension (e.g.&nbsp;if the script is called my_script.R the YAML should be called my_script.yml)..</p>
 <p>Example:</p>
 <pre><code>script: script_name.R
 name: Script Name
@@ -579,11 +575,7 @@ author:
 </section>
 <section id="loading-packages-that-are-not-available-in-conda" class="level4">
 <h4 class="anchored" data-anchor-id="loading-packages-that-are-not-available-in-conda">Loading packages that are not available in conda</h4>
-<<<<<<< HEAD
 <p>If you need a package that is not available in conda, such as one downloaded from GitHub, install the package directly in the script. Do not add these packages to the conda portion of the yml file because conda will not be able to recognize them.</p>
-=======
-<p>If you need a package that is not available in Conda, such as one downloaded from GitHub, install the package directly in the script. Do not add these packages to the conda portion of the yml file because conda will not be able to recognize them.</p>
->>>>>>> 8b30b2b (Made suggested changes)
 <p>For more information, refer to the <a href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually">conda documentation</a>.</p>
 </section>
 </section>
@@ -595,11 +587,7 @@ author:
 name: Script Name
 description: Describe what the script does
 author:
-<<<<<<< HEAD
   - name: John Doe
-=======
-  - name: John Doe 
->>>>>>> 8b30b2b (Made suggested changes)
     email: john.doe@gmail.com
   - name: Jane Doe
     email: jane.doe@gmail.com
@@ -682,22 +670,11 @@ conda: # Optional, only needed if your script has specific package dependencies
 </section>
 </section>
 </section>
-</section>
 <section id="step-4-integrating-yaml-inputs-and-outputs-into-your-script" class="level2">
 <h2 class="anchored" data-anchor-id="step-4-integrating-yaml-inputs-and-outputs-into-your-script">Step 4: Integrating YAML inputs and outputs into your script</h2>
 <p>Now that you have created your YAML file, the inputs and outputs need to be integrated into your scripts.</p>
-<<<<<<< HEAD
 <p>The scripts perform the actual work behind the scenes. They are located in <a href="https://GitHub.com/GEO-BON/bon-in-a-box-pipelines/tree/main/scripts">/scripts</a> folder</p>
 <p>Currently supported version of R, Julia, Python and shell are displayed in the server info tab of the user interface.</p>
-=======
-<p>The scripts perform the actual work behind the scenes. They are located in <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/tree/main/scripts">/scripts</a> folder</p>
-<p>Currently supported :</p>
-<ul>
-<li><p>R v4.3.1</p></li>
-<li><p>Julia v1.9.3</p></li>
-<li><p>Python3 v3.9.2 - sh</p></li>
-</ul>
->>>>>>> 8b30b2b (Made suggested changes)
 <p>Script life cycle:</p>
 <ol type="1">
 <li><p>Script launched with output folder as a parameter. (In R, an <code>outputFolder</code> variable in the R session. In Julia, Shell and Python, the output folder is received as an argument.)</p></li>
@@ -734,9 +711,9 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>Here is another example to read in an output from a previous step of the pipeline, which was output in csv format.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(input<span class="sc">$</span>csv_file)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The input that is specified in the script needs to match the name that is in the YML file. For example, to load the landcover rasters that I used as an example above, I would write:</p>
-<pre><code>landcover &lt;- rast(input$landcover)</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>landcover <span class="ot">&lt;-</span> <span class="fu">rast</span>(input<span class="sc">$</span>landcover_raster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>And to project it using the CRS that the user specified:</p>
-<pre><code>landcover_projected &lt;- project(landcover, input$crs)</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>landcover_projected <span class="ot">&lt;-</span> <span class="fu">project</span>(landcover, input<span class="sc">$</span>crs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="writing-outputs" class="level3">
 <h3 class="anchored" data-anchor-id="writing-outputs">Writing outputs</h3>
@@ -802,11 +779,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>Below that pane, there is a pane for writing the metadata of the pipeline.</p>
 <p><img src="images/Screenshot 2025-02-26 154507.png" class="img-fluid"></p>
 <p><strong>To add a step:</strong> drag and drop from the left pane to the canvas. Steps that are single scripts will display with a single border, while steps that are pipelines will display with a double border.</p>
-<<<<<<< HEAD
 <p><img src="https://GitHub.com/GEO-BON/biab-2.0/assets/6223744/f590bd01-d333-4712-934b-242a0f925f58.png" class="img-fluid" width="355"></p>
-=======
-<p><img src="https://github.com/GEO-BON/biab-2.0/assets/6223744/f590bd01-d333-4712-934b-242a0f925f58.png" class="img-fluid" width="355"></p>
->>>>>>> 8b30b2b (Made suggested changes)
 <p><strong>To connect steps:</strong> drag to connect an output and an input handle. Input handles are on the left, output handles are on the right.</p>
 <p><strong>To add a constant value:</strong> double-click on any input to add a constant value linked to this input. It is pre-filled with the example value.</p>
 <p><strong>To add an output:</strong> double-click on any <em>step</em> output to add a <em>pipeline</em> output linked to it, or drag and drop the red box from the left pane and link it manually.</p>
@@ -828,29 +801,14 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>Any <strong>input</strong> with no constant value assigned will be considered a pipeline input and user will have to fill the value.</p>
 <p><img src="images/Screenshot 2025-02-26 154439.png" class="img-fluid"></p>
 <p>Add an <strong>output</strong> node linked to a step output to specify that this output is an output of the pipeline. All other unmarked step outputs will still be available as intermediate results in the UI.</p>
-<<<<<<< HEAD
 <p><img src="https://user-images.GitHubusercontent.com/6223744/181108988-97d988ca-8f4b-45b1-b4a3-32e90821b68b.png" class="img-fluid"></p>
-=======
-<p><img src="https://user-images.githubusercontent.com/6223744/181108988-97d988ca-8f4b-45b1-b4a3-32e90821b68b.png" class="img-fluid"></p>
->>>>>>> 8b30b2b (Made suggested changes)
 <p>Pipeline inputs and outputs then appear in a collapsible pane on the right of the canvas, where their descriptions and labels can be edited.</p>
 <p><img src="https://GitHub.com/GEO-BON/biab-2.0/assets/6223744/215b75db-7198-486d-880d-87c0b340668b" height="218"></p>
 <p>Once edited, make sure to save your work before leaving the page.</p>
 </section>
 <section id="saving-and-loading" class="level3">
 <h3 class="anchored" data-anchor-id="saving-and-loading">Saving and loading</h3>
-<<<<<<< HEAD
 <p>The editor supports saving and loading on the server, unless explicitly disabled by host. This is done intuitively via the “Load from server” and “Save” buttons.</p>
-<p><em>In the event that saving has been disabled on your server instance,</em> the save button will display “Save to clipboard”. To save your modifications:</p>
-<p>1. Click save: the content is copied to your clipboard.</p>
-<p>2. Make sure you are up to date (e.g.&nbsp;<code>git pull --rebase</code>).</p>
-<p>3. Remove all the content of the target file.</p>
-<p>4. Paste content and save.</p>
-<p>5. Commit and push on a branch using git.</p>
-<p>6. To share your modifications, create a pull request for that branch through the GitHub UI.</p>
-=======
-<p>The editor supports saving and loading on the server, unless explicitly disabled by host. This is done intuitively via the “Load from server” and “Save” buttons.87</p>
->>>>>>> 8b30b2b (Made suggested changes)
 </section>
 </section>
 <section id="step-6-run-pipeline-and-troubleshoot" class="level2">
@@ -958,6 +916,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1068,6 +1028,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
+      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

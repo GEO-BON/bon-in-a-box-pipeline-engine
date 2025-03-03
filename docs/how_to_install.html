@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.41">
+<meta name="generator" content="quarto-1.5.56">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -35,10 +35,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-48ffa3e5b9d089919c6712c39e5b00f2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-87edd68557743b7c59846ba2f8eca337.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -229,9 +229,9 @@ ul.task-list li input[type="checkbox"] {
 <li><p>id_ed25519.pub</p></li>
 </ul></li>
 </ul></li>
-<li><p>If you do not already have a key, generate one by running <code>ssh-keygen ed25519 -C "your_email@example.com"</code> replacing the email with the email address associated with your GitHub account.</p>
+<li><p>If you do not already have a key, generate one by running <code>ssh-keygen -t ed25519 -C "your_email@example.com"</code> replacing the email with the email address associated with your GitHub account.</p>
 <ul>
-<li>This will prompt you to make a password. If you choose to have a password, although more secure, it will prompt you to enter it many times while creating a pipeline so consider skipping this step for easier use. You can keep pressing enter to skip creating a password.</li>
+<li>This will prompt you to make a passphrase. If you choose to have a passphrase, although more secure, it will prompt you to enter it many times while creating a pipeline so consider skipping this step for easier use. You can keep pressing enter to skip creating a passphrase.</li>
 </ul></li>
 <li><p>To check if you successfully generated the SSH key, you can run <code>ls -al ~/.ssh</code> in the terminal. Your SSH key should be there now.</p></li>
 <li><p>Now, open the file with your SSH key by running <code>cat ~/.ssh/&lt;name of SSH key&gt;</code> e.g.&nbsp;<code>cat ~/.ssh/id_ed25519.pub</code> and copy your SSH key.</p></li>
@@ -258,7 +258,7 @@ ul.task-list li input[type="checkbox"] {
 <li><p>In the linux terminal, type <code>./server-up.sh</code></p>
 <ul>
 <li><p>Make sure the server is started from a linux terminal that is in the same folder as the cloned repository so it can access the files.</p></li>
-<li><p>Note for windows users: this has to be a linux terminal (e.g.&nbsp;git bash). <strong>Connecting to the server will not work using Powershell</strong>.</p></li>
+<li><p>Note for windows users: this has to be a linux terminal (e.g.&nbsp;git bash). <strong>Connecting to the server will not work using Powershell or Windows terminal</strong>.</p></li>
 <li><p>Make sure you have docker open and running on your computer.</p></li>
 <li><p>The first execution will be long, in order to download the micro-services. The next ones will be shorter or immediate, depending on the changes.</p></li>
 <li><p>Network problems may cause the process to fail. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.</p></li>
@@ -392,6 +392,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -502,6 +504,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
+      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
