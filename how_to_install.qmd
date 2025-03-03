@@ -46,7 +46,7 @@ Prerequisites:
 
         -   id_ed25519.pub
 
-2.  If you do not already have a key, generate one by running `ssh-keygen ed25519 -C "your_email@example.com"` replacing the email with the email address associated with your GitHub account.
+2.  If you do not already have a key, generate one by running `ssh-keygen -t ed25519 -C "your_email@example.com"` replacing the email with the email address associated with your GitHub account.
 
     -   This will prompt you to make a password. If you choose to have a password, although more secure, it will prompt you to enter it many times while creating a pipeline so consider skipping this step for easier use. You can keep pressing enter to skip creating a password.
 
