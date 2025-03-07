@@ -3,8 +3,8 @@ import _ from "underscore";
 import L from "leaflet";
 import "@ngageoint/geopackage";
 import "@ngageoint/leaflet-geopackage";
-import { GeoPackageAPI } from "@ngageoint/geopackage";
-
+import { GeoPackageAPI, setSqljsWasmLocateFile } from "@ngageoint/geopackage";
+import sqlWasmUrl from "@ngageoint/geopackage/dist/sql-wasm.wasm?url";
 /**
  *
  * @param props
@@ -14,6 +14,7 @@ function GeoPackageLayer(props) {
 
   useEffect(() => {
     clearLayers();
+    setSqljsWasmLocateFile((file) => sqlWasmUrl);
     if (geoPackage !== "" && map) {
       const markerStyle = {
         radius: 2.5,
