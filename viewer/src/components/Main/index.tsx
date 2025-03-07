@@ -8,11 +8,19 @@ import Sidebar from "../Sidebar";
 import MapWrapper from "../CustomMap/MapWrapper";
 import L from "leaflet";
 
-import { GetCOGStats, GetCOGBounds } from "../../helpers/api";
+import {
+  GetCOGStats,
+  GetCountryGeojson,
+  GetStateGeojson,
+  GetCOGBounds,
+  GetCOGStatsGeojson,
+  GetMultipleCOGStatsGeojson,
+} from "../../helpers/api";
 import {
   createPipeline4Display,
   GetPipelineRunInputs,
 } from "../../helpers/biab_api";
+import StatsModal from "../StatsModal";
 import { cmap } from "../../helpers/colormaps";
 import { createRangeLegendControl } from "../SimpleLegend";
 import { Route, Routes, useNavigate } from "react-router-dom";
@@ -40,7 +48,10 @@ export default function Main(props: any) {
   const [timeSeriesLayers, setTimeSeriesLayers] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedState, setSelectedState] = useState("");
+  const [rasterStats, setRasterStats] = useState({});
   const [rasterBand, setRasterBand] = useState("b1");
+  const [timeSeriesStats, setTimeSeriesStats] = useState({});
+  const [openStatsModal, setOpenStatsModal] = useState(false);
   const [showStatsButton, setShowStatsButton] = useState(true);
   const [pipelineData, setPipelineData] = useState({});
   const [pipelineRunId, setPipelineRunId] = useState("");
@@ -135,6 +146,69 @@ export default function Main(props: any) {
     });
   };
 
+  const handleAddLocationChange = (value: any) => {
+    if (selectedCountry !== "" && selectedState === "") {
+      GetCountryGeojson(selectedCountry).then((g: any) => {
+        if (g.data) {
+          const gj = { ...geojson };
+          g.data.features.forEach((f: any) => {
+            f.properties.place = selectedCountry;
+          });
+          gj.features.push(g.data.features[0]);
+          setGeojson(gj);
+        }
+      });
+    } else if (selectedCountry !== "" && selectedState !== "") {
+      GetStateGeojson(selectedState, selectedCountry).then((g: any) => {
+        if (g.data) {
+          const gj = { ...geojson };
+          g.data.features.forEach((f: any) => {
+            f.properties.place = selectedState;
+          });
+          gj.features.push(g.data.features[0]);
+          setGeojson(gj);
+        }
+      });
+    }
+  };
+
+  const generateTimeSeries = () => {
+    setRasterStats({});
+    setTimeSeriesStats({});
+    setOpenStatsModal(true);
+    if (geojson?.features.length > 0) {
+      GetMultipleCOGStatsGeojson(geojson, timeSeriesLayers).then((st: any) => {
+        if (st?.data) {
+          setTimeSeriesStats(st.data);
+        }
+      });
+    }
+    if (selectedCountry && selectedLayer.url) {
+      setOpenStatsModal(true);
+      setShowStatsButton(true);
+    }
+  };
+
+  const generateStats = (layer: any) => {
+    if (layer.url === "") {
+      setSelectedLayer({ url: "", band_id: "b1", description: "" });
+    } else {
+      setRasterStats({});
+      setTimeSeriesStats({});
+      setOpenStatsModal(true);
+      let i = 0;
+      GetCOGStats(layer.url, layer.band_id, false).then((g: any) => {
+        const rs: any = {};
+        if (g.data) {
+          setRasterStats({
+            "Selected layer": { b1: g.data[Object.keys(g.data)[0]] },
+          });
+        }
+      });
+      setOpenStatsModal(true);
+    }
+  };
+
   const mapProps = {
     selectedLayerTiles,
     selectedLayer,
@@ -147,6 +221,7 @@ export default function Main(props: any) {
     setGeojson,
     geoPackage,
     setGeoPackage,
+    generateStats,
     colormap,
     colormapList,
     isTimeSeriesCollection,
@@ -170,10 +245,13 @@ export default function Main(props: any) {
     selectedState,
     showStatsButton,
     isTimeSeriesCollection,
+    generateTimeSeries,
+    generateStats,
     geojson,
     setGeojson,
     setGeojsonOutput,
     setGeoPackage,
+    handleAddLocationChange,
     qualcmaps,
     quantcmaps,
     colormap,
@@ -193,6 +271,13 @@ export default function Main(props: any) {
         <Route path="/" element={<Sidebar {...sidebarProps} />}></Route>
       </Routes>
       <MapWrapper {...mapProps} />
+      <StatsModal
+        rasterStats={rasterStats}
+        timeSeriesStats={timeSeriesStats}
+        setOpenStatsModal={setOpenStatsModal}
+        openStatsModal={openStatsModal}
+        selectedCountry={selectedCountry}
+      />
     </>
   );
 }
