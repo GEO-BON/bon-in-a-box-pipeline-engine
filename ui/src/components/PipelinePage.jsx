@@ -164,6 +164,19 @@ export function PipelinePage({ runType }) {
     };
     api.getInfo(runType, choice, callback);
   }
+  function httpErrorFormatter(error) {
+	  let baseMsg = "Error fetching data from script server: ";
+
+	  if (error.length > 0) {
+		  try {
+			  return baseMsg + error.replace(/\r\n/g, '').match(/<body>.+<\/body>/g)[0].replace(/<\/?[A-Za-z1-9]+>/g, " ").trim().split(/\s+/).join(' ');
+		  } catch (err) {
+			  return baseMsg + "Unhandled error: " + err;
+		  }
+	  } else {
+		  return baseMsg + "Error undefined";
+	  }
+  }
 
   function loadPipelineInputs(pip, hash) {
     var inputJson =
@@ -290,7 +303,7 @@ export function PipelinePage({ runType }) {
       )}
       {httpError && (
         <Alert severity="error" key="httpError">
-          {httpError}
+          {httpErrorFormatter(httpError)}
         </Alert>
       )}
       {pipelineMetadata && (
