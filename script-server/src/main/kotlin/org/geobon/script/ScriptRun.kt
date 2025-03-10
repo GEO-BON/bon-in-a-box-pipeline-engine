@@ -293,7 +293,20 @@ class ScriptRun( // Constructor used in single script run
                                 "bash", "-c",
                                 """
                                     ${runner.getSetupBash()}
-                                    python3 $escapedScript $escapedOutputFolder
+                                    python3 -c '
+                                    biab_output_list = {}
+                                    exec(open("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.py").read())
+                                    exec(open("$escapedScript").read())
+
+                                    json_object = json.dumps(biab_output_list, indent = 2)
+
+                                    print("TEMP debug logs:")
+                                    print(json_object)
+                                    print(sys.argv[1])
+
+                                    with open(sys.argv[1] + "/output.json", "w") as outfile:
+                                        outfile.write(json_object)
+                                    ' $escapedOutputFolder
                                 """.trimIndent()
                             )
                         } else {
