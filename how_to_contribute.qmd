@@ -78,7 +78,7 @@ YAML files should begin with a name, description, and authors of the script. The
 
 Example:
 
-```
+```         
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -95,7 +95,7 @@ All input and output ids should follow the snake case naming conventions. Names 
 
 Here is an example where the input a coordinate reference system and a distance that is specified by the user:
 
-```
+```         
 inputs:
   crs:
     label: coordinate reference system for output
@@ -127,7 +127,7 @@ There are several different types of user inputs that can be specified in the YA
 
 ^1^options type requires an additional options attribute to be added with the available options.
 
-```
+```         
 options_example:
   label: Options example
   description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
@@ -153,7 +153,7 @@ The user inputs can also be file types if you want to upload a file or connect t
 
 For example:
 
-```
+```         
 inputs:
   landcover_raster:
     label: Raster of landcover
@@ -190,7 +190,7 @@ There are also several types of outputs that can be created
 
 ^3^ When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
 
-```
+```         
 map:
   label: My map
   description: Some map that shows something
@@ -201,7 +201,7 @@ map:
 
 Here is an example output:
 
-```
+```         
 outputs:
   result:
     label: Analysis result
@@ -233,11 +233,12 @@ Search for your package names on [anaconda](https://anaconda.org/). Packages tha
 
 ::: panel-tabset
 ## R
+
 *Note that every conda sub environment and script in R must load rjson because it is necessary for running the pipelines in BON in a Box*
 
 Example of conda sub-environment for an R script:
 
-```
+```         
 conda: # Optional: if you script requires specific versions of packages.
   channels:
     - conda-forge # make sure to put conda forge first
@@ -250,9 +251,10 @@ conda: # Optional: if you script requires specific versions of packages.
 ```
 
 ## Python
+
 Example of conda sub-environment for a python script. You do not need to put anything after conda-forge or before the package names when specifying a conda environment for python.
 
-```
+```         
 conda:
   channels:
     - conda-forge
@@ -260,7 +262,6 @@ conda:
     - openeo
     - pandas
 ```
-
 :::
 
 #### Loading packages that are not available in conda
@@ -273,7 +274,7 @@ For more information, refer to the [conda documentation](https://docs.conda.io/p
 
 #### Full example of a YAML file:
 
-```
+```         
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -326,7 +327,7 @@ If inputs are outputs from a previous step in the pipeline, make sure to give th
 
 #### Empty commented sample to fill in:
 
-```
+```         
 script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targeted to those who will interpret pipeline results and edit pipelines.
@@ -411,8 +412,8 @@ This file contains the id of the parameters that were specified in the yaml scri
 The script reads the `input.json` file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline.
 
 ::: panel-tabset
-
 ## R
+
 A convenience function `biab_inputs` is loaded in R by default to load the file into a list. Here is an example of how to read the input file in the R script:
 
 ``` r
@@ -450,6 +451,7 @@ landcover_projected <- project(landcover, input$crs)
 ```
 
 ## Python
+
 A convenience function `biab_inputs` is loaded in Python by default to load the file into a list. Here is an example of how to read the input file in the script and use it's value:
 
 ``` python
@@ -459,7 +461,9 @@ my_int = data['some_int_input']
 ```
 
 ## Julia
+
 The following code allows to read inputs from the json file into a variable in the julia script:
+
 ``` julia
 function read_inputs_dict(runtime_dir)
   filepath = joinpath(runtime_dir, "input.json")
@@ -472,9 +476,7 @@ RUNTIME_DIR = ARGS[1]
 inputs = read_inputs_dict(RUNTIME_DIR)
 crs = inputs["crs"]
 # do something with crs
-
 ```
-
 :::
 
 ### Writing outputs
@@ -551,8 +553,12 @@ Any `error` message will also halt the rest of the pipeline. It is recommended t
 
 For example, if a user wanted the analysis to stop if the result was less than 0:
 
-``` r
+::: panel-tabset
+## R
+
+``` R
 # R helper function for errors
+# stop if result is less than 0
 if (result < 0){
     biab_error_stop("Analysis was halted because result is less than 0.")
     # Script stops here
@@ -562,6 +568,18 @@ if (result < 0){
 biab_warning("This warning will appear in the UI, but does not stop the pipeline.")
 biab_info("This message will appear in the UI.")
 ```
+
+## Python
+
+``` python
+if intIn < 0 :
+  biab_error_stop("intIn < 0, you're not lucky! This causes failure.")
+  
+# Other Python helper functions
+biab_warning("This warning will appear in the UI, but does not stop the pipeline.")
+biab_info("This message will appear in the UI.")
+```
+:::
 
 And then the customized message will appear in the UI.
 
