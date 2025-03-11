@@ -6,8 +6,7 @@ intIn = inputs['some_int']
 
 # Do stuff.
 if intIn == 13 :
-  print("some_int == 13, you're not lucky! This causes failure.")
-  sys.exit(1)
+  biab_error_stop("some_int == 13, you're not lucky! This causes failure.")
 
 intIn += 1
 
