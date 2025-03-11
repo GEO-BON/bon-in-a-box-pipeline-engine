@@ -296,6 +296,7 @@ class ScriptRun( // Constructor used in single script run
                                     python3 -c '
                                     import os, sys
                                     biab_output_list = {}
+                                    output_folder = sys.argv[1]
 
                                     # Add script dir to sys.path
                                     script_dir = os.path.dirname(os.path.abspath("$escapedScript"))
@@ -308,7 +309,7 @@ class ScriptRun( // Constructor used in single script run
                                         raise
                                     finally:
                                         if biab_output_list:
-                                            with open(sys.argv[1] + "/output.json", "w") as outfile:
+                                            with open(output_folder + "/output.json", "w") as outfile:
                                                 outfile.write(json.dumps(biab_output_list, indent = 2))
                                     ' $escapedOutputFolder
                                 """.trimIndent()

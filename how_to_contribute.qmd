@@ -213,15 +213,15 @@ outputs:
     type: image/png
 ```
 
-### Specifying R package dependencies with conda
+### Specifying R and Python package dependencies with conda
 
 "[Conda](https://docs.conda.io/projects/conda/en/latest/index.html) provides package, dependency, and environment management for any language." If a script is dependent on a specific package version, conda will load that package version to prevent breaking changes when packages are updated. BON in a Box uses a central conda environment that includes commonly used libraries, and supports dedicated environments for the scripts that need it.
 
-This means that instead of installing packages in R scripts, they are installed in the R environment in conda. Note that you still need to load the packages in your scripts using the `library()` command.
+This means that instead of installing packages during script execution scripts, they are installed in the R environment in conda. Note that you still need to load the packages in your scripts using the `library()` command for R or `import` for Python.
 
 #### Check if the libraries you need are in conda
 
-To check if the packages you need are already in the R environment in conda, go to runners/r-environment.yml in the BON in a Box project folder. The list of packages already installed will be under "dependencies".
+To check if the packages you need are already in the default conda environment, go to runners/r-environment.yml or runners/python-environment.yml in the BON in a Box project folder. The list of packages already installed will be under "dependencies".
 
 If all the packages that you need are in the R environment file and you do not need specific package versions, you do not need to specify a conda sub environment and you can skip the next step.
 
@@ -231,9 +231,11 @@ If you include a conda section, make sure you list all your dependencies. If you
 
 Search for your package names on [anaconda](https://anaconda.org/). Packages that are in anaconda will be recognized by conda and can be included in the conda sub-environment in the YML file. If your package is not there, see below.
 
+::: panel-tabset
+## R
 *Note that every conda sub environment and script in R must load rjson because it is necessary for running the pipelines in BON in a Box*
 
-**R**: Here is an example of a conda sub-environment for an R script:
+Example of conda sub-environment for an R script:
 
 ```
 conda: # Optional: if you script requires specific versions of packages.
@@ -247,7 +249,8 @@ conda: # Optional: if you script requires specific versions of packages.
     - r-rredlist=1.0.0 # package=version
 ```
 
-**Python:** Here is an example for a python script. You do not need to put anything after conda-forge or before the package names when specifying a conda environment for python.
+## Python
+Example of conda sub-environment for a python script. You do not need to put anything after conda-forge or before the package names when specifying a conda environment for python.
 
 ```
 conda:
@@ -257,6 +260,8 @@ conda:
     - openeo
     - pandas
 ```
+
+:::
 
 #### Loading packages that are not available in conda
 
@@ -403,7 +408,12 @@ This file contains the id of the parameters that were specified in the yaml scri
 }
 ```
 
-The script reads the `input.json` file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline. A convenience function `biab_inputs` is loaded in R by default to load the file into a list. Here is an example of how to read the input file in the R script:
+The script reads the `input.json` file that is in the run folder. This JSON file is automatically created from the BON in a Box pipeline.
+
+::: panel-tabset
+
+## R
+A convenience function `biab_inputs` is loaded in R by default to load the file into a list. Here is an example of how to read the input file in the R script:
 
 ``` r
 input <- biab_inputs()
@@ -439,9 +449,42 @@ And to project it using the CRS that the user specified:
 landcover_projected <- project(landcover, input$crs)
 ```
 
+## Python
+A convenience function `biab_inputs` is loaded in Python by default to load the file into a list. Here is an example of how to read the input file in the script and use it's value:
+
+``` python
+data = biab_inputs()
+my_int = data['some_int_input']
+# do something with my_int
+```
+
+## Julia
+The following code allows to read inputs from the json file into a variable in the julia script:
+``` julia
+function read_inputs_dict(runtime_dir)
+  filepath = joinpath(runtime_dir, "input.json")
+  output_dir = joinpath(runtime_dir, "data/")
+  isdir(output_dir) || mkdir(output_dir)
+  return JSON.parsefile(filepath)
+end
+
+RUNTIME_DIR = ARGS[1]
+inputs = read_inputs_dict(RUNTIME_DIR)
+crs = inputs["crs"]
+# do something with crs
+
+```
+
+:::
+
 ### Writing outputs
 
-The outputs can be saved in a variety of formats. The format must be accurately specified in the YAML file. A variable named `outputFolder` is loaded when R load that specifies where to save the output files.
+The outputs can be saved in a variety of file formats or primitive values (int, text, etc.). The format must be accurately specified in the YAML file.
+
+::: panel-tabset
+## R
+
+A variable named `outputFolder` is loaded when R load that specifies where to save the output files.
 
 In R, a convenience function `biab_output` allow to save the outputs. Here is an example in R of an output with a csv file and a plot in png format.
 
@@ -455,7 +498,20 @@ ggsave(result_path, result)
 biab_output("result_plot", result_plot_path)
 ```
 
-For other languages, the script needs to write the output JSON file. The format is the same as for input file above:
+## Python
+
+A variable named `output_folder` is loaded before your script is executed. It contains a string representation of the output folder.
+
+A convenience function `biab_output` allow to save the outputs as soon as they are created in the course of your script.
+
+``` python
+intOutput = 12345
+biab_output("my_int_output", intOutput)
+```
+
+## Julia
+
+The script needs to write the output JSON file. The format is the same as for the input file above:
 
 ``` json
 {
@@ -466,6 +522,20 @@ For other languages, the script needs to write the output JSON file. The format 
 ```
 
 Where `/output/folder/script/hash/` is the value of `outputFolder`.
+
+The sample code below can be modified for your specific script:
+
+``` julia
+RUNTIME_DIR = ARGS[1]
+output_json_path = joinpath(RUNTIME_DIR, "output.json")
+open(output_json_path, "w") do f
+    write(f, JSON.json(Dict(
+        :output1_name => value1,
+        :output2_name => value2
+    )))
+end
+```
+:::
 
 ### Script validation
 
