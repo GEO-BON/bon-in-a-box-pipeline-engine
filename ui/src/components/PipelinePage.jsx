@@ -101,10 +101,29 @@ export function PipelinePage({ runType }) {
     pipInitialState
   );
 
-  function showHttpError(error, response) {
-    if (response && response.text) setHttpError(response.text);
-    else if (error) setHttpError(error.toString());
-    else setHttpError(null);
+  function showHttpError(error, response, context="") {
+
+    let errorMessage = null;
+    if (response && response.text)
+      errorMessage = response.text;
+    else if (error)
+      errorMessage = error.toString()
+
+    if (errorMessage && errorMessage.startsWith("<html>")) {
+      try {
+        errorMessage = errorMessage
+          .replace(/\r\n/g, '')
+          .match(/<body>.+<\/body>/g)[0]
+          .replace(/<\/?[A-Za-z1-9]+>/g, " ")
+          .trim()
+          .split(/\s+/)
+          .join(' ');
+      } catch (err) {
+        errorMessage = "Unhandled " + err;
+      }
+    }
+
+    setHttpError("Error " + context + ": " + errorMessage)
   }
 
   let timeout;
@@ -115,7 +134,7 @@ export function PipelinePage({ runType }) {
         pipStates.runId,
         (error, data, response) => {
           if (error) {
-            showHttpError(error, response);
+            showHttpError(error, response, "while getting pipeline outputs from script server");
           } else {
             if (data.error) {
               setHttpError(data.error);
@@ -144,6 +163,7 @@ export function PipelinePage({ runType }) {
   function loadPipelineMetadata(choice, setExamples = true) {
     var callback = function (error, data, response) {
       if (error) {
+        showHttpError(error, response, "while loading pipeline metadata from script server");
         setPipelineMetadata(null)
       } else if (data) {
         setPipelineMetadata(data);
@@ -163,19 +183,6 @@ export function PipelinePage({ runType }) {
       }
     };
     api.getInfo(runType, choice, callback);
-  }
-  function httpErrorFormatter(error) {
-	  let baseMsg = "Error fetching data from script server: ";
-
-	  if (error.length > 0) {
-		  try {
-			  return baseMsg + error.replace(/\r\n/g, '').match(/<body>.+<\/body>/g)[0].replace(/<\/?[A-Za-z1-9]+>/g, " ").trim().split(/\s+/).join(' ');
-		  } catch (err) {
-			  return baseMsg + "Unhandled error: " + err;
-		  }
-	  } else {
-		  return baseMsg + "Error undefined";
-	  }
   }
 
   function loadPipelineInputs(pip, hash) {
@@ -248,7 +255,7 @@ export function PipelinePage({ runType }) {
     setStoppable(false);
     api.stop(runType, pipStates.runId, (error, data, response) => {
       if (error) {
-        showHttpError(error, response);
+        showHttpError(error, response, "in script server while stopping the pipeline");
       } else {
         setHttpError("Cancelled by user");
       }
@@ -303,7 +310,7 @@ export function PipelinePage({ runType }) {
       )}
       {httpError && (
         <Alert severity="error" key="httpError">
-          {httpErrorFormatter(httpError)}
+          {httpError}
         </Alert>
       )}
       {pipelineMetadata && (
