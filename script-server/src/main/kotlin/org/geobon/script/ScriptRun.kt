@@ -294,7 +294,13 @@ class ScriptRun( // Constructor used in single script run
                                 """
                                     ${runner.getSetupBash()}
                                     python3 -c '
+                                    import os, sys
                                     biab_output_list = {}
+
+                                    # Add script dir to sys.path
+                                    script_dir = os.path.dirname(os.path.abspath("$escapedScript"))
+                                    sys.path.insert(0, script_dir)
+
                                     try:
                                         exec(open("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.py").read(), globals())
                                         exec(open("$escapedScript").read(), globals())
