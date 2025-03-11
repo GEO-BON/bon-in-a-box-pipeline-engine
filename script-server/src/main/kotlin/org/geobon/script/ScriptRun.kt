@@ -295,18 +295,21 @@ class ScriptRun( // Constructor used in single script run
                                     ${runner.getSetupBash()}
                                     python3 -c '
                                     biab_output_list = {}
-                                    exec(open("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.py").read(), globals())
-                                    exec(open("$escapedScript").read(), globals())
+                                    try:
+                                        exec(open("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.py").read(), globals())
+                                        exec(open("$escapedScript").read(), globals())
+                                    except:
+                                        raise
+                                    finally:
+                                        json_object = json.dumps(biab_output_list, indent = 2)
 
-                                    json_object = json.dumps(biab_output_list, indent = 2)
+                                        print("TEMP debug logs:")
+                                        print(json_object)
+                                        print(sys.argv[1])
 
-                                    print("TEMP debug logs:")
-                                    print(json_object)
-                                    print(sys.argv[1])
-
-                                    if biab_output_list:
-                                        with open(sys.argv[1] + "/output.json", "w") as outfile:
-                                            outfile.write(json_object)
+                                        if biab_output_list:
+                                            with open(sys.argv[1] + "/output.json", "w") as outfile:
+                                                outfile.write(json_object)
                                     ' $escapedOutputFolder
                                 """.trimIndent()
                             )
