@@ -307,15 +307,9 @@ class ScriptRun( // Constructor used in single script run
                                     except:
                                         raise
                                     finally:
-                                        json_object = json.dumps(biab_output_list, indent = 2)
-
-                                        print("TEMP debug logs:")
-                                        print(json_object)
-                                        print(sys.argv[1])
-
                                         if biab_output_list:
                                             with open(sys.argv[1] + "/output.json", "w") as outfile:
-                                                outfile.write(json_object)
+                                                outfile.write(json.dumps(biab_output_list, indent = 2))
                                     ' $escapedOutputFolder
                                 """.trimIndent()
                             )
