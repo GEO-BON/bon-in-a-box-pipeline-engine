@@ -58,7 +58,7 @@ Prerequisites:
 
 ### Step 3: Clone repository
 
-1.  Clone repository (Windows users: do not clone the repo in a folder under OneDrive.) This can be done in terminal using the following code: `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git` or in GitHub desktop.
+1.  Clone repository (Windows users: make sure the cloned repo is under the user folder (\`C:\\Users\\yourname\\...\`), and also **not** under OneDrive.) This can be done in terminal using the following code: `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git` or in GitHub desktop.
 
 ### Step 4: Set environment file
 
