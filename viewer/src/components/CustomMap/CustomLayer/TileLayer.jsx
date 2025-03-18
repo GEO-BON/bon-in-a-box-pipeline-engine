@@ -28,7 +28,7 @@ function TileLayer(props) {
     return () => {
       if (legend && Object.keys(legend).length !== 0) legend.remove();
     };
-  }, [selectedLayerTiles, opacity]);
+  }, [selectedLayerTiles, map, opacity]);
 
   return <></>;
 }

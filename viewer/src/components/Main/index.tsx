@@ -211,6 +211,8 @@ export default function Main(props: any) {
 
   const mapProps = {
     selectedLayerTiles,
+    setSelectedLayerTiles,
+    setSelectedLayer,
     selectedLayer,
     legend,
     setColormap,

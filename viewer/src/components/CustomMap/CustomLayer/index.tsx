@@ -55,12 +55,7 @@ function CustomLayer(props: any) {
 
   return (
     <>
-      <ColorPicker
-        setColormap={setColormap}
-        colormap={colormap}
-        colormapList={colormapList}
-      />
-      {typeof geojsonOutput !== "undefined" &&
+     {typeof geojsonOutput !== "undefined" &&
         geojsonOutput &&
         geojsonOutput.features.length !== 0 && (
           <GeoJSONLayer
@@ -79,13 +74,20 @@ function CustomLayer(props: any) {
         ></GeoPackageLayer>
       )}
       {typeof selectedLayerTiles !== "undefined" && selectedLayerTiles && (
-        <TileLayer
-          selectedLayerTiles={selectedLayerTiles}
-          map={map}
-          clearLayers={clearLayers}
-          opacity={opacity}
-          legend={legend}
-        ></TileLayer>
+          <>
+            <ColorPicker
+            setColormap={setColormap}
+            colormap={colormap}
+            colormapList={colormapList}
+            />
+            <TileLayer
+              selectedLayerTiles={selectedLayerTiles}
+              map={map}
+              clearLayers={clearLayers}
+              opacity={opacity}
+              legend={legend}
+            />
+          </>
       )}
     </>
   );
