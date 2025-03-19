@@ -38,9 +38,6 @@ export default function MSMapSlider(props: any) {
           aria-label="Opacity"
           value={value ?? 100}
           valueLabelDisplay="auto"
-          onClick={(e: any, newValue: any) => {
-            L.DomEvent.stopPropagation(e);
-          }}
           onChange={(e: any, newValue: any) => {
             L.DomEvent.stopPropagation(e);
           }}
