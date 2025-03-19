@@ -81,6 +81,5 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "prettier": "^3.0.2",
     "typescript": "^5.0.2",
-    "vite-plugin-copy": "^0.1.6"
   }
 }
