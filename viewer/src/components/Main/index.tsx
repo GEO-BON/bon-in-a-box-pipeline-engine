@@ -62,6 +62,7 @@ export default function Main(props: any) {
     features: [],
   };
   const [geojson, setGeojson] = useState<FeatureCollection>(emptyFC);
+  const [geoPackage, setGeoPackage] = useState("");
   const [geojsonOutput, setGeojsonOutput] =
     useState<FeatureCollection>(emptyFC);
 
@@ -210,6 +211,8 @@ export default function Main(props: any) {
 
   const mapProps = {
     selectedLayerTiles,
+    setSelectedLayerTiles,
+    setSelectedLayer,
     selectedLayer,
     legend,
     setColormap,
@@ -218,6 +221,8 @@ export default function Main(props: any) {
     geojson,
     geojsonOutput,
     setGeojson,
+    geoPackage,
+    setGeoPackage,
     generateStats,
     colormap,
     colormapList,
@@ -247,6 +252,7 @@ export default function Main(props: any) {
     geojson,
     setGeojson,
     setGeojsonOutput,
+    setGeoPackage,
     handleAddLocationChange,
     qualcmaps,
     quantcmaps,

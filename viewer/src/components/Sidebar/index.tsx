@@ -31,6 +31,7 @@ export default function Sidebar(props: any) {
     geojson,
     setGeojson,
     setGeojsonOutput,
+    setGeoPackage,
     generateStats,
     map,
   } = props;
@@ -62,6 +63,7 @@ export default function Sidebar(props: any) {
 
   const displayOutput = (output: any, type: string) => {
     if (type.includes("geotiff")) {
+      clearOtherLayers("geotiff")
       setSelectedLayer(output);
     } else if (type.includes("points/")) {
       let crs = "EPSG:4326";
@@ -88,9 +90,13 @@ export default function Sidebar(props: any) {
         });
       });
     } else if (type.includes("geo+json")) {
+      clearOtherLayers("geo+json")
       GetJSON(output).then((res: any) => {
         setGeojsonOutput(res);
       });
+    } else if (type.includes("geopackage")) {
+      clearOtherLayers("geopackage")
+      setGeoPackage(output);
     } else if (
       type.includes("value") ||
       type.includes("csv") ||
@@ -144,6 +150,23 @@ export default function Sidebar(props: any) {
     }
   };
 
+
+  const clearOtherLayers=(thisLayer:string)=>{
+    if(thisLayer!=='geotiff'){
+      setSelectedLayer({
+        url: "",
+        band_id: "b1",
+        description: "",
+      });
+    }
+    if(thisLayer!=='geo+json'){
+      setGeojsonOutput(emptyFC)
+    }
+    if(thisLayer!=='geopackage'){
+      setGeoPackage("")
+    }
+  }
+  
   useEffect(() => {
     const pips: any = [];
     if (

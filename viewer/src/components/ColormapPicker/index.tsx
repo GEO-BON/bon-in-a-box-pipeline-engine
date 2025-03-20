@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Control from "react-leaflet";
 import L from "leaflet";
 import Grid from "@mui/material/Grid";
@@ -8,43 +8,47 @@ import { cmap } from "../../helpers/colormaps";
 export function ColorPicker(props: any) {
   const { setColormap, colormapList, colormap } = props;
   const divRef: any = React.useRef(null);
+  const [items, setItems] = useState([])
 
   const handleCLick = (c: any, e: any) => {
     e.stopPropagation();
     setColormap(c);
   };
-
-  const items = colormapList.map((c: any) => {
-    const indiv = cmap(c).map((m: any) => {
-      let border = "";
-      if (colormap === m) {
-        border = "1px solid white";
-      }
+  useEffect(()=>{
+    const it = colormapList.map((c: any) => {
+      const indiv = cmap(c).map((m: any) => {
+        let border = "";
+        if (colormap === m) {
+          border = "1px solid white";
+        }
+        return (
+          <div
+            key={m}
+            className="color-picker-color-box"
+            style={{ background: m, width: "8px", height: "8px", border: border }}
+          />
+        );
+      });
       return (
         <div
-          key={m}
-          className="color-picker-color-box"
-          style={{ background: m, width: "8px", height: "8px", border: border }}
-        />
+          key={c}
+          ref={divRef}
+          onClick={(e) => handleCLick(c, e)}
+          className="color-picker-colormap"
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            flexWrap: "nowrap",
+            cursor: "pointer",
+          }}
+        >
+          {indiv}
+        </div>
       );
-    });
-    return (
-      <div
-        key={c}
-        ref={divRef}
-        onClick={(e) => handleCLick(c, e)}
-        className="color-picker-colormap"
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          flexWrap: "nowrap",
-          cursor: "pointer",
-        }}
-      >
-        {indiv}
-      </div>
-    );
-  });
+    })
+    setItems(it)
+  },[colormap]);
+
   return (
     <div
       className="color-picker-container"

@@ -106,6 +106,7 @@ function MapWrapper(props: any) {
         width={200}
         notifyChange={(newValue: any) => setOpacity(newValue)}
         value={opacity}
+        map={map}
       />
       <ZoomControl position="topright" />
       <ScaleControl position="bottomright" />
