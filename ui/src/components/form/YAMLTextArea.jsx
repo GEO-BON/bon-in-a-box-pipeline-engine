@@ -19,6 +19,7 @@ export default function YAMLTextArea({ data, setData, setValidationError }) {
   }
 
   function handleEditorChange(value, _) {
+    setTyping(true)
     try {
       setData(yaml.load(value))
       setError(null)
@@ -37,16 +38,20 @@ export default function YAMLTextArea({ data, setData, setValidationError }) {
     }
   }
 
-  useEffect(() => {
-    setTyping(true)
+  useEffect(() => { // Handle typing timeout
+    // setTyping(true) set to true in handleEditorChange
     const stopTypingTimer = setTimeout(() => {
       setTyping(false)
     }, 500)
 
     return () => clearTimeout(stopTypingTimer)
-  }, [data])
+  }, [
+    data, // Relaunch timer when valid data entered. This won't chage as soon as there is an error.
+    isTyping, // Lauch timer when user starts typing. This covers the case where the first character is an error.
+    setTyping
+  ])
 
-  useEffect(() => {
+  useEffect(() => { // Error mark
     if (monacoRef.current) {
       const monaco = monacoRef.current
       let model = monaco.editor.getModels()[0]
@@ -69,7 +74,7 @@ export default function YAMLTextArea({ data, setData, setValidationError }) {
         }
       }
     }
-  }, [monacoRef, error, data, isTyping])
+  }, [monacoRef, error, isTyping])
 
   return (
     <Suspense fallback={<Spinner />}>
