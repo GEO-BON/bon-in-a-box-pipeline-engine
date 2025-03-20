@@ -186,6 +186,7 @@ internal class ScriptRunTest {
         assertNotEquals(run1Time, run2Time)
     }
 
+    /* This is not supported anymore.
     @Test
     fun `given script has spaces_when scripts executed_then still works`() = runTest {
         val run = ScriptRun(File(scriptRoot, "folder with spaces/assert boolean.py"),
@@ -195,5 +196,6 @@ internal class ScriptRunTest {
         assertNotNull(run.results["the_same"], "the_same key not found in ${run.results}")
         assertEquals(false, run.results["the_same"]!!)
     }
+    */
 
 }

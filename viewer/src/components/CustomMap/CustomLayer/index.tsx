@@ -4,6 +4,10 @@ import { CircleMarker, Tooltip, useMap, GeoJSON } from "react-leaflet";
 import L from "leaflet";
 import { ColorPicker } from "../../ColormapPicker";
 import type { FeatureCollection } from "geojson";
+import GeoPackageLayer from "./GeoPackageLayer";
+import GeoJSONLayer from "./GeoJSONLayer";
+import TileLayer from "./TileLayer";
+import { clear } from "console";
 
 /**
  *
@@ -20,18 +24,12 @@ function CustomLayer(props: any) {
     bounds,
     map,
     geojsonOutput,
+    geoPackage,
+    setGeoPackage,
+    setGeojson,
     clearLayers,
   } = props;
-  const [tiles, setTiles] = useState(<></>);
   const [basemap, setBasemap] = useState("cartoDark");
-  const layerContainer = map.getContainer();
-  const layerRef = useRef(null);
-
-  const emptyFC: FeatureCollection = {
-    type: "FeatureCollection",
-    features: [],
-  };
-  const [data, setData] = useState([]);
 
   const basemaps: any = {
     osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -48,64 +46,6 @@ function CustomLayer(props: any) {
   };
 
   useEffect(() => {
-    if (
-      selectedLayerTiles !== "" &&
-      typeof selectedLayerTiles !== "undefined"
-    ) {
-      clearLayers();
-      const layer = L.tileLayer(selectedLayerTiles, {
-        attribution: "io",
-        opacity: opacity / 100,
-      });
-      const container = map;
-      container.addLayer(layer);
-      if (Object.keys(legend).length !== 0) {
-        legend.addTo(map);
-      }
-    }
-
-    return () => {
-      if (legend && Object.keys(legend).length !== 0) legend.remove();
-    };
-  }, [selectedLayerTiles, opacity]);
-
-  useEffect(() => {
-    clearLayers();
-    if (geojsonOutput.features.length !== 0) {
-      const markerStyle = {
-        radius: 2.5,
-        fillColor: "#ff7800",
-        color: "#000",
-        weight: 1,
-        opacity: 0.3,
-        fillOpacity: 0.5,
-      };
-      const l = L.geoJSON(geojsonOutput, {
-        attribution: "io",
-        pointToLayer: function (feature, latlng) {
-          return L.circleMarker(latlng, markerStyle);
-        },
-        style: (feature: any) => {
-          switch (feature?.geometry.type) {
-            case "Point":
-            case "MultiPoint":
-              return markerStyle;
-            default:
-              return {
-                color: "#ff7800",
-                weight: 5,
-                opacity: 0.7,
-                fillOpacity: 0.3,
-              };
-          }
-        },
-      });
-      l.addTo(map);
-      map.fitBounds(l.getBounds());
-    }
-  }, [geojsonOutput]);
-
-  useEffect(() => {
     const layer = L.tileLayer(basemaps[basemap], {
       attribution: "Planet",
     });
@@ -114,11 +54,42 @@ function CustomLayer(props: any) {
   }, []);
 
   return (
-    <ColorPicker
-      setColormap={setColormap}
-      colormap={colormap}
-      colormapList={colormapList}
-    />
+    <>
+     {typeof geojsonOutput !== "undefined" &&
+        geojsonOutput &&
+        geojsonOutput.features.length !== 0 && (
+          <GeoJSONLayer
+            geojsonOutput={geojsonOutput}
+            setGeojson={setGeojson}
+            map={map}
+            clearLayers={clearLayers}
+          ></GeoJSONLayer>
+        )}
+      {typeof geoPackage !== "undefined" && geoPackage && (
+        <GeoPackageLayer
+          geoPackage={geoPackage}
+          map={map}
+          clearLayers={clearLayers}
+          setGeoPackage={setGeoPackage}
+        ></GeoPackageLayer>
+      )}
+      {typeof selectedLayerTiles !== "undefined" && selectedLayerTiles && (
+          <>
+            <ColorPicker
+            setColormap={setColormap}
+            colormap={colormap}
+            colormapList={colormapList}
+            />
+            <TileLayer
+              selectedLayerTiles={selectedLayerTiles}
+              map={map}
+              clearLayers={clearLayers}
+              opacity={opacity}
+              legend={legend}
+            />
+          </>
+      )}
+    </>
   );
 }
 

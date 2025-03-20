@@ -1,22 +1,14 @@
 import sys, json;
-import time;
 
 # Reading input.json
-inputFile = open(sys.argv[1] + '/input.json')
-data = json.load(inputFile)
-intIn = data['some_int']
+inputs = biab_inputs()
+intIn = inputs['some_int']
 
 # Do stuff.
 if intIn == 13 :
-  print("some_int == 13, you're not lucky! This causes failure.")
-  sys.exit(1)
+  biab_error_stop("some_int == 13, you're not lucky! This causes failure.")
 
 intIn += 1
 
 # Serializing output.json
-dictionary = {
-  "increment": intIn
-}
-json_object = json.dumps(dictionary, indent = 2)
-with open(sys.argv[1] + '/output.json', "w") as outfile:
-    outfile.write(json_object)
+biab_output("increment", intIn)
