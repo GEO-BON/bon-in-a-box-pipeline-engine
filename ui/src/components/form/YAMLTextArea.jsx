@@ -26,7 +26,7 @@ export default function YAMLTextArea({ data, setData, setValidationError }) {
       if (ex instanceof YAMLException) {
         setError((prevError) => {
           const newError = {
-            line: ex.mark.line + 1,
+            line: ex.mark.line,
             message: "YAML Syntax: " + ex.reason
           }
           return newError;
