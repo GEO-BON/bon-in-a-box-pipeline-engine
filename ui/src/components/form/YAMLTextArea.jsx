@@ -5,7 +5,7 @@ import { Spinner } from "../Spinner";
 import _lang from "lodash/lang";
 const Editor = React.lazy(() => import('@monaco-editor/react'));
 
-export default function YAMLTextArea({ data, setData }) {
+export default function YAMLTextArea({ data, setData, setValidationError }) {
   if (isEmptyObject(data)) {
     return <textarea disabled={true} placeholder="No inputs" value="" />;
   }
@@ -61,9 +61,11 @@ export default function YAMLTextArea({ data, setData }) {
                 severity: monaco.MarkerSeverity.Error
               }
             ]);
+            setValidationError("At line " + error.line + ": " + error.message);
           }
         } else {
           monaco.editor.setModelMarkers(model, "owner", []);
+          setValidationError(null);
         }
       }
     }
