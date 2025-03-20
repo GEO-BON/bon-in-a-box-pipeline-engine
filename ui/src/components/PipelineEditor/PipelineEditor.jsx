@@ -1043,7 +1043,7 @@ export default function PipelineEditor(props) {
       <p className="documentationLink">
         Need help? Check out{" "}
         <a
-          href="https://github.com/GEO-BON/biab-2.0/#pipelines"
+          href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor"
           target="_blank"
           rel="noreferrer"
         >
