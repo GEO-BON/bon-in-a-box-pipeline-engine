@@ -998,11 +998,15 @@ export default function PipelineEditor(props) {
   }, []);
 
   useEffect(() => {
-    setUnsavedChanges(
-      (savedJSON === null && nodes.length !== 0) // new and not empty
-      || (savedJSON !== null && savedJSON !== generateSaveJSON()) // existing and modified
-    )
-  }, [nodes, edges, savedJSON, inputList, outputList, metadata, handleBeforeUnload]);
+    const updateSavedStateTimeout = setTimeout(() => {
+      setUnsavedChanges(
+        (savedJSON === null && nodes.length !== 0) // new and not empty
+        || (savedJSON !== null && savedJSON !== generateSaveJSON()) // existing and modified
+      )
+    }, 500)
+
+    return () => clearTimeout(updateSavedStateTimeout)
+  }, [nodes, edges, savedJSON, inputList, outputList, metadata, handleBeforeUnload, generateSaveJSON]);
 
   useEffect(() => {
     if(hasUnsavedChanges) {
