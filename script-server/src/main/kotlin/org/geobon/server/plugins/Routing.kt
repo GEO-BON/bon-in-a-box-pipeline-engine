@@ -7,6 +7,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.geobon.hpc.HPCConnection
 import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
@@ -18,7 +19,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
-import java.text.SimpleDateFormat
 
 /**
  * Used to transport paths through path param.
@@ -33,6 +33,9 @@ private val runningPipelines = mutableMapOf<String, Pipeline>()
 private val logger: Logger = LoggerFactory.getLogger("Server")
 
 fun Application.configureRouting() {
+
+    val hpcName = System.getenv("HPC_SSH_CONFIG_NAME")
+    val hpc = HPCConnection(hpcName)
 
     routing {
 
@@ -264,6 +267,21 @@ fun Application.configureRouting() {
                 logger.debug("Cancelled $id")
                 call.respond(HttpStatusCode.OK)
             } ?: call.respond(/*412*/HttpStatusCode.PreconditionFailed, "The pipeline wasn't running")
+        }
+
+// TODO: OpenAPI spec
+        get("/api/hpc-status") {
+            call.respond(mapOf(
+                "R" to hpc.rStatus.toMap(),
+                "Python" to hpc.pythonStatus.toMap(),
+                "Julia" to hpc.juliaStatus.toMap()
+            ))
+        }
+
+// TODO: OpenAPI spec or remove
+        get("/api/hpc-prepare") {
+            hpc.prepare()
+            call.respond(HttpStatusCode.OK)
         }
 
         get("/api/versions") {

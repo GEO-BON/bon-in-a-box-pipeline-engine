@@ -56,7 +56,7 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-gson-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
-    implementation("ch.qos.logback:logback-classic:1.5.6")
+    implementation("ch.qos.logback:logback-classic:1.5.18")
     implementation("io.ktor:ktor-server-config-yaml:$ktorVersion")
 
     // https://mvnrepository.com/artifact/org.json/json

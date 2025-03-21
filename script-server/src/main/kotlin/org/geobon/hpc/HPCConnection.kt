@@ -1,0 +1,92 @@
+package org.geobon.hpc
+
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.geobon.utils.runCommand
+
+class HPCConnection(private val sshName: String?) {
+
+    var juliaStatus = ApptainerImage()
+    var rStatus = ApptainerImage()
+    val pythonStatus: ApptainerImage
+        get() = rStatus
+
+    init {
+        if(!sshName.isNullOrBlank()){
+            juliaStatus.state = ApptainerImageState.CONFIGURED
+            rStatus.state = ApptainerImageState.CONFIGURED
+        }
+    }
+
+    fun prepare() {
+        runBlocking {
+            val condaJob = launch {
+                prepareApptainer(rStatus, "runner-conda")
+            }
+
+            val juliaJob = launch {
+                prepareApptainer(juliaStatus, "runner-julia")
+            }
+
+            condaJob.join()
+            juliaJob.join()
+        }
+    }
+
+    private fun prepareApptainer(apptainerImage: ApptainerImage, dockerImage: String) {
+        try {
+            // imageDigestResult: [geobon/bon-in-a-box@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
+            val imageDigestResult = "docker image inspect --format '{{.RepoDigests}}' geobon/bon-in-a-box:$dockerImage"
+                .runCommand()
+                ?.trim()
+            if (imageDigestResult.isNullOrBlank()
+                || !imageDigestResult.startsWith('[')
+                || !imageDigestResult.endsWith(']')
+            ) {
+                throw RuntimeException("Could not read image digest:\n$imageDigestResult")
+            }
+
+            // imageDigest: geobon/bon-in-a-box@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e
+            val imageDigest = imageDigestResult.removePrefix("[").removeSuffix("]")
+            apptainerImage.image = imageDigest
+
+            // imageSha: 34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e
+            val imageSha = imageDigest.substringAfter(':')
+            if (imageSha.length != 64) throw RuntimeException("Unexpected sha length for runner image: $imageSha")
+
+            // TODO: use processbuilder directly to detect success / errors
+            val apptainerLog = """
+                ssh $sshName "
+                    module load apptainer
+                    apptainer build ${dockerImage}_$imageSha.sif docker://$imageDigest
+                "
+            """.trimIndent().runCommand()
+            println(apptainerLog)
+            apptainerImage.state = ApptainerImageState.READY
+        } catch (ex: Throwable) {
+            println(ex.printStackTrace())
+            apptainerImage.message = ex.message
+            apptainerImage.state = ApptainerImageState.ERROR
+        }
+    }
+
+    companion object {
+        enum class ApptainerImageState {
+            NOT_CONFIGURED, CONFIGURED, PREPARING, READY, ERROR
+        }
+
+        data class ApptainerImage(
+            var state: ApptainerImageState = ApptainerImageState.NOT_CONFIGURED,
+            var image: String? = null,
+            var message: String? = null
+        ) {
+            fun toMap(): Map<String, String?> {
+                return mapOf(
+                    "state" to state.toString(),
+                    "image" to image,
+                    "message" to message
+                )
+            }
+        }
+    }
+}
