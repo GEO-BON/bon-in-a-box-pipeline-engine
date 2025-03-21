@@ -1,4 +1,4 @@
-name: Publish script server to docker hub
+name: Publish script server to Docker Hub
 
 on:
   push:
@@ -7,46 +7,45 @@ on:
       - '**staging'
       - edge
     paths:
-      - 'script-server/**'
+      - "script-server/**"
   workflow_dispatch:
 
 jobs:
   script-server:
     runs-on: ubuntu-latest
     steps:
-    - name: Check out the repo
-      uses: actions/checkout@v4
+      - name: Check out the repo
+        uses: actions/checkout@v4
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Set Docker tag
-      id: set-tag
-      run: |
-        if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-          echo "TAG_NAME=script-server" >> $GITHUB_ENV
-        else
-          BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
-          echo "TAG_NAME=script-server-${BRANCH_NAME}" >> $GITHUB_ENV
-        fi
+      - name: Set Docker tag
+        id: set-tag
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "TAG_NAME=script-server" >> $GITHUB_ENV
+          else
+            BRANCH_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
+            echo "TAG_NAME=script-server-${BRANCH_NAME}" >> $GITHUB_ENV
+          fi
 
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: geobon/bon-in-a-box
-        tags: |
-          type=raw,value=${{ env.TAG_NAME }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: geobon/bon-in-a-box
+          tags: |
+            type=raw,value=${{ env.TAG_NAME }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v6
-      with:
-        context: script-server
-        file: script-server/Dockerfile.prod
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: script-server
+          file: script-server/Dockerfile.prod
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
