@@ -71,9 +71,11 @@ class HPCConnectionTest {
                 assertEquals(HttpStatusCode.OK, status)
                 assertContains(bodyAsText(), """"R":{"state":"ERROR"""")
                 assertContains(bodyAsText(), """"Julia":{"state":"ERROR"""")
-                assertContains(
-                    bodyAsText(),
-                    """"message":"ssh: Could not resolve hostname hpc-name: Name or service not known"""
+                assertTrue(
+                    // if runners exist on the testing PC
+                    bodyAsText().contains(""""message":"ssh: Could not resolve hostname hpc-name: Name or service not known""")
+                    // otherwise
+                        || bodyAsText().contains("""No such image: geobon/bon-in-a-box:runner-conda""")
                 )
             }
         }
