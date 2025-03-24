@@ -3,6 +3,7 @@ package org.geobon.hpc
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.geobon.utils.runCommand
+import java.util.concurrent.TimeUnit
 
 class HPCConnection(private val sshName: String?) {
 
@@ -19,33 +20,37 @@ class HPCConnection(private val sshName: String?) {
     }
 
     fun prepare() {
-        runBlocking {
-            val condaJob = launch {
-                prepareApptainer(rStatus, "runner-conda")
-            }
+        synchronized(this) { // sync avoids to launch the process 2 times in parallel by accident
+            runBlocking {
+                val condaJob = launch {
+                    prepareApptainer(rStatus, "runner-conda")
+                }
 
-            val juliaJob = launch {
-                prepareApptainer(juliaStatus, "runner-julia")
-            }
+                val juliaJob = launch {
+                    prepareApptainer(juliaStatus, "runner-julia")
+                }
 
-            condaJob.join()
-            juliaJob.join()
+                condaJob.join()
+                juliaJob.join()
+            }
         }
     }
 
     private fun prepareApptainer(apptainerImage: ApptainerImage, dockerImage: String) {
+        apptainerImage.state = ApptainerImageState.PREPARING
+
         try {
             // imageDigestResult: [geobon/bon-in-a-box@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
             val imageDigestResult = "docker image inspect --format '{{.RepoDigests}}' geobon/bon-in-a-box:$dockerImage"
                 .runCommand()
                 ?.trim()
+
             if (imageDigestResult.isNullOrBlank()
                 || !imageDigestResult.startsWith('[')
                 || !imageDigestResult.endsWith(']')
             ) {
                 throw RuntimeException("Could not read image digest:\n$imageDigestResult")
             }
-
             // imageDigest: geobon/bon-in-a-box@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e
             val imageDigest = imageDigestResult.removePrefix("[").removeSuffix("]")
             apptainerImage.image = imageDigest
@@ -54,15 +59,29 @@ class HPCConnection(private val sshName: String?) {
             val imageSha = imageDigest.substringAfter(':')
             if (imageSha.length != 64) throw RuntimeException("Unexpected sha length for runner image: $imageSha")
 
-            // TODO: use processbuilder directly to detect success / errors
-            val apptainerLog = """
-                ssh $sshName "
-                    module load apptainer
-                    apptainer build ${dockerImage}_$imageSha.sif docker://$imageDigest
-                "
-            """.trimIndent().runCommand()
-            println(apptainerLog)
-            apptainerImage.state = ApptainerImageState.READY
+            // Launch the container creation for that digest (if not already existing)
+            val apptainerImageName = "${dockerImage}_$imageSha.sif"
+            val process = ProcessBuilder("ssh", sshName, """
+                    if [ -f $apptainerImageName ]; then
+                        echo "Image already exists: $apptainerImageName"
+                    else
+                        module load apptainer
+                        apptainer build $apptainerImageName docker://$imageDigest
+                        echo "Image created: $apptainerImageName"
+                    fi
+                """.trimIndent())
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectErrorStream(false) // Merges stderr into stdout
+                .start()
+
+            process.waitFor(10, TimeUnit.MINUTES)
+
+            println(process.inputStream.bufferedReader().readText()) // excludes error stream
+
+            apptainerImage.state = if (process.exitValue() == 0) ApptainerImageState.READY else ApptainerImageState.ERROR
+            apptainerImage.message = process.errorStream.bufferedReader().readText()
+                .also { println(it) }
+
         } catch (ex: Throwable) {
             println(ex.printStackTrace())
             apptainerImage.message = ex.message

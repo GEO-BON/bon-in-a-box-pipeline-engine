@@ -57,7 +57,7 @@ class HPCConnectionTest {
     }
 
     @Test
-    fun givenConfigured_whenPreparedManually_thenGetLogResultWhenFails() = testApplication {
+    fun givenConfiguredWithBadHost_whenPreparedManually_thenGetFailureMessage() = testApplication {
         withEnvironment("HPC_SSH_CONFIG_NAME" to "HPC-name") {
 
             application { configureRouting() }
@@ -67,14 +67,20 @@ class HPCConnectionTest {
                 print(bodyAsText())
             }
 
-            // TODO: Do a real test here
             client.get("/api/hpc-status").apply {
                 assertEquals(HttpStatusCode.OK, status)
-                assertEquals(
-                    """""",
-                    bodyAsText()
+                assertContains(bodyAsText(), """"R":{"state":"ERROR"""")
+                assertContains(bodyAsText(), """"Julia":{"state":"ERROR"""")
+                assertContains(
+                    bodyAsText(),
+                    """"message":"ssh: Could not resolve hostname hpc-name: Name or service not known"""
                 )
             }
         }
     }
+
+//    @Test
+//    fun givenConfiguredCorrectly_whenPreparedManually_thenGetSuccessMessage() = testApplication {
+//        // Unfortunately cannot test the successful case in a mocked environment.
+//    }
 }
