@@ -37,6 +37,11 @@ class HPCConnection(private val sshName: String?) {
     }
 
     private fun prepareApptainer(apptainerImage: ApptainerImage, dockerImage: String) {
+        if(sshName.isNullOrBlank()){
+            apptainerImage.message = "Configure HPC_SSH_CONFIG_NAME before attenpting to connect to the HPC."
+            return
+        }
+
         apptainerImage.state = ApptainerImageState.PREPARING
 
         try {

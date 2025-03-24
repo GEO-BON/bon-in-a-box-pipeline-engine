@@ -270,7 +270,7 @@ fun Application.configureRouting() {
         }
 
 // TODO: OpenAPI spec
-        get("/api/hpc-status") {
+        get("/api/hpc/status") {
             call.respond(mapOf(
                 "R" to hpc.rStatus.toMap(),
                 "Python" to hpc.pythonStatus.toMap(),
@@ -279,7 +279,7 @@ fun Application.configureRouting() {
         }
 
 // TODO: OpenAPI spec or remove
-        get("/api/hpc-prepare") {
+        get("/api/hpc/prepare") {
             hpc.prepare()
             call.respond(HttpStatusCode.OK)
         }
