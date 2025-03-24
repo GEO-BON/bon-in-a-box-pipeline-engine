@@ -4,6 +4,7 @@ import { FoldableOutput } from "./FoldableOutput";
 import { PipelineForm } from "./form/PipelineForm";
 import { useParams } from "react-router-dom";
 import { PipelineResults } from "./PipelineResults";
+import { parseHttpError } from "./HttpErrors";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import _lang from "lodash/lang";
 import { CustomButtonGreen } from "./CustomMUI";
@@ -101,30 +102,7 @@ export function PipelinePage({ runType }) {
     pipInitialState
   );
 
-  function showHttpError(error, response, context="") {
 
-    let errorMessage = null;
-    if (response && response.text)
-      errorMessage = response.text;
-    else if (error)
-      errorMessage = error.toString()
-
-    if (errorMessage && errorMessage.startsWith("<html>")) {
-      try {
-        errorMessage = errorMessage
-          .replace(/\r\n/g, '')
-          .match(/<body>.+<\/body>/g)[0]
-          .replace(/<\/?[A-Za-z1-9]+>/g, " ")
-          .trim()
-          .split(/\s+/)
-          .join(' ');
-      } catch (err) {
-        errorMessage = "Unhandled " + err;
-      }
-    }
-
-    setHttpError("Error " + context + ": " + errorMessage)
-  }
 
   let timeout;
   function loadPipelineOutputs() {
@@ -134,7 +112,7 @@ export function PipelinePage({ runType }) {
         pipStates.runId,
         (error, data, response) => {
           if (error) {
-            showHttpError(error, response, "while getting pipeline outputs from script server");
+            setHttpError(parseHttpError(error, response, "while getting pipeline outputs from script server"));
           } else {
             if (data.error) {
               setHttpError(data.error);
@@ -163,7 +141,7 @@ export function PipelinePage({ runType }) {
   function loadPipelineMetadata(choice, setExamples = true) {
     var callback = function (error, data, response) {
       if (error) {
-        showHttpError(error, response, "while loading pipeline metadata from script server");
+        setHttpError(parseHttpError(error, response, "while loading pipeline metadata from script server"));
         setPipelineMetadata(null)
       } else if (data) {
         setPipelineMetadata(data);
@@ -255,7 +233,7 @@ export function PipelinePage({ runType }) {
     setStoppable(false);
     api.stop(runType, pipStates.runId, (error, data, response) => {
       if (error) {
-        showHttpError(error, response, "in script server while stopping the pipeline");
+        setHttpError(parseHttpError(error, response, "in script server while stopping the pipeline"));
       } else {
         setHttpError("Cancelled by user");
       }
@@ -291,7 +269,6 @@ export function PipelinePage({ runType }) {
               inputFileContent={inputFileContent}
               pipStates={pipStates}
               setPipStates={setPipStates}
-              showHttpError={showHttpError}
               setResultsData={setResultsData}
               runType={runType}
             />
