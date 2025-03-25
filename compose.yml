@@ -26,6 +26,8 @@ services:
       OUTPUT_LOCATION: /output
       PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
       USE_RUNNERS: true
+    secrets:
+      - hpc_ssh_key
 
   runner-conda:
     container_name: biab-runner-conda
