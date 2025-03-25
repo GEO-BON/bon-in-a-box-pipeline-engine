@@ -15,6 +15,9 @@ import "leaflet.markercluster";
 import ReactDOMServer from "react-dom/server";
 import "./MarkerCluster.Default.css";
 import Alert from "@mui/material/Alert";
+import GeoPackageLayer from './GeoPackageLayer';
+import GeoJSONLayer from './GeoJSONLayer';
+import TifLayer from './TifLayer';
 
 // Reimport default icon for markers (the Icon would otherwise not show up)
 import icon from "leaflet/dist/images/marker-icon.png";
@@ -105,9 +108,11 @@ function MarkerGroup({ markers }) {
   return markerComponents;
 }
 
-export default function MapResult({ tiff, range, json, markers }) {
+export default function MapResult({ tiff, range, json, geopackage, markers }) {
   const [error, setError] = useState();
   const [jsonContent, setJsonContent] = useState();
+  const [geopackageContent, setGeopackageContent] = useState();
+
 
   useEffect(() => {
     if (json) {
@@ -126,6 +131,12 @@ export default function MapResult({ tiff, range, json, markers }) {
     }
   }, [json]);
 
+  useEffect(() => {
+    if (geopackage) {
+      setGeopackageContent(geopackage)
+    }
+  }, [geopackage]);
+
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
@@ -138,15 +149,20 @@ export default function MapResult({ tiff, range, json, markers }) {
       <MarkerCluster markers={markers} />
 
       {jsonContent && (
-        <GeoJSON
-          data={jsonContent}
-          eventHandlers={{
-            add: (e) => e.target._map.fitBounds(e.target.getBounds()),
-          }}
+        <GeoJSONLayer
+          geojsonOutput={jsonContent}
+          setGeojson={setJsonContent}
         />
       )}
 
-      {tiff && <TiTilerLayer url={tiff} range={range} setError={setError} />}
+      {geopackageContent && (
+        <GeoPackageLayer
+          geoPackage={geopackageContent}
+          setGeoPackage={setGeopackageContent}
+        />
+      )}
+
+      {tiff && <TiTilerLayer url={tiff} range={range} setError={setError}/>}
     </MapContainer>
   );
 }

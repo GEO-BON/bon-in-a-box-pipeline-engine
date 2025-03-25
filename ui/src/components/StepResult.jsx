@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import Map from "./map/Map";
+import MapResult from "./map/Map";
 import React from "react";
 import RenderedCSV from "./csv/RenderedCSV";
 import {
@@ -151,7 +151,7 @@ export const SingleIOResult = memo(
       switch (type) {
         case "image":
           if (isGeotiff(subtype)) {
-            return <Map tiff={content} range={ioMetadata.range} />;
+            return <MapResult tiff={content} range={ioMetadata.range} />;
           }
           return <img src={content} alt={ioMetadata.label} />;
 
@@ -187,7 +187,8 @@ export const SingleIOResult = memo(
           });
 
         case "application":
-          if (subtype === "geo+json") return <Map json={content} />;
+          if (subtype === "geo+json") return <MapResult json={content} />;
+          if (subtype.includes("geopackage")) return <MapResult geopackage={content} />;
 
           break;
 
