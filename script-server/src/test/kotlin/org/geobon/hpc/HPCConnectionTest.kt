@@ -42,7 +42,7 @@ class HPCConnectionTest {
 
     @Test
     fun givenConfigured_thenStatusAsSuch() = testApplication {
-        withEnvironment("HPC_SSH_CONFIG_NAME" to "HPC-name") {
+        withEnvironment("HPC_SSH_CREDENTIALS" to "HPC-name") {
 
             application { configureRouting() }
 
@@ -58,7 +58,7 @@ class HPCConnectionTest {
 
     @Test
     fun givenConfiguredWithBadHost_whenPreparedManually_thenGetFailureMessage() = testApplication {
-        withEnvironment("HPC_SSH_CONFIG_NAME" to "HPC-name") {
+        withEnvironment("HPC_SSH_CREDENTIALS" to "HPC-name") {
 
             application { configureRouting() }
 
