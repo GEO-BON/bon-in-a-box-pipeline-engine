@@ -34,8 +34,8 @@ private val logger: Logger = LoggerFactory.getLogger("Server")
 
 fun Application.configureRouting() {
 
-    val hpcName = System.getenv("HPC_SSH_CONFIG_NAME")
-    val hpc = HPCConnection(hpcName)
+    val hpcCredentials = System.getenv("HPC_SSH_CREDENTIALS")
+    val hpc = HPCConnection(hpcCredentials)
 
     routing {
 

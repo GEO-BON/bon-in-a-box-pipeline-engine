@@ -5,7 +5,7 @@ import kotlinx.coroutines.runBlocking
 import org.geobon.utils.runCommand
 import java.util.concurrent.TimeUnit
 
-class HPCConnection(private val sshName: String?) {
+class HPCConnection(private val sshCredentials: String?) {
 
     var juliaStatus = ApptainerImage()
     var rStatus = ApptainerImage()
@@ -13,7 +13,7 @@ class HPCConnection(private val sshName: String?) {
         get() = rStatus
 
     init {
-        if(!sshName.isNullOrBlank()){
+        if(!sshCredentials.isNullOrBlank()){
             juliaStatus.state = ApptainerImageState.CONFIGURED
             rStatus.state = ApptainerImageState.CONFIGURED
         }
@@ -37,8 +37,8 @@ class HPCConnection(private val sshName: String?) {
     }
 
     private fun prepareApptainer(apptainerImage: ApptainerImage, dockerImage: String) {
-        if(sshName.isNullOrBlank()){
-            apptainerImage.message = "Configure HPC_SSH_CONFIG_NAME before attenpting to connect to the HPC."
+        if(sshCredentials.isNullOrBlank()){
+            apptainerImage.message = "Configure HPC_SSH_CREDENTIALS before attenpting to connect to the HPC."
             return
         }
 
@@ -66,7 +66,12 @@ class HPCConnection(private val sshName: String?) {
 
             // Launch the container creation for that digest (if not already existing)
             val apptainerImageName = "${dockerImage}_$imageSha.sif"
-            val process = ProcessBuilder("ssh", sshName, """
+            val process = ProcessBuilder("ssh",
+                "-i", "/run/secrets/hpc_ssh_key",
+                "-o", "IdentitiesOnly=yes",
+                "-o", "RequestTTY=no",
+                sshCredentials,
+                """
                     if [ -f $apptainerImageName ]; then
                         echo "Image already exists: $apptainerImageName"
                     else

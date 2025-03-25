@@ -87,3 +87,7 @@ services:
       TITILER_API_CORS_ORIGINS: "*"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+secrets:
+  hpc_ssh_key:
+    file: $HPC_SSH_KEY
