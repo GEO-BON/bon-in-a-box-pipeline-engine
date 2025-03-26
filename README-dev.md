@@ -59,12 +59,12 @@ gitGraph
     branch edge
     commit
     branch feature1
+    branch feature2
     checkout feature1
     commit
     commit
     checkout edge
     merge feature1
-    branch feature2
     checkout feature2
     commit
     commit
