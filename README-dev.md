@@ -48,6 +48,36 @@ Once in a while you should use `docker compose -f compose.yml -f compose.dev.yml
 
 The servers are versionned by date of build of the docker image. One can check the version in the version tab of the UI.
 
+The most up-to-date server images are on `edge` branch, and may be unstable. The server images from `main` are considered stable and are rolled out to anyone starting a BON in a Box instance.
+
+```mermaid
+---
+title: Development to release git flow
+---
+gitGraph
+    commit
+    branch edge
+    commit
+    branch feature1
+    checkout feature1
+    commit
+    commit
+    checkout edge
+    merge feature1
+    branch feature2
+    checkout feature2
+    commit
+    commit
+    checkout edge
+    merge feature2
+    checkout main
+
+    merge edge
+
+
+
+```
+
 ### Creating a staging build
 1. Create a branch that ends with "staging" from the head of the main branch.
 2. Merge your changes to that branch. The docker hub GH action will trigger for branch main and any branch with name ending by "staging". The branch name is appended to the tag of the docker image. See
