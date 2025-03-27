@@ -85,47 +85,51 @@ function is_safe_command() {
 }
 
 function validate_complex_command() {
-    local command="$1"
+    local fullCommand="$1"
     local in_conditional=false
     local conditional_allowed=false
 
     while IFS= read -r line; do
-        # Trim whitespace using xargs
-        # xargs removes leading/trailing whitespace and condenses multiple spaces
-        line=$(echo "$line" | xargs)
+		line="${line//&&/;}"  # Replace '&&' by ';', in our case we just want them to be split.
+		IFS=';' read -ra cmds <<< "$line"
+		for cmd in "${cmds[@]}"; do
+			# Trim whitespace using xargs
+			# xargs removes leading/trailing whitespace and condenses multiple spaces
+			cmd=$(echo "$cmd" | xargs)
 
-        # Skip empty lines
-        [[ -z "$line" ]] && continue
+			# Skip empty lines
+			[[ -z "$cmd" ]] && continue
 
-        # Track conditional blocks
-        if [[ "$line" =~ ^if ]]; then
-            in_conditional=true
-            conditional_allowed=false
-        fi
+			# Track conditional blocks
+			if [[ "$cmd" =~ ^if ]]; then
+				in_conditional=true
+				conditional_allowed=false
+			fi
 
-        if [[ "$line" =~ ^\\[ ]]; then
-            conditional_allowed=true
-        fi
+			if [[ "$cmd" =~ ^\\[ ]]; then
+				conditional_allowed=true
+			fi
 
-        # In a conditional block, be more strict
-        if [[ "$in_conditional" == true ]]; then
-            # Only allow file tests or predefined safe commands
-            if [[ "$conditional_allowed" == false ]] && ! is_safe_command "$line"; then
-                return 1
-            fi
-        else
-            # Outside conditional blocks, use standard validation
-            if ! is_safe_command "$line"; then
-                return 1
-            fi
-        fi
+			# In a conditional block, be more strict
+			if [[ "$in_conditional" == true ]]; then
+				# Only allow file tests or predefined safe commands
+				if [[ "$conditional_allowed" == false ]] && ! is_safe_command "$line"; then
+					return 1
+				fi
+			else
+				# Outside conditional blocks, use standard validation
+				if ! is_safe_command "$cmd"; then
+					return 1
+				fi
+			fi
 
-        # Reset conditional tracking
-        if [[ "$line" == "fi" ]]; then
-            in_conditional=false
-            conditional_allowed=false
-        fi
-    done <<< "$command"
+			# Reset conditional tracking
+			if [[ "$cmd" == "fi" ]]; then
+				in_conditional=false
+				conditional_allowed=false
+			fi
+		done
+    done <<< "$fullCommand"
 
     return 0
 }
@@ -149,6 +153,7 @@ function test_command_filter() {
         "apptainer build image.sif docker://ubuntu=PASS"
 
         "module load python; forbiddenCommand=FAIL" # this test is failing
+        "module load python && forbiddenCommand=FAIL" # this test is failing
         "forbiddenCommand=FAIL"
         "lspasswd=FAIL" # this one starts with ls (allowed) but has a non-allowed ending.
         "if [ -f /nonexistent ];
