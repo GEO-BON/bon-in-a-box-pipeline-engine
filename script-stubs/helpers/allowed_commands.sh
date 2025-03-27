@@ -182,7 +182,7 @@ function test_command_filter() {
 	done
 
 	echo "--------------------------------"
-	if $passed ; then
+	if $passed; then
 		echo "Test suite completed successfully"
 	else
 		echo -e "${RED}Test suite completed with errors${ENDCOLOR}"
@@ -199,17 +199,11 @@ if [[ "$SSH_ORIGINAL_COMMAND" == "test_command_filter" || $1 == "test_command_fi
 fi
 
 # Check script name condition from original DRAC sample script
-if [[ "$THIS_SCRIPT" == "allowed_commands.sh" || "$THIS_SCRIPT" == "slurm_commands.sh" ]]; then
-	while IFS= read -r cmd; do
-		# Trim whitespace using xargs
-		cmd=$(echo "$cmd" | xargs)
-		[[ -z "$cmd" ]] && continue
-
-		# Validate and execute
-		if validate_complex_command "$cmd"; then
-			bash -c "$cmd"
-		fi
-	done <<<"$SSH_ORIGINAL_COMMAND"
+if [[ "$THIS_SCRIPT" == "allowed_commands.sh" ]]; then
+	# Validate and execute
+	if validate_complex_command "$SSH_ORIGINAL_COMMAND"; then
+		bash -c "$SSH_ORIGINAL_COMMAND"
+	fi
 else
 	reject_command "$SSH_ORIGINAL_COMMAND"
 fi
