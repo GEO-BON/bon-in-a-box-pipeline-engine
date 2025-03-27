@@ -2,23 +2,36 @@
 
 THIS_SCRIPT=$(basename $0)
 
+RED="\033[31m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+ENDCOLOR="\033[0m"
+
+testing=false
+
 function reject_command() {
-	echo "Command rejected by $THIS_SCRIPT: $1"
+	echo -e "${YELLOW}Command rejected by $THIS_SCRIPT: $1${ENDCOLOR}"
 	logger -t automation -p local0.info "Command rejected by $THIS_SCRIPT for user $USER: $1"
-	exit 1
+	if ! $testing; then
+		exit 1
+	fi
 }
 
 function is_safe_command() {
 	local cmd="$1"
+
+	# In case we are inside an if, ignore the "then" keyword
+	cmd=$(echo "$cmd" | sed 's/^then //')
+
 	local safe_patterns=(
 		# always available commands
-		"^ls "
+		"^ls( |$)"
 		"^cat "
 		"^cd "
 		"^echo "
-		"^uname "
-		"^id "
-		"^groups "
+		"^uname( |$)"
+		"^id( |$)"
+		"^groups( |$)"
 		# file commands
 		"^mv "
 		"^cp "
@@ -51,8 +64,8 @@ function is_safe_command() {
 		"^apptainer "
 		# conditionals
 		"^if "
-		"^fi "
-		"^else "
+		"^fi( |$)"
+		"^else( |$)"
 		"^elif "
 	)
 
@@ -100,33 +113,9 @@ function validate_complex_command() {
 			# Skip empty lines
 			[[ -z "$cmd" ]] && continue
 
-			# Track conditional blocks
-			if [[ "$cmd" =~ ^if ]]; then
-				in_conditional=true
-				conditional_allowed=false
-			fi
-
-			if [[ "$cmd" =~ ^\\[ ]]; then
-				conditional_allowed=true
-			fi
-
-			# In a conditional block, be more strict
-			if [[ "$in_conditional" == true ]]; then
-				# Only allow file tests or predefined safe commands
-				if [[ "$conditional_allowed" == false ]] && ! is_safe_command "$line"; then
-					return 1
-				fi
-			else
-				# Outside conditional blocks, use standard validation
-				if ! is_safe_command "$cmd"; then
-					return 1
-				fi
-			fi
-
-			# Reset conditional tracking
-			if [[ "$cmd" == "fi" ]]; then
-				in_conditional=false
-				conditional_allowed=false
+			if ! is_safe_command "$cmd"; then
+				reject_command "$cmd"
+				return 1
 			fi
 		done
 	done <<<"$fullCommand"
@@ -135,9 +124,7 @@ function validate_complex_command() {
 }
 
 function test_command_filter() {
-	RED="\033[31m"
-	GREEN="\033[32m"
-	ENDCOLOR="\033[0m"
+	testing=true
 
 	# Command, Expected Result (PASS/FAIL)
 	local test_cases=(
@@ -148,7 +135,8 @@ function test_command_filter() {
 		"rm some_file=PASS"
 		"rm -rf some_folder=PASS"
 		"if [ -d /tmp ]; then echo 'Directory exists'; else echo 'No directory'; fi=PASS"
-		"if [ -f /nonexistent ]; then rm important_file; fi=PASS"
+		"if [ -f /nonexistent ]; then rm some_file; fi=PASS"
+		"if [ -f /nonexistent ]; then rm some_file; fi ; ls=PASS"
 		"module load python=PASS"
 		"apptainer build image.sif docker://ubuntu=PASS"
 
@@ -156,6 +144,8 @@ function test_command_filter() {
 		"module load python && forbiddenCommand=FAIL" # this test is failing
 		"forbiddenCommand=FAIL"
 		"lspasswd=FAIL" # this one starts with ls (allowed) but has a non-allowed ending.
+		"if [ -f /nonexistent ]; then forbiddenCommand; fi=FAIL"
+		"if [ -f /nonexistent && forbiddenCommand ]; then ls; fi=FAIL"
 		"if [ -f /nonexistent ];
             forbiddenCommand
         fi=FAIL" # this test is failing
@@ -208,8 +198,6 @@ if [[ "$THIS_SCRIPT" == "allowed_commands.sh" || "$THIS_SCRIPT" == "slurm_comman
 		# Validate and execute
 		if validate_complex_command "$cmd"; then
 			bash -c "$cmd"
-		else
-			reject_command "$cmd"
 		fi
 	done <<<"$SSH_ORIGINAL_COMMAND"
 else
