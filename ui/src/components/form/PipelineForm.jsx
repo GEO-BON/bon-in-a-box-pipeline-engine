@@ -42,7 +42,7 @@ export function PipelineForm({
     var callback = function (error, runId, response) {
       if (error) {
         // Server / connection errors. Data will be undefined.
-        showHttpError(error, response);
+        showHttpError(error, response, "while launching pipeline on script server");
       } else if (runId) {
         const parts = runId.split(">");
         let runHash = parts.at(-1);
@@ -53,7 +53,7 @@ export function PipelineForm({
 
         navigate("/" + runType + "-form/" + pipelineForUrl + "/" + runHash);
       } else {
-        showHttpError("Server returned empty result");
+        showHttpError("Server returned empty result", null, "while getting run ID from script server");
       }
     };
 
