@@ -206,4 +206,8 @@ To connect to the DRAC automation node, you will need
 - Manual authorisation from tech support
 - The IP address of your server or PC can be obtained with `curl ifcfg.me`.
 - The [allowed_commands.sh](./script-stubs/helpers/allowed_commands.sh) script, with execute permissions in the node.
-- Follow [these instructions](https://docs.alliancecan.ca/wiki/Automation_in_the_context_of_multifactor_authentication/)
+
+1. Follow [these instructions](https://docs.alliancecan.ca/wiki/Automation_in_the_context_of_multifactor_authentication/)
+2. Connect to the automation now via SSH, and accept the fingerprint of the HPC's node. This is mandatory since known_hosts will be used to connect.
+3. Configure all the HPC_ environment variables in runner.env. (Make sure your runner.env contains all the HPC_ variables in the up-to-date runner-sample.env)
+4. Start the BON in a Box server normally.

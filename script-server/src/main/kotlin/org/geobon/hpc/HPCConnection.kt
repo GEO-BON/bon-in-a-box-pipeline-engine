@@ -70,6 +70,7 @@ class HPCConnection(private val sshCredentials: String?) {
                 "-i", "/run/secrets/hpc_ssh_key",
                 "-o", "IdentitiesOnly=yes",
                 "-o", "RequestTTY=no",
+                "-o",  "UserKnownHostsFile=/run/secrets/hpc_known_hosts",
                 sshCredentials,
                 """
                     if [ -f $apptainerImageName ]; then

@@ -28,6 +28,7 @@ services:
       USE_RUNNERS: true
     secrets:
       - hpc_ssh_key
+      - hpc_known_hosts
 
   runner-conda:
     container_name: biab-runner-conda
@@ -93,3 +94,5 @@ services:
 secrets:
   hpc_ssh_key:
     file: $HPC_SSH_KEY
+  hpc_known_hosts:
+    file: $HPC_KNOWN_HOSTS_FILE
