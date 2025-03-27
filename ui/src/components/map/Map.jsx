@@ -17,7 +17,6 @@ import "./MarkerCluster.Default.css";
 import Alert from "@mui/material/Alert";
 import GeoPackageLayer from './GeoPackageLayer';
 import GeoJSONLayer from './GeoJSONLayer';
-import TifLayer from './TifLayer';
 
 // Reimport default icon for markers (the Icon would otherwise not show up)
 import icon from "leaflet/dist/images/marker-icon.png";
