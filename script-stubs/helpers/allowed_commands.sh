@@ -7,8 +7,6 @@ GREEN="\033[32m"
 YELLOW="\033[33m"
 ENDCOLOR="\033[0m"
 
-testing=false
-
 function reject_command() {
 	echo -e "${YELLOW}Command rejected by $THIS_SCRIPT: $1${ENDCOLOR}"
 	logger -t automation -p local0.info "Command rejected by $THIS_SCRIPT for user $USER: $1"
@@ -67,6 +65,10 @@ function is_safe_command() {
 		"^fi( |$)"
 		"^else( |$)"
 		"^elif "
+
+		# DO NOT ALLOW "sed"!
+		# someone could do
+		# sed -i 's/\# Validate and execute/testing=true/' allowed_commands.sh
 	)
 
 	local safe_file_tests=(
@@ -125,9 +127,11 @@ function validate_complex_command() {
 
 function test_command_filter() {
 	testing=true
+	passed=true
 
 	# Command, Expected Result (PASS/FAIL)
 	local test_cases=(
+		## Supposed to PASS
 		"ls -l=PASS"
 		"cat file.txt=PASS"
 		"if [ -f image.sif ]; then apptainer build image.sif docker://ubuntu; fi=PASS"
@@ -140,6 +144,7 @@ function test_command_filter() {
 		"module load python=PASS"
 		"apptainer build image.sif docker://ubuntu=PASS"
 
+		## Supposed to FAIL
 		"module load python; forbiddenCommand=FAIL"   # this test is failing
 		"module load python && forbiddenCommand=FAIL" # this test is failing
 		"forbiddenCommand=FAIL"
@@ -172,11 +177,16 @@ function test_command_filter() {
 			echo -e "${GREEN}PASS ✓ ${ENDCOLOR}(Expected: $expected, Got: $result)"
 		else
 			echo -e "${RED}FAIL ✗ (Expected: $expected, Got: $result)${ENDCOLOR}"
+			passed=false
 		fi
 	done
 
 	echo "--------------------------------"
-	echo "Test Suite Completed"
+	if $passed ; then
+		echo "Test suite completed successfully"
+	else
+		echo -e "${RED}Test suite completed with errors${ENDCOLOR}"
+	fi
 }
 
 # Main execution logic
