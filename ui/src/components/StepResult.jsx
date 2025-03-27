@@ -56,7 +56,7 @@ function FallbackDisplay({ content }) {
     (typeof content.startsWith === "function" && content.startsWith("http"))
   ) {
     // Match for tiff, TIFF, tif or TIF extensions
-    if (/\.tiff?$/i.test(content)) return <Map tiff={content} />;
+    if (/\.tiff?$/i.test(content)) return <MapResult tiff={content} />;
     else if (/\.html$/i.test(content))
       return (
         <a href={content} target="_blank" rel="noreferrer">
