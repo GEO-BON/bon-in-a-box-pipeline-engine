@@ -161,7 +161,10 @@ function test_command_filter() {
     echo "--------------------------------"
 
     for test_case in "${test_cases[@]}"; do
-        IFS='=' read -r cmd expected <<< "$test_case"
+        # Use parameter expansion to split the last '=' occurrence
+        cmd="${test_case%=*}"
+        expected="${test_case##*=}"
+
         echo "Testing command: '$cmd'"
 
         if validate_complex_command "$cmd"; then
