@@ -13,6 +13,7 @@ export function parseCsvToRowsAndColumn(csvText, csvColumnDelimiter = '\t') {
     return rows.map(row => row.split(csvColumnDelimiter));
 }
 
+
 const CsvToHtmlTable = ({
   data,
   csvDelimiter,
