@@ -31,7 +31,7 @@ Prerequisites:
     -   **For Mac users:** Make sure to check the chip of your machine and download the correct version.
         -   If there is an error message when running `docker run --rm hello-world`, see <https://stackoverflow.com/a/71923962/3519951>
         -   If you encounter error `no matching manifest for linux/arm64/v8 in the manifest list entries`, export DOCKER_DEFAULT_PLATFORM. See <https://stackoverflow.com/a/76404045/3519951>.
-        -   If you have a Silicon chip, check "Use Rosetta for x86_64/amd64 emulation on Apple Silicon". See [issue #175](https://github.com/GEO-BON/bon-in-a-box-pipelines/issues/175).
+        -   If you have a Silicon chip, check "Use Rosetta for x86_64/amd64 emulation on Apple Silicon" in the Docker Desktop preferences. See [issue #175](https://github.com/GEO-BON/bon-in-a-box-pipelines/issues/175).
     -   **For linux users:** Make sure to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/)
 
 ### Step 2: Generate SSH Key
