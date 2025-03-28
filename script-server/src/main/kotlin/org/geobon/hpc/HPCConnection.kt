@@ -12,6 +12,10 @@ class HPCConnection(private val sshCredentials: String?) {
     val pythonStatus: ApptainerImage
         get() = rStatus
 
+    val configured: Boolean
+        get() = rStatus.state != ApptainerImageState.NOT_CONFIGURED
+            && juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
+
     init {
         if(!sshCredentials.isNullOrBlank()){
             juliaStatus.state = ApptainerImageState.CONFIGURED

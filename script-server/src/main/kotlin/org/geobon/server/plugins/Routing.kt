@@ -20,6 +20,9 @@ import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+
 /**
  * Used to transport paths through path param.
  * Folder tree not supported, see https://github.com/OAI/OpenAPI-Specification/issues/892
@@ -278,10 +281,21 @@ fun Application.configureRouting() {
             ))
         }
 
-// TODO: OpenAPI spec or remove
+// TODO: OpenAPI spec
         get("/api/hpc/prepare") {
-            hpc.prepare()
-            call.respond(HttpStatusCode.OK)
+            if(!hpc.configured) {
+                call.respond(HttpStatusCode.ServiceUnavailable, "HPC not configured on this server")
+                return@get
+            }
+
+            runBlocking {
+                launch {
+                    hpc.prepare()
+                }
+
+                // We respond OK immediately when started, status API can be checked for progress.
+                call.respond(HttpStatusCode.OK)
+            }
         }
 
         get("/api/versions") {
