@@ -18,9 +18,6 @@ function reject_command() {
 function is_safe_command() {
 	local cmd="$1"
 
-	# In case we are inside an if, ignore the "then" keyword
-	cmd=$(echo "$cmd" | sed 's/^then //')
-
 	local safe_patterns=(
 		# always available commands
 		"^ls( |$)"
@@ -112,6 +109,9 @@ function validate_complex_command() {
 			# xargs removes leading/trailing whitespace and condenses multiple spaces
 			cmd=$(echo "$cmd" | xargs)
 
+			# In case we are inside an if, ignore the "then" keyword
+			cmd=$(echo "$cmd" | sed 's/^then\( \|$\)//')
+
 			# Skip empty lines
 			[[ -z "$cmd" ]] && continue
 
@@ -143,6 +143,13 @@ function test_command_filter() {
 		"if [ -f /nonexistent ]; then rm some_file; fi ; ls=PASS"
 		"module load python=PASS"
 		"apptainer build image.sif docker://ubuntu=PASS"
+		'if [ -f apptainerImageName ]; then
+			echo "Image already exists: apptainerImageName"
+		else
+			module load apptainer
+			apptainer build apptainerImageName docker://imageDigest
+			echo "Image created: apptainerImageName"
+		fi=PASS'
 
 		## Supposed to FAIL
 		"module load python; forbiddenCommand=FAIL"   # this test is failing
