@@ -998,11 +998,15 @@ export default function PipelineEditor(props) {
   }, []);
 
   useEffect(() => {
-    setUnsavedChanges(
-      (savedJSON === null && nodes.length !== 0) // new and not empty
-      || (savedJSON !== null && savedJSON !== generateSaveJSON()) // existing and modified
-    )
-  }, [nodes, edges, savedJSON, inputList, outputList, metadata, handleBeforeUnload]);
+    const updateSavedStateTimeout = setTimeout(() => {
+      setUnsavedChanges(
+        (savedJSON === null && nodes.length !== 0) // new and not empty
+        || (savedJSON !== null && savedJSON !== generateSaveJSON()) // existing and modified
+      )
+    }, 500)
+
+    return () => clearTimeout(updateSavedStateTimeout)
+  }, [nodes, edges, savedJSON, inputList, outputList, metadata, handleBeforeUnload, generateSaveJSON]);
 
   useEffect(() => {
     if(hasUnsavedChanges) {
@@ -1043,7 +1047,7 @@ export default function PipelineEditor(props) {
       <p className="documentationLink">
         Need help? Check out{" "}
         <a
-          href="https://github.com/GEO-BON/biab-2.0/#pipelines"
+          href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor"
           target="_blank"
           rel="noreferrer"
         >

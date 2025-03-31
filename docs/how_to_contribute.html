@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.6.41">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -69,10 +69,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-48ffa3e5b9d089919c6712c39e5b00f2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-87edd68557743b7c59846ba2f8eca337.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -205,7 +205,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#reporting-problems" id="toc-reporting-problems" class="nav-link" data-scroll-target="#reporting-problems">Reporting problems</a></li>
   <li><a href="#testing-your-script" id="toc-testing-your-script" class="nav-link" data-scroll-target="#testing-your-script">Testing your script</a></li>
   </ul></li>
-  <li><a href="#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor." id="toc-step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor." class="nav-link" data-scroll-target="#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor.">Step 5: Connect your scripts with the BON in a Box pipeline editor.</a>
+  <li><a href="#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" id="toc-step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" class="nav-link" data-scroll-target="#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor">Step 5: Connect your scripts with the BON in a Box pipeline editor</a>
   <ul class="collapse">
   <li><a href="#pipeline-editor" id="toc-pipeline-editor" class="nav-link" data-scroll-target="#pipeline-editor">Pipeline editor</a></li>
   <li><a href="#pipeline-inputs-and-outputs" id="toc-pipeline-inputs-and-outputs" class="nav-link" data-scroll-target="#pipeline-inputs-and-outputs">Pipeline inputs and outputs</a></li>
@@ -824,7 +824,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
 <div class="sourceCode" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> intIn <span class="op">&lt;</span> <span class="dv">0</span> :</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  biab_error_stop(<span class="st">"intIn &lt; 0, you're not lucky! This causes failure."</span>)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Other Python helper functions</span></span>
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>biab_warning(<span class="st">"This warning will appear in the UI, but does not stop the pipeline."</span>)</span>
 <span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>biab_info(<span class="st">"This message will appear in the UI."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -839,8 +839,8 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>You can test your script in the “run script” tab of the tool, where your inputs will generate a form where you can put examples and run the script for debugging.</p>
 </section>
 </section>
-<section id="step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor." class="level2">
-<h2 class="anchored" data-anchor-id="step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor.">Step 5: Connect your scripts with the BON in a Box pipeline editor.</h2>
+<section id="step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" class="level2">
+<h2 class="anchored" data-anchor-id="step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor">Step 5: Connect your scripts with the BON in a Box pipeline editor</h2>
 <p>Next, create your pipeline in the BON in a Box pipeline editor by connecting your inputs and outputs.</p>
 <p>Once you have saved your scripts and YAML files to your local computer in the Bon-in-a-box pipelines folder that was cloned from GitHub, they will show up as scripts in the pipeline editor. You can drag the scripts into the editor and connect the inputs and outputs to create your pipeline.</p>
 <p>A pipeline is a collection of steps that are connected to automate an analysis workflow. Each script becomes a pipeline step.</p>
@@ -994,8 +994,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1106,7 +1104,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
