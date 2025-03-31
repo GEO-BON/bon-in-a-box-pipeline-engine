@@ -93,6 +93,7 @@ export const IOListPane = ({
 function IOList({ list, setList, editSession, selectedNodes, extractId }) {
 
   const idList = list.map((input) => extractId(input));
+  const [isDragging, setDragging] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -104,14 +105,16 @@ function IOList({ list, setList, editSession, selectedNodes, extractId }) {
   const handleDragEnd = useCallback(
     (event) => {
       reorder(event, setList, extractId);
+      setDragging(false);
     },
-    [setList]
+    [setDragging, setList]
   );
 
   return <div>
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      onDragStart={() => setDragging(true)}
       onDragEnd={handleDragEnd}
       modifiers={[restrictToVerticalAxis, restrictToParentElement]}
     >
@@ -128,6 +131,7 @@ function IOList({ list, setList, editSession, selectedNodes, extractId }) {
               valueEdited={valueEdited}
               key={editSession + "|" + ioId}
               id={ioId}
+              expand={!isDragging}
               className={
                 selectedNodes.find((node) => node.id === listItem.nodeId)
                   ? "selected"
