@@ -24,7 +24,7 @@ function GeoJSONLayer(props) {
         fillOpacity: 0.5,
       };
       const l = L.geoJSON(geojsonOutput, {
-        attribution: "io",
+        attribution: "BON in a Box",
         pointToLayer: function (feature, latlng) {
           return L.circleMarker(latlng, markerStyle);
         },
