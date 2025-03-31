@@ -35,35 +35,10 @@ export const IOListPane = ({
 }) => {
   const [collapsedPane, setCollapsedPane] = useState(true);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  const handleInputDragEnd = useCallback(
-    (event) => {
-      reorder(event, setInputList, toInputId);
-    },
-    [setInputList]
-  );
-
-  const handleOutputDragEnd = useCallback(
-    (event) => {
-      reorder(event, setOutputList, toOutputId);
-    },
-    [setOutputList]
-  );
-
-  const inputIdList = inputList.map((input) => toInputId(input));
-  const outputIdList = outputList.map((output) => toOutputId(output));
-
   return (
     <div
-      className={`rightPane ioList ${
-        collapsedPane ? "paneCollapsed" : "paneOpen"
-      }`}
+      className={`rightPane ioList ${collapsedPane ? "paneCollapsed" : "paneOpen"
+        }`}
     >
       <div
         className="collapseTab"
@@ -84,83 +59,87 @@ export const IOListPane = ({
       </div>
       <div className="rightPaneInner">
         <h3>User inputs</h3>
-        <div>
-          {inputList.length === 0 ? (
-            "No inputs"
-          ) : (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleInputDragEnd}
-              modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-            >
-              <SortableContext
-                items={inputIdList}
-                strategy={verticalListSortingStrategy}
-              >
-                {inputList.map((input, i) => {
-                  const ioId = inputIdList[i];
-                  return (
-                    <IOListItem
-                      io={input}
-                      setter={setInputList}
-                      valueEdited={valueEdited}
-                      key={editSession + "|" + ioId}
-                      id={ioId}
-                      className={
-                        selectedNodes.find((node) => node.id === input.nodeId)
-                          ? "selected"
-                          : ""
-                      }
-                    />
-                  );
-                })}
-              </SortableContext>
-            </DndContext>
-          )}
-        </div>
+        {inputList.length === 0 ? (
+          "No inputs"
+        ) : (
+          <IOList
+            list={inputList}
+            setList={setInputList}
+            editSession={editSession}
+            selectedNodes={selectedNodes}
+            extractId={toInputId}
+          />
+        )}
+
         <h3>Pipeline outputs</h3>
         {outputList.length === 0 ? (
           <Alert severity="error">
             At least one output is needed for the pipeline to run
           </Alert>
         ) : (
-          <div>
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleOutputDragEnd}
-              modifiers={[restrictToVerticalAxis, restrictToParentElement]}
-            >
-              <SortableContext
-                items={outputIdList}
-                strategy={verticalListSortingStrategy}
-              >
-                {outputList.map((output, i) => {
-                  const ioId = outputIdList[i];
-                  return (
-                    <IOListItem
-                      io={output}
-                      setter={setOutputList}
-                      valueEdited={valueEdited}
-                      key={editSession + "|" + ioId}
-                      id={ioId}
-                      className={
-                        selectedNodes.find((node) => node.id === output.nodeId)
-                          ? "selected"
-                          : ""
-                      }
-                    />
-                  );
-                })}
-              </SortableContext>
-            </DndContext>
-          </div>
+          <IOList
+            list={outputList}
+            setList={setOutputList}
+            editSession={editSession}
+            selectedNodes={selectedNodes}
+            extractId={toOutputId}
+          />
         )}
       </div>
     </div>
   );
 };
+
+function IOList({ list, setList, editSession, selectedNodes, extractId }) {
+
+  const idList = list.map((input) => extractId(input));
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = useCallback(
+    (event) => {
+      reorder(event, setList, extractId);
+    },
+    [setList]
+  );
+
+  return <div>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+    >
+      <SortableContext
+        items={idList}
+        strategy={verticalListSortingStrategy}
+      >
+        {list.map((listItem, i) => {
+          const ioId = idList[i];
+          return (
+            <IOListItem
+              io={listItem}
+              setter={setList}
+              valueEdited={valueEdited}
+              key={editSession + "|" + ioId}
+              id={ioId}
+              className={
+                selectedNodes.find((node) => node.id === listItem.nodeId)
+                  ? "selected"
+                  : ""
+              }
+            />
+          );
+        })}
+      </SortableContext>
+    </DndContext>
+  </div>
+}
 
 function reorder(event, setItems, getItemId) {
   const { active, over } = event;
