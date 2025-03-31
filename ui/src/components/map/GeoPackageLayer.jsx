@@ -27,6 +27,7 @@ function GeoPackageLayer(props) {
           attribution: "BON in a Box",
         });
         l.addTo(fg);
+        l.addTo(map);
         geoP.close();
       });
       return fg;
@@ -37,21 +38,13 @@ function GeoPackageLayer(props) {
   };
 
   useEffect(() => {
-    if (!map) return;
-    map.on("layeradd", (e) => {
-      if (e.layer && e.layer.getBounds()) {
-        map.fitBounds(e.layer.getBounds());
-      }
-    });
-  }, [map]);
-
-  useEffect(() => {
     let ignore = false;
     setSqljsWasmLocateFile((file) => sqlWasmUrl);
     if (geoPackage !== "" && map) {
-      loadGeoPackage(geoPackage).then((fg) => {
-        if (!ignore && fg) {
-          fg.addTo(map);
+      loadGeoPackage(geoPackage).then((f) => {
+        const bounds = L.latLngBounds(f.getBounds());
+        if (bounds.isValid()) {
+          map.fitBounds(bounds);
         }
       });
     }
