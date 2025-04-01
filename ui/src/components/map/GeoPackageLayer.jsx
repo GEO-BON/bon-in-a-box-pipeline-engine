@@ -42,10 +42,13 @@ function GeoPackageLayer(props) {
     setSqljsWasmLocateFile((file) => sqlWasmUrl);
     if (geoPackage !== "" && map) {
       loadGeoPackage(geoPackage).then((f) => {
-        const bounds = L.latLngBounds(f.getBounds());
-        if (bounds.isValid()) {
-          map.fitBounds(bounds);
-        }
+        setTimeout(() => { //Necessary to wait for the layer to load before setting the bounds
+          if (ignore) return;
+          const bounds = L.latLngBounds(f.getBounds());
+          if (bounds.isValid()) {
+            map.fitBounds(bounds);
+          }
+        }, 500);
       });
     }
     return () => {
