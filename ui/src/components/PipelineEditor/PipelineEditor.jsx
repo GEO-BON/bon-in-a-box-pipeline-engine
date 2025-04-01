@@ -400,6 +400,8 @@ export default function PipelineEditor(props) {
 
       setInputList((previousInputs) => {
         let newUserInputs = [];
+        // Assign temporary weights to preserve sorting order with new inputs
+        previousInputs.forEach((previousInput, i) => previousInput.weight = i)
 
         allNodes.forEach((node) => {
           if (node.data) {
@@ -471,7 +473,11 @@ export default function PipelineEditor(props) {
         });
 
         newUserInputs = newUserInputs.sort((a, b) => a.weight - b.weight)
-        return _lang.isEqual(previousInputs, newUserInputs) ? previousInputs : newUserInputs;
+        const selectedList = _lang.isEqual(previousInputs, newUserInputs) ? previousInputs : newUserInputs;
+
+        // Remove temporary weights from selected list
+        selectedList.forEach(i => delete i.weight);
+        return selectedList
       });
     },
     [setInputList, getDescriptionFromConnection]
@@ -552,6 +558,9 @@ export default function PipelineEditor(props) {
     });
 
     setOutputList((previousOutputs) => {
+      // Assign temporary weights to preserve sorting order with new outputs
+      previousOutputs.forEach((previousOutput, i) => previousOutput.weight = i)
+
       newPipelineOutputs = newPipelineOutputs.map((newOutput) => {
         const previousOutput = previousOutputs.find(
           (prev) =>
@@ -569,7 +578,11 @@ export default function PipelineEditor(props) {
       })
 
       newPipelineOutputs = newPipelineOutputs.sort((a, b) => a.weight - b.weight)
-      return _lang.isEqual(previousOutputs, newPipelineOutputs) ? previousOutputs : newPipelineOutputs
+      const selectedList = _lang.isEqual(previousOutputs, newPipelineOutputs) ? previousOutputs : newPipelineOutputs;
+
+      // Remove temporary weights from selected list
+      selectedList.forEach((o) => delete o.weight);
+      return selectedList
     });
     // Everytime the edge changes, there might be a new connection to an output block.
   }, [edges, reactFlowInstance, setOutputList, getDescriptionFromConnection]);
@@ -858,6 +871,7 @@ export default function PipelineEditor(props) {
         });
       }
       inputsFromFile = inputsFromFile.sort((a, b) => a.weight - b.weight)
+      inputsFromFile.forEach((i) => delete i.weight);
       setInputList(inputsFromFile);
 
       // Read outputs
@@ -875,6 +889,7 @@ export default function PipelineEditor(props) {
         });
       }
       outputsFromFile = outputsFromFile.sort((a, b) => a.weight - b.weight)
+      outputsFromFile.forEach((o) => delete o.weight);
       setOutputList(outputsFromFile);
 
       // Read nodes
