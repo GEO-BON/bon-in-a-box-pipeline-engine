@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from "react";
+import React, { useCallback, useState } from "react";
 import { toInputId, toOutputId } from "../../utils/IOId";
 import Alert from "@mui/material/Alert";
 import {
@@ -94,35 +94,12 @@ function IOList({ list, setList, editSession, selectedNodes, extractId }) {
 
   const idList = list.map((input) => extractId(input));
   const [isDragging, setDragging] = useState(false);
-  const listContainer = useRef()
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
-  );
-
-  const handleDragStart = useCallback(
-    // TODO: Here, fix the offset. Update needed?
-    (event, nativeEvent) => {
-      console.log(event, "native", nativeEvent)
-      try {
-        const sortable = event.active.data.current.sortable
-        console.log(sortable)
-        const node = listContainer.current.childNodes[sortable.index]
-        console.log(node)
-        const rect = node.getBoundingClientRect()
-        console.log(rect)
-        const centerY = (rect.top + rect.bottom) / 2
-        console.log(centerY)
-
-      } catch (e) {
-        console.error(e)
-      }
-      setDragging(true);
-    },
-    [setDragging]
   );
 
   const handleDragEnd = useCallback(
@@ -133,11 +110,11 @@ function IOList({ list, setList, editSession, selectedNodes, extractId }) {
     [setDragging, setList]
   );
 
-  return <div ref={listContainer}>
+  return <div>
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
+      onDragStart={() => setDragging(true)}
       onDragEnd={handleDragEnd}
       modifiers={[restrictToVerticalAxis, restrictToParentElement]}
     >
