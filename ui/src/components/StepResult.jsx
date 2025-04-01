@@ -123,6 +123,8 @@ export const SingleIOResult = memo(
       if (mime.endsWith("[]") && Array.isArray(content)) {
         if (
           type === "image" ||
+          type === "object" ||
+          type === "application" ||
           mime.startsWith("text/csv") ||
           mime.startsWith("text/tab-separated-values")
         ) {
