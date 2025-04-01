@@ -369,7 +369,7 @@
   background-color: white;
 }
 
-.ioList .ioListItem.dragging {
+.ioList .ioListItem.dragging.collapsed {
   background-color: lightgreen;
 }
 
@@ -385,6 +385,25 @@
 .ioListItem .MuiInputBase-input{
   font-size:0.7em;
   padding: 2px;
+}
+
+.collapseButton,
+.expandButton {
+  height: 2rem;
+  z-index: 1000;
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  padding: 3px;
+  border: 1px solid lightgrey;
+  background: whitesmoke;
+  border-radius: 5px;
+}
+
+.collapseButton:hover,
+.expandButton:hover {
+  background-color: lightgrey;
+  cursor: pointer;
 }
 
 .collapseTab {

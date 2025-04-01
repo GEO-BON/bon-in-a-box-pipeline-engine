@@ -26,7 +26,8 @@ export function IOListItem({ io, id, valueEdited, setter, className, expand }) {
         zIndex: isDragging ? 1000 : 0, /* Dragged element above the rest */
     };
 
-    return <div ref={setNodeRef} {...attributes} style={style} className={"ioListItem" + (isDragging ? " dragging" : "")}>
+    return <div ref={setNodeRef} {...attributes} style={style}
+        className={"ioListItem" + (isDragging ? " dragging" : "") + (expand ? " expanded" : " collapsed")}>
         <table>
             <tbody>
                 <tr>

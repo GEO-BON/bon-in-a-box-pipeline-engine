@@ -1,6 +1,9 @@
 import React, { useCallback, useState } from "react";
 import { toInputId, toOutputId } from "../../utils/IOId";
 import Alert from "@mui/material/Alert";
+import collapseImg from "../../img/arrows-collapse.svg"
+import expandImg from "../../img/arrows-expand.svg"
+
 import {
   DndContext,
   closestCenter,
@@ -34,6 +37,7 @@ export const IOListPane = ({
   editSession,
 }) => {
   const [collapsedPane, setCollapsedPane] = useState(true);
+  const [areItemsCollapsed, setItemsCollapsed] = useState(false);
 
   return (
     <div
@@ -58,6 +62,10 @@ export const IOListPane = ({
         </>
       </div>
       <div className="rightPaneInner">
+        {areItemsCollapsed
+          ? <img src={expandImg} className="expandButton" alt="expand" title="Expand to edit descriptions and examples" onClick={(_) => setItemsCollapsed(false)} />
+          : <img src={collapseImg} className="collapseButton" alt="collapse" title="Collapse to reorder inputs and outputs" onClick={(_) => setItemsCollapsed(true)} />
+        }
         <h3>User inputs</h3>
         {inputList.length === 0 ? (
           "No inputs"
@@ -68,6 +76,7 @@ export const IOListPane = ({
             editSession={editSession}
             selectedNodes={selectedNodes}
             extractId={toInputId}
+            expandItems={!areItemsCollapsed}
           />
         )}
 
@@ -83,6 +92,7 @@ export const IOListPane = ({
             editSession={editSession}
             selectedNodes={selectedNodes}
             extractId={toOutputId}
+            expandItems={!areItemsCollapsed}
           />
         )}
       </div>
@@ -90,7 +100,7 @@ export const IOListPane = ({
   );
 };
 
-function IOList({ list, setList, editSession, selectedNodes, extractId }) {
+function IOList({ list, setList, editSession, selectedNodes, extractId, expandItems }) {
 
   const idList = list.map((input) => extractId(input));
   const [isDragging, setDragging] = useState(false);
@@ -131,7 +141,7 @@ function IOList({ list, setList, editSession, selectedNodes, extractId }) {
               valueEdited={valueEdited}
               key={editSession + "|" + ioId}
               id={ioId}
-              expand={!isDragging}
+              expand={expandItems}
               className={
                 selectedNodes.find((node) => node.id === listItem.nodeId)
                   ? "selected"
