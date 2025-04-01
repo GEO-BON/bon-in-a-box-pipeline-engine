@@ -81,12 +81,18 @@ function CsvToMap({ url, delimiter }) {
   const [error, setError] = useState();
   const [data, setData] = useState(null);
 
-
-
   useEffect(() => {
     CsvToGeojson(url, delimiter)
       .then((result) => {
-        setData(result);
+        if(result.error){
+          setError(result.error);
+          return;
+        }
+        if(result.features?.length==0){
+          setError("No coordinates found in this CSV file.");
+          return
+        }
+        setData(result);  
       })
       .catch((error) => {
         setError(error);
@@ -127,25 +133,29 @@ export async function CsvToGeojson(
         ) {
           // Assuming coordinates are really in lat/long.
           crs = "EPSG:4326";
-        }
 
-        /*console.log("Using CRS", crs)
-        const coords = proj4(
-          crs,
-          "EPSG:4326",
-          row.pos.map((str) => parseFloat(str)).reverse()
-        );*/
-        return {
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: row.pos.map((str) => parseFloat(str)).reverse(),
-          },
-          properties: { },
-        };
+          /*console.log("Using CRS", crs)
+          const coords = proj4(
+            crs,
+            "EPSG:4326",
+            row.pos.map((str) => parseFloat(str)).reverse()
+          );*/
+          return {
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: row.pos.map((str) => parseFloat(str)).reverse(),
+            },
+            properties: { },
+          };
+        }
+        return
       }
     });
-    features = features.slice(0, features.length - 1);
+    features = features.filter((f)=>(f))
+    if(features.length > 0){
+      features = features.slice(0, features.length - 1);
+    }
     return { type: "FeatureCollection", features: features };
   });
 }

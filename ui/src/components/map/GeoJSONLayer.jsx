@@ -23,28 +23,37 @@ function GeoJSONLayer(props) {
         opacity: 0.3,
         fillOpacity: 0.5,
       };
+      geojsonOutput.features=geojsonOutput.features.filter((f) => (
+        f?.geometry?.type
+      ))
+
       const l = L.geoJSON(geojsonOutput, {
         attribution: "BON in a Box",
         pointToLayer: function (feature, latlng) {
-          return L.circleMarker(latlng, markerStyle);
+            return L.circleMarker(latlng, markerStyle);
         },
         style: (feature) => {
-          switch (feature?.geometry.type) {
-            case "Point":
-            case "MultiPoint":
-              return markerStyle;
-            default:
-              return {
-                color: "#ff7800",
-                weight: 5,
-                opacity: 0.7,
-                fillOpacity: 0.3,
-              };
+          if(feature){
+            switch (feature?.geometry.type) {
+              case "Point":
+              case "MultiPoint":
+                return markerStyle;
+              default:
+                return {
+                  color: "#ff7800",
+                  weight: 5,
+                  opacity: 0.7,
+                  fillOpacity: 0.3,
+                };
+            }
           }
         },
       });
       l.addTo(map);
-      map.fitBounds(l.getBounds());
+      const bounds = L.latLngBounds(l.getBounds());
+      if (bounds.isValid()) {
+        map.fitBounds(bounds);
+      }
     }
     return () => {
       setGeojson(emptyFC);
