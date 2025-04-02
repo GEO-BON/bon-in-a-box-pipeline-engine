@@ -1,4 +1,5 @@
 import "react-flow-renderer/dist/style.css";
+import { isHttpError, parseHttpError, ShowHttpError } from "../HttpErrors";
 import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
 import {
@@ -695,11 +696,12 @@ export default function PipelineEditor(props) {
         let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
         fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
         api.savePipeline(fileNameWithoutExtension, saveJSON, (error, data, response) => {
+	  let errorMessage = (response && response.text) ? response.text : error.toString();
           if (error) {
             showAlert(
               'error',
               'Error saving the pipeline',
-              (response && response.text) ? response.text : error.toString()
+              isHttpError(error, response) ? parseHttpError(error, response) : errorMessage
             )
 
           } else if (response.text) {
@@ -766,10 +768,12 @@ export default function PipelineEditor(props) {
 
     api.getListOf("pipeline", (error, pipelineMap, response) => {
       if (error) {
+	let errorMessage = (response && response.text) ? response.text : error.toString();
+
         showAlert(
           'error',
           'Error loading the pipeline list',
-          (response && response.text) ? response.text : error.toString()
+           isHttpError(error, response) ? parseHttpError(error, response) : errorMessage
         )
       } else {
         let options = {};
@@ -942,10 +946,11 @@ export default function PipelineEditor(props) {
   const loadFromServer = useCallback((descriptionFile) => {
     api.getPipeline(descriptionFile, (error, data, response) => {
       if (error) {
+        let errorMessage = ((response && response.text) ? response.text : error.toString());
         showAlert(
           'error',
           'Error loading the pipeline',
-          (response && response.text) ? response.text : error.toString()
+	  isHttpError(error, response) ? parseHttpError(error, response) : errorMessage
         )
       } else {
         setCurrentFileName(descriptionFile);
@@ -958,13 +963,13 @@ export default function PipelineEditor(props) {
 
   const saveFileToServer = useCallback((descriptionFile) => {
     api.getListOf("pipeline", (error, pipelineList, response) => {
+      let errorMessage = ((response && response.text) ? response.text : error.toString());
       if (error) {
         showAlert(
           'error',
           'Error saving the pipeline',
-          'Failed to retrieve pipeline list.\n' +
-            ((response && response.text) ? response.text : error.toString())
-        )
+          'Failed to retrieve pipeline list.\n' + isHttpError(error, response) ? parseHttpError(error, response) : errorMessage
+        );
       } else {
         let sanitized = descriptionFile.trim().replace(/\s*(\/|>)\s*/, '>')
         if(!sanitized.endsWith('.json')) sanitized += '.json'

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Spinner } from "./Spinner";
+import { isHttpError, parseHttpError, ShowHttpError } from "./HttpErrors";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -24,10 +25,17 @@ import ReactMarkdown from "react-markdown";
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export default function RunHistory() {
-  let [runHistory, setRunHistory] = useState();
+  let [runHistory, setRunHistory] = useState(null);
   useEffect(() => {
     api.getHistory((error, _, response) => {
-      if (response && response.text) {
+      if (isHttpError(error, response)) {
+	setRunHistory(
+		<ShowHttpError httpError={parseHttpError(error, response, "getting run history")}/>
+	);
+	
+
+      } else if (response && response.text) {
+	
         const runs = JSON.parse(response.text).sort((a, b) => {
           const aa = new Date(a.startTime);
           const bb = new Date(b.startTime);
@@ -40,14 +48,16 @@ export default function RunHistory() {
             ))}
           </Grid>
         );
-      } else if (error) setRunHistory(error.toString());
-      else setRunHistory(null);
+      } 
+     
     });
   }, []);
 
   return (
     <p style={{ whiteSpace: "pre-wrap" }}>
-      {runHistory ? runHistory : <Spinner variant='light'/>}
+      {
+	      runHistory ? runHistory : <Spinner variant='light'/>
+      }
     </p>
   );
 }

@@ -1,7 +1,8 @@
 import "./StepChooser.css";
 
-import { React, useState, useEffect, useCallback } from "react";
+import { React, isValidElement, useState, useEffect, useCallback } from "react";
 
+import { isHttpError, parseHttpError, ShowHttpError } from "../HttpErrors";
 import { fetchStepDescription } from "./StepDescriptionStore";
 import { StepDescription } from "../StepDescription";
 import { Spinner } from "../Spinner";
@@ -26,6 +27,9 @@ export default function StepChooser({ popupContent, setPopupContent }) {
     api.getListOf("pipeline", (error, pipelineList, response) => {
       if (error) {
         console.error(error);
+	if (isHttpError(error, response))
+	    setPipelineFiles(<ShowHttpError httpError={parseHttpError(error, response, "unable to get list of pipelines")} />)
+	
       } else {
         setPipelineFiles(pipelineList);
       }
@@ -35,6 +39,8 @@ export default function StepChooser({ popupContent, setPopupContent }) {
     api.getListOf("script", (error, scriptList, response) => {
       if (error) {
         console.error(error);
+	if (isHttpError(error, response))
+	    setScriptFiles(<ShowHttpError httpError={parseHttpError(error, response, "unable ot get list of scripts")} />)
       } else {
         setScriptFiles(scriptList);
       }
@@ -160,7 +166,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
         <div key="Pipelines">
           <h3>Pipelines</h3>
           <div>
-            {renderTree(
+            {isValidElement(pipelineFiles) && pipelineFiles.type === ShowHttpError ? pipelineFiles : renderTree(
               [],
               Object.entries(pipelineFiles).map((entry) => [
                 entry[0].split(">"),
@@ -174,7 +180,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
       {scriptFiles && (
         <div key="Scripts">
           <h3>Scripts</h3>
-          {renderTree(
+          {isValidElement(scriptFiles) && scriptFiles.type === ShowHttpError ? scriptFiles : renderTree(
             [],
             Object.entries(scriptFiles).map((entry) => [
               entry[0].split(">"),
