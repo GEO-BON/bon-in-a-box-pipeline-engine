@@ -47,7 +47,7 @@ class CondaRunner(
 
             if [ ! -f "$condaEnvFile.yml" ]; then
                 echo "Creating new conda environment $condaEnvName..."
-                createLogs=$(mamba env create -f $condaEnvFile.2.yml 2>&1 | tee -a ${logFile.absolutePath})
+                createLogs=$(mamba env create -f $condaEnvFile.2.yml 2>&1 | tee -a "${logFile.absolutePath}")
                 if [[ ${'$'}? -eq 0 ]] ; then
                     mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
                     echo "Created successfully."

@@ -283,21 +283,46 @@ class ScriptRun( // Constructor used in single script run
 
                     "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
                     "py", "PY" -> {
+                        val scriptPath = scriptFile.absolutePath
+                        val pythonWrapper = """
+                            import os, sys
+                            biab_output_list = {}
+                            output_folder = os.path.abspath(sys.argv[1])
+
+                            # Add script dir to sys.path
+                            print("Script: "+"$scriptPath", flush=True)
+                            script_dir = os.path.dirname(os.path.abspath("$scriptPath"))
+                            print("Script dir: "+script_dir, flush=True)
+                            sys.path.insert(0, script_dir)
+
+                            try:
+                                exec(open("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.py").read(), globals())
+                                exec(open("$scriptPath").read(), globals())
+                            except:
+                                raise
+                            finally:
+                                if biab_output_list:
+                                    with open(output_folder + "/output.json", "w") as outfile:
+                                        outfile.write(json.dumps(biab_output_list, indent = 2))
+                        """.trimIndent()
+
                         if(useRunners) {
                             val runner = CondaRunner(logFile, pidFile, "python", condaEnvName, condaEnvYml)
                             container = CondaRunner.container
 
-                            val escapedScript = scriptFile.absolutePath.replace(" ", "\\ ")
+
                             val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
                             command = container.dockerCommandList + listOf(
                                 "bash", "-c",
                                 """
                                     ${runner.getSetupBash()}
-                                    python3 $escapedScript $escapedOutputFolder
+                                    python3 -c '
+                                    $pythonWrapper
+                                    ' $escapedOutputFolder
                                 """.trimIndent()
                             )
                         } else {
-                            command = listOf("python3", scriptFile.absolutePath, context.outputFolder.absolutePath)
+                            command = listOf("python3", "-c", pythonWrapper, context.outputFolder.absolutePath)
                         }
                     }
 
