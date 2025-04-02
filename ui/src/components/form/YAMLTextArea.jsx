@@ -6,10 +6,6 @@ import _lang from "lodash/lang";
 const Editor = React.lazy(() => import('@monaco-editor/react'));
 
 export default function YAMLTextArea({ data, setData, setValidationError }) {
-  if (isEmptyObject(data)) {
-    return <textarea disabled={true} placeholder="No inputs" value="" />;
-  }
-
   const [isTyping, setTyping] = useState(false);
   const [error, setError] = useState();
   const monacoRef = useRef(null);
