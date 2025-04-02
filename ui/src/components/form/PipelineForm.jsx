@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { GeneralDescription, getFolderAndName } from "../StepDescription";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { CustomButtonGreen } from "../CustomMUI";
+import { parseHttpError } from "../HttpErrors";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -12,7 +13,7 @@ export function PipelineForm({
   pipelineMetadata,
   pipStates,
   setPipStates,
-  showHttpError,
+  setHttpError,
   inputFileContent,
   setInputFileContent,
   runType,
@@ -22,7 +23,7 @@ export function PipelineForm({
   const [pipelineOptions, setPipelineOptions] = useState([]);
 
   function clearPreviousRequest() {
-    showHttpError(null);
+    setHttpError(null);
     setInputFileContent({});
   }
 
@@ -41,7 +42,7 @@ export function PipelineForm({
     var callback = function (error, runId, response) {
       if (error) {
         // Server / connection errors. Data will be undefined.
-        showHttpError(error, response, "while launching pipeline on script server");
+        setHttpError(parseHttpError(error, response, "while launching pipeline on script server"));
       } else if (runId) {
         const parts = runId.split(">");
         let runHash = parts.at(-1);
@@ -52,7 +53,7 @@ export function PipelineForm({
 
         navigate("/" + runType + "-form/" + pipelineForUrl + "/" + runHash);
       } else {
-        showHttpError("Server returned empty result", null, "while getting run ID from script server");
+        setHttpError(parseHttpError("Server returned empty result", null, "while getting run ID from script server"));
       }
     };
 
