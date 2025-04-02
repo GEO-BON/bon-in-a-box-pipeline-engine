@@ -64,7 +64,7 @@ export const MetadataPane = ({
                 severity: monaco.MarkerSeverity.Error
               }
             ]);
-          } else console.log("forget it, I'm typing!")
+          }
         } else {
           monaco.editor.setModelMarkers(model, "owner", []);
         }

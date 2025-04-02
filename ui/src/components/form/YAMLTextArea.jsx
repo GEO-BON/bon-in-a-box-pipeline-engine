@@ -25,7 +25,7 @@ export default function YAMLTextArea({ data, setData, setValidationError }) {
       setError(null)
     } catch (ex) {
       if (ex instanceof YAMLException) {
-        setError((prevError) => {
+        setError(() => {
           const newError = {
             line: ex.mark.line,
             message: "YAML Syntax: " + ex.reason
@@ -82,7 +82,7 @@ export default function YAMLTextArea({ data, setData, setValidationError }) {
         <Editor
           defaultLanguage="yaml"
           defaultValue={yaml.dump(data, {
-            lineWidth: -1,
+            lineWidth: undefined,
             sortKeys: true,
           })}
           onChange={handleEditorChange}
