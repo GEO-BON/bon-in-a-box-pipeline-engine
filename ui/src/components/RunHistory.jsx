@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Spinner } from "./Spinner";
-import { isHttpError, parseHttpError, ShowHttpError } from "./HttpErrors";
+import { HttpError } from "./HttpErrors";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -20,7 +20,6 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { styled } from "@mui/material/styles";
 import { CustomButtonGreen } from "./CustomMUI";
-import ReactMarkdown from "react-markdown";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -28,14 +27,9 @@ export default function RunHistory() {
   let [runHistory, setRunHistory] = useState(null);
   useEffect(() => {
     api.getHistory((error, _, response) => {
-      if (isHttpError(error, response)) {
-	setRunHistory(
-		<ShowHttpError httpError={parseHttpError(error, response, "getting run history")}/>
-	);
-	
-
+      if(error) {
+        if (error) setRunHistory(<HttpError httpError={error} response={response} context={"getting run history"} />);
       } else if (response && response.text) {
-	
         const runs = JSON.parse(response.text).sort((a, b) => {
           const aa = new Date(a.startTime);
           const bb = new Date(b.startTime);
@@ -48,16 +42,15 @@ export default function RunHistory() {
             ))}
           </Grid>
         );
-      } 
-     
+      } else {
+        setRunHistory("Could not retrieve history: empty response.");
+      }
     });
   }, []);
 
   return (
     <p style={{ whiteSpace: "pre-wrap" }}>
-      {
-	      runHistory ? runHistory : <Spinner variant='light'/>
-      }
+      {runHistory ? runHistory : <Spinner variant='light' />}
     </p>
   );
 }

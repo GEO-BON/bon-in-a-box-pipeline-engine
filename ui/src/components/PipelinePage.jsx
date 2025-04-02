@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useReducer, useCallback } from "react";
-import { FoldableOutput } from "./FoldableOutput";
 
 import { PipelineForm } from "./form/PipelineForm";
 import { useParams } from "react-router-dom";
@@ -269,6 +268,7 @@ export function PipelinePage({ runType }) {
               inputFileContent={inputFileContent}
               pipStates={pipStates}
               setPipStates={setPipStates}
+              setHttpError={setHttpError}
               setResultsData={setResultsData}
               runType={runType}
             />

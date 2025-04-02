@@ -1,44 +1,53 @@
 import Alert from "@mui/material/Alert";
 
 function getErrorMessage(error, response) {
-    	let errorMessage = null;
-    	if (response && response.text)
-    	  errorMessage = response.text;
-    	else if (error)
-    	  errorMessage = error.toString()
-	return errorMessage;
+    if (response && response.text)
+        return response.text;
+    else if (error)
+        return error.toString()
+    else
+        return null;
 }
 
-function isHttpError(error, response) {
-	let errorMessage = getErrorMessage(error, response);
-	if (errorMessage && errorMessage.startsWith("<html>"))
-		return true;
-	return false;
+function isHttpError(errorMessage) {
+    return errorMessage && errorMessage.startsWith("<html>")
 }
 
-function parseHttpError(error, response, context="") {
+function parseHttpError(error, response, context = "") {
+    let errorMessageWithHtml = getErrorMessage(error, response);
+    let errorMessageAlone = stripTags(errorMessageWithHtml)
+    return "Error " + context + ": " + errorMessageAlone
+}
 
-    let errorMessage = getErrorMessage(error, response);
+function stripTags(message) {
     try {
-    errorMessage = errorMessage
-      .replace(/\r\n/g, '')
-      .match(/<body>.+<\/body>/g)[0]
-      .replace(/<\/?[A-Za-z1-9]+>/g, " ")
-      .trim()
-      .split(/\s+/)
-      .join(' ');
+        return message
+            .replace(/\r\n/g, '')
+            .match(/<body>.+<\/body>/g)[0]
+            .replace(/<\/?[A-Za-z1-9]+>/g, " ")
+            .trim()
+            .split(/\s+/)
+            .join(' ');
     } catch (err) {
-       errorMessage = "Unhandled " + err;
+        return "Unhandled " + err;
     }
-
-    return "Error " + context + ": " + errorMessage
 }
 
-function ShowHttpError(props) {
-	const { httpError } = props;
-	return (
-		<Alert severity="error">{httpError}</Alert>
-	)
+function HttpError({ error, response, context = "" }) {
+    return <Alert severity="error">
+        {
+            getErrorString(error, response)
+                ? parseHttpError(error, response, context)
+                : "Error " + context + ": " + getErrorMessage(response, text)
+        }
+    </Alert>
 }
 
-export { isHttpError, parseHttpError, ShowHttpError };
+function getErrorString(error, response) {
+    let errorMessage = getErrorMessage(error, response);
+    return isHttpError(errorMessage)
+        ? parseHttpError(error, response)
+        : errorMessage
+}
+
+export { getErrorString, parseHttpError, HttpError };

@@ -1,8 +1,7 @@
-import { isValidElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Spinner } from "./Spinner";
-import { isHttpError, parseHttpError, ShowHttpError } from "./HttpErrors";
+import { HttpError } from "./HttpErrors";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
-import Alert from "@mui/material/Alert";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -11,17 +10,15 @@ export default function Versions() {
 
   useEffect(() => {
     api.getVersions((error, _, response) => {
-      if (isHttpError(error, response)) {
-	    setVersions(<ShowHttpError httpError={parseHttpError(error, response, "fetching version information")} />);
-      } else if (response && response.text) {
-	    setVersions(response.text);
-      }
+      if (error) setVersions(<HttpError httpError={error} response={response} context="fetching version information" />);
+      else if (response && response.text) (response.text);
+      else setVersions(null);
     });
   }, []);
 
   return (
     <p style={{ whiteSpace: "pre-wrap" }}>
-      { versions ? versions : (<Spinner variant='light' />)}
+      {versions ? versions : <Spinner variant='light' />}
     </p>
   );
 }
