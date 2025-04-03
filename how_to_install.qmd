@@ -126,6 +126,20 @@ Installation steps on a server are the same as installing on a Linux computer, b
 
 -   By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy and activate https with certbot. How to do this is out of scope for this readme.
 
+# Troubleshooting
+
+Here are some common installation errors and how to fix them.
+
+1.  **You cannot launch the server**
+
+    If you are having issues connecting to the server, make sure that you (1) have the docker desktop app open on your computer (2) are running `./server-up.sh` in a Linux terminal (e.g. Git Bash on Windows or Terminal on Mac), connecting to the server will not work with PowerShell nor CMD and (3) make sure you have an ssh key that is registered to your computer and GitHub.
+
+2.  **BON in a Box does not load on localhost**
+
+    This may be an issue if you are on a Mac, or have Apache or NGINX installed. To fix this, edit the runner.env file and specify a different port (`HTTP_PORT`). For example, if you set `HTTP_PORT=5522`, you can then access BON in a Box at http://localhost:5522.
+
+If you encounter further errors, please contact us on [Discourse](https://discourse.geobon.org) or email us at boninabox\@geobon.org.
+
 # Running a script or pipeline
 
 You now have an instance of BON in a Box deployed, either [locally](#deploying-the-servers-locally) or [remotely](#deploying-the-servers-remotely), and you want to run your first script or pipeline.

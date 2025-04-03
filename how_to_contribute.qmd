@@ -556,7 +556,7 @@ For example, if a user wanted the analysis to stop if the result was less than 0
 ::: panel-tabset
 ## R
 
-``` R
+``` r
 # R helper function for errors
 # stop if result is less than 0
 if (result < 0){
@@ -685,7 +685,21 @@ You can look at the log of each of your scripts to read errors and debug.
 
 ![](images/Screenshot%202025-02-10%20034124-02.png)
 
-Once you change a script and save to your local computer, the changes will immediately be implemented when you run the script through BON in a Box. **However, if you change the YAML file, you will need to reload the page in the pipeline editor to see those changes.** If this does not work, you may need to delete the script from the pipeline and re-drag it to the pipeline editor. Inputs and outputs can also be directly edited in the pipeline editor.
+Once you change a script's code and save to your local computer, the changes will immediately be implemented when you run the script through BON in a Box. **However, if you change the YAML file, you will need to reload the page in the pipeline editor to see those changes.** If this does not work, you may need to delete the script from the pipeline and re-drag it to the pipeline editor. Inputs and outputs can also be directly edited in the pipeline editor.
+
+# Troubleshooting
+
+Here are some common issues when trying to run pipelines in BON in a Box and how to fix them.
+
+1.  **The pipeline editor displays a warning when saving your pipeline**
+
+    Errors in saving pipelines are usually due to incompatible inputs and outputs. When you change inputs or outputs in the script description's YAML file, this won't automatically change on the pipeline editor. When adding inputs, reload the pipeline editor so it reflects your changes. When changing the file formats of inputs or outputs, you will need to delete the edited script from the pipeline and re-drag it into the pipeline editor so that it can be saved. Note that pipelines saved with an error cannot be ran.
+
+2.  **The script can't find your packages**
+
+    First, make sure that all of your packages are in the Conda sub-environment in the YAML file. If you are getting error that looks like `package or namespace load failed for 'sf' in dyn.load(file, DLLpath=DLLpath,...): unable to load shared object '/r-libs-user/sf/libs/sf.so`, you may need to purge the server. First, stop the server in our terminal (`./server-down.sh`) and then run `.server/prod-server.sh purge` then restart the server (`./server-up.sh`).
+
+If you encounter further errors, please contact us on [Discourse](https://discourse.geobon.org) or email us at boninabox\@geobon.org.
 
 # When is your pipeline complete?
 
