@@ -92,24 +92,27 @@ fun Application.configureRouting() {
 
         get("/api/history") {
             val history = JSONArray()
-            var timeTaken = measureTimeMillis { 
+            var timeTaken = measureTimeMillis {
                 runningPipelines.keys.forEach { runId ->
                     val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
                     history.put(getHistoryFromFolder(pipelineOutputFolder, true))
                 }
             }
-            logger.info("Time taken to get running pipelines: ${timeTaken}", timeTaken)
+            logger.info("Time taken to get running ${runningPipelines.size} pipelines: ${timeTaken}", timeTaken)
+
             var outputRootList = listOf<File>()
-            timeTaken = measureTimeMillis { 
+            timeTaken = measureTimeMillis {
                 outputRootList = outputRoot.walk().filter { it.isFile && it.name == "pipelineOutput.json" }.toList()
             }
             logger.info("Time taken for folder walk: ${timeTaken}", timeTaken)
-            timeTaken = measureTimeMillis { 
-                outputRootList.forEach { 
+
+            timeTaken = measureTimeMillis {
+                outputRootList.forEach {
                     history.put(getHistoryFromFolder(it.parentFile, false))
                 }
             }
-            logger.info("Time taken to run getHistoryFromFolder: ${timeTaken}", timeTaken)
+            logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: ${timeTaken}", timeTaken)
+
             call.respond(history.toString(2))
         }
 
