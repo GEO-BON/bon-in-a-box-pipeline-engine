@@ -76,7 +76,7 @@ export default function InputFileInput({
       )}
       {selectedTab == 1 && (
         <Box className="yamlInput">
-          <YAMLTextArea data={inputFileContent} setData={setInputFileContent} setValidationError={setValidationError} />
+          <YAMLTextArea metadata={metadata} data={inputFileContent} setData={setInputFileContent} setValidationError={setValidationError} />
           <Box className="inputsDescription">
             <InputsDescription metadata={metadata} />
           </Box>

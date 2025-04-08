@@ -1,20 +1,36 @@
 import React, { useRef, useEffect, useState, Suspense } from "react";
-import { isEmptyObject } from "../../utils/isEmptyObject";
 import yaml, { YAMLException } from "js-yaml";
 import { Spinner } from "../Spinner";
 import _lang from "lodash/lang";
 const Editor = React.lazy(() => import('@monaco-editor/react'));
 
-export default function YAMLTextArea({ data, setData, setValidationError }) {
+export default function YAMLTextArea({ metadata, data, setData, setValidationError }) {
   const [isTyping, setTyping] = useState(false);
   const [error, setError] = useState();
+  const [metadataChanged, setMetadataChanged] = useState(false);
+  const [textContent, setTextContent] = useState();
   const monacoRef = useRef(null);
+
+  useEffect(() => { // Detect pipeline selection change
+    setMetadataChanged(true)
+  }, [metadata, setMetadataChanged])
+
+  useEffect(() => { // Handle pipeline selection change
+    if(metadataChanged) {
+      setMetadataChanged(false)
+      setTextContent(yaml.dump(data, {
+        lineWidth: undefined,
+        sortKeys: true,
+      }))
+    }
+  }, [metadataChanged, data, setTextContent, setMetadataChanged])
 
   function handleEditorDidMount(_, monaco) {
     monacoRef.current = monaco;
   }
 
   function handleEditorChange(value, _) {
+    setTextContent(value)
     setTyping(true)
     try {
       setData(yaml.load(value))
@@ -77,10 +93,7 @@ export default function YAMLTextArea({ data, setData, setValidationError }) {
       <div style={{height: '30rem'}}>
         <Editor
           defaultLanguage="yaml"
-          defaultValue={yaml.dump(data, {
-            lineWidth: undefined,
-            sortKeys: true,
-          })}
+          value={textContent}
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
           options={{

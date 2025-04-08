@@ -121,7 +121,7 @@ export function PipelineForm({
         />
         <br />
         {validationError && <Alert severity="error">
-          Error parsing YAML input:<br />
+          Error parsing YAML input.<br />
           {validationError}
         </Alert>}
         <CustomButtonGreen type="submit" disabled={validationError != null} variant="contained">
