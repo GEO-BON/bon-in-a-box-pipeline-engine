@@ -120,6 +120,10 @@ export function PipelineForm({
           setValidationError={setValidationError}
         />
         <br />
+        {validationError && <Alert severity="error">
+          Error parsing YAML input:<br />
+          {validationError}
+        </Alert>}
         <CustomButtonGreen type="submit" disabled={validationError != null} variant="contained">
           {runType === "pipeline" ? "Run pipeline" : "Run script"}
         </CustomButtonGreen>
