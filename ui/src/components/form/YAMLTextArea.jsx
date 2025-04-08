@@ -39,7 +39,7 @@ export default function YAMLTextArea({ metadata, data, setData, setValidationErr
       if (ex instanceof YAMLException) {
         setError(() => {
           const newError = {
-            line: ex.mark.line,
+            line: ex.mark.line + 1,
             message: "YAML Syntax: " + ex.reason
           }
           return newError;
@@ -70,15 +70,16 @@ export default function YAMLTextArea({ metadata, data, setData, setValidationErr
       if (model) {
         if (error) {
           if (!isTyping) {
+            const line = Math.min(model.getLineCount(), error.line)
             monaco.editor.setModelMarkers(model, "owner", [
               {
-                startLineNumber: error.line,
-                endColumn: model.getLineLength(error.line) + 1,
+                startLineNumber: line,
+                endColumn: model.getLineLength(line) + 1,
                 message: error.message,
                 severity: monaco.MarkerSeverity.Error
               }
             ]);
-            setValidationError("At line " + error.line + ": " + error.message);
+            setValidationError("At line " + line + ": " + error.message);
           }
         } else {
           monaco.editor.setModelMarkers(model, "owner", []);
