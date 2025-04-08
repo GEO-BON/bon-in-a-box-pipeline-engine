@@ -18,6 +18,8 @@ export default function YAMLTextArea({ metadata, data, setData, setValidationErr
   useEffect(() => { // Handle pipeline selection change
     if(metadataChanged) {
       setMetadataChanged(false)
+
+      setError(null)
       setTextContent(yaml.dump(data, {
         lineWidth: undefined,
         sortKeys: true,
