@@ -1,5 +1,5 @@
 import { memo, useState } from "react";
-import Map from "./map/Map";
+import MapResult from "./map/Map";
 import React from "react";
 import RenderedCSV from "./csv/RenderedCSV";
 import {
@@ -56,7 +56,7 @@ function FallbackDisplay({ content }) {
     (typeof content.startsWith === "function" && content.startsWith("http"))
   ) {
     // Match for tiff, TIFF, tif or TIF extensions
-    if (/\.tiff?$/i.test(content)) return <Map tiff={content} />;
+    if (/\.tiff?$/i.test(content)) return <MapResult tiff={content} />;
     else if (/\.html$/i.test(content))
       return (
         <a href={content} target="_blank" rel="noreferrer">
@@ -123,6 +123,8 @@ export const SingleIOResult = memo(
       if (mime.endsWith("[]") && Array.isArray(content)) {
         if (
           type === "image" ||
+          type === "object" ||
+          type === "application" ||
           mime.startsWith("text/csv") ||
           mime.startsWith("text/tab-separated-values")
         ) {
@@ -151,7 +153,7 @@ export const SingleIOResult = memo(
       switch (type) {
         case "image":
           if (isGeotiff(subtype)) {
-            return <Map tiff={content} range={ioMetadata.range} />;
+            return <MapResult tiff={content} range={ioMetadata.range} />;
           }
           return <img src={content} alt={ioMetadata.label} />;
 
@@ -187,7 +189,8 @@ export const SingleIOResult = memo(
           });
 
         case "application":
-          if (subtype === "geo+json") return <Map json={content} />;
+          if (subtype === "geo+json") return <MapResult json={content} />;
+          if (subtype.includes("geopackage")) return <MapResult geopackage={content} />;
 
           break;
 

@@ -157,6 +157,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#deploying-without-pulling-the-new-server" id="toc-deploying-without-pulling-the-new-server" class="nav-link" data-scroll-target="#deploying-without-pulling-the-new-server">Deploying without pulling the new server</a></li>
   </ul></li>
   <li><a href="#deploying-the-servers-remotely" id="toc-deploying-the-servers-remotely" class="nav-link" data-scroll-target="#deploying-the-servers-remotely">Deploying BON in a Box on a server</a></li>
+  <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a></li>
   <li><a href="#running-a-script-or-pipeline" id="toc-running-a-script-or-pipeline" class="nav-link" data-scroll-target="#running-a-script-or-pipeline">Running a script or pipeline</a></li>
   </ul>
 </nav>
@@ -299,6 +300,17 @@ ul.task-list li input[type="checkbox"] {
 <li><p>The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.</p></li>
 <li><p>By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy and activate https with certbot. How to do this is out of scope for this readme.</p></li>
 </ul>
+</section>
+<section id="troubleshooting" class="level1">
+<h1>Troubleshooting</h1>
+<p>Here are some common installation errors and how to fix them.</p>
+<ol type="1">
+<li><p><strong>You cannot connect to the server</strong></p>
+<p>If you are having issues connecting to the server, make sure that you (1) have the docker desktop app open on your computer (2) are running <code>./server-up.sh</code> in a linux terminal (e.g.&nbsp;Git Bash on Windows or Terminal on Mac), connecting to the server will not work in powershell and (3) make sure you have an ssh key that is registered to your computer and GitHub.</p></li>
+<li><p><strong>BON in a Box does not load on localhost</strong></p>
+<p>This may be an issue if you are on a Mac, or have Apache or NGINX installed. To fix this, edit the runner.env file and specify a different port (<code>HTTP_PORT</code>). For example, if you set <code>HTTP_PORT=5522</code>, you can then access BON in a Box at http://localhost:5522.</p></li>
+</ol>
+<p>If you encounter further errors, please contact us on <a href="https://can01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdiscourse.geobon.org%2F&amp;data=05%7C02%7Cjory.griffith%40mcgill.ca%7Cb05c119d71864b45735308dd5a68c263%7Ccd31967152e74a68afa9fcf8f89f09ea%7C0%7C0%7C638766128163579549%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&amp;sdata=sEns2YcaYWSBIxznG0Y38D2hgpwwFABmXtS1ya4QT8k%3D&amp;reserved=0">discourse</a> or email us at boninabox@geobon.org.</p>
 </section>
 <section id="running-a-script-or-pipeline" class="level1">
 <h1>Running a script or pipeline</h1>

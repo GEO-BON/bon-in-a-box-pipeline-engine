@@ -18,6 +18,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import kotlin.system.measureTimeMillis
 
 /**
  * Used to transport paths through path param.
@@ -90,16 +91,26 @@ fun Application.configureRouting() {
 
         get("/api/history") {
             val history = JSONArray()
-            runningPipelines.keys.forEach { runId ->
-                val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
-                history.put(getHistoryFromFolder(pipelineOutputFolder, true))
-            }
-
-            outputRoot.walk().forEach { file ->
-                if (file.name == "pipelineOutput.json") {
-                    history.put(getHistoryFromFolder(file.parentFile, false))
+            var timeTaken = measureTimeMillis {
+                runningPipelines.keys.forEach { runId ->
+                    val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
+                    history.put(getHistoryFromFolder(pipelineOutputFolder, true))
                 }
             }
+            logger.info("Time taken to get running ${runningPipelines.size} pipelines: ${timeTaken}", timeTaken)
+
+            var outputRootList = listOf<File>()
+            timeTaken = measureTimeMillis {
+                outputRootList = outputRoot.walk().filter { it.isFile && it.name == "pipelineOutput.json" }.toList()
+            }
+            logger.info("Time taken for folder walk: ${timeTaken}", timeTaken)
+
+            timeTaken = measureTimeMillis {
+                outputRootList.forEach {
+                    history.put(getHistoryFromFolder(it.parentFile, false))
+                }
+            }
+            logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: ${timeTaken}", timeTaken)
 
             call.respondText(history.toString(), ContentType.Application.Json)
         }
