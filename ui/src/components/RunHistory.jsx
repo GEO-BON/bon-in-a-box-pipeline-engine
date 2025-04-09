@@ -20,6 +20,7 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { styled } from "@mui/material/styles";
 import { CustomButtonGreen } from "./CustomMUI";
+import { Alert } from "@mui/material";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -43,16 +44,12 @@ export default function RunHistory() {
           </Grid>
         );
       } else {
-        setRunHistory("Could not retrieve history: empty response.");
+        setRunHistory(<Alert severity="warning">Could not retrieve history: empty response.</Alert>);
       }
     });
   }, []);
 
-  return (
-    <p style={{ whiteSpace: "pre-wrap" }}>
-      {runHistory ? runHistory : <Spinner variant='light' />}
-    </p>
-  );
+  return runHistory ? runHistory : <Spinner variant='light' />;
 }
 
 const color = (status) => {
