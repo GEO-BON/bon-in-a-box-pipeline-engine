@@ -1,4 +1,5 @@
 import "react-flow-renderer/dist/style.css";
+import { getErrorString, parseHttpError } from "../HttpErrors";
 import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
 import {
@@ -699,7 +700,7 @@ export default function PipelineEditor(props) {
             showAlert(
               'error',
               'Error saving the pipeline',
-              (response && response.text) ? response.text : error.toString()
+              getErrorString(error, response)
             )
 
           } else if (response.text) {
@@ -769,7 +770,7 @@ export default function PipelineEditor(props) {
         showAlert(
           'error',
           'Error loading the pipeline list',
-          (response && response.text) ? response.text : error.toString()
+          getErrorString(error, response)
         )
       } else {
         let options = {};
@@ -945,7 +946,7 @@ export default function PipelineEditor(props) {
         showAlert(
           'error',
           'Error loading the pipeline',
-          (response && response.text) ? response.text : error.toString()
+          getErrorString(error, response)
         )
       } else {
         setCurrentFileName(descriptionFile);
@@ -958,13 +959,13 @@ export default function PipelineEditor(props) {
 
   const saveFileToServer = useCallback((descriptionFile) => {
     api.getListOf("pipeline", (error, pipelineList, response) => {
+      let errorMessage = ((response && response.text) ? response.text : error.toString());
       if (error) {
         showAlert(
           'error',
           'Error saving the pipeline',
-          'Failed to retrieve pipeline list.\n' +
-            ((response && response.text) ? response.text : error.toString())
-        )
+          'Failed to retrieve pipeline list.\n' + isHttpError(error, response) ? parseHttpError(error, response) : errorMessage
+        );
       } else {
         let sanitized = descriptionFile.trim().replace(/\s*(\/|>)\s*/, '>')
         if(!sanitized.endsWith('.json')) sanitized += '.json'

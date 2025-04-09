@@ -18,7 +18,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
-import java.text.SimpleDateFormat
 import kotlin.system.measureTimeMillis
 
 /**
@@ -113,7 +112,7 @@ fun Application.configureRouting() {
             }
             logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: ${timeTaken}", timeTaken)
 
-            call.respond(history.toString(2))
+            call.respondText(history.toString(), ContentType.Application.Json)
         }
 
         get("/script/{scriptPath}/info") {
@@ -158,7 +157,7 @@ fun Application.configureRouting() {
                         }
                     }
 
-                    call.respondText(metadataJSON.toString(), ContentType.parse("application/json"))
+                    call.respondText(metadataJSON.toString(), ContentType.Application.Json)
                 } else {
                     call.respondText(text = "$descriptionFile does not exist", status = HttpStatusCode.NotFound)
                     logger.debug("404: getListOf ${call.parameters["descriptionPath"]}")
@@ -172,7 +171,7 @@ fun Application.configureRouting() {
         get("/pipeline/{descriptionPath}/get") {
             val descriptionFile = File(pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
             if (descriptionFile.exists()) {
-                call.respondText(descriptionFile.readText(), ContentType.parse("application/json"))
+                call.respondText(descriptionFile.readText(), ContentType.Application.Json)
             } else {
                 call.respondText(text = "$descriptionFile does not exist", status = HttpStatusCode.NotFound)
                 logger.debug("404: pipeline/${call.parameters["descriptionPath"]}/get")
