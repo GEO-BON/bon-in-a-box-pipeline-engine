@@ -13,12 +13,6 @@ function isHttpError(errorMessage) {
     return errorMessage && errorMessage.startsWith("<html>")
 }
 
-function parseHttpError(error, response, context = "") {
-    let errorMessageWithHtml = getErrorMessage(error, response);
-    let errorMessageAlone = stripTags(errorMessageWithHtml)
-    return "Error " + context + ": " + errorMessageAlone
-}
-
 function stripTags(message) {
     try {
         return message
@@ -33,14 +27,10 @@ function stripTags(message) {
     }
 }
 
-function HttpError({ error, response, context = "" }) {
-    return <Alert severity="error">
-        {
-            getErrorString(error, response)
-                ? parseHttpError(error, response, context)
-                : "Error " + context + ": " + getErrorMessage(response, text)
-        }
-    </Alert>
+function parseHttpError(error, response, context = "") {
+    let errorMessageWithHtml = getErrorMessage(error, response);
+    let errorMessageAlone = stripTags(errorMessageWithHtml)
+    return "Error " + context + ": " + errorMessageAlone
 }
 
 function getErrorString(error, response) {
@@ -49,5 +39,16 @@ function getErrorString(error, response) {
         ? parseHttpError(error, response)
         : errorMessage
 }
+
+function HttpError({ error, response, context = "" }) {
+    return <Alert severity="error">
+        {
+            getErrorString(error, response)
+                ? parseHttpError(error, response, context)
+                : "Error " + context + ": " + getErrorMessage(error, response)
+        }
+    </Alert>
+}
+
 
 export { getErrorString, parseHttpError, HttpError };

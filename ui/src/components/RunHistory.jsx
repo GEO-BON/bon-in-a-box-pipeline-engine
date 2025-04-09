@@ -27,9 +27,9 @@ export default function RunHistory() {
   let [runHistory, setRunHistory] = useState(null);
   useEffect(() => {
     api.getHistory((error, _, response) => {
-      if(error) {
-        if (error) setRunHistory(<HttpError httpError={error} response={response} context={"getting run history"} />);
-      } else if (response && response.text) {
+	console.log(error);
+	console.log(response);
+      if (response && response.text) {
         const runs = JSON.parse(response.text).sort((a, b) => {
           const aa = new Date(a.startTime);
           const bb = new Date(b.startTime);
@@ -42,6 +42,8 @@ export default function RunHistory() {
             ))}
           </Grid>
         );
+      } else if (error) {
+        setRunHistory(<HttpError httpError={error} response={response} context={"getting run history"} />);
       } else {
         setRunHistory("Could not retrieve history: empty response.");
       }

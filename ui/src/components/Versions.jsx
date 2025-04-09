@@ -11,7 +11,7 @@ export default function Versions() {
   useEffect(() => {
     api.getVersions((error, _, response) => {
       if (error) setVersions(<HttpError httpError={error} response={response} context="fetching version information" />);
-      else if (response && response.text) (response.text);
+      else if (response && response.text) setVersions(response.text);
       else setVersions(null);
     });
   }, []);
