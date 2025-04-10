@@ -6,6 +6,7 @@ import { GeneralDescription, getFolderAndName } from "../StepDescription";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { CustomButtonGreen } from "../CustomMUI";
 import { parseHttpError } from "../HttpErrors";
+import { Alert } from "@mui/material";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -17,6 +18,7 @@ export function PipelineForm({
   inputFileContent,
   setInputFileContent,
   runType,
+  restoreDefaults,
 }) {
   const formRef = useRef();
   const navigate = useNavigate();
@@ -118,6 +120,7 @@ export function PipelineForm({
           inputFileContent={inputFileContent}
           setInputFileContent={setInputFileContent}
           setValidationError={setValidationError}
+          restoreDefaults={restoreDefaults}
         />
         <br />
         {validationError && <Alert severity="error">

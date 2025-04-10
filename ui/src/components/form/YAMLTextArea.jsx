@@ -1,23 +1,23 @@
-import React, { useRef, useEffect, useState, Suspense } from "react";
+import React, { useRef, useEffect, useState, Suspense, useCallback } from "react";
 import yaml, { YAMLException } from "js-yaml";
 import { Spinner } from "../Spinner";
 import _lang from "lodash/lang";
 const Editor = React.lazy(() => import('@monaco-editor/react'));
 
-export default function YAMLTextArea({ metadata, data, setData, setValidationError }) {
+export default function YAMLTextArea({ metadata, data, setData, setValidationError, restoreDefaults }) {
   const [isTyping, setTyping] = useState(false);
   const [error, setError] = useState();
-  const [metadataChanged, setMetadataChanged] = useState(false);
+  const [shouldResetData, setShouldResetData] = useState(false);
   const [textContent, setTextContent] = useState();
   const monacoRef = useRef(null);
 
   useEffect(() => { // Detect pipeline selection change
-    setMetadataChanged(true)
-  }, [metadata, setMetadataChanged])
+    setShouldResetData(true)
+  }, [metadata, setShouldResetData])
 
   useEffect(() => { // Handle pipeline selection change
-    if(metadataChanged) {
-      setMetadataChanged(false)
+    if(shouldResetData) {
+      setShouldResetData(false)
 
       setError(null)
       setTextContent(yaml.dump(data, {
@@ -25,17 +25,27 @@ export default function YAMLTextArea({ metadata, data, setData, setValidationErr
         sortKeys: true,
       }))
     }
-  }, [metadataChanged, data, setTextContent, setMetadataChanged])
+  }, [shouldResetData, data, setTextContent, setShouldResetData])
 
   function handleEditorDidMount(_, monaco) {
     monacoRef.current = monaco;
   }
 
-  function handleEditorChange(value, _) {
+  const handleEditorChange = useCallback((value, _) => {
     setTextContent(value)
     setTyping(true)
+
     try {
-      setData(yaml.load(value))
+      if (value && value.trim() != "") {
+        setData(yaml.load(value))
+
+      } else if (metadata && metadata.inputs) {
+        restoreDefaults(metadata)
+
+      } else {
+        console.error("No valid fallback data");
+      }
+
       setError(null)
     } catch (ex) {
       if (ex instanceof YAMLException) {
@@ -50,7 +60,7 @@ export default function YAMLTextArea({ metadata, data, setData, setValidationErr
         console.error(ex)
       }
     }
-  }
+  }, [metadata, setTextContent, setTyping, restoreDefaults, setShouldResetData, setError, yaml])
 
   useEffect(() => { // Handle typing timeout
     // setTyping(true) set to true in handleEditorChange

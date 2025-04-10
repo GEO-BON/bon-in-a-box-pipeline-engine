@@ -145,22 +145,27 @@ export function PipelinePage({ runType }) {
       } else if (data) {
         setPipelineMetadata(data);
         if (setExamples) {
-          let inputExamples = {};
-          if (data && data.inputs) {
-            Object.keys(data.inputs).forEach((inputId) => {
-              let input = data.inputs[inputId];
-              if (input) {
-                const example = input.example;
-                inputExamples[inputId] = example === undefined ? null : example;
-              }
-            });
-          }
-          setInputFileContent(inputExamples);
+          restoreDefaults(data)
         }
       }
     };
     api.getInfo(runType, choice, callback);
   }
+
+  const restoreDefaults = useCallback(metadata => {
+    let inputExamples = {};
+    if (metadata && metadata.inputs) {
+      Object.keys(metadata.inputs).forEach((inputId) => {
+        let input = metadata.inputs[inputId];
+        if (input) {
+          const example = input.example;
+          inputExamples[inputId] = example === undefined ? null : example;
+        }
+      });
+    }
+
+    setInputFileContent(inputExamples);
+  }, [setInputFileContent])
 
   function loadPipelineInputs(pip, hash) {
     var inputJson =
@@ -271,6 +276,7 @@ export function PipelinePage({ runType }) {
               setHttpError={setHttpError}
               setResultsData={setResultsData}
               runType={runType}
+              restoreDefaults={restoreDefaults}
             />
           </AccordionDetails>
         </Accordion>
