@@ -5,7 +5,7 @@ import ScriptInput from "../form/ScriptInput";
 
 
 
-export function IOListItem({ io, id, valueEdited, setter, className }) {
+export function IOListItem({ io, id, valueEdited, setter, className, expand }) {
     const {
         attributes,
         listeners,
@@ -16,15 +16,22 @@ export function IOListItem({ io, id, valueEdited, setter, className }) {
     } = useSortable({ id: id });
 
     const style = {
-        transform: CSS.Transform.toString({ ...transform, scaleX: 1, scaleY: 1 }),
+        transform: CSS.Transform.toString({
+            ...transform,
+            scaleX: 1,
+            scaleY: 1,
+        }),
         transition,
+        position: isDragging ? "relative" : "inherit",
+        zIndex: isDragging ? 1000 : 0, /* Dragged element above the rest */
     };
 
-    return <div ref={setNodeRef} style={style} className={"ioListItem" + (isDragging ? " dragging" : "")}>
+    return <div ref={setNodeRef} {...attributes} style={style}
+        className={"ioListItem" + (isDragging ? " dragging" : "") + (expand ? " expanded" : " collapsed")}>
         <table>
             <tbody>
                 <tr>
-                    <td {...attributes} {...listeners} className="draggable reorder-drag">⣿</td>
+                    <td {...listeners} className="draggable reorder-drag">⣿</td>
                     <td className={className}>
                         <ControlledTextArea className="label" keepWidth={true}
                             onBlur={e => valueEdited(e.target.value, "label", io, setter)}
@@ -33,24 +40,26 @@ export function IOListItem({ io, id, valueEdited, setter, className }) {
                             defaultValue={io.label}
                         />
 
-                        <ControlledTextArea className="description" keepWidth={true}
-                            onBlur={e => valueEdited(e.target.value, "description", io, setter)}
-                            onKeyDown={(e) => { if (e.ctrlKey) valueEdited(e.target.value, "description", io, setter) }}
-                            defaultValue={io.description} />
+                        {expand && <>
+                            <ControlledTextArea className="description" keepWidth={true}
+                                onBlur={e => valueEdited(e.target.value, "description", io, setter)}
+                                onKeyDown={(e) => { if (e.ctrlKey) valueEdited(e.target.value, "description", io, setter) }}
+                                defaultValue={io.description} />
 
-                        {io.type &&
-                            <>
-                                <span className="example-tag">Example: </span>
-                                <ScriptInput type={io.type}
-                                    className="example"
-                                    value={io.example}
-                                    options={io.options}
-                                    onValueUpdated={(value) => valueEdited(value, "example", io, setter)}
-                                    size="small"
-                                    keepWidth={true}
-                                />
-                            </>
-                        }
+                            {io.type &&
+                                <>
+                                    <span className="example-tag">Example: </span>
+                                    <ScriptInput type={io.type}
+                                        className="example"
+                                        value={io.example}
+                                        options={io.options}
+                                        onValueUpdated={(value) => valueEdited(value, "example", io, setter)}
+                                        size="small"
+                                        keepWidth={true}
+                                    />
+                                </>
+                            }
+                        </>}
                     </td>
                 </tr>
             </tbody>
