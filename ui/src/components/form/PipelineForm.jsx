@@ -21,6 +21,8 @@ export function PipelineForm({
   const formRef = useRef();
   const navigate = useNavigate();
   const [pipelineOptions, setPipelineOptions] = useState([]);
+  const [validationError, setValidationError] = useState();
+
 
   function clearPreviousRequest() {
     setHttpError(null);
@@ -115,9 +117,14 @@ export function PipelineForm({
           metadata={pipelineMetadata}
           inputFileContent={inputFileContent}
           setInputFileContent={setInputFileContent}
+          setValidationError={setValidationError}
         />
         <br />
-        <CustomButtonGreen type="submit" disabled={false} variant="contained">
+        {validationError && <Alert severity="error">
+          Error parsing YAML input.<br />
+          {validationError}
+        </Alert>}
+        <CustomButtonGreen type="submit" disabled={validationError != null} variant="contained">
           {runType === "pipeline" ? "Run pipeline" : "Run script"}
         </CustomButtonGreen>
       </form>

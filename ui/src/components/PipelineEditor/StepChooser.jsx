@@ -141,7 +141,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
         // branch
         return (
           <div key={key}>
-            <p class="dnd-head"><SubdirectoryArrowRightIcon sx={{fontSize: "0.85em"}} />{key}</p>
+            <p className="dnd-head"><SubdirectoryArrowRightIcon sx={{fontSize: "0.85em"}} />{key}</p>
             <div className="inFolder">
               {renderTree([...splitPathBefore, key], groupedFiles.get(key))}
             </div>
