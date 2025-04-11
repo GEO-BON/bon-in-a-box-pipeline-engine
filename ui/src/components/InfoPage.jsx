@@ -8,18 +8,18 @@ export default function InfoPage() {
 
   return (
     <>
-      <h2>Lincense</h2>
+      <h2>License</h2>
       <table>
         <tbody>
           <tr>
-            <td style={{border: 'none'}}>
-            <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank">
+            <td style={{ border: 'none', padding: 0 }}>
+              The BON in a Box pipeline engine and modelling tool are licensed under GPL-v3.<br />
+              Make sure to review the attribution guidelines for the platform.
+            </td>
+            <td style={{ border: 'none', padding: "0 0 0 5px" }}>
+              <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank">
                 <img src={gplImg} style={{ verticalAlign: "top" }} />
               </a>
-            </td>
-            <td style={{border: 'none'}}>
-              The BON in a Box pipeline engine and modelling tool are licensed under GPL-v3<br />
-              Make sure to review the attribution guidelines for the platform.
             </td>
           </tr>
         </tbody>
