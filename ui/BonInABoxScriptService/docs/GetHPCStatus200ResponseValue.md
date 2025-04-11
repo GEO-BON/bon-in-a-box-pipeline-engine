@@ -4,13 +4,13 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**status** | **String** |  | [optional] 
+**state** | **String** |  | [optional] 
 **image** | **String** |  | [optional] 
 **message** | **String** |  | [optional] 
 
 
 
-## Enum: StatusEnum
+## Enum: StateEnum
 
 
 * `NOT_CONFIGURED` (value: `"NOT_CONFIGURED"`)

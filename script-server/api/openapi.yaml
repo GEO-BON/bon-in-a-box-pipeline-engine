@@ -334,7 +334,7 @@ paths:
                 additionalProperties:
                   type: object
                   properties:
-                    status:
+                    state:
                       type: string
                       enum: [NOT_CONFIGURED, CONFIGURED, PREPARING, READY, ERROR]
                     image:

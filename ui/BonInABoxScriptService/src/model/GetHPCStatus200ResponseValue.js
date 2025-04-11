@@ -47,8 +47,8 @@ class GetHPCStatus200ResponseValue {
         if (data) {
             obj = obj || new GetHPCStatus200ResponseValue();
 
-            if (data.hasOwnProperty('status')) {
-                obj['status'] = ApiClient.convertToType(data['status'], 'String');
+            if (data.hasOwnProperty('state')) {
+                obj['state'] = ApiClient.convertToType(data['state'], 'String');
             }
             if (data.hasOwnProperty('image')) {
                 obj['image'] = ApiClient.convertToType(data['image'], 'String');
@@ -67,8 +67,8 @@ class GetHPCStatus200ResponseValue {
      */
     static validateJSON(data) {
         // ensure the json data is a string
-        if (data['status'] && !(typeof data['status'] === 'string' || data['status'] instanceof String)) {
-            throw new Error("Expected the field `status` to be a primitive type in the JSON string but got " + data['status']);
+        if (data['state'] && !(typeof data['state'] === 'string' || data['state'] instanceof String)) {
+            throw new Error("Expected the field `state` to be a primitive type in the JSON string but got " + data['state']);
         }
         // ensure the json data is a string
         if (data['image'] && !(typeof data['image'] === 'string' || data['image'] instanceof String)) {
@@ -88,9 +88,9 @@ class GetHPCStatus200ResponseValue {
 
 
 /**
- * @member {module:model/GetHPCStatus200ResponseValue.StatusEnum} status
+ * @member {module:model/GetHPCStatus200ResponseValue.StateEnum} state
  */
-GetHPCStatus200ResponseValue.prototype['status'] = undefined;
+GetHPCStatus200ResponseValue.prototype['state'] = undefined;
 
 /**
  * @member {String} image
@@ -107,11 +107,11 @@ GetHPCStatus200ResponseValue.prototype['message'] = undefined;
 
 
 /**
- * Allowed values for the <code>status</code> property.
+ * Allowed values for the <code>state</code> property.
  * @enum {String}
  * @readonly
  */
-GetHPCStatus200ResponseValue['StatusEnum'] = {
+GetHPCStatus200ResponseValue['StateEnum'] = {
 
     /**
      * value: "NOT_CONFIGURED"
