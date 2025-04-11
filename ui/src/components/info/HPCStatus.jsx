@@ -1,44 +1,97 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Spinner } from "../Spinner";
-import { parseHttpError } from "../HttpErrors";
+import { HttpError } from "../HttpErrors";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
+import HideSourceIcon from '@mui/icons-material/HideSource';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import PendingIcon from '@mui/icons-material/Pending';
+import { Tooltip } from "@mui/material";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export default function HPCStatus() {
-  let [status, setStatus] = useState(null);
+  let [status, setStatus] = useState();
+  let [errorMessage, setErrorMessage] = useState();
 
-  useEffect(() => {
+  // Initial connection
+  useEffect(() => { if (!status) refreshStatus() }, [])
+
+  const refreshStatus = useCallback(() => {
     api.getHPCStatus((error, data, response) => {
       if (error) {
-        setStatus({
-          status: "ERROR",
-          message: parseHttpError(error, response, "while getting HPC status")
-        })
+        setErrorMessage(<HttpError httpError={error} response={response} context={"while getting HPC status"} />)
+        setStatus(null)
       } else {
         setStatus(data)
+        // TODO: If preparing, launch a timer that refreshed every second until stops preparing
       }
-    }
-  )}, [setStatus])
+    })
+  }, [api, setStatus])
 
+  const connect = useCallback(() => {
+    api.hpcPrepareGet((error, data, response) => {
+      if (error) {
+        setErrorMessage(<HttpError httpError={error} response={response} context={"while preparing HPC"} />)
+        setStatus(null)
+      } else {
+        refreshStatus()
+      }
+    })
 
+  }, [api, refreshStatus])
 
-  // useEffect(() => { // Handle typing timeout
-  //   // setTyping(true) set to true in handleEditorChange
-  //   const stopTypingTimer = setTimeout(() => {
-  //     setTyping(false)
-  //   }, 500)
+  if(errorMessage)
+    return errorMessage
 
-  //   return () => clearTimeout(stopTypingTimer)
-  // }, [
-  //   data, // Relaunch timer when valid data entered. This won't chage as soon as there is an error.
-  //   isTyping, // Lauch timer when user starts typing. This covers the case where the first character is an error.
-  //   setTyping
-  // ])
+  if (!status)
+    return <Spinner variant='light' />
 
   return (
-    <p style={{ whiteSpace: "pre-wrap" }}>
-      {status ? JSON.stringify(status, null, 2) : <Spinner variant='light' />}
+    <p>
+      {Object.keys(status).sort().map(key =>
+        <span key={key}>
+          <strong>{key}</strong>
+          {
+            {
+              NOT_CONFIGURED: <>
+                <Tooltip title="Not configured"><HideSourceIcon style={{ height: "1rem" }} /></Tooltip>
+                <small>Not Configured.</small>
+              </>,
+              CONFIGURED: <>
+                <Tooltip title="Configured">
+                  <PlayCircleIcon style={{ height: "1rem" }} onClick={connect} />
+                </Tooltip>
+                <small>Press play to connect.</small>
+              </>,
+              PREPARING: <>
+                <Tooltip title="Preparing"><PendingIcon style={{ height: "1rem" }} /></Tooltip>
+                <small>Connection in progress...</small>
+              </>,
+              READY: <>
+                <Tooltip title="Ready"><CheckCircleIcon style={{ height: "1rem" }} /></Tooltip>
+              </>,
+              ERROR: <>
+                <Tooltip title="Error"><ErrorIcon style={{ height: "1rem" }} /></Tooltip>
+              </>,
+            }[status[key]['state']]
+          }
+          {status[key]['message'] &&
+            <>
+              <br />{/* TODO: Format the message differently when it's an error? */}
+              {status[key]['message']}
+            </>
+          }
+          {status[key]['image'] &&
+            <>
+              <br />{/* TODO: Make this a link to docker hub */}
+              <small>Image: {[status[key]['image']]}</small>
+            </>
+          }
+          <br />
+        </span>
+      )}
     </p>
   );
 }

@@ -31,10 +31,6 @@ export default function InfoPage() {
       </p>
 
       <h2>HPC Status</h2>
-      <p><small>
-        BON in a Box supports connection to a high performance computer.
-        Review the documentation for configuration guidelines.
-      </small></p>
       <HPCStatus />
 
       <h2>Server versions</h2>
