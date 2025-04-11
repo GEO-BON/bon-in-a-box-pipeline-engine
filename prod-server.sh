@@ -65,7 +65,7 @@ function command { # args appended to the docker compose command
     if [[ $branch == *"staging" ]]; then
         echo "Using staging containers with suffix \"-$branch\""
         export DOCKER_SUFFIX="-$branch"
-    else if [[ $branch == "edge" ]]; then
+    elif [[ $branch == "edge" ]]; then
         echo "Using edge releases: you'll be up to date with the latest possible server."
         export DOCKER_SUFFIX="-edge"
     else

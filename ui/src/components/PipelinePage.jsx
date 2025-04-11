@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useReducer, useCallback } from "react";
-import { FoldableOutput } from "./FoldableOutput";
 
 import { PipelineForm } from "./form/PipelineForm";
 import { useParams } from "react-router-dom";
 import { PipelineResults } from "./PipelineResults";
+import { parseHttpError } from "./HttpErrors";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import _lang from "lodash/lang";
 import { CustomButtonGreen } from "./CustomMUI";
@@ -101,11 +101,7 @@ export function PipelinePage({ runType }) {
     pipInitialState
   );
 
-  function showHttpError(error, response) {
-    if (response && response.text) setHttpError(response.text);
-    else if (error) setHttpError(error.toString());
-    else setHttpError(null);
-  }
+
 
   let timeout;
   function loadPipelineOutputs() {
@@ -115,7 +111,7 @@ export function PipelinePage({ runType }) {
         pipStates.runId,
         (error, data, response) => {
           if (error) {
-            showHttpError(error, response);
+            setHttpError(parseHttpError(error, response, "while getting pipeline outputs from script server"));
           } else {
             if (data.error) {
               setHttpError(data.error);
@@ -144,26 +140,32 @@ export function PipelinePage({ runType }) {
   function loadPipelineMetadata(choice, setExamples = true) {
     var callback = function (error, data, response) {
       if (error) {
-        showHttpError(error, response);
+        setHttpError(parseHttpError(error, response, "while loading pipeline metadata from script server"));
+        setPipelineMetadata(null)
       } else if (data) {
         setPipelineMetadata(data);
         if (setExamples) {
-          let inputExamples = {};
-          if (data && data.inputs) {
-            Object.keys(data.inputs).forEach((inputId) => {
-              let input = data.inputs[inputId];
-              if (input) {
-                const example = input.example;
-                inputExamples[inputId] = example === undefined ? null : example;
-              }
-            });
-          }
-          setInputFileContent(inputExamples);
+          restoreDefaults(data)
         }
       }
     };
     api.getInfo(runType, choice, callback);
   }
+
+  const restoreDefaults = useCallback(metadata => {
+    let inputExamples = {};
+    if (metadata && metadata.inputs) {
+      Object.keys(metadata.inputs).forEach((inputId) => {
+        let input = metadata.inputs[inputId];
+        if (input) {
+          const example = input.example;
+          inputExamples[inputId] = example === undefined ? null : example;
+        }
+      });
+    }
+
+    setInputFileContent(inputExamples);
+  }, [setInputFileContent])
 
   function loadPipelineInputs(pip, hash) {
     var inputJson =
@@ -235,7 +237,7 @@ export function PipelinePage({ runType }) {
     setStoppable(false);
     api.stop(runType, pipStates.runId, (error, data, response) => {
       if (error) {
-        showHttpError(error, response);
+        setHttpError(parseHttpError(error, response, "in script server while stopping the pipeline"));
       } else {
         setHttpError("Cancelled by user");
       }
@@ -271,9 +273,10 @@ export function PipelinePage({ runType }) {
               inputFileContent={inputFileContent}
               pipStates={pipStates}
               setPipStates={setPipStates}
-              showHttpError={showHttpError}
+              setHttpError={setHttpError}
               setResultsData={setResultsData}
               runType={runType}
+              restoreDefaults={restoreDefaults}
             />
           </AccordionDetails>
         </Accordion>

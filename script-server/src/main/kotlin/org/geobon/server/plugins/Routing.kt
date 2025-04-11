@@ -22,6 +22,7 @@ import java.io.File
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlin.system.measureTimeMillis
 
 /**
  * Used to transport paths through path param.
@@ -97,18 +98,28 @@ fun Application.configureRouting() {
 
         get("/api/history") {
             val history = JSONArray()
-            runningPipelines.keys.forEach { runId ->
-                val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
-                history.put(getHistoryFromFolder(pipelineOutputFolder, true))
-            }
-
-            outputRoot.walk().forEach { file ->
-                if (file.name == "pipelineOutput.json") {
-                    history.put(getHistoryFromFolder(file.parentFile, false))
+            var timeTaken = measureTimeMillis {
+                runningPipelines.keys.forEach { runId ->
+                    val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
+                    history.put(getHistoryFromFolder(pipelineOutputFolder, true))
                 }
             }
+            logger.info("Time taken to get running ${runningPipelines.size} pipelines: ${timeTaken}", timeTaken)
 
-            call.respond(history.toString(2))
+            var outputRootList = listOf<File>()
+            timeTaken = measureTimeMillis {
+                outputRootList = outputRoot.walk().filter { it.isFile && it.name == "pipelineOutput.json" }.toList()
+            }
+            logger.info("Time taken for folder walk: ${timeTaken}", timeTaken)
+
+            timeTaken = measureTimeMillis {
+                outputRootList.forEach {
+                    history.put(getHistoryFromFolder(it.parentFile, false))
+                }
+            }
+            logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: ${timeTaken}", timeTaken)
+
+            call.respondText(history.toString(), ContentType.Application.Json)
         }
 
         get("/script/{scriptPath}/info") {
@@ -153,7 +164,7 @@ fun Application.configureRouting() {
                         }
                     }
 
-                    call.respondText(metadataJSON.toString(), ContentType.parse("application/json"))
+                    call.respondText(metadataJSON.toString(), ContentType.Application.Json)
                 } else {
                     call.respondText(text = "$descriptionFile does not exist", status = HttpStatusCode.NotFound)
                     logger.debug("404: getListOf ${call.parameters["descriptionPath"]}")
@@ -167,7 +178,7 @@ fun Application.configureRouting() {
         get("/pipeline/{descriptionPath}/get") {
             val descriptionFile = File(pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
             if (descriptionFile.exists()) {
-                call.respondText(descriptionFile.readText(), ContentType.parse("application/json"))
+                call.respondText(descriptionFile.readText(), ContentType.Application.Json)
             } else {
                 call.respondText(text = "$descriptionFile does not exist", status = HttpStatusCode.NotFound)
                 logger.debug("404: pipeline/${call.parameters["descriptionPath"]}/get")
