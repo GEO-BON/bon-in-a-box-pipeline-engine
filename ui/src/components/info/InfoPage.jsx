@@ -1,6 +1,7 @@
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
-import gplImg from "../img/gplv3-127x51.png";
+import gplImg from "../../img/gplv3-127x51.png";
 import Versions from "./Versions";
+import HPCStatus from "./HPCStatus";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -25,9 +26,16 @@ export default function InfoPage() {
         </tbody>
       </table>
       <p>
-        <strong>Pipelines and scripts have their own licenses</strong>, specified in their metadata.<br/>
+        <strong>Pipelines and scripts have their own licenses</strong>, specified in their metadata.<br />
         Make sure to review the attribution guidelines for pipelines and scripts.
       </p>
+
+      <h2>HPC Status</h2>
+      <p><small>
+        BON in a Box supports connection to a high performance computer.
+        Review the documentation for configuration guidelines.
+      </small></p>
+      <HPCStatus />
 
       <h2>Server versions</h2>
       <Versions />
