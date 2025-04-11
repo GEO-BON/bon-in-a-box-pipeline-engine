@@ -57,7 +57,7 @@ class HPCConnectionTest {
     }
 
     @Test
-    fun givenConfiguredWithBadHost_whenPreparedManually_thenGetFailureMessage() = testApplication {
+    fun givenConfiguredWithErrors_whenPreparedManually_thenGetFailureMessage() = testApplication {
         withEnvironment("HPC_SSH_CREDENTIALS" to "HPC-name") {
 
             application { configureRouting() }
@@ -69,14 +69,17 @@ class HPCConnectionTest {
 
             client.get("/api/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
-                assertContains(bodyAsText(), """"R":{"state":"ERROR"""")
-                assertContains(bodyAsText(), """"Julia":{"state":"ERROR"""")
+                val body = bodyAsText()
+                assertContains(body, """"R":{"state":"ERROR"""")
+                assertContains(body, """"Julia":{"state":"ERROR"""")
                 assertTrue(
                     // if runners exist on the testing PC
-                    bodyAsText().contains(""""message":"ssh: Could not resolve hostname hpc-name: Name or service not known""")
+                    body.contains(""""message":"ssh: Could not resolve hostname hpc-name: Name or service not known""")
+                    // runners exist but not configured
+                        || body.contains(""""message":"Warning: Identity file /run/secrets/hpc_ssh_key not accessible: No such file or directory""")
                     // otherwise
-                        || bodyAsText().contains("""No such image: geobon/bon-in-a-box:runner-conda""")
-                )
+                        || body.contains("""No such image: geobon/bon-in-a-box:runner-conda""")
+                , "Unexpected message: $body")
             }
         }
     }
