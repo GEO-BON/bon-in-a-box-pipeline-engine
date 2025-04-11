@@ -283,7 +283,7 @@ fun Application.configureRouting() {
         }
 
 // TODO: OpenAPI spec
-        get("/api/hpc/status") {
+        get("/hpc/status") {
             call.respond(mapOf(
                 "R" to hpc.rStatus.toMap(),
                 "Python" to hpc.pythonStatus.toMap(),
@@ -292,7 +292,7 @@ fun Application.configureRouting() {
         }
 
 // TODO: OpenAPI spec
-        get("/api/hpc/prepare") {
+        get("/hpc/prepare") {
             if(!hpc.configured) {
                 call.respond(HttpStatusCode.ServiceUnavailable, "HPC not configured on this server")
                 return@get

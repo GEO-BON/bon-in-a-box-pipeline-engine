@@ -31,7 +31,7 @@ class HPCConnectionTest {
     fun givenNotConfigured_thenStatusAsSuch() = testApplication {
         application { configureRouting() }
 
-        client.get("/api/hpc/status").apply {
+        client.get("/hpc/status").apply {
             assertEquals(HttpStatusCode.OK, status)
             assertEquals(
                 """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"}}""",
@@ -46,7 +46,7 @@ class HPCConnectionTest {
 
             application { configureRouting() }
 
-            client.get("/api/hpc/status").apply {
+            client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 assertEquals(
                     """{"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"}}""",
@@ -62,12 +62,12 @@ class HPCConnectionTest {
 
             application { configureRouting() }
 
-            client.get("/api/hpc/prepare").apply {
+            client.get("/hpc/prepare").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 print(bodyAsText())
             }
 
-            client.get("/api/hpc/status").apply {
+            client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 val body = bodyAsText()
                 assertContains(body, """"R":{"state":"ERROR"""")
