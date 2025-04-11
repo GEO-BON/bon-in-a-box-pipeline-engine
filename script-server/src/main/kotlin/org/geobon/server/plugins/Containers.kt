@@ -4,7 +4,7 @@ import org.geobon.utils.runCommand
 
 enum class Containers(
     val containerName: String,
-    private val versionCommand: String = "cat /version.txt",
+    private val versionCommand: String = "bash -c '[ -f /version.txt ] && cat /version.txt || echo \"dev\"'",
     private val envCommand: String? = null
 ) {
 
@@ -48,7 +48,7 @@ enum class Containers(
 
     val version: String by lazy {
         val result = (dockerCommand + versionCommand).runCommand(showErrors = false)
-        if(result.isNullOrBlank()) "offline" else result
+        if (result.isNullOrBlank()) "offline" else result
     }
 
     val environment: String by lazy {
@@ -59,7 +59,7 @@ enum class Containers(
      * @return true if this is an external container to the script server.
      *         Only the script server will return false.
      */
-    fun isExternal():Boolean{
+    fun isExternal(): Boolean {
         return this != SCRIPT_SERVER
     }
 }
