@@ -13,6 +13,7 @@
 
 
 import ApiClient from "../ApiClient";
+import GetHPCStatus200ResponseValue from '../model/GetHPCStatus200ResponseValue';
 import GetHistory200ResponseInner from '../model/GetHistory200ResponseInner';
 import Info from '../model/Info';
 
@@ -34,6 +35,42 @@ export default class DefaultApi {
         this.apiClient = apiClient || ApiClient.instance;
     }
 
+
+    /**
+     * Callback function to receive the result of the getHPCStatus operation.
+     * @callback module:api/DefaultApi~getHPCStatusCallback
+     * @param {String} error Error message, if any.
+     * @param {Object.<String, module:model/{String: GetHPCStatus200ResponseValue}>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get status of HPC connection.
+     * @param {module:api/DefaultApi~getHPCStatusCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Object.<String, module:model/{String: GetHPCStatus200ResponseValue}>}
+     */
+    getHPCStatus(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = {'String': GetHPCStatus200ResponseValue};
+      return this.apiClient.callApi(
+        '/hpc/status', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
 
     /**
      * Callback function to receive the result of the getHistory operation.
@@ -282,6 +319,41 @@ export default class DefaultApi {
       let returnType = 'String';
       return this.apiClient.callApi(
         '/api/versions', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the hpcPrepareGet operation.
+     * @callback module:api/DefaultApi~hpcPrepareGetCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.
+     * @param {module:api/DefaultApi~hpcPrepareGetCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    hpcPrepareGet(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = [];
+      let returnType = null;
+      return this.apiClient.callApi(
+        '/hpc/prepare', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );

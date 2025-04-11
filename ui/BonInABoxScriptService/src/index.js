@@ -13,6 +13,7 @@
 
 
 import ApiClient from './ApiClient';
+import GetHPCStatus200ResponseValue from './model/GetHPCStatus200ResponseValue';
 import GetHistory200ResponseInner from './model/GetHistory200ResponseInner';
 import Info from './model/Info';
 import InfoAuthorInner from './model/InfoAuthorInner';
@@ -62,6 +63,12 @@ export {
      * @property {module:ApiClient}
      */
     ApiClient,
+
+    /**
+     * The GetHPCStatus200ResponseValue model constructor.
+     * @property {module:model/GetHPCStatus200ResponseValue}
+     */
+    GetHPCStatus200ResponseValue,
 
     /**
      * The GetHistory200ResponseInner model constructor.
