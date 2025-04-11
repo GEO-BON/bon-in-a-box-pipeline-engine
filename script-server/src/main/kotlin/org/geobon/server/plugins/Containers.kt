@@ -4,7 +4,7 @@ import org.geobon.utils.runCommand
 
 enum class Containers(
     val containerName: String,
-    private val versionCommand: String = "bash -c '[ -f /version.txt ] && cat /version.txt || echo \"dev\"'",
+    private val versionCommand: String = "cat /version.txt",
     private val envCommand: String? = null
 ) {
 
@@ -27,7 +27,7 @@ enum class Containers(
     /**
      * NGINX proxy (dev+prod) and client UI (prod).
      */
-    UI("biab-gateway"),
+    UI("biab-gateway", "bash -c '[ -f /version.txt ] && cat /version.txt || echo \"dev\"'"),
 
     /**
      * Tiling server used to serve GeoTIFF content.
