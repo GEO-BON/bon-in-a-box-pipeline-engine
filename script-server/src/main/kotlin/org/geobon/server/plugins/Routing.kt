@@ -19,6 +19,9 @@ import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import kotlin.system.measureTimeMillis
+import java.io.BufferedReader
+import java.io.InputStreamReader
+
 
 /**
  * Used to transport paths through path param.
@@ -31,6 +34,21 @@ private val scriptStubsRoot = File(System.getenv("SCRIPT_STUBS_LOCATION"))
 
 private val runningPipelines = mutableMapOf<String, Pipeline>()
 private val logger: Logger = LoggerFactory.getLogger("Server")
+
+
+
+fun findFilesinFolder(folder:File, fileName: String): List<File> {
+    val processBuilder = ProcessBuilder("/bin/bash", "-c", "find ${folder} -name ${fileName}")
+    val process = processBuilder.start()
+    val reader = BufferedReader(InputStreamReader(process.inputStream))
+    val result = mutableListOf<File>()
+
+    reader.useLines { lines -> lines.forEach { result.add(File(it)) } }
+    
+    process.waitFor()
+    return result
+}
+
 
 fun Application.configureRouting() {
 
@@ -101,7 +119,7 @@ fun Application.configureRouting() {
 
             var outputRootList = listOf<File>()
             timeTaken = measureTimeMillis {
-                outputRootList = outputRoot.walk().filter { it.isFile && it.name == "pipelineOutput.json" }.toList()
+                outputRootList = findFilesinFolder(outputRoot, "pipelineOutput.json")
             }
             logger.info("Time taken for folder walk: ${timeTaken}", timeTaken)
 
