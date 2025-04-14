@@ -41,11 +41,15 @@ function getErrorString(error, response) {
 }
 
 function HttpError({ error, response, context = "" }) {
+    let errorMessage = getErrorMessage(error, response)
+
     return <Alert severity="error">
         {
-            isHttpError(error, response)
-                ? parseHttpError(error, response, context)
-                : "Error " + context + ": " + getErrorMessage(error, response)
+            "Error " + context + ": " + (
+                isHttpError(errorMessage)
+                    ? stripTags(errorMessage)
+                    : errorMessage
+            )
         }
     </Alert>
 }
