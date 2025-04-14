@@ -43,7 +43,7 @@ function getErrorString(error, response) {
 function HttpError({ error, response, context = "" }) {
     return <Alert severity="error">
         {
-            getErrorString(error, response)
+            isHttpError(error, response)
                 ? parseHttpError(error, response, context)
                 : "Error " + context + ": " + getErrorMessage(error, response)
         }
