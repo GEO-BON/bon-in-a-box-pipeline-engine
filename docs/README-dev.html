@@ -167,6 +167,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#editing-the-openapi-specification-of-the-script-server" id="toc-editing-the-openapi-specification-of-the-script-server" class="nav-link" data-scroll-target="#editing-the-openapi-specification-of-the-script-server">Editing the OpenAPI specification of the script-server</a></li>
   </ul></li>
   <li><a href="#debugging-signal-forwarding" id="toc-debugging-signal-forwarding" class="nav-link" data-scroll-target="#debugging-signal-forwarding">Debugging signal forwarding</a></li>
+  <li><a href="#setting-up-drac-cluster-connection" id="toc-setting-up-drac-cluster-connection" class="nav-link" data-scroll-target="#setting-up-drac-cluster-connection">Setting up DRAC cluster connection</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -406,6 +407,16 @@ gitGraph
 <h2 class="anchored" data-anchor-id="debugging-signal-forwarding">Debugging signal forwarding</h2>
 <p>Since runner-conda and runner-julia run in a separate docker, when the user stops the pipeline, the signal must go from the script-server, to the runner, to the running script. Docker does not allow this by default, this is why we save the PID in a file and use a separate exec command to kill the process.</p>
 <p>The PID file is called <code>.pid</code> and is located in the output folder of the run. It is deleted when the script completes. For details, see <a href="https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/blob/main/script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt">ScriptRun.kt</a>.</p>
+</section>
+<section id="setting-up-drac-cluster-connection" class="level2">
+<h2 class="anchored" data-anchor-id="setting-up-drac-cluster-connection">Setting up DRAC cluster connection</h2>
+<p>To connect to the DRAC automation node, you will need - A valid account - Manual authorisation from tech support - The IP address of your server or PC can be obtained with <code>curl ifcfg.me</code>. - The <a href="./script-stubs/helpers/allowed_commands.sh">allowed_commands.sh</a> script, with execute permissions in the node.</p>
+<ol type="1">
+<li>Follow <a href="https://docs.alliancecan.ca/wiki/Automation_in_the_context_of_multifactor_authentication/">these instructions</a></li>
+<li>Connect to the automation now via SSH, and accept the fingerprint of the HPC’s node. This is mandatory since known_hosts will be used to connect.</li>
+<li>Configure all the HPC_ environment variables in runner.env. (Make sure your runner.env contains all the HPC_ variables in the up-to-date runner-sample.env)</li>
+<li>Start the BON in a Box server normally.</li>
+</ol>
 
 
 </section>

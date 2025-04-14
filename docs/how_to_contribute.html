@@ -897,19 +897,19 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p><img src="images/Screenshot 2025-02-05 111618.png" class="img-fluid"></p>
 <p>You can look at the log of each of your scripts to read errors and debug.</p>
 <p><img src="images/Screenshot 2025-02-10 034124-02.png" class="img-fluid"></p>
-<p>Once you change a script and save to your local computer, the changes will immediately be implemented when you run the script through BON in a Box. <strong>However, if you change the YAML file, you will need to reload the page in the pipeline editor to see those changes.</strong> If this does not work, you may need to delete the script from the pipeline and re-drag it to the pipeline editor. Inputs and outputs can also be directly edited in the pipeline editor.</p>
+<p>Once you change a script’s code and save to your local computer, the changes will immediately be implemented when you run the script through BON in a Box. <strong>However, if you change the YAML file, you will need to reload the page in the pipeline editor to see those changes.</strong> If this does not work, you may need to delete the script from the pipeline and re-drag it to the pipeline editor. Inputs and outputs can also be directly edited in the pipeline editor.</p>
 </section>
 </section>
 <section id="troubleshooting" class="level1">
 <h1>Troubleshooting</h1>
 <p>Here are some common issues when trying to run pipelines in BON in a Box and how to fix them.</p>
 <ol type="1">
-<li><p><strong>The pipeline editor won’t let you save your pipeline</strong></p>
-<p>Errors in saving pipelines are usually due to incompatible inputs and outputs. When you change inputs or outputs in the YAML file, this won’t automatically change on the pipeline editor. When adding inputs, reload the pipeline editor so it reflects your changes. When changing the file formats of inputs or outputs, you will need to delete the edited script from the pipeline and re-drag it into the pipeline editor so that it can be saved.</p></li>
-<li><p><strong>The pipeline can’t find your packages</strong></p>
+<li><p><strong>The pipeline editor displays a warning when saving your pipeline</strong></p>
+<p>Errors in saving pipelines are usually due to incompatible inputs and outputs. When you change inputs or outputs in the script description’s YAML file, this won’t automatically change on the pipeline editor. When adding inputs, reload the pipeline editor so it reflects your changes. When changing the file formats of inputs or outputs, you will need to delete the edited script from the pipeline and re-drag it into the pipeline editor so that it can be saved. Note that pipelines saved with an error cannot be ran.</p></li>
+<li><p><strong>The script can’t find your packages</strong></p>
 <p>First, make sure that all of your packages are in the Conda sub-environment in the YAML file. If you are getting error that looks like <code>package or namespace load failed for 'sf' in dyn.load(file, DLLpath=DLLpath,...): unable to load shared object '/r-libs-user/sf/libs/sf.so</code>, you may need to purge the server. First, stop the server in our terminal (<code>./server-down.sh</code>) and then run <code>.server/prod-server.sh purge</code> then restart the server (<code>./server-up.sh</code>).</p></li>
 </ol>
-<p>If you encounter further errors, please contact us on <a href="https://can01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdiscourse.geobon.org%2F&amp;data=05%7C02%7Cjory.griffith%40mcgill.ca%7Cb05c119d71864b45735308dd5a68c263%7Ccd31967152e74a68afa9fcf8f89f09ea%7C0%7C0%7C638766128163579549%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&amp;sdata=sEns2YcaYWSBIxznG0Y38D2hgpwwFABmXtS1ya4QT8k%3D&amp;reserved=0">discourse</a> or email us at boninabox@geobon.org.</p>
+<p>If you encounter further errors, please contact us on <a href="https://discourse.geobon.org">Discourse</a> or email us at boninabox@geobon.org.</p>
 </section>
 <section id="when-is-your-pipeline-complete" class="level1">
 <h1>When is your pipeline complete?</h1>

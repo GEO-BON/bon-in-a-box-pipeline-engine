@@ -126,7 +126,7 @@ Installation steps on a server are the same as installing on a Linux computer, b
 
 -   By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy and activate https with certbot. How to do this is out of scope for this readme.
 
--   Connecting to a High-Performance Computer (HPC) is still experimental. Refer to the [developer documentation](README-dev.md#Setting-up-DRAC-cluster-connection).
+-   Connecting to a High-Performance Computer (HPC) is still experimental. Refer to the [developer documentation](README-dev.html#setting-up-drac-cluster-connection).
 
 # Troubleshooting
 
