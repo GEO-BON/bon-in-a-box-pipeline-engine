@@ -42,7 +42,7 @@ export default function HPCStatus() {
 
   }, [api, refreshStatus])
 
-  if(errorMessage)
+  if (errorMessage)
     return errorMessage
 
   if (!status)
@@ -50,8 +50,24 @@ export default function HPCStatus() {
 
   return (
     <p>
-      {Object.keys(status).sort().map(key =>
-        <span key={key}>
+      {Object.keys(status).sort().map(key => {
+        const digest = [status[key]['image']]
+        let imageName
+        if (digest) {
+          switch (key) {
+            case 'R':
+            case 'Python':
+              imageName = 'runner-conda'
+              break;
+            case 'Julia':
+              imageName = 'runner-julia'
+              break
+            default:
+              console.error("Unknown runner " + key)
+          }
+        }
+
+        return <span key={key}>
           <strong>{key}</strong>
           {
             {
@@ -74,7 +90,7 @@ export default function HPCStatus() {
               </>,
               ERROR: <>
                 <Tooltip title="Error"><ErrorIcon style={{ height: "1rem" }} onClick={connect} /></Tooltip>
-                <a onClick={connect} style={{cursor:'pointer'}}>Try again</a>
+                <a onClick={connect} style={{ cursor: 'pointer' }}>Try again</a>
               </>,
             }[status[key]['state']]
           }
@@ -86,13 +102,18 @@ export default function HPCStatus() {
           }
           {status[key]['image'] &&
             <>
-              <br />{/* TODO: Make this a link to docker hub */}
-              <small>Image: {[status[key]['image']]}</small>
+              <br />
+              <small>Image:
+                <a href={"https://hub.docker.com/layers/" + status[key]['image'].replace(':', '-').replace('@', '/' + imageName + '/images/')}
+                  target="_blank">
+                  {digest}
+                </a>
+              </small>
             </>
           }
           <br />
         </span>
-      )}
+      })}
     </p>
   );
 }
