@@ -282,7 +282,6 @@ fun Application.configureRouting() {
             } ?: call.respond(/*412*/HttpStatusCode.PreconditionFailed, "The pipeline wasn't running")
         }
 
-// TODO: OpenAPI spec
         get("/hpc/status") {
             call.respond(mapOf(
                 "R" to hpc.rStatus.toMap(),
@@ -291,7 +290,6 @@ fun Application.configureRouting() {
             ))
         }
 
-// TODO: OpenAPI spec
         get("/hpc/prepare") {
             if(!hpc.configured) {
                 call.respond(HttpStatusCode.ServiceUnavailable, "HPC not configured on this server")
