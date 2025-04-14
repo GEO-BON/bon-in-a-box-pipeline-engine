@@ -73,13 +73,14 @@ export default function HPCStatus() {
                 <Tooltip title="Ready"><CheckCircleIcon style={{ height: "1rem" }} /></Tooltip>
               </>,
               ERROR: <>
-                <Tooltip title="Error"><ErrorIcon style={{ height: "1rem" }} /></Tooltip>
+                <Tooltip title="Error"><ErrorIcon style={{ height: "1rem" }} onClick={connect} /></Tooltip>
+                <a onClick={connect} style={{cursor:'pointer'}}>Try again</a>
               </>,
             }[status[key]['state']]
           }
           {status[key]['message'] &&
             <>
-              <br />{/* TODO: Format the message differently when it's an error? */}
+              <br />
               {status[key]['message']}
             </>
           }
