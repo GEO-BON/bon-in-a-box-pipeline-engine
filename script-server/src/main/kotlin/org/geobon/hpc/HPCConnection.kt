@@ -1,10 +1,13 @@
 package org.geobon.hpc
 
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.geobon.utils.runCommand
 import java.util.concurrent.TimeUnit
 
+@OptIn(DelicateCoroutinesApi::class)
 class HPCConnection(private val sshCredentials: String?) {
 
     var juliaStatus = ApptainerImage()
@@ -20,23 +23,35 @@ class HPCConnection(private val sshCredentials: String?) {
         if(!sshCredentials.isNullOrBlank()){
             juliaStatus.state = ApptainerImageState.CONFIGURED
             rStatus.state = ApptainerImageState.CONFIGURED
+
+            if(System.getenv("HPC_AUTO_CONNECT") == "true") {
+                // We are launching preparation non-blocking,
+                // and not interested immediately in the result,
+                // hence using this DelicateCoroutinesApi
+                GlobalScope.launch {
+                    prepare()
+                }
+            }
         }
     }
 
     fun prepare() {
-        synchronized(this) { // sync avoids to launch the process 2 times in parallel by accident
-            runBlocking {
-                val condaJob = launch {
+        runBlocking {
+            val condaJob = launch {
+                // Checking if already preparing to avoid launching the process 2 times in parallel by accident
+                if (rStatus.state != ApptainerImageState.PREPARING) {
                     prepareApptainer(rStatus, "runner-conda")
                 }
+            }
 
-                val juliaJob = launch {
+            val juliaJob = launch {
+                if (juliaStatus.state != ApptainerImageState.PREPARING) {
                     prepareApptainer(juliaStatus, "runner-julia")
                 }
-
-                condaJob.join()
-                juliaJob.join()
             }
+
+            condaJob.join()
+            juliaJob.join()
         }
     }
 
