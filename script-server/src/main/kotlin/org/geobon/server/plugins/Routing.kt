@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import kotlin.system.measureTimeMillis
+import kotlin.math.min
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -38,7 +39,7 @@ private val logger: Logger = LoggerFactory.getLogger("Server")
 
 
 fun findFilesinFolder(folder:File, fileName: String): List<File> {
-    val processBuilder = ProcessBuilder("/bin/bash", "-c", "find ${folder} -name ${fileName}")
+    val processBuilder = ProcessBuilder("/bin/bash", "-c", "find ${folder} -type f -name ${fileName} -exec stat --format '%Y %n' {} \\; | sort -nr | cut -d' ' -f2-")
     val process = processBuilder.start()
     val reader = BufferedReader(InputStreamReader(process.inputStream))
     val result = mutableListOf<File>()
@@ -108,6 +109,8 @@ fun Application.configureRouting() {
         }
 
         get("/api/history") {
+            val start = call.request.queryParameters["start"]
+            val limit = call.request.queryParameters["limit"]
             val history = JSONArray()
             var timeTaken = measureTimeMillis {
                 runningPipelines.keys.forEach { runId ->
@@ -122,6 +125,19 @@ fun Application.configureRouting() {
                 outputRootList = findFilesinFolder(outputRoot, "pipelineOutput.json")
             }
             logger.info("Time taken for folder walk: ${timeTaken}", timeTaken)
+            
+            if(start != null) {
+                val startIndex = start.toInt()
+                if(startIndex <= outputRootList.size) {
+                    outputRootList = outputRootList.subList(startIndex, outputRootList.size)
+                } else {
+                    logger.info("Start index is larger than the number of pipelines", timeTaken)
+                }
+            }
+            if(limit != null && outputRootList.size > 1) {
+                val limitIndex = limit.toInt()
+                outputRootList = outputRootList.subList(0, min(limitIndex, outputRootList.size))
+            }
 
             timeTaken = measureTimeMillis {
                 outputRootList.forEach {
