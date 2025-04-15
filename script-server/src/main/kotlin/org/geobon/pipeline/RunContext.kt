@@ -50,6 +50,7 @@ data class RunContext(val runId: String, val inputs: String?) {
 
         val gson: Gson = GsonBuilder()
             .serializeNulls()
+            .excludeFieldsWithoutExposeAnnotation()
             .setObjectToNumberStrategy { reader ->
                 val value: String = reader.nextString()
                 try {

@@ -29,7 +29,7 @@ class ApplicationTest {
 
     @Test
     fun testPipelineRun() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/pipeline/list").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -72,7 +72,7 @@ class ApplicationTest {
 
     @Test
     fun testScriptRun() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/script/list").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -120,7 +120,7 @@ class ApplicationTest {
     @Test
     fun testPipelineWithSubfolder() = testApplication {
         application {
-            configureRouting()
+            module()
         }
 
         var id: String
@@ -132,6 +132,7 @@ class ApplicationTest {
         }
 
         client.get("/pipeline/$id/outputs").apply {
+            assertEquals(HttpStatusCode.OK, status)
             val result = JSONObject(bodyAsText())
 
             val folder = File(
@@ -147,7 +148,7 @@ class ApplicationTest {
 
     @Test
     fun `given script exists_when getting info_then info returned`() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/script/helloWorld>helloPython.yml/info").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -242,7 +243,7 @@ class ApplicationTest {
 
     @Test
     fun testIgnoreTrailingSlash() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/pipeline/list").apply {
             assertEquals(HttpStatusCode.OK, status)

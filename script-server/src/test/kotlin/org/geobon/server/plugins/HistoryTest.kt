@@ -5,6 +5,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
+import org.geobon.server.module
 import kotlin.test.*
 
 class HistoryTest {
@@ -49,7 +50,7 @@ class HistoryTest {
 
     @Test
     fun givenPipelineHasError_whenGettingStatus_thenStatusError() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         var id: String
         client.post("/pipeline/AssertTextToNull.json/run") {
@@ -72,7 +73,7 @@ class HistoryTest {
 
     @Test
     fun givenLastScriptHasError_whenGettingStatus_thenStatusError() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         var id: String
         client.post("/pipeline/AssertTextToNull.json/run") {

@@ -23,7 +23,7 @@ RUN chmod 755 /usr/local/bin/docker-compose
 RUN chmod 755 /usr/local/bin/docker
 
 ## This image builds the server code
-FROM gradle:7.5.1-jdk11 as builder
+FROM gradle:8.13-jdk11 as builder
 COPY . /home/gradle/project
 WORKDIR /home/gradle/project
 RUN gradle assemble
