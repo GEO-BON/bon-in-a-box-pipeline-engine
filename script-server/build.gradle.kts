@@ -58,9 +58,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.json/json
     implementation("org.json:json:20250107")
 
-    // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation("com.google.code.gson:gson:2.13.0")
-
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementation("org.yaml:snakeyaml:2.4")
 
