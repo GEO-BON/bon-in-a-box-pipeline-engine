@@ -38,14 +38,13 @@ private val logger: Logger = LoggerFactory.getLogger("Server")
 
 
 
-fun findFilesinFolder(folder:File, fileName: String): List<File> {
-    val processBuilder = ProcessBuilder("/bin/bash", "-c", "find ${folder} -type f -name ${fileName} -exec stat --format '%Y %n' {} \\; | sort -nr | cut -d' ' -f2-")
-    val process = processBuilder.start()
-    val reader = BufferedReader(InputStreamReader(process.inputStream))
-    val result = mutableListOf<File>()
+fun findFilesInFolder(folder:File, fileName: String): List<File> {
+    val process = ProcessBuilder("/bin/bash", "-c", "/bin/bash", "-c", "find ${folder} -type f -name ${fileName} -exec stat --format '%Y %n' {} \\; | sort -nr | cut -d' ' -f2-").start()
+    val reader = process.inputStream.bufferedReader()
 
-    reader.useLines { lines -> lines.forEach { result.add(File(it)) } }
-    
+    val result = mutableListOf<File>()
+    reader.forEachLine { result.add(File(it)) }
+
     process.waitFor()
     return result
 }
@@ -120,12 +119,12 @@ fun Application.configureRouting() {
             }
             logger.info("Time taken to get running ${runningPipelines.size} pipelines: ${timeTaken}", timeTaken)
 
-            var outputRootList = listOf<File>()
+            var outputRootList: List<File>
             timeTaken = measureTimeMillis {
-                outputRootList = findFilesinFolder(outputRoot, "pipelineOutput.json")
+                outputRootList = findFilesInFolder(outputRoot, "pipelineOutput.json")
             }
             logger.info("Time taken for folder walk: ${timeTaken}", timeTaken)
-            
+
             if(start != null) {
                 val startIndex = start.toInt()
                 if(startIndex <= outputRootList.size) {
