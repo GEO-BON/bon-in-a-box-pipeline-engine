@@ -5,8 +5,6 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
-import org.geobon.server.plugins.configureRouting
-import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
