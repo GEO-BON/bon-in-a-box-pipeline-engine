@@ -1,6 +1,6 @@
 package org.geobon.server.plugins
 
-import org.geobon.utils.runCommand
+import org.geobon.utils.runToText
 
 enum class Containers(
     val containerName: String,
@@ -47,12 +47,12 @@ enum class Containers(
 
 
     val version: String by lazy {
-        val result = (dockerCommand + versionCommand).runCommand(showErrors = false)
+        val result = (dockerCommand + versionCommand).runToText(showErrors = false)
         if (result.isNullOrBlank()) "offline" else result
     }
 
     val environment: String by lazy {
-        (dockerCommand + envCommand).runCommand(showErrors = false) ?: ""
+        (dockerCommand + envCommand).runToText(showErrors = false) ?: ""
     }
 
     /**
