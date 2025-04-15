@@ -162,7 +162,7 @@ class ApplicationTest {
 
     @Test
     fun `given script does not exist_when getting info_then 404`() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/script/non-existing/info").apply {
             assertEquals(HttpStatusCode.NotFound, status)
@@ -171,7 +171,7 @@ class ApplicationTest {
 
     @Test
     fun `given pipeline exists_when getting info_then info returned`() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/pipeline/helloWorld.json/info").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -190,7 +190,7 @@ class ApplicationTest {
 
     @Test
     fun `given pipeline does not exist_when getting info_then 404`() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/pipeline/non-existing/info").apply {
             assertEquals(HttpStatusCode.NotFound, status)
@@ -199,7 +199,7 @@ class ApplicationTest {
 
     @Test
     fun `given pipeline exists_when getting structure_then returned`() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/pipeline/helloWorld.json/get").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -213,7 +213,7 @@ class ApplicationTest {
 
     @Test
     fun `given pipeline does not exist_when getting structure_then 404`() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/pipeline/non-existing/get").apply {
             assertEquals(HttpStatusCode.NotFound, status)
@@ -222,7 +222,7 @@ class ApplicationTest {
 
     @Test
     fun `given run does not exist_when getting outputs_then 404`() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/pipeline/1234/outputs").apply {
             assertEquals(HttpStatusCode.NotFound, status)
@@ -231,7 +231,7 @@ class ApplicationTest {
 
     @Test
     fun `given run does not exist_when trying to stop_then 412`() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/pipeline/1234/stop").apply {
             assertEquals(HttpStatusCode.PreconditionFailed, status)
@@ -260,7 +260,7 @@ class ApplicationTest {
      */
     @Test
     fun testGetVersion() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/api/versions").apply {
             assertEquals(HttpStatusCode.OK, status)
