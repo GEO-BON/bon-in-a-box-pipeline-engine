@@ -19,15 +19,19 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { styled } from "@mui/material/styles";
-import { CustomButtonGreen } from "./CustomMUI";
+import ReactMarkdown from "react-markdown";
+import { CustomButtonGreen, CustomButtonGrey } from "./CustomMUI";
 import { Alert } from "@mui/material";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export default function RunHistory() {
   let [runHistory, setRunHistory] = useState(null);
+  let [start, setStart] = useState(0);
+  let limit=30;
   useEffect(() => {
-    api.getHistory((error, _, response) => {
+    api.getHistory({start, limit}, (error, _, response) => {
+      document.getElementById('pageTop')?.scrollIntoView({ behavior: 'smooth' });
       if (error) {
         setRunHistory(<HttpError httpError={error} response={response} context={"getting run history"} />);
       } else if (response && response.text) {
@@ -37,17 +41,21 @@ export default function RunHistory() {
           return bb - aa;
         });
         setRunHistory(
-          <Grid container spacing={2}>
-            {runs.map((res) => (
-              <RunCard run={res} />
-            ))}
-          </Grid>
+          <div id='pageTop' style={{padding:"20px"}}>  
+            <h1>Previous runs</h1>
+              <Grid container spacing={2}>
+                {runs.map((res) => (
+                  <RunCard run={res} />
+                ))}
+              </Grid>
+              <PreviousNext start={start} limit={limit} runLength={runs.length} setStart={setStart}/>
+          </div>
         );
       } else {
         setRunHistory(<Alert severity="warning">Could not retrieve history: empty response.</Alert>);
       }
     });
-  }, []);
+  }, [start, limit]);
 
   return runHistory ? runHistory : <Spinner variant='light' />;
 }
@@ -92,6 +100,24 @@ const ExpandMore = styled((props) => {
   ],
 }));
 
+const PreviousNext = (props)=> {
+  const { start, limit, runLength, setStart } = props;
+  return(
+  <Grid container spacing={2} justifyContent="flex-center" sx={{ marginTop: "20px", paddingBottom: "100px" }}>
+      {start > 0 && (
+        <Grid item xs={12} md={6}>
+        <CustomButtonGrey onClick={()=>{setStart((prev)=>(Math.min(prev-limit,0)))}}>{"<< Previous page"}</CustomButtonGrey>
+        </Grid>
+      )}
+      {runLength == limit && (
+        <Grid item xs={12} md={6}>
+        <CustomButtonGrey onClick={()=>{setStart((prev)=>(prev+limit))}}>{"Next page >>"}</CustomButtonGrey>
+        </Grid>
+      )}
+  </Grid>
+  )
+}
+
 const RunCard = (props) => {
   const { run } = props;
   const [expanded, setExpanded] = useState(false);
@@ -135,15 +161,17 @@ const RunCard = (props) => {
         }}
       >
         <Tooltip title={runHash}>
-          <CardHeader
-            avatar={
-              <Avatar sx={{ bgcolor: color(run.status) }}>
-                <AccountTreeIcon sx={{ color: "#f3f3f1" }} />
-              </Avatar>
-            }
-            title={run.runId.substring(0, ind)}
-            subheader={date.toLocaleString(navigator.language)}
-          />
+          <>
+            <CardHeader
+              avatar={
+                <Avatar sx={{ bgcolor: color(run.status) }}>
+                  <AccountTreeIcon sx={{ color: "#f3f3f1" }} />
+                </Avatar>
+              }
+              title={run.runId.substring(0, ind)}
+              subheader={date.toLocaleString(navigator.language)}
+            />
+          </>
         </Tooltip>
         <CardContent>
           <Tooltip title={desc}>
@@ -193,8 +221,11 @@ const RunCard = (props) => {
                   fontSize: "0.9em",
                   marginBottom: "10px",
                 }}
-              >
+              ><div className="whiteBackground">
+                <ReactMarkdown>
                 {desc}
+                </ReactMarkdown>
+                </div>
               </Typography>
               <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>
               <Table size="small">
