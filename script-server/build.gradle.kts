@@ -15,6 +15,9 @@ application {
 
     val isDevelopment: Boolean = ("true" == System.getenv("DEV"))
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+
+    // Better behavior of trimIndent() when it includes variables
+    //id("com.bennyhuo.kotlin.trimindent") version "1.9.20-1.1.0"
 }
 
 repositories {
