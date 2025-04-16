@@ -314,11 +314,13 @@ class ScriptRun( // Constructor used in single script run
                             val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
                             command = container.dockerCommandList + listOf(
                                 "bash", "-c",
+                                // FIXME: until Trim Indent plugin is usable again, unindenting python code.
+                                // See https://github.com/bennyhuo/Kotlin-Trim-Indent/issues/5#issuecomment-2807833820
                                 """
-                                    ${runner.getSetupBash()}
-                                    python3 -c '
-                                    $pythonWrapper
-                                    ' $escapedOutputFolder
+${runner.getSetupBash()}
+python3 -c '
+$pythonWrapper
+' $escapedOutputFolder
                                 """.trimIndent()
                             )
                         } else {

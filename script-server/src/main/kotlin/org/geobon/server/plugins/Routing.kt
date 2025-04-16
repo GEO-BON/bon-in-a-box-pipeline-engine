@@ -278,6 +278,8 @@ fun Application.configureRouting() {
 
         get("/api/versions") {
             call.respond(
+                // FIXME: until Trim Indent plugin is usable again, using trimMargin and replace("\n", "\n    ")}.
+                // See https://github.com/bennyhuo/Kotlin-Trim-Indent/issues/5#issuecomment-2807833820
                 """
                     |UI: ${Containers.UI.version}
                     |Script server: ${Containers.SCRIPT_SERVER.version}
@@ -292,7 +294,7 @@ fun Application.configureRouting() {
                             if (end == -1) it
                             else it.substring(0, end).replace('T', ' ')
                         }
-                    }   
+                    }
                 """.trimMargin("|")
             )
         }
