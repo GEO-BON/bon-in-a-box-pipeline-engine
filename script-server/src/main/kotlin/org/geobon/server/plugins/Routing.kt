@@ -278,24 +278,22 @@ fun Application.configureRouting() {
 
         get("/api/versions") {
             call.respond(
-                // FIXME: until Trim Indent plugin is usable again, using trimMargin and replace("\n", "\n    ")}.
-                // See https://github.com/bennyhuo/Kotlin-Trim-Indent/issues/5#issuecomment-2807833820
                 """
-                    |UI: ${Containers.UI.version}
-                    |Script server: ${Containers.SCRIPT_SERVER.version}
-                    |    ${Containers.SCRIPT_SERVER.environment}
-                    |Conda runner: ${Containers.CONDA.version}
-                    |    ${Containers.CONDA.environment.replace("\n", "\n    ")}
-                    |Julia runner: ${Containers.JULIA.version}
-                    |    ${Containers.JULIA.environment}
-                    |TiTiler: ${
+                    UI: ${Containers.UI.version}
+                    Script server: ${Containers.SCRIPT_SERVER.version}
+                        ${Containers.SCRIPT_SERVER.environment}
+                    Conda runner: ${Containers.CONDA.version}
+                        ${Containers.CONDA.environment}
+                    Julia runner: ${Containers.JULIA.version}
+                        ${Containers.JULIA.environment}
+                    TiTiler: ${
                         Containers.TILER.version.let {
                             val end = it.lastIndexOf(':')
                             if (end == -1) it
                             else it.substring(0, end).replace('T', ' ')
                         }
                     }
-                """.trimMargin("|")
+                """.trimIndent()
             )
         }
 

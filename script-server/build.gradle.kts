@@ -6,6 +6,9 @@ val kotlinVersion: String by project
 plugins {
     kotlin("jvm") version "2.1.20"
     id("io.ktor.plugin")
+
+    // Better behavior of trimIndent() when it includes variables
+    id("com.bennyhuo.kotlin.trimindent") version "2.1.20-1.1.0-SNAPSHOT"
 }
 
 group = "org.geobon"
@@ -15,13 +18,11 @@ application {
 
     val isDevelopment: Boolean = ("true" == System.getenv("DEV"))
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
-
-    // Better behavior of trimIndent() when it includes variables
-    //id("com.bennyhuo.kotlin.trimindent") version "1.9.20-1.1.0"
 }
 
 repositories {
     mavenCentral()
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 
 tasks.test {
