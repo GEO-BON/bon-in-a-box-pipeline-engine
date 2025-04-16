@@ -144,6 +144,7 @@ export function PipelineOutput(props: any) {
               <>
                 {(outputObj?.label?.toLowerCase().includes("presence") ||
                   outputObj?.label?.toLowerCase().includes("occurrence") ||
+                  outputObj?.label?.toLowerCase().includes("observation") ||
                   outputObj?.label?.toLowerCase().includes("absence")) && (
                   <CustomButtonGreen
                     key={`but-${outputObj.outputs}`}
