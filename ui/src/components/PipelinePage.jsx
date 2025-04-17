@@ -103,7 +103,7 @@ export function PipelinePage({ runType }) {
 
 
 
-  let timeout;
+  let pipelineOutputsTimeout;
   function loadPipelineOutputs() {
     if (pipStates.runHash) {
       api.getOutputFolders(
@@ -123,7 +123,7 @@ export function PipelinePage({ runType }) {
             );
             if (!allOutputFoldersKnown) {
               // try again later
-              timeout = setTimeout(loadPipelineOutputs, 1000);
+              pipelineOutputsTimeout = setTimeout(loadPipelineOutputs, 1000);
             }
 
             setResultsData((previousData) =>
@@ -209,6 +209,13 @@ export function PipelinePage({ runType }) {
     }
 
     loadPipelineOutputs();
+
+    return () => {
+      if (pipelineOutputsTimeout) {
+        clearTimeout(pipelineOutputsTimeout)
+        pipelineOutputsTimeout = null
+      }
+    }
   }, [pipStates]);
 
   useEffect(() => {
