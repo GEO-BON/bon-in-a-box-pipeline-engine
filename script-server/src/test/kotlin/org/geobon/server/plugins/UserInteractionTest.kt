@@ -5,6 +5,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
+import org.geobon.server.module
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
@@ -28,7 +29,7 @@ class UserInteractionTest {
 
     @Test
     fun testPipelineRun() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         client.get("/pipeline/list").apply {
 

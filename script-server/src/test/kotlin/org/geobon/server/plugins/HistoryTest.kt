@@ -5,6 +5,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
+import org.geobon.server.module
 import kotlin.test.*
 
 class HistoryTest {
@@ -27,7 +28,7 @@ class HistoryTest {
     fun givenCancelledPipeline_whenGettingStatus_thenStatusCancelled() = testApplication {
         // This CANNOT be tested with this framework, since client.post waits for the call to complete,
         // and doesn't continue once the response if finished.
-//        application { configureRouting() }
+//        application { module() }
 //
 //        var id: String
 //        client.post("/script/sleep.yml/run") {
@@ -49,7 +50,7 @@ class HistoryTest {
 
     @Test
     fun givenPipelineHasError_whenGettingStatus_thenStatusError() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         var id: String
         client.post("/pipeline/AssertTextToNull.json/run") {
@@ -72,7 +73,7 @@ class HistoryTest {
 
     @Test
     fun givenLastScriptHasError_whenGettingStatus_thenStatusError() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         var id: String
         client.post("/pipeline/AssertTextToNull.json/run") {
@@ -95,7 +96,7 @@ class HistoryTest {
 
     @Test
     fun givenPipelineRan_whenGettingStatus_thenStatusComplete() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         var id: String
         client.post("/pipeline/0in1out_1step.json/run") {
