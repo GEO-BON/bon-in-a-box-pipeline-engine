@@ -23,36 +23,28 @@ function stripTags(message) {
             .split(/\s+/)
             .join(' ');
     } catch (err) {
-        return "Unhandled " + err;
+        console.error(err)
+        return message;
     }
-}
-
-function parseHttpError(error, response, context = "") {
-    let errorMessageWithHtml = getErrorMessage(error, response);
-    let errorMessageAlone = stripTags(errorMessageWithHtml)
-    return "Error " + context + ": " + errorMessageAlone
 }
 
 function getErrorString(error, response) {
     let errorMessage = getErrorMessage(error, response);
     return isHttpError(errorMessage)
-        ? parseHttpError(error, response)
+        ? stripTags(errorMessage)
         : errorMessage
 }
 
-function HttpError({ error, response, context = "" }) {
-    let errorMessage = getErrorMessage(error, response)
+function formatError(error, response, context = "") {
+    return "Error " + context + ": " +
+        getErrorString(error, response)
+}
 
+function HttpError({ error, response, context = "" }) {
     return <Alert severity="error">
-        {
-            "Error " + context + ": " + (
-                isHttpError(errorMessage)
-                    ? stripTags(errorMessage)
-                    : errorMessage
-            )
-        }
+        {formatError(error, response, context)}
     </Alert>
 }
 
 
-export { getErrorString, parseHttpError, HttpError };
+export { getErrorString, formatError, HttpError };
