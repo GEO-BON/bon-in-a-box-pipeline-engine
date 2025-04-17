@@ -95,7 +95,7 @@ fun Application.configureRouting() {
                             } else { // Pipelines
                                 JSONObject(file.readText()).getJSONObject(METADATA).getString(METADATA__NAME)
                             }
-                        } catch (e: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
+                        } catch (_: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
                             null
                         }
 
@@ -117,20 +117,20 @@ fun Application.configureRouting() {
                     history.put(getHistoryFromFolder(pipelineOutputFolder, true))
                 }
             }
-            logger.info("Time taken to get running ${runningPipelines.size} pipelines: ${timeTaken}", timeTaken)
+            logger.info("Time taken to get running ${runningPipelines.size} pipelines: $timeTaken")
 
             var outputRootList: List<File>
             timeTaken = measureTimeMillis {
                 outputRootList = findFilesInFolder(outputRoot, "pipelineOutput.json")
             }
-            logger.info("Time taken for folder walk: ${timeTaken}", timeTaken)
+            logger.info("Time taken for folder walk: $timeTaken")
 
             if(start != null) {
                 val startIndex = start.toInt()
                 if(startIndex <= outputRootList.size) {
                     outputRootList = outputRootList.subList(startIndex, outputRootList.size)
                 } else {
-                    logger.info("Start index is larger than the number of pipelines", timeTaken)
+                    logger.info("Start index is larger than the number of pipelines")
                 }
             }
             if(limit != null && outputRootList.size > 1) {
@@ -143,7 +143,7 @@ fun Application.configureRouting() {
                     history.put(getHistoryFromFolder(it.parentFile, false))
                 }
             }
-            logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: ${timeTaken}", timeTaken)
+            logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: $timeTaken")
 
             call.respondText(history.toString(), ContentType.Application.Json)
         }
