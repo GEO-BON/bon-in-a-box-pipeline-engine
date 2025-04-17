@@ -1,16 +1,73 @@
 package org.geobon.pipeline
 
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import org.geobon.pipeline.RunContext.Companion.pipelineRoot
 import org.geobon.pipeline.RunContext.Companion.scriptRoot
 import org.geobon.server.plugins.FILE_SEPARATOR
+import org.geobon.utils.findFilesInFolderByDate
+import org.json.JSONArray
 import org.json.JSONObject
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.text.SimpleDateFormat
+import kotlin.math.min
+import kotlin.system.measureTimeMillis
+
+private val logger: Logger = LoggerFactory.getLogger("History")
 
 // Date format definition https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
 private val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
-fun getHistoryFromFolder(runFolder:File, isRunning:Boolean) : JSONObject {
+suspend fun handleHistoryCall(
+    call: ApplicationCall,
+    start: String?,
+    limit: String?,
+    runningPipelines: MutableMap<String, Pipeline>
+) {
+    val history = JSONArray()
+    var timeTaken = measureTimeMillis {
+        runningPipelines.keys.forEach { runId ->
+            val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
+            history.put(getHistoryFromFolder(pipelineOutputFolder, true))
+        }
+    }
+    logger.info("Time taken to get running ${runningPipelines.size} pipelines: $timeTaken")
+
+    var outputRootList: List<File>
+    timeTaken = measureTimeMillis {
+        outputRootList = findFilesInFolderByDate(outputRoot, "pipelineOutput.json")
+    }
+    logger.info("Time taken for folder walk: $timeTaken")
+
+    if(start != null) {
+        val startIndex = start.toInt()
+        if(startIndex <= outputRootList.size) {
+            outputRootList = outputRootList.subList(startIndex, outputRootList.size)
+        } else {
+            call.respond(HttpStatusCode.RequestedRangeNotSatisfiable, "Start index is larger than the number of pipelines.")
+            return
+        }
+    }
+
+    if(limit != null && outputRootList.size > 1) {
+        val limitIndex = limit.toInt()
+        outputRootList = outputRootList.subList(0, min(limitIndex, outputRootList.size))
+    }
+
+    timeTaken = measureTimeMillis {
+        outputRootList.forEach {
+            history.put(getHistoryFromFolder(it.parentFile, false))
+        }
+    }
+    logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: $timeTaken")
+
+    call.respondText(history.toString(), ContentType.Application.Json)
+}
+
+private fun getHistoryFromFolder(runFolder:File, isRunning:Boolean) : JSONObject {
     val run = JSONObject()
     val runId = runFolder.relativeTo(outputRoot).path.replace('/', FILE_SEPARATOR)
     run.put("runId", runId)

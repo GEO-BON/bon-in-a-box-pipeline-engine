@@ -11,17 +11,12 @@ import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
 import org.geobon.pipeline.RunContext.Companion.scriptRoot
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
-import kotlin.system.measureTimeMillis
-import kotlin.math.min
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
 
 /**
@@ -35,19 +30,6 @@ private val scriptStubsRoot = File(System.getenv("SCRIPT_STUBS_LOCATION"))
 
 private val runningPipelines = mutableMapOf<String, Pipeline>()
 private val logger: Logger = LoggerFactory.getLogger("Server")
-
-
-
-fun findFilesInFolder(folder:File, fileName: String): List<File> {
-    val process = ProcessBuilder("/bin/bash", "-c", "/bin/bash", "-c", "find ${folder} -type f -name ${fileName} -exec stat --format '%Y %n' {} \\; | sort -nr | cut -d' ' -f2-").start()
-    val reader = process.inputStream.bufferedReader()
-
-    val result = mutableListOf<File>()
-    reader.forEachLine { result.add(File(it)) }
-
-    process.waitFor()
-    return result
-}
 
 
 fun Application.configureRouting() {
@@ -110,42 +92,7 @@ fun Application.configureRouting() {
         get("/api/history") {
             val start = call.request.queryParameters["start"]
             val limit = call.request.queryParameters["limit"]
-            val history = JSONArray()
-            var timeTaken = measureTimeMillis {
-                runningPipelines.keys.forEach { runId ->
-                    val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
-                    history.put(getHistoryFromFolder(pipelineOutputFolder, true))
-                }
-            }
-            logger.info("Time taken to get running ${runningPipelines.size} pipelines: $timeTaken")
-
-            var outputRootList: List<File>
-            timeTaken = measureTimeMillis {
-                outputRootList = findFilesInFolder(outputRoot, "pipelineOutput.json")
-            }
-            logger.info("Time taken for folder walk: $timeTaken")
-
-            if(start != null) {
-                val startIndex = start.toInt()
-                if(startIndex <= outputRootList.size) {
-                    outputRootList = outputRootList.subList(startIndex, outputRootList.size)
-                } else {
-                    logger.info("Start index is larger than the number of pipelines")
-                }
-            }
-            if(limit != null && outputRootList.size > 1) {
-                val limitIndex = limit.toInt()
-                outputRootList = outputRootList.subList(0, min(limitIndex, outputRootList.size))
-            }
-
-            timeTaken = measureTimeMillis {
-                outputRootList.forEach {
-                    history.put(getHistoryFromFolder(it.parentFile, false))
-                }
-            }
-            logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: $timeTaken")
-
-            call.respondText(history.toString(), ContentType.Application.Json)
+            handleHistoryCall(call, start, limit, runningPipelines)
         }
 
         get("/script/{scriptPath}/info") {
