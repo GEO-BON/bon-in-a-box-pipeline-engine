@@ -21,7 +21,10 @@ fun String.runToText(
 
 
 fun findFilesInFolderByDate(folder:File, fileName: String): List<File> {
-    val process = ProcessBuilder("/bin/bash", "-c", "find $folder -type f -name $fileName -exec stat --format '%Y %n' {} \\; | sort -nr | cut -d' ' -f2-").start()
+    val process = ProcessBuilder(
+        "/bin/bash", "-c",
+        "find $folder -type f -name $fileName -exec stat --format '%Y %n' {} \\; | sort -nr | cut -d' ' -f2-"
+    ).start()
     val reader = process.inputStream.bufferedReader()
 
     val result = mutableListOf<File>()
