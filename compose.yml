@@ -71,6 +71,7 @@ services:
       - ${GATEWAY_CONFIG}:/etc/nginx/conf.d:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ${PIPELINE_REPO_PATH}/output:/static/output:ro
+      - ${PIPELINE_REPO_PATH}/userdata:/static/userdata:ro
     depends_on:
       - script-server
 
