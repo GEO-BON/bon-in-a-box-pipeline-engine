@@ -77,7 +77,7 @@ fun Application.configureRouting() {
                             } else { // Pipelines
                                 JSONObject(file.readText()).getJSONObject(METADATA).getString(METADATA__NAME)
                             }
-                        } catch (e: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
+                        } catch (_: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
                             null
                         }
 
@@ -281,18 +281,18 @@ fun Application.configureRouting() {
                 """
                     UI: ${Containers.UI.version}
                     Script server: ${Containers.SCRIPT_SERVER.version}
-                       ${Containers.SCRIPT_SERVER.environment}
+                        ${Containers.SCRIPT_SERVER.environment}
                     Conda runner: ${Containers.CONDA.version}
                         ${Containers.CONDA.environment}
                     Julia runner: ${Containers.JULIA.version}
-                       ${Containers.JULIA.environment}
+                        ${Containers.JULIA.environment}
                     TiTiler: ${
-                    Containers.TILER.version.let {
-                        val end = it.lastIndexOf(':')
-                        if (end == -1) it
-                        else it.substring(0, end).replace('T', ' ')
+                        Containers.TILER.version.let {
+                            val end = it.lastIndexOf(':')
+                            if (end == -1) it
+                            else it.substring(0, end).replace('T', ' ')
+                        }
                     }
-                }
                 """.trimIndent()
             )
         }

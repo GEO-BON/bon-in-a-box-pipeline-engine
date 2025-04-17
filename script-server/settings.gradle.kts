@@ -5,4 +5,10 @@ pluginManagement {
     plugins {
         id("io.ktor.plugin") version ktorVersion
     }
+
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        maven("https://s01.oss.sonatype.org/content/repositories/releases")
+    }
 }

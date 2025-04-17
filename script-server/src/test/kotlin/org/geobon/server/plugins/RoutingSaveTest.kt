@@ -7,6 +7,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
+import org.geobon.server.module
 import java.io.File
 import kotlin.test.*
 
@@ -35,7 +36,7 @@ class RoutingSaveTest {
 
     @Test
     fun testSaveSuccess() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         val content = """
                 {
@@ -116,7 +117,7 @@ class RoutingSaveTest {
 
     @Test
     fun testSaveWithWarnings() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         val content = """
                 {
@@ -198,7 +199,7 @@ class RoutingSaveTest {
 
     @Test
     fun testSaveCleanFilePaths() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         val content = """
                 {
@@ -305,7 +306,7 @@ class RoutingSaveTest {
 
     @Test
     fun testSaveInvalidJSON() = testApplication {
-        application { configureRouting() }
+        application { module() }
 
         val content = """
                 {
@@ -338,7 +339,7 @@ class RoutingSaveTest {
     @Test
     fun testSaveNotAllowed() = testApplication {
         withEnvironment("SAVE_PIPELINE_TO_SERVER", "deny", OverrideMode.SetOrOverride) {
-            application { configureRouting() }
+            application { module() }
 
             val content = """
                 {
