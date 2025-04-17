@@ -8,7 +8,7 @@ plugins {
     id("io.ktor.plugin")
 
     // Better behavior of trimIndent() when it includes variables
-    id("com.bennyhuo.kotlin.trimindent") version "2.1.20-1.1.0-SNAPSHOT"
+    id("com.bennyhuo.kotlin.trimindent") version "2.1.20-1.1.0"
 }
 
 group = "org.geobon"
@@ -22,7 +22,7 @@ application {
 
 repositories {
     mavenCentral()
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
+    maven("https://s01.oss.sonatype.org/content/repositories/releases")
 }
 
 tasks.test {
