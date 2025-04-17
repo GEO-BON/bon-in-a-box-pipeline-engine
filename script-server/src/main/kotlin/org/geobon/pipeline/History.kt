@@ -27,11 +27,13 @@ suspend fun handleHistoryCall(
     limit: String?,
     runningPipelines: MutableMap<String, Pipeline>
 ) {
+    val explored = HashSet<File>()
     val history = JSONArray()
     var timeTaken = measureTimeMillis {
         runningPipelines.keys.forEach { runId ->
             val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
             history.put(getHistoryFromFolder(pipelineOutputFolder, true))
+            explored.add(pipelineOutputFolder)
         }
     }
     logger.info("Time taken to get running ${runningPipelines.size} pipelines: $timeTaken")
@@ -59,7 +61,9 @@ suspend fun handleHistoryCall(
 
     timeTaken = measureTimeMillis {
         outputRootList.forEach {
-            history.put(getHistoryFromFolder(it.parentFile, false))
+            val folder = it.parentFile
+            if (!explored.contains(folder))
+                history.put(getHistoryFromFolder(folder, false))
         }
     }
     logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: $timeTaken")
