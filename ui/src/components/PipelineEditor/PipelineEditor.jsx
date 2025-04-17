@@ -1,5 +1,5 @@
 import "react-flow-renderer/dist/style.css";
-import { getErrorString, parseHttpError } from "../HttpErrors";
+import { getErrorString } from "../HttpErrors";
 import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
 import {
@@ -808,7 +808,7 @@ export default function PipelineEditor(props) {
         showAlert(
           'error',
           'Error while loading the previously opened pipeline "' + descriptionFile + '"',
-          (response && response.text) ? response.text : error.toString()
+          getErrorString(error, response)
         )
       } else {
         setCurrentFileName(descriptionFile);
@@ -974,12 +974,12 @@ export default function PipelineEditor(props) {
 
   const saveFileToServer = useCallback((descriptionFile) => {
     api.getListOf("pipeline", (error, pipelineList, response) => {
-      let errorMessage = ((response && response.text) ? response.text : error.toString());
       if (error) {
         showAlert(
           'error',
           'Error saving the pipeline',
-          'Failed to retrieve pipeline list.\n' + isHttpError(error, response) ? parseHttpError(error, response) : errorMessage
+          'Failed to retrieve pipeline list.\n'
+           + getErrorString(error, response)
         );
       } else {
         let sanitized = descriptionFile.trim().replace(/\s*(\/|>)\s*/, '>')
