@@ -27,27 +27,30 @@ suspend fun handleHistoryCall(
     limit: String?,
     runningPipelines: MutableMap<String, Pipeline>
 ) {
-    val explored = HashSet<File>()
+    val outputRootList: MutableList<Pair<File, Boolean>> = mutableListOf()
     val history = JSONArray()
     var timeTaken = measureTimeMillis {
         runningPipelines.keys.forEach { runId ->
             val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
-            history.put(getHistoryFromFolder(pipelineOutputFolder, true))
-            explored.add(pipelineOutputFolder)
+            outputRootList.add(Pair(pipelineOutputFolder, true))
         }
     }
     logger.info("Time taken to get running ${runningPipelines.size} pipelines: $timeTaken")
 
-    var outputRootList: List<File>
+    var completedRootList: List<File>
     timeTaken = measureTimeMillis {
-        outputRootList = findFilesInFolderByDate(outputRoot, "pipelineOutput.json")
+        completedRootList = findFilesInFolderByDate(outputRoot, "pipelineOutput.json")
     }
+    completedRootList.forEach { folder ->
+        outputRootList.add(Pair(folder, false))
+    }
+    val numberOfPipelines = outputRootList.size
     logger.info("Time taken for folder walk: $timeTaken")
 
     if(start != null) {
         val startIndex = start.toInt()
         if(startIndex <= outputRootList.size) {
-            outputRootList = outputRootList.subList(startIndex, outputRootList.size)
+            outputRootList = outputRootList.subList(startIndex, outputRootList.size).toMutableList()
         } else {
             call.respond(HttpStatusCode.RequestedRangeNotSatisfiable, "Start index is larger than the number of pipelines.")
             return
@@ -56,19 +59,21 @@ suspend fun handleHistoryCall(
 
     if(limit != null && outputRootList.size > 1) {
         val limitIndex = limit.toInt()
-        outputRootList = outputRootList.subList(0, min(limitIndex, outputRootList.size))
+        outputRootList = outputRootList.subList(0, min(limitIndex, outputRootList.size)).toMutableList()
     }
 
     timeTaken = measureTimeMillis {
-        outputRootList.forEach {
-            val folder = it.parentFile
-            if (!explored.contains(folder))
-                history.put(getHistoryFromFolder(folder, false))
+        outputRootList.forEach { (path, isRunning) ->
+            history.put(getHistoryFromFolder(path.parentFile, isRunning))
         }
     }
     logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: $timeTaken")
-
-    call.respondText(history.toString(), ContentType.Application.Json)
+    if(outputRootList.size < numberOfPipelines) {
+        call.respondText(text = history.toString(), status = HttpStatusCode.PartialContent, contentType = ContentType.Application.Json)
+    }else{
+        call.respondText(text = history.toString(), contentType = ContentType.Application.Json)
+    }
+    
 }
 
 private fun getHistoryFromFolder(runFolder:File, isRunning:Boolean) : JSONObject {
