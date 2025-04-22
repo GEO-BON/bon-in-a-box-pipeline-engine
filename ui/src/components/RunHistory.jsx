@@ -170,7 +170,7 @@ const RunCard = (props) => {
     });
   }, [pipeline, run]);
   return (
-    <Grid item size={{ md: 10, lg: 5 }}>
+    <Grid size={{ md: 10, lg: 5 }}>
       <Card
         sx={{
           width: "100%",
