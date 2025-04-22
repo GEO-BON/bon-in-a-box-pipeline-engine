@@ -159,7 +159,8 @@ const RunCard = (props) => {
   const debug_url = `/pipeline-form/${pipeline}/${runHash}`;
   useEffect(() => {
     setExpanded(false) // close card if card reused for another history item
-    api.getInfo("pipeline", `${pipeline}.json`, (error, _, response) => {
+    const descriptionPath = `${pipeline}.${run.type === "script" ? "yaml" : "json"}`
+    api.getInfo(run.type, descriptionPath, (error, _, response) => {
       if (response.status !== 404) {
         const res = JSON.parse(response.text);
         setDesc(res.description);
