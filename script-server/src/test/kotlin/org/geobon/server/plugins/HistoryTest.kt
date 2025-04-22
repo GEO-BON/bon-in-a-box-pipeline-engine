@@ -69,6 +69,11 @@ class HistoryTest {
             println(bodyAsText())
             assertContains(bodyAsText(), """"status":"error"""")
         }
+
+        client.get("/api/history?start=0&limit=5").apply {
+            println(bodyAsText())
+            assertContains(bodyAsText(),  """"status":"error"""")
+        }
     }
 
     @Test
@@ -92,6 +97,11 @@ class HistoryTest {
             println(bodyAsText())
             assertContains(bodyAsText(), """"status":"error"""")
         }
+
+        client.get("/api/history?start=0&limit=5").apply {
+            println(bodyAsText())
+            assertContains(bodyAsText(),  """"status":"error"""")
+        }
     }
 
     @Test
@@ -112,6 +122,11 @@ class HistoryTest {
         }
 
         client.get("/api/history").apply {
+            println(bodyAsText())
+            assertContains(bodyAsText(), """"status":"completed"""")
+        }
+
+        client.get("/api/history?start=0&limit=5").apply {
             println(bodyAsText())
             assertContains(bodyAsText(), """"status":"completed"""")
         }
