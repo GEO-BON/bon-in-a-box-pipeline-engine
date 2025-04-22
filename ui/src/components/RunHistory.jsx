@@ -41,7 +41,7 @@ export default function RunHistory() {
           return bb - aa;
         });
         setRunHistory(
-          <div id='pageTop' style={{padding:"20px"}}>  
+          <div id='pageTop' style={{padding:"20px"}}>
             <h1>Previous runs</h1>
               <Grid container spacing={2}>
                 {runs.map((res, i) => (
@@ -269,7 +269,7 @@ const RunCard = (props) => {
                           }
                         </TableCell>
                         <TableCell style={{whiteSpace: "pre-wrap"}}>
-                          {Array.isArray(i[1]) ? i[1].join(", ") : i[1]}
+                          <>{Array.isArray(i[1]) ? i[1].join(", ") : i[1]}</>
                         </TableCell>
                       </TableRow>
                     );
