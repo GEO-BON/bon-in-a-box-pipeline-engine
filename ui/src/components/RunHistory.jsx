@@ -260,10 +260,10 @@ const RunCard = (props) => {
                             fontWeight: "bold",
                           }}
                         >
-                          {i[0] in inputs && !!inputs[i[0]] && (
-                            <Tooltip title={i[0]}>{inputs[i[0]].label}</Tooltip>
-                          )}
-                          {!(i[0] in inputs) && <>{i[0]}</>}
+                          {i[0] in inputs && !!inputs[i[0]]
+                            ? <Tooltip title={i[0]}>{inputs[i[0]].label}</Tooltip>
+                            : i[0] // When script / pipelines info not found on the server
+                          }
                         </TableCell>
                         <TableCell>{i[1]}</TableCell>
                       </TableRow>
