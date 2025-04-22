@@ -467,6 +467,13 @@ h2.MuiDialogTitle-root {
   display: none;
 }
 
+.historyDescription p {
+  color: #444;
+  font-size: 0.9em;
+  margin-bottom: 10px;
+  font-family: "Montserrat";
+}
+
 @media (max-width: 739px) or (max-height: 549px) {
 
   button#clear,

@@ -238,17 +238,9 @@ const RunCard = (props) => {
         {run.inputs && Object.entries(run.inputs).length > 0 && (
           <Collapse in={expanded} timeout="auto" unmountOnExit>
             {expanded && <CardContent>
-              <Typography
-                sx={{
-                  color: "#444",
-                  fontSize: "0.9em",
-                  marginBottom: "10px",
-                }}
-              >
-                <ReactMarkdown>
-                  {desc}
-                </ReactMarkdown>
-              </Typography>
+              <ReactMarkdown className="historyDescription">
+                {desc}
+              </ReactMarkdown>
               <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>
               <Table size="small">
                 <TableBody>
