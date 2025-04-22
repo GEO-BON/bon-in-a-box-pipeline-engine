@@ -30,7 +30,7 @@ export default function RunHistory() {
   let [start, setStart] = useState(0);
   let limit=30;
   useEffect(() => {
-    api.getHistory({start, limit}, (error, _, response) => {
+    api.getHistory({start, limit},(error, _, response) => {
       document.getElementById('pageTop')?.scrollIntoView({ behavior: 'smooth' });
       if (error) {
         setRunHistory(<HttpError httpError={error} response={response} context={"getting run history"} />);
@@ -232,7 +232,7 @@ const RunCard = (props) => {
             />
           </ExpandMore>
         </CardActions>
-        {Object.entries(run.inputs).length > 0 && (
+        {run.inputs && Object.entries(run.inputs).length > 0 && (
           <Collapse in={expanded} timeout="auto" unmountOnExit>
             <CardContent>
               <Typography
