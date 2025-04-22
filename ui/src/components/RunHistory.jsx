@@ -44,8 +44,8 @@ export default function RunHistory() {
           <div id='pageTop' style={{padding:"20px"}}>  
             <h1>Previous runs</h1>
               <Grid container spacing={2}>
-                {runs.map((res) => (
-                  <RunCard run={res} />
+                {runs.map((res, i) => (
+                  <RunCard key={i} run={res} />
                 ))}
               </Grid>
               <PreviousNext start={start} limit={limit} runLength={runs.length} setStart={setStart}/>
