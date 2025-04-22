@@ -266,7 +266,9 @@ const RunCard = (props) => {
                             : <>{i[0]}</> // When script / pipelines info not found on the server
                           }
                         </TableCell>
-                        <TableCell>{i[1]}</TableCell>
+                        <TableCell style={{whiteSpace: "pre-wrap"}}>
+                          {Array.isArray(i[1]) ? i[1].join(", ") : i[1]}
+                        </TableCell>
                       </TableRow>
                     );
                   })}
