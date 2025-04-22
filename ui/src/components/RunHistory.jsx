@@ -234,7 +234,7 @@ const RunCard = (props) => {
         </CardActions>
         {run.inputs && Object.entries(run.inputs).length > 0 && (
           <Collapse in={expanded} timeout="auto" unmountOnExit>
-            <CardContent>
+            {expanded && <CardContent>
               <Typography
                 sx={{
                   color: "#444",
@@ -271,7 +271,7 @@ const RunCard = (props) => {
                   })}
                 </TableBody>
               </Table>
-            </CardContent>
+            </CardContent>}
           </Collapse>
         )}
       </Card>
