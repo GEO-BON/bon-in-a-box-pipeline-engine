@@ -244,11 +244,10 @@ const RunCard = (props) => {
                   fontSize: "0.9em",
                   marginBottom: "10px",
                 }}
-              ><div className="whiteBackground">
+              >
                 <ReactMarkdown>
-                {desc}
+                  {desc}
                 </ReactMarkdown>
-                </div>
               </Typography>
               <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>
               <Table size="small">
