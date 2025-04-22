@@ -48,7 +48,7 @@ export default function RunHistory() {
                   <RunCard run={res} />
                 ))}
               </Grid>
-              <PreviousNext start={start} limit={limit} runLength={runs.length} setStart={setStart}/>
+              <PreviousNext start={start} limit={limit} runsLength={runs.length} showNext={response.status===206} setStart={setStart}/>
           </div>
         );
       } else {
@@ -121,15 +121,15 @@ const ExpandMore = styled((props) => {
 }));
 
 const PreviousNext = (props)=> {
-  const { start, limit, runLength, setStart } = props;
+  const { start, limit, runsLength, showNext, setStart } = props;
   return(
   <Grid container spacing={2} justifyContent="flex-center" sx={{ marginTop: "20px", paddingBottom: "100px" }}>
       {start > 0 && (
         <Grid item xs={12} md={6}>
-        <CustomButtonGrey onClick={()=>{setStart((prev)=>(Math.min(prev-limit,0)))}}>{"<< Previous page"}</CustomButtonGrey>
+        <CustomButtonGrey onClick={()=>{setStart((prev)=>(Math.max(prev-limit,0)))}}>{"<< Previous page"}</CustomButtonGrey>
         </Grid>
       )}
-      {runLength == limit && (
+      {showNext && runsLength === limit && (
         <Grid item xs={12} md={6}>
         <CustomButtonGrey onClick={()=>{setStart((prev)=>(prev+limit))}}>{"Next page >>"}</CustomButtonGrey>
         </Grid>
@@ -151,7 +151,11 @@ const RunCard = (props) => {
   };
 
   var date = new Date(run.startTime);
-  const ind = run.runId.lastIndexOf(">");
+  let ind = run.runId.length;
+  if(run.status!== "running"){
+    ind = run.runId.lastIndexOf(">");
+  }
+  
   const pipeline = run.runId.substring(0, ind);
   const runHash = run.runId.substring(ind + 1);
   const debug_url = `/pipeline-form/${pipeline}/${runHash}`;
