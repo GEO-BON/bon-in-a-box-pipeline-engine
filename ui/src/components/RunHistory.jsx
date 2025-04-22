@@ -252,7 +252,7 @@ const RunCard = (props) => {
                 <TableBody>
                   {Object.entries(run.inputs).map((i) => {
                     return (
-                      <TableRow>
+                      <TableRow key={i[0]}>
                         <TableCell
                           sx={{
                             maxWidth: "300px",
