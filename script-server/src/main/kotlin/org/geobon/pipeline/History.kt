@@ -27,7 +27,7 @@ suspend fun handleHistoryCall(
     limit: String?,
     runningPipelines: MutableMap<String, Pipeline>
 ) {
-    val outputRootList: MutableList<Pair<File, Boolean>> = mutableListOf()
+    var outputRootList: MutableList<Pair<File, Boolean>> = mutableListOf()
     val history = JSONArray()
     var timeTaken = measureTimeMillis {
         runningPipelines.keys.forEach { runId ->
@@ -35,9 +35,9 @@ suspend fun handleHistoryCall(
             outputRootList.add(Pair(pipelineOutputFolder, true))
         }
     }
-    logger.info("Time taken to get running ${runningPipelines.size} pipelines: $timeTaken")
+    logger.debug("Time taken to get running ${runningPipelines.size} pipelines: $timeTaken")
 
-    var completedRootList: List<File>
+    val completedRootList: List<File>
     timeTaken = measureTimeMillis {
         completedRootList = findFilesInFolderByDate(outputRoot, "pipelineOutput.json")
     }
@@ -45,7 +45,7 @@ suspend fun handleHistoryCall(
         outputRootList.add(Pair(folder, false))
     }
     val numberOfPipelines = outputRootList.size
-    logger.info("Time taken for folder walk: $timeTaken")
+    logger.debug("Time taken for folder walk: $timeTaken")
 
     if(start != null) {
         val startIndex = start.toInt()
@@ -67,7 +67,7 @@ suspend fun handleHistoryCall(
             history.put(getHistoryFromFolder(path.parentFile, isRunning))
         }
     }
-    logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: $timeTaken")
+    logger.debug("Time taken to run getHistoryFromFolder ${outputRootList.size} times: $timeTaken")
     if(outputRootList.size < numberOfPipelines) {
         call.respondText(text = history.toString(), status = HttpStatusCode.PartialContent, contentType = ContentType.Application.Json)
     }else{
