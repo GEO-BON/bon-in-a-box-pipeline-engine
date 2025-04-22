@@ -126,7 +126,9 @@ const PreviousNext = (props)=> {
   <Grid container spacing={2} justifyContent="flex-center" sx={{ marginTop: "20px", paddingBottom: "100px" }}>
       {start > 0 && (
         <Grid xs={12} md={6}>
-        <CustomButtonGrey onClick={()=>{setStart((prev)=>(Math.min(prev-limit,0)))}}>{"<< Previous page"}</CustomButtonGrey>
+          <CustomButtonGrey onClick={() => { setStart((prev) => (Math.max(prev - limit, 0))) }}>
+            {"<< Previous page"}
+          </CustomButtonGrey>
         </Grid>
       )}
       {runLength == limit && (
