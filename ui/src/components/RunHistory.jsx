@@ -48,7 +48,7 @@ export default function RunHistory() {
                   <RunCard key={i} run={res} />
                 ))}
               </Grid>
-              <PreviousNext start={start} limit={limit} runLength={runs.length} setStart={setStart}/>
+              <PreviousNext start={start} limit={limit} runsLength={runs.length} showNext={response.status===206} setStart={setStart}/>
           </div>
         );
       } else {
@@ -121,17 +121,17 @@ const ExpandMore = styled((props) => {
 }));
 
 const PreviousNext = (props)=> {
-  const { start, limit, runLength, setStart } = props;
+  const { start, limit, runsLength, showNext, setStart } = props;
   return(
   <Grid container spacing={2} justifyContent="flex-center" sx={{ marginTop: "20px", paddingBottom: "100px" }}>
       {start > 0 && (
-        <Grid xs={12} md={6}>
+        <Grid item xs={12} md={6}>
           <CustomButtonGrey onClick={() => { setStart((prev) => (Math.max(prev - limit, 0))) }}>
             {"<< Previous page"}
           </CustomButtonGrey>
         </Grid>
       )}
-      {runLength == limit && (
+      {showNext && runsLength === limit && (
         <Grid xs={12} md={6}>
         <CustomButtonGrey onClick={()=>{setStart((prev)=>(prev+limit))}}>{"Next page >>"}</CustomButtonGrey>
         </Grid>
@@ -153,9 +153,13 @@ const RunCard = (props) => {
   };
 
   var date = new Date(run.startTime);
-  const ind = run.runId.lastIndexOf(">");
-  const pipeline = run.runId.substring(0, ind);
-  const runHash = run.runId.substring(ind + 1);
+  let index = run.runId.length;
+  if (run.status !== "running") {
+    index = run.runId.lastIndexOf(">");
+  }
+
+  const pipeline = run.runId.substring(0, index);
+  const runHash = run.runId.substring(index + 1);
   const debug_url = `/pipeline-form/${pipeline}/${runHash}`;
   useEffect(() => {
     setExpanded(false) // close card if card reused for another history item
@@ -192,7 +196,7 @@ const RunCard = (props) => {
                   <AccountTreeIcon sx={{ color: "#f3f3f1" }} />
                 </Avatar>
               }
-              title={run.runId.substring(0, ind)}
+              title={run.runId.substring(0, index)}
               subheader={date.toLocaleString(navigator.language)}
             />
           </>
