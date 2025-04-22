@@ -156,6 +156,7 @@ const RunCard = (props) => {
   const runHash = run.runId.substring(ind + 1);
   const debug_url = `/pipeline-form/${pipeline}/${runHash}`;
   useEffect(() => {
+    setExpanded(false) // close card if card reused for another history item
     api.getInfo("pipeline", `${pipeline}.json`, (error, _, response) => {
       if (response.status !== 404) {
         const res = JSON.parse(response.text);
@@ -168,7 +169,7 @@ const RunCard = (props) => {
         setStatus("unavailable");
       }
     });
-  }, [pipeline, run]);
+  }, [pipeline, run, setExpanded]);
   return (
     <Grid size={{ md: 10, lg: 5 }}>
       <Card
