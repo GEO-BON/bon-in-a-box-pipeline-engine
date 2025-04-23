@@ -84,7 +84,6 @@ private fun getHistoryFromFolder(runFolder: File, isRunning: Boolean): JSONObjec
     val inputFile = File(runFolder, "input.json")
     if (inputFile.isFile) {
         run.put("startTime", dateFormat.format(inputFile.lastModified()))
-        run.put("endTime", dateFormat.format(File(runFolder, "pipelineOutput.json").lastModified()))
         run.put("inputs", JSONObject(inputFile.readText()))
     }
 
