@@ -128,6 +128,7 @@ class HistoryTest {
         }
 
         client.get("/api/history?start=0&limit=5").apply {
+            assertEquals(HttpStatusCode.OK, status)
             val response = bodyAsText()
             assertContains(response, """"status":"completed"""")
             val responseArray = JSONArray(response)
@@ -136,7 +137,7 @@ class HistoryTest {
     }
 
     @Test
-    fun givenLongHistory_whenGettingHistory_thenTruncated() = testApplication {
+    fun givenLongHistory_whenGettingHistory_thenPaging() = testApplication {
         application { module() }
 
         for(i in 0..8) {
@@ -145,6 +146,7 @@ class HistoryTest {
         }
 
         client.get("/api/history?start=0&limit=5").apply {
+            assertEquals(HttpStatusCode.PartialContent, status)
             val response = bodyAsText()
             val responseArray = JSONArray(response)
             assertEquals(5, responseArray.length(), "First page is full, 5 items")
@@ -158,7 +160,9 @@ class HistoryTest {
             assertFalse(response.contains("some_int\":1"))
             assertFalse(response.contains("some_int\":0"))
         }
+
         client.get("/api/history?start=5&limit=5").apply {
+            assertEquals(HttpStatusCode.OK, status)
             val response = bodyAsText()
             val responseArray = JSONArray(response)
             assertEquals(4, responseArray.length(), "Second page has only 4 items")
@@ -171,6 +175,64 @@ class HistoryTest {
             assertContains(response, "some_int\":2")
             assertContains(response, "some_int\":1")
             assertContains(response, "some_int\":0")
+        }
+
+        // Getting all items (no params specified)
+        client.get("/api/history").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(9, responseArray.length(), "")
+            assertContains(response, "some_int\":8")
+            assertContains(response, "some_int\":7")
+            assertContains(response, "some_int\":6")
+            assertContains(response, "some_int\":5")
+            assertContains(response, "some_int\":4")
+            assertContains(response, "some_int\":3")
+            assertContains(response, "some_int\":2")
+            assertContains(response, "some_int\":1")
+            assertContains(response, "some_int\":0")
+        }
+
+        // Getting all items (page is longer than items)
+        client.get("/api/history?start=0&limit=10").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(9, responseArray.length(), "")
+            assertContains(response, "some_int\":8")
+            assertContains(response, "some_int\":7")
+            assertContains(response, "some_int\":6")
+            assertContains(response, "some_int\":5")
+            assertContains(response, "some_int\":4")
+            assertContains(response, "some_int\":3")
+            assertContains(response, "some_int\":2")
+            assertContains(response, "some_int\":1")
+            assertContains(response, "some_int\":0")
+        }
+
+        // Getting all items (page has exact items length)
+        client.get("/api/history?start=0&limit=9").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(9, responseArray.length(), "")
+            assertContains(response, "some_int\":8")
+            assertContains(response, "some_int\":7")
+            assertContains(response, "some_int\":6")
+            assertContains(response, "some_int\":5")
+            assertContains(response, "some_int\":4")
+            assertContains(response, "some_int\":3")
+            assertContains(response, "some_int\":2")
+            assertContains(response, "some_int\":1")
+            assertContains(response, "some_int\":0")
+        }
+
+        // Out of range error
+        client.get("/api/history?start=10&limit=10").apply {
+            assertEquals(HttpStatusCode.RequestedRangeNotSatisfiable, status)
+            val response = bodyAsText()
+            println(response)
         }
     }
 
