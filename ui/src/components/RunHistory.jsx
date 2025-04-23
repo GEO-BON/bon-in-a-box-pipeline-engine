@@ -153,10 +153,7 @@ const RunCard = (props) => {
   };
 
   var date = new Date(run.startTime);
-  let index = run.runId.length;
-  if (run.status !== "running") {
-    index = run.runId.lastIndexOf(">");
-  }
+  let index = run.runId.lastIndexOf(">");
 
   const pipeline = run.runId.substring(0, index);
   const runHash = run.runId.substring(index + 1);

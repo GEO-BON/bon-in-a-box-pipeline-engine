@@ -27,7 +27,7 @@ suspend fun handleHistoryCall(
     limit: String?,
     runningPipelines: MutableMap<String, Pipeline>
 ) {
-    // Pair of pipelineOutput.json file to isRunning
+    // Pair of pipeline output folder file to isRunning
     val running = mutableListOf<Pair<File, Boolean>>()
     val completed = mutableListOf<Pair<File, Boolean>>()
     var timeTaken = measureTimeMillis {
@@ -39,9 +39,10 @@ suspend fun handleHistoryCall(
 
         // Find completed pipelines
         findFilesInFolderByDate(outputRoot, "pipelineOutput.json")
-            .forEach { folder ->
-                if (running.find { pair -> pair.first == folder } == null) {
-                    completed.add(Pair(folder, false))
+            .forEach { found ->
+                val outputFolder = found.parentFile
+                if (running.find { pair -> pair.first == outputFolder } == null) {
+                    completed.add(Pair(found.parentFile, false))
                 }
             }
     }
@@ -63,7 +64,7 @@ suspend fun handleHistoryCall(
     val foldersToRead = all.subList(startIndex, min(endIndex, numberOfPipelines))
     timeTaken = measureTimeMillis {
         foldersToRead.forEach { (path, isRunning) ->
-            history.put(getHistoryFromFolder(path.parentFile, isRunning))
+            history.put(getHistoryFromFolder(path, isRunning))
         }
     }
     logger.debug("Read history for ${foldersToRead.size} pipelines in $timeTaken ms")
@@ -113,7 +114,13 @@ private fun getCompletionStatus(pipelineOutputs: File): String {
             (outputPath as? String)?.let {
                 val outputDir = File(outputRoot, outputPath)
                 if (outputDir.isDirectory) {
-                    val outputText = File(outputDir, "output.json").readText()
+                    val outputFile = File(outputDir, "output.json")
+                    if(!outputFile.exists()) {
+                        logger.error("getCompletionStatus encountered a running pipeline $pipelineOutputs")
+                        return "running"
+                    }
+
+                    val outputText = outputFile.readText()
                     if (outputText.contains("\"error\":")) {
                         if (outputText.contains("\"Cancelled by user\"")) {
                             return "cancelled"
