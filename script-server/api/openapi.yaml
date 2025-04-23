@@ -66,10 +66,6 @@ paths:
                 items:
                   type: object
                   properties:
-                    name:
-                      description: Human readable name of the pipeline.
-                      type: string
-                      example: Very interesting index
                     runId:
                       description: Where to find the pipeline outputs in ./output folder.
                       type: string
@@ -94,12 +90,12 @@ paths:
                 example:
                   [
                     {
-                      runId: path>to>script>hash,
-                      type: script,
-                      startDate: 2024-01-01 00:00,
+                      runId: "path>to>script>hash",
+                      type: "script",
+                      startTime: "2024-01-01 00:00",
                       inputs: {
-                        input1: value,
-                        input2: value
+                        input1: "value",
+                        input2: "value"
                       },
                       status: "completed"
                     },

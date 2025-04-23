@@ -89,38 +89,15 @@ private fun getHistoryFromFolder(runFolder: File, isRunning: Boolean): JSONObjec
 
     run.put(
         "status",
-        if (isRunning) {
-            "running"
-        } else {
-            getCompletionStatus(File(runFolder, "pipelineOutput.json"))
-        }
+        if (isRunning) "running" else getCompletionStatus(File(runFolder, "pipelineOutput.json"))
     )
 
-    val type: String
-    val description: String
-    if (File(
-            runFolder,
-            "output.json"
-        ).exists()
-    ) { // single script runs have both output and pipelineOutput in the same folder
-        type = "script"
-        val scriptDescription = File(scriptRoot, runFolder.relativeTo(outputRoot).path + ".yml")
-        description = if (scriptDescription.isFile) {
-            "working on it..."
-        } else {
-            "missing"
-        }
-    } else {
-        type = "pipeline"
-        val pipelineDescription = File(pipelineRoot, runFolder.relativeTo(outputRoot).path + ".json")
-        description = if (pipelineDescription.isFile) {
-            "working on it..."
-        } else {
-            "missing"
-        }
-    }
-    run.put("type", type)
-    run.put("description", description)
+    run.put(
+        "type",
+
+        // single script runs have both output and pipelineOutput in the same folder
+        if (File(runFolder,"output.json").exists()) "script" else "pipeline"
+    )
 
     return run
 }
