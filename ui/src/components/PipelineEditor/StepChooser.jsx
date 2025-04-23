@@ -1,8 +1,7 @@
 import "./StepChooser.css";
 
-import { React, isValidElement, useState, useEffect, useCallback } from "react";
+import { React, useState, useEffect, useCallback } from "react";
 
-import { HttpError } from "../HttpErrors";
 import { fetchStepDescription } from "./StepDescriptionStore";
 import { StepDescription } from "../StepDescription";
 import { Spinner } from "../Spinner";
@@ -27,8 +26,6 @@ export default function StepChooser({ popupContent, setPopupContent }) {
     api.getListOf("pipeline", (error, pipelineList, response) => {
       if (error) {
         console.error(error);
-        setPipelineFiles(<HttpError httpError={error} response={response} context="Unable to get list of pipelines" />)
-
       } else {
         setPipelineFiles(pipelineList);
       }
@@ -38,8 +35,6 @@ export default function StepChooser({ popupContent, setPopupContent }) {
     api.getListOf("script", (error, scriptList, response) => {
       if (error) {
         console.error(error);
-        setScriptFiles(<HttpError httpError={error} response={response} context="unable ot get list of scripts" />)
-
       } else {
         setScriptFiles(scriptList);
       }
@@ -141,7 +136,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
         // branch
         return (
           <div key={key}>
-            <p className="dnd-head"><SubdirectoryArrowRightIcon sx={{fontSize: "0.85em"}} />{key}</p>
+            <p class="dnd-head"><SubdirectoryArrowRightIcon sx={{fontSize: "0.85em"}} />{key}</p>
             <div className="inFolder">
               {renderTree([...splitPathBefore, key], groupedFiles.get(key))}
             </div>
@@ -165,7 +160,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
         <div key="Pipelines">
           <h3>Pipelines</h3>
           <div>
-            {isValidElement(pipelineFiles) && pipelineFiles.type === HttpError ? pipelineFiles : renderTree(
+            {renderTree(
               [],
               Object.entries(pipelineFiles).map((entry) => [
                 entry[0].split(">"),
@@ -179,7 +174,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
       {scriptFiles && (
         <div key="Scripts">
           <h3>Scripts</h3>
-          {isValidElement(scriptFiles) && scriptFiles.type === HttpError ? scriptFiles : renderTree(
+          {renderTree(
             [],
             Object.entries(scriptFiles).map((entry) => [
               entry[0].split(">"),

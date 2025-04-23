@@ -24,8 +24,6 @@ export default function InputFileInput({
   metadata,
   inputFileContent,
   setInputFileContent,
-  setValidationError,
-  restoreDefaults,
 }) {
   const [selectedTab, setSelectedTab] = useState(0);
 
@@ -77,12 +75,7 @@ export default function InputFileInput({
       )}
       {selectedTab == 1 && (
         <Box className="yamlInput">
-          <YAMLTextArea metadata={metadata}
-            data={inputFileContent}
-            setData={setInputFileContent}
-            setValidationError={setValidationError}
-            restoreDefaults={restoreDefaults}
-          />
+          <YAMLTextArea data={inputFileContent} setData={setInputFileContent} />
           <Box className="inputsDescription">
             <InputsDescription metadata={metadata} />
           </Box>
@@ -143,10 +136,10 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                     size="medium"
                     keepWidth={true}
                   />
-                  {(!inputFileContent || inputFileContent[inputId] == "" || inputFileContent[inputId] == null)
-                    && example !== undefined
-                    && example !== null
-                    && (
+                  {(inputFileContent[inputId] == "" ||
+                    inputFileContent[inputId] == null) &&
+                    example !== undefined &&
+                    example !== null && (
                       <Box>
                         <Typography
                           sx={{

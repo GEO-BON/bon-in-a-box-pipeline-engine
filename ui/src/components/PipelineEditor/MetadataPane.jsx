@@ -36,12 +36,11 @@ export const MetadataPane = ({
   }
 
   function handleEditorChange(value, _) {
-    setTyping(true)
     setMetadata(value)
   }
 
-  useEffect(() => { // Handle typing timeout
-    // setTyping(true) set to true in handleEditorChange
+  useEffect(()=>{
+    setTyping(true)
     const stopTypingTimer = setTimeout(() => {
       setTyping(false)
     }, 500)
@@ -49,7 +48,7 @@ export const MetadataPane = ({
     return () => clearTimeout(stopTypingTimer)
   }, [metadata])
 
-  useEffect(() => { // Error mark
+  useEffect(() => {
     if (monacoRef.current) {
       const monaco = monacoRef.current
       let model = monaco.editor.getModels()[0]
@@ -70,7 +69,7 @@ export const MetadataPane = ({
         }
       }
     }
-  }, [monacoRef, metadataError, isTyping])
+  }, [monacoRef, metadataError, metadata, isTyping])
 
   // Avoid loading the editor until it's opened. Then we keep it open or else the sliding animation looks weird.
   useEffect(()=>{

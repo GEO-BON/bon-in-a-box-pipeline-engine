@@ -8,10 +8,11 @@ import {
   useLocation,
 } from "react-router-dom";
 
+import HomePage from "./components/HomePage";
 import { PipelinePage } from "./components/PipelinePage";
 import StepChooser from "./components/PipelineEditor/StepChooser";
 import { Layout } from "./Layout";
-import InfoPage from "./components/InfoPage";
+import Versions from "./components/Versions";
 import RunHistory from "./components/RunHistory";
 import { Spinner } from "./components/Spinner";
 const PipelineEditor = lazy(() =>
@@ -35,7 +36,8 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />,
+      // element: <Layout />,
+      element: <Layout right={<HomePage />} />,
     },
     {
       path: "script-form/:pipeline?/:runHash?",
@@ -70,8 +72,8 @@ function App() {
       element: <Layout right={<RunHistory />} />,
     },
     {
-      path: "info",
-      element: <Layout right={<InfoPage />} />,
+      path: "versions",
+      element: <Layout right={<Versions />} />,
     },
     {
       path: "*",

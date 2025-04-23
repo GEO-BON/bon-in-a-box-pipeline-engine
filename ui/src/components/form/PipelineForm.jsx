@@ -2,11 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import Select from "react-select";
 import InputFileInput from "./InputFileInput";
 import { useNavigate } from "react-router-dom";
+import Alert from "@mui/material/Alert";
 import { GeneralDescription, getFolderAndName } from "../StepDescription";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { CustomButtonGreen } from "../CustomMUI";
-import { formatError } from "../HttpErrors";
-import { Alert } from "@mui/material";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -14,20 +13,17 @@ export function PipelineForm({
   pipelineMetadata,
   pipStates,
   setPipStates,
-  setHttpError,
+  showHttpError,
   inputFileContent,
   setInputFileContent,
   runType,
-  restoreDefaults,
 }) {
   const formRef = useRef();
   const navigate = useNavigate();
   const [pipelineOptions, setPipelineOptions] = useState([]);
-  const [validationError, setValidationError] = useState();
-
 
   function clearPreviousRequest() {
-    setHttpError(null);
+    showHttpError(null);
     setInputFileContent({});
   }
 
@@ -46,7 +42,7 @@ export function PipelineForm({
     var callback = function (error, runId, response) {
       if (error) {
         // Server / connection errors. Data will be undefined.
-        setHttpError(formatError(error, response, "while launching pipeline on script server"));
+        showHttpError(error, response);
       } else if (runId) {
         const parts = runId.split(">");
         let runHash = parts.at(-1);
@@ -57,7 +53,7 @@ export function PipelineForm({
 
         navigate("/" + runType + "-form/" + pipelineForUrl + "/" + runHash);
       } else {
-        setHttpError(formatError("Server returned empty result", null, "while getting run ID from script server"));
+        showHttpError("Server returned empty result");
       }
     };
 
@@ -119,15 +115,9 @@ export function PipelineForm({
           metadata={pipelineMetadata}
           inputFileContent={inputFileContent}
           setInputFileContent={setInputFileContent}
-          setValidationError={setValidationError}
-          restoreDefaults={restoreDefaults}
         />
         <br />
-        {validationError && <Alert severity="error">
-          Error parsing YAML input.<br />
-          {validationError}
-        </Alert>}
-        <CustomButtonGreen type="submit" disabled={validationError != null} variant="contained">
+        <CustomButtonGreen type="submit" disabled={false} variant="contained">
           {runType === "pipeline" ? "Run pipeline" : "Run script"}
         </CustomButtonGreen>
       </form>
