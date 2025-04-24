@@ -22,6 +22,7 @@ import { styled } from "@mui/material/styles";
 import ReactMarkdown from "react-markdown";
 import { CustomButtonGreen, CustomButtonGrey } from "./CustomMUI";
 import { Alert } from "@mui/material";
+import Warning from "@mui/icons-material/Warning";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -247,8 +248,10 @@ const RunCard = (props) => {
               <Table size="small">
                 <TableBody>
                   {Object.entries(run.inputs).map((i) => {
+                    const inputId = i[0]
+                    const value = i[1]
                     return (
-                      <TableRow key={i[0]}>
+                      <TableRow key={inputId}>
                         <TableCell
                           sx={{
                             maxWidth: "300px",
@@ -256,13 +259,13 @@ const RunCard = (props) => {
                             fontWeight: "bold",
                           }}
                         >
-                          {i[0] in inputs && !!inputs[i[0]]
-                            ? <Tooltip title={i[0]}><>{inputs[i[0]].label}</></Tooltip>
-                            : <>{i[0]}</> // When script / pipelines info not found on the server
+                          {inputId in inputs && !!inputs[inputId]
+                            ? <Tooltip title={inputId}><>{inputs[inputId].label}</></Tooltip>
+                            : <UnknownInputId id={inputId} />
                           }
                         </TableCell>
                         <TableCell style={{whiteSpace: "pre-wrap"}}>
-                          <>{Array.isArray(i[1]) ? i[1].join(", ") : i[1]}</>
+                          <>{Array.isArray(value) ? value.join(", ") : value}</>
                         </TableCell>
                       </TableRow>
                     );
@@ -276,3 +279,28 @@ const RunCard = (props) => {
     </Grid>
   );
 };
+
+// When input's info not found on the server.
+// Either the whole script / pipeline is missing,
+// or the input does not exist anymore.
+const UnknownInputId = ({ id }) => {
+  const warningIcon =
+    <Tooltip title="Input description not found">
+      <Warning color="warning" style={{height: "1rem", transform: "translate(0, 0.15rem)"}} />
+    </Tooltip>
+
+  const pipeIx = id.lastIndexOf('|')
+  if (pipeIx > 0) {
+    return <>
+      {id.substring(pipeIx + 1)}
+      {warningIcon}
+      <br />
+      <small style={{fontWeight: "normal"}}>{id.substring(0, pipeIx)}</small>
+    </>
+  } else {
+    return <>
+      {id}
+      {warningIcon}
+    </>
+  }
+}
