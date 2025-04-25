@@ -4,7 +4,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 
 
-fun String.runCommand(
+fun String.runToText(
     workingDir: File = File("."),
     timeoutAmount: Long = 1,
     timeoutUnit: TimeUnit = TimeUnit.SECONDS,
@@ -18,3 +18,18 @@ fun String.runCommand(
         .start().also { it.waitFor(timeoutAmount, timeoutUnit) }
         .inputStream.bufferedReader().readText()
 }.onFailure { it.printStackTrace() }.getOrNull()
+
+
+fun findFilesInFolderByDate(folder:File, fileName: String): List<File> {
+    val process = ProcessBuilder(
+        "/bin/bash", "-c",
+        "find $folder -type f -name $fileName -exec stat --format '%.3Y %n' {} \\; | sort -nr | cut -d' ' -f2-"
+    ).start()
+    val reader = process.inputStream.bufferedReader()
+
+    val result = mutableListOf<File>()
+    reader.forEachLine { result.add(File(it)) }
+
+    process.waitFor()
+    return result
+}
