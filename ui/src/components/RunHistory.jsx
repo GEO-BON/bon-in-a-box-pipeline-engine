@@ -158,7 +158,7 @@ const RunCard = (props) => {
 
   const pipeline = run.runId.substring(0, index);
   const runHash = run.runId.substring(index + 1);
-  const debug_url = `/pipeline-form/${pipeline}/${runHash}`;
+  const debug_url = `/${run.type}-form/${pipeline}/${runHash}`;
   useEffect(() => {
     setExpanded(false) // close card if card reused for another history item
     const descriptionPath = `${pipeline}.${run.type === "script" ? "yaml" : "json"}`
@@ -214,9 +214,11 @@ const RunCard = (props) => {
           </Typography>
         </CardContent>
         <CardActions disableSpacing>
-          {status !== "error" &&
-            status !== "unavailable" &&
-            status !== "running" && (
+          {run.type === "pipeline"
+            && status !== "error"
+            && status !== "unavailable"
+            && status !== "running"
+            && (
               <a href={`/viewer/${run.runId}`} target="_blank">
                 <CustomButtonGreen>See in viewer</CustomButtonGreen>
               </a>
