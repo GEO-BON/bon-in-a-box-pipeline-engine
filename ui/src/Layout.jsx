@@ -23,69 +23,68 @@ export function Layout(props) {
 
   return (
     <ThemeProvider theme={theme}>
-        <div className="left-pane">
-          <div>
-            <img id="logo" src={BiaBLogo} alt="BON in a Box logo" />
-          </div>
-          {props.left}
-          </div>
+      <div className="left-pane">
+        <div>
+          <img id="logo" src={BiaBLogo} alt="BON in a Box logo" />
+        </div>
+        {props.left}
+      </div>
 
       <div className="right-content">
         <div className="navigation-bar">    {/* added the navigation bar */}
           <nav>
-              <NavLink 
-                to="/"
-                className="navigation-bar-link" 
-                style={{paddingLeft: '60px'}}
-                >Home
-              </NavLink>
-              <NavLink 
-                to="/script-form"
-                className="navigation-bar-link"  
-                >Run&nbsp;a&nbsp;script
-              </NavLink>
+            <NavLink
+              to="/"
+              className="navigation-bar-link"
+              style={{ paddingLeft: '60px' }}
+            >Home
+            </NavLink>
+            <NavLink
+              to="/script-form"
+              className="navigation-bar-link"
+            >Run&nbsp;a&nbsp;script
+            </NavLink>
 
-              <NavLink 
-                to="/pipeline-form"
-                className="navigation-bar-link"
-                >Run&nbsp;a&nbsp;pipeline
-              </NavLink>
+            <NavLink
+              to="/pipeline-form"
+              className="navigation-bar-link"
+            >Run&nbsp;a&nbsp;pipeline
+            </NavLink>
 
-              <NavLink 
-                to="/pipeline-editor"
-                className="navigation-bar-link" 
-                >Pipeline&nbsp;editor
-              </NavLink>
+            <NavLink
+              to="/pipeline-editor"
+              className="navigation-bar-link"
+            >Pipeline&nbsp;editor
+            </NavLink>
 
-              <NavLink 
-                to="/history"
-                className="navigation-bar-link"
-                >History
-              </NavLink> 
+            <NavLink
+              to="/history"
+              className="navigation-bar-link"
+            >History
+            </NavLink>
 
-              <NavLink 
-                // to="/versions"
-                to="/info"
-                className="navigation-bar-link"
-                >Info
-              </NavLink>
+            <NavLink
+              to="/info"
+              className="navigation-bar-link"
+            >Info
+            </NavLink>
 
-              <NavLink 
-                to="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/" 
-                target="_blank"
-                className="navigation-bar-link help-link"
-                style={{ display: "flex", alignItems: "center", gap: "6px", fontSize : "16px"}}
-                >
-                   <img 
-                    src={HelpIcon} 
-                    alt="Help Icon" 
-                    style={{ width: "20px", height: "auto"}} 
-                  />
-                  Help
-              </NavLink> 
+            <NavLink
+              to="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/"
+              target="_blank"
+              className="navigation-bar-link help-link"
+              style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "16px" }}
+            >
+              <img
+                src={HelpIcon}
+                alt="Help Icon"
+                style={{ width: "20px", height: "auto" }}
+              />
+              Help
+            </NavLink>
           </nav>
         </div>
- 
+
         {props.popupContent && (
           <div className="fullScreenPopup">
             <div className="content">{props.popupContent}</div>
@@ -94,8 +93,8 @@ export function Layout(props) {
               className="close"
               onClick={() => props.setPopupContent(null)}
             >
-              
-            ×
+
+              ×
 
             </button>
           </div>
