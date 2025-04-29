@@ -1,8 +1,6 @@
 import { NavLink } from "react-router-dom";
-import LeavesIcon from "../img/leavesIcon.png";
 import GreenSquares from "../img/greenSquares.png";
 import BigGreenBoxes from "../img/bigGreenSquares.png"
-import GreenBoxBlank from "../img/greenBoxBlank.png";
 import Tooltip from "@mui/material/Tooltip";
  
 export default function HomePage() {
