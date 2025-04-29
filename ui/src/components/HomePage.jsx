@@ -7,7 +7,13 @@ import { useEffect, useState } from "react";
 export default function HomePage() {
 
     return (
-        <div>
+        <div         
+            style={{background: `url(${BigGreenBoxes})`,
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "left bottom",
+            backgroundSize: "500px",
+            overflow: "show",
+            paddingBottom: "225px"}}>
         <div>
             <img  
                 src={GreenSquares} 
@@ -41,6 +47,7 @@ export default function HomePage() {
         <div className="green-separator"></div>
 
         <div className="home-page-content" >
+
             <div className="home-page-subtitle">FEATURED PIPELINES</div>
 
             <div className="pipeline-columns">
@@ -121,22 +128,12 @@ export default function HomePage() {
             </div>
 
             </div>
-        </div>
-
-
-        <div style={{
-            background: `url(${BigGreenBoxes})`,
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "left bottom",
-            backgroundSize: "500px",
-            minHeight: "750px",
-            marginLeft: "50px",
-            paddingLeft: "160px",
-            overflowX: "scroll"
-        }}>
                 <div className="home-page-subtitle" style={{marginBottom:'20px'}}>LATEST RUNS</div>
                <LastNRuns n={3} />
         </div>
+
+
+
         </div>
         
       );
