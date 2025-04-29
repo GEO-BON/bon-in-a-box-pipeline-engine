@@ -1,8 +1,19 @@
 import { NavLink } from "react-router-dom";
 import GreenSquares from "../img/greenSquares.png";
 import BigGreenBoxes from "../img/bigGreenSquares.png"
- 
+import { lastNRuns } from "./RunHistory";
+import { useEffect, useState } from "react";
+
 export default function HomePage() {
+    const [lastRuns, setLastRuns] = useState();
+    useEffect(() => {
+        let ignore = false
+        lastNRuns(4).then((result) => {
+            if(ignore) return;
+            setLastRuns(result.text);
+        });
+        return () => {ignore=true};
+    }, []);
     return (
         <div>
         <div>
@@ -173,22 +184,16 @@ export default function HomePage() {
         </div>
 
 
-        <div>
-          <img
-            src={BigGreenBoxes}
-            style={{
-              position: "relative",
-              bottom: 0,
-              left: 0,
-              width: "500px",
-              marginLeft : "-30px",
-              marginTop : "-400px",
-              opacity: 0.35,
-              zIndex: 0, // making sure it's under everything
-              pointerEvents: "none", 
-            }}
-          >
-          </img>
+        <div style={{
+            background: `url(${BigGreenBoxes})`,
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "left bottom",
+            backgroundSize: "contain",
+            minHeight: "300px",
+            marginLeft: "200px"
+        }}>
+                <div className="home-page-subtitle">LATEST RUNS</div>
+               {lastRuns}
         </div>
         </div>
         

@@ -61,16 +61,15 @@ export default function RunHistory() {
   return runHistory ? runHistory : <Spinner variant='light' />;
 }
 
-export const LastNRuns = async (n) => {
+export const lastNRuns = async (n) => {
     const start0=0;
     return await api.getHistory({start0, n}, (error, _, response) => {
-      document.getElementById('pageTop')?.scrollIntoView({ behavior: 'smooth' });
       if (error) {
         return <HttpError httpError={error} response={response} context={"getting run history"} />
-      } else if (response && response.text) {
+      } else if (response && response.body) {
         return (
           <Grid container spacing={2}>
-            {runs.map((res) => (
+            {response.body.map((res) => (
               <RunCard run={res} />
             ))}
           </Grid>
