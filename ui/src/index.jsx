@@ -8,6 +8,7 @@ import {
   useLocation,
 } from "react-router-dom";
 
+import HomePage from "./components/HomePage";
 import { PipelinePage } from "./components/PipelinePage";
 import StepChooser from "./components/PipelineEditor/StepChooser";
 import { Layout } from "./Layout";
@@ -35,7 +36,7 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout />,
+      element: <Layout right={<HomePage />} />,
     },
     {
       path: "script-form/:pipeline?/:runHash?",
