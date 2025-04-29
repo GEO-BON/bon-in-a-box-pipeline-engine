@@ -100,7 +100,7 @@ h2 {
 }
 
 .navigation-bar-link.active {     /* added */
-  color : #ABD6C6;
+  color : #E6F7F0;
   text-decoration: underline;
   text-decoration-color: #ABD6C6;
   font-weight : bold ;
@@ -709,10 +709,10 @@ textarea.autoResizeWidth {
   padding: 10px;
 }
 
-.inputsTop h3 {
+.inputsTop h3, .inputsTop h3 button span {
   color: #fff;
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.6em;
 }
 
 .inputsTop .MuiAccordion-root.Mui-expanded {
