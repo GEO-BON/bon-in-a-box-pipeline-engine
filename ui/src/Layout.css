@@ -7,17 +7,26 @@ nav {
 }
 
 a {
+  color: var(--biab-blue-light);
+}
+a.active {
+  color: white;
+  text-decoration: none;
+}
+
+.home-page-content a {
   /* color: var(--biab-blue-light); */
   color : #ABD6C6;
   font-weight: bold;
 }
 
-a.link {
+.home-page-content a.link {
   color: #ABD6C6;
   font-weight: bold;
   text-decoration: underline;
   text-decoration-color: #ABD6C6 ;
 }
+
 
 a.active {
   color: white;
@@ -32,18 +41,18 @@ h2 {
   cursor: pointer;
 }
 
+
 .left-pane {
   float: left;
   background-color: #f3f3f1;
+
   flex-direction: column;
   display: flex;
   height: 100vh;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .right-content {
   background-color: #282c34;
-  /* z-index: ; */
   height: 100vh;
   color: #f3f3f1;
   overflow: auto;
