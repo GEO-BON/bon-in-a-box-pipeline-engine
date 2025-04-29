@@ -1,19 +1,11 @@
 import { NavLink } from "react-router-dom";
 import GreenSquares from "../img/greenSquares.png";
 import BigGreenBoxes from "../img/bigGreenSquares.png"
-import { lastNRuns } from "./RunHistory";
+import { LastNRuns } from "./RunHistory";
 import { useEffect, useState } from "react";
 
 export default function HomePage() {
-    const [lastRuns, setLastRuns] = useState();
-    useEffect(() => {
-        let ignore = false
-        lastNRuns(4).then((result) => {
-            if(ignore) return;
-            setLastRuns(result.text);
-        });
-        return () => {ignore=true};
-    }, []);
+
     return (
         <div>
         <div>
@@ -23,19 +15,12 @@ export default function HomePage() {
                 className="medium-icons"
                 style={{ width: '225px', height: 'auto', float: "right", alignContent: "right", marginRight : "-30px"}} 
             />
-            {/* style={{ width: '230px', height: 'auto' ,right: "0", position: "absolute"}} /> */}
 
             <div className="home-page-content">
                 <div className="title-container">
                     <h1 className="home-page-title" 
                         style={{ marginTop: "30px" , marginBottom: "10px"}}
                     >The BON in a Box Modeling Tool</h1>
-
-                    {/* <img 
-                        src={LeavesIcon} 
-                        alt="Leaves icon" 
-                        className="medium-icons"
-                        style={{ width: '90px', height: 'auto' , alignContent: "center"}} /> */}
                 </div>
                 <p style={{ 
                     lineHeight: "1.75", 
@@ -70,13 +55,7 @@ export default function HomePage() {
                                 <a href="https://boninabox.geobon.org/indicator?i=GeneticDiversity" target="_blank">More info</a>      |       <a href="/pipeline-form/GenesFromSpace>ToolComponents>GetIndicators>GFS_Indicators">Run pipeline</a>
                             </span>    
                         </div>
-                        {/* <NavLink 
-                            // to="/pipeline-form"
-                            to="/pipeline-form/GenesFromSpace>ToolComponents>GetIndicators>GFS_Indicators"
-                            className="pipelines-link"
-                            >
-                            Genetic Diversity Indicator
-                        </NavLink> */}
+
                     </li>
                     <li className="paw-bullet">
                         <div className="home-tooltip">
@@ -86,13 +65,6 @@ export default function HomePage() {
                                 <a href="https://boninabox.geobon.org/indicator?i=RLI" target="_blank">More info</a>      |       <a href="/pipeline-form/RLI_pipeline>IUCN_RLI_pipeline">Run pipeline</a>
                             </span>    
                         </div>
-                            {/* <NavLink 
-                                // to="/pipeline-form/"
-                                to="/pipeline-form/RLI_pipeline>IUCN_RLI_pipeline"
-                                className="pipelines-link"
-                            > 
-                            Red List Index
-                        </NavLink> */}
                     </li>
                     <li className="graph-bullet">
                         <div className="home-tooltip">
@@ -102,13 +74,7 @@ export default function HomePage() {
                                 <a href="https://boninabox.geobon.org/indicator?i=ProtConn" target="_blank">More info</a>      |       <a href="/pipeline-form/Protconn-pipeline>ProtConn_pipeline">Run pipeline</a>
                             </span>    
                         </div>
-                        {/* <NavLink 
-                            // to="/pipeline-form/"
-                            to="/pipeline-form/Protconn-pipeline>ProtConn_pipeline"
-                            className="pipelines-link"
-                        >
-                            Protected Connected Index
-                        </NavLink> */}
+
                     </li> 
                 </ul>
             </div>
@@ -122,13 +88,7 @@ export default function HomePage() {
                                 <a href="https://boninabox.geobon.org/indicator?i=SHI" target="_blank">More info</a>      |       <a href="/pipeline-form/SHI_pipeline">Run pipeline</a>
                             </span>    
                         </div>
-                            
-                            {/* <NavLink 
-                                to="/pipeline-form/SHI_pipeline"
-                                className="pipelines-link"
-                            >
-                            Species Habitat Index
-                        </NavLink> */}
+
                     </li>
 
                     <li className="world-bullet">
@@ -139,24 +99,10 @@ export default function HomePage() {
                                 <a href="https://boninabox.geobon.org/indicator?i=SDM" target="_blank">More info</a>      |       <a href="/pipeline-form/SDM>SDM_ewlgcp">Run pipeline</a>
                             </span>    
                         </div>
-                            {/* <NavLink 
-                                to="/pipeline-form/SDM>SDM_ewlgcp"
-                                className="pipelines-link" 
-                            >
-                            Species Distribution Models - ewlgcpSDM (mapSpecies)
-                        </NavLink> */}
+
                     </li>
 
-                    {/* <li className="pin-bullet">
-                        <div className="tooltip">
-                            Sampling Prioritization
-                            <span className="tooltiptext-left"
-                                style={{ whiteSpace : "pre-wrap"}}
-                                >Where should you sample to improve biodiversity knowledge?<br></br>
-                                <a href="https://boninabox.geobon.org">More info</a>      |       <a href="/pipeline-form">Run pipeline</a>
-                            </span>    
-                        </div>
-                    </li>  */}
+
 
                     <li className="leaf-bullet">
                         <div className="home-tooltip">
@@ -166,12 +112,6 @@ export default function HomePage() {
                                 <a href="https://boninabox.geobon.org/indicator?i=BII" target="_blank">More info</a>      |       <a href="/pipeline-form/BII>BII">Run pipeline</a>
                             </span>    
                         </div>
-                        {/* <NavLink 
-                            to="/pipeline-form/BII>BII"
-                            className="pipelines-link"
-                        >
-                            Biodiversity Intactness Index
-                        </NavLink> */}
                     </li>
                 </ul>
 
@@ -188,12 +128,14 @@ export default function HomePage() {
             background: `url(${BigGreenBoxes})`,
             backgroundRepeat: "no-repeat",
             backgroundPosition: "left bottom",
-            backgroundSize: "contain",
-            minHeight: "300px",
-            marginLeft: "200px"
+            backgroundSize: "500px",
+            minHeight: "750px",
+            marginLeft: "50px",
+            paddingLeft: "160px",
+            overflowX: "scroll"
         }}>
-                <div className="home-page-subtitle">LATEST RUNS</div>
-               {lastRuns}
+                <div className="home-page-subtitle" style={{marginBottom:'20px'}}>LATEST RUNS</div>
+               <LastNRuns n={3} />
         </div>
         </div>
         
