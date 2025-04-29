@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import GreenSquares from "../img/greenSquares.png";
 import BigGreenBoxes from "../img/bigGreenSquares.png"
-import Tooltip from "@mui/material/Tooltip";
  
 export default function HomePage() {
     return (
@@ -53,7 +52,7 @@ export default function HomePage() {
             <div className="column">    {/* left column */}
                 <ul className="pipeline-bullets"> {/* change to a dropdown menu (kinda) */}
                     <li className="dna-bullet">
-                        <div className="tooltip">
+                        <div className="home-tooltip">
                             Genetic Diversity Indicator
                             <span className="tooltiptext-right"
                                 >Are populations maintaining genetic diversity? <br></br>
@@ -69,7 +68,7 @@ export default function HomePage() {
                         </NavLink> */}
                     </li>
                     <li className="paw-bullet">
-                        <div className="tooltip">
+                        <div className="home-tooltip">
                             Red List Index
                             <span className="tooltiptext-right"
                                 >Is there recovery of threatened species?<br></br>
@@ -85,7 +84,7 @@ export default function HomePage() {
                         </NavLink> */}
                     </li>
                     <li className="graph-bullet">
-                        <div className="tooltip">
+                        <div className="home-tooltip">
                             Protected Connected Index
                             <span className="tooltiptext-right"
                                 >How much area is covered by well-connected protected areas?<br></br>
@@ -106,7 +105,7 @@ export default function HomePage() {
             <div className="column">    {/* right column */}
                 <ul className="pipeline-bullets"> 
                 <li className="tree-bullet">
-                        <div className="tooltip">Species Habitat Index
+                        <div className="home-tooltip">Species Habitat Index
                             <span className="tooltiptext-left"
                                 >Are species losing or gaining habitat? <br></br>
                                 <a href="https://boninabox.geobon.org/indicator?i=SHI" target="_blank">More info</a>      |       <a href="/pipeline-form/SHI_pipeline">Run pipeline</a>
@@ -122,7 +121,7 @@ export default function HomePage() {
                     </li>
 
                     <li className="world-bullet">
-                        <div className="tooltip">
+                        <div className="home-tooltip">
                             Species Distribution Models - ewlgcpSDM (mapSpecies)
                             <span className="tooltiptext-left"
                                 >Where are species likely to be?<br></br>
@@ -149,7 +148,7 @@ export default function HomePage() {
                     </li>  */}
 
                     <li className="leaf-bullet">
-                        <div className="tooltip">
+                        <div className="home-tooltip">
                             Biodiversity Intactness Index
                             <span className="tooltiptext-left"
                                 >How much are species abundances changing?<br></br>
