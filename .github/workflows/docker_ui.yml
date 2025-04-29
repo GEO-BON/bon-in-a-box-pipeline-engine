@@ -1,10 +1,11 @@
-name: Publish UI to docker Hub
+name: Publish UI to Docker Hub
 
 on:
   push:
     branches:
       - main
-      - '**staging'
+      - '*staging'
+      - edge
     paths:
       - "ui/**"
       - "viewer/**"

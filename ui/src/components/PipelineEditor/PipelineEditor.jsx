@@ -1,4 +1,5 @@
 import "react-flow-renderer/dist/style.css";
+import { getErrorString } from "../HttpErrors";
 import "react-flow-renderer/dist/theme-default.css";
 import "./Editor.css";
 import {
@@ -400,6 +401,8 @@ export default function PipelineEditor(props) {
 
       setInputList((previousInputs) => {
         let newUserInputs = [];
+        // Assign temporary weights to preserve sorting order with new inputs
+        previousInputs.forEach((previousInput, i) => previousInput.weight = i)
 
         allNodes.forEach((node) => {
           if (node.data) {
@@ -471,7 +474,11 @@ export default function PipelineEditor(props) {
         });
 
         newUserInputs = newUserInputs.sort((a, b) => a.weight - b.weight)
-        return _lang.isEqual(previousInputs, newUserInputs) ? previousInputs : newUserInputs;
+        const selectedList = _lang.isEqual(previousInputs, newUserInputs) ? previousInputs : newUserInputs;
+
+        // Remove temporary weights from selected list
+        selectedList.forEach(i => delete i.weight);
+        return selectedList
       });
     },
     [setInputList, getDescriptionFromConnection]
@@ -552,6 +559,9 @@ export default function PipelineEditor(props) {
     });
 
     setOutputList((previousOutputs) => {
+      // Assign temporary weights to preserve sorting order with new outputs
+      previousOutputs.forEach((previousOutput, i) => previousOutput.weight = i)
+
       newPipelineOutputs = newPipelineOutputs.map((newOutput) => {
         const previousOutput = previousOutputs.find(
           (prev) =>
@@ -569,7 +579,11 @@ export default function PipelineEditor(props) {
       })
 
       newPipelineOutputs = newPipelineOutputs.sort((a, b) => a.weight - b.weight)
-      return _lang.isEqual(previousOutputs, newPipelineOutputs) ? previousOutputs : newPipelineOutputs
+      const selectedList = _lang.isEqual(previousOutputs, newPipelineOutputs) ? previousOutputs : newPipelineOutputs;
+
+      // Remove temporary weights from selected list
+      selectedList.forEach((o) => delete o.weight);
+      return selectedList
     });
     // Everytime the edge changes, there might be a new connection to an output block.
   }, [edges, reactFlowInstance, setOutputList, getDescriptionFromConnection]);
@@ -699,7 +713,7 @@ export default function PipelineEditor(props) {
             showAlert(
               'error',
               'Error saving the pipeline',
-              (response && response.text) ? response.text : error.toString()
+              getErrorString(error, response)
             )
 
           } else if (response.text) {
@@ -769,7 +783,7 @@ export default function PipelineEditor(props) {
         showAlert(
           'error',
           'Error loading the pipeline list',
-          (response && response.text) ? response.text : error.toString()
+          getErrorString(error, response)
         )
       } else {
         let options = {};
@@ -794,7 +808,7 @@ export default function PipelineEditor(props) {
         showAlert(
           'error',
           'Error while loading the previously opened pipeline "' + descriptionFile + '"',
-          (response && response.text) ? response.text : error.toString()
+          getErrorString(error, response)
         )
       } else {
         setCurrentFileName(descriptionFile);
@@ -858,6 +872,7 @@ export default function PipelineEditor(props) {
         });
       }
       inputsFromFile = inputsFromFile.sort((a, b) => a.weight - b.weight)
+      inputsFromFile.forEach((i) => delete i.weight);
       setInputList(inputsFromFile);
 
       // Read outputs
@@ -875,6 +890,7 @@ export default function PipelineEditor(props) {
         });
       }
       outputsFromFile = outputsFromFile.sort((a, b) => a.weight - b.weight)
+      outputsFromFile.forEach((o) => delete o.weight);
       setOutputList(outputsFromFile);
 
       // Read nodes
@@ -945,7 +961,7 @@ export default function PipelineEditor(props) {
         showAlert(
           'error',
           'Error loading the pipeline',
-          (response && response.text) ? response.text : error.toString()
+          getErrorString(error, response)
         )
       } else {
         setCurrentFileName(descriptionFile);
@@ -962,9 +978,9 @@ export default function PipelineEditor(props) {
         showAlert(
           'error',
           'Error saving the pipeline',
-          'Failed to retrieve pipeline list.\n' +
-            ((response && response.text) ? response.text : error.toString())
-        )
+          'Failed to retrieve pipeline list.\n'
+           + getErrorString(error, response)
+        );
       } else {
         let sanitized = descriptionFile.trim().replace(/\s*(\/|>)\s*/, '>')
         if(!sanitized.endsWith('.json')) sanitized += '.json'
@@ -998,11 +1014,15 @@ export default function PipelineEditor(props) {
   }, []);
 
   useEffect(() => {
-    setUnsavedChanges(
-      (savedJSON === null && nodes.length !== 0) // new and not empty
-      || (savedJSON !== null && savedJSON !== generateSaveJSON()) // existing and modified
-    )
-  }, [nodes, edges, savedJSON, inputList, outputList, metadata, handleBeforeUnload]);
+    const updateSavedStateTimeout = setTimeout(() => {
+      setUnsavedChanges(
+        (savedJSON === null && nodes.length !== 0) // new and not empty
+        || (savedJSON !== null && savedJSON !== generateSaveJSON()) // existing and modified
+      )
+    }, 500)
+
+    return () => clearTimeout(updateSavedStateTimeout)
+  }, [nodes, edges, savedJSON, inputList, outputList, metadata, handleBeforeUnload, generateSaveJSON]);
 
   useEffect(() => {
     if(hasUnsavedChanges) {
@@ -1043,7 +1063,7 @@ export default function PipelineEditor(props) {
       <p className="documentationLink">
         Need help? Check out{" "}
         <a
-          href="https://github.com/GEO-BON/biab-2.0/#pipelines"
+          href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor"
           target="_blank"
           rel="noreferrer"
         >

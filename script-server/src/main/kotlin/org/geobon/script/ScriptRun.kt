@@ -283,22 +283,21 @@ class ScriptRun( // Constructor used in single script run
 
                     "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
                     "py", "PY" -> {
-                        val escapedScript = scriptFile.absolutePath.replace(" ", "\\ ")
+                        val scriptPath = scriptFile.absolutePath
                         val pythonWrapper = """
                             import os, sys
                             biab_output_list = {}
                             output_folder = os.path.abspath(sys.argv[1])
 
                             # Add script dir to sys.path
-                            print("this is a test")
-                            print("Script: "+"$escapedScript", flush=True)
-                            script_dir = os.path.dirname(os.path.abspath("$escapedScript"))
+                            print("Script: "+"$scriptPath", flush=True)
+                            script_dir = os.path.dirname(os.path.abspath("$scriptPath"))
                             print("Script dir: "+script_dir, flush=True)
                             sys.path.insert(0, script_dir)
 
                             try:
                                 exec(open("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.py").read(), globals())
-                                exec(open("$escapedScript").read(), globals())
+                                exec(open("$scriptPath").read(), globals())
                             except:
                                 raise
                             finally:

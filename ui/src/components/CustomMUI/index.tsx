@@ -64,6 +64,10 @@ export const CustomButtonGreen = styled(Button)(({ theme }) => ({
   margin: "5px"
 }));
 
+export const CustomButtonGrey = styled(CustomButtonGreen)(({ theme }) => ({
+  backgroundColor: "#7e8697",
+}));
+
 export const CustomAutocomplete = styled(Autocomplete)(({ theme }) => ({
   "label + &": {
     marginTop: theme.spacing(3),

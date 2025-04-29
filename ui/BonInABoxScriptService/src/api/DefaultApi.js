@@ -44,16 +44,22 @@ export default class DefaultApi {
      */
 
     /**
-     * Get the history of runs for all pipelines on this server
+     * Get the history of runs for all pipelines on this server, or using pagination with start and limit.
+     * @param {Object} opts Optional parameters
+     * @param {Number} [start] Start index for pagination
+     * @param {Number} [limit] Limit the number of results
      * @param {module:api/DefaultApi~getHistoryCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/GetHistory200ResponseInner>}
      */
-    getHistory(callback) {
+    getHistory(opts, callback) {
+      opts = opts || {};
       let postBody = null;
 
       let pathParams = {
       };
       let queryParams = {
+        'start': opts['start'],
+        'limit': opts['limit']
       };
       let headerParams = {
       };

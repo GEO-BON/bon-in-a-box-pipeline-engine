@@ -4,7 +4,7 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getHistory**](DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server
+[**getHistory**](DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 [**getInfo**](DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
 [**getListOf**](DefaultApi.md#getListOf) | **GET** /{type}/list | Get a list of available steps of given type and their names.
 [**getOutputFolders**](DefaultApi.md#getOutputFolders) | **GET** /{type}/{id}/outputs | Get the output folders of the scripts composing this pipeline
@@ -18,9 +18,9 @@ Method | HTTP request | Description
 
 ## getHistory
 
-> [GetHistory200ResponseInner] getHistory()
+> [GetHistory200ResponseInner] getHistory(opts)
 
-Get the history of runs for all pipelines on this server
+Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 
 ### Example
 
@@ -28,7 +28,11 @@ Get the history of runs for all pipelines on this server
 import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
-apiInstance.getHistory((error, data, response) => {
+let opts = {
+  'start': 56, // Number | Start index for pagination
+  'limit': 56 // Number | Limit the number of results
+};
+apiInstance.getHistory(opts, (error, data, response) => {
   if (error) {
     console.error(error);
   } else {
@@ -39,7 +43,11 @@ apiInstance.getHistory((error, data, response) => {
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **start** | **Number**| Start index for pagination | [optional] 
+ **limit** | **Number**| Limit the number of results | [optional] 
 
 ### Return type
 

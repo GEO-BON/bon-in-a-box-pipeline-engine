@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.6.41">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -35,10 +35,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-48ffa3e5b9d089919c6712c39e5b00f2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-87edd68557743b7c59846ba2f8eca337.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -71,7 +71,7 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-sidebar docked nav-fixed">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -115,7 +115,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./README-dev.html">Developer documentation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -127,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
       <a href="./index.html" class="sidebar-logo-link">
       <img src="./Biab_large.png" alt="" class="sidebar-logo py-0 d-lg-inline d-none">
@@ -138,40 +138,6 @@ ul.task-list li input[type="checkbox"] {
         <div id="quarto-search" class="" title="Search"></div>
         </div>
         </div>
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./CODE_OF_CONDUCT.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">CODE OF CONDUCT</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./how_to_contribute.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">How to Contribute</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./how_to_install.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">How to Install</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./README-dev.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Developer documentation</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./working_with_stac.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Working with STAC</span></a>
-  </div>
-</li>
-    </ul>
-    </div>
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
@@ -206,7 +172,7 @@ ul.task-list li input[type="checkbox"] {
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
@@ -262,6 +228,32 @@ ul.task-list li input[type="checkbox"] {
 <section id="releasing-a-server-version" class="level2">
 <h2 class="anchored" data-anchor-id="releasing-a-server-version">Releasing a server version</h2>
 <p>The servers are versionned by date of build of the docker image. One can check the version in the version tab of the UI.</p>
+<p>The most up-to-date server images are on <code>edge</code> branch, and may be unstable. The server images from <code>main</code> are considered stable and are rolled out to anyone starting a BON in a Box instance.</p>
+<pre class="mermaid"><code>---
+title: Development to release git flow
+---
+gitGraph
+    commit
+    branch edge
+    commit
+    branch feature1
+    branch feature2
+    checkout feature1
+    commit
+    commit
+    checkout edge
+    merge feature1
+    checkout feature2
+    commit
+    commit
+    checkout edge
+    merge feature2
+    checkout main
+
+    merge edge
+
+
+</code></pre>
 <section id="creating-a-staging-build" class="level3">
 <h3 class="anchored" data-anchor-id="creating-a-staging-build">Creating a staging build</h3>
 <ol type="1">
@@ -404,7 +396,7 @@ ul.task-list li input[type="checkbox"] {
 <ol type="1">
 <li>Using http://localhost/swagger, edit the specification.</li>
 <li>Copy the result to <a href="../script-server/api/openapi.yaml">script-server/api/openapi.yaml</a></li>
-<li>Use <a href="../ui/BonInABoxScriptService/generate-client.sh">ui/BonInABoxScriptService/generate-client.sh</a> and <a href="../script-server/generate-server-openapitools.sh">script-server/generate-server-openapitools.sh</a> to regenerate the client and the server.</li>
+<li>Use <a href="../ui/BonInABoxScriptService/generate-client.sh">ui/BonInABoxScriptService/generate-client.sh</a> to regenerate the client.</li>
 <li>Merge carefully, not all generated code is to be kept.</li>
 <li>Implement the gaps.</li>
 </ol>
@@ -502,8 +494,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -614,7 +604,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

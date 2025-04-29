@@ -11,14 +11,13 @@ import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
 import org.geobon.pipeline.RunContext.Companion.scriptRoot
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
-import java.text.SimpleDateFormat
+
 
 /**
  * Used to transport paths through path param.
@@ -31,6 +30,7 @@ private val scriptStubsRoot = File(System.getenv("SCRIPT_STUBS_LOCATION"))
 
 private val runningPipelines = mutableMapOf<String, Pipeline>()
 private val logger: Logger = LoggerFactory.getLogger("Server")
+
 
 fun Application.configureRouting() {
 
@@ -77,7 +77,7 @@ fun Application.configureRouting() {
                             } else { // Pipelines
                                 JSONObject(file.readText()).getJSONObject(METADATA).getString(METADATA__NAME)
                             }
-                        } catch (e: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
+                        } catch (_: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
                             null
                         }
 
@@ -90,19 +90,9 @@ fun Application.configureRouting() {
         }
 
         get("/api/history") {
-            val history = JSONArray()
-            runningPipelines.keys.forEach { runId ->
-                val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
-                history.put(getHistoryFromFolder(pipelineOutputFolder, true))
-            }
-
-            outputRoot.walk().forEach { file ->
-                if (file.name == "pipelineOutput.json") {
-                    history.put(getHistoryFromFolder(file.parentFile, false))
-                }
-            }
-
-            call.respond(history.toString(2))
+            val start = call.request.queryParameters["start"]
+            val limit = call.request.queryParameters["limit"]
+            handleHistoryCall(call, start, limit, runningPipelines)
         }
 
         get("/script/{scriptPath}/info") {
@@ -147,7 +137,7 @@ fun Application.configureRouting() {
                         }
                     }
 
-                    call.respondText(metadataJSON.toString(), ContentType.parse("application/json"))
+                    call.respondText(metadataJSON.toString(), ContentType.Application.Json)
                 } else {
                     call.respondText(text = "$descriptionFile does not exist", status = HttpStatusCode.NotFound)
                     logger.debug("404: getListOf ${call.parameters["descriptionPath"]}")
@@ -161,7 +151,7 @@ fun Application.configureRouting() {
         get("/pipeline/{descriptionPath}/get") {
             val descriptionFile = File(pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
             if (descriptionFile.exists()) {
-                call.respondText(descriptionFile.readText(), ContentType.parse("application/json"))
+                call.respondText(descriptionFile.readText(), ContentType.Application.Json)
             } else {
                 call.respondText(text = "$descriptionFile does not exist", status = HttpStatusCode.NotFound)
                 logger.debug("404: pipeline/${call.parameters["descriptionPath"]}/get")
@@ -271,18 +261,18 @@ fun Application.configureRouting() {
                 """
                     UI: ${Containers.UI.version}
                     Script server: ${Containers.SCRIPT_SERVER.version}
-                       ${Containers.SCRIPT_SERVER.environment}
+                        ${Containers.SCRIPT_SERVER.environment}
                     Conda runner: ${Containers.CONDA.version}
                         ${Containers.CONDA.environment}
                     Julia runner: ${Containers.JULIA.version}
-                       ${Containers.JULIA.environment}
+                        ${Containers.JULIA.environment}
                     TiTiler: ${
-                    Containers.TILER.version.let {
-                        val end = it.lastIndexOf(':')
-                        if (end == -1) it
-                        else it.substring(0, end).replace('T', ' ')
+                        Containers.TILER.version.let {
+                            val end = it.lastIndexOf(':')
+                            if (end == -1) it
+                            else it.substring(0, end).replace('T', ' ')
+                        }
                     }
-                }
                 """.trimIndent()
             )
         }

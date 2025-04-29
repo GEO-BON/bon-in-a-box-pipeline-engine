@@ -144,6 +144,7 @@ export function PipelineOutput(props: any) {
               <>
                 {(outputObj?.label?.toLowerCase().includes("presence") ||
                   outputObj?.label?.toLowerCase().includes("occurrence") ||
+                  outputObj?.label?.toLowerCase().includes("observation") ||
                   outputObj?.label?.toLowerCase().includes("absence")) && (
                   <CustomButtonGreen
                     key={`but-${outputObj.outputs}`}
@@ -300,6 +301,58 @@ export function PipelineOutput(props: any) {
                   See on map
                 </CustomButtonGreen>
               </>
+            )}
+          {!Array.isArray(outs) &&
+            outputObj?.type?.includes("geopackage") &&
+            "type" in outputObj && (
+              <>
+                <CustomButtonGreen
+                  key={`but-${outputObj.outputs}`}
+                  onClick={(event: any) => {
+                    handleClick(event, outputObj.outputs, "geopackage");
+                  }}
+                >
+                  See on map
+                </CustomButtonGreen>
+              </>
+            )}
+          {Array.isArray(outs) &&
+            outputObj?.type?.includes("geopackage") &&
+            "type" in outputObj && (
+              <FormControl
+                variant="standard"
+                sx={{
+                  m: 1,
+                  minWidth: 200,
+                  width: "80%",
+                }}
+              >
+                <InputLabel id="collection-label">
+                  <Typography color="primary.light">Choose layer</Typography>
+                </InputLabel>
+                <CustomSelect
+                  key="image-select"
+                  value={selectedItem}
+                  onChange={(event: any) => handleSelect(event.target.value)}
+                  label="Layer"
+                >
+                  {outs.map((o: any) => (
+                    <CustomMenuItem key={`it-${o}`} value={o}>
+                      {o.split("/").pop()}
+                    </CustomMenuItem>
+                  ))}
+                </CustomSelect>
+                <Grid container sx={{ alignItems: "center" }}>
+                  <CustomButtonGreen
+                    key={`but-${outputObj.outputs}`}
+                    onClick={(event: any) => {
+                      handleClick(event, "", "geopackage");
+                    }}
+                  >
+                    See on map
+                  </CustomButtonGreen>
+                </Grid>
+              </FormControl>
             )}
           {!Array.isArray(outs) &&
             outputObj?.type?.includes("json") &&

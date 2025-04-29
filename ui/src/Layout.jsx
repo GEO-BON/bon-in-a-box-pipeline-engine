@@ -38,7 +38,7 @@ export function Layout(props) {
           <span className="separator">&nbsp;|&nbsp;</span>
           <NavLink to="/history">Run&nbsp;history</NavLink>
           <span className="separator">&nbsp;|&nbsp;</span>
-          <NavLink to="/versions">Server&nbsp;info</NavLink>
+          <NavLink to="/info">Info</NavLink>
         </nav>
 
         {props.popupContent && (

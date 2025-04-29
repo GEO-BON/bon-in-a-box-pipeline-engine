@@ -5,7 +5,6 @@ project:
     - "*.qmd"
     - "*.md"
     - "!ui/"
-    - "!README-dev.md"
 
 website:
   title: "BON in a Box"

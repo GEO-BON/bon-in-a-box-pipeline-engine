@@ -1,6 +1,6 @@
 package org.geobon.server.plugins
 
-import org.geobon.utils.runCommand
+import org.geobon.utils.runToText
 
 enum class Containers(
     val containerName: String,
@@ -27,7 +27,7 @@ enum class Containers(
     /**
      * NGINX proxy (dev+prod) and client UI (prod).
      */
-    UI("biab-gateway"),
+    UI("biab-gateway", "bash -c '[ -f /version.txt ] && cat /version.txt || echo \"dev\"'"),
 
     /**
      * Tiling server used to serve GeoTIFF content.
@@ -47,19 +47,19 @@ enum class Containers(
 
 
     val version: String by lazy {
-        val result = (dockerCommand + versionCommand).runCommand(showErrors = false)
-        if(result.isNullOrBlank()) "offline" else result
+        val result = (dockerCommand + versionCommand).runToText(showErrors = false)
+        if (result.isNullOrBlank()) "offline" else result
     }
 
     val environment: String by lazy {
-        (dockerCommand + envCommand).runCommand(showErrors = false) ?: ""
+        (dockerCommand + envCommand).runToText(showErrors = false) ?: ""
     }
 
     /**
      * @return true if this is an external container to the script server.
      *         Only the script server will return false.
      */
-    fun isExternal():Boolean{
+    fun isExternal(): Boolean {
         return this != SCRIPT_SERVER
     }
 }
