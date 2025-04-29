@@ -1,9 +1,6 @@
 import "./Layout.css";
-
 import React, { useEffect, useState } from "react";
-
 import { NavLink } from "react-router-dom";
-
 import BiaBLogo from "./img/boninabox_logo.jpg";
 import HelpIcon from "./img/helpIcon.png"
 import { ThemeProvider } from "@mui/material/styles";
@@ -15,9 +12,13 @@ export function Layout(props) {
   const [mainHeight, setMainHeight] = useState();
 
   // Main section size
+
   useEffect(() => {
+
     let nav = document.getElementsByTagName("nav")[0];
+
     setMainHeight(windowHeight - nav.offsetHeight);
+
   }, [windowHeight]);
 
   return (
@@ -70,7 +71,7 @@ export function Layout(props) {
               </NavLink>
 
               <NavLink 
-                to="https://boninabox.geobon.org/pipeline-engine" 
+                to="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/" 
                 target="_blank"
                 className="navigation-bar-link help-link"
                 style={{ display: "flex", alignItems: "center", gap: "6px", fontSize : "16px"}}
