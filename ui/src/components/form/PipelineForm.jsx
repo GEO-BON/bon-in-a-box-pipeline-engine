@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import Select from "react-select";
+import Select, { components } from "react-select";
 import InputFileInput from "./InputFileInput";
 import { useNavigate } from "react-router-dom";
 import { GeneralDescription, getFolderAndName } from "../StepDescription";
@@ -7,6 +7,7 @@ import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { CustomButtonGreen } from "../CustomMUI";
 import { formatError } from "../HttpErrors";
 import { Alert } from "@mui/material";
+import _ from "lodash";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -76,15 +77,35 @@ export function PipelineForm({
       } else {
         let newOptions = [];
         Object.entries(data).forEach(([descriptionFile, pipelineName]) => {
+          //let l = getFolderAndName(descriptionFile, pipelineName).split(" > ");
+          //l.shift()
           newOptions.push({
-            label: getFolderAndName(descriptionFile, pipelineName),
+            label: pipelineName,
+            folderName : getFolderAndName(descriptionFile, pipelineName).split(" > "),
             value: descriptionFile,
           });
         });
-        setPipelineOptions(newOptions);
+        newOptions = _.groupBy(newOptions, (o) => o.folderName.split(" > ")[0]);
+        let groupedOptions = [];
+        Object.keys(newOptions).forEach(function(key, index) {
+            groupedOptions[index]={
+              label: key, 
+              options: newOptions[key]
+            }
+        });
+        setPipelineOptions(groupedOptions);
       }
     });
   }, [runType, setPipelineOptions]);
+
+const groupStyles = {
+  background: '#f2fcff',
+};
+  const Group = (props) => (
+  <div style={groupStyles}>
+    <components.Group {...props} />
+  </div>
+);
 
   return (
     pipelineOptions.length > 0 && (
@@ -107,6 +128,7 @@ export function PipelineForm({
           )}
           menuPortalTarget={document.body}
           onChange={(v) => handlePipelineChange(v.label, v.value)}
+          components={{ Group }}
         />
         <br />
         {pipelineMetadata && (
