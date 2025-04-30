@@ -7,6 +7,10 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
@@ -169,6 +173,8 @@ fun Application.configureRouting() {
                 return@post
             }
 
+	    val callbackUrl = call.request.queryParameters["callback"]
+
             val singleScript = call.parameters["type"] == "script"
 
             val inputFileContent = call.receive<String>()
@@ -215,10 +221,19 @@ fun Application.configureRouting() {
                     resultFile.writeText(gson.toJson(scriptOutputFolders))
                 } catch (ex: Exception) {
                     ex.printStackTrace()
+
                 } finally {
                     runningPipelines.remove(runId)
-                }
+		    if (callbackUrl != null) {
+			val request = HttpRequest.newBuilder()
+						     .uri(URI.create(callbackUrl))
+			                             .GET()
+			                             .build()
 
+			val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
+			logger.debug("Callback called ${response?.statusCode()} for $runId")
+		    }
+                }
             }.onFailure {
                 call.respondText(text = it.message ?: "", status = HttpStatusCode.InternalServerError)
                 logger.debug("run: ${it.message}")
