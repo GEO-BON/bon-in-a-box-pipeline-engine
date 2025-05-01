@@ -173,7 +173,7 @@ fun Application.configureRouting() {
                 return@post
             }
 
-	    val callbackUrl = call.request.queryParameters["callback"]
+            val callbackUrl = call.request.queryParameters["callback"]
 
             val singleScript = call.parameters["type"] == "script"
 
@@ -224,15 +224,15 @@ fun Application.configureRouting() {
 
                 } finally {
                     runningPipelines.remove(runId)
-		    if (callbackUrl != null) {
-			val request = HttpRequest.newBuilder()
-						     .uri(URI.create(callbackUrl))
-			                             .GET()
-			                             .build()
+                    if (callbackUrl != null) {
+                        val request = HttpRequest.newBuilder()
+                            .uri(URI.create(callbackUrl))
+                            .GET()
+                            .build()
 
-			val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
-			logger.debug("Callback called ${response?.statusCode()} for $runId")
-		    }
+                        val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
+                        logger.debug("Callback called ${response?.statusCode()} for $runId")
+                    }
                 }
             }.onFailure {
                 call.respondText(text = it.message ?: "", status = HttpStatusCode.InternalServerError)
@@ -282,12 +282,12 @@ fun Application.configureRouting() {
                     Julia runner: ${Containers.JULIA.version}
                         ${Containers.JULIA.environment}
                     TiTiler: ${
-                        Containers.TILER.version.let {
-                            val end = it.lastIndexOf(':')
-                            if (end == -1) it
-                            else it.substring(0, end).replace('T', ' ')
-                        }
+                    Containers.TILER.version.let {
+                        val end = it.lastIndexOf(':')
+                        if (end == -1) it
+                        else it.substring(0, end).replace('T', ' ')
                     }
+                }
                 """.trimIndent()
             )
         }

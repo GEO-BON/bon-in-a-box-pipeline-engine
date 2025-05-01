@@ -246,6 +246,12 @@ paths:
       parameters:
         - $ref: '#/components/parameters/stepType'
         - $ref: '#/components/parameters/descriptionPath'
+        - in: query
+          name: callback
+          schema:
+            type: string
+            description:
+              Callback url called when the pipeline finishes running
       requestBody:
         $ref: '#/components/requestBodies/run_input_body'
       responses:
