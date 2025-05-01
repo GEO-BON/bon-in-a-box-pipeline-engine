@@ -61,25 +61,28 @@ export default function RunHistory() {
   return runHistory ? runHistory : <Spinner variant='light' />;
 }
 
-export const LastNRuns = async (n) => {
-    const start0=0;
-    return await api.getHistory({start0, n}, (error, _, response) => {
-      document.getElementById('pageTop')?.scrollIntoView({ behavior: 'smooth' });
-      if (error) {
-        return <HttpError httpError={error} response={response} context={"getting run history"} />
-      } else if (response && response.text) {
-        return (
-          <Grid container spacing={2}>
-            {runs.map((res) => (
-              <RunCard run={res} />
-            ))}
-          </Grid>
-        );
-      } else {
-        return <Alert severity="warning">Could not retrieve history: empty response.</Alert>;
-      }
-    });
-}
+export const LastNRuns = (n) => {
+    const [lastRuns, setLastRuns] = useState(null);
+    useEffect(() => {
+        api.getHistory({start:0, limit:4}, (error, _, response) => {
+          let resp=<></>
+          if (error) {
+            resp = <HttpError httpError={error} response={response} context={"getting run history"} />
+          } else if (response && response.body) {
+            resp = 
+              <Grid container spacing={3}>
+                {response.body.map((res) => (
+                  <RunCard run={res} />
+                ))}
+              </Grid>
+          } else {
+            resp = <Alert severity="warning">Could not retrieve history: empty response.</Alert>;
+          }
+          setLastRuns(resp);
+        });
+    }, []);
+    return lastRuns;
+  } 
 
 const color = (status) => {
   switch (status) {
@@ -176,7 +179,7 @@ const RunCard = (props) => {
     });
   }, [pipeline, run, setExpanded]);
   return (
-    <Grid size={{ md: 10, lg: 5 }}>
+    <Grid item size={{ md: 10, lg: 5 }}>
       <Card
         sx={{
           width: "100%",
