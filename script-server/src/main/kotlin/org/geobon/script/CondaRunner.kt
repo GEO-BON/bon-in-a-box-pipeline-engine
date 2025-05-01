@@ -47,7 +47,7 @@ class CondaRunner(
 
             if [ ! -f "$condaEnvFile.yml" ]; then
                 echo "Creating new conda environment $condaEnvName..."
-                createLogs=$(mamba env create -f $condaEnvFile.2.yml 2>&1 | tee -a "${logFile.absolutePath}")
+                createLogs=$(mamba env create -y -f $condaEnvFile.2.yml 2>&1 | tee -a "${logFile.absolutePath}")
                 if [[ ${'$'}? -eq 0 ]] ; then
                     mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
                     echo "Created successfully."
@@ -55,7 +55,7 @@ class CondaRunner(
                     echo "YML files out of sync, will attempt updating..."
                 else
                     echo "Cleaning up after failure..."
-                    mamba remove -n $condaEnvName --all > /dev/null 2>&1
+                    mamba remove -y -n $condaEnvName --all > /dev/null 2>&1
                     rm -rf $condaEnvFile.lock 2>/dev/null
                     rm $condaEnvFile.2.yml 2> /dev/null
                     echo -e "FAILED" ; exit 1
@@ -67,7 +67,7 @@ class CondaRunner(
                     echo "Activating existing conda environment $condaEnvName"
                 else
                     echo "Updating existing conda environment $condaEnvName"
-                    mamba env update -f $condaEnvFile.2.yml ; assertSuccess
+                    mamba env update -y -f $condaEnvFile.2.yml ; assertSuccess
                 fi
 
                 mv $condaEnvFile.2.yml $condaEnvFile.yml ; assertSuccess
@@ -78,7 +78,7 @@ class CondaRunner(
                 echo "$condaEnvName activated"
             else
                 echo "Activation failed, will attempt creating..."
-                mamba env create -f $condaEnvFile.yml
+                mamba env create -y -f $condaEnvFile.yml
                 mamba activate $condaEnvName
             fi
 
