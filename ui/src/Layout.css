@@ -295,10 +295,6 @@ input[type="number"].input-float {
   display: inline-block;
 }
 
-.gray {
-  color: #aaaaaa;
-}
-
 .logs {
   border: 2px solid #87cefa45;
   height: 30em;
@@ -398,12 +394,18 @@ textarea.autoResizeWidth {
   color: var(--biab-green-main);
 }
 
-.pipelineResults h3.gray {
+.pipelineResults .outputTitle {
+  color: #444;
+}
+
+.gray,
+.gray h3 {
   color: #aaaaaa;
 }
 
-.pipelineResults .outputTitle {
-  color: #444;
+
+.gray .expandIcon svg {
+  color: #aaaaaa !important;
 }
 
 .pipelineResults table {

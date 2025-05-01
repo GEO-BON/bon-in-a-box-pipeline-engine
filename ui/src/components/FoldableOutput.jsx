@@ -135,7 +135,7 @@ function FoldableOutputInternal({
             )}{" "}
             {icon}
           </div>
-          <h3 className={className.includes("gray") ? "gray" : ""} ref={titleRef}>{title}</h3>
+          <h3 ref={titleRef}>{title}</h3>
           <div className="inlinePreview">
             {inline}
             {!active && inlineCollapsed}
