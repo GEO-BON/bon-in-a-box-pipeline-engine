@@ -398,6 +398,10 @@ textarea.autoResizeWidth {
   color: var(--biab-green-main);
 }
 
+.pipelineResults h3.gray {
+  color: #aaaaaa;
+}
+
 .pipelineResults .outputTitle {
   color: #444;
 }
