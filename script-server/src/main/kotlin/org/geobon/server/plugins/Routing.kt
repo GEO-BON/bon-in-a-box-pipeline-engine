@@ -17,6 +17,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 
 
 /**
@@ -169,6 +173,8 @@ fun Application.configureRouting() {
                 return@post
             }
 
+            val callbackUrl = call.request.queryParameters["callback"]
+
             val singleScript = call.parameters["type"] == "script"
 
             val inputFileContent = call.receive<String>()
@@ -215,10 +221,20 @@ fun Application.configureRouting() {
                     resultFile.writeText(gson.toJson(scriptOutputFolders))
                 } catch (ex: Exception) {
                     ex.printStackTrace()
+
                 } finally {
                     runningPipelines.remove(runId)
-                }
 
+                    if (callbackUrl != null) {
+                        val request = HttpRequest.newBuilder()
+                            .uri(URI.create(callbackUrl))
+                            .GET()
+                            .build()
+
+                        val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
+                        logger.debug("Callback called ${response?.statusCode()} for $runId")
+                    }
+                }
             }.onFailure {
                 call.respondText(text = it.message ?: "", status = HttpStatusCode.InternalServerError)
                 logger.debug("run: ${it.message}")
@@ -267,12 +283,12 @@ fun Application.configureRouting() {
                     Julia runner: ${Containers.JULIA.version}
                         ${Containers.JULIA.environment}
                     TiTiler: ${
-                        Containers.TILER.version.let {
-                            val end = it.lastIndexOf(':')
-                            if (end == -1) it
-                            else it.substring(0, end).replace('T', ' ')
-                        }
+                    Containers.TILER.version.let {
+                        val end = it.lastIndexOf(':')
+                        if (end == -1) it
+                        else it.substring(0, end).replace('T', ' ')
                     }
+                }
                 """.trimIndent()
             )
         }
