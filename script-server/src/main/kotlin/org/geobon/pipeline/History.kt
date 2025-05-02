@@ -50,6 +50,10 @@ suspend fun handleHistoryCall(
     val all = running + completed
     val numberOfPipelines = all.size
     logger.debug("Found $numberOfPipelines in $timeTaken ms")
+    if (numberOfPipelines == 0) {
+        call.respondText("[]", ContentType.Application.Json, HttpStatusCode.OK)
+        return
+    }
 
     val startIndex = start?.toInt() ?: 0
     if (numberOfPipelines <= startIndex) {
@@ -70,9 +74,9 @@ suspend fun handleHistoryCall(
     logger.debug("Read history for ${foldersToRead.size} pipelines in $timeTaken ms")
 
     call.respondText(
-        text = history.toString(),
-        status = if (endIndex < numberOfPipelines) HttpStatusCode.PartialContent else HttpStatusCode.OK,
-        contentType = ContentType.Application.Json
+        history.toString(),
+        ContentType.Application.Json,
+        if (endIndex < numberOfPipelines) HttpStatusCode.PartialContent else HttpStatusCode.OK
     )
 }
 

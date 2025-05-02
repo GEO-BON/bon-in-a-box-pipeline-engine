@@ -137,6 +137,16 @@ class HistoryTest {
     }
 
     @Test
+    fun givenNoHistory_whenGettingHistory_thenEmptyArray() = testApplication {
+        application { module() }
+
+        client.get("/api/history").apply {
+            println(bodyAsText())
+            assertEquals("[]", bodyAsText())
+        }
+    }
+
+    @Test
     fun givenLongHistory_whenGettingHistory_thenPaging() = testApplication {
         application { module() }
 
@@ -228,7 +238,14 @@ class HistoryTest {
             assertContains(response, "some_int\":0")
         }
 
-        // Out of range error
+        // Exactly out of range
+        client.get("/api/history?start=9&limit=9").apply {
+            assertEquals(HttpStatusCode.RequestedRangeNotSatisfiable, status)
+            val response = bodyAsText()
+            println(response)
+        }
+
+        // Out of range
         client.get("/api/history?start=10&limit=10").apply {
             assertEquals(HttpStatusCode.RequestedRangeNotSatisfiable, status)
             val response = bodyAsText()
