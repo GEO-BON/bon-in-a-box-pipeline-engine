@@ -4,7 +4,6 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **String** | Human readable name of the pipeline. | [optional] 
 **runId** | **String** | Where to find the pipeline outputs in ./output folder. | [optional] 
 **type** | **String** | If it&#39;s a script or a pipeline | [optional] 
 **startTime** | **Date** | UTC date and time when the run was started | [optional] 

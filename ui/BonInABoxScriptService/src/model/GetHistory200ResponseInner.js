@@ -47,9 +47,6 @@ class GetHistory200ResponseInner {
         if (data) {
             obj = obj || new GetHistory200ResponseInner();
 
-            if (data.hasOwnProperty('name')) {
-                obj['name'] = ApiClient.convertToType(data['name'], 'String');
-            }
             if (data.hasOwnProperty('runId')) {
                 obj['runId'] = ApiClient.convertToType(data['runId'], 'String');
             }
@@ -76,10 +73,6 @@ class GetHistory200ResponseInner {
      */
     static validateJSON(data) {
         // ensure the json data is a string
-        if (data['name'] && !(typeof data['name'] === 'string' || data['name'] instanceof String)) {
-            throw new Error("Expected the field `name` to be a primitive type in the JSON string but got " + data['name']);
-        }
-        // ensure the json data is a string
         if (data['runId'] && !(typeof data['runId'] === 'string' || data['runId'] instanceof String)) {
             throw new Error("Expected the field `runId` to be a primitive type in the JSON string but got " + data['runId']);
         }
@@ -99,12 +92,6 @@ class GetHistory200ResponseInner {
 }
 
 
-
-/**
- * Human readable name of the pipeline.
- * @member {String} name
- */
-GetHistory200ResponseInner.prototype['name'] = undefined;
 
 /**
  * Where to find the pipeline outputs in ./output folder.
