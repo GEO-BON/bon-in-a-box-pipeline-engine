@@ -120,7 +120,7 @@ export function PipelineForm({
         setPipelineOptions(groupedOptions);
       }
     });
-  }, [runType]);
+  }, [runType, setPipelineOptions]);
 
   return (
     pipelineOptions.length > 0 && (
