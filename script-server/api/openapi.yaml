@@ -251,7 +251,9 @@ paths:
           schema:
             type: string
             description:
-              Callback url called when the pipeline finishes running
+              Callback url called upon pipeline completion, only if the call to /run responds 200 OK.
+              When receiving the callback, check the outputs or the history to know
+              if the pipeline completed successfully.
       requestBody:
         $ref: '#/components/requestBodies/run_input_body'
       responses:

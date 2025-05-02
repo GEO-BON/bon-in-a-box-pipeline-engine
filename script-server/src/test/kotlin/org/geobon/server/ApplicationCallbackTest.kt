@@ -1,19 +1,14 @@
 package org.geobon.server
 
-import io.kotest.core.spec.style.AnnotationSpec
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
-
-import io.ktor.server.application.*
-import io.ktor.server.testing.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
-
 import kotlin.test.*
 
 class ApplicationCallbackTest {
@@ -44,7 +39,7 @@ class ApplicationCallbackTest {
             routing {
                 get("/callback") {
                     callbackCalled = true
-                    call.respondText("Hello, world!")
+                    call.respondText("Callback received")
                 }
             }
         }.start(wait = false)
@@ -63,7 +58,7 @@ class ApplicationCallbackTest {
     }
 
     @Test
-    fun `given pipeline run with callback when server to posted then call callback`() = testApplication {
+    fun `given pipeline run with callback_when run completes_then callback received`() = testApplication {
         application { module() }
         // Callback url being called
         client.post("/pipeline/helloWorld.json/run?callback=$callbackURL") {
@@ -71,12 +66,35 @@ class ApplicationCallbackTest {
 
         }.apply {
             assertEquals(HttpStatusCode.OK, status)
-            assertTrue(callbackCalled, "Expected callback url to be called, failed")
+            assertTrue(callbackCalled, "Expected callback not received")
+        }
+
+        client.get("/api/history").apply {
+            println(bodyAsText())
+            assertContains(bodyAsText(), "\"status\":\"completed\"")
         }
     }
 
     @Test
-    fun `given pipeline with callback when server is posted with wrong input then internal server error`() =
+    fun `given pipeline run with callback_when run fails_then callback received`() = testApplication {
+            application { module() }
+            // Callback url being called
+            client.post("/pipeline/helloWorld.json/run?callback=$callbackURL") {
+                setBody("{\"helloWorld>helloPython.yml@0|some_int\":13}")
+
+            }.apply {
+                assertEquals(HttpStatusCode.OK, status)
+                assertTrue(callbackCalled, "Expected callback not received")
+            }
+
+            client.get("/api/history").apply {
+                println(bodyAsText())
+                assertContains(bodyAsText(), "\"status\":\"error\"")
+            }
+        }
+
+    @Test
+    fun `given pipeline with callback_when error code 500 returned_then there is no callback`() =
         testApplication {
             application { module() }
             client.post("/pipeline/helloWorld.json/run?callback=$callbackURL") {
@@ -84,13 +102,17 @@ class ApplicationCallbackTest {
 
             }.apply {
                 assertEquals(HttpStatusCode.InternalServerError, status)
-                assertFalse(callbackCalled, "Expected callback not to be called, failed")
+                assertFalse(callbackCalled, "Callback was not expected, but was received")
+            }
 
+            client.get("/api/history").apply {
+                println(bodyAsText())
+                assertEquals("[]", bodyAsText())
             }
         }
 
     @Test
-    fun `given pipeline that does not exist with callback when server is posted then 404 not found`() =
+    fun `given pipeline with callback_when error code 404 returned_then there is no callback`() =
         testApplication {
             application { module() }
             client.post("/pipeline/doesNotExist.json/run?callback=$callbackURL") {
@@ -98,8 +120,12 @@ class ApplicationCallbackTest {
 
             }.apply {
                 assertEquals(HttpStatusCode.NotFound, status)
-                assertFalse(callbackCalled, "Expected callback not to be called, failed")
+                assertFalse(callbackCalled, "Callback was not expected, but was received")
+            }
 
+            client.get("/api/history").apply {
+                println(bodyAsText())
+                assertEquals("[]", bodyAsText())
             }
         }
 
