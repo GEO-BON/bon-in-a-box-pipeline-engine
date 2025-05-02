@@ -38,7 +38,7 @@ services:
       - conda-dir:/.conda
       - conda-cache:/.cache/conda
       - conda-env-yml:/conda-env-yml
-      - r-libs-user:/r-libs-user:rw
+      # - r-libs-user:/r-libs-user:rw
     user: ${MY_UID}:${DOCKER_GID}
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
@@ -46,7 +46,7 @@ services:
       SCRIPT_LOCATION: /scripts
       USERDATA_LOCATION: /userdata
       OUTPUT_LOCATION: /output
-      R_LIBS_USER: /r-libs-user
+      # R_LIBS_USER: /r-libs-user
 
   runner-julia:
     container_name: biab-runner-julia
