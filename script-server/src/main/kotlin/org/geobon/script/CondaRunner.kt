@@ -11,6 +11,7 @@ class CondaRunner(
     condaEnvYml: String?
 ) {
     private var activateEnvironment = ""
+    private val condaEnvFile = "/conda-env-yml/$condaEnvName"
 
     init {
         if (condaEnvName?.isNotEmpty() == true && condaEnvYml?.isNotEmpty() == true) {
@@ -30,12 +31,15 @@ class CondaRunner(
         """.trimIndent()
     }
 
+    fun getForceStopCleanup(): List<String> {
+        return listOf("rm", "-rf", "$condaEnvFile.lock")
+    }
+
     private fun useBase(language: String) {
         activateEnvironment = "mamba activate ${language}base ; assertSuccess"
     }
 
     private fun useSubEnvironment(condaEnvName: String, condaEnvYml: String) {
-        val condaEnvFile = "/conda-env-yml/$condaEnvName"
         activateEnvironment = """
             $assertSuccessBash
             set -o pipefail

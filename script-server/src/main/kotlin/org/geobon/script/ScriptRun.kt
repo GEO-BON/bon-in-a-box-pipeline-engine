@@ -182,6 +182,7 @@ class ScriptRun( // Constructor used in single script run
         var error = false
         var outputs: Map<String, Any>? = null
 
+        var forceStopCleanup = listOf<String>()
         var container: Containers = Containers.SCRIPT_SERVER
         val elapsed = measureTime {
             val pidFile = File(context.outputFolder.absolutePath, ".pid")
@@ -227,6 +228,7 @@ class ScriptRun( // Constructor used in single script run
                     "r", "R" -> {
                         val runner = CondaRunner(logFile, pidFile, "r", condaEnvName, condaEnvYml)
                         container = CondaRunner.container
+                        forceStopCleanup = runner.getForceStopCleanup()
 
                         command = container.dockerCommandList + listOf(
                             "bash", "-c",
@@ -309,7 +311,7 @@ class ScriptRun( // Constructor used in single script run
                         if(useRunners) {
                             val runner = CondaRunner(logFile, pidFile, "python", condaEnvName, condaEnvYml)
                             container = CondaRunner.container
-
+                            forceStopCleanup = runner.getForceStopCleanup()
 
                             val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
                             command = container.dockerCommandList + listOf(
@@ -339,7 +341,7 @@ class ScriptRun( // Constructor used in single script run
                     .start().also { process ->
                         withContext(Dispatchers.IO) { // More info on this context switching : https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761
                             // The watchdog will terminate the process in two cases :
-                            // if the user cancels or if 60 minutes delay expires.
+                            // if the user cancels or if timeout delay expires.
                             val watchdog = launch {
                                 try {
                                     delay(timeout.toLong(DurationUnit.MILLISECONDS))
@@ -373,6 +375,9 @@ class ScriptRun( // Constructor used in single script run
                                             log(logger::info, "$event: cancellation timeout elapsed.")
                                             process.destroyForcibly()
                                         }
+
+                                        // Cleanup after stop
+                                        ProcessBuilder(container.dockerCommandList + forceStopCleanup).start()
 
                                         throw ex
                                     }
