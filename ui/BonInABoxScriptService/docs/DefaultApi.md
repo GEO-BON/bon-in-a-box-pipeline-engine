@@ -293,6 +293,7 @@ let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script or pipeline
 let descriptionPath = "descriptionPath_example"; // String | Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.
 let opts = {
+  'callback': "callback_example", // String | Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully.
   'body': "body_example" // String | Content of input.json for this run
 };
 apiInstance.run(type, descriptionPath, opts, (error, data, response) => {
@@ -311,6 +312,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **type** | **String**| Script or pipeline | 
  **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. | 
+ **callback** | **String**| Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully. | [optional] 
  **body** | **String**| Content of input.json for this run | [optional] 
 
 ### Return type
