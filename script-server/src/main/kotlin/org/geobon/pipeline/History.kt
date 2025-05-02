@@ -3,8 +3,6 @@ package org.geobon.pipeline
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
-import org.geobon.pipeline.RunContext.Companion.pipelineRoot
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
 import org.geobon.server.plugins.FILE_SEPARATOR
 import org.geobon.utils.findFilesInFolderByDate
 import org.json.JSONArray
