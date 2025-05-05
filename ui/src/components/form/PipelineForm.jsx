@@ -104,13 +104,18 @@ export function PipelineForm({
         newOptions = _.groupBy(newOptions, (o) => o.folderName);
         let groupedOptions = [];
         Object.keys(newOptions).forEach((key, index) => {
-          groupedOptions.push(<MyListSubheader>{key}</MyListSubheader>);
+          if (newOptions[key].length > 1) {
+            groupedOptions.push(<MyListSubheader>{key}</MyListSubheader>);
+          }
           newOptions[key].forEach((opt) =>
             groupedOptions.push(
               <MenuItem
                 key={opt.value}
                 value={opt.value}
-                style={{ marginLeft: "10px" }}
+                style={{
+                  marginLeft: newOptions[key].length > 1 ? "25px" : "0px",
+                  /*fontWeight: newOptions[key].length > 1 ? "normal" : "bold",*/
+                }}
               >
                 {opt.label}
               </MenuItem>
