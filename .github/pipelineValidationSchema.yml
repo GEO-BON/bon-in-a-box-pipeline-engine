@@ -28,7 +28,6 @@ metadata:
 
     reviewer:
       type: list
-      required: true
       schema:
         type: dict
         schema:
