@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **name** | **String** |  | [optional] 
 **description** | **String** |  | [optional] 
 **author** | [**[InfoAuthorInner]**](InfoAuthorInner.md) |  | [optional] 
+**reviewer** | [**[InfoReviewerInner]**](InfoReviewerInner.md) |  | [optional] 
 **license** | **String** |  | [optional] 
 **externalLink** | **String** |  | [optional] 
 **timeout** | **Number** |  | [optional] 
