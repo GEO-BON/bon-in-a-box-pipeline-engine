@@ -280,9 +280,16 @@ name: Script Name
 description: Describe what the script does
 author:
   - name: John Doe
-    email: john.doe@gmail.com
+    email: john.doe@example.com
   - name: Jane Doe
-    email: jane.doe@gmail.com
+    email: jane.doe@example.com
+    identifier: https://orcid.org/0000-0000-0000-0000
+reviewer:
+  - name: John Smith
+    email: john.smith@example.com
+  - name: Jane Smith
+    email: jane.smith@example.com
+    identifier: https://orcid.org/0000-0000-0000-0000
 inputs:
   landcover_raster:
     label: Raster of landcover

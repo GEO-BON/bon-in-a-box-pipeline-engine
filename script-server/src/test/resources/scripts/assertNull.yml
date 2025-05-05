@@ -3,6 +3,8 @@ name: Assert null
 description: "Test python script that fails if it doesn't receive a null string."
 author:
   - name: Jean-Michel Lord
+reviewer:
+  - name: No One
 inputs:
   input:
     label: Text input

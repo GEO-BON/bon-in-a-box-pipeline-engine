@@ -27,6 +27,22 @@ author:
         type: string
         required: false
 
+reviewer:
+  type: list
+  required: true
+  schema:
+    type: dict
+    schema:
+      name:
+        type: string
+        required: true
+      email:
+        type: string
+        required: false
+      identifier:
+        type: string
+        required: false
+
 license:
   type: string
   required: false
