@@ -211,8 +211,12 @@ function down {
 
 function clean {
     echo "Removing shared containers between dev and prod"
-    docker container rm biab-gateway biab-ui biab-script-server \
-        biab-tiler biab-runner-conda biab-runner-julia biab-viewer
+    docker container rm \
+        biab-gateway \
+        biab-script-server \
+        biab-tiler \
+        biab-runner-conda \
+        biab-runner-julia
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
 }
 
