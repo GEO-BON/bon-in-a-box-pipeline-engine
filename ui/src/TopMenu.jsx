@@ -85,6 +85,15 @@ function TopMenu() {
               </NavLink>
             ))}
           </Box>
+          <Box sx={{ flexGrow: 0 }}><NavLink
+                key={`nav-help`}
+                className="navigation-bar-link"
+                to='https://geo-bon.github.io/bon-in-a-box-pipeline-engine/'
+                target="_blank"
+                style={{fontWeight: 'bold', fontSize: '1.2em'}}
+              >?
+              </NavLink>
+              </Box>
         </Toolbar>
       </Container>
     </AppBar>
