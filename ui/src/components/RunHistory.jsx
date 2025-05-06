@@ -14,6 +14,7 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import Tooltip from "@mui/material/Tooltip";
+import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -34,8 +35,10 @@ export default function RunHistory() {
     api.getHistory({start, limit},(error, _, response) => {
       document.getElementById('pageTop')?.scrollIntoView({ behavior: 'smooth' });
       if (error) {
-        setRunHistory(<HttpError httpError={error} response={response} context={"getting run history"} />);
-      } else if (response && response.text) {
+        setRunHistory(<Box sx={{padding:'50px'}}><HttpError httpError={error} response={response} context={"getting run history"} /></Box>);
+      } else if (response && response.body.length === 0) {
+        setRunHistory(<Box sx={{padding:'50px'}}><h1>Previous runs</h1><Alert severity="warning">There are no runs in history.</Alert></Box>);
+      } else if (response && response.body.length > 0) {
         const runs = response.body.sort((a, b) => {
           const aa = new Date(a.startTime);
           const bb = new Date(b.startTime);
@@ -65,23 +68,20 @@ export const LastNRuns = (n) => {
     const [lastRuns, setLastRuns] = useState(null);
     useEffect(() => {
         api.getHistory({start:0, limit:4}, (error, _, response) => {
-          let resp=<></>
+          let resp=null
           if (error) {
-            resp = <HttpError httpError={error} response={response} context={"getting run history"} />
-          } else if (response && response.body) {
+          } else if (response && response.body?.length > 0) {
             resp = 
               <Grid container spacing={3}>
                 {response.body.map((res) => (
                   <RunCard run={res} />
                 ))}
               </Grid>
-          } else {
-            resp = <Alert severity="warning">Could not retrieve history: empty response.</Alert>;
-          }
+          } 
           setLastRuns(resp);
         });
     }, []);
-    return lastRuns;
+    return <>{lastRuns && (<div><div className="home-page-subtitle" style={{marginTop: '30px', marginBottom:'20px'}}>LATEST RUNS</div>{lastRuns}</div>)}</>;
   } 
 
 const color = (status) => {

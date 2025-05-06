@@ -125,7 +125,6 @@ export default function HomePage() {
                 
 
             </div>
-                <div className="home-page-subtitle" style={{marginTop: '30px', marginBottom:'20px'}}>LATEST RUNS</div>
                 <LastNRuns n={3} />
         </div>
 
