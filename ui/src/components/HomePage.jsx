@@ -96,15 +96,14 @@ export default function HomePage() {
 
                     <li className="world-bullet">
                         <div className="home-tooltip">
-                            Species Distribution Models - ewlgcpSDM (mapSpecies)          
+                            Species Distribution Models with Boosted Regression Trees
                             <span className="tooltiptext-left"
                                 >Where are species likely to be?<br></br>
-                                <a href="https://boninabox.geobon.org/indicator?i=SDM" target="_blank">More info</a>      |       <a href="/pipeline-form/SDM>SDM_ewlgcp">Run pipeline</a>
+                                <a href="https://boninabox.geobon.org/indicator?i=SDM" target="_blank">More info</a>      |       <a href="/pipeline-form/SDM>SDM_BRT">Run pipeline</a>
                             </span>
                         </div>
 
                     </li>
-
 
 
                     <li className="leaf-bullet">
