@@ -35,9 +35,18 @@ export default function RunHistory() {
     api.getHistory({start, limit},(error, _, response) => {
       document.getElementById('pageTop')?.scrollIntoView({ behavior: 'smooth' });
       if (error) {
-        setRunHistory(<Box sx={{padding:'50px'}}><HttpError httpError={error} response={response} context={"getting run history"} /></Box>);
+        setRunHistory(
+          <Box sx={{ padding: '50px' }}>
+            <HttpError httpError={error} response={response} context={"getting run history"} />
+          </Box>
+        );
       } else if (response && response.body.length === 0) {
-        setRunHistory(<Box sx={{padding:'50px'}}><h1>Previous runs</h1><Alert severity="warning">There are no runs in history.</Alert></Box>);
+        setRunHistory(
+          <Box sx={{ padding: '50px' }}>
+            <h1>Previous runs</h1>
+            <Alert severity="info">There are no runs in history.</Alert>
+          </Box>
+        );
       } else if (response && response.body.length > 0) {
         const runs = response.body.sort((a, b) => {
           const aa = new Date(a.startTime);
@@ -71,18 +80,18 @@ export const LastNRuns = (n) => {
           let resp=null
           if (error) {
           } else if (response && response.body?.length > 0) {
-            resp = 
+            resp =
               <Grid container spacing={3}>
-                {response.body.map((res) => (
-                  <RunCard run={res} />
+                {response.body.map((res, i) => (
+                  <RunCard key={i} run={res} />
                 ))}
               </Grid>
-          } 
+          }
           setLastRuns(resp);
         });
     }, []);
     return <>{lastRuns && (<div><div className="home-page-subtitle" style={{marginTop: '30px', marginBottom:'20px'}}>LATEST RUNS</div>{lastRuns}</div>)}</>;
-  } 
+  }
 
 const color = (status) => {
   switch (status) {

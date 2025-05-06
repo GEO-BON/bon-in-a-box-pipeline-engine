@@ -10,40 +10,34 @@ import MenuItem from '@mui/material/MenuItem';
 import BiaBLogo from "./img/boninabox_logo.jpg";
 import { NavLink } from "react-router-dom";
 
-const pages = [{title: 'Home', link: '/'},
-    {title: 'Run a script', link:'/script-form'}, 
-    {title:'Run a pipeline', link: '/pipeline-form'}, 
-    {title:'Pipeline editor', link:'/pipeline-editor'}, 
-    {title: 'History', link:'/history'},
-    {title: 'Info', link:'/info'}];
+const pages = [
+  { title: 'Home', link: '/' },
+  { title: 'Run a script', link: '/script-form' },
+  { title: 'Run a pipeline', link: '/pipeline-form' },
+  { title: 'Pipeline editor', link: '/pipeline-editor' },
+  { title: 'History', link: '/history' },
+  { title: 'Info', link: '/info' }
+];
 
 
 function TopMenu() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
   };
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-
   return (
     <AppBar position="static" className="navigation-bar">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-        <Box sx={{display: { xs: 'block', sm: 'none' } }}>
-            <img id="logo" src={BiaBLogo} alt="BON in a Box logo" style={{display: { xs: 'block', sm: 'none' } }}/>
-        </Box>
+          <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
+            <img id="logo" src={BiaBLogo} alt="BON in a Box logo" style={{ display: { xs: 'block', sm: 'none' } }} />
+          </Box>
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
@@ -70,29 +64,25 @@ function TopMenu() {
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' }, padding:20 }}
+              sx={{ display: { xs: 'block', md: 'none' }, padding: 20 }}
             >
               {pages.map((page) => (
-                <li>
-                <MenuItem onClick={()=> handleCloseNavMenu()}>
-                <NavLink
-                    key={page.title}
-                    to={page.link}
-                    >{page.title}
-                </NavLink>
+                <MenuItem key={`nav-sm-${page.title}`} onClick={() => handleCloseNavMenu()}>
+                  <NavLink key={page.title} to={page.link}>
+                    {page.title}
+                  </NavLink>
                 </MenuItem>
-                </li>
               ))}
             </Menu>
           </Box>
-        <Box sx={{ flexGrow: 1, gap: 5, display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ flexGrow: 1, gap: 5, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-                <NavLink
-                    key={`nav-${page.title}`}
-                    className="navigation-bar-link"
-                    to={page.link}
-                    >{page.title}
-                </NavLink>
+              <NavLink
+                key={`nav-lg-${page.title}`}
+                className="navigation-bar-link"
+                to={page.link}
+              >{page.title}
+              </NavLink>
             ))}
           </Box>
         </Toolbar>
