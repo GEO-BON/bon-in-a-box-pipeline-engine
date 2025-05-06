@@ -306,6 +306,7 @@ export default class DefaultApi {
      * @param {module:model/String} type Script or pipeline
      * @param {String} descriptionPath Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.
      * @param {Object} opts Optional parameters
+     * @param {String} [callback] Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully.
      * @param {String} [body] Content of input.json for this run
      * @param {module:api/DefaultApi~runCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link String}
@@ -327,6 +328,7 @@ export default class DefaultApi {
         'descriptionPath': descriptionPath
       };
       let queryParams = {
+        'callback': opts['callback']
       };
       let headerParams = {
       };

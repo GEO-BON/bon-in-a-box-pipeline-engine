@@ -246,6 +246,14 @@ paths:
       parameters:
         - $ref: '#/components/parameters/stepType'
         - $ref: '#/components/parameters/descriptionPath'
+        - in: query
+          name: callback
+          schema:
+            type: string
+          description:
+            Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK.
+            When receiving the callback, check the outputs or the history to know
+            if the pipeline completed successfully.
       requestBody:
         $ref: '#/components/requestBodies/run_input_body'
       responses:
@@ -263,6 +271,21 @@ paths:
           description: Bad request
         "404":
           description: Script or pipeline not found
+      callbacks:
+        runComplete:
+          "{$request.query.callbackUrl}":
+            get:
+              responses:
+                "202":
+                  description:
+                    Your server implementation should return this HTTP status code
+                    if the callback was received successfully.
+                "500":
+                  description: |
+                    500 or any error code can be returned when a problem occurs.
+                    Nothing special will be done with it: the current
+                    script-server implementation simply discard the error.
+
   /{type}/{id}/outputs:
     get:
       tags: []
