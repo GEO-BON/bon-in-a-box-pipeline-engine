@@ -854,6 +854,7 @@ h2.MuiDialogTitle-root {
     background-color: #548B7B;
     position: fixed;
     height: 75px;
+    padding: 0;
   }
 
   .pipeline-columns {
