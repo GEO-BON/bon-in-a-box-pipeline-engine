@@ -105,9 +105,12 @@ h2 {
   color: #E6F7F0;
   text-decoration: underline 0.1em;
   text-decoration-color: #ABD6C6;
-  font-weight: bold;
   /* 1.2x size */
   transform: scale(1.2);
+
+  /* Bold without extra width, see https://stackoverflow.com/a/46452396/3519951 */
+  -webkit-text-stroke-width: 0.04ex;
+  text-shadow: -0.03ex 0 0, 0.03ex 0 0;
 }
 
 .navigation-bar-mobile-menu a {
