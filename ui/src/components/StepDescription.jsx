@@ -22,6 +22,24 @@ export function getFolderAndName(ymlPath, name) {
     return split.join(' > ')
 }
 
+function generatePersonList(list) {
+    return list.map((person, i, array) => {
+        let email = person.email && <a href={'mailto:' + person.email} style={{textDecoration:'none'}}> &#9993;</a>
+        let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
+        if (person.identifier)
+            return <span key={i}>
+                <a href={person.identifier} target="_blank">
+                    {person.name}{!email && comma}
+                </a>
+                {email && <>{email}{comma}</>}
+                &nbsp;
+            </span>
+
+        else
+            return <span key={i}>{person.name}{email}{comma} </span>
+    })
+}
+
 /**
  * Prints a general description of the script, along with the references.
  * @param {string} Path to the yml script description file
@@ -36,24 +54,14 @@ export function GeneralDescription({ ymlPath, metadata }) {
     return <div className='stepDescription'>
         {metadata.author &&
             <p>
-                <i>
-                    {metadata.author.map((author, i, array) => {
-                        let email = author.email && <a href={'mailto:' + author.email} style={{textDecoration:'none'}}> &#9993;</a>
-                        let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
-                        if (author.identifier)
-                            return <span key={i}>
-                                <a href={author.identifier} target="_blank">
-                                    {author.name}{!email && comma}
-                                </a>
-                                {email && <>{email}{comma}</>}
-                                &nbsp;
-                            </span>
-
-                        else
-                            return <span key={i}>{author.name}{email}{comma} </span>
-                    })}
-                </i>
+                <i>{generatePersonList(metadata.author)}</i>
             </p>
+        }
+        {metadata.reviewer &&
+            <p><small>
+                Reviewed by:&nbsp;
+                <i>{generatePersonList(metadata.reviewer)}</i>
+            </small></p>
         }
         {metadata.description && <ReactMarkdown className="reactMarkdown" children={metadata.description} />}
         {codeLink && <p>
