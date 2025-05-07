@@ -108,15 +108,14 @@ h2 {
 }
 
 .navigation-bar-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 5px;
+  text-decoration: underline 0.1em;
   transform: scale(1.2);
   text-decoration-color: #ABD6C6;
 }
 
 .navigation-bar-link.active {
   color: #E6F7F0;
-  text-decoration: underline;
+  text-decoration: underline 0.1em;
   text-decoration-color: #ABD6C6;
   font-weight: bold;
   /* 1.2x size */
