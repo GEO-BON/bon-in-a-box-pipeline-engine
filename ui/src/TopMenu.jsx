@@ -34,7 +34,7 @@ function TopMenu() {
 
   return (
     <AppBar position="static" className="navigation-bar">
-      <Container maxWidth="xl">
+      <Container maxWidth="xl" disableGutters>
         <Toolbar disableGutters>
           <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
             <img id="logo" src={BiaBLogo} alt="BON in a Box logo" style={{ display: { xs: 'block', sm: 'none' } }} />
@@ -65,7 +65,7 @@ function TopMenu() {
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' }, padding: 20 }}
+              sx={{ padding: 20 }}
             >
               {pages.map((page) => (
                 <MenuItem key={`nav-sm-${page.title}`} onClick={() => handleCloseNavMenu()}>
