@@ -33,7 +33,7 @@ function TopMenu() {
   };
 
   return (
-    <AppBar position="static" className="navigation-bar">
+    <AppBar position="static"className="navigation-bar">
       <Container maxWidth="xl" disableGutters>
         <Toolbar disableGutters>
           <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
@@ -91,7 +91,7 @@ function TopMenu() {
               to="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/"
               target="_blank"
               className="navigation-bar-link help-link"
-              style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "16px" }}
+              style={{ display: "flex" }}
             >
               <HelpIcon
                 alt="Help"

@@ -78,15 +78,10 @@ h2 {
 }
 
 .navigation-bar {
-  z-index: 999;
-  background-color: #548B7B !important;
-}
-
-.navigation-bar {
   font-family: "Montserrat", sans-serif;
-  display: flex;
-  align-items: center;
-  width: 100%;
+  z-index: 999; /* Navigation bar */
+  background-color: #548B7B !important;
+  padding-left: 15px;
 }
 
 .navigation-bar-link {
@@ -753,6 +748,12 @@ h2.MuiDialogTitle-root {
 .narrowWarning,
 .previewMode {
   display: none;
+}
+
+@media (max-width: 1100px) {
+  .navigation-bar-link {
+    margin-left: 10px;
+  }
 }
 
 @media (max-width: 739px) or (max-height: 549px) {
