@@ -51,31 +51,37 @@ export default function HomePage() {
             <div className="column">    {/* left column */}
                 <ul className="pipeline-bullets"> {/* change to a dropdown menu (kinda) */}
                     <li className="dna-bullet">
-                        <div className="home-tooltip">
+                        <div className="home-tooltip right">
                             Genetic Diversity Indicator
-                            <span className="tooltiptext-right"
-                                >Are populations maintaining genetic diversity? <br></br>
-                                <a href="https://boninabox.geobon.org/indicator?i=GeneticDiversity" target="_blank">More info</a>      |       <a href="/pipeline-form/GenesFromSpace>ToolComponents>GetIndicators>GFS_Indicators">Run pipeline</a>
-                            </span>
+                            <div className="tooltip-wrapper">
+                                <div className="tooltiptext">
+                                    Are populations maintaining genetic diversity? <br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=GeneticDiversity" target="_blank">More info</a>      |       <a href="/pipeline-form/GenesFromSpace>ToolComponents>GetIndicators>GFS_Indicators">Run pipeline</a>
+                                </div>
+                            </div>
                         </div>
 
                     </li>
                     <li className="paw-bullet">
-                        <div className="home-tooltip">
+                        <div className="home-tooltip right">
                             Red List Index
-                            <span className="tooltiptext-right"
-                                >Is there recovery of threatened species?<br></br>
-                                <a href="https://boninabox.geobon.org/indicator?i=RLI" target="_blank">More info</a>      |       <a href="/pipeline-form/RLI_pipeline>IUCN_RLI_pipeline">Run pipeline</a>
-                            </span>
+                            <div className="tooltip-wrapper">
+                                <div className="tooltiptext"
+                                    >Is there recovery of threatened species?<br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=RLI" target="_blank">More info</a>      |       <a href="/pipeline-form/RLI_pipeline>IUCN_RLI_pipeline">Run pipeline</a>
+                                </div>
+                            </div>
                         </div>
                     </li>
                     <li className="graph-bullet">
-                        <div className="home-tooltip">
+                        <div className="home-tooltip right">
                             Protected Connected Index
-                            <span className="tooltiptext-right"
-                                >How much area is covered by well-connected protected areas?<br></br>
-                                <a href="https://boninabox.geobon.org/indicator?i=ProtConn" target="_blank">More info</a>      |       <a href="/pipeline-form/Protconn-pipeline>ProtConn_pipeline">Run pipeline</a>
-                            </span>
+                            <div className="tooltip-wrapper">
+                                <div className="tooltiptext"
+                                    >How much area is covered by well-connected protected areas?<br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=ProtConn" target="_blank">More info</a>      |       <a href="/pipeline-form/Protconn-pipeline>ProtConn_pipeline">Run pipeline</a>
+                                </div>
+                            </div>
                         </div>
 
                     </li>
@@ -85,34 +91,40 @@ export default function HomePage() {
             <div className="column">    {/* right column */}
                 <ul className="pipeline-bullets">
                 <li className="tree-bullet">
-                        <div className="home-tooltip">Species Habitat Index
-                            <span className="tooltiptext-left"
-                                >Are species losing or gaining habitat? <br></br>
-                                <a href="https://boninabox.geobon.org/indicator?i=SHI" target="_blank">More info</a>      |       <a href="/pipeline-form/SHI_pipeline">Run pipeline</a>
-                            </span>
+                        <div className="home-tooltip left">Species Habitat Index
+                            <div className="tooltip-wrapper">
+                                <div className="tooltiptext"
+                                    >Are species losing or gaining habitat? <br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=SHI" target="_blank">More info</a>      |       <a href="/pipeline-form/SHI_pipeline">Run pipeline</a>
+                                </div>
+                            </div>
                         </div>
 
                     </li>
 
                     <li className="world-bullet">
-                        <div className="home-tooltip">
+                        <div className="home-tooltip left">
                             Species Distribution Models with Boosted Regression Trees
-                            <span className="tooltiptext-left"
-                                >Where are species likely to be?<br></br>
-                                <a href="https://boninabox.geobon.org/indicator?i=SDM" target="_blank">More info</a>      |       <a href="/pipeline-form/SDM>SDM_BRT">Run pipeline</a>
-                            </span>
+                            <div className="tooltip-wrapper">
+                                <div className="tooltiptext"
+                                    >Where are species likely to be?<br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=SDM" target="_blank">More info</a>      |       <a href="/pipeline-form/SDM>SDM_BRT">Run pipeline</a>
+                                </div>
+                            </div>
                         </div>
 
                     </li>
 
 
                     <li className="leaf-bullet">
-                        <div className="home-tooltip">
+                        <div className="home-tooltip left">
                             Biodiversity Intactness Index
-                            <span className="tooltiptext-left"
-                                >How much are species abundances changing?<br></br>
-                                <a href="https://boninabox.geobon.org/indicator?i=BII" target="_blank">More info</a>      |       <a href="/pipeline-form/BII>BII">Run pipeline</a>
-                            </span>
+                            <div className="tooltip-wrapper">
+                                <div className="tooltiptext"
+                                    >How much are species abundances changing?<br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=BII" target="_blank">More info</a>      |       <a href="/pipeline-form/BII>BII">Run pipeline</a>
+                                </div>
+                            </div>
                         </div>
                     </li>
                 </ul>

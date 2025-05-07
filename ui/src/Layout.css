@@ -183,50 +183,48 @@ h2 {
   cursor: help;
 }
 
-.home-tooltip .tooltiptext-right,
-.home-tooltip .tooltiptext-left {
-  z-index: 0;
+.home-tooltip .tooltip-wrapper {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 0px;
+  transition: all 0.5s;
+}
+
+.home-tooltip.right .tooltip-wrapper {
+  left: 100%;
+  padding-left: 1.5em;
+}
+
+.home-tooltip.left .tooltip-wrapper {
+  right: 100%;
+  padding-right: 3em;
+}
+
+.home-tooltip.left .tooltiptext,
+.home-tooltip.right .tooltiptext {
+  width: 300px;
   font-size: 14px;
   line-height: 1.75;
-  visibility: hidden;
-  width: 300px;
+  text-align: center;
   background-color: #336c5ccf;
   color: #ffff;
-  text-align: center;
   border-radius: 10px;
   padding: 5px 0;
-  position: absolute;
-  opacity: 0;
-
-  transition: all 0.5s;
   white-space: pre-wrap;
 }
 
 .home-tooltip:hover {
   transform: scale(1.125);
-  z-index: 999;
+  z-index: 999; /* home page pipeline tooltip */
+
   color: #ABD6C6;
   text-decoration: rgba(0, 0, 0, 0);
   transition: all 0.5s ease;
 }
 
-.home-tooltip .tooltiptext-right {
-  left: 115%;
-}
-
-.home-tooltip:hover .tooltiptext-right {
+.home-tooltip:hover .tooltip-wrapper {
   visibility: visible;
-  z-index: 999;
-  opacity: 1;
-}
-
-.home-tooltip .tooltiptext-left {
-  left: -350px;
-}
-
-.home-tooltip:hover .tooltiptext-left {
-  visibility: visible;
-  z-index: 999;
   opacity: 1;
 }
 
@@ -823,11 +821,6 @@ h2.MuiDialogTitle-root {
     padding: 3.5em 10px 10px 10px;
   }
 
-  /*
-    add phone support for the menu here
-    The two pipeline columns should also become a single column.
-  */
-
   .home-page-title {
     z-index: 100;
     color: #DAECE5;
@@ -855,47 +848,36 @@ h2.MuiDialogTitle-root {
 
   .pipeline-columns {
     display: block;
+    margin: 1em 0;
   }
 
-
-  .home-tooltip .tooltiptext-right {
-    z-index: 0;
-    font-size: 14px;
-    line-height: 1.75;
-    visibility: hidden;
-    width: 300px;
-    background-color: #336c5ccf;
-    color: #ffff;
-    text-align: center;
-    border-radius: 10px;
-    padding: 5px 0;
-    position: absolute;
-    top: 100%;
-    left: -5px;
-    opacity: 0;
-    white-space: pre-wrap;
-    transition: all 0.5s;
+  .pipeline-columns ul {
+    margin: 0;
   }
 
-  .home-tooltip .tooltiptext-left {
-    z-index: 0;
-    font-size: 14px;
-    line-height: 1.75;
-    visibility: hidden;
-    width: 300px;
-    background-color: #336c5ccf;
-    color: #ffff;
-    text-align: center;
-    border-radius: 10px;
-    padding: 5px 0;
-    position: absolute;
-    top: 100%;
-    left: 0px;
-    opacity: 0;
-    transition: all 0.5s;
-    white-space: pre-wrap;
+  .home-tooltip.right .tooltip-wrapper,
+  .home-tooltip.left .tooltip-wrapper {
+    position: relative;
+    display: none;
+    left: -45px;
+    right: 0px;
+    padding: 0;
   }
 
+  .home-tooltip:hover {
+    transform: unset;
+  }
+
+  .home-tooltip.right:hover .tooltip-wrapper,
+  .home-tooltip.left:hover .tooltip-wrapper {
+    display: unset;
+  }
+
+  .home-tooltip.right .tooltiptext,
+  .home-tooltip.left .tooltiptext {
+    width: 85vw;
+    margin-bottom: 10px;
+  }
 
   .outputTitle .clickable {
     flex-wrap: wrap
