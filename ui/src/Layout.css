@@ -183,39 +183,7 @@ h2 {
   cursor: help;
 }
 
-.home-tooltip:hover {
-  transform: scale(1.125);
-  z-index: 999;
-  color: #ABD6C6;
-  text-decoration: rgba(0, 0, 0, 0);
-  transition: all 0.5s ease;
-}
-
-.home-tooltip .tooltiptext-right {
-  z-index: 0;
-  font-size: 14px;
-  line-height: 1.75;
-  visibility: hidden;
-  width: 300px;
-  background-color: #336c5ccf;
-  color: #ffff;
-  text-align: center;
-  border-radius: 10px;
-  padding: 5px 0;
-  position: absolute;
-  left: 115%;
-  opacity: 0;
-  white-space: pre-wrap;
-  transition: all 0.5s;
-}
-
-.home-tooltip:hover .tooltiptext-right {
-  visibility: visible;
-  z-index: 999;
-  opacity: 1;
-}
-
-
+.home-tooltip .tooltiptext-right,
 .home-tooltip .tooltiptext-left {
   z-index: 0;
   font-size: 14px;
@@ -228,12 +196,33 @@ h2 {
   border-radius: 10px;
   padding: 5px 0;
   position: absolute;
-  left: -350px;
   opacity: 0;
+
   transition: all 0.5s;
   white-space: pre-wrap;
 }
 
+.home-tooltip:hover {
+  transform: scale(1.125);
+  z-index: 999;
+  color: #ABD6C6;
+  text-decoration: rgba(0, 0, 0, 0);
+  transition: all 0.5s ease;
+}
+
+.home-tooltip .tooltiptext-right {
+  left: 115%;
+}
+
+.home-tooltip:hover .tooltiptext-right {
+  visibility: visible;
+  z-index: 999;
+  opacity: 1;
+}
+
+.home-tooltip .tooltiptext-left {
+  left: -350px;
+}
 
 .home-tooltip:hover .tooltiptext-left {
   visibility: visible;

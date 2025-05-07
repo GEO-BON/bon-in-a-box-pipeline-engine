@@ -121,7 +121,7 @@ export default function HomePage() {
                     <a href="/pipeline-form">View All</a>
                 </p>
             </div>
-                
+
 
             </div>
                 <LastNRuns n={3} />
