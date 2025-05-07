@@ -55,6 +55,28 @@ export function GeneralDescription({ ymlPath, metadata }) {
                 </i>
             </p>
         }
+        {metadata.reviewer &&
+            <p>
+                Reviewed by:&nbsp;
+                <i>
+                    {metadata.reviewer.map((reviewer, i, array) => {
+                        let email = reviewer.email && <a href={'mailto:' + reviewer.email} style={{textDecoration:'none'}}> &#9993;</a>
+                        let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
+                        if (reviewer.identifier)
+                            return <span key={i}>
+                                <a href={reviewer.identifier} target="_blank">
+                                    {reviewer.name}{!email && comma}
+                                </a>
+                                {email && <>{email}{comma}</>}
+                                &nbsp;
+                            </span>
+
+                        else
+                            return <span key={i}>{reviewer.name}{email}{comma} </span>
+                    })}
+                </i>
+            </p>
+        }
         {metadata.description && <ReactMarkdown className="reactMarkdown" children={metadata.description} />}
         {codeLink && <p>
                 Code: <a href={codeLink} target="_blank">{codeLink.substring(codeLink.search(/(scripts|pipelines)\//))}</a>
