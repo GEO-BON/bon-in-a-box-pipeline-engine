@@ -9,6 +9,7 @@ import Container from '@mui/material/Container';
 import MenuItem from '@mui/material/MenuItem';
 import BiaBLogo from "./img/boninabox_logo.jpg";
 import { NavLink } from "react-router-dom";
+import HelpIcon from '@mui/icons-material/HelpOutline';
 
 const pages = [
   { title: 'Home', link: '/' },
@@ -87,13 +88,17 @@ function TopMenu() {
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <NavLink
-                key={`nav-help`}
-                className="navigation-bar-link"
-                to='https://geo-bon.github.io/bon-in-a-box-pipeline-engine/'
-                target="_blank"
-                style={{fontWeight: 'bold', fontSize: '1.2em'}}
-              >?</NavLink>
-              </Box>
+              to="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/"
+              target="_blank"
+              className="navigation-bar-link help-link"
+              style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "16px" }}
+            >
+              <HelpIcon
+                alt="Help"
+                style={{ width: "1.2em", height: "auto" }}
+              />
+            </NavLink>
+          </Box>
         </Toolbar>
       </Container>
     </AppBar>
