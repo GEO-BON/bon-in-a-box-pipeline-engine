@@ -95,18 +95,6 @@ h2 {
   margin-left: 30px;
 }
 
-.navigation-bar-mobile-menu a {
-  color: #548B7B
-}
-
-.navigation-bar-mobile-menu a.active {
-  color: #71bba6
-}
-
-.help-link {
-  margin-right: 30px;
-}
-
 .navigation-bar-link:hover {
   text-decoration: underline 0.1em;
   transform: scale(1.2);
@@ -120,6 +108,18 @@ h2 {
   font-weight: bold;
   /* 1.2x size */
   transform: scale(1.2);
+}
+
+.navigation-bar-mobile-menu a {
+  color: #548B7B
+}
+
+.navigation-bar-mobile-menu a.active {
+  color: #71bba6
+}
+
+.help-link {
+  margin-right: 30px;
 }
 
 .home-page-content {
