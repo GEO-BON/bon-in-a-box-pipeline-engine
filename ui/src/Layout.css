@@ -756,6 +756,10 @@ h2.MuiDialogTitle-root {
   .navigation-bar-link {
     margin-left: 10px;
   }
+
+  .home-page-content {
+    max-width: unset;
+  }
 }
 
 @media (max-width: 739px) or (max-height: 549px) {
@@ -785,6 +789,11 @@ h2.MuiDialogTitle-root {
 
   div.right-content main {
     padding: 0px 5px;
+  }
+
+  .home-page-content {
+    max-width: 90%;
+    margin: auto;
   }
 }
 
@@ -844,9 +853,7 @@ h2.MuiDialogTitle-root {
   }
 
   .home-page-content {
-    max-width: 90%;
     padding-top: 30px;
-    margin: auto;
   }
 
   .navigation-bar {
