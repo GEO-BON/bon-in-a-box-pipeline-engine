@@ -14,18 +14,18 @@
 import ApiClient from '../ApiClient';
 
 /**
- * The InfoAuthorInner model module.
- * @module model/InfoAuthorInner
+ * The InfoReviewerInner model module.
+ * @module model/InfoReviewerInner
  * @version 1.0.0
  */
-class InfoAuthorInner {
+class InfoReviewerInner {
     /**
-     * Constructs a new <code>InfoAuthorInner</code>.
-     * @alias module:model/InfoAuthorInner
+     * Constructs a new <code>InfoReviewerInner</code>.
+     * @alias module:model/InfoReviewerInner
      */
     constructor() { 
         
-        InfoAuthorInner.initialize(this);
+        InfoReviewerInner.initialize(this);
     }
 
     /**
@@ -37,15 +37,15 @@ class InfoAuthorInner {
     }
 
     /**
-     * Constructs a <code>InfoAuthorInner</code> from a plain JavaScript object, optionally creating a new instance.
+     * Constructs a <code>InfoReviewerInner</code> from a plain JavaScript object, optionally creating a new instance.
      * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
      * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/InfoAuthorInner} obj Optional instance to populate.
-     * @return {module:model/InfoAuthorInner} The populated <code>InfoAuthorInner</code> instance.
+     * @param {module:model/InfoReviewerInner} obj Optional instance to populate.
+     * @return {module:model/InfoReviewerInner} The populated <code>InfoReviewerInner</code> instance.
      */
     static constructFromObject(data, obj) {
         if (data) {
-            obj = obj || new InfoAuthorInner();
+            obj = obj || new InfoReviewerInner();
 
             if (data.hasOwnProperty('name')) {
                 obj['name'] = ApiClient.convertToType(data['name'], 'String');
@@ -61,9 +61,9 @@ class InfoAuthorInner {
     }
 
     /**
-     * Validates the JSON data with respect to <code>InfoAuthorInner</code>.
+     * Validates the JSON data with respect to <code>InfoReviewerInner</code>.
      * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @return {boolean} to indicate whether the JSON data is valid with respect to <code>InfoAuthorInner</code>.
+     * @return {boolean} to indicate whether the JSON data is valid with respect to <code>InfoReviewerInner</code>.
      */
     static validateJSON(data) {
         // ensure the json data is a string
@@ -88,27 +88,27 @@ class InfoAuthorInner {
 
 
 /**
- * Full name of the author
+ * Full name of the reviewer
  * @member {String} name
  */
-InfoAuthorInner.prototype['name'] = undefined;
+InfoReviewerInner.prototype['name'] = undefined;
 
 /**
- * Email of the author
+ * Email of the reviewer
  * @member {String} email
  */
-InfoAuthorInner.prototype['email'] = undefined;
+InfoReviewerInner.prototype['email'] = undefined;
 
 /**
  * Full URL of a unique digital identifier such as an ORCID
  * @member {String} identifier
  */
-InfoAuthorInner.prototype['identifier'] = undefined;
+InfoReviewerInner.prototype['identifier'] = undefined;
 
 
 
 
 
 
-export default InfoAuthorInner;
+export default InfoReviewerInner;
 

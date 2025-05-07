@@ -146,6 +146,7 @@ Class | Method | HTTP request | Description
  - [BonInABoxScriptService.InfoOutputsValue](docs/InfoOutputsValue.md)
  - [BonInABoxScriptService.InfoOutputsValueExample](docs/InfoOutputsValueExample.md)
  - [BonInABoxScriptService.InfoReferencesInner](docs/InfoReferencesInner.md)
+ - [BonInABoxScriptService.InfoReviewerInner](docs/InfoReviewerInner.md)
 
 
 ## Documentation for Authorization

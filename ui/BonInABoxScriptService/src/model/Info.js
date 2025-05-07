@@ -16,6 +16,7 @@ import InfoAuthorInner from './InfoAuthorInner';
 import InfoInputsValue from './InfoInputsValue';
 import InfoOutputsValue from './InfoOutputsValue';
 import InfoReferencesInner from './InfoReferencesInner';
+import InfoReviewerInner from './InfoReviewerInner';
 
 /**
  * The Info model module.
@@ -62,6 +63,9 @@ class Info {
             }
             if (data.hasOwnProperty('author')) {
                 obj['author'] = ApiClient.convertToType(data['author'], [InfoAuthorInner]);
+            }
+            if (data.hasOwnProperty('reviewer')) {
+                obj['reviewer'] = ApiClient.convertToType(data['reviewer'], [InfoReviewerInner]);
             }
             if (data.hasOwnProperty('license')) {
                 obj['license'] = ApiClient.convertToType(data['license'], 'String');
@@ -113,6 +117,16 @@ class Info {
                 InfoAuthorInner.validateJSON(item);
             };
         }
+        if (data['reviewer']) { // data not null
+            // ensure the json data is an array
+            if (!Array.isArray(data['reviewer'])) {
+                throw new Error("Expected the field `reviewer` to be an array in the JSON data but got " + data['reviewer']);
+            }
+            // validate the optional field `reviewer` (array)
+            for (const item of data['reviewer']) {
+                InfoReviewerInner.validateJSON(item);
+            };
+        }
         // ensure the json data is a string
         if (data['license'] && !(typeof data['license'] === 'string' || data['license'] instanceof String)) {
             throw new Error("Expected the field `license` to be a primitive type in the JSON string but got " + data['license']);
@@ -159,6 +173,11 @@ Info.prototype['description'] = undefined;
  * @member {Array.<module:model/InfoAuthorInner>} author
  */
 Info.prototype['author'] = undefined;
+
+/**
+ * @member {Array.<module:model/InfoReviewerInner>} reviewer
+ */
+Info.prototype['reviewer'] = undefined;
 
 /**
  * @member {String} license

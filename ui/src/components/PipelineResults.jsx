@@ -11,7 +11,6 @@ import Info from "@mui/icons-material/Info";
 
 import Box from "@mui/material/Box";
 
-import Button from "@mui/material/Button";
 import { CustomButtonGreen } from "./CustomMUI";
 import Alert from "@mui/material/Alert";
 import { getScriptOutput, getBreadcrumbs } from "../utils/IOId";
