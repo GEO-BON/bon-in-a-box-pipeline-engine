@@ -5,7 +5,7 @@ GREEN="\033[32m"
 ENDCOLOR="\033[0m"
 
 if [ -d "pipeline-repo" ]; then
-  echo -e "${RED}ERROR: Do not run directly! This script is meant to be ran by validate.sh in the pipeline-repo folder.${ENDCOLOR}"
+  echo -e "${RED}ERROR: Do not run directly! This script is meant to be ran by server-up.sh or validate.sh in the pipeline-repo folder.${ENDCOLOR}"
   exit 1
 fi
 
@@ -42,12 +42,11 @@ function help {
     echo "    up                   Start the server, accessible in http://localhost"
     echo "    stop                 Stops the server"
     echo "    validate             Run basic basic validation on pipelines and scripts. "
-    echo "    clean                Removes the docker containers of all services."
+    echo "    clean                Removes the docker containers of all services and the volume "
+    echo "                         used to store the conda sub-environment info."
     echo "                         This is useful in development switching from prod to dev server,"
     echo "                         in cases when we get the following error:"
     echo "                         \"The container name ... is already in use by container ...\""
-    echo "    purge                Removes the volumes that store dependencies (conda, R)"
-    echo "                         in addition to the clean"
     echo "    command [ARGS...]    Run an arbitrary docker compose command,"
     echo "                         such as (pull|run|up|down|build|logs)"
     echo
@@ -203,6 +202,14 @@ function up {
     echo -e "${GREEN}Server is running.${ENDCOLOR}"
 }
 
+function update {
+    echo "Removing legacy volumes"
+    docker volume rm \
+        conda-dir \
+        conda-cache \
+        r-libs-user
+}
+
 function down {
     echo "Stopping the servers..."
     command down ; assertSuccess
@@ -210,25 +217,16 @@ function down {
 }
 
 function clean {
-    echo "Removing shared containers between dev and prod"
+    echo "Removing docker containers and volumes"
     docker container rm \
         biab-gateway \
         biab-script-server \
         biab-tiler \
         biab-runner-conda \
         biab-runner-julia
+
+    docker volume rm conda-env-yml
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
-}
-
-function purge {
-    clean
-    echo "Removing dependency volumes"
-    docker volume rm \
-        conda-dir \
-        conda-cache \
-        conda-env-yml \
-        r-libs-user
-
 }
 
 case "$1" in
@@ -257,7 +255,7 @@ case "$1" in
         clean
         ;;
     purge)
-        purge
+        echo "Deprecated: Purge is now an alias to the clean command."
         ;;
     *)
         help

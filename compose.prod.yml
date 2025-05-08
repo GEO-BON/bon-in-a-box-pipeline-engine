@@ -18,11 +18,5 @@ services:
       - "80"
 
 volumes:
-  conda-dir:
-    name: "conda-dir"
-  conda-cache:
-    name: "conda-cache"
   conda-env-yml:
     name: "conda-env-yml"
-  r-libs-user:
-    name: "r-libs-user"

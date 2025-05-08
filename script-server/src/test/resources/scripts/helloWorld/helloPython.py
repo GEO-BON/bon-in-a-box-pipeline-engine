@@ -1,5 +1,8 @@
 import sys, json;
 
+import os
+print(os.environ['SCRIPT_SERVER_CACHE_CLEANER'])
+
 # Reading input.json
 inputs = biab_inputs()
 intIn = inputs['some_int']

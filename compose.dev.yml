@@ -67,11 +67,5 @@ services:
       - ./script-server/api/:/app
 
 volumes:
-  conda-dir:
-    name: "conda-dir-dev"
-  conda-cache:
-    name: "conda-cache-dev"
   conda-env-yml:
     name: "conda-env-yml-dev"
-  r-libs-user:
-    name: "r-libs-user-dev"
