@@ -4,9 +4,12 @@ RED="\033[31m"
 GREEN="\033[32m"
 ENDCOLOR="\033[0m"
 
-if [ -d "pipeline-repo" ]; then
-  echo -e "${RED}ERROR: Do not run directly! This script is meant to be ran by server-up.sh or validate.sh in the pipeline-repo folder.${ENDCOLOR}"
-  exit 1
+# Checking that this script is ran from the .server folder, and not from the dev repo,
+# which would break the relative file path.
+(cd .. && ls "server-up.sh" 2> /dev/null 1>&2)
+if [[ 0 -ne $? && ! -f "server-up.sh" ]]; then
+    echo -e "${RED}ERROR: Do not run directly! This script is meant to be ran by server-up.sh or validate.sh in the pipeline-repo folder.${ENDCOLOR}"
+    exit 1
 fi
 
 which docker
