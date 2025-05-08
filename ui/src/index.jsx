@@ -30,8 +30,8 @@ function NotFound() {
   );
 }
 
+
 function App() {
-  const [popupContent, setPopupContent] = useState();
 
   const router = createBrowserRouter([
     {
@@ -51,18 +51,13 @@ function App() {
       element: (
         <Layout
           left={
-            <StepChooser
-              popupContent={popupContent}
-              setPopupContent={setPopupContent}
-            />
+            <StepChooser />
           }
           right={
             <Suspense fallback={<Spinner />}>
               <PipelineEditor />
             </Suspense>
           }
-          popupContent={popupContent}
-          setPopupContent={setPopupContent}
         />
       ),
     },
