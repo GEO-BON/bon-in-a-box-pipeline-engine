@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { useBlocker } from "react-router-dom";
+// import { useBlocker } from "react-router";
 import ReactFlow, {
   ReactFlowProvider,
   addEdge,
@@ -1041,6 +1041,7 @@ export default function PipelineEditor(props) {
     };
   }, [handleBeforeUnload])
 
+	/*
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
       hasUnsavedChanges &&
@@ -1057,6 +1058,9 @@ export default function PipelineEditor(props) {
       setModal("leavePage");
     }
   }, [blocker.state])
+  */
+  const handleLeavePageModalClose = () => {}
+  
 
   return (
     <div id="editorLayout">
@@ -1164,7 +1168,7 @@ export default function PipelineEditor(props) {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleLeavePageModalClose}>Stay</Button>
-          <Button onClick={blocker.proceed}>Leave</Button>
+          <Button onClick={ () => {}}>Leave</Button>
         </DialogActions>
       </Dialog>
 

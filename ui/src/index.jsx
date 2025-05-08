@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
@@ -6,7 +6,8 @@ import {
   createBrowserRouter,
   RouterProvider,
   useLocation,
-} from "react-router-dom";
+} from "react-router";
+import { BrowserRouter, Routes, Route } from "react-router";
 
 import HomePage from "./components/HomePage";
 import { PipelinePage } from "./components/PipelinePage";
@@ -30,8 +31,16 @@ function NotFound() {
   );
 }
 
+/*
 function App() {
   const [popupContent, setPopupContent] = useState();
+  
+  useEffect(() => {
+    console.log("Running from App");
+    console.log(popupContent);
+  }, [popupContent])
+  
+
 
   const router = createBrowserRouter([
     {
@@ -81,10 +90,43 @@ function App() {
   ]);
 
   return <RouterProvider router={router} />;
-}
+} 
 
 const root = createRoot(document.getElementById("root"));
 root.render(<App />);
+*/
+
+function App() {
+	const [popupContent, setPopupContent] = useState();
+	return (
+		<BrowserRouter>
+			<Routes>
+				<Route path="/" element={<Layout />} />
+				<Route path="script-form/:pipeline?/:runHash?" element={<Layout right={<PipelinePage key="singleScriptRun" runType="script" />} />} />
+				<Route path="pipeline-form/:pipeline?/:runHash?" element={<Layout right={<PipelinePage key="pipelineRun" runType="pipeline" />} />} />
+				<Route path="pipeline-editor" element={
+					<Layout
+  	        left={
+  	          <StepChooser
+  	            popupContent={popupContent}
+  	            setPopupContent={setPopupContent}
+  	          />
+  	        }
+  	        right={
+  	          <Suspense fallback={<Spinner />}>
+  	            <PipelineEditor />
+  	          </Suspense>
+  	        }
+  	        popupContent={popupContent}
+  	        setPopupContent={setPopupContent}
+  	      />} />
+				<Route path="history" element={<Layout right={<RunHistory />} />}/>
+				<Route path="info" element={<Layout right={<InfoPage />} />} />
+				<Route path="*" element={<Layout right={<NotFound />} />} />
+			</Routes>
+  	</BrowserRouter>);
+}
+createRoot(document.getElementById("root")).render(<App/>);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

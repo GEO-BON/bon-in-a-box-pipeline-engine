@@ -1,5 +1,6 @@
 import "./Layout.css";
 import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router";
 import BiaBLogo from "./img/boninabox_logo.jpg";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./components/styles/theme";
@@ -19,6 +20,12 @@ export function Layout(props) {
     setMainHeight(windowHeight - nav.offsetHeight);
 
   }, [windowHeight]);
+
+  useEffect(() => {
+    console.log("Running from Layout");
+    console.log(props.popupContent);
+  }, [props.popupContent])
+  
 
   return (
     <ThemeProvider theme={theme}>

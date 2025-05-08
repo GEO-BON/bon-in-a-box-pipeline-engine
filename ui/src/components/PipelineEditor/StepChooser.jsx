@@ -70,6 +70,7 @@ export default function StepChooser({ popupContent, setPopupContent }) {
               metadata={metadata}
             />
           );
+	  console.log(popupContent)
         });
       }
     },
