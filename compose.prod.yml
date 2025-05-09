@@ -1,5 +1,6 @@
 # Production compose file.
 # Contains configurations specific to the production environment.
+name: bon-in-a-box
 
 services:
 

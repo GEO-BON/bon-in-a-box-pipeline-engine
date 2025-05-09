@@ -1,5 +1,6 @@
 # Development compose file.
 # Contains configurations specific to the development environment.
+name: bon-in-a-box_dev
 
 services:
   ## UI server to use when developing UI code
