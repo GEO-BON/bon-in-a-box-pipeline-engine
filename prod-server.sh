@@ -93,6 +93,7 @@ function command { # args appended to the docker compose command
         fi
     fi
 
+    #echo "docker compose $composeFiles --env-file runner.env --env-file .server/.prod-paths.env $@"
     docker compose $composeFiles \
         --env-file runner.env --env-file .server/.prod-paths.env $@
 }
@@ -185,20 +186,57 @@ function up {
         exit 1
     fi
 
-    echo "Pulling docker images..."
-    command pull ; assertSuccess
-
     echo "Building (if necessary)..."
     command build ; assertSuccess
 
+    echo "Checking for updates to docker images..."
+    updatesFound=false
+    images=$(command config | grep 'image:' | awk '{print $2}')
+
+    for image in $images; do
+        # Get the local digest in the format sha256:<hash>
+        localDigest=$(docker image inspect --format='{{index .Id}}' $image 2>/dev/null)
+        if [[ $? -ne 0 ]]; then
+            echo "At least one image not found locally: $image"
+            updatesFound=true
+            break
+        fi
+        echo $localDigest
+
+        # Get the remote digest in format sha256:48c4dfdb7a68a97b917ea5a65c838480207fe52dc95c7d61f21784f717f9078d
+        # Would have been cleaner with jq but it is not available in a git bash on Windows...
+        remoteDigest=$(docker manifest inspect -v $image \
+            | awk '/"config":/ {found=1} found&& /"digest"/ {print $2; exit}' \
+            | tr -d '",')
+        echo $remoteDigest
+
+        # Perform comparison
+        if [[ "$localDigest" == "$remoteDigest" ]]; then
+            echo "Up to date: $image"
+        else
+            echo "At least one image outdated: $image"
+            updatesFound=true
+            break
+        fi
+    done
+
+    if $updatesFound; then
+        echo "Updates found. Pulling images and starting server..."
+        command pull ; assertSuccess
+        flag=""
+    else
+        echo "No updates found. Starting server without recreating containers..."
+        flag="--no-recreate"
+    fi
+
     echo "Starting the server..."
-    output=$(command up -d $@ 2>&1); returnCode=$?;
+    output=$(command up -d $flag $@ 2>&1); returnCode=$?;
 
     if [[ $output == *"is already in use by container"* ]] ; then
-        # Container conflict, perform clean and try again.
+        echo "A container name conflict was found, we will clean and try again."
         clean
         echo "Starting the server after a clean..."
-        command up -d $@ ; assertSuccess
+        command up -d $flag $@ ; assertSuccess
     else # No container conflict, check the return code
         if [[ $returnCode -ne 0 ]] ; then
             echo $output
@@ -219,7 +257,7 @@ function update {
 
 function down {
     echo "Stopping the servers..."
-    command down ; assertSuccess
+    command stop ; assertSuccess
     echo -e "${GREEN}Server has stopped.${ENDCOLOR}"
 }
 
@@ -233,7 +271,7 @@ function clean {
         biab-runner-julia 2>&1)
 
     if [[ $output == *"container is running"* ]]; then
-        echo -e "${RED}BON in a Box is already running.${ENDCOLOR}"
+        echo -e "${RED}Cannot clean while BON in a Box is already running.${ENDCOLOR}"
         exit 1
     fi
 
