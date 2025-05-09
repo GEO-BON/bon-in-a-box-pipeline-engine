@@ -190,6 +190,7 @@ function up {
     command build ; assertSuccess
 
     echo "Checking for updates to docker images..."
+    # see https://github.com/docker/cli/issues/6059
     updatesFound=false
     images=$(command config | grep 'image:' | awk '{print $2}')
 
@@ -201,14 +202,14 @@ function up {
             updatesFound=true
             break
         fi
-        echo $localDigest
+        #echo $localDigest
 
-        # Get the remote digest in format sha256:48c4dfdb7a68a97b917ea5a65c838480207fe52dc95c7d61f21784f717f9078d
+        # Get the remote digest in format sha256:<hash>
         # Would have been cleaner with jq but it is not available in a git bash on Windows...
         remoteDigest=$(docker manifest inspect -v $image \
             | awk '/"config":/ {found=1} found&& /"digest"/ {print $2; exit}' \
             | tr -d '",')
-        echo $remoteDigest
+        #echo $remoteDigest
 
         # Perform comparison
         if [[ "$localDigest" == "$remoteDigest" ]]; then
