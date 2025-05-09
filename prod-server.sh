@@ -179,6 +179,10 @@ function up {
         echo "Run the server with the following command"
         echo "    ./server-up.sh pre-conda-staging"
         exit 1
+
+    elif [[ $output == *"geobon/bon-in-a-box:gateway"* ]] ; then
+        echo -e "${RED}BON in a Box is already running.${ENDCOLOR}"
+        exit 1
     fi
 
     echo "Pulling docker images..."
