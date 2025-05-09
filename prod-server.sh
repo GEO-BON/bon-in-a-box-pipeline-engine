@@ -12,12 +12,12 @@ if [[ 0 -ne $? && ! -f "server-up.sh" ]]; then
     exit 1
 fi
 
-which docker
+which docker > /dev/null 2>&1
 if [[ $? -ne 0 ]] ; then
     echo -e "${RED}Docker and docker compose plugin are required to run the pipeline engine.${ENDCOLOR}" ; exit 1
 fi
 
-which git
+which git > /dev/null 2>&1
 if [[ $? -ne 0 ]] ; then
     echo -e "${RED}Git is required to run the latest version of the pipeline engine.${ENDCOLOR}" ; exit 1
 fi
@@ -221,12 +221,17 @@ function down {
 
 function clean {
     echo "Removing docker containers and volumes"
-    docker container rm \
+    output=$(docker container rm \
         biab-gateway \
         biab-script-server \
         biab-tiler \
         biab-runner-conda \
-        biab-runner-julia
+        biab-runner-julia 2>&1)
+
+    if [[ $output == *"container is running"* ]]; then
+        echo -e "${RED}BON in a Box is already running.${ENDCOLOR}"
+        exit 1
+    fi
 
     docker volume rm conda-env-yml
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
