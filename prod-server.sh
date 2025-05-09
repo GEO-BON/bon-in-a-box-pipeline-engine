@@ -43,7 +43,7 @@ function help {
     echo "    help                 Display this help"
     echo "    checkout [BRANCH]    Checkout config files from given branch of pipeline engine repo."
     echo "    up                   Start the server, accessible in http://localhost"
-    echo "    stop                 Stops the server"
+    echo "    down                 Stops the server"
     echo "    validate             Run basic basic validation on pipelines and scripts. "
     echo "    clean                Removes the docker containers of all services and the volume "
     echo "                         used to store the conda sub-environment info."
