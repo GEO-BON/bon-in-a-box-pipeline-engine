@@ -187,7 +187,7 @@ function checkForUpdates {
         echo $remoteDigest
 
         # Perform comparison
-        if [[ "bla$localDigest" != "$remoteDigest" ]]; then
+        if [[ "$localDigest" != "$remoteDigest" ]]; then
             echo -e "${YELLOW} ! ${ENDCOLOR}At least one image outdated: $image"
             return 0
         else
@@ -228,8 +228,8 @@ function up {
     images=$(command config | grep 'image:' | awk '{print $2}')
 
     # There are some images for which we want to keep the containers, others can be discarded.
-    savedContainerImages=$(echo "$images" | grep '^geobon/bon-in-a-box:runner-conda')
-    otherImages=$(echo "$images" | grep -v '^geobon/bon-in-a-box:runner-conda')
+    savedContainerImages=$(echo "$images" | grep -E '^geobon/bon-in-a-box:(runner-conda|runner-julia)')
+    otherImages=$(echo "$images" | grep -vE '^geobon/bon-in-a-box:(runner-conda|runner-julia)')
 
     # Check the images for which the containers should be kept whenever possible.
     checkForUpdates "$savedContainerImages"
