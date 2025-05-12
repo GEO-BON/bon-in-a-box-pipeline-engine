@@ -173,7 +173,7 @@ function checkForUpdates {
         # Get the local digest in the format sha256:<hash>
         localDigest=$(docker image inspect --format='{{index .Id}}' $image 2>/dev/null)
         if [[ $? -ne 0 ]]; then
-            echo "At least one image not found locally: $image"
+            echo -e "${YELLOW} ! ${ENDCOLOR}At least one image not found locally: $image"
             return 0
         fi
         echo $localDigest
@@ -187,13 +187,14 @@ function checkForUpdates {
         echo $remoteDigest
 
         # Perform comparison
-        if [[ "$localDigest" != "$remoteDigest" ]]; then
-            echo "At least one image outdated: $image"
+        if [[ "bla$localDigest" != "$remoteDigest" ]]; then
+            echo -e "${YELLOW} ! ${ENDCOLOR}At least one image outdated: $image"
             return 0
+        else
+            echo -e "${GREEN} ✔ ${ENDCOLOR}Up to date: $image"
         fi
     done
 
-    echo "${GREEN} ✔ ${ENDCOLOR}Up to date: $image"
     return 1
 }
 
@@ -246,7 +247,7 @@ function up {
         if [[ $containersDiscarded -eq 0 ]] ; then
             echo -e "${YELLOW}This update will discard runner containers.\nThis means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
         fi
-        command pull ; assertSuccess
+            command pull ; assertSuccess
         flag=""
     else
         echo "No updates found. Starting server without recreating containers..."
