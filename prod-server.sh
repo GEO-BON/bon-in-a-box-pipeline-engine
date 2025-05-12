@@ -2,6 +2,7 @@
 
 RED="\033[31m"
 GREEN="\033[32m"
+YELLOW="\033[33m"
 ENDCOLOR="\033[0m"
 
 # Checking that this script is ran from the .server folder, and not from the dev repo,
@@ -164,25 +165,36 @@ function checkout {
     echo -e "${GREEN}Server configuration updated.${ENDCOLOR}"
 }
 
-function checkForUpdate {
-    # Get the local digest in the format sha256:<hash>
-    localDigest=$(docker image inspect --format='{{index .Id}}' $image 2>/dev/null)
-    if [[ $? -ne 0 ]]; then
-        echo "At least one image not found locally: $image"
-        updatesFound=true
-        break
-    fi
-    echo $localDigest
+# Docker pull should be able to tell us. In the meantime, comparing digests.
+# See https://github.com/docker/cli/issues/6059
+function checkForUpdates {
+    local images=$1
+    for image in $images; do
+        # Get the local digest in the format sha256:<hash>
+        localDigest=$(docker image inspect --format='{{index .Id}}' $image 2>/dev/null)
+        if [[ $? -ne 0 ]]; then
+            echo "At least one image not found locally: $image"
+            return 0
+        fi
+        echo $localDigest
 
-    # Get the remote digest in format sha256:<hash>
-    # Would have been cleaner with jq but it is not available in a git bash on Windows...
-    remoteDigest=$(docker manifest inspect -v $image \
-        | awk '/"config":/ {found=1} found&& /"digest"/ {print $2; exit}' \
-        | tr -d '",')
-    echo $remoteDigest
+        # Get the remote digest in format sha256:<hash>
+        # Would have been cleaner with jq but it is not available in a git bash on Windows...
+        # WARNING: Works only on single architecture builds or if Linux happens to be the first variant.
+        remoteDigest=$(docker manifest inspect -v $image \
+            | awk '/"config":/ {found=1} found&& /"digest"/ {print $2; exit}' \
+            | tr -d '",')
+        echo $remoteDigest
 
-    [[ "$localDigest" != "$remoteDigest" ]]
-    return $?  # Return the exit status of the test command
+        # Perform comparison
+        if [[ "$localDigest" != "$remoteDigest" ]]; then
+            echo "At least one image outdated: $image"
+            return 0
+        fi
+    done
+
+    echo "${GREEN} ✔ ${ENDCOLOR}Up to date: $image"
+    return 1
 }
 
 function up {
@@ -212,26 +224,28 @@ function up {
 
     echo "Checking for updates to docker images..."
     # see https://github.com/docker/cli/issues/6059
-    updatesFound=false
     images=$(command config | grep 'image:' | awk '{print $2}')
 
-    for image in $images; do
-        checkForUpdate $image
+    # There are some images for which we want to keep the containers, others can be discarded.
+    savedContainerImages=$(echo "$images" | grep '^geobon/bon-in-a-box:runner-conda')
+    otherImages=$(echo "$images" | grep -v '^geobon/bon-in-a-box:runner-conda')
+
+    # Check the images for which the containers should be kept whenever possible.
+    checkForUpdates "$savedContainerImages"
+    updatesFound=$?
+    containersDiscarded=$?
+
+    if [[ $updatesFound -ne 0 ]] ; then
+        # Check the other images
+        checkForUpdates "$otherImages"
         updatesFound=$?
-
-        # Perform comparison
-        if [[ $updatesFound -eq 0 ]]; then
-            echo "At least one image outdated: $image"
-            break
-        else
-            echo "Up to date: $image"
-        fi
-    done
-
-    exit
+    fi
 
     if [[ $updatesFound ]] ; then
         echo "Updates found. Pulling images and starting server..."
+        if [[ $containersDiscarded -eq 0 ]] ; then
+            echo -e "${YELLOW}This update will discard runner containers.\nThis means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
+        fi
         command pull ; assertSuccess
         flag=""
     else
