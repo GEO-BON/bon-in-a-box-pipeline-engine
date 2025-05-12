@@ -164,6 +164,27 @@ function checkout {
     echo -e "${GREEN}Server configuration updated.${ENDCOLOR}"
 }
 
+function checkForUpdate {
+    # Get the local digest in the format sha256:<hash>
+    localDigest=$(docker image inspect --format='{{index .Id}}' $image 2>/dev/null)
+    if [[ $? -ne 0 ]]; then
+        echo "At least one image not found locally: $image"
+        updatesFound=true
+        break
+    fi
+    echo $localDigest
+
+    # Get the remote digest in format sha256:<hash>
+    # Would have been cleaner with jq but it is not available in a git bash on Windows...
+    remoteDigest=$(docker manifest inspect -v $image \
+        | awk '/"config":/ {found=1} found&& /"digest"/ {print $2; exit}' \
+        | tr -d '",')
+    echo $remoteDigest
+
+    [[ "$localDigest" != "$remoteDigest" ]]
+    return $?  # Return the exit status of the test command
+}
+
 function up {
     cd .. # Back to pipeline-repo folder
 
@@ -195,33 +216,21 @@ function up {
     images=$(command config | grep 'image:' | awk '{print $2}')
 
     for image in $images; do
-        # Get the local digest in the format sha256:<hash>
-        localDigest=$(docker image inspect --format='{{index .Id}}' $image 2>/dev/null)
-        if [[ $? -ne 0 ]]; then
-            echo "At least one image not found locally: $image"
-            updatesFound=true
-            break
-        fi
-        #echo $localDigest
-
-        # Get the remote digest in format sha256:<hash>
-        # Would have been cleaner with jq but it is not available in a git bash on Windows...
-        remoteDigest=$(docker manifest inspect -v $image \
-            | awk '/"config":/ {found=1} found&& /"digest"/ {print $2; exit}' \
-            | tr -d '",')
-        #echo $remoteDigest
+        checkForUpdate $image
+        updatesFound=$?
 
         # Perform comparison
-        if [[ "$localDigest" == "$remoteDigest" ]]; then
-            echo "Up to date: $image"
-        else
+        if [[ $updatesFound -eq 0 ]]; then
             echo "At least one image outdated: $image"
-            updatesFound=true
             break
+        else
+            echo "Up to date: $image"
         fi
     done
 
-    if $updatesFound; then
+    exit
+
+    if [[ $updatesFound ]] ; then
         echo "Updates found. Pulling images and starting server..."
         command pull ; assertSuccess
         flag=""
