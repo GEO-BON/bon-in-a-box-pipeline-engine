@@ -234,7 +234,7 @@ function up {
     # Check the images for which the containers should be kept whenever possible.
     checkForUpdates "$savedContainerImages"
     updatesFound=$?
-    containersDiscarded=$?
+    containersDiscarded=$updatesFound
 
     if [[ $updatesFound -ne 0 ]] ; then
         # Check the other images
@@ -242,19 +242,31 @@ function up {
         updatesFound=$?
     fi
 
-    if [[ $updatesFound ]] ; then
-        echo "Updates found. Pulling images and starting server..."
+    flag=""
+    if [[ $updatesFound -eq 0 ]] ; then
+        echo "Updates found."
         if [[ $containersDiscarded -eq 0 ]] ; then
             echo -e "${YELLOW}This update will discard runner containers.\nThis means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
         fi
+
+        read -p "Do you want to update? (y/n): " choice
+        if [[ -z "$choice" || "$choice" == "y" || "$choice" == "Y" ]]; then
             command pull ; assertSuccess
-        flag=""
+
+        else # Ok then, let's pretend there are no updates.
+            updatesFound=1
+        fi
     else
-        echo "No updates found. Starting server without recreating containers..."
+        echo "No updates found."
+    fi
+
+    if [[ $updatesFound -eq 0 ]] ; then
+        echo "Starting the server..."
+    else
+        echo "Starting server without recreating containers..."
         flag="--no-recreate"
     fi
 
-    echo "Starting the server..."
     output=$(command up -d $flag $@ 2>&1); returnCode=$?;
 
     if [[ $output == *"is already in use by container"* ]] ; then
