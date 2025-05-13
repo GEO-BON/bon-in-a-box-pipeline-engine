@@ -295,7 +295,7 @@ function up {
     done
 
     # Starting the rest of the services
-    lastOutput=$(command up -d $otherServices 2>&1 | tee /dev/pts/2); lastReturnCode=$?;
+    lastOutput=$(command up -d $otherServices 2>&1); lastReturnCode=$?;
     output="$output\n$lastOutput"
     if [[ $lastReturnCode -ne 0 ]]; then
         returnCode=1
