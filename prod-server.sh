@@ -225,20 +225,25 @@ function up {
 
     echo "Checking for updates to docker images..."
     # see https://github.com/docker/cli/issues/6059
-    images=$(command config | grep 'image:' | awk '{print $2}')
+    images=$(command config --images)
+    services=$(command config --services)
 
     # There are some images for which we want to keep the containers, others can be discarded.
-    savedContainerImages=$(echo "$images" | grep -E '^geobon/bon-in-a-box:(runner-conda|runner-julia)')
-    otherImages=$(echo "$images" | grep -vE '^geobon/bon-in-a-box:(runner-conda|runner-julia)')
+    savedContainerRegex="(runner-conda|runner-julia)"
+    savedContainerServices="runner-conda runner-julia"
+    otherServices="gateway script-server tiler"  # $(echo "$services" | grep -vE "^$savedContainerRegex")
+
+    savedContainerImages=$(echo "$images" | grep -E "^geobon/bon-in-a-box:$savedContainerRegex")
+    otherImages=$(echo "$images" | grep -vE "^geobon/bon-in-a-box:$savedContainerRegex")
 
     updatesFound=1 # Will become 0 if there is an update
 
     # Check the images for which the containers should be kept whenever possible.
-    discardedContainers=""
+    containersToDiscard=""
     for savedContainerImage in $savedContainerImages; do
         checkForUpdates "$savedContainerImage"
         if [[ $? -eq 0 ]]; then
-            discardedContainers="$discardedContainers $savedContainerImage"
+            containersToDiscard="$containersToDiscard $savedContainerImage"
             updatesFound=0
         fi
     done
@@ -249,12 +254,11 @@ function up {
         updatesFound=$?
     fi
 
-    flag=""
     if [[ $updatesFound -eq 0 ]]; then
         echo "Updates found."
-        if [[ -n "$discardedContainers" ]]; then
+        if [[ -n "$containersToDiscard" ]]; then
             echo -e "${YELLOW}This update will discard the following runner containers: ${ENDCOLOR}"
-            for container in $discardedContainers; do
+            for container in $containersToDiscard; do
                 echo -e "${YELLOW} - $container${ENDCOLOR}"
             done
             echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
@@ -266,19 +270,36 @@ function up {
 
         else # Ok then, let's pretend there are no updates.
             updatesFound=1
+            containersToDiscard=""
         fi
     else
         echo "No updates found."
     fi
 
-    if [[ $updatesFound -eq 0 ]] ; then
-        echo "Starting the server..."
-    else
-        echo "Starting server without recreating containers..."
-        flag="--no-recreate"
+    echo "Starting the server..."
+    # Starting the services for which we want to preserve the containers
+    output=""
+    returnCode=0
+    for service in $savedContainerServices; do
+        flag="--no-recreate" # By default, we keep runners unless they are updated
+        if [[ $containersToDiscard == "*$service*" ]]; then
+            echo "  Discarding $service runner"
+            flag=""
+        fi
+
+        lastOutput=$(command up -d $flag $service 2>&1); lastReturnCode=$?;
+        output="$output\n$lastOutput"
+        if [[ $lastReturnCode -ne 0 ]]; then
+            returnCode=1
+        fi
+    done
+
+    # Starting the rest of the services
+    lastOutput=$(command up -d $otherServices 2>&1 | tee /dev/pts/2); lastReturnCode=$?;
+    output="$output\n$lastOutput"
+    if [[ $lastReturnCode -ne 0 ]]; then
+        returnCode=1
     fi
-exit
-    output=$(command up -d $flag 2>&1); returnCode=$?;
 
     if [[ $output == *"is already in use by container"* ]] ; then
         echo "A container name conflict was found, we will clean and try again."
@@ -287,7 +308,7 @@ exit
         command up -d $flag ; assertSuccess
     else # No container conflict, check the return code
         if [[ $returnCode -ne 0 ]] ; then
-            echo $output
+            echo -e $output
             echo -e "${RED}FAILED${ENDCOLOR}" ; exit 1
         fi
     fi
