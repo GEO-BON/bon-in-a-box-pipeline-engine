@@ -231,10 +231,17 @@ function up {
     savedContainerImages=$(echo "$images" | grep -E '^geobon/bon-in-a-box:(runner-conda|runner-julia)')
     otherImages=$(echo "$images" | grep -vE '^geobon/bon-in-a-box:(runner-conda|runner-julia)')
 
+    updatesFound=1 # Will become 0 if there is an update
+
     # Check the images for which the containers should be kept whenever possible.
-    checkForUpdates "$savedContainerImages"
-    updatesFound=$?
-    containersDiscarded=$updatesFound
+    discardedContainers=()
+    for savedContainerImage in $savedContainerImages; do
+        checkForUpdates "$savedContainerImage"
+        if [[ $? -eq 0 ]]; then
+            discardedContainers+=("$savedContainerImage")
+            updatesFound=0
+        fi
+    done
 
     if [[ $updatesFound -ne 0 ]] ; then
         # Check the other images
@@ -246,7 +253,11 @@ function up {
     if [[ $updatesFound -eq 0 ]] ; then
         echo "Updates found."
         if [[ $containersDiscarded -eq 0 ]] ; then
-            echo -e "${YELLOW}This update will discard runner containers.\nThis means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
+            echo -e "${YELLOW}This update will discard the following runner containers: ${ENDCOLOR}"
+            for container in "${discardedContainers[@]}"; do
+                echo -e "${YELLOW} - $container${ENDCOLOR}"
+            done
+            echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
         fi
 
         read -p "Do you want to update? (y/n): " choice
@@ -266,7 +277,7 @@ function up {
         echo "Starting server without recreating containers..."
         flag="--no-recreate"
     fi
-
+exit
     output=$(command up -d $flag $@ 2>&1); returnCode=$?;
 
     if [[ $output == *"is already in use by container"* ]] ; then
