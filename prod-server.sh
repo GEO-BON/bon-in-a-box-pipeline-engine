@@ -176,7 +176,7 @@ function checkForUpdates {
             echo -e "${YELLOW} ! ${ENDCOLOR}At least one image not found locally: $image"
             return 0
         fi
-        echo $localDigest
+        # echo $localDigest
 
         # Get the remote digest in format sha256:<hash>
         # Would have been cleaner with jq but it is not available in a git bash on Windows...
@@ -184,7 +184,7 @@ function checkForUpdates {
         remoteDigest=$(docker manifest inspect -v $image \
             | awk '/"config":/ {found=1} found&& /"digest"/ {print $2; exit}' \
             | tr -d '",')
-        echo $remoteDigest
+        # echo $remoteDigest
 
         # Perform comparison
         if [[ "$localDigest" != "$remoteDigest" ]]; then
