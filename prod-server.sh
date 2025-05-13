@@ -202,7 +202,7 @@ function up {
     cd .. # Back to pipeline-repo folder
 
     echo "Checking requirements..."
-    output=$(command ps $@ 2>&1); returnCode=$?;
+    output=$(command ps 2>&1); returnCode=$?;
     if [[ $output == *"service \"runner-conda\" has neither an image nor a build context specified"* ]] ; then
         bold=$(tput bold)
         normal=$(tput sgr0)
@@ -278,13 +278,13 @@ function up {
         flag="--no-recreate"
     fi
 exit
-    output=$(command up -d $flag $@ 2>&1); returnCode=$?;
+    output=$(command up -d $flag 2>&1); returnCode=$?;
 
     if [[ $output == *"is already in use by container"* ]] ; then
         echo "A container name conflict was found, we will clean and try again."
         clean
         echo "Starting the server after a clean..."
-        command up -d $flag $@ ; assertSuccess
+        command up -d $flag ; assertSuccess
     else # No container conflict, check the return code
         if [[ $returnCode -ne 0 ]] ; then
             echo $output
@@ -336,7 +336,7 @@ case "$1" in
         ;;
     up)
         shift
-        up $@
+        up
         ;;
     down)
         down
