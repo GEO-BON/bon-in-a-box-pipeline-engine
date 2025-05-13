@@ -234,11 +234,11 @@ function up {
     updatesFound=1 # Will become 0 if there is an update
 
     # Check the images for which the containers should be kept whenever possible.
-    discardedContainers=()
+    discardedContainers=""
     for savedContainerImage in $savedContainerImages; do
         checkForUpdates "$savedContainerImage"
         if [[ $? -eq 0 ]]; then
-            discardedContainers+=("$savedContainerImage")
+            discardedContainers="$discardedContainers $savedContainerImage"
             updatesFound=0
         fi
     done
@@ -250,11 +250,11 @@ function up {
     fi
 
     flag=""
-    if [[ $updatesFound -eq 0 ]] ; then
+    if [[ $updatesFound -eq 0 ]]; then
         echo "Updates found."
-        if [[ $containersDiscarded -eq 0 ]] ; then
+        if [[ -n "$discardedContainers" ]]; then
             echo -e "${YELLOW}This update will discard the following runner containers: ${ENDCOLOR}"
-            for container in "${discardedContainers[@]}"; do
+            for container in $discardedContainers; do
                 echo -e "${YELLOW} - $container${ENDCOLOR}"
             done
             echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
