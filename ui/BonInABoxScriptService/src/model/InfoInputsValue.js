@@ -12,7 +12,7 @@
  */
 
 import ApiClient from '../ApiClient';
-import InfoInputsValueExample from './InfoInputsValueExample';
+//import InfoInputsValueExample from './InfoInputsValueExample';
 
 /**
  * The InfoInputsValue model module.
@@ -24,8 +24,8 @@ class InfoInputsValue {
      * Constructs a new <code>InfoInputsValue</code>.
      * @alias module:model/InfoInputsValue
      */
-    constructor() { 
-        
+    constructor() {
+
         InfoInputsValue.initialize(this);
     }
 
@@ -34,7 +34,7 @@ class InfoInputsValue {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) { 
+    static initialize(obj) {
     }
 
     /**
@@ -67,7 +67,9 @@ class InfoInputsValue {
                 obj['properties'] = ApiClient.convertToType(data['properties'], ['String']);
             }
             if (data.hasOwnProperty('example')) {
-                obj['example'] = InfoInputsValueExample.constructFromObject(data['example']);
+                // JM Lord: Current version of the generator does not work when type is "oneOf" in OpenAPI spec.
+                // We want the default convertToType clause to execute.
+                obj['example'] = ApiClient.convertToType(data['example'], 'depends on type');
             }
         }
         return obj;
@@ -101,7 +103,8 @@ class InfoInputsValue {
         }
         // validate the optional field `example`
         if (data['example']) { // data not null
-          InfoInputsValueExample.validateJSON(data['example']);
+          // JM Lord: Current version of the generator does not work when type is "oneOf" in OpenAPI spec.
+          //InfoInputsValueExample.validateJSON(data['example']);
         }
 
         return true;
