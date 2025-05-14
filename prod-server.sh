@@ -264,7 +264,7 @@ function up {
             echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
         fi
 
-        read -p "Do you want to update? (y/n): " choice
+        read -p "Do you want to update? (Y/n): " choice
         if [[ -z "$choice" || "$choice" == "y" || "$choice" == "Y" ]]; then
             command pull ; assertSuccess
 
