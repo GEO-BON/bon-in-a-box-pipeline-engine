@@ -129,6 +129,7 @@ Class | Method | HTTP request | Description
 *BonInABoxScriptService.DefaultApi* | [**getListOf**](docs/DefaultApi.md#getListOf) | **GET** /{type}/list | Get a list of available steps of given type and their names.
 *BonInABoxScriptService.DefaultApi* | [**getOutputFolders**](docs/DefaultApi.md#getOutputFolders) | **GET** /{type}/{id}/outputs | Get the output folders of the scripts composing this pipeline
 *BonInABoxScriptService.DefaultApi* | [**getPipeline**](docs/DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
+*BonInABoxScriptService.DefaultApi* | [**getSystemStatus**](docs/DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 *BonInABoxScriptService.DefaultApi* | [**getVersions**](docs/DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
 *BonInABoxScriptService.DefaultApi* | [**run**](docs/DefaultApi.md#run) | **POST** /{type}/{descriptionPath}/run | Runs the script or pipeline matching &#x60;descriptionPath&#x60;.
 *BonInABoxScriptService.DefaultApi* | [**savePipeline**](docs/DefaultApi.md#savePipeline) | **POST** /pipeline/save/{filename} | Save a json file to the pipeline folder.

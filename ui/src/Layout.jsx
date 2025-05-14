@@ -14,13 +14,9 @@ export function Layout(props) {
   const [popupContent, setPopupContent] = useState();
 
   // Main section size
-
   useEffect(() => {
-
     let nav = document.getElementsByClassName("navigation-bar")[0];
-
     setMainHeight(windowHeight - nav.offsetHeight);
-
   }, [windowHeight]);
 
   return (

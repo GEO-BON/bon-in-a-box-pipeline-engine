@@ -391,6 +391,10 @@ img#greenSquares {
   font-size: calc(10px + 2vmin);
 }
 
+.systemError {
+  margin: 30px;
+}
+
 .error-inline {
   height: 2em;
   display: inline;
