@@ -229,57 +229,64 @@ function up {
     echo "Building (if necessary)..."
     command build ; assertSuccess
 
-    echo "Checking for updates to docker images..."
-    # see https://github.com/docker/cli/issues/6059
-    images=$(command config --images)
-    services=$(command config --services)
+    docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
+    if [[ $? -eq 1 ]] ; then
+        echo "Installing..."
+        command pull ; assertSuccess
 
-    # There are some images for which we want to keep the containers, others can be discarded.
-    savedContainerRegex="(runner-conda|runner-julia)"
-    savedContainerServices="runner-conda runner-julia"
-    otherServices="gateway script-server tiler"  # $(echo "$services" | grep -vE "^$savedContainerRegex")
+    else # Already installed
+        echo "Checking for updates to docker images..."
+        # see https://github.com/docker/cli/issues/6059
+        images=$(command config --images)
+        services=$(command config --services)
 
-    savedContainerImages=$(echo "$images" | grep -E "^geobon/bon-in-a-box:$savedContainerRegex")
-    otherImages=$(echo "$images" | grep -vE "^geobon/bon-in-a-box:$savedContainerRegex")
+        # There are some images for which we want to keep the containers, others can be discarded.
+        savedContainerRegex="(runner-conda|runner-julia)"
+        savedContainerServices="runner-conda runner-julia"
+        otherServices="gateway script-server tiler"  # $(echo "$services" | grep -vE "^$savedContainerRegex")
 
-    updatesFound=1 # Will become 0 if there is an update
-    containersToDiscard=""
+        savedContainerImages=$(echo "$images" | grep -E "^geobon/bon-in-a-box:$savedContainerRegex")
+        otherImages=$(echo "$images" | grep -vE "^geobon/bon-in-a-box:$savedContainerRegex")
 
-    # Check the images for which the containers should be kept whenever possible.
-    for savedContainerImage in $savedContainerImages; do
-        checkForUpdates "$savedContainerImage"
-        if [[ $? -eq 0 ]]; then
-            containersToDiscard="$containersToDiscard $savedContainerImage"
-            updatesFound=0
-        fi
-    done
+        updatesFound=1 # Will become 0 if there is an update
+        containersToDiscard=""
 
-    if [[ $updatesFound -ne 0 ]] ; then
-        # Check the other images
-        checkForUpdates "$otherImages"
-        updatesFound=$?
-    fi
+        # Check the images for which the containers should be kept whenever possible.
+        for savedContainerImage in $savedContainerImages; do
+            checkForUpdates "$savedContainerImage"
+            if [[ $? -eq 0 ]]; then
+                containersToDiscard="$containersToDiscard $savedContainerImage"
+                updatesFound=0
+            fi
+        done
 
-    if [[ $updatesFound -eq 0 ]]; then
-        echo "Updates found."
-        if [[ -n "$containersToDiscard" ]]; then
-            echo -e "${YELLOW}This update will discard the following runner containers: ${ENDCOLOR}"
-            for container in $containersToDiscard; do
-                echo -e "${YELLOW} - $container${ENDCOLOR}"
-            done
-            echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
+        if [[ $updatesFound -ne 0 ]] ; then
+            # Check the other images
+            checkForUpdates "$otherImages"
+            updatesFound=$?
         fi
 
-        read -p "Do you want to update? (Y/n): " choice
-        if [[ -z "$choice" || "$choice" == "y" || "$choice" == "Y" ]]; then
-            command pull ; assertSuccess
+        if [[ $updatesFound -eq 0 ]]; then
+            echo "Updates found."
+            if [[ -n "$containersToDiscard" ]]; then
+                echo -e "${YELLOW}This update will discard the following runner containers: ${ENDCOLOR}"
+                for container in $containersToDiscard; do
+                    echo -e "${YELLOW} - $container${ENDCOLOR}"
+                done
+                echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
+            fi
 
-        else # Ok then, let's pretend there are no updates.
-            updatesFound=1
-            containersToDiscard=""
+            read -p "Do you want to update? (Y/n): " choice
+            if [[ -z "$choice" || "$choice" == "y" || "$choice" == "Y" ]]; then
+                command pull ; assertSuccess
+
+            else # Ok then, let's pretend there are no updates.
+                updatesFound=1
+                containersToDiscard=""
+            fi
+        else
+            echo "No updates found."
         fi
-    else
-        echo "No updates found."
     fi
 
     echo "Starting the server..."
