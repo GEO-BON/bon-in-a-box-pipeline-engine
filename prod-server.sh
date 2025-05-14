@@ -58,7 +58,12 @@ function help {
 
 # Run your docker commands on the server manually.
 # `command <command>` with command such as pull/run/up/down/build/logs...
-function command { # args appended to the docker compose command
+# args are appended to the docker compose command with @$
+function command {
+    # Logs are useful to display to the user but only once, on the up command.
+    # They could interfere with other command outputs such as config
+    if [[ "$@" == "up"* ]] ; then log=0; else log=1; fi
+
     # Get docker group. Will not work on Windows, silencing the warning with 2> /dev/null
     export DOCKER_GID="$(getent group docker 2> /dev/null | cut -d: -f3)"
 
@@ -67,8 +72,10 @@ function command { # args appended to the docker compose command
     branch=$(git -C .server config remote.origin.fetch | sed 's/.*remotes\/origin\///')
     if [[ $branch == *"staging" ]]; then
         export DOCKER_SUFFIX="-$branch"
+        if [ $log ]; then echo "Using staging containers with suffix \"-$branch\"" ; fi
     elif [[ $branch == "edge" ]]; then
         export DOCKER_SUFFIX="-edge"
+        if [ $log ]; then echo "Using edge releases: you'll be up to date with the latest possible server." ; fi
     else
         export DOCKER_SUFFIX=""
     fi
@@ -87,7 +94,7 @@ function command { # args appended to the docker compose command
     if ! [[ -z "$macCPU" ]]; then
         # This is a Mac, check chip type
         if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
-            echo "Apple M* chip detected"
+            if [ $log ]; then echo "Apple M* chip detected" ; fi
             composeFiles+=" -f .server/compose.apple.yml"
         fi
     fi
