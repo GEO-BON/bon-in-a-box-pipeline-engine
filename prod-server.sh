@@ -72,12 +72,13 @@ function command {
     branch=$(git -C .server config remote.origin.fetch | sed 's/.*remotes\/origin\///')
     if [[ $branch == *"staging" ]]; then
         export DOCKER_SUFFIX="-$branch"
-        if [ $log ]; then echo "Using staging containers with suffix \"-$branch\"" ; fi
+        if [ $log -eq 0 ]; then echo "Using staging containers with suffix \"-$branch\"" ; fi
     elif [[ $branch == "edge" ]]; then
         export DOCKER_SUFFIX="-edge"
-        if [ $log ]; then echo "Using edge releases: you'll be up to date with the latest possible server." ; fi
+        if [ $log -eq 0 ]; then echo "Using edge releases: you'll be up to date with the latest possible server." ; fi
     else
         export DOCKER_SUFFIX=""
+        if [ $log -eq 0 ]; then echo "Using default branch." ; fi
     fi
 
     # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
@@ -94,7 +95,7 @@ function command {
     if ! [[ -z "$macCPU" ]]; then
         # This is a Mac, check chip type
         if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
-            if [ $log ]; then echo "Apple M* chip detected" ; fi
+            if [ $log -eq 0 ]; then echo "Apple M* chip detected" ; fi
             composeFiles+=" -f .server/compose.apple.yml"
         fi
     fi
