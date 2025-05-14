@@ -4,12 +4,8 @@ import org.geobon.pipeline.outputRoot
 import java.io.File
 import kotlin.test.*
 
-// private const val DUMMY_TEXT = "Some content"
 
 class SystemStatusTest {
-    // private var someDir = File(outputRoot, "someDir")
-    // private var someFile = File(someDir, "someFile")
-    // private val gitignoreFile = File(outputRoot, ".gitignore")
 
     @BeforeTest
     fun setupOutputFolder() {
@@ -18,10 +14,6 @@ class SystemStatusTest {
             mkdirs()
             assertTrue(exists())
         }
-
-        // someDir.mkdir()
-        // someFile.writeText(DUMMY_TEXT)
-        // gitignoreFile.createNewFile()
     }
 
     @AfterTest
@@ -30,16 +22,15 @@ class SystemStatusTest {
     }
 
     @Test
-    fun givenOutputRootDNE_whenCheckDir_thenError() {
+    fun givenOutputRootDoesNotExist_whenCheckDir_thenError() {
 	    outputRoot.deleteRecursively()
 
 	    val testSystemStatus = SystemStatus()
 	    assertFalse(testSystemStatus.check())
-
     }
 
     @Test
-    fun givenOutputRootUnreadablePermission_whenCheckDir_thenError() {
+    fun givenOutputRootNotReadable_whenCheckDir_thenError() {
         outputRoot.setReadable(false, false)
 
         val testSystemStatus = SystemStatus()
@@ -47,7 +38,7 @@ class SystemStatusTest {
     }
 
     @Test
-    fun givenOutputRootUnwritablePermission_whenCheckDir_thenError() {
+    fun givenOutputRootNotWritable_whenCheckDir_thenError() {
         outputRoot.setWritable(false, false)
 
         val testSystemStatus = SystemStatus()
@@ -55,7 +46,7 @@ class SystemStatusTest {
     }
 
     @Test
-    fun givenOutputRootUnreadableAndUnwritablePermission_whenCheckDir_thenError() {
+    fun givenOutputRootNotReadableAndNotWritable_whenCheckDir_thenError() {
         outputRoot.setWritable(false, false)
         outputRoot.setReadable(false, false)
 
