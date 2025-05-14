@@ -332,6 +332,27 @@ paths:
           description: Bad request
         "404":
           description: id not found
+  /api/systemStatus:
+    get:
+      summary: Returns the system status.
+      operationId: getSystemStatus
+      responses:
+        "200":
+          description: System is in good condition.
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+                example: OK
+        "503":
+          description: System has a bad configuration
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+                example: Output folder is improperly configured
   /api/versions:
     get:
       summary: Returns the version of system components.

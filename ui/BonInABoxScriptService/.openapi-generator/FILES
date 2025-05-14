@@ -27,4 +27,3 @@ src/model/InfoOutputsValue.js
 src/model/InfoOutputsValueExample.js
 src/model/InfoReferencesInner.js
 src/model/InfoReviewerInner.js
-test/model/InfoReviewerInner.spec.js
