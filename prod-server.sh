@@ -13,12 +13,12 @@ if [[ 0 -ne $? && ! -f "server-up.sh" ]]; then
     exit 1
 fi
 
-which docker > /dev/null 2>&1
+which docker > /dev/null
 if [[ $? -ne 0 ]] ; then
     echo -e "${RED}Docker and docker compose plugin are required to run the pipeline engine.${ENDCOLOR}" ; exit 1
 fi
 
-which git > /dev/null 2>&1
+which git > /dev/null
 if [[ $? -ne 0 ]] ; then
     echo -e "${RED}Git is required to run the latest version of the pipeline engine.${ENDCOLOR}" ; exit 1
 fi
@@ -344,7 +344,7 @@ function down {
 }
 
 function clean {
-    echo "Removing docker containers and volumes"
+    echo "Removing docker containers and volumes..."
     output=$(docker container rm \
         biab-gateway \
         biab-script-server \
@@ -353,11 +353,19 @@ function clean {
         biab-runner-julia 2>&1)
 
     if [[ $output == *"container is running"* ]]; then
-        echo -e "${RED}Cannot clean while BON in a Box is already running.${ENDCOLOR}"
+        echo -e "${RED}Cannot clean while BON in a Box is running.${ENDCOLOR}"
         exit 1
     fi
 
-    docker volume rm conda-env-yml
+    # Currently used volumes
+    docker volume rm conda-env-yml 2> /dev/null 2>&1
+
+    # Removing legacy volumes
+    docker volume rm \
+        conda-dir-dev \
+        conda-cache-dev \
+        r-libs-user-dev 2> /dev/null 2>&1
+
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
 }
 
