@@ -40,8 +40,8 @@ function formatError(error, response, context = "") {
         getErrorString(error, response)
 }
 
-function HttpError({ error, response, context = "" }) {
-    return <Alert severity="error">
+function HttpError({ error, response, context = "", ...props }) {
+    return <Alert {...props} severity="error">
         {formatError(error, response, context)}
     </Alert>
 }

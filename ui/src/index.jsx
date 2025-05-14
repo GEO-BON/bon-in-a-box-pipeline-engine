@@ -4,8 +4,11 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import {
+  BrowserRouter,
   createBrowserRouter,
+  Route,
   RouterProvider,
+  Routes,
   useLocation,
 } from "react-router-dom";
 
@@ -22,6 +25,7 @@ const PipelineEditor = lazy(() =>
 );
 
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
+import { Alert } from "@mui/material";
 export const api = new BonInABoxScriptService.DefaultApi();
 
 function NotFound() {
@@ -36,91 +40,103 @@ function NotFound() {
 }
 
 const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <Layout right={<HomePage />} />,
-    },
-    {
-      path: "script-form/:pipeline?/:runHash?",
-      element: <Layout right={<PipelinePage key="singleScriptRun" runType="script" />} />,
-    },
-    {
-      path: "pipeline-form/:pipeline?/:runHash?",
-      element: <Layout right={<PipelinePage key="pipelineRun" runType="pipeline" />} />,
-    },
-    {
-      path: "pipeline-editor",
-      element: (
-        <Layout
-          left={
-            <StepChooser />
-          }
-          right={
-            <Suspense fallback={<Spinner />}>
-              <PipelineEditor />
-            </Suspense>
-          }
-        />
-      ),
-    },
-    {
-      path: "history",
-      element: <Layout right={<RunHistory />} />,
-    },
-    {
-      path: "info",
-      element: <Layout right={<InfoPage />} />,
-    },
-    {
-      path: "*",
-      element: <Layout right={<NotFound />} />,
-    },
+  {
+    path: "/",
+    element: <Layout right={<HomePage />} />,
+  },
+  {
+    path: "script-form/:pipeline?/:runHash?",
+    element: <Layout right={<PipelinePage key="singleScriptRun" runType="script" />} />,
+  },
+  {
+    path: "pipeline-form/:pipeline?/:runHash?",
+    element: <Layout right={<PipelinePage key="pipelineRun" runType="pipeline" />} />,
+  },
+  {
+    path: "pipeline-editor",
+    element: (
+      <Layout
+        left={
+          <StepChooser />
+        }
+        right={
+          <Suspense fallback={<Spinner />}>
+            <PipelineEditor />
+          </Suspense>
+        }
+      />
+    ),
+  },
+  {
+    path: "history",
+    element: <Layout right={<RunHistory />} />,
+  },
+  {
+    path: "info",
+    element: <Layout right={<InfoPage />} />,
+  },
+  {
+    path: "*",
+    element: <Layout right={<NotFound />} />,
+  },
 ]);
 
-const errorRouter = ({error, response}) => createBrowserRouter([
-			{
-				path: "*",
-				element: <Layout right={<HttpError error={error} response={response}/>} />,
-			},
-]);
+const staticRouter = (content) => {
+  return <BrowserRouter>
+    <Routes>
+      <Route path="*" element={<Layout right={content} />} />
+    </Routes>
+  </BrowserRouter>
+};
 
 function App() {
-	const [systemError, setSystemError] = useState(null);
-	const [statusChecked, setStatusChecked] = useState(false);
-	
+  const [systemError, setSystemError] = useState(null);
+  const [statusChecked, setStatusChecked] = useState(false);
+
   useEffect(() => {
-		api.getSystemStatus((error, _, response) => {
-					setSystemError({error, response});
-					setStatusChecked(true);
-					if (error) {
-						console.log("Start polling");
-						const keepPollingStatus = () => {
-							console.log("Polling...");
-							const pollId = setTimeout(() => {
-								api.getSystemStatus((error, _, response) => {
-									setSystemError({error, response});
-									console.log("Polled!");
-									if (error)
-										keepPollingStatus();
-								});
-	
-						  }, 5000);
-							return () => clearTimeout(pollId);
-						}
-						keepPollingStatus();
-					}
-		});
-	}, []);
-	
-	if (!statusChecked)
-		return <span>Loading...</span>
+    api.getSystemStatus((error, _, response) => {
+      setStatusChecked(true);
+      let pollingTimer = null
 
+      if (error) {
+        setSystemError({ error, response });
 
-	if (systemError.response.text != "OK") {
-				return <RouterProvider router={errorRouter(systemError)} />;
-	}
+        const keepPollingStatus = () => {
+          pollingTimer = setTimeout(() => {
+            api.getSystemStatus((error, _, response) => {
+              if (error) {
+                keepPollingStatus();
+                setSystemError({ error, response });
+              } else {
+                setSystemError(null)
+              }
+            });
 
-	return <RouterProvider router={router} />;
+          }, 5000);
+        }
+        keepPollingStatus();
+      }
+
+      return () => clearTimeout(pollingTimer);
+    });
+  }, [setSystemError, setStatusChecked]);
+
+  if (!statusChecked)
+    return staticRouter(<Spinner />);
+
+  if (systemError) {
+    if (systemError.error.status === 502) {
+      return staticRouter(
+        <Alert severity="error" className="systemError">
+          502 error: Script server appears to be offline.
+          If it is starting, it is not yet ready to respond.
+        </Alert>
+      );
+    }
+    return staticRouter(<HttpError className="systemError" error={systemError.error} response={systemError.response} />);
+  }
+
+  return <RouterProvider router={router} />;
 }
 
 const root = createRoot(document.getElementById("root"));

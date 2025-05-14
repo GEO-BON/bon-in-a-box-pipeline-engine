@@ -7,30 +7,16 @@ import useWindowDimensions from "./utils/WindowDimensions";
 import TopMenu from "./TopMenu";
 
 export const PopupContentContext = createContext();
-/*
-import * as BonInABoxScriptService from "bon_in_a_box_script_service";
-const api = new BonInABoxScriptService.DefaultApi();
-*/
 
 export function Layout(props) {
   const { windowHeight } = useWindowDimensions();
   const [mainHeight, setMainHeight] = useState();
   const [popupContent, setPopupContent] = useState();
-	/*
-  useEffect(() => {
-		api.getSystemStatus((error, _, response) => {
-			if (error) setPopupContent(response.text)
-		})
-  });
-  */
 
   // Main section size
   useEffect(() => {
-
     let nav = document.getElementsByClassName("navigation-bar")[0];
-
     setMainHeight(windowHeight - nav.offsetHeight);
-
   }, [windowHeight]);
 
   return (

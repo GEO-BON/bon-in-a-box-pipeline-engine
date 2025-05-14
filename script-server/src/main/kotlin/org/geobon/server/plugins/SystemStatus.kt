@@ -2,22 +2,19 @@ package org.geobon.server.plugins
 import java.io.File
 
 class SystemStatus {
-    var error = ""
+    var errorMessage = ""
+        private set
 
-    private fun isOutputCorrect(): Boolean {
+    private fun checkOutputFolderAccess(): Boolean {
 	    val outputFolder = File(System.getenv("OUTPUT_LOCATION"))
 	    return outputFolder.exists() && outputFolder.isDirectory() && outputFolder.canWrite() && outputFolder.canRead()
     }
 
-    fun getErrorMsg(): String {
-	    return this.error
-    }
-    
     fun check(): Boolean {
-	    if (!this.isOutputCorrect()) {
-	        this.error = "Output folder is cannot be accessed. Check if folder exists and permission set to readable and writable by the current user."
+        // TODO progress, status and message, status not set, checking and done
+	    if (!checkOutputFolderAccess()) {
+            errorMessage = "Output folder cannot be accessed. Check if folder exists and permissions allow to read and write with the current user."
 	        return false
-	        /* having progress, status and message, status not set, checking and done */
 	    }
         return true
     }
