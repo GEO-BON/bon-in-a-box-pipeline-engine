@@ -66,10 +66,8 @@ function command { # args appended to the docker compose command
     # We use remote.origin.fetch because of the partial checkout, see server-up.sh.
     branch=$(git -C .server config remote.origin.fetch | sed 's/.*remotes\/origin\///')
     if [[ $branch == *"staging" ]]; then
-        echo "Using staging containers with suffix \"-$branch\""
         export DOCKER_SUFFIX="-$branch"
     elif [[ $branch == "edge" ]]; then
-        echo "Using edge releases: you'll be up to date with the latest possible server."
         export DOCKER_SUFFIX="-edge"
     else
         export DOCKER_SUFFIX=""
@@ -237,9 +235,9 @@ function up {
     otherImages=$(echo "$images" | grep -vE "^geobon/bon-in-a-box:$savedContainerRegex")
 
     updatesFound=1 # Will become 0 if there is an update
+    containersToDiscard=""
 
     # Check the images for which the containers should be kept whenever possible.
-    containersToDiscard=""
     for savedContainerImage in $savedContainerImages; do
         checkForUpdates "$savedContainerImage"
         if [[ $? -eq 0 ]]; then
