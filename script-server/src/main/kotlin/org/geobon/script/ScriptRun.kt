@@ -294,7 +294,6 @@ class ScriptRun( // Constructor used in single script run
                             # Add script dir to sys.path
                             print("Script: "+"$scriptPath", flush=True)
                             script_dir = os.path.dirname(os.path.abspath("$scriptPath"))
-                            print("Script dir: "+script_dir, flush=True)
                             sys.path.insert(0, script_dir)
 
                             try:
