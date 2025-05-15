@@ -97,17 +97,24 @@ export function PipelineResults({
                       value = inputFileContent[breadcrumbs];
                     }
 
+                    const noValueOutputStatus = () => {
+                      const inputToOutputRegex = new RegExp("pipeline@\d|default_output");
+                      if (inputToOutputRegex.test(ioId)) {
+                        return <span>N/A</span>;
+                      } else if (runningScripts.size > 0) {
+                        return <InlineSpinner />;
+                      } else {
+                        return <Alert severity="warning">
+                                  See detailed results
+                                </Alert>;
+                      }
+                    }
+                                
                     if (!value) {
                       return (
                         <div key={ioId} className="outputTitle">
                           <h3>{outputDescription.label}</h3>
-                          {runningScripts.size > 0 ? (
-                            <InlineSpinner />
-                          ) : (
-                            <Alert severity="warning">
-                              See detailed results
-                            </Alert>
-                          )}
+                          {noValueOutputStatus()}
                         </div>
                       );
                     }
