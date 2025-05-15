@@ -39,6 +39,20 @@ private val logger: Logger = LoggerFactory.getLogger("Server")
 fun Application.configureRouting() {
 
     routing {
+        get("/api/systemStatus") {
+            val systemStatus = SystemStatus()
+            // Perform server sanity check
+            if (!systemStatus.check()) {
+                call.respondText(
+                    text = systemStatus.errorMessage,
+                    status = HttpStatusCode.ServiceUnavailable
+                )
+                return@get
+            }
+
+            call.respondText(text = "OK", status = HttpStatusCode.OK)
+            return@get
+        }
 
         get("/{type}/list") {
             val type = call.parameters["type"]

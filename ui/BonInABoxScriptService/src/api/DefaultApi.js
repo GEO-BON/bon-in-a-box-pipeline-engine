@@ -258,6 +258,42 @@ export default class DefaultApi {
     }
 
     /**
+     * Callback function to receive the result of the getSystemStatus operation.
+     * @callback module:api/DefaultApi~getSystemStatusCallback
+     * @param {String} error Error message, if any.
+     * @param {String} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Returns the system status.
+     * @param {module:api/DefaultApi~getSystemStatusCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link String}
+     */
+    getSystemStatus(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['text/plain'];
+      let returnType = 'String';
+      return this.apiClient.callApi(
+        '/api/systemStatus', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the getVersions operation.
      * @callback module:api/DefaultApi~getVersionsCallback
      * @param {String} error Error message, if any.
