@@ -98,8 +98,7 @@ export function PipelineResults({
                     }
 
                     const noValueOutputStatus = () => {
-                      const inputToOutputRegex = new RegExp("pipeline@\d|default_output");
-                      if (inputToOutputRegex.test(ioId)) {
+                      if (/pipeline@\d+|default_output/.test(ioId)) {
                         return <span>N/A</span>;
                       } else if (runningScripts.size > 0) {
                         return <InlineSpinner />;
