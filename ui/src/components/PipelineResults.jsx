@@ -97,17 +97,22 @@ export function PipelineResults({
                       value = inputFileContent[breadcrumbs];
                     }
 
+                                                    
                     if (!value) {
+                      let noValueStatus = null;
+                      if (/pipeline@\d+|default_output/.test(ioId)) {
+                        noValueStatus = <span>N/A</span>;
+                      } else if (runningScripts.size > 0) {
+                        noValueStatus = <InlineSpinner />;
+                      } else {
+                        noValueStatus = <Alert severity="warning">
+                                  See detailed results
+                                </Alert>;
+                      }
                       return (
                         <div key={ioId} className="outputTitle">
                           <h3>{outputDescription.label}</h3>
-                          {runningScripts.size > 0 ? (
-                            <InlineSpinner />
-                          ) : (
-                            <Alert severity="warning">
-                              See detailed results
-                            </Alert>
-                          )}
+                          {noValueStatus}
                         </div>
                       );
                     }
