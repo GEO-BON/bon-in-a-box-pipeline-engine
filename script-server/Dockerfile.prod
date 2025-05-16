@@ -1,4 +1,4 @@
-FROM openjdk:11-jre-bullseye as base-image
+FROM openjdk:11-jre-bullseye AS base-image
 
 # Installing
 # - python (to run python scripts directly on the server)
@@ -23,7 +23,7 @@ RUN chmod 755 /usr/local/bin/docker-compose
 RUN chmod 755 /usr/local/bin/docker
 
 ## This image builds the server code
-FROM gradle:8.13-jdk11 as builder
+FROM gradle:8.13-jdk11 AS builder
 COPY . /home/gradle/project
 WORKDIR /home/gradle/project
 RUN gradle assemble
