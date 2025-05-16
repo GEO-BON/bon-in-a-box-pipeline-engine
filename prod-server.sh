@@ -7,9 +7,9 @@ ENDCOLOR="\033[0m"
 
 # Checking that this script is ran from the .server folder, and not from the dev repo,
 # which would break the relative file path.
-(cd .. && ls "server-up.sh" 2> /dev/null 1>&2)
+(cd .. && ls "server-up.sh" 2> /dev/null 1>&2) # true if in .server folder with dev symlink
 if [[ 0 -ne $? && ! -f "server-up.sh" ]]; then
-    echo -e "${RED}ERROR: Do not run directly! This script is meant to be ran by server-up.sh or validate.sh in the pipeline-repo folder.${ENDCOLOR}"
+    echo -e "${RED}ERROR: Do not run directly! This script is meant to be run by server-up.sh or validate.sh in the pipeline-repo folder.${ENDCOLOR}"
     exit 1
 fi
 
@@ -229,6 +229,9 @@ function up {
     echo "Building (if necessary)..."
     command build ; assertSuccess
 
+    # These are the "saved" containers that we would normally keep, but that we will discard due to the update.
+    containersToDiscard=""
+
     docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
     if [[ $? -eq 1 ]] ; then
         echo "Installing..."
@@ -243,13 +246,12 @@ function up {
         # There are some images for which we want to keep the containers, others can be discarded.
         savedContainerRegex="(runner-conda|runner-julia)"
         savedContainerServices="runner-conda runner-julia"
-        otherServices="gateway script-server tiler"  # $(echo "$services" | grep -vE "^$savedContainerRegex")
+        otherServices=$(echo "$services" | grep -vE "^$savedContainerRegex")
 
         savedContainerImages=$(echo "$images" | grep -E "^geobon/bon-in-a-box:$savedContainerRegex")
         otherImages=$(echo "$images" | grep -vE "^geobon/bon-in-a-box:$savedContainerRegex")
 
         updatesFound=1 # Will become 0 if there is an update
-        containersToDiscard=""
 
         # Check the images for which the containers should be kept whenever possible.
         for savedContainerImage in $savedContainerImages; do
@@ -281,7 +283,7 @@ function up {
                 command pull ; assertSuccess
 
             else # Ok then, let's pretend there are no updates.
-                updatesFound=1
+                updatesFound=1 # 1=false in bash
                 containersToDiscard=""
             fi
         else
@@ -292,7 +294,7 @@ function up {
     echo "Starting the server..."
     # Starting the services for which we want to preserve the containers
     output=""
-    returnCode=0
+    returnCode=0 # 0=true in bash
     for service in $savedContainerServices; do
         flag="--no-recreate" # By default, we keep runners unless they are updated
         if [[ $containersToDiscard == "*$service*" ]]; then
@@ -302,17 +304,13 @@ function up {
 
         lastOutput=$(command up -d $flag $service 2>&1); lastReturnCode=$?;
         output="$output\n$lastOutput"
-        if [[ $lastReturnCode -ne 0 ]]; then
-            returnCode=1
-        fi
+        if [[ $lastReturnCode -ne 0 ]]; then returnCode=1; fi
     done
 
     # Starting the rest of the services
     lastOutput=$(command up -d $otherServices 2>&1); lastReturnCode=$?;
     output="$output\n$lastOutput"
-    if [[ $lastReturnCode -ne 0 ]]; then
-        returnCode=1
-    fi
+    if [[ $lastReturnCode -ne 0 ]]; then returnCode=1; fi
 
     if [[ $output == *"is already in use by container"* ]] ; then
         echo "A container name conflict was found, we will clean and try again."
@@ -327,14 +325,6 @@ function up {
     fi
 
     echo -e "${GREEN}Server is running.${ENDCOLOR}"
-}
-
-function update {
-    echo "Removing legacy volumes"
-    docker volume rm \
-        conda-dir \
-        conda-cache \
-        r-libs-user
 }
 
 function down {
