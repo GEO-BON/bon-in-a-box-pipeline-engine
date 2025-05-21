@@ -215,12 +215,31 @@ class ScriptRun( // Constructor used in single script run
                     "jl", "JL" -> {
                         container = Containers.JULIA
                         command = container.dockerCommandList + listOf(
-                            "julia", "-e",
+                            "sh", "-c",
                             """
-                            open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
-                            ARGS=["${context.outputFolder.absolutePath}"];
-                            include("${scriptFile.absolutePath}")
-                            rm("${pidFile.absolutePath}")
+                                source importEnvVars.sh
+                                julia --project=${"$"}JULIA_DEPOT_PATH -e '
+                                    open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
+                                    ARGS=["${context.outputFolder.absolutePath}"];
+                                    include("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.jl")
+                                    try
+                                        include("${scriptFile.absolutePath}")
+                                    catch e
+                                        rethrow(e)
+                                    finally
+                                        if !isempty(biab_output_dict)
+                                            println("Writing outputs to BON in a Box...")
+                                            jsonData = JSON.json(biab_output_dict; indent=2)
+                                            open(joinpath(outputFolder, "output.json"), "w") do f
+                                                write(f, jsonData)
+                                            end
+                                            println(" done.")
+                                        end
+                                        flush(stdout)
+
+                                        rm("${pidFile.absolutePath}")
+                                    end
+                                '
                             """
                         )
                     }
