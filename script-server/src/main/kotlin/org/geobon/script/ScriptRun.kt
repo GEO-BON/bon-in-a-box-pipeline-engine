@@ -215,7 +215,7 @@ class ScriptRun( // Constructor used in single script run
                     "jl", "JL" -> {
                         container = Containers.JULIA
                         command = container.dockerCommandList + listOf(
-                            "sh", "-c",
+                            "bash", "-c",
                             """
                                 source importEnvVars.sh
                                 julia --project=${"$"}JULIA_DEPOT_PATH -e '
@@ -234,7 +234,7 @@ class ScriptRun( // Constructor used in single script run
                                         if !isempty(biab_output_dict)
                                             println("Writing outputs to BON in a Box...")
                                             jsonData = JSON.json(biab_output_dict, 2)
-                                            open(joinpath(outputFolder, "output.json"), "w") do f
+                                            open("${context.outputFolder.absolutePath}/output.json", "w") do f
                                                 write(f, jsonData)
                                             end
                                             println(" done.")
