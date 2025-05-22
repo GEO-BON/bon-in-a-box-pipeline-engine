@@ -225,17 +225,20 @@ class ScriptRun( // Constructor used in single script run
                                     try
                                         include("${scriptFile.absolutePath}")
                                     catch e
-                                        rethrow(e)
+                                        msg = sprint(showerror, e)
+                                        biab_output_dict["error"] = msg
+                                        println("\n${"$"}msg")
+                                        Base.show_backtrace(stdout, catch_backtrace())
+                                        println("\n\n")
                                     finally
                                         if !isempty(biab_output_dict)
                                             println("Writing outputs to BON in a Box...")
-                                            jsonData = JSON.json(biab_output_dict; indent=2)
+                                            jsonData = JSON.json(biab_output_dict, 2)
                                             open(joinpath(outputFolder, "output.json"), "w") do f
                                                 write(f, jsonData)
                                             end
                                             println(" done.")
                                         end
-                                        flush(stdout)
 
                                         rm("${pidFile.absolutePath}")
                                     end
