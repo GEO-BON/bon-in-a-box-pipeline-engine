@@ -182,6 +182,7 @@ class ScriptRun( // Constructor used in single script run
         var error = false
         var outputs: Map<String, Any>? = null
 
+        var forceStopCleanup = listOf<String>()
         var container: Containers = Containers.SCRIPT_SERVER
         val elapsed = measureTime {
             val pidFile = File(context.outputFolder.absolutePath, ".pid")
@@ -214,12 +215,34 @@ class ScriptRun( // Constructor used in single script run
                     "jl", "JL" -> {
                         container = Containers.JULIA
                         command = container.dockerCommandList + listOf(
-                            "julia", "-e",
+                            "bash", "-c",
                             """
-                            open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
-                            ARGS=["${context.outputFolder.absolutePath}"];
-                            include("${scriptFile.absolutePath}")
-                            rm("${pidFile.absolutePath}")
+                                source importEnvVars.sh
+                                julia --project=${"$"}JULIA_DEPOT_PATH -e '
+                                    open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
+                                    ARGS=["${context.outputFolder.absolutePath}"];
+                                    include("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.jl")
+                                    try
+                                        include("${scriptFile.absolutePath}")
+                                    catch e
+                                        msg = sprint(showerror, e)
+                                        biab_output_dict["error"] = msg
+                                        println("\n${"$"}msg")
+                                        Base.show_backtrace(stdout, catch_backtrace())
+                                        println("\n\n")
+                                    finally
+                                        if !isempty(biab_output_dict)
+                                            println("Writing outputs to BON in a Box...")
+                                            jsonData = JSON.json(biab_output_dict, 2)
+                                            open("${context.outputFolder.absolutePath}/output.json", "w") do f
+                                                write(f, jsonData)
+                                            end
+                                            println(" done.")
+                                        end
+
+                                        rm("${pidFile.absolutePath}")
+                                    end
+                                '
                             """
                         )
                     }
@@ -227,6 +250,7 @@ class ScriptRun( // Constructor used in single script run
                     "r", "R" -> {
                         val runner = CondaRunner(logFile, pidFile, "r", condaEnvName, condaEnvYml)
                         container = CondaRunner.container
+                        forceStopCleanup = runner.getForceStopCleanup()
 
                         command = container.dockerCommandList + listOf(
                             "bash", "-c",
@@ -292,7 +316,6 @@ class ScriptRun( // Constructor used in single script run
                             # Add script dir to sys.path
                             print("Script: "+"$scriptPath", flush=True)
                             script_dir = os.path.dirname(os.path.abspath("$scriptPath"))
-                            print("Script dir: "+script_dir, flush=True)
                             sys.path.insert(0, script_dir)
 
                             try:
@@ -309,7 +332,7 @@ class ScriptRun( // Constructor used in single script run
                         if(useRunners) {
                             val runner = CondaRunner(logFile, pidFile, "python", condaEnvName, condaEnvYml)
                             container = CondaRunner.container
-
+                            forceStopCleanup = runner.getForceStopCleanup()
 
                             val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
                             command = container.dockerCommandList + listOf(
@@ -339,7 +362,7 @@ class ScriptRun( // Constructor used in single script run
                     .start().also { process ->
                         withContext(Dispatchers.IO) { // More info on this context switching : https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761
                             // The watchdog will terminate the process in two cases :
-                            // if the user cancels or if 60 minutes delay expires.
+                            // if the user cancels or if timeout delay expires.
                             val watchdog = launch {
                                 try {
                                     delay(timeout.toLong(DurationUnit.MILLISECONDS))
@@ -373,6 +396,9 @@ class ScriptRun( // Constructor used in single script run
                                             log(logger::info, "$event: cancellation timeout elapsed.")
                                             process.destroyForcibly()
                                         }
+
+                                        // Cleanup after stop
+                                        ProcessBuilder(container.dockerCommandList + forceStopCleanup).start()
 
                                         throw ex
                                     }

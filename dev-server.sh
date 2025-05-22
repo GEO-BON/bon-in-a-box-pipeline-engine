@@ -47,17 +47,18 @@ function clean {
     docker container rm biab-gateway biab-ui biab-script-server \
         biab-tiler biab-runner-conda biab-runner-julia biab-viewer swagger_editor
     echo "Clean complete."
-}
 
-function purge {
-    clean
-    echo "Removing dependency volumes"
+    echo "Removing volumes..."
+    docker volume rm \
+        conda-env-yml-dev \
+    # Legacy volumes
+    echo "Removing legacy volumes..."
     docker volume rm \
         conda-dir-dev \
         conda-cache-dev \
-        conda-env-yml-dev \
         r-libs-user-dev
 
+    echo "Clean complete."
 }
 
 case "$1" in
@@ -68,7 +69,8 @@ case "$1" in
         clean
         ;;
     purge)
-        purge
+        echo "Deprecated: Purge is now an alias to the clean command."
+        clean
         ;;
     test-paths)
         shift 1

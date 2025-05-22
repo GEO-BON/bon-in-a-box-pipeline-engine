@@ -704,7 +704,7 @@ Here are some common issues when trying to run pipelines in BON in a Box and how
 
 2.  **The script can't find your packages**
 
-    First, make sure that all of your packages are in the Conda sub-environment in the YAML file. If you are getting error that looks like `package or namespace load failed for 'sf' in dyn.load(file, DLLpath=DLLpath,...): unable to load shared object '/r-libs-user/sf/libs/sf.so`, you may need to purge the server. First, stop the server in our terminal (`./server-down.sh`) and then run `.server/prod-server.sh purge` then restart the server (`./server-up.sh`).
+    Make sure that all of packages available on [anaconda.org](https://anaconda.org/) are in the Conda sub-environment in the script description YAML file. If they are not on anaconda, install them via the regular installation mechanism of your programming language.
 
 If you encounter further errors, please contact us on [Discourse](https://discourse.geobon.org) or email us at boninabox\@geobon.org.
 
