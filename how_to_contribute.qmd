@@ -4,7 +4,7 @@ title: "How to Contribute"
 
 If you wish to contribute a pipeline, please email us at boninabox\@geobon.org.
 
-The recommended approach is to setup an instance of BON in a Box in a place where you can easily play with the script files, using either the local or remote setup. You can create a branch or fork to save your work. Make sure that the code is general and works with various parameters, such as in different regions across the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before being accepted.
+The recommended approach is to setup an instance of BON in a Box on a machine where you can easily play with the script files, using either the local or remote setup. You can create a branch or fork to save your work. Make sure that the code is general and works with various parameters, such as in different regions across the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before being accepted.
 
 # Is your analysis pipeline right for us?
 
@@ -46,11 +46,11 @@ Analysis pipelines in BON in a Box are workflows that have been adapted to pipel
 
 {{< video https://www.youtube.com/watch?v=LwncUuc4WeM&t=4s >}}
 
-Analysis workflows can be adapted to BON in a Box pipelines using a few simple steps. Once BON in a Box is installed on your computer, pipelines can be edited and run locally by creating files in your local BON-in-a-box folder cloned from the GitHub repository. Workflows can be written a variety of languages, including R, Julia, and Python, and not all pipeline steps need to be in the same language.
+Analysis workflows can be adapted to BON in a Box pipelines using a few simple steps. Once BON in a Box is installed on your computer, pipelines can be edited and run locally by creating files in your local BON-in-a-box folder cloned from the GitHub repository. Workflows can be written in a variety of languages, including R, Julia, and Python, and not all pipeline steps need to be in the same language.
 
 ## Before you start
 
-Make sure that you are working in the right environment when running code in BON in a Box. This can be in your code editor of choice, such as Visual Studio Code opened to the BON in a Box pipelines folder cloned to your computer from GitHub or an R Studio project set up with the BON in a Box GitHub repository. This will make it easier to pull and push to the GitHub repository later.
+Make sure that you are working in the right environment when running code in BON in a Box. This can be in your code editor of choice, such as Visual Studio Code opened to the BON in a Box pipelines folder cloned to your computer from GitHub, or an R Studio project set up with the BON in a Box GitHub repository. This will make it easier to pull and push to the GitHub repository later.
 
 ## Step 1: Plan your pipeline
 
@@ -556,7 +556,7 @@ This validates that the syntax and structure are correct, but not that it's cont
 
 The output keys `info`, `warning` and `error` can be used to report problems in script execution. They do not need to be described in the `outputs` section of the description. They will be displayed with special formatting in the UI.
 
-Any `error` message will also halt the rest of the pipeline. It is recommended to output specific error messages to avoid crashes when errors can be foreseen. This can be done by writing an "error" attribute to the `output.json` file, or by using the R helper functions, such as the `biab_error_stop` function.
+Any `error` message will also halt the rest of the pipeline. It is recommended to output specific error messages to avoid crashes when errors can be foreseen. This can be done using `biab_error_stop` helper function, or by writing an "error" attribute to the `output.json` file.
 
 For example, if a user wanted the analysis to stop if the result was less than 0:
 
@@ -590,7 +590,7 @@ biab_info("This message will appear in the UI.")
 
 And then the customized message will appear in the UI.
 
-A crash will have the same behavior as an `error` output, stopping the pipeline and with the error displayed in the UI.
+A crash will have the same behavior as an `error` output, stopping the pipeline and with the error displayed in the UI. A script that completed without creating the `output.json` file is assumed to have crashed, and a general error message will be displayed. In both cases, the logs can be inspected for more details.
 
 ### Testing your script
 
