@@ -1,6 +1,9 @@
 script: 0in1out.sh
 name: 0 in 1 out
 description: 0 input 1 output
+lifecycle:
+  status: in_development
+  message: bombardino crocodilo
 author:
   - name: Jean-Michel Lord
 inputs:
