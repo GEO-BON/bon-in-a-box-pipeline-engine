@@ -423,6 +423,26 @@ components:
         description:
           type: string
           example: This sample script shows how it works.
+        lifecycle:
+          oneOf:
+            - type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [in_development, in_review, reviewed]
+                  default: in_development
+                message:
+                  type: string
+            - type: object
+              required: [status, message]
+              properties:
+                status:
+                  type: string
+                  enum: [deprecated]
+                message:
+                  type: string
+
         author:
           type: array
           items:
@@ -591,3 +611,5 @@ components:
                 "occurence":"/output/result/from/previous/script",
                 "intensity":3
               }
+  
+
