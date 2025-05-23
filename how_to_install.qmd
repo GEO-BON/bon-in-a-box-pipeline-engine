@@ -2,7 +2,7 @@
 title: "How to Install"
 ---
 
-The user interface allows the user to run and edit pipelines. It is used through the browser, but doesn't need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.
+The user interface allows the user to run and edit pipelines. It is used through a browser, but doesn't need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.
 
 ## Video tutorial
 
@@ -62,7 +62,7 @@ Prerequisites:
 
 ### Step 4: Set environment file
 
-1.  Provide the environment variables: - Open the newly cloned repository on your computer
+1.  Provide the environment variables: Open the newly cloned repository on your computer
 
     1.  Find the file called [`runner-sample.env`](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env)
 
@@ -120,7 +120,7 @@ Installation steps on a server are the same as installing on a Linux computer, b
 
 -   In `runner.env`, select the "partial" cache cleaning mode. This will allow for calculated results to be long-lived on the server, as long as they are not run again with a new version of the script. The results in the output folder are always accessible by URL.
 
--   In the case where a server is used for demonstration purpose only, set environment variable `BLOCK_RUNS=true`
+-   In the case where a server is used for demonstration purposes only, set environment variable `BLOCK_RUNS=true`
 
 -   The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.
 

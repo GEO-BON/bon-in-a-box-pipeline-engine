@@ -6,7 +6,7 @@ editor: visual
 
 ## What is a STAC Catalog?
 
-[STAC](https://stacspec.org/en) stands for SpatioTemporal Asset Catalog. It is a common language to describe geospatial information, so it can be more easily worked with, indexed, and discovered. Spatial information is stored in a geoJSON format, which can be easily adapted to different domains. The goal of STAC is to enable a global index of all imagery derived data products with an easily implementable standard for organization to expose their data in a persistent and reliable way. STAC objects are hosted in geoJSON format as HTML pages.
+[STAC](https://stacspec.org/en) stands for SpatioTemporal Asset Catalog. It is a common language to describe geospatial information, so it can be more easily worked with, indexed, and discovered. Spatial information is stored in a geoJSON format, which can be easily adapted to different domains. The goal of STAC is to enable a global index of all imagery derived data products with an easily implementable standard for organizations to expose their data in a persistent and reliable way. STAC objects are hosted in geoJSON format as HTML pages.
 
 ## GEO BON STAC Catalog
 
