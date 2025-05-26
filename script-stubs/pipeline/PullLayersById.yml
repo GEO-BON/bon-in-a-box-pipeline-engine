@@ -4,6 +4,9 @@ description:
   Will pull only the layers found in with_ids. Useful to execute only part of a pipeline depending on an initial configuration.
   To be used in conjunction with AssignId, inside a pipeline.
   (Cannot be ran as a single script.)
+lifecycle:
+  status: in_development
+  message: bombardino crocodilo
 author:
   - name: Jean-Michel Lord
     identifier: https://orcid.org/0009-0007-3826-1125
