@@ -41,13 +41,16 @@ jobs:
           tags: |
             type=raw,value=${{ env.TAG_NAME }}
 
+      - name: Load BIAB_VERSION from version.txt
+        run: echo "BIAB_VERSION=$(cat version.txt)" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: script-server
           file: script-server/Dockerfile.prod
           build-args: |
-            BIAB_VERSION=$(cat version.txt)
+            "BIAB_VERSION=${{ env.BIAB_VERSION }}"
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
