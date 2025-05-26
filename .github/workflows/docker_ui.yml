@@ -9,6 +9,7 @@ on:
     paths:
       - "ui/**"
       - "viewer/**"
+      - "Dockerfile.gateway.prod"
   workflow_dispatch:
 
 jobs:
