@@ -36,4 +36,4 @@ RUN chmod 755 /root
 WORKDIR /root
 CMD ["java", "-server", "-Xms4g", "-Xmx4g", "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=100", "-XX:+UseStringDeduplication", "-jar", "biab-script-server.jar"]
 
-RUN date +"%Y-%m-%d %R" > /version.txt
+RUN echo "$BIAB_VERSION ($(date +'%Y-%m-%d %R'))" > /version.txt
