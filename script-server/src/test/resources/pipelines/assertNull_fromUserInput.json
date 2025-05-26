@@ -69,6 +69,10 @@
   "metadata": {
     "name": "Assert null from user input",
     "description": "Checks that a user input can receive a null value",
+    "lifecycle": {
+      "status": "in_development",
+      "message": "bla bla"
+    },
     "author": [
       {
         "name": "Jean-Michel Lord"

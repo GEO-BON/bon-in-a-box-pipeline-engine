@@ -301,6 +301,10 @@
   "metadata": {
     "name": "0 in 2 out - parallel pipelines",
     "description": "Pipeline for automated tests",
+    "lifecycle": {
+      "status": "reviewed",
+      "message": "bla bla"
+    },
     "author": [
       {
         "name": "Jean-Michel Lord",
