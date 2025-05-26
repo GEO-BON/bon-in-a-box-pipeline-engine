@@ -1,6 +1,9 @@
 script: condaEnvTest.R
 name: Conda Env Test
 description:
+lifecycle:
+  status: in_development
+  message: bla bla
   Test that dependencies specified within a conda file can be loaded, and even installed on the fly.
   If this works, a plot should be generated from the csv.
 author:

@@ -1,6 +1,9 @@
 script: assertNull.py
 name: Assert null
 description: "Test python script that fails if it doesn't receive a null string."
+lifecycle:
+  status: in_development
+  message: bla bla
 author:
   - name: Jean-Michel Lord
 reviewer:
