@@ -5,6 +5,9 @@ author:
     identifier: https://orcid.org/0009-0007-3826-1125
 license: CC0
 description: "Sample python script that increments a number."
+lifecycle:
+  status: in_development
+  message: bla bla
 timeout: 1
 inputs:
   some_int:
