@@ -245,22 +245,33 @@ function up {
         echo "Installing..."
         command pull ; assertSuccess
 
-    # Pre-1.1.0 migration: clean install
-    elif [[ ! -f "serverVersion.txt" ]]; then
-        echo "Upgrading from before 1.1.0, a clean will be performed to remove unnecessary volumes."
-
-        echo "Removing legacy volumes..."
-        docker volume rm \
-            conda-dir-dev \
-            conda-cache-dev \
-            conda-env-yml \
-            r-libs-user-dev 2> /dev/null 1>&2
-
-        clean
-        command pull ; assertSuccess
-
-    # Already installed: check for updates
+    # Already installed
     else
+        # Check for migrations
+        lastVersion=$(docker run --rm geobon/bon-in-a-box:script-server cat /version.txt)
+
+        # Extract semver (major.minor.patch) only, ignore any suffix like -SNAPSHOT
+        semver=$(echo "$lastVersion" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+')
+        if [[ $? -ne 0 ]]; then # Older version.txt file with just a date, and no semver.
+            echo "Upgrading from before 1.1.0, a clean will be performed to remove obsolete volumes and outdated containers."
+
+            echo "Removing obsolete volumes..."
+            docker volume rm \
+                conda-dir-dev \
+                conda-cache-dev \
+                conda-env-yml \
+                r-libs-user-dev 2> /dev/null 1>&2
+
+            clean
+        else
+            echo "Running $semver server"
+        fi
+
+        # For next migrations, we can check the following variables
+        #major=$(echo "$semver" | cut -d. -f1)
+        #minor=$(echo "$semver" | cut -d. -f2)
+        #patch=$(echo "$semver" | cut -d. -f3)
+
         echo "Checking for updates to docker images..."
         # see https://github.com/docker/cli/issues/6059
         images=$(command config --images)
@@ -346,8 +357,6 @@ function up {
             echo -e "${RED}FAILED${ENDCOLOR}" ; exit 1
         fi
     fi
-
-    cp .server/version.txt serverVersion.txt
 
     echo -e "${GREEN}Server is running.${ENDCOLOR}"
 }
