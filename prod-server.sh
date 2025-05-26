@@ -347,13 +347,11 @@ function clean {
         exit 1
     fi
 
-    # Currently used volumes
-    docker volume rm conda-env-yml 2> /dev/null 2>&1
-
     # Removing legacy volumes
     docker volume rm \
         conda-dir-dev \
         conda-cache-dev \
+        conda-env-yml \
         r-libs-user-dev 2> /dev/null 2>&1
 
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"

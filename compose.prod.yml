@@ -17,7 +17,3 @@ services:
     #   dockerfile: Dockerfile.gateway.prod
     expose:
       - "80"
-
-volumes:
-  conda-env-yml:
-    name: "conda-env-yml"

@@ -46,16 +46,13 @@ function clean {
     echo "Removing shared containers between dev and prod"
     docker container rm biab-gateway biab-ui biab-script-server \
         biab-tiler biab-runner-conda biab-runner-julia biab-viewer swagger_editor
-    echo "Clean complete."
 
-    echo "Removing volumes..."
-    docker volume rm \
-        conda-env-yml-dev \
     # Legacy volumes
     echo "Removing legacy volumes..."
     docker volume rm \
         conda-dir-dev \
         conda-cache-dev \
+        conda-env-yml-dev \
         r-libs-user-dev
 
     echo "Clean complete."

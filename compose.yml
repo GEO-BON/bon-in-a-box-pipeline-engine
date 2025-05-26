@@ -36,7 +36,6 @@ services:
       - ${PIPELINE_REPO_PATH}/output:/output:rw
       - ${PIPELINE_REPO_PATH}/runners/r-environment.yml:/data/r-environment.yml:ro
       - ${PIPELINE_REPO_PATH}/runner.env:/runner.env:ro
-      - conda-env-yml:/conda-env-yml
     user: ${MY_UID}:${DOCKER_GID}
     environment:
       SCRIPT_LOCATION: /scripts
