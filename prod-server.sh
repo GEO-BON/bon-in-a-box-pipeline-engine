@@ -56,29 +56,31 @@ function help {
     echo
 }
 
-# Run your docker commands on the server manually.
-# `command <command>` with command such as pull/run/up/down/build/logs...
-# args are appended to the docker compose command with @$
-function command {
-    # Logs are useful to display to the user but only once, on the up command.
-    # They could interfere with other command outputs such as config
-    if [[ "$@" == "up"* ]] ; then log=0; else log=1; fi
-
+# Must be called once before command function can be called
+function prepareCommands {
     # Get docker group. Will not work on Windows, silencing the warning with 2> /dev/null
     export DOCKER_GID="$(getent group docker 2> /dev/null | cut -d: -f3)"
 
+    # This file's directory, see https://stackoverflow.com/a/246128/3519951
+    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    echo "Server config location: $SCRIPT_DIR"
+
     # Set the branch suffix. This allows to use a staging build.
     # We use remote.origin.fetch because of the partial checkout, see server-up.sh.
-    branch=$(git -C .server config remote.origin.fetch | sed 's/.*remotes\/origin\///')
+    branch=$(git -C $SCRIPT_DIR config remote.origin.fetch | sed 's/.*remotes\/origin\///')
+
+    # In "dev symlink" setup, just get the regular branch
+    if [[ $branch == "*" ]]; then branch=$(git branch --show-current); fi
+
     if [[ $branch == *"staging" ]]; then
         export DOCKER_SUFFIX="-$branch"
-        if [ $log -eq 0 ]; then echo "Using staging containers with suffix \"-$branch\"" ; fi
+        echo "Using staging containers with suffix \"-$branch\""
     elif [[ $branch == "edge" ]]; then
         export DOCKER_SUFFIX="-edge"
-        if [ $log -eq 0 ]; then echo "Using edge releases: you'll be up to date with the latest possible server." ; fi
+        echo "Using edge releases: you'll be up to date with the latest possible server."
     else
         export DOCKER_SUFFIX=""
-        if [ $log -eq 0 ]; then echo "Using default branch." ; fi
+        echo "Using default branch."
     fi
 
     # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
@@ -95,14 +97,20 @@ function command {
     if ! [[ -z "$macCPU" ]]; then
         # This is a Mac, check chip type
         if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
-            if [ $log -eq 0 ]; then echo "Apple M* chip detected" ; fi
+            echo "Apple M* chip detected"
             composeFiles+=" -f .server/compose.apple.yml"
         fi
     fi
+}
 
-    #echo "docker compose $composeFiles --env-file runner.env --env-file .server/.prod-paths.env $@"
+# Run your docker commands on the server manually.
+# `command <command>` with command such as pull/run/up/down/build/logs...
+# args are appended to the docker compose command with @$
+function command {
+    #set -ex
     docker compose $composeFiles \
         --env-file runner.env --env-file .server/.prod-paths.env $@
+    #set +ex
 }
 
 function validate {
@@ -375,25 +383,31 @@ case "$1" in
         checkout $2
         ;;
     up)
-        shift
+        prepareCommands
         up
         ;;
     down)
+        prepareCommands
         down
         ;;
     validate)
+        prepareCommands
         validate
         ;;
     command)
         shift
+        prepareCommands
         command $@
         assertSuccess
         ;;
     clean)
+        prepareCommands
         clean
         ;;
     purge)
         echo "Deprecated: Purge is now an alias to the clean command."
+        prepareCommands
+        clean
         ;;
     *)
         help
