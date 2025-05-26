@@ -237,7 +237,22 @@ function up {
         echo "Installing..."
         command pull ; assertSuccess
 
-    else # Already installed
+    # Pre-1.1.0 migration: clean install
+    elif [[ ! -f "serverVersion.txt" ]]; then
+        echo "Upgrading from before 1.1.0, a clean will be performed to remove unnecessary volumes."
+
+        echo "Removing legacy volumes..."
+        docker volume rm \
+            conda-dir-dev \
+            conda-cache-dev \
+            conda-env-yml \
+            r-libs-user-dev 2> /dev/null 1>&2
+
+        clean
+        command pull ; assertSuccess
+
+    # Already installed: check for updates
+    else
         echo "Checking for updates to docker images..."
         # see https://github.com/docker/cli/issues/6059
         images=$(command config --images)
@@ -324,6 +339,8 @@ function up {
         fi
     fi
 
+    cp .server/version.txt serverVersion.txt
+
     echo -e "${GREEN}Server is running.${ENDCOLOR}"
 }
 
@@ -334,7 +351,7 @@ function down {
 }
 
 function clean {
-    echo "Removing docker containers and volumes..."
+    echo "Removing docker containers..."
     output=$(docker container rm \
         biab-gateway \
         biab-script-server \
@@ -346,13 +363,6 @@ function clean {
         echo -e "${RED}Cannot clean while BON in a Box is running.${ENDCOLOR}"
         exit 1
     fi
-
-    # Removing legacy volumes
-    docker volume rm \
-        conda-dir-dev \
-        conda-cache-dev \
-        conda-env-yml \
-        r-libs-user-dev 2> /dev/null 2>&1
 
     echo -e "${GREEN}Clean complete.${ENDCOLOR}"
 }
