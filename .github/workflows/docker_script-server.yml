@@ -35,18 +35,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Load BIAB_VERSION from version.txt
+      - name: Read BON in a Box version
         run: echo "BIAB_VERSION=$(cat version.txt)" >> $GITHUB_ENV
 
       - name: Set Docker tag
         id: set-tag
         run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          if [ "${{ github.ref_name }}" == "main" ]; then
             echo "TAG_BRANCH=latest" >> $GITHUB_ENV
             echo "TAG_VERSION=${{ env.BIAB_VERSION }}" >> $GITHUB_ENV
           else
             echo "TAG_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
-            echo "TAG_VERSION=${{ env.BIAB_VERSION }}_${{ github.ref_name }}" >> $GITHUB_ENV
+            if [ "${{ github.ref_name }}" == "edge" ]; then
+              echo "TAG_VERSION=${{ env.BIAB_VERSION }}-SNAPSHOT" >> $GITHUB_ENV
+            fi
           fi
 
       - name: Extract metadata (tags, labels) for Docker
