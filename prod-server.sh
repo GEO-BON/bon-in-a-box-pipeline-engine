@@ -73,13 +73,13 @@ function prepareCommands {
     if [[ $branch == "*" ]]; then branch=$(git branch --show-current); fi
 
     if [[ $branch == *"staging" ]]; then
-        export DOCKER_SUFFIX="-$branch"
-        echo "Using staging containers with suffix \"-$branch\""
+        export DOCKER_SUFFIX="$branch"
+        echo "Using staging containers with tag \"$branch\""
     elif [[ $branch == "edge" ]]; then
-        export DOCKER_SUFFIX="-edge"
+        export DOCKER_SUFFIX="edge"
         echo "Using edge releases: you'll be up to date with the latest possible server."
     else
-        export DOCKER_SUFFIX=""
+        export DOCKER_SUFFIX="latest"
         echo "Using default branch."
     fi
 
@@ -144,7 +144,7 @@ function validate {
         -v /$(pwd)/.server/.github/validateCerberusSchema.py://validator/validateCerberusSchema.py:ro \
         -v /$(pwd)/.server/.github/pipelineValidationSchema.yml://validator/pipelineValidationSchema.yml:ro \
         -w //toValidate/ \
-        geobon/bon-in-a-box:script-server \
+        ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/script-server \
         python3 //validator/validateCerberusSchema.py //validator/pipelineValidationSchema.yml
     flagErrors
 
@@ -229,7 +229,7 @@ function up {
         echo "    ./server-up.sh pre-conda-staging"
         exit 1
 
-    elif [[ $output == *"geobon/bon-in-a-box:gateway"* ]] ; then
+    elif [[ $output == *"ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/gateway"* ]] ; then
         echo -e "${RED}BON in a Box is already running.${ENDCOLOR}"
         exit 1
     fi
@@ -240,6 +240,14 @@ function up {
     # These are the "saved" containers that we would normally keep, but that we will discard due to the update.
     containersToDiscard=""
 
+#### TODO: Check for the old images from docker hub for a clean.
+# echo "Removing obsolete volumes..."
+#             docker volume rm \
+#                 conda-dir-dev \
+#                 conda-cache-dev \
+#                 conda-env-yml \
+#                 r-libs-user-dev 2> /dev/null 1>&2
+
     docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
     if [[ $? -eq 1 ]] ; then
         echo "Installing..."
@@ -248,30 +256,15 @@ function up {
     # Already installed
     else
         # Check for migrations
-        lastVersion=$(docker run --rm geobon/bon-in-a-box:script-server$DOCKER_SUFFIX cat /version.txt)
+        # lastVersion=$(docker run --rm ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/script-server:$DOCKER_SUFFIX cat /version.txt)
+        # Extract semver (major.minor.patch) only, ignore any suffix like -SNAPSHOT
+        # semver=$(echo "$lastVersion" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+')
+        # echo "Existing server: $semver"
 
-        # Older version.txt file with just a date, and no semver.
-        if [[ "$lastVersion" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} ]]; then
-            echo "Upgrading from before 1.1.0, a clean will be performed to remove obsolete volumes and outdated containers."
-
-            echo "Removing obsolete volumes..."
-            docker volume rm \
-                conda-dir-dev \
-                conda-cache-dev \
-                conda-env-yml \
-                r-libs-user-dev 2> /dev/null 1>&2
-
-            clean
-        else
-            # Extract semver (major.minor.patch) only, ignore any suffix like -SNAPSHOT
-            semver=$(echo "$lastVersion" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+')
-            echo "Existing server: $semver"
-
-             # For next migrations, we can check the following variables
-            #major=$(echo "$semver" | cut -d. -f1)
-            #minor=$(echo "$semver" | cut -d. -f2)
-            #patch=$(echo "$semver" | cut -d. -f3)
-        fi
+        # For next migrations, we can check the following variables
+        #major=$(echo "$semver" | cut -d. -f1)
+        #minor=$(echo "$semver" | cut -d. -f2)
+        #patch=$(echo "$semver" | cut -d. -f3)
 
         echo "Checking for updates to docker images..."
         # see https://github.com/docker/cli/issues/6059
@@ -279,12 +272,11 @@ function up {
         services=$(command config --services)
 
         # There are some images for which we want to keep the containers, others can be discarded.
-        savedContainerRegex="(runner-conda|runner-julia)"
         savedContainerServices="runner-conda runner-julia"
         otherServices=$(echo "$services" | grep -vE "^$savedContainerRegex")
 
-        savedContainerImages=$(echo "$images" | grep -E "^geobon/bon-in-a-box:$savedContainerRegex")
-        otherImages=$(echo "$images" | grep -vE "^geobon/bon-in-a-box:$savedContainerRegex")
+        savedContainerImages=$(echo "$images" | grep -E "^ghcr.io/geo-bon/bon-in-a-box-.*/$savedContainerRegex")
+        otherImages=$(echo "$images" | grep -vE "^ghcr.io/geo-bon/bon-in-a-box-.*/$savedContainerRegex")
 
         updatesFound=1 # Will become 0 if there is an update
 
