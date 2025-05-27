@@ -1,4 +1,5 @@
-import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from 'react-markdown';
+import { LifecycleDescription } from './Lifecycle';
 
 export function StepDescription({ descriptionFile, metadata }) {
     return <>
@@ -40,6 +41,7 @@ function generatePersonList(list) {
     })
 }
 
+
 /**
  * Prints a general description of the script, along with the references.
  * @param {string} Path to the yml script description file
@@ -52,6 +54,7 @@ export function GeneralDescription({ ymlPath, metadata }) {
     const codeLink = getCodeUrl(ymlPath, metadata.script)
 
     return <div className='stepDescription'>
+        {metadata.lifecycle && <LifecycleDescription lifecycle={metadata.lifecycle} />}
         {metadata.author &&
             <p>
                 <i>{generatePersonList(metadata.author)}</i>
