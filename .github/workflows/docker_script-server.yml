@@ -12,7 +12,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: script-server
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   script-server:
