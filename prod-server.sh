@@ -272,6 +272,7 @@ function up {
         services=$(command config --services)
 
         # There are some images for which we want to keep the containers, others can be discarded.
+        savedContainerRegex="(runner-conda|runner-julia)"
         savedContainerServices="runner-conda runner-julia"
         otherServices=$(echo "$services" | grep -vE "^$savedContainerRegex")
 
