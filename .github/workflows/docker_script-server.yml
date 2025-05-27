@@ -8,11 +8,12 @@ on:
       - edge
     paths:
       - "script-server/**"
+      - ".github/workflows/docker_script-server.yml"
   workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository }}/script-server
 
 jobs:
   script-server:
@@ -59,6 +60,7 @@ jobs:
             type=sha,value=${{ github.sha }}
 
       - name: Build and push Docker image
+        id: push
         uses: docker/build-push-action@v6
         with:
           context: script-server
