@@ -19,6 +19,9 @@ import InfoAuthorInner from './model/InfoAuthorInner';
 import InfoInputsValue from './model/InfoInputsValue';
 import InfoInputsValueExample from './model/InfoInputsValueExample';
 import InfoInputsValueExampleOneOfInner from './model/InfoInputsValueExampleOneOfInner';
+import InfoLifecycle from './model/InfoLifecycle';
+import InfoLifecycleOneOf from './model/InfoLifecycleOneOf';
+import InfoLifecycleOneOf1 from './model/InfoLifecycleOneOf1';
 import InfoOutputsValue from './model/InfoOutputsValue';
 import InfoOutputsValueExample from './model/InfoOutputsValueExample';
 import InfoReferencesInner from './model/InfoReferencesInner';
@@ -99,6 +102,24 @@ export {
      * @property {module:model/InfoInputsValueExampleOneOfInner}
      */
     InfoInputsValueExampleOneOfInner,
+
+    /**
+     * The InfoLifecycle model constructor.
+     * @property {module:model/InfoLifecycle}
+     */
+    InfoLifecycle,
+
+    /**
+     * The InfoLifecycleOneOf model constructor.
+     * @property {module:model/InfoLifecycleOneOf}
+     */
+    InfoLifecycleOneOf,
+
+    /**
+     * The InfoLifecycleOneOf1 model constructor.
+     * @property {module:model/InfoLifecycleOneOf1}
+     */
+    InfoLifecycleOneOf1,
 
     /**
      * The InfoOutputsValue model constructor.
