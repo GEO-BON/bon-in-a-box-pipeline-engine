@@ -12,8 +12,6 @@
  */
 
 import ApiClient from '../ApiClient';
-import InfoLifecycleOneOf from './InfoLifecycleOneOf';
-import InfoLifecycleOneOf1 from './InfoLifecycleOneOf1';
 
 /**
  * The InfoLifecycle model module.
@@ -24,56 +22,19 @@ class InfoLifecycle {
     /**
      * Constructs a new <code>InfoLifecycle</code>.
      * @alias module:model/InfoLifecycle
-     * @param {(module:model/InfoLifecycleOneOf|module:model/InfoLifecycleOneOf1)} instance The actual instance to initialize InfoLifecycle.
      */
-    constructor(instance = null) {
-        if (instance === null) {
-            this.actualInstance = null;
-            return;
-        }
-        var match = 0;
-        var errorMessages = [];
-        try {
-            if (typeof instance === "InfoLifecycleOneOf") {
-                this.actualInstance = instance;
-            } else {
-                // plain JS object
-                // validate the object
-                InfoLifecycleOneOf.validateJSON(instance); // throw an exception if no match
-                // create InfoLifecycleOneOf from JS object
-                this.actualInstance = InfoLifecycleOneOf.constructFromObject(instance);
-            }
-            match++;
-        } catch(err) {
-            // json data failed to deserialize into InfoLifecycleOneOf
-            errorMessages.push("Failed to construct InfoLifecycleOneOf: " + err)
-        }
+    constructor() { 
+        
+        InfoLifecycle.initialize(this);
+    }
 
-        try {
-            if (typeof instance === "InfoLifecycleOneOf1") {
-                this.actualInstance = instance;
-            } else {
-                // plain JS object
-                // validate the object
-                InfoLifecycleOneOf1.validateJSON(instance); // throw an exception if no match
-                // create InfoLifecycleOneOf1 from JS object
-                this.actualInstance = InfoLifecycleOneOf1.constructFromObject(instance);
-            }
-            match++;
-        } catch(err) {
-            // json data failed to deserialize into InfoLifecycleOneOf1
-            errorMessages.push("Failed to construct InfoLifecycleOneOf1: " + err)
-        }
-
-        if (match > 1) {
-            throw new Error("Multiple matches found constructing `InfoLifecycle` with oneOf schemas InfoLifecycleOneOf, InfoLifecycleOneOf1. Input: " + JSON.stringify(instance));
-        } else if (match === 0) {
-            this.actualInstance = null; // clear the actual instance in case there are multiple matches
-            throw new Error("No match found constructing `InfoLifecycle` with oneOf schemas InfoLifecycleOneOf, InfoLifecycleOneOf1. Details: " +
-                            errorMessages.join(", "));
-        } else { // only 1 match
-            // the input is valid
-        }
+    /**
+     * Initializes the fields of this object.
+     * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
+     * Only for internal use.
+     */
+    static initialize(obj) { 
+        obj['status'] = 'in_development';
     }
 
     /**
@@ -84,47 +45,47 @@ class InfoLifecycle {
      * @return {module:model/InfoLifecycle} The populated <code>InfoLifecycle</code> instance.
      */
     static constructFromObject(data, obj) {
-        return new InfoLifecycle(data);
+        if (data) {
+            obj = obj || new InfoLifecycle();
+
+            if (data.hasOwnProperty('status')) {
+                obj['status'] = ApiClient.convertToType(data['status'], 'String');
+            }
+            if (data.hasOwnProperty('message')) {
+                obj['message'] = ApiClient.convertToType(data['message'], 'String');
+            }
+        }
+        return obj;
     }
 
     /**
-     * Gets the actual instance, which can be <code>InfoLifecycleOneOf</code>, <code>InfoLifecycleOneOf1</code>.
-     * @return {(module:model/InfoLifecycleOneOf|module:model/InfoLifecycleOneOf1)} The actual instance.
+     * Validates the JSON data with respect to <code>InfoLifecycle</code>.
+     * @param {Object} data The plain JavaScript object bearing properties of interest.
+     * @return {boolean} to indicate whether the JSON data is valid with respect to <code>InfoLifecycle</code>.
      */
-    getActualInstance() {
-        return this.actualInstance;
+    static validateJSON(data) {
+        // ensure the json data is a string
+        if (data['status'] && !(typeof data['status'] === 'string' || data['status'] instanceof String)) {
+            throw new Error("Expected the field `status` to be a primitive type in the JSON string but got " + data['status']);
+        }
+        // ensure the json data is a string
+        if (data['message'] && !(typeof data['message'] === 'string' || data['message'] instanceof String)) {
+            throw new Error("Expected the field `message` to be a primitive type in the JSON string but got " + data['message']);
+        }
+
+        return true;
     }
 
-    /**
-     * Sets the actual instance, which can be <code>InfoLifecycleOneOf</code>, <code>InfoLifecycleOneOf1</code>.
-     * @param {(module:model/InfoLifecycleOneOf|module:model/InfoLifecycleOneOf1)} obj The actual instance.
-     */
-    setActualInstance(obj) {
-       this.actualInstance = InfoLifecycle.constructFromObject(obj).getActualInstance();
-    }
 
-    /**
-     * Returns the JSON representation of the actual instance.
-     * @return {string}
-     */
-    toJSON = function(){
-        return this.getActualInstance();
-    }
-
-    /**
-     * Create an instance of InfoLifecycle from a JSON string.
-     * @param {string} json_string JSON string.
-     * @return {module:model/InfoLifecycle} An instance of InfoLifecycle.
-     */
-    static fromJSON = function(json_string){
-        return InfoLifecycle.constructFromObject(JSON.parse(json_string));
-    }
 }
+
+
 
 /**
  * @member {module:model/InfoLifecycle.StatusEnum} status
+ * @default 'in_development'
  */
-InfoLifecycle.prototype['status'] = undefined;
+InfoLifecycle.prototype['status'] = 'in_development';
 
 /**
  * @member {String} message
@@ -132,7 +93,42 @@ InfoLifecycle.prototype['status'] = undefined;
 InfoLifecycle.prototype['message'] = undefined;
 
 
-InfoLifecycle.OneOf = ["InfoLifecycleOneOf", "InfoLifecycleOneOf1"];
+
+
+
+/**
+ * Allowed values for the <code>status</code> property.
+ * @enum {String}
+ * @readonly
+ */
+InfoLifecycle['StatusEnum'] = {
+
+    /**
+     * value: "in_development"
+     * @const
+     */
+    "in_development": "in_development",
+
+    /**
+     * value: "in_review"
+     * @const
+     */
+    "in_review": "in_review",
+
+    /**
+     * value: "reviewed"
+     * @const
+     */
+    "reviewed": "reviewed",
+
+    /**
+     * value: "deprecated"
+     * @const
+     */
+    "deprecated": "deprecated"
+};
+
+
 
 export default InfoLifecycle;
 
