@@ -240,16 +240,31 @@ function up {
     # These are the "saved" containers that we would normally keep, but that we will discard due to the update.
     containersToDiscard=""
 
-#### TODO: Check for the old images from docker hub for a clean.
-# echo "Removing obsolete volumes..."
-#             docker volume rm \
-#                 conda-dir-dev \
-#                 conda-cache-dev \
-#                 conda-env-yml \
-#                 r-libs-user-dev 2> /dev/null 1>&2
-
-    docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
+    # Not installed, or legacy installation
+    docker image ls | grep ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/ 2> /dev/null 1>&2
     if [[ $? -eq 1 ]] ; then
+        docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
+        if [[ $? -eq 0 ]] ; then
+            echo -e "${YELLOW}Docker Hub containers found: cleaning up before installing the new version.${ENDCOLOR}"
+
+            clean
+
+            echo "Removing obsolete images..."
+            docker image ls --format '{{.Repository}}:{{.Tag}}' \
+                | grep '^geobon/bon-in-a-box' \
+                | xargs -r docker image rm \
+                2> /dev/null 1>&2
+
+            echo "Removing obsolete volumes..."
+            docker volume rm \
+                conda-dir-dev \
+                conda-cache-dev \
+                conda-env-yml \
+                r-libs-user-dev 2> /dev/null 1>&2
+
+            echo -e "${GREEN}Clean complete.${ENDCOLOR}"
+        fi
+
         echo "Installing..."
         command pull ; assertSuccess
 
@@ -374,8 +389,6 @@ function clean {
         echo -e "${RED}Cannot clean while BON in a Box is running.${ENDCOLOR}"
         exit 1
     fi
-
-    echo -e "${GREEN}Clean complete.${ENDCOLOR}"
 }
 
 case "$1" in
@@ -403,14 +416,13 @@ case "$1" in
         command $@
         assertSuccess
         ;;
+    purge)
+        echo "Deprecated: Purge is now an alias to the clean command."
+        ;& # fall through
     clean)
         prepareCommands
         clean
-        ;;
-    purge)
-        echo "Deprecated: Purge is now an alias to the clean command."
-        prepareCommands
-        clean
+        echo -e "${GREEN}Clean complete.${ENDCOLOR}"
         ;;
     *)
         help
