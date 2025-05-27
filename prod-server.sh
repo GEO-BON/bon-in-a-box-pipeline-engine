@@ -248,11 +248,10 @@ function up {
     # Already installed
     else
         # Check for migrations
-        lastVersion=$(docker run --rm geobon/bon-in-a-box:script-server cat /version.txt)
+        lastVersion=$(docker run --rm geobon/bon-in-a-box:script-server$DOCKER_SUFFIX cat /version.txt)
 
-        # Extract semver (major.minor.patch) only, ignore any suffix like -SNAPSHOT
-        semver=$(echo "$lastVersion" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+')
-        if [[ $? -ne 0 ]]; then # Older version.txt file with just a date, and no semver.
+        # Older version.txt file with just a date, and no semver.
+        if [[ "$lastVersion" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2} ]]; then
             echo "Upgrading from before 1.1.0, a clean will be performed to remove obsolete volumes and outdated containers."
 
             echo "Removing obsolete volumes..."
@@ -264,13 +263,15 @@ function up {
 
             clean
         else
-            echo "Running $semver server"
-        fi
+            # Extract semver (major.minor.patch) only, ignore any suffix like -SNAPSHOT
+            semver=$(echo "$lastVersion" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+')
+            echo "Existing server: $semver"
 
-        # For next migrations, we can check the following variables
-        #major=$(echo "$semver" | cut -d. -f1)
-        #minor=$(echo "$semver" | cut -d. -f2)
-        #patch=$(echo "$semver" | cut -d. -f3)
+             # For next migrations, we can check the following variables
+            #major=$(echo "$semver" | cut -d. -f1)
+            #minor=$(echo "$semver" | cut -d. -f2)
+            #patch=$(echo "$semver" | cut -d. -f3)
+        fi
 
         echo "Checking for updates to docker images..."
         # see https://github.com/docker/cli/issues/6059
