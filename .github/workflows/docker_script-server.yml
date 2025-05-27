@@ -1,4 +1,4 @@
-name: Publish script server to Docker Hub
+name: Publish script server to Github Packages
 
 on:
   push:
