@@ -45,7 +45,7 @@ function help {
     echo "    checkout [BRANCH]    Checkout config files from given branch of pipeline engine repo."
     echo "    up                   Start the server, accessible in http://localhost"
     echo "    down                 Stops the server"
-    echo "    validate             Run basic basic validation on pipelines and scripts. "
+    echo "    validate             Run basic validation on pipelines and scripts. "
     echo "    clean                Removes the docker containers of all services and the volume "
     echo "                         used to store the conda sub-environment info."
     echo "                         This is useful in development switching from prod to dev server,"
