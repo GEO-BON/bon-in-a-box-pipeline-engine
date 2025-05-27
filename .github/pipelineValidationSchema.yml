@@ -11,7 +11,7 @@ metadata:
       type: string
 
     lifecycle:
-      required: true
+      required: false
       type: dict
       oneof:
         - schema:
