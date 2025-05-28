@@ -196,17 +196,14 @@ function checkForUpdates {
         # Get the remote digest in format sha256:<hash>
         # Would have been cleaner with jq but it is not available in a git bash on Windows...
         # WARNING: Works only on single architecture builds or if Linux happens to be the first variant.
-        remoteDigest=$(docker manifest inspect -v $image \
-            | awk '/"config":/ {found=1} found&& /"digest"/ {print $2; exit}' \
-            | tr -d '",')
-        # echo $remoteDigest
+        remoteDigest=$(docker manifest inspect -v $image)
 
         # Perform comparison
-        if [[ "$localDigest" != "$remoteDigest" ]]; then
+        if echo $remoteDigest | grep -q $localDigest; then
+            echo -e "${GREEN} ✔ ${ENDCOLOR}Up to date: $image"
+        else
             echo -e "${YELLOW} ! ${ENDCOLOR}At least one image outdated: $image"
             return 0
-        else
-            echo -e "${GREEN} ✔ ${ENDCOLOR}Up to date: $image"
         fi
     done
 
