@@ -43,7 +43,8 @@ function help {
     echo "Commands:"
     echo "    help                 Display this help"
     echo "    checkout [BRANCH]    Checkout config files from given branch of pipeline engine repo."
-    echo "    up                   Start the server, accessible in http://localhost"
+    echo "    up [-y]              Start the server, accessible in http://localhost"
+    echo "                         Use -y or --yes to skip confirmation prompts (for automation)"
     echo "    down                 Stops the server"
     echo "    validate             Run basic validation on pipelines and scripts. "
     echo "    clean                Removes the docker containers of all services and the volume "
@@ -321,7 +322,12 @@ function up {
                 echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
             fi
 
-            read -p "Do you want to update? (Y/n): " choice
+            if [[ " $@ " == *" -y "* || " $@ " == *" --yes "* ]]; then
+                choice="y"
+            else
+                read -p "Do you want to update? (Y/n): " choice
+            fi
+
             if [[ -z "$choice" || "$choice" == "y" || "$choice" == "Y" ]]; then
                 command pull ; assertSuccess
 
@@ -399,8 +405,9 @@ case "$1" in
         checkout $2
         ;;
     up)
+        shift
         prepareCommands
-        up
+        up $@
         ;;
     down)
         prepareCommands
