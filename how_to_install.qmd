@@ -64,13 +64,13 @@ Prerequisites:
 
 1.  Provide the environment variables: Open the newly cloned repository on your computer
 
-    1.  Find the file called [`runner-sample.env`](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env)
+    a.  Find the file called [`runner-sample.env`](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env)
 
-    2.  Duplicate the file and rename the copy to `runner.env`.
+    b.  Duplicate the file and rename the copy to `runner.env`.
 
-    3.  Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g. GBIF or IUCN)
+    c.  Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g. GBIF or IUCN)
 
-    4.  Adjust any server option as you see fit.
+    d.  Adjust any server option as you see fit.
 
 2.  Using a linux terminal (terminal on Mac or Git Bash), navigate to the folder of the cloned repository.
 
