@@ -8,6 +8,7 @@ docs/InfoAuthorInner.md
 docs/InfoInputsValue.md
 docs/InfoInputsValueExample.md
 docs/InfoInputsValueExampleOneOfInner.md
+docs/InfoLifecycle.md
 docs/InfoOutputsValue.md
 docs/InfoOutputsValueExample.md
 docs/InfoReferencesInner.md
@@ -23,6 +24,7 @@ src/model/InfoAuthorInner.js
 src/model/InfoInputsValue.js
 src/model/InfoInputsValueExample.js
 src/model/InfoInputsValueExampleOneOfInner.js
+src/model/InfoLifecycle.js
 src/model/InfoOutputsValue.js
 src/model/InfoOutputsValueExample.js
 src/model/InfoReferencesInner.js

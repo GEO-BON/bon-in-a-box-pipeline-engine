@@ -144,6 +144,7 @@ Class | Method | HTTP request | Description
  - [BonInABoxScriptService.InfoInputsValue](docs/InfoInputsValue.md)
  - [BonInABoxScriptService.InfoInputsValueExample](docs/InfoInputsValueExample.md)
  - [BonInABoxScriptService.InfoInputsValueExampleOneOfInner](docs/InfoInputsValueExampleOneOfInner.md)
+ - [BonInABoxScriptService.InfoLifecycle](docs/InfoLifecycle.md)
  - [BonInABoxScriptService.InfoOutputsValue](docs/InfoOutputsValue.md)
  - [BonInABoxScriptService.InfoOutputsValueExample](docs/InfoOutputsValueExample.md)
  - [BonInABoxScriptService.InfoReferencesInner](docs/InfoReferencesInner.md)
