@@ -425,7 +425,10 @@ case "$1" in
         ;;
     purge)
         echo "Deprecated: Purge is now an alias to the clean command."
-        ;& # fall through
+        prepareCommands
+        clean
+        echo -e "${GREEN}Clean complete.${ENDCOLOR}"
+        ;;
     clean)
         prepareCommands
         clean
