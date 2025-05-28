@@ -3,7 +3,6 @@ name: In subfolder
 description: This script tests that sub-folders work for scripts.
 lifecycle:
   status: in_development
-  message: bombardino crocodilo
 author:
   - name: Jean-Michel Lord
 inputs:

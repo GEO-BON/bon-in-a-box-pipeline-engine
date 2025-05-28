@@ -435,7 +435,7 @@ components:
           example:
             - status: in_development
             - status: deprecated
-              message: Pipeline has been deprecated, be careful while using it
+              message: Message explaining why it's deprecated and what to choose instead
         author:
           type: array
           items:
@@ -604,5 +604,5 @@ components:
                 "occurence":"/output/result/from/previous/script",
                 "intensity":3
               }
-  
+
 

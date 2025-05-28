@@ -6,7 +6,6 @@ description:
   (Cannot be ran as a single script.)
 lifecycle:
   status: in_development
-  message: bombardino crocodilo
 author:
   - name: Jean-Michel Lord
     identifier: https://orcid.org/0009-0007-3826-1125

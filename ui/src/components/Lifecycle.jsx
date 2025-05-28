@@ -8,7 +8,7 @@ function LifecycleMessage({ status, message }) {
 }
 
 function ChipFromStatus({ status }) {
-  let chipStyle = { 
+  let chipStyle = {
                     backgroundColor: '#76d2ff',
                     color: 'black'
                   };
@@ -26,6 +26,8 @@ function ChipFromStatus({ status }) {
       chipStyle.backgroundColor = 'black';
       chipStyle.color = 'white';
       break;
+    default:
+      console.warn(`Unknown lifecycle status: ${status}`);
   }
   return <Chip label={status} size="small" style={chipStyle} color='primary'/>
 
@@ -34,7 +36,7 @@ function ChipFromStatus({ status }) {
 export function LifecycleDescription({ lifecycle }) {
 
   return <>
-          {lifecycle.status && <ChipFromStatus status={lifecycle.status} /> || <ChipFromStatus status="in_development" />}
-          {lifecycle.message && <LifecycleMessage status={lifecycle.status} message={lifecycle.message} />}
+          <ChipFromStatus status={(lifecycle && lifecycle.status) || "in_development"} />
+          {lifecycle && lifecycle.message && <LifecycleMessage status={lifecycle.status} message={lifecycle.message} />}
          </>
 }

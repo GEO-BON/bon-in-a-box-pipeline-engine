@@ -54,7 +54,7 @@ export function GeneralDescription({ ymlPath, metadata }) {
     const codeLink = getCodeUrl(ymlPath, metadata.script)
 
     return <div className='stepDescription'>
-        {metadata.lifecycle && <LifecycleDescription lifecycle={metadata.lifecycle} />}
+        <LifecycleDescription lifecycle={metadata.lifecycle} />
         {metadata.author &&
             <p>
                 <i>{generatePersonList(metadata.author)}</i>

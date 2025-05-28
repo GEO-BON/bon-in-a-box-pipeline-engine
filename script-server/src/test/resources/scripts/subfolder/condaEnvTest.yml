@@ -5,7 +5,6 @@ description:
   If this works, a plot should be generated from the csv.
 lifecycle:
   status: in_development
-  message: bombardino crocodilo
 author:
   - name: Jean-Michel Lord
 inputs:

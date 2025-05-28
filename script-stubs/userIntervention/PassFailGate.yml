@@ -9,7 +9,6 @@ description: |
   (Cannot be ran as a single script.)
 lifecycle:
   status: in_development
-  message: bombardino crocodilo
 author:
   - name: Jean-Michel Lord
     email: jean-michel.lord@mcgill.ca
