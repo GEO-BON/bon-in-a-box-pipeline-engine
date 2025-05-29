@@ -5,6 +5,7 @@ import { InputsDescription } from "../StepDescription";
 import ReactMarkdown from "react-markdown";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
+import LocationChooser from "./LocationChooser";
 
 import yaml from "js-yaml";
 import { isEmptyObject } from "../../utils/isEmptyObject";
@@ -13,8 +14,12 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Alert from "@mui/material/Alert";
+import TravelExploreIcon from '@mui/icons-material/TravelExplore';
+import Modal from "@mui/material/Modal";
+import { CustomButtonGreen } from "../CustomMUI";
 
 import { styled } from "@mui/material";
+import { set } from "lodash";
 
 /**
  * An input that we use to fill the input file's content.
@@ -94,6 +99,7 @@ export default function InputFileInput({
 
 const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   if (!inputs) return <p>No Inputs</p>;
+  const [openLocationChooser, setOpenLocationChooser] = useState(false);
 
   function updateInputFile(inputId, value) {
     setInputFileContent((content) => {
@@ -104,6 +110,19 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   }
 
   return (
+    <div className="inputFileForm">
+      <CustomButtonGreen variant="contained" 
+        endIcon={<TravelExploreIcon/>} 
+        onClick={() => {setOpenLocationChooser(true);}} 
+        className="locationChooserButton">
+          Location Chooser   
+      </CustomButtonGreen>
+      <Modal
+        open={openLocationChooser}
+        onClose={() => setOpenLocationChooser(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      ><LocationChooser/></Modal>
     <table className="inputFileFields">
       <tbody>
         {Object.entries(inputs)
@@ -179,5 +198,6 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
           })}
       </tbody>
     </table>
+    </div>
   );
 };
