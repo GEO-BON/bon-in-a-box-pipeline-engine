@@ -248,9 +248,7 @@ function up {
             clean
 
             echo "Removing obsolete images..."
-            docker image ls --format '{{.Repository}}:{{.Tag}}' \
-                | grep '^geobon/bon-in-a-box' \
-                | xargs -r docker image rm \
+            docker image rm $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep '^geobon/bon-in-a-box') \
                 2> /dev/null 1>&2
 
             echo "Removing obsolete volumes..."
