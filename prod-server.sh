@@ -180,34 +180,29 @@ function checkout {
     echo -e "${GREEN}Server configuration updated.${ENDCOLOR}"
 }
 
+# This function echoes the images that need to be updated.
 # Docker pull should be able to tell us. In the meantime, comparing digests.
 # See https://github.com/docker/cli/issues/6059
 function checkForUpdates {
     local images=$1
-    for image in $images; do
+
+    check_image_update() {
+        local image="$1"
         # Get the local digest in the format sha256:<hash>
-        localDigest=$(docker image inspect --format='{{index .Id}}' $image 2>/dev/null)
+        local localDigest=$(docker image inspect --format='{{index .Id}}' "$image" 2>/dev/null)
         if [[ $? -ne 0 ]]; then
-            echo -e "${YELLOW} ! ${ENDCOLOR}At least one image not found locally: $image"
-            return 0
+            echo "$image"
+            return
         fi
-        # echo $localDigest
 
-        # Get the remote digest in format sha256:<hash>
-        # Would have been cleaner with jq but it is not available in a git bash on Windows...
-        # WARNING: Works only on single architecture builds or if Linux happens to be the first variant.
-        remoteDigest=$(docker manifest inspect -v $image)
-
-        # Perform comparison
-        if echo $remoteDigest | grep -q $localDigest; then
-            echo -e "${GREEN} ✔ ${ENDCOLOR}Up to date: $image"
-        else
-            echo -e "${YELLOW} ! ${ENDCOLOR}At least one image outdated: $image"
-            return 0
+        local remoteDigest=$(docker manifest inspect -v "$image")
+        if ! echo "$remoteDigest" | grep -q "$localDigest"; then
+            echo "$image"
         fi
-    done
+    }
 
-    return 1
+    export -f check_image_update # Export function for xargs subshells
+    echo "$images" | xargs -n1 -P8 bash -c 'check_image_update "$0"'
 }
 
 function up {
@@ -290,27 +285,13 @@ function up {
         savedContainerServices="runner-conda runner-julia"
         otherServices=$(echo "$services" | grep -vE "^$savedContainerRegex")
 
-        savedContainerImages=$(echo "$images" | grep -E "^ghcr.io/geo-bon/bon-in-a-box-.*/$savedContainerRegex")
-        otherImages=$(echo "$images" | grep -vE "^ghcr.io/geo-bon/bon-in-a-box-.*/$savedContainerRegex")
+        # Get all images that have an update available.
+        imagesToUpdate=$(checkForUpdates "$images")
 
-        updatesFound=1 # Will become 0 if there is an update
+        # Sublist of the images for which the containers should be kept whenever possible.
+        containersToDiscard=$(echo $images | tr ' ' "\n" | grep -E "$savedContainerRegex")
 
-        # Check the images for which the containers should be kept whenever possible.
-        for savedContainerImage in $savedContainerImages; do
-            checkForUpdates "$savedContainerImage"
-            if [[ $? -eq 0 ]]; then
-                containersToDiscard="$containersToDiscard $savedContainerImage"
-                updatesFound=0
-            fi
-        done
-
-        if [[ $updatesFound -ne 0 ]] ; then
-            # Check the other images
-            checkForUpdates "$otherImages"
-            updatesFound=$?
-        fi
-
-        if [[ $updatesFound -eq 0 ]]; then
+        if [[ -n "$imagesToUpdate" ]]; then
             echo "Updates found."
             if [[ -n "$containersToDiscard" ]]; then
                 echo -e "${YELLOW}This update will discard the following runner containers: ${ENDCOLOR}"
@@ -330,7 +311,7 @@ function up {
                 command pull ; assertSuccess
 
             else # Ok then, let's pretend there are no updates.
-                updatesFound=1 # 1=false in bash
+                imagesToUpdate=""
                 containersToDiscard=""
             fi
         else

@@ -250,7 +250,6 @@ class ScriptRun( // Constructor used in single script run
                     "r", "R" -> {
                         val runner = CondaRunner(logFile, pidFile, "r", condaEnvName, condaEnvYml)
                         container = CondaRunner.container
-                        forceStopCleanup = runner.getForceStopCleanup()
 
                         command = container.dockerCommandList + listOf(
                             "bash", "-c",
@@ -332,7 +331,6 @@ class ScriptRun( // Constructor used in single script run
                         if(useRunners) {
                             val runner = CondaRunner(logFile, pidFile, "python", condaEnvName, condaEnvYml)
                             container = CondaRunner.container
-                            forceStopCleanup = runner.getForceStopCleanup()
 
                             val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
                             command = container.dockerCommandList + listOf(
