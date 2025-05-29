@@ -238,18 +238,20 @@ function up {
     # These are the "saved" containers that we would normally keep, but that we will discard due to the update.
     containersToDiscard=""
 
-    # Not installed, or legacy installation
+    # Installing or updating
     docker image ls | grep ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/ 2> /dev/null 1>&2
     if [[ $? -eq 1 ]] ; then
+        # Not installed, or legacy installation
         docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
         if [[ $? -eq 0 ]] ; then
             echo -e "${YELLOW}Docker Hub containers found: cleaning up before installing the new version.${ENDCOLOR}"
 
             clean
 
-            echo "Removing obsolete images..."
-            docker image rm $(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep '^geobon/bon-in-a-box') \
-                2> /dev/null 1>&2
+            echo "Removing obsolete images... (Please be patient while we save some disk space: this may take a while)"
+            docker image rm $(docker image ls --format '{{.Repository}}:{{.Tag}} {{.ID}}' \
+                | grep '^geobon/bon-in-a-box' \
+                | cut -d' '  -f2)
 
             echo "Removing obsolete volumes..."
             docker volume rm \
