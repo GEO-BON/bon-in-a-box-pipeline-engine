@@ -43,6 +43,7 @@ services:
     env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
     environment:
+      PYTHONUNBUFFERED: 1 
       SCRIPT_LOCATION: /scripts
       USERDATA_LOCATION: /userdata
       OUTPUT_LOCATION: /output
