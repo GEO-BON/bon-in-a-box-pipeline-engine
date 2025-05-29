@@ -245,13 +245,14 @@ function up {
         docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
         if [[ $? -eq 0 ]] ; then
             echo -e "${YELLOW}Docker Hub containers found: cleaning up before installing the new version.${ENDCOLOR}"
+            echo -e "${YELLOW}Please be patient while we save some disk space: this may take a while.${ENDCOLOR}"
 
             clean
 
-            echo "Removing obsolete images... (Please be patient while we save some disk space: this may take a while)"
+            echo "Removing obsolete images..."
             docker image rm $(docker image ls --format '{{.Repository}}:{{.Tag}} {{.ID}}' \
                 | grep '^geobon/bon-in-a-box' \
-                | cut -d' '  -f2)
+                | cut -d' ' -f2)
 
             echo "Removing obsolete volumes..."
             docker volume rm \
