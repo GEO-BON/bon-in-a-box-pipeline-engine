@@ -182,7 +182,6 @@ class ScriptRun( // Constructor used in single script run
         var error = false
         var outputs: Map<String, Any>? = null
 
-        var forceStopCleanup = listOf<String>()
         var container: Containers = Containers.SCRIPT_SERVER
         val elapsed = measureTime {
             val pidFile = File(context.outputFolder.absolutePath, ".pid")
@@ -394,9 +393,6 @@ class ScriptRun( // Constructor used in single script run
                                             log(logger::info, "$event: cancellation timeout elapsed.")
                                             process.destroyForcibly()
                                         }
-
-                                        // Cleanup after stop
-                                        ProcessBuilder(container.dockerCommandList + forceStopCleanup).start()
 
                                         throw ex
                                     }
