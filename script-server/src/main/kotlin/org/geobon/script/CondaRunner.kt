@@ -40,7 +40,7 @@ class CondaRunner(
             $assertSuccessBash
             set -o pipefail
 
-            n=$RANDOM
+            n=${"$"}RANDOM
             echo "$condaEnvYml" > $condaEnvFile.$n.yml ; assertSuccess
 
 
