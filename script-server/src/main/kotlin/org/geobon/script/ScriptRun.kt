@@ -219,7 +219,8 @@ class ScriptRun( // Constructor used in single script run
                                 source importEnvVars.sh
                                 julia --project=${"$"}JULIA_DEPOT_PATH -e '
                                     open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
-                                    ARGS=["${context.outputFolder.absolutePath}"];
+                                    output_folder="${context.outputFolder.absolutePath}"
+                                    ARGS=[output_folder];
                                     include("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.jl")
                                     try
                                         include("${scriptFile.absolutePath}")
@@ -233,7 +234,7 @@ class ScriptRun( // Constructor used in single script run
                                         if !isempty(biab_output_dict)
                                             println("Writing outputs to BON in a Box...")
                                             jsonData = JSON.json(biab_output_dict, 2)
-                                            open("${context.outputFolder.absolutePath}/output.json", "w") do f
+                                            open(joinpath(output_folder, "output.json"), "w") do f
                                                 write(f, jsonData)
                                             end
                                             println(" done.")
