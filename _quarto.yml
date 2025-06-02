@@ -15,7 +15,10 @@ website:
       - href: index.qmd
         text: About
       - how_to_install.qmd
+      - how_to_use.qmd
       - how_to_contribute.qmd
+      - pipeline_standards.qmd
+      - peer_review.qmd
       - working_with_stac.qmd
   sidebar:
     style: "floating"

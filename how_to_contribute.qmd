@@ -78,7 +78,7 @@ YAML files should begin with a name, description, and the authors of the script.
 
 Example:
 
-```
+```         
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -95,7 +95,7 @@ All input and output ids should follow the snake case naming conventions. Names 
 
 Here is an example where the input a coordinate reference system and a distance that is specified by the user:
 
-```
+```         
 inputs:
   crs:
     label: coordinate reference system for output
@@ -114,7 +114,7 @@ Specifying an example will auto-fill that input with the example unless changed 
 There are several different types of user inputs that can be specified in the YAML file:
 
 | "Type" attribute in the yaml | UI rendering | Description |
-|------------------------|------------------------|------------------------|
+|----|----|----|
 | boolean | Plain text | true/false |
 | float or float\[\] (float array) | Plain text | positive or negative numbers with a decimal point, accepts int and a valid input. |
 | int or int\[\] (int array) | Plain text | integer |
@@ -127,7 +127,7 @@ There are several different types of user inputs that can be specified in the YA
 
 ^1^options type requires an additional options attribute to be added with the available options.
 
-```
+```         
 options_example:
   label: Options example
   description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
@@ -142,7 +142,7 @@ options_example:
 The user inputs can also be file types if you want to upload a file or connect the script to a previous one that outputs a specific file type. There are several file types that you can specify:
 
 | File Type | MIME type to use in the yaml | Description |
-|------------------|----------------------------|--------------------------|
+|----|----|----|
 | CSV | text/csv | Comma separated values file format (.csv) |
 | GeoJSON | application/geo+json | GeoJSON file format (.geojson) |
 | GeoPackage | application/geopackage+sqlite3 | GeoPackage file format (.gpkg) |
@@ -153,7 +153,7 @@ The user inputs can also be file types if you want to upload a file or connect t
 
 For example:
 
-```
+```         
 inputs:
   landcover_raster:
     label: Raster of landcover
@@ -190,7 +190,7 @@ There are also several types of outputs that can be created
 
 ^3^ When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
 
-```
+```         
 map:
   label: My map
   description: Some map that shows something
@@ -201,7 +201,7 @@ map:
 
 Here is an example output:
 
-```
+```         
 outputs:
   result:
     label: Analysis result
@@ -238,7 +238,7 @@ Search for your package names on [anaconda](https://anaconda.org/). Packages tha
 
 Example of conda sub-environment for an R script:
 
-```
+```         
 conda: # Optional: if you script requires specific versions of packages.
   channels:
     - conda-forge # make sure to put conda forge first
@@ -254,7 +254,7 @@ conda: # Optional: if you script requires specific versions of packages.
 
 Example of conda sub-environment for a python script. You do not need to put anything after conda-forge or before the package names when specifying a conda environment for python.
 
-```
+```         
 conda:
   channels:
     - conda-forge
@@ -265,9 +265,7 @@ conda:
 
 ## Julia
 
-Conda dependency management is not available in Julia.
-There is a central project at /julia_depot/.
-
+Conda dependency management is not available in Julia. There is a central project at /julia_depot/.
 :::
 
 #### Loading packages that are not available in conda
@@ -280,7 +278,7 @@ For more information, refer to the [conda documentation](https://docs.conda.io/p
 
 #### Full example of a YAML file:
 
-```
+```         
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -340,7 +338,7 @@ If inputs are outputs from a previous step in the pipeline, make sure to give th
 
 #### Empty commented sample to fill in:
 
-```
+```         
 script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targeted to those who will interpret pipeline results and edit pipelines.

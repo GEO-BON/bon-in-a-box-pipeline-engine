@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>How to Install – BON in a Box</title>
+<title>How to use – BON in a Box</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -127,7 +127,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">How to Install</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">How to use</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -153,34 +153,15 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#video-tutorial" id="toc-video-tutorial" class="nav-link active" data-scroll-target="#video-tutorial">Video tutorial</a></li>
-  <li><a href="#deploying-bon-in-a-box-locally" id="toc-deploying-bon-in-a-box-locally" class="nav-link" data-scroll-target="#deploying-bon-in-a-box-locally">Deploying BON in a Box locally</a>
-  <ul class="collapse">
-  <li><a href="#step-1-install-docker" id="toc-step-1-install-docker" class="nav-link" data-scroll-target="#step-1-install-docker">Step 1: Install Docker</a></li>
-  <li><a href="#step-2-generate-ssh-key" id="toc-step-2-generate-ssh-key" class="nav-link" data-scroll-target="#step-2-generate-ssh-key">Step 2: Generate SSH Key</a></li>
-  <li><a href="#step-3-clone-repository" id="toc-step-3-clone-repository" class="nav-link" data-scroll-target="#step-3-clone-repository">Step 3: Clone repository</a></li>
-  <li><a href="#step-4-set-environment-file" id="toc-step-4-set-environment-file" class="nav-link" data-scroll-target="#step-4-set-environment-file">Step 4: Set environment file</a></li>
-  <li><a href="#step-5-opening-bon-in-a-box-in-the-browser" id="toc-step-5-opening-bon-in-a-box-in-the-browser" class="nav-link" data-scroll-target="#step-5-opening-bon-in-a-box-in-the-browser">Step 5: Opening BON in a Box in the browser</a></li>
-  <li><a href="#step-6-stopping-bon-in-a-box" id="toc-step-6-stopping-bon-in-a-box" class="nav-link" data-scroll-target="#step-6-stopping-bon-in-a-box">Step 6: Stopping BON in a Box</a></li>
-  <li><a href="#updating-bon-in-a-box" id="toc-updating-bon-in-a-box" class="nav-link" data-scroll-target="#updating-bon-in-a-box">Updating BON in a Box</a></li>
-  </ul></li>
-  <li><a href="#deploying-the-servers-remotely" id="toc-deploying-the-servers-remotely" class="nav-link" data-scroll-target="#deploying-the-servers-remotely">Deploying BON in a Box on a server</a></li>
-  <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a></li>
-  <li><a href="#running-a-script-or-pipeline" id="toc-running-a-script-or-pipeline" class="nav-link" data-scroll-target="#running-a-script-or-pipeline">Running a script or pipeline</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">How to Install</h1>
+<h1 class="title">How to use</h1>
 </div>
 
 
@@ -197,150 +178,8 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>The user interface allows the user to run and edit pipelines. It is used through a browser, but doesn’t need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.</p>
-<section id="video-tutorial" class="level2">
-<h2 class="anchored" data-anchor-id="video-tutorial">Video tutorial</h2>
-<div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/h3T36nLvg1E" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
-</section>
-<section id="deploying-bon-in-a-box-locally" class="level2">
-<h2 class="anchored" data-anchor-id="deploying-bon-in-a-box-locally">Deploying BON in a Box locally</h2>
-<p>BON in a Box can be installed and ran on a local computer. While personal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.</p>
-<p>Prerequisites:</p>
-<ul>
-<li><p>A GitHub account, and git installed on your computer</p></li>
-<li><p>At least 6GB of free space (RAM requirements depend on the script that is being run)</p></li>
-<li><p>A Linux shell</p>
-<ul>
-<li>This can be Terminal on a Mac or Git Bash on a PC</li>
-</ul></li>
-</ul>
-<section id="step-1-install-docker" class="level3">
-<h3 class="anchored" data-anchor-id="step-1-install-docker">Step 1: Install Docker</h3>
-<ul>
-<li><p>Install Docker <a href="https://www.docker.com/products/docker-desktop/">here</a></p>
-<ul>
-<li>Note: It is not necessary to make an account</li>
-<li>To test whether docker is added to the path of your terminal, run <code>docker run --rm hello-world</code></li>
-<li><strong>For Mac users:</strong> Make sure to check the chip of your machine and download the correct version.
-<ul>
-<li>If there is an error message when running <code>docker run --rm hello-world</code>, see <a href="https://stackoverflow.com/a/71923962/3519951" class="uri">https://stackoverflow.com/a/71923962/3519951</a></li>
-<li>If you encounter error <code>no matching manifest for linux/arm64/v8 in the manifest list entries</code>, export DOCKER_DEFAULT_PLATFORM. See <a href="https://stackoverflow.com/a/76404045/3519951" class="uri">https://stackoverflow.com/a/76404045/3519951</a>.</li>
-<li>If you have a Silicon chip, check “Use Rosetta for x86_64/amd64 emulation on Apple Silicon” in the Docker Desktop preferences. See <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/issues/175">issue #175</a>.</li>
-</ul></li>
-<li><strong>For Linux users:</strong> Make sure to <a href="https://docs.docker.com/engine/install/linux-postinstall/">add your user to the docker group</a></li>
-</ul></li>
-</ul>
-</section>
-<section id="step-2-generate-ssh-key" class="level3">
-<h3 class="anchored" data-anchor-id="step-2-generate-ssh-key">Step 2: Generate SSH Key</h3>
-<ol type="1">
-<li><p>First, make sure that you do not already have an SSH key registered to your computer by running <code>ls -al ~/.ssh</code> in your terminal.</p>
-<ul>
-<li><p>If you already have a key it will be called one of the following:</p>
-<ul>
-<li><p>id_rsa.pub</p></li>
-<li><p>id_ecdsa.pub</p></li>
-<li><p>id_ed25519.pub</p></li>
-</ul></li>
-</ul></li>
-<li><p>If you do not already have a key, generate one by running <code>ssh-keygen -t ed25519 -C "your_email@example.com"</code> replacing the email with the email address associated with your GitHub account.</p>
-<ul>
-<li>This will prompt you to make a passphrase. If you choose to have a passphrase, although more secure, it will prompt you to enter it many times while creating a pipeline so consider skipping this step for easier use. You can keep pressing enter to skip creating a passphrase.</li>
-</ul></li>
-<li><p>To check if you successfully generated the SSH key, you can run <code>ls -al ~/.ssh</code> in the terminal. Your SSH key should be there now.</p></li>
-<li><p>Now, open the file with your SSH key by running <code>cat ~/.ssh/&lt;name of SSH key&gt;</code> e.g.&nbsp;<code>cat ~/.ssh/id_ed25519.pub</code> and copy your SSH key.</p></li>
-<li><p>Now, add your SSH key to your GitHub account by going to GitHub settings &gt; SSH and GPG keys and “New SSH key”. You can name this whatever you want and paste your SSH key into the “Key” field.</p></li>
-</ol>
-</section>
-<section id="step-3-clone-repository" class="level3">
-<h3 class="anchored" data-anchor-id="step-3-clone-repository">Step 3: Clone repository</h3>
-<ol type="1">
-<li>Clone repository (Windows users: make sure the cloned repo is under the user folder (`C:\Users\yourname\…`), and also <strong>not</strong> under OneDrive.) This can be done in terminal using the following code: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git</code> or in GitHub desktop.</li>
-</ol>
-</section>
-<section id="step-4-set-environment-file" class="level3">
-<h3 class="anchored" data-anchor-id="step-4-set-environment-file">Step 4: Set environment file</h3>
-<ol type="1">
-<li><p>Provide the environment variables: Open the newly cloned repository on your computer</p>
-<ol type="a">
-<li><p>Find the file called <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env"><code>runner-sample.env</code></a></p></li>
-<li><p>Duplicate the file and rename the copy to <code>runner.env</code>.</p></li>
-<li><p>Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g.&nbsp;GBIF or IUCN)</p></li>
-<li><p>Adjust any server option as you see fit.</p></li>
-</ol></li>
-<li><p>Using a Linux terminal (terminal on Mac, Git Bash or WSL on Windows), navigate to the folder of the cloned repository.</p></li>
-<li><p>If you are not in the same folder as the cloned repository, navigate to that folder so it can access the files. This can be done with `cd &lt;folder name&gt;`</p>
-<ul>
-<li>On Windows, the drives will be noted as <code>/c/</code> instead of <code>C:\</code>. The path should look like<br>
-` /c/Users/yourUsername/folder/bon-in-a-box-pipelines`</li>
-</ul></li>
-<li><p>In the Linux terminal, type <code>./server-up.sh</code></p>
-<ul>
-<li><p>Note for windows users: this has to be a Linux terminal (e.g.&nbsp;git bash). <strong>Launching the server locally will not work using Powershell or Windows CMD terminal</strong>.</p></li>
-<li><p>If using Docker Desktop, make sure you have docker open and running on your computer.</p></li>
-<li><p>The first execution will be long, in order to download the micro-services. The next ones will be shorter or immediate, depending on the changes.</p></li>
-<li><p>Network problems may cause the process to fail. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.</p></li>
-<li><p>Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl (“wsl –update”, see <a href="https://docs.docker.com/desktop/troubleshoot/topics/#virtualization" class="uri">https://docs.docker.com/desktop/troubleshoot/topics/#virtualization</a>). Access to the BIOS may be required to enable virtualization.</p></li>
-</ul></li>
-<li><p>The startup script might prompt you for an update. Accepting it is recommended.</p></li>
-</ol>
-</section>
-<section id="step-5-opening-bon-in-a-box-in-the-browser" class="level3">
-<h3 class="anchored" data-anchor-id="step-5-opening-bon-in-a-box-in-the-browser">Step 5: Opening BON in a Box in the browser</h3>
-<ol type="1">
-<li><p>In a regular browser, type <a href="http://localhost/" class="uri">http://localhost/</a> to open BON in a Box</p></li>
-<li><p>Head to the ““Run a Pipeline” and select the one that interests you. See <a href="#running-a-script-or-pipeline">Running a script or pipeline</a> section.</p></li>
-</ol>
-</section>
-<section id="step-6-stopping-bon-in-a-box" class="level3">
-<h3 class="anchored" data-anchor-id="step-6-stopping-bon-in-a-box">Step 6: Stopping BON in a Box</h3>
-<ol type="1">
-<li><p>Run <code>./server-down.sh</code> in the terminal to stop the server when done</p></li>
-<li><p>On Windows, to completely stop the processes, you might have to run <code>wsl --shutdown</code></p></li>
-</ol>
-</section>
-<section id="updating-bon-in-a-box" class="level3">
-<h3 class="anchored" data-anchor-id="updating-bon-in-a-box">Updating BON in a Box</h3>
-<p>Each time that the server is started, the startup script will check for updates and propose them. Type <code>y</code> for yes or press enter to update.</p>
-<p>Accepting the updates are generally recommended, unless:</p>
-<ul>
-<li><p>You are currently using an unstable, rate-limited, or billable Internet connection. Defer the update by typing <code>n</code> (no) until a better internet connection is available. You can also use <code>./server-up.sh --offline</code> option to completely skip update checks. Use with caution, since this may create errors if elements of the repository depend on new server features.</p></li>
-<li><p>The runner containers need to be discarded, and you are using a pipeline that has installed dependencies. This is the case for a minority of script whose dependencies cannot be found on anaconda.org. Since we know that installing dependencies live can take a while, when the runners need an update, you will see a warning like this:<br>
-<img src="images/runner-container-updates.png" class="img-fluid" alt="Checking for updates to docker images... Updates found. This update will discard the following runner containers:  - ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda:mamba_update_staging  - ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia:mamba_update_staging This means that conda environments and dependencies installed at runtime will need to be reinstalled. Do you want to update? (Y/n):"><br>
-In this case, defer the update until you can afford the time to start a run that will reinstall the dependencies.</p></li>
-</ul>
-</section>
-</section>
-<section id="deploying-the-servers-remotely" class="level2">
-<h2 class="anchored" data-anchor-id="deploying-the-servers-remotely">Deploying BON in a Box on a server</h2>
-<p>Installation steps on a server are the same as installing on a Linux computer, but some additional configurations need to be changed:</p>
-<ul>
-<li><p>In <code>runner.env</code>, choose the appropriate <code>HTTP_ADDRESS</code> and <code>HTTP_PORT</code> for your server configuration. In a typical installation, use 0.0.0.0 as an HTTP address and default port (80).</p></li>
-<li><p>In <code>runner.env</code>, select the “partial” cache cleaning mode. This will allow for calculated results to be long-lived on the server, as long as they are not run again with a new version of the script. The results in the output folder are always accessible by URL.</p></li>
-<li><p>In the case where a server is used for demonstration purposes only, set environment variable <code>BLOCK_RUNS=true</code></p></li>
-<li><p>The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.</p></li>
-<li><p>By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy and activate https with certbot. How to do this is out of scope for this readme.</p></li>
-</ul>
-</section>
-<section id="troubleshooting" class="level1">
-<h1>Troubleshooting</h1>
-<p>Here are some common installation errors and how to fix them.</p>
-<ol type="1">
-<li><p><strong>You cannot launch the server</strong></p>
-<p>If you are having issues connecting to the server, make sure that you (1) have the docker desktop app open on your computer (2) are running <code>./server-up.sh</code> in a Linux terminal (e.g.&nbsp;Git Bash or WSL on Windows or Terminal on Mac), launching the server locally will not work with PowerShell nor CMD and (3) make sure you have an ssh key that is registered to your computer and GitHub.</p></li>
-<li><p><strong>BON in a Box does not load on localhost</strong></p>
-<p>This may be an issue if you are on a Mac, or have Apache or NGINX installed. To fix this, edit the runner.env file and specify a different port (<code>HTTP_PORT</code>). For example, if you set <code>HTTP_PORT=5522</code>, you can then access BON in a Box at http://localhost:5522.</p></li>
-</ol>
-<p>If you encounter further errors, please contact us on <a href="https://discourse.geobon.org">Discourse</a> or email us at boninabox@geobon.org.</p>
-</section>
-<section id="running-a-script-or-pipeline" class="level1">
-<h1>Running a script or pipeline</h1>
-<p>You now have an instance of BON in a Box deployed, either <a href="#deploying-the-servers-locally">locally</a> or <a href="#deploying-the-servers-remotely">remotely</a>, and you want to run your first script or pipeline.</p>
-<p>There is one page to run scripts, and one to run pipelines. Once there, select the script or pipelines from the dropdown and fill the form.</p>
-<p>The form might ask you for a file. In order to provide a file that you own locally, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders.</p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
