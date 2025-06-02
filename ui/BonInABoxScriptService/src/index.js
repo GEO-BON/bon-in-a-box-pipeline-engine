@@ -19,6 +19,7 @@ import InfoAuthorInner from './model/InfoAuthorInner';
 import InfoInputsValue from './model/InfoInputsValue';
 import InfoInputsValueExample from './model/InfoInputsValueExample';
 import InfoInputsValueExampleOneOfInner from './model/InfoInputsValueExampleOneOfInner';
+import InfoLifecycle from './model/InfoLifecycle';
 import InfoOutputsValue from './model/InfoOutputsValue';
 import InfoOutputsValueExample from './model/InfoOutputsValueExample';
 import InfoReferencesInner from './model/InfoReferencesInner';
@@ -99,6 +100,12 @@ export {
      * @property {module:model/InfoInputsValueExampleOneOfInner}
      */
     InfoInputsValueExampleOneOfInner,
+
+    /**
+     * The InfoLifecycle model constructor.
+     * @property {module:model/InfoLifecycle}
+     */
+    InfoLifecycle,
 
     /**
      * The InfoOutputsValue model constructor.

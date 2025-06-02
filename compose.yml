@@ -38,6 +38,7 @@ services:
       - ${PIPELINE_REPO_PATH}/runner.env:/runner.env:ro
     user: ${MY_UID}:${DOCKER_GID}
     environment:
+      PYTHONUNBUFFERED: 1 
       SCRIPT_LOCATION: /scripts
       USERDATA_LOCATION: /userdata
       OUTPUT_LOCATION: /output

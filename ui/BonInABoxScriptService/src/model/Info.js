@@ -14,6 +14,7 @@
 import ApiClient from '../ApiClient';
 import InfoAuthorInner from './InfoAuthorInner';
 import InfoInputsValue from './InfoInputsValue';
+import InfoLifecycle from './InfoLifecycle';
 import InfoOutputsValue from './InfoOutputsValue';
 import InfoReferencesInner from './InfoReferencesInner';
 import InfoReviewerInner from './InfoReviewerInner';
@@ -61,6 +62,9 @@ class Info {
             if (data.hasOwnProperty('description')) {
                 obj['description'] = ApiClient.convertToType(data['description'], 'String');
             }
+            if (data.hasOwnProperty('lifecycle')) {
+                obj['lifecycle'] = InfoLifecycle.constructFromObject(data['lifecycle']);
+            }
             if (data.hasOwnProperty('author')) {
                 obj['author'] = ApiClient.convertToType(data['author'], [InfoAuthorInner]);
             }
@@ -106,6 +110,10 @@ class Info {
         // ensure the json data is a string
         if (data['description'] && !(typeof data['description'] === 'string' || data['description'] instanceof String)) {
             throw new Error("Expected the field `description` to be a primitive type in the JSON string but got " + data['description']);
+        }
+        // validate the optional field `lifecycle`
+        if (data['lifecycle']) { // data not null
+          InfoLifecycle.validateJSON(data['lifecycle']);
         }
         if (data['author']) { // data not null
             // ensure the json data is an array
@@ -168,6 +176,11 @@ Info.prototype['name'] = undefined;
  * @member {String} description
  */
 Info.prototype['description'] = undefined;
+
+/**
+ * @member {module:model/InfoLifecycle} lifecycle
+ */
+Info.prototype['lifecycle'] = undefined;
 
 /**
  * @member {Array.<module:model/InfoAuthorInner>} author
