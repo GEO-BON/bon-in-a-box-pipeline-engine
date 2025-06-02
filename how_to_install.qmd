@@ -18,7 +18,7 @@ Prerequisites:
 
 -   At least 6GB of free space (RAM requirements depend on the script that is being run)
 
--   A linux shell
+-   A Linux shell
 
     -   This can be Terminal on a Mac or Git Bash on a PC
 
@@ -32,7 +32,7 @@ Prerequisites:
         -   If there is an error message when running `docker run --rm hello-world`, see <https://stackoverflow.com/a/71923962/3519951>
         -   If you encounter error `no matching manifest for linux/arm64/v8 in the manifest list entries`, export DOCKER_DEFAULT_PLATFORM. See <https://stackoverflow.com/a/76404045/3519951>.
         -   If you have a Silicon chip, check "Use Rosetta for x86_64/amd64 emulation on Apple Silicon" in the Docker Desktop preferences. See [issue #175](https://github.com/GEO-BON/bon-in-a-box-pipelines/issues/175).
-    -   **For linux users:** Make sure to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/)
+    -   **For Linux users:** Make sure to [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/)
 
 ### Step 2: Generate SSH Key
 
@@ -42,7 +42,7 @@ Prerequisites:
 
         -   id_rsa.pub
 
-        -   id\_\_ecdsa.pub
+        -   id_ecdsa.pub
 
         -   id_ed25519.pub
 
@@ -72,45 +72,50 @@ Prerequisites:
 
     d.  Adjust any server option as you see fit.
 
-2.  Using a linux terminal (terminal on Mac or Git Bash), navigate to the folder of the cloned repository.
+2.  Using a Linux terminal (terminal on Mac, Git Bash or WSL on Windows), navigate to the folder of the cloned repository.
 
-3.  In the linux terminal, type `./server-up.sh`
+3.  If you are not in the same folder as the cloned repository, navigate to that folder so it can access the files. This can be done with \`cd \<folder name\>\`
 
-    -   Make sure the server is started from a linux terminal that is in the same folder as the cloned repository so it can access the files.
+    -   On Windows, the drives will be noted as `/c/` instead of `C:\`. The path should look like\
+        \` /c/Users/yourUsername/folder/bon-in-a-box-pipelines\`
 
-    -   Note for windows users: this has to be a linux terminal (e.g. git bash). **Connecting to the server will not work using Powershell or Windows terminal**.
+4.  In the Linux terminal, type `./server-up.sh`
 
-    -   Make sure you have docker open and running on your computer.
+    -   Note for windows users: this has to be a Linux terminal (e.g. git bash). **Launching the server locally will not work using Powershell or Windows CMD terminal**.
+
+    -   If using Docker Desktop, make sure you have docker open and running on your computer.
 
     -   The first execution will be long, in order to download the micro-services. The next ones will be shorter or immediate, depending on the changes.
 
     -   Network problems may cause the process to fail. First try running the command again. Intermediate states are saved so not everything will be redone even when there is a failure.
 
-    -   Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl ("wsl --update", see <https://docs.docker.com/desktop/troubleshoot/topics/#virtualization>. Access to the BIOS may be required to enable virtualization)
+    -   Windows users may need to turn on virtualization and other tools for Docker Desktop to work and update wsl ("wsl --update", see <https://docs.docker.com/desktop/troubleshoot/topics/#virtualization>). Access to the BIOS may be required to enable virtualization.
 
-### Step 5: Connect to server
+5.  The startup script might prompt you for an update. Accepting it is recommended.
 
-1.  Type <http://localhost/> to open BON in a Box
+### Step 5: Opening BON in a Box in the browser
 
-2.  Run `./server-down.sh` in a terminal to stop the server when done
+1.  In a regular browser, type <http://localhost/> to open BON in a Box
 
-3.  On Windows, to completely stop the processes, you might have to run `wsl --shutdown`
+2.  Head to the ""Run a Pipeline" and select the one that interests you. See [Running a script or pipeline] section.
 
-When modifying scripts in the `/scripts` folder, servers do not need to be restarted:
+### Step 6: Stopping BON in a Box
 
--   When modifying an existing script, simply re-run the script from the UI and the new version will be executed.
+1.  Run `./server-down.sh` in the terminal to stop the server when done
 
--   When adding or renaming scripts, refresh the browser page.
+2.  On Windows, to completely stop the processes, you might have to run `wsl --shutdown`
 
-When modifying pipelines in the /pipelines folder, servers do not need to be restarted:
+### Updating BON in a Box
 
--   In the pipeline editor, click save, paste the file to your file in the pipeline folder and run it from the "pipeline run" page.
+Each time that the server is started, the startup script will check for updates and propose them. Type `y` for yes or press enter to update.
 
--   When adding or renaming pipelines, refresh the browser page.
+Accepting the updates are generally recommended, unless:
 
-### Deploying without pulling the new server
+-   You are currently using an unstable, rate-limited, or billable Internet connection. Defer the update by typing `n` (no) until a better internet connection is available. You can also use `./server-up.sh --offline` option to completely skip update checks. Use with caution, since this may create errors if elements of the repository depend on new server features.
 
-If the server has already been deployed at least once, and low bandwidth does not allow to download the latest version (this can be a few gigabytes), the server can be started with option `./server-up.sh --offline`. Use with caution, since this may create errors if elements of the repository depend on new server features.
+-   The runner containers need to be discarded, and you are using a pipeline that has installed dependencies. This is the case for a minority of script whose dependencies cannot be found on anaconda.org. Since we know that installing dependencies live can take a while, when the runners need an update, you will see a warning like this:\
+    ![](images/runner-container-updates.png){alt="Checking for updates to docker images... Updates found. This update will discard the following runner containers:  - ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda:mamba_update_staging  - ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia:mamba_update_staging This means that conda environments and dependencies installed at runtime will need to be reinstalled. Do you want to update? (Y/n):"}\
+    In this case, defer the update until you can afford the time to start a run that will reinstall the dependencies.
 
 ## Deploying BON in a Box on a server {#deploying-the-servers-remotely}
 
@@ -132,7 +137,7 @@ Here are some common installation errors and how to fix them.
 
 1.  **You cannot launch the server**
 
-    If you are having issues connecting to the server, make sure that you (1) have the docker desktop app open on your computer (2) are running `./server-up.sh` in a Linux terminal (e.g. Git Bash on Windows or Terminal on Mac), connecting to the server will not work with PowerShell nor CMD and (3) make sure you have an ssh key that is registered to your computer and GitHub.
+    If you are having issues connecting to the server, make sure that you (1) have the docker desktop app open on your computer (2) are running `./server-up.sh` in a Linux terminal (e.g. Git Bash or WSL on Windows or Terminal on Mac), launching the server locally will not work with PowerShell nor CMD and (3) make sure you have an ssh key that is registered to your computer and GitHub.
 
 2.  **BON in a Box does not load on localhost**
 
