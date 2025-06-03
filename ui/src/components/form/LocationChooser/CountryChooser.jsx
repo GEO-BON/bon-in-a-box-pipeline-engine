@@ -16,6 +16,7 @@ import Map from "./Map";
 import axios from "axios";
 import countryOptionsJSON from "./countries.json"; // Assuming you have a JSON file with country data
 import { set } from "lodash";
+import { GetStateAPI } from "./api";
 
 
 export default function CountryChooser({
@@ -28,22 +29,7 @@ export default function CountryChooser({
     const [stateProv, setStateProv] = useState("");
     const [countryOptions, setCountryOptions] = useState([]);
     const [stateOptions, setStateOptions] = useState([]);
-    const [stateProvJSON, setStateProvJSON] = useState({});
-
-    const GetStateAPI = async (geonameId) => {
-        let result;
-        const base_url = "http://api.geonames.org/childrenJSON";
-        try {
-            result = await axios({
-            method: "get",
-            baseURL: `${base_url}`,
-            params: { geonameId: geonameId, inclBbox: true, username: "geobon" },
-            });
-        } catch (error) {
-            result = { data: null };
-        }
-        return result;
-    };
+    const [stateProvJSON, setStateProvJSON] = useState([]);
 
 
     useEffect(() => {
@@ -81,7 +67,7 @@ export default function CountryChooser({
     },[ country, countryOptions ]);
 
     const buttonClicked = () =>{
-        setClearFeatures(Math.random());
+        //setClearFeatures(Math.random());
         const countryObj = countryOptionsJSON.geonames.find(c => c.geonameId === country);
         if (country){
             setCountryISO(countryObj.isoAlpha3);
@@ -101,7 +87,8 @@ export default function CountryChooser({
     }
 
   return (
-    <>
+    <div style={{ width: "100%"}}>
+    <h4>Choose Country/Region</h4>
     <Autocomplete
       disablePortal
       options={countryOptions}
@@ -116,7 +103,7 @@ export default function CountryChooser({
       disablePortal
       options={stateOptions}
       sx={{ marginTop: '20px', width: "90%", background: "#fff", color: "#fff", borderRadius: "4px", marginBottom: '20px' }}
-      renderInput={(params) => <TextField {...params} label="Select state or province" />}
+      renderInput={(params) => <TextField {...params} label="Select subregion" />}
       onChange={(event, value) => {
         setStateProv(value ? value.value : "");
       }}
@@ -128,7 +115,7 @@ export default function CountryChooser({
             className="stateCountryButton">
             Accept Selection   
         </CustomButtonGreen>
-    </>
+    </div>
   );
 }
 

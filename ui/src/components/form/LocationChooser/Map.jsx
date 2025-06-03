@@ -10,9 +10,8 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { MaplibreTerradrawControl } from "@watergis/maplibre-gl-terradraw";
 import "@watergis/maplibre-gl-terradraw/dist/maplibre-gl-terradraw.css";
-import bbox from '@turf/bbox';
 import { TerraDraw, TerraDrawRectangleMode, TerraDrawPolygonMode } from "terra-draw";
-
+import bbox from '@turf/bbox';
 import { TerraDrawMapLibreGLAdapter } from 'terra-draw-maplibre-gl-adapter';
 import { styled } from "@mui/material";
 
@@ -23,12 +22,16 @@ const drawControl = new MaplibreTerradrawControl({
 
 export default function Map({
   drawFeatures = [],
+  setDrawFeatures = () => {},
   clearFeatures = false,
+  previousId = "",
+  setBbox = () => {},
 }) {
   const [terraDraw, setTerraDraw] = useState(null);
   const mapRef = useRef(null);
   const mapContainer = useRef(null);
   const [mapReady, setMapReady] = useState(false);
+  const [update, setUpdate] = useState(0);
 
 
   useEffect(() => {
@@ -93,24 +96,21 @@ export default function Map({
 
     map.addControl(new maplibregl.GlobeControl());
     map.addControl(drawControl, 'top-left'); 
+    const drawInstance = drawControl.getTerraDrawInstance();
+    drawInstance.on("finish", (ids, type) => {
+       setBbox(bbox(drawControl.getFeatures()))
+    })
     mapRef.current = map;
     return () => map.remove(); // Clean up
   }, []);
 
   useEffect(() => {
-    if(clearFeatures && mapReady) {
+    if(previousId && drawFeatures.length > 0 && mapReady) {
         const drawInstance = drawControl.getTerraDrawInstance();
         if (drawInstance) {
-            //drawInstance.clear();
-        }
-    }
-  },[clearFeatures, mapReady]);
-
-
-  useEffect(() => {
-    if(drawControl && drawFeatures.length > 0 && mapReady) {
-        const drawInstance = drawControl.getTerraDrawInstance();
-        if (drawInstance) {
+            if(drawInstance.hasFeature(previousId)) {
+                drawInstance.removeFeatures([previousId]);
+            }
             drawInstance.addFeatures(drawFeatures);
             drawInstance.setMode("select");
             const boundsArray = bbox(drawFeatures[0]);
@@ -121,7 +121,7 @@ export default function Map({
             mapRef.current.fitBounds(bounds);
         }
     }
-  }, [drawFeatures, mapReady]);
+  }, [previousId]);
 
   return (
     <div
