@@ -3,7 +3,7 @@ import { LifecycleDescription } from './Lifecycle';
 
 export function StepDescription({ descriptionFile, metadata }) {
     return <>
-        <h2>{getFolderAndNameFromMetadata(descriptionFile, metadata)}</h2>
+        <h2 style={{marginBottom: "0px"}} >{getFolderAndNameFromMetadata(descriptionFile, metadata)}</h2>
         <GeneralDescription ymlPath={descriptionFile} metadata={metadata} />
         <InputsDescription metadata={metadata} />
         <OutputsDescription metadata={metadata} />
