@@ -20,6 +20,15 @@ if [[ $? -ne 0 ]] ; then
     echo -e "${RED}Git is required to run the latest version of the pipeline engine.${ENDCOLOR}" ; exit 1
 fi
 
+function excludeStrings {
+   local excludes=$1
+
+   while read -r pipedString
+   do
+       [[ "$excludes" =~ $pipedString ]] || echo $pipedString
+   done
+}
+
 function assertSuccess {
     if [[ $? -ne 0 ]] ; then
         echo -e "${RED}FAILED${ENDCOLOR}" ; exit 1
@@ -181,11 +190,13 @@ function checkout {
     echo -e "${GREEN}Server configuration updated.${ENDCOLOR}"
 }
 
+
 # This function echoes the images that need to be updated.
 # Docker pull should be able to tell us. In the meantime, comparing digests.
 # See https://github.com/docker/cli/issues/6059
 function checkForUpdates {
     local images=$1
+    local excludes=$2
 
     check_image_update() {
         local image="$1"
@@ -203,7 +214,7 @@ function checkForUpdates {
     }
 
     export -f check_image_update # Export function for xargs subshells
-    echo "$images" | xargs -n1 -P8 bash -c 'check_image_update "$0"'
+    echo "$images" | excludeStrings "$excludes" | xargs -n1 -P8 bash -c 'check_image_update "$0"'
 }
 
 function up {
@@ -287,7 +298,8 @@ function up {
         otherServices=$(echo "$services" | grep -vE "^$savedContainerRegex")
 
         # Get all images that have an update available.
-        imagesToUpdate=$(checkForUpdates "$images")
+        excludeImages="ghcr.io/developmentseed/titiler:0.18.9" # Added for images that have different digests on different platforms
+        imagesToUpdate=$(checkForUpdates "$images" "$excludeImages")
 
         # Sublist of the images for which the containers should be kept whenever possible.
         containersToDiscard=$(echo $images | tr ' ' "\n" | grep -E "$savedContainerRegex")
