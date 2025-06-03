@@ -2,8 +2,7 @@ script: assertText.py
 name: Assert Text
 description: Test python script that fails if it doesn't receive a string. It also crashes when receiving null.
 lifecycle:
-  status: in_development
-  message: bla bla
+  status: example
 author:
   - name: Jean-Michel Lord
 inputs:
