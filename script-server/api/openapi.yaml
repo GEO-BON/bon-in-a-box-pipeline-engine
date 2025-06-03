@@ -428,7 +428,7 @@ components:
           properties:
             status:
               type: string
-              enum: [in_development, in_review, reviewed, deprecated]
+              enum: [in_development, in_review, reviewed, deprecated, example]
               default: in_development
             message:
               type: string
