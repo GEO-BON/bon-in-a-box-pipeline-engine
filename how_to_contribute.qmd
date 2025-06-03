@@ -221,7 +221,7 @@ This means that instead of installing packages during script execution scripts, 
 
 #### Check if the libraries you need are in conda
 
-To check if the packages you need are already in the default conda environment, go to runners/r-environment.yml or runners/python-environment.yml in the BON in a Box project folder. The list of packages already installed will be under "dependencies".
+To check if the packages you need are already in the default conda environment, go to runners/conda/r-environment.yml or runners/conda/python-environment.yml in the BON in a Box project folder. The list of packages already installed will be under "dependencies".
 
 If all the packages that you need are in the R environment file and you do not need specific package versions, you do not need to specify a conda sub environment and you can skip the next step.
 
@@ -265,9 +265,7 @@ conda:
 
 ## Julia
 
-Conda dependency management is not available in Julia.
-There is a central project at /julia_depot/.
-
+Conda dependency management is not available in Julia. There is a central project at /julia_depot/.
 :::
 
 #### Loading packages that are not available in conda
