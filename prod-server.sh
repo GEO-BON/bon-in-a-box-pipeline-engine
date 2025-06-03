@@ -303,7 +303,7 @@ function up {
         imagesToUpdate=$(checkForUpdates "$imagesToCheck")
 
         # Sublist of the images for which the containers should be kept whenever possible.
-        containersToDiscard=$(echo $images | tr ' ' "\n" | grep -E "$savedContainerRegex")
+        containersToDiscard=$(echo $imagesToUpdate | tr ' ' "\n" | grep -E "$savedContainerRegex")
 
         if [[ -n "$imagesToUpdate" ]]; then
             echo "Updates found."
