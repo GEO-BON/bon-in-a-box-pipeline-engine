@@ -40,7 +40,7 @@ function ChipFromStatus({ status }) {
 }
 
 export function LifecycleDescription({ lifecycle }) {
-  return <div style={{marginTop: "-19px", marginBottom: "20px"}}>
+  return <div style={{marginBottom: "20px"}}>
           <ChipFromStatus status={(lifecycle && lifecycle.status) || "in_development"} />
           {lifecycle && lifecycle.message && <LifecycleMessage status={lifecycle.status} message={lifecycle.message} />}
          </div>
