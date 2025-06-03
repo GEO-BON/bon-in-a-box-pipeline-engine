@@ -298,8 +298,8 @@ function up {
         otherServices=$(echo "$services" | grep -vE "^$savedContainerRegex")
 
         # Get all images that have an update available.
-        excludeImages="ghcr.io/developmentseed/titiler:.*" # Add for images we don't want to check for updates as regex
-        imagesToCheck=$(echo "$images" | excludeStrings "$excludeImages")
+        excludedImages="ghcr.io/developmentseed/titiler:.*" # Add for images we don't want to check for updates as regex
+        imagesToCheck=$(echo "$images" | excludeStrings "$excludedImages")
         imagesToUpdate=$(checkForUpdates "$imagesToCheck")
 
         # Sublist of the images for which the containers should be kept whenever possible.
