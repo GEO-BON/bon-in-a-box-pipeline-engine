@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Contribute a pipeline – BON in a Box</title>
+<title>Instructions for adapting your code to an analysis pipeline – BON in a Box</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -168,7 +168,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Contribute a pipeline</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Instructions for adapting your code to an analysis pipeline</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -199,9 +199,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#instructions-for-adapting-your-code-to-an-analysis-pipeline" id="toc-instructions-for-adapting-your-code-to-an-analysis-pipeline" class="nav-link active" data-scroll-target="#instructions-for-adapting-your-code-to-an-analysis-pipeline">Instructions for adapting your code to an analysis pipeline</a>
-  <ul class="collapse">
-  <li><a href="#github-contribution-workflow" id="toc-github-contribution-workflow" class="nav-link" data-scroll-target="#github-contribution-workflow"><strong>GitHub contribution workflow</strong></a></li>
+  <li><a href="#github-contribution-workflow" id="toc-github-contribution-workflow" class="nav-link active" data-scroll-target="#github-contribution-workflow">GitHub contribution workflow</a></li>
   <li><a href="#how-to-write-a-script-video-tutorial" id="toc-how-to-write-a-script-video-tutorial" class="nav-link" data-scroll-target="#how-to-write-a-script-video-tutorial">How to write a script video tutorial</a></li>
   <li><a href="#how-to-create-a-pipeline-video-tutorial" id="toc-how-to-create-a-pipeline-video-tutorial" class="nav-link" data-scroll-target="#how-to-create-a-pipeline-video-tutorial">How to create a pipeline video tutorial</a></li>
   <li><a href="#before-you-start" id="toc-before-you-start" class="nav-link" data-scroll-target="#before-you-start">Before you start</a></li>
@@ -231,7 +229,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#saving-and-loading" id="toc-saving-and-loading" class="nav-link" data-scroll-target="#saving-and-loading">Saving and loading</a></li>
   </ul></li>
   <li><a href="#step-6-run-pipeline-and-troubleshoot" id="toc-step-6-run-pipeline-and-troubleshoot" class="nav-link" data-scroll-target="#step-6-run-pipeline-and-troubleshoot">Step 6: Run pipeline and troubleshoot</a></li>
-  </ul></li>
   <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a></li>
   <li><a href="#when-is-your-pipeline-complete" id="toc-when-is-your-pipeline-complete" class="nav-link" data-scroll-target="#when-is-your-pipeline-complete">When is your pipeline complete?</a></li>
   </ul>
@@ -242,7 +239,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Contribute a pipeline</h1>
+<h1 class="title">Instructions for adapting your code to an analysis pipeline</h1>
 </div>
 
 
@@ -259,11 +256,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="instructions-for-adapting-your-code-to-an-analysis-pipeline" class="level1">
-<h1>Instructions for adapting your code to an analysis pipeline</h1>
 <p>Analysis pipelines in BON in a Box are workflows that have been adapted to pipelines within the tool. Here we will walk you through a few steps to adapt your code to run in BON in a Box.</p>
-<section id="github-contribution-workflow" class="level3">
-<h3 class="anchored" data-anchor-id="github-contribution-workflow"><strong>GitHub contribution workflow</strong></h3>
+<section id="github-contribution-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="github-contribution-workflow">GitHub contribution workflow</h2>
 <p>Contributors will follow the <a href="https://docs.github.com/en/get-started/using-github/github-flow">GitHub flow</a> when contributing pipelines to BON in a Box. Contributors can follow these steps:</p>
 <ol type="1">
 <li><p>Make sure you have a personal/institutional GitHub repository</p></li>
@@ -274,10 +269,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ol></li>
 <li><p>Create a branch from the main branch for your pipeline, with a descriptive branch name (e.g.&nbsp;ProtConn_pipeline)</p></li>
 <li><p>Create your pipeline on this branch</p></li>
-<li><p>When it is complete, create a pull request to the main branch on the bon-in-a-box-pipelines GitHub and fill out the <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/pull/188/commits/8f33d28fc691b7bf0ed1bffe00330076c7271cf3">peer review template</a>, suggesting at least two potential peer reviewers</p></li>
+<li><p>When it is complete, create a pull request (<a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request">instructions here</a>) to the main branch on the bon-in-a-box-pipelines GitHub and fill out the <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/pull/188/commits/8f33d28fc691b7bf0ed1bffe00330076c7271cf3">peer review template</a>, suggesting at least two potential peer reviewers</p></li>
 <li><p>When peer review is complete, make any suggested changes to the pipeline and resubmit</p></li>
-<li><p>When the pipeline has been accepted, it will be merged to the main branch and published with a DOI</p></li>
-<li><p>The BON in a Box team will contact you for any bug fixes or feature requests, and new releases will follow the versioning structure above</p></li>
+<li><p>When the pipeline has been accepted, it will be merged to the main branch and published on Zenodo with a DOI</p></li>
+<li><p>The BON in a Box team will contact you for any bug fixes or feature requests, and new releases will follow the versioning structure below</p></li>
 <li><p>During the development process of the pipeline, regularly merge the main branch to your branch to avoid potential conflicts when merging your branch.</p></li>
 </ol>
 </section>
@@ -940,7 +935,6 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>You can look at the log of each of your scripts to read errors and debug.</p>
 <p><img src="images/Screenshot 2025-02-10 034124-02.png" class="img-fluid"></p>
 <p>Once you change a script’s code and save to your local computer, the changes will immediately be implemented when you run the script through BON in a Box. <strong>However, if you change the YAML file, you will need to reload the page in the pipeline editor to see those changes.</strong> If this does not work, you may need to delete the script from the pipeline and re-drag it to the pipeline editor. Inputs and outputs can also be directly edited in the pipeline editor.</p>
-</section>
 </section>
 <section id="troubleshooting" class="level1">
 <h1>Troubleshooting</h1>

@@ -16,7 +16,7 @@ format: html
 ## Glossary
 
 |  |  |
-|------------------------------------|------------------------------------|
+|----|----|
 | Script | A sequence of code written in a programming language that accomplishes a single task, such as data cleaning, analysis, visualization, or modeling. |
 | Pipeline | A sequence of scripts connected to automate an entire analysis workflow, from the input parameters to the analysis result. |
 | Biodiversity Observation Network (BON) | A network of observation sites or stations and/or a network of experts and groups who collect and analyze biodiversity data for different needs. A BON coordinates monitoring efforts to support conservation policy and/or management action from national biodiversity strategies and action plans. A BON can be regional (e.g. Europe, Asia-Pacific), national (e.g. Japan), or thematic (e.g. Marine, Freshwater). |

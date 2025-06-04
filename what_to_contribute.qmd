@@ -23,7 +23,7 @@ We strongly encourage those who have created or are developing code to calculate
 
 4.  Secure the resources. This could be the time of a graduate student or work study student. If applying for funding, include BON in a Box in your proposal as a tool.
 
-5.   Create the pipeline following the steps below. We recommend starting with the simplest version and then adding complexity or features when needed.
+5.  Create the pipeline following the steps below. We recommend starting with the simplest version and then adding complexity or features when needed.
 
 6.  When you feel that the pipeline is complete and you have verified that it meets the \[quality requirement standards\](pipeline_standards.qmd), you can submit the pipeline for peer review. While you are waiting, why not contribute by reviewing someone else’s contribution?
 
