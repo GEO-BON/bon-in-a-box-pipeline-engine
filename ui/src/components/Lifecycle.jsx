@@ -32,6 +32,10 @@ function ChipFromStatus({ status }) {
       chipStyle.color = 'white';
       displayText = "Deprecated";
       break;
+    case 'example':
+      chipStyle.backgroundColor = '#c7a9ff';
+      displayText = "Example";
+      break;
     default:
       console.warn(`Unknown lifecycle status: ${status}`);
   }
