@@ -16,10 +16,15 @@ website:
         text: About
       - how_to_install.qmd
       - how_to_use.qmd
-      - how_to_contribute.qmd
-      - pipeline_standards.qmd
+      - text: "Contribute a pipeline"
+        menu: 
+          - href: what_to_contribute.qmd
+            text: "Should you contribute?"
+          - href: how_to_contribute.qmd
+            text: "Contribution instructions"
+          - href: pipeline_standards.qmd
+            text: "Pipeline standards"
       - peer_review.qmd
-      - working_with_stac.qmd
   sidebar:
     style: "floating"
     search: true

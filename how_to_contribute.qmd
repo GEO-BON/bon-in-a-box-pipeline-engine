@@ -1,42 +1,34 @@
 ---
-title: "How to Contribute"
+title: "Instructions for adapting your code to an analysis pipeline"
 ---
 
-If you wish to contribute a pipeline, please email us at boninabox\@geobon.org.
-
-The recommended approach is to setup an instance of BON in a Box on a machine where you can easily play with the script files, using either the local or remote setup. You can create a branch or fork to save your work. Make sure that the code is general and works with various parameters, such as in different regions across the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before being accepted.
-
-# Does your analysis pipeline fit in BON in a Box?
-
-We are looking for pipelines that calculate biodiversity metrics that are relevant to policy and biodiversity reporting, such as Essential Biodiversity Variables (EBVs) and Indicators. These pipelines should be
-
--   open source, written in the coding languages R, Julia, or Python
-
--   relevant to many contexts (different species, countries, and regions)
-
-# Steps for contributing
-
-We strongly encourage those who have created or are developing code to calculate Essential Biodiversity Variables or indicators to share it through BON in a Box. The purpose of the modeling tool is to have state of the art processing pipelines shared across the community, for the benefit of all. We recommend following these steps: 
-
-1.  Identify a workflow with a good potential for reuse by other organisations, and that can be mostly automated.
-
-2.  Draw a high-level view of the pipeline that identifies each step, the inputs and outputs, how the scripts are put together, and the format of the final results.
-
-3.  Meet the BON in a Box team. We will help design the pipeline, ensuring that each step is modular, identifying scripts that are already in the modeling tool to avoid rewriting code, and finding places where the existing code would need to be modified. For example, using cloud-optimized approaches such as STAC and Parquet files instead of dowloading large files during the pipeline’s execution.
-
-4.  Secure the resources. This could be the time of a graduate student or work study student. If applying for funding, include BON in a Box in your proposal as a tool.
-
-5.  Create the pipeline. Write or adapt the code, write the yml script description files and the pipeline metadata. This step should be in constant collaboration with the GEO BON team and the stakeholders, using an incremental development approach. One way to approach this is to build a minimal working pipeline that delivers a useful output, but maybe not the desired end-result yet. Validate that, then plan and implement the rest of a minimal “happy” path up to the final desired outcome. After validating again, add options to cover alternate cases, make the pipeline more customizable, etc. in subsequent iterations. The benefits of this approach include staying aligned with the stakeholder’s expectations, making the most of GEO BON’s expertise, and ensuring a functional and publishable pipeline is created, even if not all planned features were implemented.
-
-6.  Open a pull request to the BON in a Box pipelines repository. The pull request will be peer-reviewed for it’s scientific rigor, it’s reusability, and the quality of the documentation. While you are waiting, why not contribute by reviewing someone else’s contribution?
-
-7.  Make the necessary corrections.
-
-8.  The pipeline is published on BON in a Box’s trunk, website, and receives a DOI for identification. It’s time to share!
-
-# Instructions for adapting your code to an analysis pipeline
-
 Analysis pipelines in BON in a Box are workflows that have been adapted to pipelines within the tool. Here we will walk you through a few steps to adapt your code to run in BON in a Box.
+
+## GitHub contribution workflow
+
+Contributors will follow the [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) when contributing pipelines to BON in a Box. Contributors can follow these steps:
+
+1.  Make sure you have a personal/institutional GitHub repository
+
+2.  Fork the bon-in-a-box-pipelines repository to your personal GitHub repository
+
+    1.  Documentation on working with forks can be found [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
+
+    2.  Make sure you keep the forked repository up to date by adding the bon-in-a-box-pipelines repository as an upstream repository and regularly fetching changes
+
+3.  Create a branch from the main branch for your pipeline, with a descriptive branch name (e.g. ProtConn_pipeline)
+
+4.  Create your pipeline on this branch
+
+5.  When it is complete, create a pull request ([instructions here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)) to the main branch on the bon-in-a-box-pipelines GitHub and fill out the [peer review template](https://github.com/GEO-BON/bon-in-a-box-pipelines/pull/188/commits/8f33d28fc691b7bf0ed1bffe00330076c7271cf3), suggesting at least two potential peer reviewers
+
+6.  When peer review is complete, make any suggested changes to the pipeline and resubmit
+
+7.  When the pipeline has been accepted, it will be merged to the main branch and published on Zenodo with a DOI
+
+8.  The BON in a Box team will contact you for any bug fixes or feature requests, and new releases will follow the versioning structure below
+
+9.  During the development process of the pipeline, regularly merge the main branch to your branch to avoid potential conflicts when merging your branch.
 
 ## How to write a script video tutorial
 
@@ -114,7 +106,7 @@ Specifying an example will auto-fill that input with the example unless changed 
 There are several different types of user inputs that can be specified in the YAML file:
 
 | "Type" attribute in the yaml | UI rendering | Description |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | boolean | Plain text | true/false |
 | float or float\[\] (float array) | Plain text | positive or negative numbers with a decimal point, accepts int and a valid input. |
 | int or int\[\] (int array) | Plain text | integer |
@@ -142,7 +134,7 @@ options_example:
 The user inputs can also be file types if you want to upload a file or connect the script to a previous one that outputs a specific file type. There are several file types that you can specify:
 
 | File Type | MIME type to use in the yaml | Description |
-|----|----|----|
+|------------------|----------------------------|--------------------------|
 | CSV | text/csv | Comma separated values file format (.csv) |
 | GeoJSON | application/geo+json | GeoJSON file format (.geojson) |
 | GeoPackage | application/geopackage+sqlite3 | GeoPackage file format (.gpkg) |
@@ -734,6 +726,8 @@ If you encounter further errors, please contact us on [Discourse](https://discou
 # When is your pipeline complete?
 
 -   The pipeline is generalizable (for example can be used with other species, in other regions)
+
+-   The pipeline meets all of the standards in the [quality control requirements](pipeline_standards.qmd)
 
 -   Each step has documentation for each input, output, references, etc. It should be easy enough to understand for a normal biologist (i.e. not a subject matter expert of this specific pipeline)
 

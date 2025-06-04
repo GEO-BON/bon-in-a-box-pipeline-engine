@@ -3,7 +3,7 @@ title: "Peer review"
 format: html
 ---
 
-### **Peer review process**
+## **Peer review process**
 
 Each pipeline will be reviewed by 2-5 people for scientific rigor, usability, and generalizability. The contributor will suggest potential reviewers, and they will be contacted by the BON in a Box team. Additional reviewers will be chosen by the BON in a Box team. It is encouraged to have reviewers from both the academic and policy sphere (e.g. a government scientist). The contributor will specify whether the pipeline is a pipeline for reporting, a pipeline for BONs, or a sampling prioritization pipeline.
 
@@ -25,18 +25,24 @@ The pipelines will be reviewed based on the following criteria:
 
 -   **Usability:** Is the pipeline easy to use and understand for a non expert? Is there adequate guidance on how to parameterize it?
 
-The reviewers will test the pipeline with a number of datasets, species, and scales based on their expertise, and provide feedback. The reviewer will decide if the pipeline should be accepted with minor revisions, needs to be revised and resubmitted, or is not suitable for BON in a Box.
+The reviewers will test the pipeline with a number of data sets, species, and scales based on their expertise, and provide feedback. The reviewer will decide if the pipeline should be accepted with minor revisions, needs to be revised and resubmitted, or is not suitable for BON in a Box.
 
-#### **When is a pipeline ready for peer review?**
+### **When is a pipeline ready for peer review?**
 
 Pipelines are ready for peer review when:
 
--   The pipeline meets all of the requirements in this document
+-   The pipeline meets all of the [quality requirements](pipelines_standards.qmd)
 
--   The pipeline runs without errors with all of the potential options and inputs, including publicly available data or user data
+-   The pipeline runs without errors with the defaults, and with different inputs and outputs, including publicly available data or user data
 
--   The pipeline has been tested with different geographical areas, ecosystems, scales, and species when relevant and the results make sense
+-   The pipeline has been tested with different parameters (geographical areas, ecosystems, scales, and species) and the results make sense
 
-### **Pipeline publication**
+## **Pipeline publication**
 
-DETAIL PUBLICATION PROCESS HERE
+When pipelines have been peer reviewed and are accepted, they will be published on [Zenodo](https://zenodo.org/) and given a DOI, which will be cited whenever the pipeline is used.
+
+## Instructions for reviewers
+
+Reviewers will evaluate the code, method implementation, and usability of the pipeline. Reviewers will provide comments in the pipeline review form. Reviewers can also comment directly in the pull request on GitHub.
+
+#### Download peer review form here (ADD FILE)
