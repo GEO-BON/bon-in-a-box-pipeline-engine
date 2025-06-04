@@ -115,8 +115,8 @@
     "name": "Assert boolean",
     "description": "Pipeline for automated tests",
     "lifecycle": {
-      "status": "in_development",
-      "message": "bla bla"
+      "status": "example",
+      "message": "This is an example!"
     },
     "author": [
       {
