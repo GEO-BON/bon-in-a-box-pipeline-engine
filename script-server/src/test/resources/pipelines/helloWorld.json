@@ -52,7 +52,7 @@
     "name": "Hello World pipeline",
     "description": "This very simple pipeline shows how to connect a single script to a single output.\nThe input of the script is left blank, thus becoming a pipeline input.",
     "lifecycle": {
-      "status": "example",
+      "status": "example"
     },
     "author": [
       {
