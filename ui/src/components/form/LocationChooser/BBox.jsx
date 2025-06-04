@@ -1,26 +1,19 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useRef, useCallback } from "react";
-
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Alert from "@mui/material/Alert";
-import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { ButtonGroup, styled } from "@mui/material";
-import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
-import CheckIcon from '@mui/icons-material/Check';
 import { CustomButtonGreen } from "../../CustomMUI";
-import Map from "./Map";
-import axios from "axios";
-import countryOptionsJSON from "./countries.json"; // Assuming you have a JSON file with country data
-import { set } from "lodash";
-
+import { transformBboxAPI, validTerraPolygon } from "./api"
+import * as turf from '@turf/turf';
 
 export default function BBox({
-  Bbox,
+  bbox,
+  bboxGeoJSON,
+  setBboxGeoJSON,
+  CRS,
   setBbox,
-  setClearFeatures,
+  action,
+  setAction
 }) {
     const [MinX, setMinX] = useState("");
     const [MaxX, setMaxX] = useState("");
@@ -28,15 +21,87 @@ export default function BBox({
     const [MaxY, setMaxY] = useState("");
 
     const updateBbox = () =>{
-        setBbox([parseFloat(MinX), parseFloat(MinY), parseFloat(MaxX), parseFloat(MaxY)]);
+        setAction('BboxButton')
+        const b = [parseFloat(MinX), parseFloat(MinY), parseFloat(MaxX), parseFloat(MaxY)]
+        setBbox(b);
+        if(CRS === 4326){
+            var feature = validTerraPolygon(turf.bboxPolygon(b));
+            setBboxGeoJSON(feature)
+        } else {
+            transformBboxAPI(b, CRS, 4326).then((result)=>{
+                if(result.data.results){
+                    const r2 = result.data.results
+                    var geometry = {
+                        type: "Polygon",
+                        coordinates: [[r2[0].x, r2[0].y],[r2[1].x, r2[1].y],[r2[2].x, r2[2].y],[r2[3].x, r2[3].y],[r2[0].x, r2[0].y]]
+                        };
+                    var feature = validTerraPolygon(turf.feature(geometry));
+                    setBboxGeoJSON(feature)
+                }else{
+                    return
+                }
+            })
+        }
     }
 
     useEffect(()=>{
-        setMinX(Bbox[0]);
-        setMinY(Bbox[1]);
-        setMaxX(Bbox[2]);
-        setMaxY(Bbox[3]);
-    }, [Bbox]);
+        if(action !== ''){
+            if(bboxGeoJSON){
+                const b = turf.bbox(bboxGeoJSON)
+                if(CRS === "4326"){
+                    setBbox(b)
+                } else {
+                    transformBboxAPI(b, 4326, CRS).then((result) => {
+                        if(result.data.results){
+                            const r = result.data.results
+                            const minx = Math.min(r[0].x,r[1].x,r[2].x,r[3].x)
+                            const maxx = Math.max(r[0].x,r[1].x,r[2].x,r[3].x)
+                            const miny = Math.min(r[0].y,r[1].y,r[2].y,r[3].y)
+                            const maxy = Math.max(r[0].y,r[1].y,r[2].y,r[3].y)
+                            const b2 =[minx, miny, maxx, maxy]
+                            setBbox(b2)
+                            if(action == 'CRSButton'){
+                                setAction("")
+                                transformBboxAPI(b2, CRS, 4326).then((result)=>{
+                                    if(result.data.results){
+                                        const r2 = result.data.results
+                                        var geometry = {
+                                            type: "Polygon",
+                                            coordinates: [[r2[0].x, r2[0].y],[r2[1].x, r2[1].y],[r2[2].x, r2[2].y],[r2[3].x, r2[3].y],[r2[0].x, r2[0].y]]
+                                            };
+                                        var feature = validTerraPolygon(turf.feature(geometry));
+                                        setBboxGeoJSON(feature)
+                                    }else{
+                                        return
+                                    }
+                                })
+                            }
+                        }
+                    })
+                }
+            }
+        }
+        setAction("")
+    }, [bboxGeoJSON, CRS, action])
+
+    /*useEffect(()=>{
+        if(action==='CRSButton'){
+            if(update){
+                setBboxGeoJSON(validTerraPolygon(turf.bboxPolygon(b)));
+                setAction("")
+            }
+            update = false
+        }
+    })*/
+
+    useEffect(()=>{
+        if(bbox){
+            setMinX(bbox[0]);
+            setMinY(bbox[1]);
+            setMaxX(bbox[2]);
+            setMaxY(bbox[3]);
+        }
+    }, [bbox, CRS]);
 
   return (
     <>

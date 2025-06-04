@@ -14,15 +14,18 @@ import CheckIcon from '@mui/icons-material/Check';
 import { CustomButtonGreen } from "../../CustomMUI";
 import Map from "./Map";
 import axios from "axios";
+import * as turf from '@turf/turf';
 import countryOptionsJSON from "./countries.json"; // Assuming you have a JSON file with country data
 import { set } from "lodash";
-import { GetStateAPI } from "./api";
+import { getStateAPI, validTerraPolygon} from "./api";
 
 
 export default function CountryChooser({
   setBbox,
+  setBboxGeoJSON,
   setCountryISO,
   setStateProvName,
+  setAction,
   setClearFeatures,
 }) {
     const [country, setCountry] = useState("");
@@ -49,7 +52,7 @@ export default function CountryChooser({
     useEffect(() => {
         if (country) {
             // Fetch states or provinces based on the selected country
-            GetStateAPI(country).then((response) => {
+            getStateAPI(country).then((response) => {
                 if (response.data && response.data.geonames) {
                     const stateOpts = response.data.geonames.map(state => ({
                         label: state.name,
@@ -68,6 +71,7 @@ export default function CountryChooser({
 
     const buttonClicked = () =>{
         //setClearFeatures(Math.random());
+        setAction("CountryButton")
         const countryObj = countryOptionsJSON.geonames.find(c => c.geonameId === country);
         if (country){
             setCountryISO(countryObj.isoAlpha3);
@@ -75,14 +79,14 @@ export default function CountryChooser({
         if(country && !stateProv) {
             let b = [countryObj.west, countryObj.south, countryObj.east, countryObj.north]
             b = b.map((c) => (c.toFixed(6)));
-            setBbox(b);
+            setBboxGeoJSON(validTerraPolygon(turf.bboxPolygon(b)));
         }
         if(stateProv) {
             const stateObj = stateProvJSON.find(s => s.geonameId === stateProv);
             setStateProvName(stateObj ? stateObj.name : "");
             let b = [stateObj.bbox.west, stateObj.bbox.south, stateObj.bbox.east, stateObj.bbox.north]
             b = b.map((c) => (c.toFixed(6)));
-            setBbox(b);
+            setBboxGeoJSON(validTerraPolygon(turf.bboxPolygon(b)));
         }
     }
 

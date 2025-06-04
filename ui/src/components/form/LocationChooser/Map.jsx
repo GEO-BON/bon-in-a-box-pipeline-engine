@@ -11,7 +11,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { MaplibreTerradrawControl } from "@watergis/maplibre-gl-terradraw";
 import "@watergis/maplibre-gl-terradraw/dist/maplibre-gl-terradraw.css";
 import { TerraDraw, TerraDrawRectangleMode, TerraDrawPolygonMode } from "terra-draw";
-import bbox from '@turf/bbox';
+import * as turf from '@turf/turf';
 import { TerraDrawMapLibreGLAdapter } from 'terra-draw-maplibre-gl-adapter';
 import { styled } from "@mui/material";
 
@@ -26,13 +26,11 @@ export default function Map({
   clearFeatures = false,
   previousId = "",
   setBbox = () => {},
+  setAction,
 }) {
-  const [terraDraw, setTerraDraw] = useState(null);
   const mapRef = useRef(null);
   const mapContainer = useRef(null);
   const [mapReady, setMapReady] = useState(false);
-  const [update, setUpdate] = useState(0);
-
 
   useEffect(() => {
     if (mapRef.current || !mapContainer.current) return;
@@ -90,15 +88,13 @@ export default function Map({
     map.on('style.load', () => {
         setMapReady(true);
     });
-    /*map.once('load',()=>{
-        setTerraDraw(drawControl)
-    });*/
 
     map.addControl(new maplibregl.GlobeControl());
     map.addControl(drawControl, 'top-left'); 
     const drawInstance = drawControl.getTerraDrawInstance();
     drawInstance.on("finish", (ids, type) => {
-       setBbox(bbox(drawControl.getFeatures()))
+       setAction("Digitize")
+       setBbox(turf.bbox(drawControl.getFeatures()))
     })
     mapRef.current = map;
     return () => map.remove(); // Clean up
@@ -113,7 +109,7 @@ export default function Map({
             }
             drawInstance.addFeatures(drawFeatures);
             drawInstance.setMode("select");
-            const boundsArray = bbox(drawFeatures[0]);
+            const boundsArray = turf.bbox(drawFeatures[0]);
             const bounds = [
               [boundsArray[0], boundsArray[1]],
               [boundsArray[2], boundsArray[3]]
@@ -121,7 +117,7 @@ export default function Map({
             mapRef.current.fitBounds(bounds);
         }
     }
-  }, [previousId]);
+  }, [previousId, drawFeatures]);
 
   return (
     <div

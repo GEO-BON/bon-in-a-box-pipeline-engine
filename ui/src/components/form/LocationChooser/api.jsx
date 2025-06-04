@@ -1,6 +1,7 @@
 import axios from "axios";
+import { v4 as uuidv4 } from 'uuid';
 
-export const GetStateAPI = async (geonameId) => {
+export const getStateAPI = async (geonameId) => {
     let result;
     const base_url = "http://api.geonames.org/childrenJSON";
     try {
@@ -15,7 +16,7 @@ export const GetStateAPI = async (geonameId) => {
     return result;
 };
 
-export const GetProjestAPI = async (geojson) => {
+export const getProjestAPI = async (geojson) => {
     let result;
     const base_url = "https://projest.io/ns/api/";
     let allData = [];
@@ -46,3 +47,25 @@ export const GetProjestAPI = async (geojson) => {
     return allData;
 };
 
+
+export const transformBboxAPI = async (bbox, source_crs, dest_crs) => {
+    let result;
+    const base_url = `https://api.maptiler.com/coordinates/transform/${bbox[0]},${bbox[1]};${bbox[0]},${bbox[3]};${bbox[2]},${bbox[1]};${bbox[2]},${bbox[3]}.json`;
+    try {
+        result = await axios({
+        method: "get",
+        baseURL: `${base_url}`,
+        params: { s_srs: source_crs, t_srs: dest_crs, key:"U4hNLWRENxTa7CfHUUnN" },
+        });
+    } catch (error) {
+        result = { results: null };
+    }
+    return result;
+};
+
+export const validTerraPolygon = (feature) =>{
+    feature.properties.mode = "rectangle";
+    feature.id=uuidv4();
+    delete feature.bbox;
+    return feature
+}
