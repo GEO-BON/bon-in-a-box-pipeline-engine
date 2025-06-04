@@ -550,7 +550,7 @@ end
 
 The syntax and structure of the script description file will be validated on push. To run the validation locally, run `validate.sh`
 
-This validates that the syntax and structure are correct, but not that it's content is correct. Hence, peer review of the scripts and the description files is mandatory before accepting a pull requests. Once peer reviewed, it will be tagged as in development, in review, reviewed or deprecated with an optional message describing why it was given that status.
+This validates that the syntax and structure are correct, but not that it's content is correct. Hence, peer review of the scripts and the description files is mandatory before accepting a pull requests. Once peer reviewed, it will be tagged as in development, in review, reviewed or deprecated with an optional message describing why it was given that status. Additionally, a script can be tagged as an example.
 
 ### Reporting problems
 
