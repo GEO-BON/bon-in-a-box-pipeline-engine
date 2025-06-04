@@ -49,6 +49,8 @@ jobs:
             echo "TAG_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
             if [ "${{ github.ref_name }}" == "edge" ]; then
               echo "TAG_VERSION=${{ env.BIAB_VERSION }}-SNAPSHOT" >> $GITHUB_ENV
+            else
+              echo "TAG_VERSION=${{ env.BIAB_VERSION }}-${{ github.ref_name }}" >> $GITHUB_ENV
             fi
           fi
 

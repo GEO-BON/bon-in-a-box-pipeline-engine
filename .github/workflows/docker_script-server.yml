@@ -48,6 +48,8 @@ jobs:
             echo "TAG_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
             if [ "${{ github.ref_name }}" == "edge" ]; then
               echo "TAG_VERSION=${{ env.BIAB_VERSION }}-SNAPSHOT" >> $GITHUB_ENV
+            else
+              echo "TAG_VERSION=${{ env.BIAB_VERSION }}-${{ github.ref_name }}" >> $GITHUB_ENV
             fi
           fi
 
@@ -68,7 +70,7 @@ jobs:
           context: script-server
           file: script-server/Dockerfile.prod
           build-args: |
-            "BIAB_VERSION=${{ env.BIAB_VERSION }}"
+            "BIAB_VERSION=${{ env.TAG_VERSION }}"
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
