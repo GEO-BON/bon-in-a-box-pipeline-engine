@@ -202,4 +202,4 @@ Versioning will follow a semantic versioning style in the form of major.minor.pa
 
 ### **Licensing**
 
-The BON in a Box software is under the [GPLv3](https://www.gnu.org/licenses/quick-guide-gplv3.html) licence, but each pipeline is licensed individually, with the specific license chosen by the contributor. Our recommended license is MIT. You can explore licenses [here](https://choosealicense.com/) 
+The BON in a Box software is under the [GPLv3](https://www.gnu.org/licenses/quick-guide-gplv3.html) licence, but each pipeline is licensed individually, with the specific license chosen by the contributor. Our recommended license is MIT. You can explore licenses [here](https://choosealicense.com/)
