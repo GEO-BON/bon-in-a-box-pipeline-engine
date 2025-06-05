@@ -41,7 +41,8 @@ export default function LocationChooser({
         setPreviousId(uuidv4()) //Random ID for the first feature
       }
       //Shrink bbox for projestion which wont provide a crs suggestion if even a small part of the bbox is outside the area of coverage of the CRS
-      const b = turf.bbox(bboxGeoJSON).map((c) => (parseFloat(c)));
+      let b = turf.bbox(bboxGeoJSON)
+      b = b.map((c) => (parseFloat(c)));
       const scale_width=(b[2]-b[0])/2
       const scale_height=(b[3]-b[1])/2        
       const bbox_shrink = [b[0]+scale_width, b[1]+scale_height, b[2]-scale_width, b[3]-scale_height];

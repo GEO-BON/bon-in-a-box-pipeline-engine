@@ -22,7 +22,7 @@ export default function BBox({
 
     const updateBbox = () =>{
         setAction('BboxButton')
-        const b = [parseFloat(MinX), parseFloat(MinY), parseFloat(MaxX), parseFloat(MaxY)]
+        const b = [parseFloat(MinX).toFixed(6), parseFloat(MinY).toFixed(6), parseFloat(MaxX).toFixed(6), parseFloat(MaxY).toFixed(6)]
         setBbox(b);
         if(CRS === 4326){
             var feature = validTerraPolygon(turf.bboxPolygon(b));
@@ -30,10 +30,16 @@ export default function BBox({
         } else {
             transformBboxAPI(b, CRS, 4326).then((result)=>{
                 if(result.data.results){
-                    const r2 = result.data.results
+                    let r2 = result.data.results
+                    r2 = r2.map((n)=>({ "x": parseFloat(n.x.toFixed(6)), "y": parseFloat(n.x.toFixed(6))}))
                     var geometry = {
                         type: "Polygon",
-                        coordinates: [[r2[0].x, r2[0].y],[r2[1].x, r2[1].y],[r2[2].x, r2[2].y],[r2[3].x, r2[3].y],[r2[0].x, r2[0].y]]
+                        coordinates: [
+                            [r2[0].x, r2[0].y],
+                            [r2[1].x, r2[1].y],
+                            [r2[2].x, r2[2].y],
+                            [r2[3].x, r2[3].y],
+                            [r2[0].x, r2[0].y]]
                         };
                     var feature = validTerraPolygon(turf.feature(geometry));
                     setBboxGeoJSON(feature)
@@ -58,16 +64,23 @@ export default function BBox({
                             const maxx = Math.max(r[0].x,r[1].x,r[2].x,r[3].x)
                             const miny = Math.min(r[0].y,r[1].y,r[2].y,r[3].y)
                             const maxy = Math.max(r[0].y,r[1].y,r[2].y,r[3].y)
-                            const b2 =[minx, miny, maxx, maxy]
+                            const b2 = [parseFloat(minx).toFixed(6), parseFloat(miny).toFixed(6), parseFloat(maxx).toFixed(6), parseFloat(maxy).toFixed(6)]
                             setBbox(b2)
                             if(action == 'CRSButton'){
                                 setAction("")
                                 transformBboxAPI(b2, CRS, 4326).then((result)=>{
                                     if(result.data.results){
-                                        const r2 = result.data.results
+                                        let r2 = result.data.results
+                                        r2 = r2 = r2.map((n)=>({ "x": parseFloat(n.x.toFixed(6)), "y": parseFloat(n.y.toFixed(6))}))
                                         var geometry = {
                                             type: "Polygon",
-                                            coordinates: [[r2[0].x, r2[0].y],[r2[1].x, r2[1].y],[r2[2].x, r2[2].y],[r2[3].x, r2[3].y],[r2[0].x, r2[0].y]]
+                                            coordinates: [[
+                                                [r2[0].x, r2[0].y],
+                                                [r2[1].x, r2[1].y],
+                                                [r2[2].x, r2[2].y],
+                                                [r2[3].x, r2[3].y],
+                                                [r2[0].x, r2[0].y]
+                                            ]]
                                             };
                                         var feature = validTerraPolygon(turf.feature(geometry));
                                         setBboxGeoJSON(feature)

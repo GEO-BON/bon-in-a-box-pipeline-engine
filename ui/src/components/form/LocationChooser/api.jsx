@@ -50,7 +50,7 @@ export const getProjestAPI = async (geojson) => {
 
 export const transformBboxAPI = async (bbox, source_crs, dest_crs) => {
     let result;
-    const base_url = `https://api.maptiler.com/coordinates/transform/${bbox[0]},${bbox[1]};${bbox[0]},${bbox[3]};${bbox[2]},${bbox[1]};${bbox[2]},${bbox[3]}.json`;
+    const base_url = `https://api.maptiler.com/coordinates/transform/${bbox[0]},${bbox[1]};${bbox[0]},${bbox[3]};${bbox[2]},${bbox[3]};${bbox[2]},${bbox[1]}.json`;
     try {
         result = await axios({
         method: "get",
