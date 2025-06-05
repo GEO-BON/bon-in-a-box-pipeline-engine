@@ -27,17 +27,19 @@ function generatePersonList(list) {
     return list.map((person, i, array) => {
         let email = person.email && <a href={'mailto:' + person.email} style={{textDecoration:'none'}}> &#9993;</a>
         let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
+        let role = person.role && <span> ({person.role.reduce((r1, r2) => r1 + ", " + r2)})</span>
         if (person.identifier)
             return <span key={i}>
                 <a href={person.identifier} target="_blank">
                     {person.name}{!email && comma}
                 </a>
+                {role}
                 {email && <>{email}{comma}</>}
                 &nbsp;
             </span>
 
         else
-            return <span key={i}>{person.name}{email}{comma} </span>
+            return <span key={i}>{person.name}{role}{email}{comma} </span>
     })
 }
 
