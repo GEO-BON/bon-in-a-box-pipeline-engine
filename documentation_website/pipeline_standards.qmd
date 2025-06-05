@@ -60,13 +60,13 @@ BON in a Box is designed to run analyses with both publicly available data and d
 
 #### **Naming standards:**
 
--   Input and output file names should be machine readable, with no spaces, symbols, capital letters, or special characters. Spaces should be replaced with an underscore (\_)
+-   Input and output file names should be machine readable, with no spaces, symbols, capital letters, or special characters. Spaces should be replaced with an underscore (\_).
 
--   File names should be descriptive (e.g. “population_polygons.gpkg”)
+-   File names should be descriptive (e.g. “population_polygons.gpkg”).
 
 #### **Standards for publicly available input data:**
 
--   When using publicly available data, BON in a Box should use APIs when they are available so pipelines can be run with the most up to date data available
+-   When using publicly available data, BON in a Box should use APIs when they are available so pipelines can be run with the most up to date data available.
 
     -   When processing GBIF data in a pipeline, the **GBIF download API** should be used to ensure reproducibility and citability, as it provides a download DOI for each run, and this doi script output must be included in the pipeline outputs. The “GBIF observations with download API” script should be used for basic GBIF data retrieval. 
 
@@ -78,9 +78,9 @@ BON in a Box is designed to run analyses with both publicly available data and d
 
 -   **Point, line, and polygon data** should be in the form of a geopackage.
 
-    -   The geometry column must be called “geom”
+    -   The geometry column must be called “geom”.
 
-    -   Data should be in the coordinate reference system appropriate for the region of interest (to find a crs, search [here](https://epsg.io/))
+    -   Data should be in the coordinate reference system (CRS) appropriate for the region of interest (to find a CRS, search [here](https://epsg.io/)).
 
 -   **Raster data** should be a GeoTiff file
 
@@ -90,17 +90,17 @@ BON in a Box is designed to run analyses with both publicly available data and d
 
 -   Tabular data can be uploaded as CSV (comma separated values) or TSV (tab separated values). Column names should be in snake_case and should avoid special characters and capital letters. When geographical coordinates are included, use the CRS EPSG:4326 (latitude, longitude WGS 84) and column names “latitude” and “longitude”, whenever possible. 
 
-    -   Specific file formats and column formatting guidelines will depend on the pipeline and should be specified in the pipeline documentation
+    -   Specific file formats and column formatting guidelines will depend on the pipeline and should be specified in the pipeline documentation.
 
 #### **Standards for output data**
 
 Each BON in a Box script creates outputs that can be downloaded. They should be in standard file formats and follow these guidelines:
 
--   Outputs should be in interoperable data formats (e.g. not a language specific format such as RData)
+-   Outputs should be in interoperable data formats (e.g. not a language specific format such as RData).
 
 -   Point, line, and polygon data should be output as geopackages. Include just one layer per geopackage whenever possible. 
 
--   Raster data should be output as a GeoTIFF, compressed (ex. Deflate or LZW)
+-   Raster data should be output as a GeoTIFF, compressed (ex. Deflate or LZW).
 
 -   Tabular data can be output as a comma separated values (CSV) or tab separated value (TSV) format.
 
@@ -176,7 +176,7 @@ Each pipeline contains metadata, which can be edited in the right sliding pane o
 
 -   The description of the pipeline, including a short description of the methods, any data it is using, the limitations of the pipeline, and if it is an indicator in the GBF, what kind of indicator it is and which targets/goals it is related to
 
--   The licence of the pipeline (this is chosen by the user, see section on licensing below)
+-   The license of the pipeline (this is chosen by the user, see section on licensing below)
 
 -   The author(s) of the pipeline and their emails and ORCIDs
 
@@ -198,8 +198,8 @@ Versioning will follow a semantic versioning style in the form of major.minor.pa
 
 -   Minor bug fixes will be released continuously (e.g. 1.0.1).
 
--   Any major changes to methods or packages will be a scheduled major release (e.g. 2.0.0). The old pipeline will be labelled as deprecated but will still be available for backwards compatibility.
+-   Any major changes to methods or packages will be a scheduled major release (e.g. 2.0.0). The old pipeline will be labeled as deprecated but will still be available for backwards compatibility.
 
 ### **Licensing**
 
-The BON in a Box software is under the [GPLv3](https://www.gnu.org/licenses/quick-guide-gplv3.html) licence, but each pipeline is licensed individually, with the specific license chosen by the contributor. Our recommended license is MIT. You can explore licenses [here](https://choosealicense.com/)
+The BON in a Box software is under the [GPLv3](https://www.gnu.org/licenses/quick-guide-gplv3.html) license, but each pipeline is licensed individually, with the specific license chosen by the contributor. Our recommended license is MIT. You can explore licenses [here](https://choosealicense.com/).

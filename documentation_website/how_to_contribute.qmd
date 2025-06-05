@@ -2,31 +2,31 @@
 title: "Instructions for adapting your code to an analysis pipeline"
 ---
 
-Analysis pipelines in BON in a Box are workflows that have been adapted to pipelines within the tool. Here we will walk you through a few steps to adapt your code to run in BON in a Box.
+Analysis pipelines in BON in a Box are workflows that have been adapted to its pipelines framework. Here we will walk you through a few steps to adapt your code to run in BON in a Box.
 
-## GitHub contribution workflow
+## General GitHub contribution workflow
 
 Contributors will follow the [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) when contributing pipelines to BON in a Box. Contributors can follow these steps:
 
-1.  Make sure you have a personal/institutional GitHub repository
+1.  Make sure you have a personal/institutional GitHub repository.
 
-2.  Fork the bon-in-a-box-pipelines repository to your personal GitHub repository
+2.  Fork the bon-in-a-box-pipelines repository to your personal GitHub repository and then clone it to your computer.
 
-    1.  Documentation on working with forks can be found [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
+    1.  Documentation on working with forks can be found [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) and cloning [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
 
-    2.  Make sure you keep the forked repository up to date by adding the bon-in-a-box-pipelines repository as an upstream repository and regularly fetching changes
+    2.  Make sure you keep the forked repository up to date by adding the bon-in-a-box-pipelines repository as an upstream repository and regularly fetching changes.
 
-3.  Create a branch from the main branch for your pipeline, with a descriptive branch name (e.g. ProtConn_pipeline)
+3.  Create a branch from the main branch for your pipeline, with a descriptive branch name (e.g. ProtConn_pipeline).
 
-4.  Create your pipeline on this branch
+4.  Create your pipeline on this branch.
 
-5.  When it is complete, create a pull request ([instructions here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)) to the main branch on the bon-in-a-box-pipelines GitHub and fill out the [peer review template](https://github.com/GEO-BON/bon-in-a-box-pipelines/pull/188/commits/8f33d28fc691b7bf0ed1bffe00330076c7271cf3), suggesting at least two potential peer reviewers
+5.  When it is complete, create a pull request ([instructions here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)) to the main branch on the bon-in-a-box-pipelines GitHub and fill out the [peer review template](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/raw/refs/heads/documentation_peer_review/documentation_website/peer_review_form.docx) , suggesting at least two potential peer reviewers.
 
-6.  When peer review is complete, make any suggested changes to the pipeline and resubmit
+6.  When peer review is complete, make any suggested changes to the pipeline and resubmit.
 
-7.  When the pipeline has been accepted, it will be merged to the main branch and published on Zenodo with a DOI
+7.  When the pipeline has been accepted, it will be merged to the main branch and published on Zenodo with a DOI.
 
-8.  The BON in a Box team will contact you for any bug fixes or feature requests, and new releases will follow the versioning structure below
+8.  The BON in a Box team will contact you for any bug fixes or feature requests, and new releases will follow the [versioning structure](pipeline_standards.qmd).
 
 9.  During the development process of the pipeline, regularly merge the main branch to your branch to avoid potential conflicts when merging your branch.
 
@@ -56,13 +56,13 @@ Check if any of the steps you need are already available in BON in a Box to avoi
 
 ## Step 2: Break up your scripts
 
-You can start writing the individual scripts in your pipeline. If you already have an analysis workflow, break this up into individual scripts representing the steps of the pipeline. Plan what you want the inputs and outputs to be for each script.
+You can start writing the individual scripts in your pipeline. If you already have an analysis workflow, break this up into individual scripts representing the steps of the pipeline. Plan what you want as the inputs and outputs for each script.
 
 ## Step 3: Create a YAML file
 
 Each script should be accompanied by a YAML file (.yml extension) that specifies inputs and outputs of that step of the pipeline.
 
-Markdown is supported for pipeline, script, input and output descriptions. See this [CommonMark quick reference](https://commonmark.org/help/) for allowed markups. These can include special characters, links, and images.
+Markdown is supported for pipeline, script, input, and output descriptions. See this [CommonMark quick reference](https://commonmark.org/help/) for allowed markups. These can include special characters, links, and images.
 
 ### Name and description
 
@@ -70,7 +70,7 @@ YAML files should begin with a name, description, and the authors of the script.
 
 Example:
 
-```         
+```
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -83,11 +83,11 @@ author:
 
 Next, the YAML file should specify the inputs of the script. These inputs will either be outputs from the previous script, which can be connected by lines in the pipeline editor, or specified by the user in the input form.
 
-All input and output ids should follow the snake case naming conventions. Names should be all lowercase with underscores instead of spaces. For example, an input labelled "Species name" would cear the snake case id of "species_name". This id will be the name of the input parameter in your code.
+All input and output ids should follow the snake case naming conventions. Names should be all lowercase with underscores instead of spaces. For example, an input labelled "Species name" would have the snake case id of "species_name". This id will be the name of the input parameter in your code.
 
-Here is an example where the input a coordinate reference system and a distance that is specified by the user:
+Here is an example where the inputs are a coordinate reference system and a distance, specified by the user:
 
-```         
+```
 inputs:
   crs:
     label: coordinate reference system for output
@@ -101,7 +101,7 @@ inputs:
     example: 1000
 ```
 
-Specifying an example will auto-fill that input with the example unless changed by the user. If you do not want an example that auto-fills the input write "example: null". This will leave the input blank unless the user adds one. Not specifying any example will cause an error. It is mandatory that a script can be run successfully by leaving all the examples and simply pressing Run.
+Specifying an example will auto-fill that input with the example unless changed by the user. If you do not want an example that auto-fills the input, write "example: null". This will leave the input blank unless the user adds one. Not specifying any example will cause an error. It is mandatory that a script can be run successfully by leaving all the examples and simply pressing Run.
 
 There are several different types of user inputs that can be specified in the YAML file:
 
@@ -119,7 +119,7 @@ There are several different types of user inputs that can be specified in the YA
 
 ^1^options type requires an additional options attribute to be added with the available options.
 
-```         
+```
 options_example:
   label: Options example
   description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
@@ -145,7 +145,7 @@ The user inputs can also be file types if you want to upload a file or connect t
 
 For example:
 
-```         
+```
 inputs:
   landcover_raster:
     label: Raster of landcover
@@ -182,7 +182,7 @@ There are also several types of outputs that can be created
 
 ^3^ When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
 
-```         
+```
 map:
   label: My map
   description: Some map that shows something
@@ -193,7 +193,7 @@ map:
 
 Here is an example output:
 
-```         
+```
 outputs:
   result:
     label: Analysis result
@@ -213,7 +213,7 @@ This means that instead of installing packages during script execution scripts, 
 
 #### Check if the libraries you need are in conda
 
-To check if the packages you need are already in the default conda environment, go to runners/r-environment.yml or runners/python-environment.yml in the BON in a Box project folder. The list of packages already installed will be under "dependencies".
+To check if the packages you need are already in the default conda environment, go to runners/r-environment.yml or runners/python-environment.yml in the BON in a Box project folder. The list of packages already installed can be found under "dependencies".
 
 If all the packages that you need are in the R environment file and you do not need specific package versions, you do not need to specify a conda sub environment and you can skip the next step.
 
@@ -230,7 +230,7 @@ Search for your package names on [anaconda](https://anaconda.org/). Packages tha
 
 Example of conda sub-environment for an R script:
 
-```         
+```
 conda: # Optional: if you script requires specific versions of packages.
   channels:
     - conda-forge # make sure to put conda forge first
@@ -246,7 +246,7 @@ conda: # Optional: if you script requires specific versions of packages.
 
 Example of conda sub-environment for a python script. You do not need to put anything after conda-forge or before the package names when specifying a conda environment for python.
 
-```         
+```
 conda:
   channels:
     - conda-forge
@@ -270,7 +270,7 @@ For more information, refer to the [conda documentation](https://docs.conda.io/p
 
 #### Full example of a YAML file:
 
-```         
+```
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -328,9 +328,9 @@ YAML is a space sensitive format, so make sure all the tab sets are correct in t
 
 If inputs are outputs from a previous step in the pipeline, make sure to give the inputs and outputs the same name and they will be automatically linked in the pipeline.
 
-#### Empty commented sample to fill in:
+#### Empty commented template to fill in:
 
-```         
+```
 script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targeted to those who will interpret pipeline results and edit pipelines.
@@ -379,13 +379,13 @@ Currently supported versions of R, Julia, Python and shell are displayed in the 
 
 Script life cycle:
 
-1.  Script launched with output folder as a parameter. (In R, an `outputFolder` variable in the R session. In Julia, Shell and Python, the output folder is received as an argument.)
+1.  Script launched with output folder as a parameter (In R, an `outputFolder` variable in the R session. In Julia, Shell and Python, the output folder is received as an argument.)
 
 2.  Script reads `input.json` to get execution parameters (ex. species, area, data source, etc.)
 
 3.  Script performs its task
 
-4.  Script generates `output.json` containing links to result files, or native values (number, string, etc.)
+4.  Script generates `output.json` containing links to result files, or native values (ex. number, string, etc.)
 
 See [empty R script](https://GitHub.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/empty.R) for a minimal script life cycle example.
 
@@ -487,9 +487,9 @@ The outputs can be saved in a variety of file formats or primitive values (int, 
 ::: panel-tabset
 ## R
 
-A variable named `outputFolder` is loaded when R load that specifies where to save the output files.
+A variable named `outputFolder` is automatically loaded and contains the file path to output folder.
 
-In R, a convenience function `biab_output` allow to save the outputs. Here is an example in R of an output with a csv file and a plot in png format.
+In R, a convenience function `biab_output` allows to save the outputs. Here is an example of an output with a csv file and a plot in png format.
 
 ``` r
 result_path <- file.path(outputFolder, "result.csv")
@@ -503,9 +503,9 @@ biab_output("result_plot", result_plot_path)
 
 ## Python
 
-A variable named `output_folder` is loaded before your script is executed. It contains a string representation of the output folder.
+A variable named `output_folder` is automatically loaded and contains the file path to output folder.
 
-A convenience function `biab_output` allow to save the outputs as soon as they are created in the course of your script.
+A convenience function `biab_output` allows to save the outputs as soon as they are created in the course of your script.
 
 ``` python
 intOutput = 12345
@@ -514,9 +514,9 @@ biab_output("my_int_output", intOutput)
 
 ## Julia
 
-A variable named `output_folder` is loaded before your script is executed. It contains a string representation of the output folder.
+A variable named `output_folder` is automatically loaded and contains the file path to output folder.
 
-A convenience function `biab_output` allow to save the outputs as soon as they are created in the course of your script.
+A convenience function `biab_output` allows to save the outputs as soon as they are created in the course of your script.
 
 ``` julia
 # Write the output file to disk
@@ -534,7 +534,7 @@ biab_output("my_output", my_output_path)
 
 When modifying scripts in the `/scripts` folder, servers do not need to be restarted:
 
--   When modifying an existing script, simply re-run the script from the UI and the new version will be executed.
+-   When modifying an existing script, simply save the file and re-run the script from the UI and the new version will be executed.
 
 -   When adding or renaming scripts, refresh the browser page.
 
@@ -548,7 +548,7 @@ When modifying pipelines in the `/pipelines` folder, servers do not need to be r
 
 ### Script validation
 
-The syntax and structure of the script description file will be validated on push. To run the validation locally, run `validate.sh`
+The syntax and structure of the script description file will be validated on push. To run the validation locally, run `validate.sh` in your terminal.
 
 This validates that the syntax and structure are correct, but not that it's content is correct. Hence, peer review of the scripts and the description files is mandatory before accepting a pull requests. Once peer reviewed, it will be tagged as in development, in review, reviewed or deprecated with an optional message describing why it was given that status.
 
@@ -556,7 +556,7 @@ This validates that the syntax and structure are correct, but not that it's cont
 
 The output keys `info`, `warning` and `error` can be used to report problems in script execution. They do not need to be described in the `outputs` section of the description. They will be displayed with special formatting in the UI.
 
-Any `error` message will also halt the script and the rest of the pipeline. It is recommended to output specific error messages to avoid crashes when errors can be foreseen. This can be done using `biab_error_stop` helper function, or by writing an "error" attribute to the `output.json` file.
+Any `error` message will also halt the script and the rest of the pipeline. It is recommended to output specific error messages to avoid crashes when errors can be foreseen. This can be done using the `biab_error_stop` helper function, or by writing an "error" attribute to the `output.json` file.
 
 For example, if an analysis should stop if the result was less than 0:
 
@@ -605,11 +605,16 @@ biab_info("This message will appear in the UI.")
 
 And then the customized message will appear in the UI.
 
-A crash will have the same behavior as an `error` output, stopping the pipeline and with the error displayed in the UI. A script that completed without creating the `output.json` file is assumed to have crashed, and a general error message will be displayed. In both cases, the logs can be inspected for more details.
+A crash will have the same behavior as an `error` output, stopping the pipeline with the error displayed in the UI. A script that completed without creating the `output.json` file is assumed to have crashed, and a general error message will be displayed. In both cases, the logs can be inspected for more details.
 
 ### Testing your script
 
-You can test your script in the "run script" tab of the tool. This will generate a form based on your inputs, where you can put examples and run the script for debugging.
+To start testing:
+
+1.  Connect to the server by running `./server-up.sh` in a Linux terminal (e.g. Git Bash or WSL on Windows or Terminal on Mac). Make sure you are in the bon-in-a-box-pipeline directory on your computer.
+2.  In a web browser, type <http://localhost/>.
+
+You can test your script in the "run script" tab of the tool. This will generate a form where you can enter sample inputs or use your default parameters to run the script for debugging.
 
 ## Step 5: Connect your scripts with the BON in a Box pipeline editor
 

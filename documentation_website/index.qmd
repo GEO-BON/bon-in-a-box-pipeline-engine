@@ -16,7 +16,7 @@ It is a community-contributed and open-source data to biodiversity indicator or 
 
 Scientists around the world are developing tools to create workflows to calculate essential biodiversity variables and indicators to report on biodiversity change. However, there are almost no platforms to share these workflows and tools, leading to duplication of effort. BON in a Box allows networks to share and enhance each other's work.
 
-Additionally, organisations often lack the technical capabilities to calculate these indicators to monitor biodiversity, which impairs decision-making. BON in a Box can bridge the gap between those knowing how to calculate, and those needing the indicators for monitoring and conservation.
+Additionally, organizations often lack the technical capabilities to calculate these indicators to monitor biodiversity, which impairs decision-making. BON in a Box can bridge the gap between those knowing how to calculate, and those needing the indicators for monitoring and conservation.
 
 # What is a pipeline?
 
