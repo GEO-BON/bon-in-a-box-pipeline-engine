@@ -139,9 +139,21 @@ Here are some common installation errors and how to fix them.
 
     If you are having issues connecting to the server, make sure that you (1) have the docker desktop app open on your computer (2) are running `./server-up.sh` in a Linux terminal (e.g. Git Bash or WSL on Windows or Terminal on Mac), launching the server locally will not work with PowerShell nor CMD and (3) make sure you have an ssh key that is registered to your computer and GitHub.
 
-2.  **BON in a Box does not load on localhost**
+2.  **Docker crashes with Bad Gateway error**
 
-    This may be an issue if you are on a Mac, or have Apache or NGINX installed. To fix this, edit the runner.env file and specify a different port (`HTTP_PORT`). For example, if you set `HTTP_PORT=5522`, you can then access BON in a Box at http://localhost:5522.
+    If you get an error that looks like `unable to get image 'ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia:mamba_update_staging': request returned 502 Bad Gateway for API route and version http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.49/images/ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia:mamba_update_staging/json, check if the server supports the requested API version`
+
+    [This discussion](https://github.com/docker/desktop-linux/issues/156) suggests a few different causes for this type of error. One that proved to work with one of our users was to disable the "containerd image store" from the Docker Desktop settings.
+
+3.  **BON in a Box is not visible on http://localhost**
+
+    Conflicting ports may be an issue if you are on a Mac, or have Apache or NGINX installed. To fix this, edit the runner.env file and specify a different port (`HTTP_PORT`). For example, if you set `HTTP_PORT=5522`, you can then access BON in a Box at http://localhost:5522.
+
+4.  **On my Mac, a script is taking way too long**
+
+    If there is a significant difference in the duration of the scripts compared to users on Linux or Windows, and you have a Mac with an Apple Silicon chip, enable the "Use Rosetta for x86_64/amd64 emulation on Apple Silicon" in Docker Desktop settings.
+
+    On the contrary, if the script completely hangs and never completes, try to turn off that option.
 
 If you encounter further errors, please contact us on [Discourse](https://discourse.geobon.org) or email us at boninabox\@geobon.org.
 
