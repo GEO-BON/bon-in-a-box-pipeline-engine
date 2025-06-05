@@ -2,19 +2,23 @@
 
 RED="\033[31m"
 GREEN="\033[32m"
+YELLOW="\033[33m"
 ENDCOLOR="\033[0m"
 
-if [ -d "pipeline-repo" ]; then
-  echo -e "${RED}ERROR: Do not run directly! This script is meant to be ran by validate.sh in the pipeline-repo folder.${ENDCOLOR}"
-  exit 1
+# Checking that this script is ran from the .server folder, and not from the dev repo,
+# which would break the relative file path.
+(cd .. && ls "server-up.sh" 2> /dev/null 1>&2) # true if in .server folder with dev symlink
+if [[ 0 -ne $? && ! -f "server-up.sh" ]]; then
+    echo -e "${RED}ERROR: Do not run directly! This script is meant to be run by server-up.sh or validate.sh in the pipeline-repo folder.${ENDCOLOR}"
+    exit 1
 fi
 
-which docker
+which docker > /dev/null
 if [[ $? -ne 0 ]] ; then
     echo -e "${RED}Docker and docker compose plugin are required to run the pipeline engine.${ENDCOLOR}" ; exit 1
 fi
 
-which git
+which git > /dev/null
 if [[ $? -ne 0 ]] ; then
     echo -e "${RED}Git is required to run the latest version of the pipeline engine.${ENDCOLOR}" ; exit 1
 fi
@@ -40,14 +44,13 @@ function help {
     echo "    help                 Display this help"
     echo "    checkout [BRANCH]    Checkout config files from given branch of pipeline engine repo."
     echo "    up                   Start the server, accessible in http://localhost"
-    echo "    stop                 Stops the server"
+    echo "    down                 Stops the server"
     echo "    validate             Run basic basic validation on pipelines and scripts. "
-    echo "    clean                Removes the docker containers of all services."
+    echo "    clean                Removes the docker containers of all services and the volume "
+    echo "                         used to store the conda sub-environment info."
     echo "                         This is useful in development switching from prod to dev server,"
     echo "                         in cases when we get the following error:"
     echo "                         \"The container name ... is already in use by container ...\""
-    echo "    purge                Removes the volumes that store dependencies (conda, R)"
-    echo "                         in addition to the clean"
     echo "    command [ARGS...]    Run an arbitrary docker compose command,"
     echo "                         such as (pull|run|up|down|build|logs)"
     echo
@@ -55,7 +58,12 @@ function help {
 
 # Run your docker commands on the server manually.
 # `command <command>` with command such as pull/run/up/down/build/logs...
-function command { # args appended to the docker compose command
+# args are appended to the docker compose command with @$
+function command {
+    # Logs are useful to display to the user but only once, on the up command.
+    # They could interfere with other command outputs such as config
+    if [[ "$@" == "up"* ]] ; then log=0; else log=1; fi
+
     # Get docker group. Will not work on Windows, silencing the warning with 2> /dev/null
     export DOCKER_GID="$(getent group docker 2> /dev/null | cut -d: -f3)"
 
@@ -63,13 +71,14 @@ function command { # args appended to the docker compose command
     # We use remote.origin.fetch because of the partial checkout, see server-up.sh.
     branch=$(git -C .server config remote.origin.fetch | sed 's/.*remotes\/origin\///')
     if [[ $branch == *"staging" ]]; then
-        echo "Using staging containers with suffix \"-$branch\""
         export DOCKER_SUFFIX="-$branch"
+        if [ $log -eq 0 ]; then echo "Using staging containers with suffix \"-$branch\"" ; fi
     elif [[ $branch == "edge" ]]; then
-        echo "Using edge releases: you'll be up to date with the latest possible server."
         export DOCKER_SUFFIX="-edge"
+        if [ $log -eq 0 ]; then echo "Using edge releases: you'll be up to date with the latest possible server." ; fi
     else
         export DOCKER_SUFFIX=""
+        if [ $log -eq 0 ]; then echo "Using default branch." ; fi
     fi
 
     # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
@@ -86,11 +95,12 @@ function command { # args appended to the docker compose command
     if ! [[ -z "$macCPU" ]]; then
         # This is a Mac, check chip type
         if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
-            echo "Apple M* chip detected"
+            if [ $log -eq 0 ]; then echo "Apple M* chip detected" ; fi
             composeFiles+=" -f .server/compose.apple.yml"
         fi
     fi
 
+    #echo "docker compose $composeFiles --env-file runner.env --env-file .server/.prod-paths.env $@"
     docker compose $composeFiles \
         --env-file runner.env --env-file .server/.prod-paths.env $@
 }
@@ -161,11 +171,44 @@ function checkout {
     echo -e "${GREEN}Server configuration updated.${ENDCOLOR}"
 }
 
+# Docker pull should be able to tell us. In the meantime, comparing digests.
+# See https://github.com/docker/cli/issues/6059
+function checkForUpdates {
+    local images=$1
+    for image in $images; do
+        # Get the local digest in the format sha256:<hash>
+        localDigest=$(docker image inspect --format='{{index .Id}}' $image 2>/dev/null)
+        if [[ $? -ne 0 ]]; then
+            echo -e "${YELLOW} ! ${ENDCOLOR}At least one image not found locally: $image"
+            return 0
+        fi
+        # echo $localDigest
+
+        # Get the remote digest in format sha256:<hash>
+        # Would have been cleaner with jq but it is not available in a git bash on Windows...
+        # WARNING: Works only on single architecture builds or if Linux happens to be the first variant.
+        remoteDigest=$(docker manifest inspect -v $image \
+            | awk '/"config":/ {found=1} found&& /"digest"/ {print $2; exit}' \
+            | tr -d '",')
+        # echo $remoteDigest
+
+        # Perform comparison
+        if [[ "$localDigest" != "$remoteDigest" ]]; then
+            echo -e "${YELLOW} ! ${ENDCOLOR}At least one image outdated: $image"
+            return 0
+        else
+            echo -e "${GREEN} ✔ ${ENDCOLOR}Up to date: $image"
+        fi
+    done
+
+    return 1
+}
+
 function up {
     cd .. # Back to pipeline-repo folder
 
     echo "Checking requirements..."
-    output=$(command ps $@ 2>&1); returnCode=$?;
+    output=$(command ps 2>&1); returnCode=$?;
     if [[ $output == *"service \"runner-conda\" has neither an image nor a build context specified"* ]] ; then
         bold=$(tput bold)
         normal=$(tput sgr0)
@@ -177,25 +220,106 @@ function up {
         echo "Run the server with the following command"
         echo "    ./server-up.sh pre-conda-staging"
         exit 1
-    fi
 
-    echo "Pulling docker images..."
-    command pull ; assertSuccess
+    elif [[ $output == *"geobon/bon-in-a-box:gateway"* ]] ; then
+        echo -e "${RED}BON in a Box is already running.${ENDCOLOR}"
+        exit 1
+    fi
 
     echo "Building (if necessary)..."
     command build ; assertSuccess
 
+    # These are the "saved" containers that we would normally keep, but that we will discard due to the update.
+    containersToDiscard=""
+
+    docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
+    if [[ $? -eq 1 ]] ; then
+        echo "Installing..."
+        command pull ; assertSuccess
+
+    else # Already installed
+        echo "Checking for updates to docker images..."
+        # see https://github.com/docker/cli/issues/6059
+        images=$(command config --images)
+        services=$(command config --services)
+
+        # There are some images for which we want to keep the containers, others can be discarded.
+        savedContainerRegex="(runner-conda|runner-julia)"
+        savedContainerServices="runner-conda runner-julia"
+        otherServices=$(echo "$services" | grep -vE "^$savedContainerRegex")
+
+        savedContainerImages=$(echo "$images" | grep -E "^geobon/bon-in-a-box:$savedContainerRegex")
+        otherImages=$(echo "$images" | grep -vE "^geobon/bon-in-a-box:$savedContainerRegex")
+
+        updatesFound=1 # Will become 0 if there is an update
+
+        # Check the images for which the containers should be kept whenever possible.
+        for savedContainerImage in $savedContainerImages; do
+            checkForUpdates "$savedContainerImage"
+            if [[ $? -eq 0 ]]; then
+                containersToDiscard="$containersToDiscard $savedContainerImage"
+                updatesFound=0
+            fi
+        done
+
+        if [[ $updatesFound -ne 0 ]] ; then
+            # Check the other images
+            checkForUpdates "$otherImages"
+            updatesFound=$?
+        fi
+
+        if [[ $updatesFound -eq 0 ]]; then
+            echo "Updates found."
+            if [[ -n "$containersToDiscard" ]]; then
+                echo -e "${YELLOW}This update will discard the following runner containers: ${ENDCOLOR}"
+                for container in $containersToDiscard; do
+                    echo -e "${YELLOW} - $container${ENDCOLOR}"
+                done
+                echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
+            fi
+
+            read -p "Do you want to update? (Y/n): " choice
+            if [[ -z "$choice" || "$choice" == "y" || "$choice" == "Y" ]]; then
+                command pull ; assertSuccess
+
+            else # Ok then, let's pretend there are no updates.
+                updatesFound=1 # 1=false in bash
+                containersToDiscard=""
+            fi
+        else
+            echo "No updates found."
+        fi
+    fi
+
     echo "Starting the server..."
-    output=$(command up -d $@ 2>&1); returnCode=$?;
+    # Starting the services for which we want to preserve the containers
+    output=""
+    returnCode=0 # 0=true in bash
+    for service in $savedContainerServices; do
+        flag="--no-recreate" # By default, we keep runners unless they are updated
+        if [[ $containersToDiscard == "*$service*" ]]; then
+            echo "  Discarding $service runner"
+            flag=""
+        fi
+
+        lastOutput=$(command up -d $flag $service 2>&1); lastReturnCode=$?;
+        output="$output\n$lastOutput"
+        if [[ $lastReturnCode -ne 0 ]]; then returnCode=1; fi
+    done
+
+    # Starting the rest of the services
+    lastOutput=$(command up -d $otherServices 2>&1); lastReturnCode=$?;
+    output="$output\n$lastOutput"
+    if [[ $lastReturnCode -ne 0 ]]; then returnCode=1; fi
 
     if [[ $output == *"is already in use by container"* ]] ; then
-        # Container conflict, perform clean and try again.
+        echo "A container name conflict was found, we will clean and try again."
         clean
         echo "Starting the server after a clean..."
-        command up -d $@ ; assertSuccess
+        command up -d $flag ; assertSuccess
     else # No container conflict, check the return code
         if [[ $returnCode -ne 0 ]] ; then
-            echo $output
+            echo -e $output
             echo -e "${RED}FAILED${ENDCOLOR}" ; exit 1
         fi
     fi
@@ -205,26 +329,34 @@ function up {
 
 function down {
     echo "Stopping the servers..."
-    command down ; assertSuccess
+    command stop ; assertSuccess
     echo -e "${GREEN}Server has stopped.${ENDCOLOR}"
 }
 
 function clean {
-    echo "Removing shared containers between dev and prod"
-    docker container rm biab-gateway biab-ui biab-script-server \
-        biab-tiler biab-runner-conda biab-runner-julia biab-viewer
-    echo -e "${GREEN}Clean complete.${ENDCOLOR}"
-}
+    echo "Removing docker containers and volumes..."
+    output=$(docker container rm \
+        biab-gateway \
+        biab-script-server \
+        biab-tiler \
+        biab-runner-conda \
+        biab-runner-julia 2>&1)
 
-function purge {
-    clean
-    echo "Removing dependency volumes"
+    if [[ $output == *"container is running"* ]]; then
+        echo -e "${RED}Cannot clean while BON in a Box is running.${ENDCOLOR}"
+        exit 1
+    fi
+
+    # Currently used volumes
+    docker volume rm conda-env-yml 2> /dev/null 2>&1
+
+    # Removing legacy volumes
     docker volume rm \
-        conda-dir \
-        conda-cache \
-        conda-env-yml \
-        r-libs-user
+        conda-dir-dev \
+        conda-cache-dev \
+        r-libs-user-dev 2> /dev/null 2>&1
 
+    echo -e "${GREEN}Clean complete.${ENDCOLOR}"
 }
 
 case "$1" in
@@ -236,7 +368,7 @@ case "$1" in
         ;;
     up)
         shift
-        up $@
+        up
         ;;
     down)
         down
@@ -253,7 +385,7 @@ case "$1" in
         clean
         ;;
     purge)
-        purge
+        echo "Deprecated: Purge is now an alias to the clean command."
         ;;
     *)
         help

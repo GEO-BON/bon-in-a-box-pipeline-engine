@@ -35,18 +35,13 @@ services:
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
       - ${PIPELINE_REPO_PATH}/runners/r-environment.yml:/data/r-environment.yml:ro
-      - conda-dir:/.conda
-      - conda-cache:/.cache/conda
+      - ${PIPELINE_REPO_PATH}/runner.env:/runner.env:ro
       - conda-env-yml:/conda-env-yml
-      - r-libs-user:/r-libs-user:rw
     user: ${MY_UID}:${DOCKER_GID}
-    env_file:
-      - ${PIPELINE_REPO_PATH}/runner.env
     environment:
       SCRIPT_LOCATION: /scripts
       USERDATA_LOCATION: /userdata
       OUTPUT_LOCATION: /output
-      R_LIBS_USER: /r-libs-user
 
   runner-julia:
     container_name: biab-runner-julia
@@ -55,9 +50,8 @@ services:
       - ./script-stubs:/script-stubs:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
+      - ${PIPELINE_REPO_PATH}/runner.env:/runner.env:ro
     user: ${MY_UID}:${DOCKER_GID}
-    env_file:
-      - ${PIPELINE_REPO_PATH}/runner.env
     environment:
       SCRIPT_LOCATION: /scripts
       USERDATA_LOCATION: /userdata
