@@ -140,7 +140,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-contribute-a-pipeline">    
         <li>
-    <a class="dropdown-item" href="./what_to_contribute.html">
+    <a class="dropdown-item" href="./what_to_contribute.qmd">
  <span class="dropdown-text">Should you contribute?</span></a>
   </li>  
         <li>
@@ -148,7 +148,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="dropdown-text">Contribution instructions</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./pipeline_standards.html">
+    <a class="dropdown-item" href="./pipeline_standards.qmd">
  <span class="dropdown-text">Pipeline standards</span></a>
   </li>  
     </ul>
@@ -951,7 +951,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <h1>When is your pipeline complete?</h1>
 <ul>
 <li><p>The pipeline is generalizable (for example can be used with other species, in other regions)</p></li>
-<li><p>The pipeline meets all of the standards in the <a href="./pipeline_standards.html">quality control requirements</a></p></li>
+<li><p>The pipeline meets all of the standards in the <a href="pipeline_standards.qmd">quality control requirements</a></p></li>
 <li><p>Each step has documentation for each input, output, references, etc. It should be easy enough to understand for a normal biologist (i.e.&nbsp;not a subject matter expert of this specific pipeline)</p></li>
 <li><p>Each step validates its inputs for aberrations and its outputs for correctness. If an aberration is detected an “error” should be returned to halt the pipeline, or a “warning” to let it continue but alert the user.</p></li>
 <li><p>The GitHub actions pass.</p></li>

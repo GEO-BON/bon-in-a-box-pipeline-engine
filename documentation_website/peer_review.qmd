@@ -3,8 +3,6 @@ title: "Peer review"
 format: html
 ---
 
-## **Peer review process**
-
 Each pipeline will be reviewed by 2-5 people for scientific rigor, usability, and generalizability. The contributor will suggest potential reviewers, and they will be contacted by the BON in a Box team. Additional reviewers will be chosen by the BON in a Box team. It is encouraged to have reviewers from both the academic and policy sphere (e.g. a government scientist). The contributor will specify whether the pipeline is a pipeline for reporting, a pipeline for BONs, or a sampling prioritization pipeline.
 
 The pipelines will be reviewed based on the following criteria:

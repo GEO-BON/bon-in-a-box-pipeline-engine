@@ -128,27 +128,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./how_to_install.html"> 
-<span class="menu-text">How to Install</span></a>
+<span class="menu-text">Install</span></a>
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./how_to_use.html"> 
-<span class="menu-text">How to use</span></a>
+<span class="menu-text">Run a pipeline</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./how_to_contribute.html"> 
-<span class="menu-text">How to Contribute</span></a>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribute-a-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Contribute a pipeline</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-contribute-a-pipeline">    
+        <li>
+    <a class="dropdown-item" href="./what_to_contribute.qmd">
+ <span class="dropdown-text">Should you contribute?</span></a>
   </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./pipeline_standards.html"> 
-<span class="menu-text">Pipeline standards</span></a>
+        <li>
+    <a class="dropdown-item" href="./how_to_contribute.html">
+ <span class="dropdown-text">Contribution instructions</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="./pipeline_standards.qmd">
+ <span class="dropdown-text">Pipeline standards</span></a>
+  </li>  
+    </ul>
+  </li>
   <li class="nav-item">
     <a class="nav-link" href="./peer_review.html"> 
 <span class="menu-text">Peer review</span></a>
-  </li>  
-  <li class="nav-item">
-    <a class="nav-link" href="./working_with_stac.html"> 
-<span class="menu-text">Working with STAC</span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -246,7 +253,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Loading required package: sf</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.3.1; sf_use_s2() is TRUE</code></pre>
+<pre><code>Linking to GEOS 3.13.0, GDAL 3.10.1, PROJ 9.5.1; sf_use_s2() is TRUE</code></pre>
 </div>
 </div>
 <p>Next, connect to the STAC catalog using the <code>stac</code> function in the <code>rstac</code> package.</p>
