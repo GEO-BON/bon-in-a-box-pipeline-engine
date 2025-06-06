@@ -56,6 +56,9 @@ class InfoAuthorInner {
             if (data.hasOwnProperty('identifier')) {
                 obj['identifier'] = ApiClient.convertToType(data['identifier'], 'String');
             }
+            if (data.hasOwnProperty('role')) {
+                obj['role'] = ApiClient.convertToType(data['role'], ['String']);
+            }
         }
         return obj;
     }
@@ -77,6 +80,10 @@ class InfoAuthorInner {
         // ensure the json data is a string
         if (data['identifier'] && !(typeof data['identifier'] === 'string' || data['identifier'] instanceof String)) {
             throw new Error("Expected the field `identifier` to be a primitive type in the JSON string but got " + data['identifier']);
+        }
+        // ensure the json data is an array
+        if (!Array.isArray(data['role'])) {
+            throw new Error("Expected the field `role` to be an array in the JSON data but got " + data['role']);
         }
 
         return true;
@@ -104,6 +111,12 @@ InfoAuthorInner.prototype['email'] = undefined;
  * @member {String} identifier
  */
 InfoAuthorInner.prototype['identifier'] = undefined;
+
+/**
+ * Role of the author in the contribution. Suggested to use CRediT roles (https://credit.niso.org/)
+ * @member {Array.<String>} role
+ */
+InfoAuthorInner.prototype['role'] = undefined;
 
 
 
