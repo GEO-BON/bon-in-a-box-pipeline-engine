@@ -1,6 +1,9 @@
 # Ignore everything
 *
 
+# Include version
+!version.txt
+
 # Include UI folder with exceptions
 !ui/
 ui/node_modules

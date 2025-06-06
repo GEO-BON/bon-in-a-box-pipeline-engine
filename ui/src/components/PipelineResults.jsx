@@ -227,8 +227,37 @@ export function DelayedResult({
       fetch("/output/" + folder + "/output.json?t=" + displayTimeStamp)
         .then((response) => {
           if (response.ok) {
-            clearInterval(interval);
-            return response.json();
+            response.text()
+              .then((text) => {
+                if(!text) {
+                  // Covers the case where Julia scripts allow reading the file before it is written
+                  console.log("Output file empty: retrying...");
+                  return Promise.resolve(null);
+                }
+
+                const json = JSON.parse(text)
+                clearInterval(interval);
+
+                // Detailed results
+                setOutputData(json);
+
+                // Contribute to pipeline outputs (if this script is relevant)
+                setPipelineOutputResults((results) => {
+                  if (breadcrumbs in results)
+                    results[breadcrumbs] = json;
+
+                  return results;
+                });
+              })
+              .catch(e => {
+                console.error(e)
+                clearInterval(interval);
+                setOutputData({
+                  error: e.message,
+                });
+              });
+
+            return
           }
 
           // Script not done yet: wait for next attempt
@@ -237,17 +266,6 @@ export function DelayedResult({
           }
 
           return Promise.reject(response);
-        })
-        .then((json) => {
-          // Detailed results
-          setOutputData(json);
-
-          // Contribute to pipeline outputs (if this script is relevant)
-          setPipelineOutputResults((results) => {
-            if (breadcrumbs in results) results[breadcrumbs] = json;
-
-            return results;
-          });
         })
         .catch((response) => {
           clearInterval(interval);

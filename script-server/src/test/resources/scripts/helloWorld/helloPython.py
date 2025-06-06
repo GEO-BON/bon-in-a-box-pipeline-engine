@@ -1,4 +1,3 @@
-import sys, json;
 
 # Reading input.json
 inputs = biab_inputs()
