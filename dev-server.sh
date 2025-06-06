@@ -1,19 +1,28 @@
 #!/bin/bash
 
 function help {
-    echo "Usage: ./dev-server.sh [DOCKER COMPOSE COMMAND...]"
+    echo "Usage: "
+    echo "./dev-server.sh [test-paths] [DOCKER COMPOSE COMMAND...]"
+    echo "OR"
+    echo "./dev-server.sh [clean|help]"
     echo
     echo "Use this script to run your docker commands on the server more easily."
-    echo "Most probably, you will need"
-    echo "./dev-server.sh pull     to pull the docker compose images"
-    echo "./dev-server.sh build    to build the UI and script-server images"
-    echo "./dev-server.sh up -d    to start the development server"
-    echo "./dev-server.sh down     to stop the development server (if started without -d option)"
-    echo "./dev-server.sh clean    to remove the docker containers of all services"
-    echo "                         (NOT a regular docker compose command)."
-    echo "                         This is useful in development switching from prod to dev server,"
-    echo "                         in cases when we get the following error:"
-    echo "                         \"The container name ... is already in use by container ...\""
+    echo "Most probably, you will need:"
+    echo "./dev-server.sh pull              to pull the docker compose images"
+    echo "./dev-server.sh build             to build the UI and script-server images"
+    echo "./dev-server.sh up                to start the development server"
+    echo "./dev-server.sh down              to stop the development server (unless started with -d option)"
+    echo ""
+    echo "Special commands:"
+    echo "./dev-server.sh clean             to remove the docker containers of all services and legacy volumes"
+    echo "                                  (NOT a regular docker compose command)."
+    echo "                                  This is useful in development switching from prod to dev server,"
+    echo "                                  in cases when we get the following error:"
+    echo "                                  \"The container name ... is already in use by container ...\""
+    echo "./dev-server.sh test-paths up     to start the development server with .test-paths.env"
+    echo "                                  This loads the script and pipelines in script-server/src/test/resources"
+    echo "./dev-server.sh -h"
+    echo "                help              to print this help"
 }
 
 function command { # args appended to the docker compose command
@@ -43,32 +52,28 @@ function command { # args appended to the docker compose command
 }
 
 function clean {
-    echo "Removing shared containers between dev and prod"
+    echo "Removing containers..."
     docker container rm biab-gateway biab-ui biab-script-server \
         biab-tiler biab-runner-conda biab-runner-julia biab-viewer swagger_editor
-    echo "Clean complete."
-}
 
-function purge {
-    clean
-    echo "Removing dependency volumes"
+    # Legacy volumes
+    echo "Removing legacy volumes..."
     docker volume rm \
         conda-dir-dev \
         conda-cache-dev \
         conda-env-yml-dev \
         r-libs-user-dev
 
+    echo "Clean complete."
 }
 
 case "$1" in
-    help)
-        help
-        ;;
-    clean)
-        clean
-        ;;
+    -h) help ;;
+    help) help ;;
+    clean) clean ;;
     purge)
-        purge
+        echo "Deprecated: Purge is now an alias to the clean command."
+        clean
         ;;
     test-paths)
         shift 1

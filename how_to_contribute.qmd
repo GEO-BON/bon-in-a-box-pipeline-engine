@@ -6,7 +6,7 @@ If you wish to contribute a pipeline, please email us at boninabox\@geobon.org.
 
 The recommended approach is to setup an instance of BON in a Box on a machine where you can easily play with the script files, using either the local or remote setup. You can create a branch or fork to save your work. Make sure that the code is general and works with various parameters, such as in different regions across the globe. Once the integration of the new scripts or pipelines are complete, open a pull request to this repository. The pull request will be peer-reviewed before being accepted.
 
-# Is your analysis pipeline right for us?
+# Does your analysis pipeline fit in BON in a Box?
 
 We are looking for pipelines that calculate biodiversity metrics that are relevant to policy and biodiversity reporting, such as Essential Biodiversity Variables (EBVs) and Indicators. These pipelines should be
 
@@ -221,7 +221,7 @@ This means that instead of installing packages during script execution scripts, 
 
 #### Check if the libraries you need are in conda
 
-To check if the packages you need are already in the default conda environment, go to runners/r-environment.yml or runners/python-environment.yml in the BON in a Box project folder. The list of packages already installed will be under "dependencies".
+To check if the packages you need are already in the default conda environment, go to runners/conda/r-environment.yml or runners/conda/python-environment.yml in the BON in a Box project folder. The list of packages already installed will be under "dependencies".
 
 If all the packages that you need are in the R environment file and you do not need specific package versions, you do not need to specify a conda sub environment and you can skip the next step.
 
@@ -262,6 +262,10 @@ conda:
     - openeo
     - pandas
 ```
+
+## Julia
+
+Conda dependency management is not available in Julia. There is a central project at /julia_depot/.
 :::
 
 #### Loading packages that are not available in conda
@@ -469,26 +473,24 @@ my_int = data['some_int_input']
 
 ## Julia
 
-The following code allows to read inputs from the json file into a variable in the julia script:
+The following code allows to read inputs from the json file into a variable in a julia script:
 
 ``` julia
-function read_inputs_dict(runtime_dir)
-  filepath = joinpath(runtime_dir, "input.json")
-  output_dir = joinpath(runtime_dir, "data/")
-  isdir(output_dir) || mkdir(output_dir)
-  return JSON.parsefile(filepath)
+using JSON
+
+# Read the inputs from input.json
+input_data = open("input.json", "r") do f
+    JSON.parse(f)
 end
 
-RUNTIME_DIR = ARGS[1]
-inputs = read_inputs_dict(RUNTIME_DIR)
-crs = inputs["crs"]
-# do something with crs
+number = input_data["number"]
+# do something with number
 ```
 :::
 
 ### Writing outputs
 
-The outputs can be saved in a variety of file formats or primitive values (int, text, etc.). The format must be accurately specified in the YAML file.
+The outputs can be saved in a variety of file formats or primitive values (int, text, etc.). The format must be accurately specified in the YAML file. If your script has many outputs, it is recommended to call `biab_output(...)` throughout your script, and not only at the end: in the event that your script fails, the results that had already been already output can be valuable to understand what has happened.
 
 ::: panel-tabset
 ## R
@@ -520,31 +522,37 @@ biab_output("my_int_output", intOutput)
 
 ## Julia
 
-The script needs to write the output JSON file. The format is the same as for the input file above:
+A variable named `output_folder` is loaded before your script is executed. It contains a string representation of the output folder.
 
-``` json
-{
-    "some_array": [1, 55, 67],
-    "some_string": "This is my output",
-    "some_file": "/output/folder/script/hash/file.ext",
-}
-```
-
-Where `/output/folder/script/hash/` is the value of `outputFolder`.
-
-The sample code below can be modified for your specific script:
+A convenience function `biab_output` allow to save the outputs as soon as they are created in the course of your script.
 
 ``` julia
-RUNTIME_DIR = ARGS[1]
-output_json_path = joinpath(RUNTIME_DIR, "output.json")
-open(output_json_path, "w") do f
-    write(f, JSON.json(Dict(
-        :output1_name => value1,
-        :output2_name => value2
-    )))
+# Write the output file to disk
+my_output_path=joinpath(output_folder, "someOutput.csv")
+open(my_output_path, "w") do f
+    write(f, #= ... =#)
 end
+
+# Add it to the BON in a Box outputs for this script
+biab_output("my_output", my_output_path)
 ```
 :::
+
+### Modifying your script
+
+When modifying scripts in the `/scripts` folder, servers do not need to be restarted:
+
+-   When modifying an existing script, simply re-run the script from the UI and the new version will be executed.
+
+-   When adding or renaming scripts, refresh the browser page.
+
+-   If your scripts depends on additional files or external dependencies that have been updated, the update will not be detected automatically. In that case, re-save the main script file - the one reference in the `.yml` file - to trigger a re-execution for the next runs (we use the saved date of the script file to trigger re-runs).
+
+When modifying pipelines in the `/pipelines` folder, servers do not need to be restarted:
+
+-   In the pipeline editor, click save and run it again from the "pipeline run" page.
+
+-   When adding or renaming pipelines, refresh the browser page.
 
 ### Script validation
 
@@ -556,9 +564,9 @@ This validates that the syntax and structure are correct, but not that it's cont
 
 The output keys `info`, `warning` and `error` can be used to report problems in script execution. They do not need to be described in the `outputs` section of the description. They will be displayed with special formatting in the UI.
 
-Any `error` message will also halt the rest of the pipeline. It is recommended to output specific error messages to avoid crashes when errors can be foreseen. This can be done using `biab_error_stop` helper function, or by writing an "error" attribute to the `output.json` file.
+Any `error` message will also halt the script and the rest of the pipeline. It is recommended to output specific error messages to avoid crashes when errors can be foreseen. This can be done using `biab_error_stop` helper function, or by writing an "error" attribute to the `output.json` file.
 
-For example, if a user wanted the analysis to stop if the result was less than 0:
+For example, if an analysis should stop if the result was less than 0:
 
 ::: panel-tabset
 ## R
@@ -571,7 +579,7 @@ if (result < 0){
     # Script stops here
 }
 
-# Other R helper functions
+# Other reporting functions
 biab_warning("This warning will appear in the UI, but does not stop the pipeline.")
 biab_info("This message will appear in the UI.")
 ```
@@ -579,10 +587,25 @@ biab_info("This message will appear in the UI.")
 ## Python
 
 ``` python
-if intIn < 0 :
-  biab_error_stop("intIn < 0, you're not lucky! This causes failure.")
+if result < 0 :
+  biab_error_stop("Analysis was halted because result is less than 0.")
+  # Script stops here
 
-# Other Python helper functions
+# Other reporting functions
+biab_warning("This warning will appear in the UI, but does not stop the pipeline.")
+biab_info("This message will appear in the UI.")
+```
+
+## Julia
+
+``` julia
+# Sanitize the inputs
+if result < 0
+    biab_error_stop("Analysis was halted because result is less than 0.")
+    # Script stops here
+end
+
+# Other reporting functions
 biab_warning("This warning will appear in the UI, but does not stop the pipeline.")
 biab_info("This message will appear in the UI.")
 ```
@@ -704,7 +727,7 @@ Here are some common issues when trying to run pipelines in BON in a Box and how
 
 2.  **The script can't find your packages**
 
-    First, make sure that all of your packages are in the Conda sub-environment in the YAML file. If you are getting error that looks like `package or namespace load failed for 'sf' in dyn.load(file, DLLpath=DLLpath,...): unable to load shared object '/r-libs-user/sf/libs/sf.so`, you may need to purge the server. First, stop the server in our terminal (`./server-down.sh`) and then run `.server/prod-server.sh purge` then restart the server (`./server-up.sh`).
+    Make sure that all of packages available on [anaconda.org](https://anaconda.org/) are in the Conda sub-environment in the script description YAML file. If they are not on anaconda, install them via the regular installation mechanism of your programming language.
 
 If you encounter further errors, please contact us on [Discourse](https://discourse.geobon.org) or email us at boninabox\@geobon.org.
 
