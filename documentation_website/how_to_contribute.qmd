@@ -12,9 +12,9 @@ Contributors will follow the [GitHub flow](https://docs.github.com/en/get-starte
 
 2.  Fork the bon-in-a-box-pipelines repository to your personal GitHub repository and then clone it to your computer.
 
-    1.  Documentation on working with forks can be found [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) and cloning [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
+    i)  Documentation on working with forks can be found [here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) and cloning [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
 
-    2.  Make sure you keep the forked repository up to date by adding the bon-in-a-box-pipelines repository as an upstream repository and regularly fetching changes.
+    ii) Make sure you keep the forked repository up to date by adding the bon-in-a-box-pipelines repository as an upstream repository and regularly fetching changes.
 
 3.  Create a branch from the main branch for your pipeline, with a descriptive branch name (e.g. ProtConn_pipeline).
 
@@ -24,9 +24,9 @@ Contributors will follow the [GitHub flow](https://docs.github.com/en/get-starte
 
 6.  When peer review is complete, make any suggested changes to the pipeline and resubmit.
 
-7.  When the pipeline has been accepted, it will be merged to the main branch and published on Zenodo with a DOI.
+7.  When the pipeline has been accepted, it will be merged to the main branch and published on [Zenodo](https://zenodo.org/) with a DOI.
 
-8.  The BON in a Box team will contact you for any bug fixes or feature requests, and new releases will follow the [versioning structure](pipeline_standards.qmd).
+8.  The BON in a Box team will contact you for any bug fixes or feature requests, and new releases will follow the versioning structure specified at the bottom of [this page](pipeline_standards.qmd).
 
 9.  During the development process of the pipeline, regularly merge the main branch to your branch to avoid potential conflicts when merging your branch.
 
@@ -607,7 +607,7 @@ And then the customized message will appear in the UI.
 
 A crash will have the same behavior as an `error` output, stopping the pipeline with the error displayed in the UI. A script that completed without creating the `output.json` file is assumed to have crashed, and a general error message will be displayed. In both cases, the logs can be inspected for more details.
 
-### Testing your script
+## Step 5: Testing your script
 
 To start testing:
 
@@ -616,7 +616,7 @@ To start testing:
 
 You can test your script in the "run script" tab of the tool. This will generate a form where you can enter sample inputs or use your default parameters to run the script for debugging.
 
-## Step 5: Connect your scripts with the BON in a Box pipeline editor
+## Step 6: Connect your scripts with the BON in a Box pipeline editor
 
 Next, create your pipeline in the BON in a Box pipeline editor by connecting your inputs and outputs.
 
@@ -647,6 +647,8 @@ Below that pane, there is a pane for writing the metadata of the pipeline.
 ![](images/Screenshot%202025-02-26%20154507.png)
 
 **To add a step:** drag and drop from the left pane to the canvas. Steps that are single scripts will display with a single border, while steps that are pipelines will display with a double border.
+
+ADD NEW PICTURE HERE
 
 ![](https://GitHub.com/GEO-BON/biab-2.0/assets/6223744/f590bd01-d333-4712-934b-242a0f925f58){width="355"}
 
@@ -700,7 +702,7 @@ Once edited, make sure to save your work before leaving the page.
 
 The editor supports saving and loading on the server, unless explicitly disabled by host. This is done intuitively via the "Load from server" and "Save" buttons.
 
-## Step 6: Run pipeline and troubleshoot
+## Step 7: Run pipeline and troubleshoot
 
 The last step is to load your saved pipeline in BON and a Box and run it in the "run pipelines" tab.
 
