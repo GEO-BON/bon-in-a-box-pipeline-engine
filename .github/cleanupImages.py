@@ -3,7 +3,11 @@ import json
 import re
 from datetime import datetime, timedelta
 
-## This script cleans up all BON in a Box images from GitHub that don't have a special tag
+## This script cleans up all BON in a Box images from GitHub that don't have a special tag.
+
+# True, staging branches are deleted.
+# False, it keeps only the the head of all staging branches.
+delete_staging=False
 
 org = "geo-bon"
 
@@ -25,8 +29,13 @@ def is_git_sha(tag):
     return (re.fullmatch(r"sha-[a-f0-9]{7,}", tag) is not None
         or re.fullmatch(r"sha256-[a-f0-9]+", tag) is not None)
 
-def should_delete(tags):
-    return len(tags) == 0 or (len(tags) == 1 and is_git_sha(tags[0]))
+def is_staging(tag):
+    return re.fullmatch(r".*staging", tag) is not None
+
+def should_delete(tag):
+    return (is_git_sha(tag)
+            or (delete_staging and is_staging(tag))
+        )
 
 def delete_version(package, version_id):
     print(f"       X {version_id}...")
@@ -71,7 +80,7 @@ def cleanup(package):
             tags.extend(version.get("metadata", {}).get("container", {}).get("tags", []))
 
 
-        important_tags = [x for x in tags if not is_git_sha(x)]
+        important_tags = [x for x in tags if not should_delete(x)]
         if len(important_tags) == 0:
             print("DELETE", tags)
             for version in group:
