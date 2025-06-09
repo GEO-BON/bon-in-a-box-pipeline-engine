@@ -290,6 +290,16 @@ function up {
         echo "Checking for updates to docker images..."
         # see https://github.com/docker/cli/issues/6059
         images=$(command config --images)
+        if echo "$images" | grep -q "geobon/bon-in-a-box:runner"; then # migrating from v1.0.x to v1.1.0
+            echo -e "${YELLOW}Legacy Docker Hub images detected in your configuration."
+            echo -e "Please update your branch by merging the changes from the main branch to use the new ghcr.io images.${ENDCOLOR}"
+            echo "This can be done visually or on the command line with the following commands:"
+            echo "    git fetch"
+            echo "    git merge origin/main"
+            echo -e "${RED}FAILED${ENDCOLOR}"
+            exit 1
+        fi
+
         services=$(command config --services)
 
         # There are some images for which we want to keep the containers, others can be discarded.
