@@ -40,8 +40,8 @@
     "web-worker": "^1.2.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
-    "vite": "^4.0.0"
+    "@vitejs/plugin-react": "^4.4.0",
+    "vite": "^6.3.0"
   },
   "scripts": {
     "start": "vite --host --no-open",

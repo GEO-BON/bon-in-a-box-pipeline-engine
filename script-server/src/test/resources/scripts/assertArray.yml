@@ -1,6 +1,8 @@
 script: assertArray.py
 name: Assert array
 description: "Sample python script fail if it doesn't receive an array."
+lifecycle:
+  status: reviewed
 author:
   - name: Jean-Michel Lord
 inputs:

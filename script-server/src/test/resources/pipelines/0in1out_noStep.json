@@ -73,6 +73,10 @@
   "metadata": {
     "name": "0 in 1 out - no step",
     "description": "Pipeline for automated tests",
+    "lifecycle": {
+      "status": "in_review",
+      "message": "bla bla"
+    },
     "author": [
       {
         "name": "Jean-Michel Lord",

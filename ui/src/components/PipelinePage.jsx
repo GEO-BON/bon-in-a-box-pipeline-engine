@@ -263,7 +263,7 @@ export function PipelinePage({ runType }) {
 
 
   return (
-    <>
+    <div className="pipeline-page">
       <h2>{runType === "pipeline" ? "Pipeline" : "Script"} run</h2>
       <Box className="inputsTop" >
         <Accordion expanded={expandInputs} onChange={toggleAccord}>
@@ -317,6 +317,6 @@ export function PipelinePage({ runType }) {
           isPipeline={runType === "pipeline"}
         />
       )}
-    </>
+    </div>
   );
 }

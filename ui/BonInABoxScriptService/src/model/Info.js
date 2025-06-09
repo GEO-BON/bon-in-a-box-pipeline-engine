@@ -14,8 +14,10 @@
 import ApiClient from '../ApiClient';
 import InfoAuthorInner from './InfoAuthorInner';
 import InfoInputsValue from './InfoInputsValue';
+import InfoLifecycle from './InfoLifecycle';
 import InfoOutputsValue from './InfoOutputsValue';
 import InfoReferencesInner from './InfoReferencesInner';
+import InfoReviewerInner from './InfoReviewerInner';
 
 /**
  * The Info model module.
@@ -60,8 +62,14 @@ class Info {
             if (data.hasOwnProperty('description')) {
                 obj['description'] = ApiClient.convertToType(data['description'], 'String');
             }
+            if (data.hasOwnProperty('lifecycle')) {
+                obj['lifecycle'] = InfoLifecycle.constructFromObject(data['lifecycle']);
+            }
             if (data.hasOwnProperty('author')) {
                 obj['author'] = ApiClient.convertToType(data['author'], [InfoAuthorInner]);
+            }
+            if (data.hasOwnProperty('reviewer')) {
+                obj['reviewer'] = ApiClient.convertToType(data['reviewer'], [InfoReviewerInner]);
             }
             if (data.hasOwnProperty('license')) {
                 obj['license'] = ApiClient.convertToType(data['license'], 'String');
@@ -103,6 +111,10 @@ class Info {
         if (data['description'] && !(typeof data['description'] === 'string' || data['description'] instanceof String)) {
             throw new Error("Expected the field `description` to be a primitive type in the JSON string but got " + data['description']);
         }
+        // validate the optional field `lifecycle`
+        if (data['lifecycle']) { // data not null
+          InfoLifecycle.validateJSON(data['lifecycle']);
+        }
         if (data['author']) { // data not null
             // ensure the json data is an array
             if (!Array.isArray(data['author'])) {
@@ -111,6 +123,16 @@ class Info {
             // validate the optional field `author` (array)
             for (const item of data['author']) {
                 InfoAuthorInner.validateJSON(item);
+            };
+        }
+        if (data['reviewer']) { // data not null
+            // ensure the json data is an array
+            if (!Array.isArray(data['reviewer'])) {
+                throw new Error("Expected the field `reviewer` to be an array in the JSON data but got " + data['reviewer']);
+            }
+            // validate the optional field `reviewer` (array)
+            for (const item of data['reviewer']) {
+                InfoReviewerInner.validateJSON(item);
             };
         }
         // ensure the json data is a string
@@ -156,9 +178,19 @@ Info.prototype['name'] = undefined;
 Info.prototype['description'] = undefined;
 
 /**
+ * @member {module:model/InfoLifecycle} lifecycle
+ */
+Info.prototype['lifecycle'] = undefined;
+
+/**
  * @member {Array.<module:model/InfoAuthorInner>} author
  */
 Info.prototype['author'] = undefined;
+
+/**
+ * @member {Array.<module:model/InfoReviewerInner>} reviewer
+ */
+Info.prototype['reviewer'] = undefined;
 
 /**
  * @member {String} license

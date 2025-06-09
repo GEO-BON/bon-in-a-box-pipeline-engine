@@ -1,6 +1,7 @@
 import "./StepChooser.css";
 
-import { React, isValidElement, useState, useEffect, useCallback } from "react";
+import { React, isValidElement, useContext, useState, useEffect, useCallback } from "react";
+import { PopupContentContext } from "../../Layout.jsx";
 
 import { HttpError } from "../HttpErrors";
 import { fetchStepDescription } from "./StepDescriptionStore";
@@ -17,10 +18,11 @@ const onDragStart = (event, nodeType, descriptionFile) => {
   event.dataTransfer.effectAllowed = "move";
 };
 
-export default function StepChooser({ popupContent, setPopupContent }) {
+export default function StepChooser(props) { 
   const [scriptFiles, setScriptFiles] = useState([]);
   const [pipelineFiles, setPipelineFiles] = useState([]);
   const [selectedStep, setSelectedStep] = useState([]);
+  const {popupContent, setPopupContent} = useContext(PopupContentContext);
 
   // Applied only once when first loaded
   useEffect(() => {

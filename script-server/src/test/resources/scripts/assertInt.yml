@@ -1,8 +1,15 @@
 script: assertInt.py
 name: Assert int
 description: "Test python script that fails if it doesn't receive an integer."
+lifecycle:
+  status: example
+  message: This is an example!
 author:
   - name: Jean-Michel Lord
+reviewer:
+  - name: No One
+    email: noone@example.com
+    identifier: http://orcid.org/0000-0000-0000-0000
 inputs:
   input:
     label: Some int

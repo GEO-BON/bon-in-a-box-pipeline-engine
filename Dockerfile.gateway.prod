@@ -42,5 +42,6 @@ CMD ["nginx", "-g", "daemon off;"]
 
 # Temp switch to root user and back to write version file
 USER root
-RUN date +"%Y-%m-%d %R" > /version.txt
+COPY version.txt /version.txt
+RUN echo " ($(date +'%Y-%m-%d %R'))" >> /version.txt
 USER nginx
