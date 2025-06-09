@@ -634,23 +634,21 @@ The pipeline editor allows the user to create pipelines by connecting individual
 
 The left pane shows the available steps, which can be dragged onto the pipeline editor canvas.
 
-![](images/Screenshot%202025-02-26%20154357-01.png)
+![](images/Image1.png)
 
-![](images/Screenshot%202025-02-26%20154424.png)
+![](images/Image2.png)
 
 On the right side, a collapsible pane allows the user to edit the labels and descriptions of the pipeline inputs and outputs.
 
-![](images/Screenshot%202025-02-26%20154455.png)
+![](images/Image3.png)
 
 Below that pane, there is a pane for writing the metadata of the pipeline.
 
-![](images/Screenshot%202025-02-26%20154507.png)
+![](images/Image4.png)
 
 **To add a step:** drag and drop from the left pane to the canvas. Steps that are single scripts will display with a single border, while steps that are pipelines will display with a double border.
 
-ADD NEW PICTURE HERE
-
-![](https://GitHub.com/GEO-BON/biab-2.0/assets/6223744/f590bd01-d333-4712-934b-242a0f925f58){width="355"}
+![](images/Image5.png)
 
 **To connect steps:** drag to connect an output and an input handle. Input handles are on the left, output handles are on the right.
 
@@ -686,7 +684,7 @@ The node will change as shown below, and the details will appear on the right pa
 
 Any **input** with no constant value assigned will be considered a pipeline input and the user will have to fill the value.
 
-![](images/Screenshot%202025-02-26%20154439.png)
+![](images/Image6.png)
 
 Add an **output** node linked to a step output to specify that this output is an output of the pipeline. All other unmarked step outputs will still be available as intermediate results in the UI.
 
