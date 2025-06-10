@@ -202,8 +202,8 @@ function checkForUpdates {
         local image="$1"
         # Get the local digest in the format sha256:<hash>
         local localDigest=$(docker image inspect --format='{{index .RepoDigests 0}}' "$image" 2>/dev/null | cut -d '@' -f2)
-        if [[ $? -ne 0 ]]; then
-            echo "$image"
+        if [[ -z "$localDigest" ]]; then
+            echo "$image" # Not available locally
             return
         fi
 
@@ -255,6 +255,11 @@ function up {
             echo -e "${YELLOW}Please be patient while we save some disk space: this may take a while.${ENDCOLOR}"
 
             clean
+
+            echo "Removing obsolete containers..."
+            docker container rm $(docker container ls -a --format '{{.Image}} {{.ID}}'  \
+                | grep "geobon/bon-in-a-box:" \
+                | cut -d' ' -f2)
 
             echo "Removing obsolete images..."
             docker image rm $(docker image ls --format '{{.Repository}}:{{.Tag}} {{.ID}}' \
