@@ -20,9 +20,21 @@ Here is a detailed guide on how to run BON in a Box locally on your computer. Th
 
 Under the `Home` tab, you will find a description of the BON in a Box modeling tool, as well as all of its featured pipelines.
 
+<div style="margin-top: 40px;"></div>
+
+![](images/Image7.png)
+
+<div style="margin-top: 40px;"></div>
+
 ## Run a script
 
-The `Run a script` tab lets you run an individual script.
+The `Run a script` tab lets you run an individual script. Scripts are individual parts of pipelines designed to perform one well-defined task at a time, like extracting data from a file, cleaning files, or applying a specific formulas.
+
+<div style="margin-top: 40px;"></div>
+
+![](images/Image8.png)
+
+<div style="margin-top: 40px;"></div>
 
 1.  Select from the drop down menu the script you would like to run.
 
@@ -31,8 +43,6 @@ The `Run a script` tab lets you run an individual script.
 2.  Fill out the form with the input parameters the script should use.
 
     -   Scripts will run with default parameters if no inputs are specified. You may use as many or as little of the default inputs as you wish.
-
-    <!-- -->
 
     -   Some inputs can simply be typed in, while others are options.
 
@@ -46,24 +56,74 @@ The `Run a script` tab lets you run an individual script.
 
 3.  Click on `Run script`. To terminate the execution of the script at any point, use the `stop` button.
 
-After the script runs, you'll see a detailed results box, which includes tabs for your inputs and script outputs. You can click on them to see details. You should also see a gray box that contains the script logs. If you see a red exclamation mark, the script failed to completely execute and an error message will be displayed. If you encounter an error due to the script’s internal structure, please contact us on [Discourse](https://discourse.geobon.org) or email us at boninabox\@geobon.org.
+After the script runs, you'll see a detailed results box, which includes tabs for your inputs and script outputs. You can click on them to see details. A gray box containing the script logs can be found under the outputs.
 
-To download outputs, simply use the link next the output name. To run the script again, use the input form drop down button.
+<div style="margin-top: 40px;"></div>
 
-**ADD PICTURE HERE**
+![](images/Image10.png)
+
+<div style="margin-top: 40px;"></div>
+
+If you see a red exclamation mark, the script failed to completely execute and an error message will be displayed. If you encounter an error due to the script’s internal structure, please contact us on [Discourse](https://discourse.geobon.org) or email us at boninabox\@geobon.org.
+
+To download outputs, simply use the link next the output name.
+
+<div style="margin-top: 40px;"></div>
+
+![](images/Image11.png)
+
+<div style="margin-top: 40px;"></div>
+
+To run the script again, click `Run script` in the input form.
 
 ## Run a pipeline
 
-The `Run a pipeline` tab can be used to run an entire pipeline and works very similarly to the `Run a script` tab. Simply fill out the desired inputs and click on `Run pipeline`. To terminate the execution of the pipeline at any point, use the `stop` button. While the pipeline is running, you may see its progress under `Results`.
+The `Run a pipeline` tab can be used to run an entire pipeline and works very similarly to the `Run a script` tab. Pipelines run a full sequence of connected scripts and are designed specifically to carry out a complete assessment of biodiversity indicators. Each pipeline integrates multiple steps like data cleaning, processing, metric computation, and final reporting into one automated workflow.
+
+<div style="margin-top: 40px;"></div>
+
+![](images/Image12.png)
+
+<div style="margin-top: 40px;"></div>
+
+Simply fill out the desired inputs and click on `Run pipeline`. To terminate the execution of the pipeline at any point, use the `stop` button. While the pipeline is running, you may see its progress under `Results`.
 
 The `Results` box displays the outputs of the pipeline. You may view them using the drop down menu for each, or use `See in results viewer` for a more detailed view. Outputs can be downloaded by using the link next to the output name.
 
 In the `Detailed results` you will find all the individual scripts used throughout the pipeline, as well as their inputs and outputs.
 
+<div style="margin-top: 40px;"></div>
+
+![](images/Image13.png)
+
+<div style="margin-top: 40px;"></div>
+
 ## Pipeline editor
 
 Under the `Pipeline editor` tab, users can create and edit pipelines. For more information on how to do so, please refer to Step 6 of [this page](how_to_contribute.qmd).
 
+<div style="margin-top: 40px;"></div>
+
+![](images/Image14.png)
+
+<div style="margin-top: 40px;"></div>
+
 ## History
 
-The `History` tab shows previous script and pipeline runs. Use the drop down arrow to see the inputs of a run and `See run in UI` to view the details of a run, including the inputs, outputs, and logs. The latter can be used to try the run again with some or all of the same inputs. For pipelines, you may see outputs in the results viewer using `See in viewer`.
+The `History` tab shows previous script and pipeline runs.
+
+<div style="margin-top: 40px;"></div>
+
+![](images/Image15.png)
+
+<div style="margin-top: 40px;"></div>
+
+Use the drop down arrow to see the inputs of a run and `See run in UI` to view the details of a run, including the inputs, outputs, and logs. The latter can be used to try the run again with some or all of the same inputs. For pipelines, you may see outputs in the results viewer using `See in viewer`.
+
+<div style="margin-top: 40px;"></div>
+
+![](images/Image16.png)
+
+<div style="margin-top: 40px;"></div>
+
+**For any further questions, please contact us on [Discourse](https://discourse.geobon.org) or email us at boninabox\@geobon.org.**
