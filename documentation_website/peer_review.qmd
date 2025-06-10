@@ -41,6 +41,14 @@ When pipelines have been peer reviewed and are accepted, they will be published 
 
 ## Instructions for reviewers
 
-Reviewers will evaluate the code, method implementation, and usability of the pipeline. Reviewers will provide comments in the pipeline review form. Reviewers can also comment directly in the pull request on GitHub.
+Reviewers will need to install BON in a Box to test the pipeline. See the installation instructions [here](how_to_install.qmd).
 
-#### [Download peer review form here](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/raw/refs/heads/documentation_peer_review/documentation_website/peer_review_form.docx)
+Download the pipeline review form to fill out while testing and reviewing the pipeline.
+
+1.  Run the pipeline with the default parameters and make sure that it works, that the pipeline, input, and output descriptions are clear, and that the outputs are useful. Users should be able to understand how to parameterize and run the pipeline using these descriptions.
+2.  Review the code in the GitHub pull request to make sure there are no errors and it is doing what it is supposed to (note: not all reviewers will be reviewing code, only reviewers that are familiar with the coding methods). If there are specific code issues, comment those directly in the pull request.
+3.  Read the markdown tutorial and evaluate it for clarity.
+4.  Test the pipeline several times with different parameters. If you have your own data on hand, test the pipeline with that data. It is preferential to test the data in areas or with parameters that you are familiar with so you can evaluate the accuracy of the results. If the pipeline crashes or there are incorrect results, make note of this in the pipeline review form.
+5.  Make a decision about whether the pipeline is ready to publish.
+
+#### [Download pipeline review form here](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/raw/refs/heads/documentation_peer_review/documentation_website/peer_review_form.docx)
