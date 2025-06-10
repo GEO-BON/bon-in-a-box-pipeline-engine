@@ -23,6 +23,7 @@ export default function CountryChooser({
   setBbox,
   setBboxGeoJSON,
   setCountryISO,
+  setCountryBbox,
   setStateProvName,
   setAction,
   setClearFeatures,
@@ -86,7 +87,7 @@ export default function CountryChooser({
         countryObj.north,
       ];
       b = b.map((c) => c.toFixed(6));
-      setBboxGeoJSON(validTerraPolygon(turf.bboxPolygon(b)));
+      setCountryBbox(b);
     }
     if (stateProv) {
       const stateObj = stateProvJSON.find((s) => s.geonameId === stateProv);
@@ -98,7 +99,7 @@ export default function CountryChooser({
         stateObj.bbox.north,
       ];
       b = b.map((c) => c.toFixed(6));
-      setBboxGeoJSON(validTerraPolygon(turf.bboxPolygon(b)));
+      setCountryBbox(b);
     }
   };
 

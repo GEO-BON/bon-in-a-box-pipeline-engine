@@ -45,7 +45,7 @@ export default function Map({
           },
           sources: {
             satellite: {
-              url: "https://api.maptiler.com/tiles/satellite-v2/tiles.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL",
+              url: "https://api.maptiler.com/maps/satellite/?key=U4hNLWRENxTa7CfHUUnN#1.0/0.00000/0.00000",
               type: "raster",
             },
             background: {
@@ -104,7 +104,27 @@ export default function Map({
     if(previousId && drawFeatures.length > 0 && mapReady) {
         const drawInstance = drawControl.getTerraDrawInstance();
         if (drawInstance) {
-            if(drawInstance.hasFeature(previousId)) {
+          drawInstance.updateModeOptions('polygon', {
+            projection: 'globe',
+            insertCoordinates: {
+              strategy: 'amount',
+              value: 10
+            },
+            validation: (feature, { updateType }) => {
+              return { valid: true }
+            }
+          })
+          drawInstance.updateModeOptions('rectangle', {
+            projection: 'globe',
+            insertCoordinates: {
+              strategy: 'amount',
+              value: 10
+            },
+            validation: (feature, { updateType }) => {
+              return { valid: true }
+            }
+          })
+          if(drawInstance.hasFeature(previousId)) {
                 drawInstance.removeFeatures([previousId]);
             }
             drawInstance.addFeatures(drawFeatures);

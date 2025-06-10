@@ -8,7 +8,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { styled } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import Map from "./Map";
+import MapOL from "./MapOL";
 import { geometry } from "@turf/turf";
 import * as turf from "@turf/turf";
 import CountryChooser from "./CountryChooser";
@@ -20,6 +20,7 @@ import { set } from "lodash";
 
 export default function LocationChooser({ locationFile }) {
   const [bbox, setBbox] = useState([]);
+  const [countryBbox, setCountryBbox] = useState([]);
   const [countryISO, setCountryISO] = useState("");
   const [stateProvName, setStateProvName] = useState("");
   const [drawFeatures, setDrawFeatures] = useState([]);
@@ -27,19 +28,19 @@ export default function LocationChooser({ locationFile }) {
   const [previousId, setPreviousId] = useState("");
   const [bboxGeoJSON, setBboxGeoJSON] = useState(null);
   const [bboxGeoJSONShrink, setBboxGeoJSONShrink] = useState(null);
-  const [CRS, setCRS] = useState(4326);
+  const [CRS, setCRS] = useState({name: 'WGS84 - Lat/long', authority: 'EPSG', code: '4326', def: '+proj=longlat +datum=WGS84 +no_defs'});
   const [action, setAction] = useState("");
 
   useEffect(() => {
-    if (bboxGeoJSON) {
+    if (bbox.length > 0) {
       if (drawFeatures.length > 0) {
         setPreviousId(drawFeatures[0].id);
       } else {
         setPreviousId(uuidv4()); //Random ID for the first feature
       }
       //Shrink bbox for projestion which wont provide a crs suggestion if even a small part of the bbox is outside the area of coverage of the CRS
-      let b = turf.bbox(bboxGeoJSON);
-      b = b.map((c) => parseFloat(c));
+      //let b = turf.bbox(bboxGeoJSON);
+      const b = bbox.map((c) => parseFloat(c));
       const scale_width = (b[2] - b[0]) / 2;
       const scale_height = (b[3] - b[1]) / 2;
       const bbox_shrink = [
@@ -49,9 +50,9 @@ export default function LocationChooser({ locationFile }) {
         b[3] - scale_height,
       ];
       setBboxGeoJSONShrink(turf.bboxPolygon(bbox_shrink));
-      setDrawFeatures([bboxGeoJSON]);
+      //setDrawFeatures([bboxGeoJSON]);
     }
-  }, [bboxGeoJSON]);
+  }, [bbox]);
 
   return (
     <div
@@ -79,6 +80,7 @@ export default function LocationChooser({ locationFile }) {
             {...{
               setBboxGeoJSON,
               setCountryISO,
+              setCountryBbox,
               setStateProvName,
               setClearFeatures,
               setAction,
@@ -111,12 +113,14 @@ export default function LocationChooser({ locationFile }) {
           xs={9}
           sx={{ padding: "0px", backgroundColor: "#", height: "100%" }}
         >
-          <Map
+          <MapOL
             {...{
               bbox,
               setBbox,
+              countryBbox,
               drawFeatures,
               clearFeatures,
+              CRS,
               previousId,
               setAction,
             }}

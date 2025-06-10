@@ -17,7 +17,7 @@ export default function CRSMenu({
   bboxGeoJSON,
 }) {
   const [CRSList, setCRSList] = useState([]);
-  const [selectedCRS, setSelectedCRS] = useState(CRS);
+  const [selectedCRS, setSelectedCRS] = useState(CRS.value);
   useEffect(() => {
     if (bboxGeoJSONShrink === null) return;
     let bbj = { type: "FeatureCollection", features: [bboxGeoJSONShrink] };
@@ -44,9 +44,13 @@ export default function CRSMenu({
     });
   }, [bboxGeoJSONShrink]);
 
-  const updateCRS = () => {
+  const updateCRS = (value) => {
     setAction("CRSButton");
-    setCRS(selectedCRS.value);
+    getCRSDef(`EPSG:${value.value}`).then((def) => {
+      if(def){
+        setCRS({name: value.label, code: value.value, def: def})
+      }
+    })
   };
 
   return (
@@ -66,15 +70,18 @@ export default function CRSMenu({
         renderInput={(params) => <TextField {...params} label="Select CRS" />}
         onChange={(event, value) => {
           setSelectedCRS(value);
+          updateCRS(value)
         }}
         value={selectedCRS}
       />
-      <CustomButtonGreen
-        variant="contained"
-        onClick={(e) => updateCRS(e, bbox, CRS)}
-      >
-        Set CRS
-      </CustomButtonGreen>
+      {false && (
+        <CustomButtonGreen
+          variant="contained"
+          onClick={(e) => updateCRS(e, bbox, CRS)}
+        >
+          Set CRS
+        </CustomButtonGreen>
+      )}
     </div>
   );
 }

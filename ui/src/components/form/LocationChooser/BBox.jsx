@@ -100,20 +100,20 @@ export default function BBox({
       parseFloat(MaxX.toFixed(6)),
       parseFloat(MaxY.toFixed(6)),
     ];
-    bboxToLLGeoJSON(b, CRS);
+    //bboxToLLGeoJSON(b, CRS);
     setBbox(b);
   };
 
   useEffect(() => {
     if (action !== "" && bboxGeoJSON) {
-      GeoJSONtoLLBbox(bboxGeoJSON, CRS);
+      //GeoJSONtoLLBbox(bboxGeoJSON, CRS);
     }
   }, [bboxGeoJSON, CRS]);
 
   useEffect(() => {
     if (CRS !== "" && bbox.length > 0) {
       setAction("");
-      bboxToLLGeoJSON(bbox, CRS);
+      //bboxToLLGeoJSON(bbox, CRS);
     }
   }, [bbox]);
 

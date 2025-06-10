@@ -26,7 +26,7 @@ let defs = [
   ],
 ];
 
-proj4.defs = defs;
+//proj4.defs = defs;
 
 export const getStateAPI = async (geonameId) => {
   let result;
@@ -112,9 +112,9 @@ export const getCRSDef = async (epsg_number) => {
       result.data.results &&
       result.data.results.length > 0 &&
       result.data.results[0].exports &&
-      result.data.results[0].exports.wkt
+      result.data.results[0].exports.proj4
     ) {
-      return result.data.results[0].exports.wkt;
+      return result.data.results[0].exports.proj4;
     } else {
       throw new Error("CRS definition not found for " + epsg_number);
     }
@@ -131,12 +131,13 @@ export const transformCoordCRS = (coords, source_crs_epsg, dest_crs_epsg) => {
 };
 
 export const bboxToCoords = (bbox) => {
-  return [
+  const b = [
     [bbox[0], bbox[1]],
     [bbox[0], bbox[3]],
     [bbox[2], bbox[3]],
     [bbox[2], bbox[1]],
-  ];
+  ].map((bb)=>[parseFloat(bb[0]),parseFloat(bb[1])]);
+  return b
 };
 
 export const validTerraPolygon = (feature) => {
