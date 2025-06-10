@@ -256,6 +256,11 @@ function up {
 
             clean
 
+            echo "Removing obsolete containers..."
+            docker container rm $(docker container ls -a --format '{{.Image}} {{.ID}}'  \
+                | grep "geobon/bon-in-a-box:" \
+                | cut -d' ' -f2)
+
             echo "Removing obsolete images..."
             docker image rm $(docker image ls --format '{{.Repository}}:{{.Tag}} {{.ID}}' \
                 | grep '^geobon/bon-in-a-box' \
