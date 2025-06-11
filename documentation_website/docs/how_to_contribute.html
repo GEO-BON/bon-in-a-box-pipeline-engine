@@ -132,7 +132,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./how_to_use.html"> 
-<span class="menu-text">Run a pipeline</span></a>
+<span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribute-a-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
@@ -140,15 +140,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-contribute-a-pipeline">    
         <li>
-    <a class="dropdown-item" href="./what_to_contribute.qmd">
- <span class="dropdown-text">Should you contribute?</span></a>
+    <a class="dropdown-item" href="./what_to_contribute.html">
+ <span class="dropdown-text">Interested in Contributing?</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./how_to_contribute.html">
  <span class="dropdown-text">Contribution instructions</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./pipeline_standards.qmd">
+    <a class="dropdown-item" href="./pipeline_standards.html">
  <span class="dropdown-text">Pipeline standards</span></a>
   </li>  
     </ul>
@@ -199,7 +199,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#github-contribution-workflow" id="toc-github-contribution-workflow" class="nav-link active" data-scroll-target="#github-contribution-workflow">GitHub contribution workflow</a></li>
+  <li><a href="#general-github-contribution-workflow" id="toc-general-github-contribution-workflow" class="nav-link active" data-scroll-target="#general-github-contribution-workflow">General GitHub contribution workflow</a></li>
   <li><a href="#how-to-write-a-script-video-tutorial" id="toc-how-to-write-a-script-video-tutorial" class="nav-link" data-scroll-target="#how-to-write-a-script-video-tutorial">How to write a script video tutorial</a></li>
   <li><a href="#how-to-create-a-pipeline-video-tutorial" id="toc-how-to-create-a-pipeline-video-tutorial" class="nav-link" data-scroll-target="#how-to-create-a-pipeline-video-tutorial">How to create a pipeline video tutorial</a></li>
   <li><a href="#before-you-start" id="toc-before-you-start" class="nav-link" data-scroll-target="#before-you-start">Before you start</a></li>
@@ -220,15 +220,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#modifying-your-script" id="toc-modifying-your-script" class="nav-link" data-scroll-target="#modifying-your-script">Modifying your script</a></li>
   <li><a href="#script-validation" id="toc-script-validation" class="nav-link" data-scroll-target="#script-validation">Script validation</a></li>
   <li><a href="#reporting-problems" id="toc-reporting-problems" class="nav-link" data-scroll-target="#reporting-problems">Reporting problems</a></li>
-  <li><a href="#testing-your-script" id="toc-testing-your-script" class="nav-link" data-scroll-target="#testing-your-script">Testing your script</a></li>
   </ul></li>
-  <li><a href="#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" id="toc-step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" class="nav-link" data-scroll-target="#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor">Step 5: Connect your scripts with the BON in a Box pipeline editor</a>
+  <li><a href="#step-5-testing-your-script" id="toc-step-5-testing-your-script" class="nav-link" data-scroll-target="#step-5-testing-your-script">Step 5: Testing your script</a></li>
+  <li><a href="#step-6-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" id="toc-step-6-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" class="nav-link" data-scroll-target="#step-6-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor">Step 6: Connect your scripts with the BON in a Box pipeline editor</a>
   <ul class="collapse">
   <li><a href="#pipeline-editor" id="toc-pipeline-editor" class="nav-link" data-scroll-target="#pipeline-editor">Pipeline editor</a></li>
   <li><a href="#pipeline-inputs-and-outputs" id="toc-pipeline-inputs-and-outputs" class="nav-link" data-scroll-target="#pipeline-inputs-and-outputs">Pipeline inputs and outputs</a></li>
   <li><a href="#saving-and-loading" id="toc-saving-and-loading" class="nav-link" data-scroll-target="#saving-and-loading">Saving and loading</a></li>
   </ul></li>
-  <li><a href="#step-6-run-pipeline-and-troubleshoot" id="toc-step-6-run-pipeline-and-troubleshoot" class="nav-link" data-scroll-target="#step-6-run-pipeline-and-troubleshoot">Step 6: Run pipeline and troubleshoot</a></li>
+  <li><a href="#step-7-run-pipeline-and-troubleshoot" id="toc-step-7-run-pipeline-and-troubleshoot" class="nav-link" data-scroll-target="#step-7-run-pipeline-and-troubleshoot">Step 7: Run pipeline and troubleshoot</a></li>
   <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a></li>
   <li><a href="#when-is-your-pipeline-complete" id="toc-when-is-your-pipeline-complete" class="nav-link" data-scroll-target="#when-is-your-pipeline-complete">When is your pipeline complete?</a></li>
   </ul>
@@ -256,23 +256,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Analysis pipelines in BON in a Box are workflows that have been adapted to pipelines within the tool. Here we will walk you through a few steps to adapt your code to run in BON in a Box.</p>
-<section id="github-contribution-workflow" class="level2">
-<h2 class="anchored" data-anchor-id="github-contribution-workflow">GitHub contribution workflow</h2>
+<p>Analysis pipelines in BON in a Box are workflows that have been adapted to its pipelines framework. Here we will walk you through a few steps to adapt your code to run in BON in a Box.</p>
+<section id="general-github-contribution-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="general-github-contribution-workflow">General GitHub contribution workflow</h2>
 <p>Contributors will follow the <a href="https://docs.github.com/en/get-started/using-github/github-flow">GitHub flow</a> when contributing pipelines to BON in a Box. Contributors can follow these steps:</p>
 <ol type="1">
-<li><p>Make sure you have a personal/institutional GitHub repository</p></li>
-<li><p>Fork the bon-in-a-box-pipelines repository to your personal GitHub repository</p>
-<ol type="1">
-<li><p>Documentation on working with forks can be found <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo">here</a></p></li>
-<li><p>Make sure you keep the forked repository up to date by adding the bon-in-a-box-pipelines repository as an upstream repository and regularly fetching changes</p></li>
+<li><p>Make sure you have a personal/institutional GitHub repository.</p></li>
+<li><p>Fork the bon-in-a-box-pipelines repository to your personal GitHub repository and then clone it to your computer.</p>
+<ol type="i">
+<li><p>Documentation on working with forks can be found <a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo">here</a> and cloning <a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository">here</a>.</p></li>
+<li><p>Make sure you keep the forked repository up to date by adding the bon-in-a-box-pipelines repository as an upstream repository and regularly fetching changes.</p></li>
 </ol></li>
-<li><p>Create a branch from the main branch for your pipeline, with a descriptive branch name (e.g.&nbsp;ProtConn_pipeline)</p></li>
-<li><p>Create your pipeline on this branch</p></li>
-<li><p>When it is complete, create a pull request (<a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request">instructions here</a>) to the main branch on the bon-in-a-box-pipelines GitHub and fill out the <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/pull/188/commits/8f33d28fc691b7bf0ed1bffe00330076c7271cf3">peer review template</a>, suggesting at least two potential peer reviewers</p></li>
-<li><p>When peer review is complete, make any suggested changes to the pipeline and resubmit</p></li>
-<li><p>When the pipeline has been accepted, it will be merged to the main branch and published on Zenodo with a DOI</p></li>
-<li><p>The BON in a Box team will contact you for any bug fixes or feature requests, and new releases will follow the versioning structure below</p></li>
+<li><p>Create a branch from the main branch for your pipeline, with a descriptive branch name (e.g.&nbsp;ProtConn_pipeline).</p></li>
+<li><p>Create your pipeline on this branch.</p></li>
+<li><p>When it is complete, create a pull request (<a href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request">instructions here</a>) to the main branch on the bon-in-a-box-pipelines GitHub and fill out the <a href="https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/raw/refs/heads/documentation_peer_review/documentation_website/peer_review_form.docx">peer review template</a> , suggesting at least two potential peer reviewers.</p></li>
+<li><p>When peer review is complete, make any suggested changes to the pipeline and resubmit.</p></li>
+<li><p>When the pipeline has been accepted, it will be merged to the main branch and published on <a href="https://zenodo.org/">Zenodo</a> with a DOI.</p></li>
+<li><p>The BON in a Box team will contact you for any bug fixes or feature requests, and new releases will follow the versioning structure specified at the bottom of <a href="./pipeline_standards.html">this page</a>.</p></li>
 <li><p>During the development process of the pipeline, regularly merge the main branch to your branch to avoid potential conflicts when merging your branch.</p></li>
 </ol>
 </section>
@@ -298,12 +298,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="step-2-break-up-your-scripts" class="level2">
 <h2 class="anchored" data-anchor-id="step-2-break-up-your-scripts">Step 2: Break up your scripts</h2>
-<p>You can start writing the individual scripts in your pipeline. If you already have an analysis workflow, break this up into individual scripts representing the steps of the pipeline. Plan what you want the inputs and outputs to be for each script.</p>
+<p>You can start writing the individual scripts in your pipeline. If you already have an analysis workflow, break this up into individual scripts representing the steps of the pipeline. Plan what you want as the inputs and outputs for each script.</p>
 </section>
 <section id="step-3-create-a-yaml-file" class="level2">
 <h2 class="anchored" data-anchor-id="step-3-create-a-yaml-file">Step 3: Create a YAML file</h2>
 <p>Each script should be accompanied by a YAML file (.yml extension) that specifies inputs and outputs of that step of the pipeline.</p>
-<p>Markdown is supported for pipeline, script, input and output descriptions. See this <a href="https://commonmark.org/help/">CommonMark quick reference</a> for allowed markups. These can include special characters, links, and images.</p>
+<p>Markdown is supported for pipeline, script, input, and output descriptions. See this <a href="https://commonmark.org/help/">CommonMark quick reference</a> for allowed markups. These can include special characters, links, and images.</p>
 <section id="name-and-description" class="level3">
 <h3 class="anchored" data-anchor-id="name-and-description">Name and description</h3>
 <p>YAML files should begin with a name, description, and the authors of the script. The name should be the name of the script described by the YAML file (script_name.R below). Save the file with the same name as the script that it describes but with a .yml extension (e.g.&nbsp;if the script is called my_script.R the YAML should be called my_script.yml).</p>
@@ -318,8 +318,8 @@ author:
 <section id="inputs" class="level3">
 <h3 class="anchored" data-anchor-id="inputs">Inputs</h3>
 <p>Next, the YAML file should specify the inputs of the script. These inputs will either be outputs from the previous script, which can be connected by lines in the pipeline editor, or specified by the user in the input form.</p>
-<p>All input and output ids should follow the snake case naming conventions. Names should be all lowercase with underscores instead of spaces. For example, an input labelled “Species name” would cear the snake case id of “species_name”. This id will be the name of the input parameter in your code.</p>
-<p>Here is an example where the input a coordinate reference system and a distance that is specified by the user:</p>
+<p>All input and output ids should follow the snake case naming conventions. Names should be all lowercase with underscores instead of spaces. For example, an input labelled “Species name” would have the snake case id of “species_name”. This id will be the name of the input parameter in your code.</p>
+<p>Here is an example where the inputs are a coordinate reference system and a distance, specified by the user:</p>
 <pre><code>inputs:
   crs:
     label: coordinate reference system for output
@@ -331,7 +331,7 @@ author:
     description: Some distance measurement (in meters) for a parameter
     type: int
     example: 1000</code></pre>
-<p>Specifying an example will auto-fill that input with the example unless changed by the user. If you do not want an example that auto-fills the input write “example: null”. This will leave the input blank unless the user adds one. Not specifying any example will cause an error. It is mandatory that a script can be run successfully by leaving all the examples and simply pressing Run.</p>
+<p>Specifying an example will auto-fill that input with the example unless changed by the user. If you do not want an example that auto-fills the input, write “example: null”. This will leave the input blank unless the user adds one. Not specifying any example will cause an error. It is mandatory that a script can be run successfully by leaving all the examples and simply pressing Run.</p>
 <p>There are several different types of user inputs that can be specified in the YAML file:</p>
 <table class="caption-top table">
 <colgroup>
@@ -557,7 +557,7 @@ author:
 <p>This means that instead of installing packages during script execution scripts, they are installed in the R environment in conda. Note that you still need to load the packages in your scripts using the <code>library()</code> command for R or <code>import</code> for Python.</p>
 <section id="check-if-the-libraries-you-need-are-in-conda" class="level4">
 <h4 class="anchored" data-anchor-id="check-if-the-libraries-you-need-are-in-conda">Check if the libraries you need are in conda</h4>
-<p>To check if the packages you need are already in the default conda environment, go to runners/r-environment.yml or runners/python-environment.yml in the BON in a Box project folder. The list of packages already installed will be under “dependencies”.</p>
+<p>To check if the packages you need are already in the default conda environment, go to runners/r-environment.yml or runners/python-environment.yml in the BON in a Box project folder. The list of packages already installed can be found under “dependencies”.</p>
 <p>If all the packages that you need are in the R environment file and you do not need specific package versions, you do not need to specify a conda sub environment and you can skip the next step.</p>
 </section>
 <section id="specify-a-conda-sub-environment-in-your-yml-file" class="level4">
@@ -659,8 +659,8 @@ conda: # Optional, only needed if you need packages not in the central environme
 <p>YAML is a space sensitive format, so make sure all the tab sets are correct in the file.</p>
 <p>If inputs are outputs from a previous step in the pipeline, make sure to give the inputs and outputs the same name and they will be automatically linked in the pipeline.</p>
 </section>
-<section id="empty-commented-sample-to-fill-in" class="level4">
-<h4 class="anchored" data-anchor-id="empty-commented-sample-to-fill-in">Empty commented sample to fill in:</h4>
+<section id="empty-commented-template-to-fill-in" class="level4">
+<h4 class="anchored" data-anchor-id="empty-commented-template-to-fill-in">Empty commented template to fill in:</h4>
 <pre><code>script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targeted to those who will interpret pipeline results and edit pipelines.
@@ -706,10 +706,10 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>Currently supported versions of R, Julia, Python and shell are displayed in the server info tab of the user interface.</p>
 <p>Script life cycle:</p>
 <ol type="1">
-<li><p>Script launched with output folder as a parameter. (In R, an <code>outputFolder</code> variable in the R session. In Julia, Shell and Python, the output folder is received as an argument.)</p></li>
+<li><p>Script launched with output folder as a parameter (In R, an <code>outputFolder</code> variable in the R session. In Julia, Shell and Python, the output folder is received as an argument.)</p></li>
 <li><p>Script reads <code>input.json</code> to get execution parameters (ex. species, area, data source, etc.)</p></li>
 <li><p>Script performs its task</p></li>
-<li><p>Script generates <code>output.json</code> containing links to result files, or native values (number, string, etc.)</p></li>
+<li><p>Script generates <code>output.json</code> containing links to result files, or native values (ex. number, string, etc.)</p></li>
 </ol>
 <p>See <a href="https://GitHub.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/empty.R">empty R script</a> for a minimal script life cycle example.</p>
 <section id="receiving-inputs" class="level3">
@@ -777,8 +777,8 @@ conda: # Optional, only needed if your script has specific package dependencies
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Python</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false">Julia</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
-<p>A variable named <code>outputFolder</code> is loaded when R load that specifies where to save the output files.</p>
-<p>In R, a convenience function <code>biab_output</code> allow to save the outputs. Here is an example in R of an output with a csv file and a plot in png format.</p>
+<p>A variable named <code>outputFolder</code> is automatically loaded and contains the file path to output folder.</p>
+<p>In R, a convenience function <code>biab_output</code> allows to save the outputs. Here is an example of an output with a csv file and a plot in png format.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>result_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(outputFolder, <span class="st">"result.csv"</span>)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(result, result_path, <span class="at">row.names =</span> F )</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">biab_output</span>(<span class="st">"result"</span>, result_path)</span>
@@ -788,14 +788,14 @@ conda: # Optional, only needed if your script has specific package dependencies
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">biab_output</span>(<span class="st">"result_plot"</span>, result_plot_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
-<p>A variable named <code>output_folder</code> is loaded before your script is executed. It contains a string representation of the output folder.</p>
-<p>A convenience function <code>biab_output</code> allow to save the outputs as soon as they are created in the course of your script.</p>
+<p>A variable named <code>output_folder</code> is automatically loaded and contains the file path to output folder.</p>
+<p>A convenience function <code>biab_output</code> allows to save the outputs as soon as they are created in the course of your script.</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>intOutput <span class="op">=</span> <span class="dv">12345</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>biab_output(<span class="st">"my_int_output"</span>, intOutput)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
-<p>A variable named <code>output_folder</code> is loaded before your script is executed. It contains a string representation of the output folder.</p>
-<p>A convenience function <code>biab_output</code> allow to save the outputs as soon as they are created in the course of your script.</p>
+<p>A variable named <code>output_folder</code> is automatically loaded and contains the file path to output folder.</p>
+<p>A convenience function <code>biab_output</code> allows to save the outputs as soon as they are created in the course of your script.</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Write the output file to disk</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>my_output_path<span class="op">=</span><span class="fu">joinpath</span>(output_folder, <span class="st">"someOutput.csv"</span>)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">open</span>(my_output_path, <span class="st">"w"</span>) <span class="cf">do</span> f</span>
@@ -812,7 +812,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <h3 class="anchored" data-anchor-id="modifying-your-script">Modifying your script</h3>
 <p>When modifying scripts in the <code>/scripts</code> folder, servers do not need to be restarted:</p>
 <ul>
-<li><p>When modifying an existing script, simply re-run the script from the UI and the new version will be executed.</p></li>
+<li><p>When modifying an existing script, simply save the file and re-run the script from the UI and the new version will be executed.</p></li>
 <li><p>When adding or renaming scripts, refresh the browser page.</p></li>
 <li><p>If your scripts depends on additional files or external dependencies that have been updated, the update will not be detected automatically. In that case, re-save the main script file - the one reference in the <code>.yml</code> file - to trigger a re-execution for the next runs (we use the saved date of the script file to trigger re-runs).</p></li>
 </ul>
@@ -824,13 +824,13 @@ conda: # Optional, only needed if your script has specific package dependencies
 </section>
 <section id="script-validation" class="level3">
 <h3 class="anchored" data-anchor-id="script-validation">Script validation</h3>
-<p>The syntax and structure of the script description file will be validated on push. To run the validation locally, run <code>validate.sh</code></p>
+<p>The syntax and structure of the script description file will be validated on push. To run the validation locally, run <code>validate.sh</code> in your terminal.</p>
 <p>This validates that the syntax and structure are correct, but not that it’s content is correct. Hence, peer review of the scripts and the description files is mandatory before accepting a pull requests. Once peer reviewed, it will be tagged as in development, in review, reviewed or deprecated with an optional message describing why it was given that status.</p>
 </section>
 <section id="reporting-problems" class="level3">
 <h3 class="anchored" data-anchor-id="reporting-problems">Reporting problems</h3>
 <p>The output keys <code>info</code>, <code>warning</code> and <code>error</code> can be used to report problems in script execution. They do not need to be described in the <code>outputs</code> section of the description. They will be displayed with special formatting in the UI.</p>
-<p>Any <code>error</code> message will also halt the script and the rest of the pipeline. It is recommended to output specific error messages to avoid crashes when errors can be foreseen. This can be done using <code>biab_error_stop</code> helper function, or by writing an “error” attribute to the <code>output.json</code> file.</p>
+<p>Any <code>error</code> message will also halt the script and the rest of the pipeline. It is recommended to output specific error messages to avoid crashes when errors can be foreseen. This can be done using the <code>biab_error_stop</code> helper function, or by writing an “error” attribute to the <code>output.json</code> file.</p>
 <p>For example, if an analysis should stop if the result was less than 0:</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Python</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false">Julia</a></li></ul>
@@ -870,15 +870,20 @@ conda: # Optional, only needed if your script has specific package dependencies
 </div>
 </div>
 <p>And then the customized message will appear in the UI.</p>
-<p>A crash will have the same behavior as an <code>error</code> output, stopping the pipeline and with the error displayed in the UI. A script that completed without creating the <code>output.json</code> file is assumed to have crashed, and a general error message will be displayed. In both cases, the logs can be inspected for more details.</p>
-</section>
-<section id="testing-your-script" class="level3">
-<h3 class="anchored" data-anchor-id="testing-your-script">Testing your script</h3>
-<p>You can test your script in the “run script” tab of the tool. This will generate a form based on your inputs, where you can put examples and run the script for debugging.</p>
+<p>A crash will have the same behavior as an <code>error</code> output, stopping the pipeline with the error displayed in the UI. A script that completed without creating the <code>output.json</code> file is assumed to have crashed, and a general error message will be displayed. In both cases, the logs can be inspected for more details.</p>
 </section>
 </section>
-<section id="step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" class="level2">
-<h2 class="anchored" data-anchor-id="step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor">Step 5: Connect your scripts with the BON in a Box pipeline editor</h2>
+<section id="step-5-testing-your-script" class="level2">
+<h2 class="anchored" data-anchor-id="step-5-testing-your-script">Step 5: Testing your script</h2>
+<p>To start testing:</p>
+<ol type="1">
+<li>Connect to the server by running <code>./server-up.sh</code> in a Linux terminal (e.g.&nbsp;Git Bash or WSL on Windows or Terminal on Mac). Make sure you are in the bon-in-a-box-pipeline directory on your computer.</li>
+<li>In a web browser, type <a href="http://localhost/" class="uri">http://localhost/</a>.</li>
+</ol>
+<p>You can test your script in the “run script” tab of the tool. This will generate a form where you can enter sample inputs or use your default parameters to run the script for debugging.</p>
+</section>
+<section id="step-6-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" class="level2">
+<h2 class="anchored" data-anchor-id="step-6-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor">Step 6: Connect your scripts with the BON in a Box pipeline editor</h2>
 <p>Next, create your pipeline in the BON in a Box pipeline editor by connecting your inputs and outputs.</p>
 <p>Once you have saved your scripts and YAML files to your local computer in the Bon-in-a-box pipelines folder that was cloned from GitHub, they will show up as scripts in the pipeline editor. You can drag the scripts into the editor and connect the inputs and outputs to create your pipeline.</p>
 <p>A pipeline is a collection of steps that are connected to automate an analysis workflow. Each script becomes a pipeline step.</p>
@@ -888,14 +893,14 @@ conda: # Optional, only needed if your script has specific package dependencies
 <h3 class="anchored" data-anchor-id="pipeline-editor">Pipeline editor</h3>
 <p>The pipeline editor allows the user to create pipelines by connecting individual scripts through inputs and outputs.</p>
 <p>The left pane shows the available steps, which can be dragged onto the pipeline editor canvas.</p>
-<p><img src="images/Screenshot 2025-02-26 154357-01.png" class="img-fluid"></p>
-<p><img src="images/Screenshot 2025-02-26 154424.png" class="img-fluid"></p>
+<p><img src="images/Image1.png" class="img-fluid"></p>
+<p><img src="images/Image2.png" class="img-fluid"></p>
 <p>On the right side, a collapsible pane allows the user to edit the labels and descriptions of the pipeline inputs and outputs.</p>
-<p><img src="images/Screenshot 2025-02-26 154455.png" class="img-fluid"></p>
+<p><img src="images/Image3.png" class="img-fluid"></p>
 <p>Below that pane, there is a pane for writing the metadata of the pipeline.</p>
-<p><img src="images/Screenshot 2025-02-26 154507.png" class="img-fluid"></p>
+<p><img src="images/Image4.png" class="img-fluid"></p>
 <p><strong>To add a step:</strong> drag and drop from the left pane to the canvas. Steps that are single scripts will display with a single border, while steps that are pipelines will display with a double border.</p>
-<p><img src="https://GitHub.com/GEO-BON/biab-2.0/assets/6223744/f590bd01-d333-4712-934b-242a0f925f58.png" class="img-fluid" width="355"></p>
+<p><img src="images/Image5.png" class="img-fluid"></p>
 <p><strong>To connect steps:</strong> drag to connect an output and an input handle. Input handles are on the left, output handles are on the right.</p>
 <p><strong>To add a constant value:</strong> double-click on any input to add a constant value linked to this input. It is pre-filled with the example value.</p>
 <p><strong>To add an output:</strong> double-click on any <em>step</em> output to add a <em>pipeline</em> output linked to it, or drag and drop the red box from the left pane and link it manually.</p>
@@ -915,7 +920,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <section id="pipeline-inputs-and-outputs" class="level3">
 <h3 class="anchored" data-anchor-id="pipeline-inputs-and-outputs">Pipeline inputs and outputs</h3>
 <p>Any <strong>input</strong> with no constant value assigned will be considered a pipeline input and the user will have to fill the value.</p>
-<p><img src="images/Screenshot 2025-02-26 154439.png" class="img-fluid"></p>
+<p><img src="images/Image6.png" class="img-fluid"></p>
 <p>Add an <strong>output</strong> node linked to a step output to specify that this output is an output of the pipeline. All other unmarked step outputs will still be available as intermediate results in the UI.</p>
 <p><img src="https://user-images.GitHubusercontent.com/6223744/181108988-97d988ca-8f4b-45b1-b4a3-32e90821b68b.png" class="img-fluid"></p>
 <p>Pipeline inputs and outputs then appear in a collapsible pane on the right of the canvas, where their descriptions and labels can be edited.</p>
@@ -927,8 +932,8 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>The editor supports saving and loading on the server, unless explicitly disabled by host. This is done intuitively via the “Load from server” and “Save” buttons.</p>
 </section>
 </section>
-<section id="step-6-run-pipeline-and-troubleshoot" class="level2">
-<h2 class="anchored" data-anchor-id="step-6-run-pipeline-and-troubleshoot">Step 6: Run pipeline and troubleshoot</h2>
+<section id="step-7-run-pipeline-and-troubleshoot" class="level2">
+<h2 class="anchored" data-anchor-id="step-7-run-pipeline-and-troubleshoot">Step 7: Run pipeline and troubleshoot</h2>
 <p>The last step is to load your saved pipeline in BON and a Box and run it in the “run pipelines” tab.</p>
 <p>Your pipeline should generate a form, which you can fill and then click run.</p>
 <p><img src="images/Screenshot 2025-02-05 111618.png" class="img-fluid"></p>
@@ -951,7 +956,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <h1>When is your pipeline complete?</h1>
 <ul>
 <li><p>The pipeline is generalizable (for example can be used with other species, in other regions)</p></li>
-<li><p>The pipeline meets all of the standards in the <a href="pipeline_standards.qmd">quality control requirements</a></p></li>
+<li><p>The pipeline meets all of the standards in the <a href="./pipeline_standards.html">quality control requirements</a></p></li>
 <li><p>Each step has documentation for each input, output, references, etc. It should be easy enough to understand for a normal biologist (i.e.&nbsp;not a subject matter expert of this specific pipeline)</p></li>
 <li><p>Each step validates its inputs for aberrations and its outputs for correctness. If an aberration is detected an “error” should be returned to halt the pipeline, or a “warning” to let it continue but alert the user.</p></li>
 <li><p>The GitHub actions pass.</p></li>

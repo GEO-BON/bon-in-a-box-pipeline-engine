@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Run a pipeline – BON in a Box</title>
+<title>how_to_use – BON in a Box</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -98,7 +98,7 @@ ul.task-list li input[type="checkbox"] {
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="./how_to_use.html"> 
-<span class="menu-text">Run a pipeline</span></a>
+<span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribute-a-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
@@ -106,15 +106,15 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-contribute-a-pipeline">    
         <li>
-    <a class="dropdown-item" href="./what_to_contribute.qmd">
- <span class="dropdown-text">Should you contribute?</span></a>
+    <a class="dropdown-item" href="./what_to_contribute.html">
+ <span class="dropdown-text">Interested in Contributing?</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="./how_to_contribute.html">
  <span class="dropdown-text">Contribution instructions</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./pipeline_standards.qmd">
+    <a class="dropdown-item" href="./pipeline_standards.html">
  <span class="dropdown-text">Pipeline standards</span></a>
   </li>  
     </ul>
@@ -134,7 +134,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Run a pipeline</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -160,33 +160,91 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#installing-bon-in-a-box" id="toc-installing-bon-in-a-box" class="nav-link active" data-scroll-target="#installing-bon-in-a-box">Installing BON in a Box</a></li>
+  <li><a href="#connecting-to-the-server-and-running-bon-in-a-box" id="toc-connecting-to-the-server-and-running-bon-in-a-box" class="nav-link" data-scroll-target="#connecting-to-the-server-and-running-bon-in-a-box">Connecting to the server and running BON in a Box</a></li>
+  <li><a href="#user-guide" id="toc-user-guide" class="nav-link" data-scroll-target="#user-guide">User Guide</a>
+  <ul class="collapse">
+  <li><a href="#home" id="toc-home" class="nav-link" data-scroll-target="#home">Home</a></li>
+  <li><a href="#run-a-script" id="toc-run-a-script" class="nav-link" data-scroll-target="#run-a-script">Run a script</a></li>
+  <li><a href="#run-a-pipeline" id="toc-run-a-pipeline" class="nav-link" data-scroll-target="#run-a-pipeline">Run a pipeline</a></li>
+  <li><a href="#pipeline-editor" id="toc-pipeline-editor" class="nav-link" data-scroll-target="#pipeline-editor">Pipeline editor</a></li>
+  <li><a href="#history" id="toc-history" class="nav-link" data-scroll-target="#history">History</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Run a pipeline</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
+<section id="installing-bon-in-a-box" class="level2">
+<h2 class="anchored" data-anchor-id="installing-bon-in-a-box">Installing BON in a Box</h2>
+<p>The instructions for how to install BON in a Box on your computer can be found <a href="./how_to_install.html">here</a>.</p>
+</section>
+<section id="connecting-to-the-server-and-running-bon-in-a-box" class="level2">
+<h2 class="anchored" data-anchor-id="connecting-to-the-server-and-running-bon-in-a-box">Connecting to the server and running BON in a Box</h2>
+<ol type="1">
+<li>Connect to the server by running <code>./server-up.sh</code> in a Linux terminal (e.g.&nbsp;Git Bash or WSL on Windows or Terminal on Mac). Make sure you are in the bon-in-a-box-pipeline directory on your computer.</li>
+<li>Open a web browser and navigate to&nbsp;<a href="http://localhost/" class="uri">http://localhost/</a>.</li>
+</ol>
+</section>
+<section id="user-guide" class="level1">
+<h1>User Guide</h1>
+<p>Here is a detailed guide on how to run BON in a Box locally on your computer. This guide outlines the features of BON in a Box and how to use them.</p>
+<section id="home" class="level2">
+<h2 class="anchored" data-anchor-id="home">Home</h2>
+<p>Under the <code>Home</code> tab, you will find a description of the BON in a Box modeling tool, as well as all of its featured pipelines.</p>
+</section>
+<section id="run-a-script" class="level2">
+<h2 class="anchored" data-anchor-id="run-a-script">Run a script</h2>
+<p>The <code>Run a script</code> tab lets you run an individual script.</p>
+<ol type="1">
+<li><p>Select from the drop down menu the script you would like to run.</p>
+<ul>
+<li>Under the menu you have a description of the script, with its authors and references.</li>
+</ul></li>
+<li><p>Fill out the form with the input parameters the script should use.</p>
+<ul>
+<li>Scripts will run with default parameters if no inputs are specified. You may use as many or as little of the default inputs as you wish.</li>
+</ul>
+<!-- -->
+<ul>
+<li><p>Some inputs can simply be typed in, while others are options.</p></li>
+<li><p>Each input field includes a description and its purpose on the right of the input box. Here you will also see the <em>type</em> of the input.</p></li>
+<li><p>The form might ask you for a file. In order to provide a file that you own locally, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders.</p></li>
+<li><p><strong>Please ensure each input matches the required type.</strong> <strong>For any details on input types, please refer to Step 3 of <a href="./how_to_contribute.html">this page</a>.</strong></p></li>
+<li><p>The <code>Input yaml</code> tab can be used to see how your inputs are being passed in to the script. By scrolling down, you can also see how the inputs were defined by the author(s).</p></li>
+</ul></li>
+<li><p>Click on <code>Run script</code>. To terminate the execution of the script at any point, use the <code>stop</code> button.</p></li>
+</ol>
+<p>After the script runs, you’ll see a detailed results box, which includes tabs for your inputs and script outputs. You can click on them to see details. You should also see a gray box that contains the script logs. If you see a red exclamation mark, the script failed to completely execute and an error message will be displayed. If you encounter an error due to the script’s internal structure, please contact us on <a href="https://discourse.geobon.org">Discourse</a> or email us at boninabox@geobon.org.</p>
+<p>To download outputs, simply use the link next the output name. To run the script again, use the input form drop down button.</p>
+<p><strong>ADD PICTURE HERE</strong></p>
+</section>
+<section id="run-a-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="run-a-pipeline">Run a pipeline</h2>
+<p>The <code>Run a pipeline</code> tab can be used to run an entire pipeline and works very similarly to the <code>Run a script</code> tab. Simply fill out the desired inputs and click on <code>Run pipeline</code>. To terminate the execution of the pipeline at any point, use the <code>stop</code> button. While the pipeline is running, you may see its progress under <code>Results</code>.</p>
+<p>The <code>Results</code> box displays the outputs of the pipeline. You may view them using the drop down menu for each, or use <code>See in results viewer</code> for a more detailed view. Outputs can be downloaded by using the link next to the output name.</p>
+<p>In the <code>Detailed results</code> you will find all the individual scripts used throughout the pipeline, as well as their inputs and outputs.</p>
+</section>
+<section id="pipeline-editor" class="level2">
+<h2 class="anchored" data-anchor-id="pipeline-editor">Pipeline editor</h2>
+<p>Under the <code>Pipeline editor</code> tab, users can create and edit pipelines. For more information on how to do so, please refer to Step 6 of <a href="./how_to_contribute.html">this page</a>.</p>
+</section>
+<section id="history" class="level2">
+<h2 class="anchored" data-anchor-id="history">History</h2>
+<p>The <code>History</code> tab shows previous script and pipeline runs. Use the drop down arrow to see the inputs of a run and <code>See run in UI</code> to view the details of a run, including the inputs, outputs, and logs. The latter can be used to try the run again with some or all of the same inputs. For pipelines, you may see outputs in the results viewer using <code>See in viewer</code>.</p>
 
-    
-  
-    
-  </div>
-  
 
-
-</header>
-
-
-
-
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
