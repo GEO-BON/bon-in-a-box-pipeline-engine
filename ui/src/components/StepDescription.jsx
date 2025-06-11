@@ -1,5 +1,9 @@
 import ReactMarkdown from 'react-markdown';
 import { LifecycleDescription } from './Lifecycle';
+import { HoverCard } from './HoverCard';
+import LinkedinLogo from "../img/LinkedIn_icon.svg";
+import ResearchGateLogo from "../img/ResearchGate_icon.svg";
+import OrcIDLogo from "../img/ORCID_ID_green.svg";
 
 export function StepDescription({ descriptionFile, metadata }) {
     return <>
@@ -23,23 +27,41 @@ export function getFolderAndName(ymlPath, name) {
     return split.join(' > ')
 }
 
+function findLogoImageFromURL(url) {
+    const isUrlFromBaseUrl = (baseUrl) => (new RegExp(`.*${baseUrl}.+`)).test(url);
+    if (isUrlFromBaseUrl("linkedin.com/in")) {
+      return LinkedinLogo;
+    } else if (isUrlFromBaseUrl("orcid.org")) {
+      return OrcIDLogo
+    } else if (isUrlFromBaseUrl("researchgate.net/profile")) {
+      return ResearchGateLogo
+    } else {
+      return null;
+    }
+}
+function LogoFromUrl({ src }) {
+    return <div style={{display: "flex", justifyContent: "flex-end"}}>
+            <a href={src} target="_blank">
+              <img src={findLogoImageFromURL(src)} alt="ID" title="ID" width="20px"></img>
+            </a>
+           </div>
+}
 function generatePersonList(list) {
     return list.map((person, i, array) => {
-        let email = person.email && <a href={'mailto:' + person.email} style={{textDecoration:'none'}}> &#9993;</a>
+        let name = person.name;
+        let email = person.email && <a href={'mailto:' + person.email} style={{textDecoration:'none'}}>{person.email}</a>
         let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
-        let role = person.role && <span> ({person.role.join(', ')})</span>
-        if (person.identifier)
-            return <span key={i}>
-                <a href={person.identifier} target="_blank">
-                    {person.name}{!email && comma}
-                </a>
-                {role}
-                {email && <>{email}{comma}</>}
-                &nbsp;
-            </span>
+        let role = person.role && <span>{person.role.join(', ')}</span>
+        let identifier = person.identifier //  && <a href={person.identifier} target="_blank">ID</a>
 
-        else
-            return <span key={i}>{person.name}{role}{email}{comma} </span>
+        let hoverCardDisplay = <>
+                                {email && <h3 style={{ marginTop: "0px", marginBottom: "0px" }}>{name}</h3> || <h3 style={{ marginTop: "0px" }}>{name}</h3>}
+                                {email}
+                                {role && <p>Contribution: {role}</p> || <p></p> }
+                                {identifier && <LogoFromUrl src={identifier}/>}
+                               </>
+        let hoverCardName = name && <HoverCard popoverContent={hoverCardDisplay}>{name}</HoverCard>
+        return <span key={i}>{hoverCardName}{comma}</span>
     })
 }
 
@@ -58,15 +80,15 @@ export function GeneralDescription({ ymlPath, metadata }) {
     return <div className='stepDescription'>
         <LifecycleDescription lifecycle={metadata.lifecycle} />
         {metadata.author &&
-            <p>
+            <div>
                 <i>{generatePersonList(metadata.author)}</i>
-            </p>
+            </div>
         }
         {metadata.reviewer &&
-            <p><small>
+            <div><small>
                 Reviewed by:&nbsp;
                 <i>{generatePersonList(metadata.reviewer)}</i>
-            </small></p>
+            </small></div>
         }
         {metadata.description && <ReactMarkdown className="reactMarkdown" children={metadata.description} />}
         {codeLink && <p>
