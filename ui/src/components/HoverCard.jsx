@@ -1,18 +1,18 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import Popover from "@mui/material/Popover";
 import Typography from "@mui/material/Typography";
 
 export function HoverCard({children, popoverContent}) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorElem, setAnchorElem] = React.useState(null);
 
   const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
+    setAnchorElem(event.currentTarget);
   };
   const handleClose = () => {
-    setAnchorEl(null);
+    setAnchorElem(null);
   };
 
-  const open = Boolean(anchorEl);
+  const open = Boolean(anchorElem);
 
   return (
     <span>
@@ -26,9 +26,9 @@ export function HoverCard({children, popoverContent}) {
       </Typography>
       <Popover
         id="mouse-over-popover"
-        sx={{ zIndex: 11000 }}
+        sx={{ zIndex: 11000 /* Author or reviewer popup */ }}
         open={open}
-        anchorEl={anchorEl}
+        anchorEl={anchorElem}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'left',
@@ -40,9 +40,7 @@ export function HoverCard({children, popoverContent}) {
         onClose={handleClose}
         slotProps={{ paper: { elevation: "0", variant:"outlined", borderRadius: "20px"}}}
       >
-        <Typography
-          sx={{ p: 1 }}
-        >
+        <Typography sx={{ p: 1 }}>
           {popoverContent}
         </Typography>
       </Popover>

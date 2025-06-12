@@ -52,7 +52,7 @@ function generatePersonList(list) {
     return list.map((person, i, array) => {
         let email = person.email && <a href={'mailto:' + person.email} style={{ textDecoration: 'none' }}>{person.email}</a>
         let role = person.role && <span>{person.role.join(', ')}</span>
-        let comma = (i !== array.length - 1) && ', ' // Comma will be inside link but the space outside the link.
+        let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
 
         let hoverCardDisplay = <>
             <h3 style={{
@@ -65,7 +65,7 @@ function generatePersonList(list) {
         </>
 
         let hoverCardName = person.name && <HoverCard popoverContent={hoverCardDisplay}>{person.name}</HoverCard>
-        return <span key={i}>{hoverCardName}{comma}</span>
+        return <><span key={i}>{hoverCardName}{comma}</span> </>
 
     })
 }
