@@ -11,6 +11,10 @@ import MVT from 'ol/format/MVT.js';
 import VectorLayer from 'ol/layer/Vector';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile';
+import olms from 'ol-mapbox-style';
+import Layer from 'ol/layer/WebGLTile.js';
+import {useGeographic} from 'ol/proj.js';
+import Source from 'ol/source/ImageTile.js';
 import Fill from 'ol/style/Fill';
 import Icon from 'ol/style/Icon';
 import Stroke from 'ol/style/Stroke';
@@ -19,12 +23,13 @@ import Text from 'ol/style/Text';
 import Feature from 'ol/Feature';
 import { register } from 'ol/proj/proj4';
 import { fromLonLat, getUserProjection } from "ol/proj";
+import Draw, { createBox } from 'ol/interaction/Draw.js';
+import Snap from 'ol/interaction/Snap.js';
+import Modify from 'ol/interaction/Modify.js';
 import {get as getProjection} from 'ol/proj';
-import { TerraDraw, TerraDrawRectangleMode, TerraDrawPolygonMode } from "terra-draw";
 import * as turf from '@turf/turf';
-import { TerraDrawOpenLayersAdapter } from 'terra-draw-openlayers-adapter';
 import proj4 from 'proj4';
-import { getCRSDef, transformCoordCRS, validTerraPolygon, bboxToCoords } from "./utils";
+import { getCRSDef, transformCoordCRS, validTerraPolygon, bboxToCoords, densifyPolygon } from "./utils";
 
 
 export default function MapOL({
@@ -32,10 +37,13 @@ export default function MapOL({
   setDrawFeatures = () => {},
   clearFeatures = false,
   previousId = "",
+  bbox = [],
   setBbox = () => {},
   setAction,
   countryBbox,
-  CRS
+  CRS,
+  digitize,
+  setDigitize,
 }) {
 
   const mapRef = useRef(null);
@@ -43,6 +51,7 @@ export default function MapOL({
   const [mapp, setMapp] = useState(null);
   const [mapReady, setMapReady] = useState(false);
   const [projection, setProjection] = useState(null)
+  const [draw, setDraw] = useState(null);
 
   const styles = {
     'Polygon': new Style({
@@ -60,6 +69,93 @@ export default function MapOL({
     return styles[feature.getGeometry().getType()];
   };
 
+  const clearLayers = () => {
+    const ly = mapp.getAllLayers();
+    ly.forEach((l)=>{
+        console.log(l.getAttributions())
+        if(l.getAttributions()[0] === 'biab'){
+            mapp.removeLayer(l)
+        }
+    })
+  }
+
+  useEffect(()=>{
+    if(mapp && digitize){
+        clearLayers()
+        const source = new VectorSource({wrapX: false, attributions: ['biab']});
+        const vector = new VectorLayer({
+            source: source,
+            style: styleFunction,
+        });
+        const drawInt = new Draw({
+            source: source,
+            type: "Circle",
+            geometryFunction: createBox(),
+        });
+        mapp.addLayer(vector)
+        mapp.addInteraction(drawInt);
+        const snap = new Snap({source: source});
+        mapp.addInteraction(snap);
+
+        const defaultStyle = new Modify({source: source})
+        .getOverlay()
+        .getStyleFunction();
+
+        const modify = new Modify({source: source,
+            style: function (feature, resolution) {
+                feature.get('features').forEach(function (modifyFeature) {
+                  const modifyGeometry = modifyFeature.get('modifyGeometry');
+                  if (modifyGeometry) {
+                    const coo = modifyFeature.getGeometry().getCoordinates();
+                    const newgeom = turf.bboxPolygon(turf.bbox(turf.feature({type: 'Polygon', coordinates: coo})))
+                    /*const geojsonFormat = new GeoJSON();
+                    const geojsonFeatureCollection = geojsonFormat.writeFeaturesObject(modifyFeature);*/
+                    // save changes to be applied at the end of the interaction
+
+                    //modifyGeometry.setGeometries([newgeom]);
+                  }
+                });
+                return defaultStyle(feature, resolution);
+              },
+        });
+
+        modify.on('modifystart', function (event) {
+            event.features.forEach(function (feature) {
+              const geometry = feature.getGeometry();
+              if (geometry.getType() === 'Polygon') {
+                feature.set('modifyGeometry', geometry.clone(), true);
+              }
+            });
+         });
+          
+        modify.on('modifyend', function (event) {
+            event.features.forEach(function (feature) {
+              const modifyGeometry = feature.get('modifyGeometry');
+              if (modifyGeometry) {
+                feature.setGeometry(modifyGeometry);
+                feature.unset('modifyGeometry', true);
+              }
+            });
+        });
+
+        mapp.addInteraction(modify);
+        setDraw(drawInt)
+        /*drawInt.on('drawend',()=>{
+            const ly = mapp.getAllLayers()
+            ly.forEach((l)=>{
+                if(l.getAttributions()[0]=='biab'){
+                    const geojsonFormat = new GeoJSON();
+                    const geojsonFeatureCollection = geojsonFormat.writeFeaturesObject(features, {
+                    featureProjection: vectorLayer.getSource().getProjection() || 'EPSG:3857', // or your map/view projection
+                    dataProjection: 'EPSG:4326' // GeoJSON standard
+                    });
+                }
+            })
+        })*/
+    }
+  },[mapp, digitize])
+
+
   useEffect(()=>{
     if(CRS && mapp){
         proj4.defs(`EPSG:${CRS.code}`, CRS.def); // full proj string
@@ -75,88 +171,90 @@ export default function MapOL({
   },[CRS, mapp])
 
   useEffect(()=>{
-    if(countryBbox.length > 0){
-        let r2 = transformCoordCRS(bboxToCoords(countryBbox), "EPSG:4326", CRS.def);
-        if (r2.length > 0) {
-            r2 = r2.map((n) => [
-                parseFloat(n[0].toFixed(6)),
-                parseFloat(n[1].toFixed(6)),
-            ]);
-            
-            var geometry = {
-                type: "Polygon",
-                coordinates: [
-                [
-                    [r2[0][0], r2[0][1]],
-                    [r2[1][0], r2[1][1]],
-                    [r2[2][0], r2[2][1]],
-                    [r2[3][0], r2[3][1]],
-                    [r2[0][0], r2[0][1]],
-                ],
-                ],
-            };
-            const f = validTerraPolygon(turf.feature(geometry))
+    if(countryBbox.length > 0 && mapp){
+        let poly = turf.bboxPolygon(countryBbox)
+        if(parseInt(CRS.code) !== 4326){
+            poly = transformCoordCRS(densifyPolygon(poly,50), "EPSG:4326", CRS.def);
+        }
+        if (poly.geometry.coordinates.length > 0) {
+            const f = validTerraPolygon(poly)
             var feature = {
                 'crs': {
                 'type': 'name',
                 'properties': {
                   'name': `EPSG:${CRS.code}`,
                 },
-              },type: 'FeatureCollection', features: [f]};
-            setBbox(turf.bbox(f))
+              }, type: 'FeatureCollection', features: [f]};
+            clearLayers();
+            //BBox of the 
+            const newBbox = turf.bbox(feature)
+            setBbox(newBbox)
             const vectorSource = new VectorSource({
-                features: new GeoJSON().readFeatures(feature),
+                features: new GeoJSON().readFeatures(turf.bboxPolygon(newBbox)),
+                attributions: ['biab']
             });
             const vectorLayer = new VectorLayer({
                 source: vectorSource,
                 style: styleFunction,
             });
             mapp.addLayer(vectorLayer)
-        }
+            const modify = new Modify({source: vectorSource, geometryFunction: createBox(),});
+            mapp.addInteraction(modify);
+            mapp.getView().fit(vectorSource.getExtent(), mapp.getSize())
+        } 
+    } else if(countryBbox.length == 0 && mapp){
+        clearLayers()
     }
-  },[countryBbox, CRS])
+  },[mapp, countryBbox, CRS])
+
+  useEffect(() => {
+    if(bbox && bbox.length>0){
+        clearLayers();
+        const vectorSource = new VectorSource({
+            features: new GeoJSON().readFeatures(turf.bboxPolygon(bbox)),
+            attributions: ['biab']
+        });
+        const vectorLayer = new VectorLayer({
+            source: vectorSource,
+            style: styleFunction,
+        });
+        mapp.addLayer(vectorLayer)
+        const modify = new Modify({source: vectorSource, geometryFunction: createBox(),});
+        mapp.addInteraction(modify);
+        mapp.getView().fit(vectorSource.getExtent(), mapp.getSize())
+    }
+  },[bbox])
 
   useEffect(() => {
     const map = new Map({
       target: "map",
       layers: [
-        new TileLayer({
+        /*new TileLayer({
           source: new OSM(),
           projection: `EPSG:3857`
-        }),
+        }),*/
+        /*new TileLayer({
+            source: new OGCMapTile({
+              url: 'https://maps.gnosis.earth/ogcapi/collections/blueMarble/map/tiles/WebMercatorQuad',
+              projection: `EPSG:3857`
+            }),
+          }),*/
+          new Layer({
+            source: new Source({
+              attributions: ["adv"],
+              url:
+                "https://2.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+            }),
+            projection: `EPSG:3857`
+          }),
     ],
       view: new View({
         center: [0, 0],
-        zoom: 2,
+        zoom: 3,
         projection: `EPSG:${CRS.code}`
       }),
     });
     setMapp(map)
-    map.once("rendercomplete", () => {
-        // Create Terra Draw
-        const draw = new TerraDraw({
-            adapter: new TerraDrawOpenLayersAdapter({
-                lib: {
-                    Feature,
-                    GeoJSON,
-                    Style,
-                    VectorLayer,
-                    VectorSource,
-                    Stroke,
-                    getUserProjection,
-                    Fill,
-                },
-                map,
-                coordinatePrecision: 9,
-            }),
-            modes: [new TerraDrawRectangleMode()],
-        });
-
-        // Start drawing
-        /*draw.start();
-        draw.setMode("rectangle");*/
-    });
-
     return () => {
       map.setTarget(null);
     };

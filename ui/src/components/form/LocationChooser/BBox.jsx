@@ -123,12 +123,25 @@ export default function BBox({
       setMinY(bbox[1]);
       setMaxX(bbox[2]);
       setMaxY(bbox[3]);
+    }else{
+      setMinX(null);
+      setMinY(null);
+      setMaxX(null);
+      setMaxY(null);
     }
   }, [bbox]);
 
+  useEffect(() => {
+    if(MinX && MinY && MaxX && MaxY){
+      setBbox([MinX, MinY, MaxX, MaxY])
+    }
+  }, [MinX, MinY, MaxX, MaxY]);
+
   const inputProps = {
-    step: 50,
+    step: (CRS.unit === 'degree')? 0.5 : 5000,
   };
+
+  console.log(CRS.unit)
   return (
     <>
       <TextField

@@ -17,6 +17,7 @@ import CRSMenu from "./CRSMenu";
 import { transformBboxAPI, validTerraPolygon } from "./utils";
 import { v4 as uuidv4 } from "uuid";
 import { set } from "lodash";
+import { CustomButtonGreen } from "../../CustomMUI";
 
 export default function LocationChooser({ locationFile }) {
   const [bbox, setBbox] = useState([]);
@@ -28,8 +29,9 @@ export default function LocationChooser({ locationFile }) {
   const [previousId, setPreviousId] = useState("");
   const [bboxGeoJSON, setBboxGeoJSON] = useState(null);
   const [bboxGeoJSONShrink, setBboxGeoJSONShrink] = useState(null);
-  const [CRS, setCRS] = useState({name: 'WGS84 - Lat/long', authority: 'EPSG', code: '4326', def: '+proj=longlat +datum=WGS84 +no_defs'});
+  const [CRS, setCRS] = useState({name: 'WGS84 - Lat/long', authority: 'EPSG', code: '4326', def: '+proj=longlat +datum=WGS84 +no_defs', unit: 'degree'});
   const [action, setAction] = useState("");
+  const [digitize, setDigitize] = useState(false)
 
   useEffect(() => {
     if (bbox.length > 0) {
@@ -78,6 +80,7 @@ export default function LocationChooser({ locationFile }) {
         >
           <CountryChooser
             {...{
+              setBbox,
               setBboxGeoJSON,
               setCountryISO,
               setCountryBbox,
@@ -86,6 +89,8 @@ export default function LocationChooser({ locationFile }) {
               setAction,
             }}
           />
+          <h4>Or click here to draw area of interest on map</h4>
+          <CustomButtonGreen onClick={()=>{setDigitize(true)}}>Draw</CustomButtonGreen>
           <CRSMenu
             {...{
               CRS,
@@ -123,6 +128,8 @@ export default function LocationChooser({ locationFile }) {
               CRS,
               previousId,
               setAction,
+              digitize,
+              setDigitize,
             }}
           />
         </Grid>

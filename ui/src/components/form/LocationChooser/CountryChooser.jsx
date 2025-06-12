@@ -67,6 +67,8 @@ export default function CountryChooser({
       });
     } else {
       setStateOptions([]);
+      setCountryBbox([])
+      setBbox([])
     }
   }, [country, countryOptions]);
 
@@ -120,6 +122,7 @@ export default function CountryChooser({
         )}
         onChange={(event, value) => {
           setCountry(value ? value.value : "");
+          setCountryBbox([])
           setStateProv("");
         }}
       />
@@ -138,6 +141,7 @@ export default function CountryChooser({
           <TextField {...params} label="Select subregion" />
         )}
         onChange={(event, value) => {
+          setCountryBbox([])
           setStateProv(value ? value.value : "");
         }}
       />

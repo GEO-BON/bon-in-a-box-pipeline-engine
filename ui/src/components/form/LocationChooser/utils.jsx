@@ -1,5 +1,6 @@
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+import { polygonToLine, length, along, lineString, polygon } from '@turf/turf';
 import proj4 from "proj4";
 
 let defs = [
@@ -114,7 +115,7 @@ export const getCRSDef = async (epsg_number) => {
       result.data.results[0].exports &&
       result.data.results[0].exports.proj4
     ) {
-      return result.data.results[0].exports.proj4;
+      return result.data.results[0];
     } else {
       throw new Error("CRS definition not found for " + epsg_number);
     }
@@ -124,10 +125,19 @@ export const getCRSDef = async (epsg_number) => {
   }
 };
 
-export const transformCoordCRS = (coords, source_crs_epsg, dest_crs_epsg) => {
+/*export const transformCoordCRS = (coords, source_crs_epsg, dest_crs_epsg) => {
   return coords.map((c) =>
     proj4(source_crs_epsg, dest_crs_epsg).forward(c, true)
   );
+};*/
+
+export const transformCoordCRS = (poly, source_crs_epsg, dest_crs_epsg) => {
+  const coo =  poly.geometry.coordinates[0].map((c) => {
+    const cc = proj4(source_crs_epsg, dest_crs_epsg).forward(c, true)
+    return [parseFloat(cc[0].toFixed(6)), parseFloat(cc[1].toFixed(6))]
+  });
+  poly.geometry.coordinates[0] = coo
+  return poly
 };
 
 export const bboxToCoords = (bbox) => {
@@ -146,3 +156,25 @@ export const validTerraPolygon = (feature) => {
   delete feature.bbox;
   return feature;
 };
+
+
+
+export const densifyPolygon = (poly, minDist) => {
+  // Convert polygon to line
+  const line = polygonToLine(poly);
+
+  // Densify: interpolate points every X kilometers
+  const lineLen = length(line, { units: 'kilometers' });
+  let coords = [];
+  for (let dist = 0; dist <= lineLen; dist += minDist) {
+    coords.push(along(line, dist, { units: 'kilometers' }).geometry.coordinates);
+  }
+  // Ensure the polygon is closed
+  /*if (coords.length && coords[0][0] !== coords[coords.length - 1][0] && coords[0][1] !== coords[coords.length - 1][1]) {
+    coords.push(coords[0]);
+  }*/
+  coords.push(coords[0]);
+  coords = coords.map((c)=>[parseFloat(c[0].toFixed(6)),parseFloat(c[1].toFixed(6))])
+  // Create a new polygon
+  return polygon([coords]);
+}

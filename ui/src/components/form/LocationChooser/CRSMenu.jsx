@@ -17,7 +17,9 @@ export default function CRSMenu({
   bboxGeoJSON,
 }) {
   const [CRSList, setCRSList] = useState([]);
-  const [selectedCRS, setSelectedCRS] = useState(CRS.value);
+  const [selectedCRS, setSelectedCRS] = useState({label: 'WGS84 - Lat/long', value: '4326'});
+  const [inputValue, setInputValue] = useState("4326")
+
   useEffect(() => {
     if (bboxGeoJSONShrink === null) return;
     let bbj = { type: "FeatureCollection", features: [bboxGeoJSONShrink] };
@@ -44,21 +46,31 @@ export default function CRSMenu({
     });
   }, [bboxGeoJSONShrink]);
 
+  useEffect(()=>{
+    setSelectedCRS({label: 'WGS84 - Lat/long', value: '4326'})
+  },[])
+
   const updateCRS = (value) => {
     setAction("CRSButton");
-    getCRSDef(`EPSG:${value.value}`).then((def) => {
-      if(def){
-        setCRS({name: value.label, code: value.value, def: def})
-      }
-    })
+    if(value && value?.value){
+      getCRSDef(`EPSG:${value.value}`).then((def) => {
+        if(def){
+          setCRS({name: def.name, authority: def.id.authority, code: def.id.code, def: def.exports.proj4, unit: def.unit, bbox: def.bbox})
+        }
+      })
+    }else{
+      setCRS({name: 'WGS84 - Lat/long', authority: 'EPSG', code: '4326', def: '+proj=longlat +datum=WGS84 +no_defs', unit: 'degree'})
+      setSelectedCRS({label: '', value: ''})
+    }
   };
 
   return (
     <div style={{ width: "100%" }}>
       <Autocomplete
+        freeSolo
         disablePortal
         options={CRSList}
-        getOptionLabel={(option) => option.label || ""}
+        //getOptionLabel={(option) => option.label || ""}
         sx={{
           width: "90%",
           background: "#fff",
@@ -73,6 +85,8 @@ export default function CRSMenu({
           updateCRS(value)
         }}
         value={selectedCRS}
+        inputValue={inputValue}
+        onInputChange={(e, val)=>{setInputValue(val)}}
       />
       {false && (
         <CustomButtonGreen
