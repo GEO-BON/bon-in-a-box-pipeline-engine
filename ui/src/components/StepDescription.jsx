@@ -62,6 +62,7 @@ function generatePersonList(list) {
                                </>
         let hoverCardName = name && <HoverCard popoverContent={hoverCardDisplay}>{name}</HoverCard>
         return <span key={i}>{hoverCardName}{comma}</span>
+
     })
 }
 
