@@ -29,38 +29,42 @@ export function getFolderAndName(ymlPath, name) {
 
 function findLogoImageFromURL(url) {
     const isUrlFromBaseUrl = (baseUrl) => (new RegExp(`.*${baseUrl}.+`)).test(url);
-    if (isUrlFromBaseUrl("linkedin.com/in")) {
-      return LinkedinLogo;
-    } else if (isUrlFromBaseUrl("orcid.org")) {
-      return OrcIDLogo
-    } else if (isUrlFromBaseUrl("researchgate.net/profile")) {
-      return ResearchGateLogo
+    if (isUrlFromBaseUrl("linkedin.com/in/")) {
+        return LinkedinLogo;
+    } else if (isUrlFromBaseUrl("orcid.org/")) {
+        return OrcIDLogo
+    } else if (isUrlFromBaseUrl("researchgate.net/profile/")) {
+        return ResearchGateLogo
     } else {
-      return null;
+        return null;
     }
 }
+
 function LogoFromUrl({ src }) {
-    return <div style={{display: "flex", justifyContent: "flex-end"}}>
-            <a href={src} target="_blank">
-              <img src={findLogoImageFromURL(src)} alt="ID" title="ID" width="20px"></img>
-            </a>
-           </div>
+    return <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <a href={src} target="_blank">
+            <img src={findLogoImageFromURL(src)} alt="ID" title="ID" width="20px"></img>
+        </a>
+    </div>
 }
+
 function generatePersonList(list) {
     return list.map((person, i, array) => {
-        let name = person.name;
-        let email = person.email && <a href={'mailto:' + person.email} style={{textDecoration:'none'}}>{person.email}</a>
-        let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
+        let email = person.email && <a href={'mailto:' + person.email} style={{ textDecoration: 'none' }}>{person.email}</a>
         let role = person.role && <span>{person.role.join(', ')}</span>
-        let identifier = person.identifier //  && <a href={person.identifier} target="_blank">ID</a>
+        let comma = (i !== array.length - 1) && ', ' // Comma will be inside link but the space outside the link.
 
         let hoverCardDisplay = <>
-                                {email && <h3 style={{ marginTop: "0px", marginBottom: "0px" }}>{name}</h3> || <h3 style={{ marginTop: "0px" }}>{name}</h3>}
-                                {email}
-                                {role && <p>Contribution: {role}</p> || <p></p> }
-                                {identifier && <LogoFromUrl src={identifier}/>}
-                               </>
-        let hoverCardName = name && <HoverCard popoverContent={hoverCardDisplay}>{name}</HoverCard>
+            <h3 style={{
+                marginTop: "0px",
+                marginBottom: email && "0px"
+            }}>{person.name}</h3>
+            {email}
+            {role && <p>Contribution: {role}</p> || <p></p>}
+            {person.identifier && <LogoFromUrl src={person.identifier} />}
+        </>
+
+        let hoverCardName = person.name && <HoverCard popoverContent={hoverCardDisplay}>{person.name}</HoverCard>
         return <span key={i}>{hoverCardName}{comma}</span>
 
     })
