@@ -1,6 +1,6 @@
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
-import { polygonToLine, length, along, lineString, polygon } from '@turf/turf';
+import { polygonToLine, length, along, lineString, polygon } from "@turf/turf";
 import proj4 from "proj4";
 
 let defs = [
@@ -132,12 +132,12 @@ export const getCRSDef = async (epsg_number) => {
 };*/
 
 export const transformCoordCRS = (poly, source_crs_epsg, dest_crs_epsg) => {
-  const coo =  poly.geometry.coordinates[0].map((c) => {
-    const cc = proj4(source_crs_epsg, dest_crs_epsg).forward(c, true)
-    return [parseFloat(cc[0].toFixed(6)), parseFloat(cc[1].toFixed(6))]
+  const coo = poly.geometry.coordinates[0].map((c) => {
+    const cc = proj4(source_crs_epsg, dest_crs_epsg).forward(c, true);
+    return [parseFloat(cc[0].toFixed(6)), parseFloat(cc[1].toFixed(6))];
   });
-  poly.geometry.coordinates[0] = coo
-  return poly
+  poly.geometry.coordinates[0] = coo;
+  return poly;
 };
 
 export const bboxToCoords = (bbox) => {
@@ -146,8 +146,8 @@ export const bboxToCoords = (bbox) => {
     [bbox[0], bbox[3]],
     [bbox[2], bbox[3]],
     [bbox[2], bbox[1]],
-  ].map((bb)=>[parseFloat(bb[0]),parseFloat(bb[1])]);
-  return b
+  ].map((bb) => [parseFloat(bb[0]), parseFloat(bb[1])]);
+  return b;
 };
 
 export const validTerraPolygon = (feature) => {
@@ -157,24 +157,45 @@ export const validTerraPolygon = (feature) => {
   return feature;
 };
 
+export const cleanBbox = (bbox, units) => {
+  const dec = units === "degree" ? 5 : 0;
+  return bbox.map((b) => parseFloat(b.toFixed(dec)));
+};
 
+export const densifyPolygon = (poly, minDistDeg) => {
+  const coords = poly.geometry.coordinates[0];
+  let densified = [];
 
-export const densifyPolygon = (poly, minDist) => {
-  // Convert polygon to line
-  const line = polygonToLine(poly);
+  for (let i = 0; i < coords.length - 1; i++) {
+    const start = coords[i];
+    const end = coords[i + 1];
+    densified.push([
+      parseFloat(start[0].toFixed(6)),
+      parseFloat(start[1].toFixed(6)),
+    ]);
 
-  // Densify: interpolate points every X kilometers
-  const lineLen = length(line, { units: 'kilometers' });
-  let coords = [];
-  for (let dist = 0; dist <= lineLen; dist += minDist) {
-    coords.push(along(line, dist, { units: 'kilometers' }).geometry.coordinates);
+    const dx = end[0] - start[0];
+    const dy = end[1] - start[1];
+    const segLen = Math.sqrt(dx * dx + dy * dy);
+
+    if (segLen > 0) {
+      const steps = Math.floor(segLen / minDistDeg);
+      for (let j = 1; j < steps; j++) {
+        const frac = (j * minDistDeg) / segLen;
+        const x = start[0] + frac * dx;
+        const y = start[1] + frac * dy;
+        densified.push([parseFloat(x.toFixed(6)), parseFloat(y.toFixed(6))]);
+      }
+    }
   }
-  // Ensure the polygon is closed
-  /*if (coords.length && coords[0][0] !== coords[coords.length - 1][0] && coords[0][1] !== coords[coords.length - 1][1]) {
-    coords.push(coords[0]);
-  }*/
-  coords.push(coords[0]);
-  coords = coords.map((c)=>[parseFloat(c[0].toFixed(6)),parseFloat(c[1].toFixed(6))])
-  // Create a new polygon
-  return polygon([coords]);
-}
+
+  if (
+    densified.length &&
+    (densified[0][0] !== densified[densified.length - 1][0] ||
+      densified[0][1] !== densified[densified.length - 1][1])
+  ) {
+    densified.push(densified[0]);
+  }
+
+  return polygon([densified]);
+};

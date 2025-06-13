@@ -36,7 +36,7 @@ import {
   getCRSDef,
   transformCoordCRS,
   validTerraPolygon,
-  bboxToCoords,
+  cleanBbox,
   densifyPolygon,
 } from "./utils";
 
@@ -56,8 +56,6 @@ export default function MapOL({
   const mapRef = useRef(null);
   const mapContainer = useRef(null);
   const [mapp, setMapp] = useState(null);
-  const [mapReady, setMapReady] = useState(false);
-  const [projection, setProjection] = useState(null);
   const [draw, setDraw] = useState(null);
   const [features, setFeatures] = useState([]);
   var featureId = 0;
@@ -74,8 +72,22 @@ export default function MapOL({
     }),
   };
 
+  const modifyStyles = {
+    Polygon: new Style({
+      stroke: new Stroke({
+        color: "#1d7368",
+        width: 3,
+      }),
+      fill: new Fill({
+        color: "#1d736866",
+      }),
+    }),
+  };
   const styleFunction = function (feature) {
     return styles[feature.getGeometry().getType()];
+  };
+  const modifyStyleFunction = function (feature) {
+    return modifyStyles[feature.getGeometry().getType()];
   };
 
   const clearLayers = () => {
@@ -89,6 +101,65 @@ export default function MapOL({
         mapp.removeLayer(l);
       }
     });
+  };
+
+  // Adapted from https://sun-san-tech.com/javascript/285/
+  const getRectangleExtent = (oldCoordinates, newCoordinates) => {
+    var result;
+    if (oldCoordinates[0].length == newCoordinates[0].length) {
+      var diffVertex = -1;
+      for (var i = 0; i < oldCoordinates[0].length; i++) {
+        if (
+          oldCoordinates[0][i][0] != newCoordinates[0][i][0] ||
+          oldCoordinates[0][i][1] != newCoordinates[0][i][1]
+        ) {
+          diffVertex = i;
+        }
+      }
+      var oppositeVertex = diffVertex > 1 ? diffVertex - 2 : diffVertex + 2;
+      var minX = Math.min(
+        newCoordinates[0][diffVertex][0],
+        newCoordinates[0][oppositeVertex][0]
+      );
+      var minY = Math.min(
+        newCoordinates[0][diffVertex][1],
+        newCoordinates[0][oppositeVertex][1]
+      );
+      var maxX = Math.max(
+        newCoordinates[0][diffVertex][0],
+        newCoordinates[0][oppositeVertex][0]
+      );
+      var maxY = Math.max(
+        newCoordinates[0][diffVertex][1],
+        newCoordinates[0][oppositeVertex][1]
+      );
+      result = [minX, minY, maxX, maxY];
+    } else {
+      var newVertex;
+      newCo: for (var i = 0; i < newCoordinates[0].length; i++) {
+        for (var j = 0; j < oldCoordinates[0].length; j++) {
+          if (newCoordinates[0][i][0] == oldCoordinates[0][j][0]) {
+            if (newCoordinates[0][i][1] == oldCoordinates[0][j][1]) {
+              continue newCo;
+            }
+          }
+        }
+        newVertex = i;
+        break;
+      }
+      if (!newVertex) {
+        result = boundingExtent(oldCoordinates[0]);
+        return result;
+      }
+      var oppositeVertex1 = i - 2 > 0 ? i - 2 : i + 3;
+      var oppositeVertex2 = i - 3 > 0 ? i - 3 : i + 2;
+      result = boundingExtent([
+        newCoordinates[0][newVertex],
+        newCoordinates[0][oppositeVertex1],
+        newCoordinates[0][oppositeVertex2],
+      ]);
+    }
+    return result;
   };
 
   useEffect(() => {
@@ -115,76 +186,24 @@ export default function MapOL({
         geometryName: "Rectangle",
       });
 
+      drawInt.on("drawstart", function (e) {
+        source.clear(); // Remove all existing features
+      });
       drawInt.on("drawend", function (e) {
         var shape = e.feature.getGeometryName();
+        var extent = e.feature.getGeometry().getExtent();
+        setBbox(cleanBbox(extent, CRS.unit));
         e.feature.set("shape", shape);
         e.feature.setId(++featureId);
       });
       mapp.addLayer(vector);
       mapp.addInteraction(drawInt);
-      if (features.length > 0) {
+      if (features.length > 0 && !digitize) {
         mapp.getView().fit(source.getExtent(), mapp.getSize());
       }
       const modify = new Modify({
         source: source,
       });
-      function getRectangleExtent(oldCoordinates, newCoordinates) {
-        var result;
-        if (oldCoordinates[0].length == newCoordinates[0].length) {
-          var diffVertex = -1;
-          for (var i = 0; i < oldCoordinates[0].length; i++) {
-            if (
-              oldCoordinates[0][i][0] != newCoordinates[0][i][0] ||
-              oldCoordinates[0][i][1] != newCoordinates[0][i][1]
-            ) {
-              diffVertex = i;
-            }
-          }
-          var oppositeVertex = diffVertex > 1 ? diffVertex - 2 : diffVertex + 2;
-          var minX = Math.min(
-            newCoordinates[0][diffVertex][0],
-            newCoordinates[0][oppositeVertex][0]
-          );
-          var minY = Math.min(
-            newCoordinates[0][diffVertex][1],
-            newCoordinates[0][oppositeVertex][1]
-          );
-          var maxX = Math.max(
-            newCoordinates[0][diffVertex][0],
-            newCoordinates[0][oppositeVertex][0]
-          );
-          var maxY = Math.max(
-            newCoordinates[0][diffVertex][1],
-            newCoordinates[0][oppositeVertex][1]
-          );
-          result = [minX, minY, maxX, maxY];
-        } else {
-          var newVertex;
-          newCo: for (var i = 0; i < newCoordinates[0].length; i++) {
-            for (var j = 0; j < oldCoordinates[0].length; j++) {
-              if (newCoordinates[0][i][0] == oldCoordinates[0][j][0]) {
-                if (newCoordinates[0][i][1] == oldCoordinates[0][j][1]) {
-                  continue newCo;
-                }
-              }
-            }
-            newVertex = i;
-            break;
-          }
-          if (!newVertex) {
-            result = boundingExtent(oldCoordinates[0]);
-            return result;
-          }
-          var oppositeVertex1 = i - 2 > 0 ? i - 2 : i + 3;
-          var oppositeVertex2 = i - 3 > 0 ? i - 3 : i + 2;
-          result = boundingExtent([
-            newCoordinates[0][newVertex],
-            newCoordinates[0][oppositeVertex1],
-            newCoordinates[0][oppositeVertex2],
-          ]);
-        }
-        return result;
-      }
 
       var modifyingFeatures = features;
       var rectangleInteraction;
@@ -202,7 +221,7 @@ export default function MapOL({
         document.addEventListener("pointermove", modifying);
 
         rectangleInteraction = new Extent({
-          boxStyle: styleFunction,
+          boxStyle: modifyStyleFunction,
         });
         rectangleInteraction.setActive(false);
         if (extent) {
@@ -218,7 +237,7 @@ export default function MapOL({
             return;
           }
           var extent = rectangleInteraction.getExtent();
-          setBbox(extent);
+          setBbox(cleanBbox(extent, CRS.unit));
           var poly = new Feature(polygonFromExtent(extent));
           b.getGeometry().setCoordinates(poly.getGeometry().getCoordinates());
           b.unset("coordinates");
@@ -248,9 +267,8 @@ export default function MapOL({
 
   useEffect(() => {
     if (CRS && mapp) {
-      proj4.defs(`EPSG:${CRS.code}`, CRS.def); // full proj string
+      proj4.defs(`EPSG:${CRS.code}`, CRS.def);
       register(proj4);
-      const newProj = getProjection(CRS.code);
       const newView = new View({
         center: [0, 0],
         zoom: 2,
@@ -262,16 +280,14 @@ export default function MapOL({
 
   useEffect(() => {
     if (countryBbox.length > 0 && mapp) {
+      setDigitize(false);
       let poly = turf.bboxPolygon(countryBbox);
       if (parseInt(CRS.code) !== 4326) {
-        poly = transformCoordCRS(
-          densifyPolygon(poly, 50),
-          "EPSG:4326",
-          CRS.def
-        );
+        const d = densifyPolygon(poly, 0.25);
+        console.log(JSON.stringify(d));
+        poly = transformCoordCRS(d, "EPSG:4326", CRS.def);
       }
       if (poly.geometry.coordinates.length > 0) {
-        const f = validTerraPolygon(poly);
         const feat = {
           crs: {
             type: "name",
@@ -280,34 +296,20 @@ export default function MapOL({
             },
           },
           type: "FeatureCollection",
-          features: [f],
+          features: [poly],
         };
-        const newBbox = turf.bbox(feat);
-        setBbox(newBbox);
+        console.log(JSON.stringify(feat));
+        const newBbox = turf.bbox(feat, { recompute: true });
+        setBbox(cleanBbox(newBbox, CRS.unit));
       }
     } else if (countryBbox.length == 0 && mapp) {
       clearLayers();
     }
-  }, [countryBbox]);
+  }, [countryBbox, CRS]);
 
   useEffect(() => {
     if (bbox && bbox.length > 0) {
       setFeatures(new GeoJSON().readFeatures(turf.bboxPolygon(bbox)));
-      /*const vectorSource = new VectorSource({
-        features: new GeoJSON().readFeatures(turf.bboxPolygon(bbox)),
-        attributions: ["biab"],
-      });
-      const vectorLayer = new VectorLayer({
-        source: vectorSource,
-        style: styleFunction,
-      });
-      mapp.addLayer(vectorLayer);
-      const modify = new Modify({
-        source: vectorSource,
-        geometryFunction: createBox(),
-      });
-      mapp.addInteraction(modify);
-      mapp.getView().fit(vectorSource.getExtent(), mapp.getSize());*/
     }
   }, [bbox]);
 
@@ -354,7 +356,6 @@ export default function MapOL({
         width: "100%",
         height: "100%",
         zIndex: "88",
-        //background: "url('/night-sky.png')",
         border: "0px",
       }}
     ></div>

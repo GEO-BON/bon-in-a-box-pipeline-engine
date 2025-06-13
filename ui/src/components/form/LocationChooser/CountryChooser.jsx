@@ -1,32 +1,21 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useRef, useCallback } from "react";
 
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Alert from "@mui/material/Alert";
-import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { styled } from "@mui/material";
-import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import CheckIcon from "@mui/icons-material/Check";
 import { CustomButtonGreen } from "../../CustomMUI";
-import Map from "./Map";
-import axios from "axios";
-import * as turf from "@turf/turf";
 import countryOptionsJSON from "./countries.json"; // Assuming you have a JSON file with country data
-import { set } from "lodash";
 import { getStateAPI, validTerraPolygon } from "./utils";
 
 export default function CountryChooser({
   setBbox,
-  setBboxGeoJSON,
   setCountryISO,
   setCountryBbox,
   setStateProvName,
   setAction,
-  setClearFeatures,
 }) {
   const [country, setCountry] = useState("");
   const [stateProv, setStateProv] = useState("");
@@ -36,7 +25,6 @@ export default function CountryChooser({
 
   useEffect(() => {
     // Fetch country options from the JSON file
-    //const opts = JSON.parse(countryOptionsJSON)
     let countryOpts = countryOptionsJSON.geonames;
     countryOpts.sort((a, b) => {
       return a.countryName
@@ -67,8 +55,8 @@ export default function CountryChooser({
       });
     } else {
       setStateOptions([]);
-      setCountryBbox([])
-      setBbox([])
+      setCountryBbox([]);
+      setBbox([]);
     }
   }, [country, countryOptions]);
 
@@ -122,7 +110,7 @@ export default function CountryChooser({
         )}
         onChange={(event, value) => {
           setCountry(value ? value.value : "");
-          setCountryBbox([])
+          setCountryBbox([]);
           setStateProv("");
         }}
       />
@@ -141,7 +129,7 @@ export default function CountryChooser({
           <TextField {...params} label="Select subregion" />
         )}
         onChange={(event, value) => {
-          setCountryBbox([])
+          setCountryBbox([]);
           setStateProv(value ? value.value : "");
         }}
       />
