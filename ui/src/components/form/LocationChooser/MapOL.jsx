@@ -32,22 +32,11 @@ import Modify from "ol/interaction/Modify.js";
 import { get as getProjection } from "ol/proj";
 import * as turf from "@turf/turf";
 import proj4 from "proj4";
-import {
-  getCRSDef,
-  transformCoordCRS,
-  validTerraPolygon,
-  cleanBbox,
-  densifyPolygon,
-} from "./utils";
+import { transformPolyToBboxCRS, cleanBbox } from "./utils";
 
 export default function MapOL({
-  drawFeatures = [],
-  setDrawFeatures = () => {},
-  clearFeatures = false,
-  previousId = "",
   bbox = [],
   setBbox = () => {},
-  setAction,
   countryBbox,
   CRS,
   digitize,
@@ -58,6 +47,7 @@ export default function MapOL({
   const [mapp, setMapp] = useState(null);
   const [draw, setDraw] = useState(null);
   const [features, setFeatures] = useState([]);
+  const [oldCRS, setOldCRS] = useState(null);
   var featureId = 0;
 
   const styles = {
@@ -162,6 +152,7 @@ export default function MapOL({
     return result;
   };
 
+  // New bounding box is coming in or the digitize button was clicked
   useEffect(() => {
     if (mapp && (digitize || features.length > 0)) {
       clearLayers();
@@ -199,7 +190,9 @@ export default function MapOL({
       mapp.addLayer(vector);
       mapp.addInteraction(drawInt);
       if (features.length > 0 && !digitize) {
-        mapp.getView().fit(source.getExtent(), mapp.getSize());
+        mapp.getView().fit(source.getExtent(), {
+          padding: [100, 100, 100, 100],
+        });
       }
       const modify = new Modify({
         source: source,
@@ -265,6 +258,7 @@ export default function MapOL({
     }
   }, [mapp, features, digitize]);
 
+  // The CRS gets updated. We need to reproject the map
   useEffect(() => {
     if (CRS && mapp) {
       proj4.defs(`EPSG:${CRS.code}`, CRS.def);
@@ -278,40 +272,35 @@ export default function MapOL({
     }
   }, [CRS, mapp]);
 
+  // The Country Bounding box or the CRS are updated, we need to update and reproject
   useEffect(() => {
     if (countryBbox.length > 0 && mapp) {
       setDigitize(false);
-      let poly = turf.bboxPolygon(countryBbox);
-      if (parseInt(CRS.code) !== 4326) {
-        const d = densifyPolygon(poly, 0.25);
-        console.log(JSON.stringify(d));
-        poly = transformCoordCRS(d, "EPSG:4326", CRS.def);
-      }
-      if (poly.geometry.coordinates.length > 0) {
-        const feat = {
-          crs: {
-            type: "name",
-            properties: {
-              name: `EPSG:${CRS.code}`,
-            },
-          },
-          type: "FeatureCollection",
-          features: [poly],
-        };
-        console.log(JSON.stringify(feat));
-        const newBbox = turf.bbox(feat, { recompute: true });
-        setBbox(cleanBbox(newBbox, CRS.unit));
-      }
+      setBbox(cleanBbox(countryBbox, "degree"));
     } else if (countryBbox.length == 0 && mapp) {
       clearLayers();
     }
-  }, [countryBbox, CRS]);
+  }, [countryBbox]);
 
   useEffect(() => {
-    if (bbox && bbox.length > 0) {
-      setFeatures(new GeoJSON().readFeatures(turf.bboxPolygon(bbox)));
+    setDigitize(false);
+    if (bbox.length > 0) {
+      if (oldCRS && CRS && CRS.code === oldCRS.code) {
+        if (mapp && bbox && bbox.length > 0) {
+          setFeatures(new GeoJSON().readFeatures(turf.bboxPolygon(bbox)));
+        }
+      } else if (oldCRS && CRS && CRS.code !== oldCRS.code) {
+        let newpoly = turf.bboxPolygon(bbox);
+        if (CRS.code !== oldCRS.code) {
+          newpoly = transformPolyToBboxCRS(newpoly, oldCRS, CRS);
+        }
+        setBbox(cleanBbox(newpoly, CRS.unit)); // Set updated BBox in new CRS and re-run this block
+        setOldCRS(CRS);
+      } else if (CRS) {
+        setOldCRS(CRS);
+      }
     }
-  }, [bbox]);
+  }, [bbox, mapp, CRS, oldCRS]);
 
   useEffect(() => {
     const map = new Map({

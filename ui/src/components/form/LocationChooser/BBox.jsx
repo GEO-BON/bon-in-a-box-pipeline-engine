@@ -179,9 +179,11 @@ export default function BBox({
         sx={{ marginBottom: "10px" }}
         inputProps={inputProps}
       />
-      <CustomButtonGreen variant="contained" onClick={(e) => updateBbox(e)}>
-        Update coordinates
-      </CustomButtonGreen>
+      {false && (
+        <CustomButtonGreen variant="contained" onClick={(e) => updateBbox(e)}>
+          Update coordinates
+        </CustomButtonGreen>
+      )}
     </>
   );
 }

@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useRef, useCallback } from "react";
 
-import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import maplibregl from "maplibre-gl";
@@ -29,9 +29,15 @@ export default function LocationChooser({ locationFile }) {
   const [previousId, setPreviousId] = useState("");
   const [bboxGeoJSON, setBboxGeoJSON] = useState(null);
   const [bboxGeoJSONShrink, setBboxGeoJSONShrink] = useState(null);
-  const [CRS, setCRS] = useState({name: 'WGS84 - Lat/long', authority: 'EPSG', code: '4326', def: '+proj=longlat +datum=WGS84 +no_defs', unit: 'degree'});
+  const [CRS, setCRS] = useState({
+    name: "WGS84 - Lat/long",
+    authority: "EPSG",
+    code: "4326",
+    def: "+proj=longlat +datum=WGS84 +no_defs",
+    unit: "degree",
+  });
   const [action, setAction] = useState("");
-  const [digitize, setDigitize] = useState(false)
+  const [digitize, setDigitize] = useState(false);
 
   useEffect(() => {
     if (bbox.length > 0) {
@@ -55,6 +61,13 @@ export default function LocationChooser({ locationFile }) {
       //setDrawFeatures([bboxGeoJSON]);
     }
   }, [bbox]);
+
+  const CustomPaper = styled(Paper)({
+    padding: "5px 10px",
+    borderRadius: "10px",
+    border: "1px solid #ddd",
+    margin: "10px",
+  });
 
   return (
     <div
@@ -89,8 +102,14 @@ export default function LocationChooser({ locationFile }) {
               setAction,
             }}
           />
-          <h4>Or click here to draw area of interest on map</h4>
-          <CustomButtonGreen onClick={()=>{setDigitize(true)}}>Draw</CustomButtonGreen>
+          <h4>Or </h4>
+          <CustomButtonGreen
+            onClick={() => {
+              setDigitize(true);
+            }}
+          >
+            Draw area of interest on map
+          </CustomButtonGreen>
           <CRSMenu
             {...{
               CRS,

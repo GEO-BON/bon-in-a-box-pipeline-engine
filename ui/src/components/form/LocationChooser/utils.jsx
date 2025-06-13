@@ -1,6 +1,6 @@
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
-import { polygonToLine, length, along, lineString, polygon } from "@turf/turf";
+import { polygon, bbox } from "@turf/turf";
 import proj4 from "proj4";
 
 let defs = [
@@ -140,6 +140,25 @@ export const transformCoordCRS = (poly, source_crs_epsg, dest_crs_epsg) => {
   return poly;
 };
 
+export const transformPolyToBboxCRS = (poly, src_crs, dest_crs) => {
+  const d = densifyPolygon(poly, 0.25); //Densify vertices of polygon in Eucledian space before reprojection
+  poly = transformCoordCRS(d, src_crs.def, dest_crs.def);
+  if (poly.geometry.coordinates.length > 0) {
+    const feat = {
+      crs: {
+        type: "name",
+        properties: {
+          name: `EPSG:${dest_crs.code}`,
+        },
+      },
+      type: "FeatureCollection",
+      features: [poly],
+    };
+    return bbox(feat, { recompute: true });
+  }
+  return poly;
+};
+
 export const bboxToCoords = (bbox) => {
   const b = [
     [bbox[0], bbox[1]],
@@ -159,7 +178,7 @@ export const validTerraPolygon = (feature) => {
 
 export const cleanBbox = (bbox, units) => {
   const dec = units === "degree" ? 5 : 0;
-  return bbox.map((b) => parseFloat(b.toFixed(dec)));
+  return bbox.map((b) => parseFloat(parseFloat(b).toFixed(dec)));
 };
 
 export const densifyPolygon = (poly, minDistDeg) => {
