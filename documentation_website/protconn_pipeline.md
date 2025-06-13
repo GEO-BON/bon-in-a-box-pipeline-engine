@@ -29,40 +29,45 @@ BON in a Box has created a pipeline to calculate ProtConn for a given country or
 
 - **State/Province:** the user can specify a state/province within the country of interest and the pipeline will pull the polygon and protected areas for this region.
 
+**Polygon of study area:** there is also an option to add a custom study area file, which will override the polygon from the specified country or region of interest.
+
 - **Polygon of protected areas:** this input should only be used if the user wants to use custom protected area data. If you use the `ProtConn Analysis with WDPA` pipeline, this input is optional and any file added will be combined with WDPA data of the country of interest. If you use the `ProtConn Analysis with custom PAs` pipeline, this input is mandatory and the pipeline will only work the custom data.
 
 - **Coordinate Reference System:** the user can specify the coordinate reference system.
 
 - **Date Column Name:** the user must indicate the name of the column in the custom protected area data file that specifies when the protected area was created (leave blank if only using WDPA data).
 
-- **Distance analysis threshold:** the user can specify a dispersal distance depending on which species they are interested in. This will be the median of the negative dispersal kernel, meaning that at that distance, there will be a dispersal probability of 0.5.
+- **Distance analysis threshold:** the user can specify one or more dispersal distances depending on which species they are interested in. Common dispersal distances are 1000 meters (1km), 10000 m (10km) and 100 m (100 km) The dispersal distance is the median of the negative dispersal kernel, meaning that at that distance there is a dispersal probability of 0.5. Note that larger dispersal distances will be more computationally intensive.
   ![](images/Image17.png)
 
-- **Type of distance matrix:** the user can specify whether the distances between protected areas should be measured using the centroid, or center, of the protected area or the closest edge.
+- **Type of distance matrix:** the user can specify whether the distances between protected areas should be measured using the centroid (geometric center) of the protected area or the closest edge.
 
   ![](images/Image18.PNG)
   ![](images/Image19.PNG)
-- **Year for cutoff:** the user can specify the year for the ProtConn analysis to calculate. The analysis will only calculate values for protected areas that were designated before this cutoff year.
+- **Year for cutoff:** the user can specify a year for the analysis. The analysis will only calculate values for protected areas that were established before this cutoff year.
 
-- **Start year:** the user can specify the start year of the time series of ProtConn values.
+- **Start year:** the user can specify the start year of the time series of ProtConn values. The time series will calculate ProtConn for the protected areas established on or before the chosen year, and will count up to the cutoff year by the specified interval.
 
-- **Year interval:** the user can specify the year interval for the time series of ProtConn values (eg. an input of 10 will calculate ProtConn values for every 10 years).
+- **Year interval:** the user can specify the year interval for the time series of ProtConn values. (eg. an input of 10 will calculate ProtConn values every 10 years).
 
-- **PA legal status types to include:** the user can specify types of protected areas to include in the analysis. The protected areas can have a legal status of `Designated`, `Inscribed`, or `Established`.
+- **PA legal status types to include:** the user can specify legal status types of WDPA data to include in the analysis. The protected areas can have a legal status of `Designated`, `Inscribed`, or `Established`. 
+ - Designated means that it is officially established under national or international law/policy. 
+ - Inscribed means that it is inscribed in an international list (e.g. World Heritage). This can overlap with designated. 
+ - Established means that it is protected and managed, but possibly lacks formal legal designation.
 
-- **Exclude UNESCO Biosphere reserves:** the user can specify whether they want to include UNESCO Biosphere reserves in the analysis or not.
+- **Include UNESCO Biosphere reserves:** the user can specify whether they want to include UNESCO Man and the Biosphere reserves in the analysis or not. These serve as learning sites for sustainable development and combine biodiversity conservation with the sustainable use of natural resources and sustainable development. They may not be legally protected and may not be fully conserved, because they are often used for development or human settlement. Excluding these will limit the dataset to meeting stricter conservation standards. Note that this is only relevant if using WDPA data. 
 
-- **Buffer protected area points:** the user can specify whether they want to buffer protected area points such that they become a part of the analysis. If left unchecked, all protected areas represented as points will be removed.
+- **Buffer protected area points:** the user can specify whether they want to buffer protected area points such that they become a part of the analysis. If left unchecked, all protected areas represented as points will be removed. Note that this is only relevant if using WDPA data.
 
-- **Include marine protected areas:** the user can specify whether they want to include marine protected areas in the analysis or not.
+- **Include marine protected areas:** the user can specify whether they want to include marine protected areas in the analysis or not. Note that the analysis is still limited to the bounds of the study area polygon.Note that this is only relevant if using WDPA data.
 
-- **Include OECMs:** the user can specify whether they want to include other effective area-based conservation measures (OECMs) in the analysis or not. These areas are not officially designated protected areas but are still achieving conservation outcomes.
+- **Include OECMs:** the user can specify whether they want to include other effective area-based conservation measures (OECMs) in the analysis or not. These areas are not officially designated protected areas but are still achieving conservation outcomes. Note that this is only relevant if using WDPA data.
 
 ### Pipeline steps
 
 #### **1. Getting protected areas from World Database on Protected Areas (WDPA)**
 
-This step retrieves protected areas of the country/region of interest from the WDPA database using the WDPA API. (This step is skipped if you are only using custom data)
+This step retrieves protected areas of the country/region of interest from the WDPA database using the WDPA API. (This step is skipped if you are only using custom data).
 
 #### **2. Getting the country polygon**
 
@@ -70,7 +75,7 @@ This step returns the polygon for the country/region of interest.
 
 #### **3. Cleaning the protected areas data**
 
-This step cleans the data retrieved from the WDPA using the `sf` R package. (This step is skipped if you are only using custom data)
+This step cleans the data retrieved from the WDPA using the `sf` R package. (This step is skipped if you are only using custom data).
 
 #### **3. Performing the ProtConn analysis**
 
@@ -79,16 +84,11 @@ This step performs the ProtConn analysis on the protected areas of interest. Pro
 ### Pipeline outputs
 
 - **ProtConn results:** The pipeline gives a table with several measures
-  - Prot - percentage of study area that is protected
-  - Unprotected - percentage of study area that is unprotected
+  - Unprotected - percentage of study area that is protected
   - ProtConn - percentage of the study area that is protected and connected
   - ProtUnconn - percentage of the study area that is protected and unconnected
 
-- **Result plot:** donut plot of percentage of the study area that is unprotected, protected and unconnected, and protected and connected.
-
-- **Result with standardized distances:** ProtConn results for 3 standardized dispersal distances (1km, 10km, and 100km) that cover common dispersal distances for a range of species.
-
-- **Result plot with standardized distances:** donut plot of percentage of the study area that is unprotected, protected and unconnected, and protected and connected for each dispersal distance.
+- **Result plot:** donut plot of percentage of the study area that is protected and unconnected, and protected and connected.
 
 - **ProtConn time series:** plot of ProtConn over time, based on the dates that protected areas were established and the specified dispersal distance.
 
