@@ -70,7 +70,7 @@ YAML files should begin with a name, description, and the authors of the script.
 
 Example:
 
-```
+```         
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -87,7 +87,7 @@ All input and output ids should follow the snake case naming conventions. Names 
 
 Here is an example where the inputs are a coordinate reference system and a distance, specified by the user:
 
-```
+```         
 inputs:
   crs:
     label: coordinate reference system for output
@@ -119,7 +119,7 @@ There are several different types of user inputs that can be specified in the YA
 
 ^1^options type requires an additional options attribute to be added with the available options.
 
-```
+```         
 options_example:
   label: Options example
   description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
@@ -145,7 +145,7 @@ The user inputs can also be file types if you want to upload a file or connect t
 
 For example:
 
-```
+```         
 inputs:
   landcover_raster:
     label: Raster of landcover
@@ -182,7 +182,7 @@ There are also several types of outputs that can be created
 
 ^3^ When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
 
-```
+```         
 map:
   label: My map
   description: Some map that shows something
@@ -193,7 +193,7 @@ map:
 
 Here is an example output:
 
-```
+```         
 outputs:
   result:
     label: Analysis result
@@ -230,7 +230,7 @@ Search for your package names on [anaconda](https://anaconda.org/). Packages tha
 
 Example of conda sub-environment for an R script:
 
-```
+```         
 conda: # Optional: if you script requires specific versions of packages.
   channels:
     - conda-forge # make sure to put conda forge first
@@ -246,7 +246,7 @@ conda: # Optional: if you script requires specific versions of packages.
 
 Example of conda sub-environment for a python script. You do not need to put anything after conda-forge or before the package names when specifying a conda environment for python.
 
-```
+```         
 conda:
   channels:
     - conda-forge
@@ -270,7 +270,7 @@ For more information, refer to the [conda documentation](https://docs.conda.io/p
 
 #### Full example of a YAML file:
 
-```
+```         
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -331,7 +331,7 @@ If inputs are outputs from a previous step in the pipeline, make sure to give th
 
 #### Empty commented template to fill in:
 
-```
+```         
 script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targeted to those who will interpret pipeline results and edit pipelines.
@@ -536,7 +536,7 @@ biab_output("my_output", my_output_path)
 
 When modifying scripts in the `/scripts` folder, servers do not need to be restarted:
 
-- When modifying an existing script, simply save the file and re-run the script from the UI for the new version to be executed.
+-   When modifying an existing script, simply save the file and re-run the script from the UI for the new version to be executed.
 
 -   When adding or renaming scripts, refresh the browser page.
 
@@ -741,3 +741,5 @@ If you encounter further errors, please contact us on [Discourse](https://discou
 -   Each step validates its inputs for aberrations and its outputs for correctness. If an aberration is detected an "error" should be returned to halt the pipeline, or a "warning" to let it continue but alert the user.
 
 -   The GitHub actions pass.
+
+-   You have created a tutorial to go along with your pipeline, following \[this template\](<https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/pipelines/New-pipeline/pipeline-tutorial-template.md>).
