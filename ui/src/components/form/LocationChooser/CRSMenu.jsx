@@ -9,7 +9,13 @@ import IconButton from "@mui/material/IconButton";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import Paper from "@mui/material/Paper";
-import { getProjestAPI, transformBboxAPI, getCRSDef } from "./utils";
+import {
+  getProjestAPI,
+  transformBboxAPI,
+  getCRSDef,
+  defaultCRS,
+  getCRSListFromName,
+} from "./utils";
 import * as turf from "@turf/turf";
 import _ from "lodash";
 
@@ -21,6 +27,8 @@ export default function CRSMenu({
   setBbox,
   bboxGeoJSONShrink,
   bboxGeoJSON,
+  countryName,
+  stateProvName,
 }) {
   const [CRSList, setCRSList] = useState([]);
   const [selectedCRS, setSelectedCRS] = useState({
@@ -34,7 +42,24 @@ export default function CRSMenu({
     if (bboxGeoJSONShrink === null) return;
     setSearching(true);
     let bbj = { type: "FeatureCollection", features: [bboxGeoJSONShrink] };
-    getProjestAPI(bbj).then((result) => {
+    const searchName = stateProvName ? stateProvName : country;
+    getCRSListFromName(searchName).then((result) => {
+      if (result) {
+        const suggestions = result.map((proj) => {
+          const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
+          return {
+            label: `${proj.name} (${p})`,
+            value: `${p}`,
+          };
+        });
+        setCRSList(suggestions);
+      } else {
+        setCRSList([defaultCRS]);
+      }
+      setSearching(false);
+    });
+
+    /*getProjestAPI(bbj).then((result) => {
       if (result && result.length > 0) {
         let suggestions = _.uniqBy(result, function (e) {
           return e.properties.coord_ref_sys_code;
@@ -53,8 +78,8 @@ export default function CRSMenu({
       } else {
         setCRSList([]);
       }
-      setSearching(false);
-    });
+      
+    });*/
   }, [bboxGeoJSONShrink]);
 
   useEffect(() => {
@@ -87,16 +112,13 @@ export default function CRSMenu({
           } else {
             setSelectedCRS(value);
           }
+        } else {
+          setCRS({});
+          setSelectedCRS(value);
         }
       });
     } else {
-      setCRS({
-        name: "WGS84 - Lat/long",
-        authority: "EPSG",
-        code: "4326",
-        def: "+proj=longlat +datum=WGS84 +no_defs",
-        unit: "degree",
-      });
+      setCRS(defaultCRS);
       setSelectedCRS({ label: "", value: "" });
     }
   };
@@ -130,6 +152,9 @@ export default function CRSMenu({
           borderRadius: "4px",
           marginTop: "10px",
           marginBottom: "10px",
+          "& .MuiInputBase-input": {
+            fontSize: 13,
+          },
         }}
         renderInput={(params) => (
           <TextField {...params} label="Select or type CRS" />
@@ -186,6 +211,14 @@ export default function CRSMenu({
           />
         </IconButton>
       </Paper>
+      <div
+        style={{
+          fontSize: "11px",
+          margin: "5px 0px 2px 5px",
+        }}
+      >
+        Units: {CRS.unit}
+      </div>
       {false && (
         <CustomButtonGreen
           variant="contained"

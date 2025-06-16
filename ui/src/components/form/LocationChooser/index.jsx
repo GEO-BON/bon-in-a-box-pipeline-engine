@@ -17,11 +17,14 @@ export default function LocationChooser({ locationFile }) {
   const [bbox, setBbox] = useState([]);
   const [countryBbox, setCountryBbox] = useState([]);
   const [countryISO, setCountryISO] = useState("");
+  const [countryName, setCountryName] = useState("");
   const [stateProvName, setStateProvName] = useState("");
   const [drawFeatures, setDrawFeatures] = useState([]);
   const [clearFeatures, setClearFeatures] = useState(0);
   const [previousId, setPreviousId] = useState("");
   const [bboxGeoJSON, setBboxGeoJSON] = useState(null);
+  const [country, setCountry] = useState("");
+  const [stateProv, setStateProv] = useState("");
   const [bboxGeoJSONShrink, setBboxGeoJSONShrink] = useState(null);
   const [CRS, setCRS] = useState({
     name: "WGS84 - Lat/long",
@@ -97,9 +100,16 @@ export default function LocationChooser({ locationFile }) {
               setBboxGeoJSON,
               setCountryISO,
               setCountryBbox,
+              countryName,
+              setCountryName,
               setStateProvName,
+              stateProv,
+              setStateProv,
+              stateProvName,
               setClearFeatures,
               setAction,
+              country,
+              setCountry,
             }}
           />
 
@@ -112,6 +122,8 @@ export default function LocationChooser({ locationFile }) {
               bboxGeoJSON,
               setBboxGeoJSON,
               setAction,
+              countryName,
+              stateProvName,
             }}
           />
           <BBox

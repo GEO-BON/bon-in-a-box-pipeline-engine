@@ -12,11 +12,15 @@ export default function CountryChooser({
   setBbox,
   setCountryISO,
   setCountryBbox,
+  countryName,
+  setCountryName,
   setStateProvName,
   setAction,
+  country,
+  setCountry,
+  stateProv,
+  setStateProv,
 }) {
-  const [country, setCountry] = useState("");
-  const [stateProv, setStateProv] = useState("");
   const [countryOptions, setCountryOptions] = useState([]);
   const [stateOptions, setStateOptions] = useState([]);
   const [stateProvJSON, setStateProvJSON] = useState([]);
@@ -60,11 +64,13 @@ export default function CountryChooser({
 
   const buttonClicked = () => {
     setAction("CountryButton");
+    setBbox([]);
     const countryObj = countryOptionsJSON.geonames.find(
       (c) => c.geonameId === country
     );
     if (country) {
       setCountryISO(countryObj.isoAlpha3);
+      setCountryName(countryObj.countryName);
     }
     if (country && !stateProv) {
       let b = [

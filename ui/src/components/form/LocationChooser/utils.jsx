@@ -29,6 +29,14 @@ let defs = [
 
 //proj4.defs = defs;
 
+export const defaultCRS = {
+  name: "WGS84 - Lat/long",
+  authority: "EPSG",
+  code: "4326",
+  def: "+proj=longlat +datum=WGS84 +no_defs",
+  unit: "degree",
+};
+
 export const getStateAPI = async (geonameId) => {
   let result;
   const base_url = "http://api.geonames.org/childrenJSON";
@@ -118,6 +126,37 @@ export const getCRSDef = async (epsg_number) => {
       return result.data.results[0];
     } else {
       throw new Error("CRS definition not found for " + epsg_number);
+    }
+  } catch (error) {
+    console.error("getCRSDef error:", error);
+    return null;
+  }
+};
+
+export const getCRSListFromName = async (name) => {
+  let result;
+  const base_url = `https://api.maptiler.com/coordinates/search/${name} deprecated:0.json`;
+  try {
+    result = await axios({
+      method: "get",
+      baseURL: `${base_url}`,
+      params: {
+        limit: 50,
+        exports: true,
+        key: "U4hNLWRENxTa7CfHUUnN",
+      },
+    });
+    // Check if the response is valid and contains the proj4 definition
+    if (
+      result.data &&
+      result.data.results &&
+      result.data.results.length > 0 &&
+      result.data.results[0].exports &&
+      result.data.results[0].exports.proj4
+    ) {
+      return result.data.results;
+    } else {
+      throw new Error("No CRS found for " + name);
     }
   } catch (error) {
     console.error("getCRSDef error:", error);
