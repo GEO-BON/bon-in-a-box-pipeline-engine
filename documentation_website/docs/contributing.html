@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>how_to_use – BON in a Box</title>
+<title>contributing – BON in a Box</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -176,16 +176,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installing-bon-in-a-box" id="toc-installing-bon-in-a-box" class="nav-link active" data-scroll-target="#installing-bon-in-a-box">Installing BON in a Box</a></li>
-  <li><a href="#start-bon-in-a-box" id="toc-start-bon-in-a-box" class="nav-link" data-scroll-target="#start-bon-in-a-box">Start BON in a Box</a></li>
-  <li><a href="#user-guide" id="toc-user-guide" class="nav-link" data-scroll-target="#user-guide">User Guide</a>
-  <ul class="collapse">
-  <li><a href="#home" id="toc-home" class="nav-link" data-scroll-target="#home">Home</a></li>
-  <li><a href="#run-a-script" id="toc-run-a-script" class="nav-link" data-scroll-target="#run-a-script">Run a script</a></li>
-  <li><a href="#run-a-pipeline" id="toc-run-a-pipeline" class="nav-link" data-scroll-target="#run-a-pipeline">Run a pipeline</a></li>
-  <li><a href="#pipeline-editor" id="toc-pipeline-editor" class="nav-link" data-scroll-target="#pipeline-editor">Pipeline editor</a></li>
-  <li><a href="#history" id="toc-history" class="nav-link" data-scroll-target="#history">History</a></li>
-  </ul></li>
+  <li><a href="#does-your-analysis-pipeline-fit-in-bon-in-a-box" id="toc-does-your-analysis-pipeline-fit-in-bon-in-a-box" class="nav-link active" data-scroll-target="#does-your-analysis-pipeline-fit-in-bon-in-a-box">Does your analysis pipeline fit in BON in a Box?</a></li>
+  <li><a href="#steps-for-contributing" id="toc-steps-for-contributing" class="nav-link" data-scroll-target="#steps-for-contributing">Steps for contributing</a></li>
   </ul>
 </nav>
     </div>
@@ -195,130 +187,30 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="installing-bon-in-a-box" class="level2">
-<h2 class="anchored" data-anchor-id="installing-bon-in-a-box">Installing BON in a Box</h2>
-<p>The instructions for how to install BON in a Box on your computer can be found <a href="./how_to_install.html">here</a>.</p>
-</section>
-<section id="start-bon-in-a-box" class="level2">
-<h2 class="anchored" data-anchor-id="start-bon-in-a-box">Start BON in a Box</h2>
-<ol type="1">
-<li>Start the server by running <code>./server-up.sh</code> in a Linux terminal (e.g.&nbsp;Git Bash or WSL on Windows or Terminal on Mac). Make sure you are in the bon-in-a-box-pipeline directory on your computer.</li>
-<li>Open a web browser and navigate to&nbsp;<a href="http://localhost/" class="uri">http://localhost/</a>.</li>
-</ol>
-</section>
-<section id="user-guide" class="level1">
-<h1>User Guide</h1>
-<p>Here is a detailed guide on how to run BON in a Box locally on your computer. This guide outlines the features of BON in a Box and how to use them.</p>
-<section id="home" class="level2">
-<h2 class="anchored" data-anchor-id="home">Home</h2>
-<p>Under the <code>Home</code> tab, you will find a description of the BON in a Box modeling tool, as well as its featured pipelines. And your most recent pipeline runs.</p>
-<div style="margin-top: 40px;">
-
-</div>
-<p><img src="images/Image7.png" class="img-fluid"></p>
-<div style="margin-top: 40px;">
-
-</div>
-</section>
-<section id="run-a-script" class="level2">
-<h2 class="anchored" data-anchor-id="run-a-script">Run a script</h2>
-<p>The <code>Run a script</code> tab lets you run an individual script. Scripts are individual parts of pipelines designed to perform one well-defined task at a time, like extracting data from a file, cleaning files, or applying a specific formulas.</p>
-<div style="margin-top: 40px;">
-
-</div>
-<p><img src="images/Image8.png" class="img-fluid"></p>
-<div style="margin-top: 40px;">
-
-</div>
-<ol type="1">
-<li><p>Select from the drop down menu the script you would like to run.</p>
+<section id="does-your-analysis-pipeline-fit-in-bon-in-a-box" class="level1">
+<h1>Does your analysis pipeline fit in BON in a Box?</h1>
+<p>We are looking for pipelines that calculate biodiversity metrics that are relevant to policy and biodiversity reporting, such as Essential Biodiversity Variables (EBVs) and Indicators. These pipelines should be</p>
 <ul>
-<li>Under the menu you have a description of the script, with its authors and references.</li>
-</ul></li>
-<li><p>Fill out the form with the input parameters the script should use.</p>
-<ul>
-<li><p>Scripts will run with default parameters if no inputs are specified. Sometimes scripts require specific files that are pulled from other parts of a pipeline, so you may not be able to run the script by itself with the default parameters. However, all pipelines should run successfully with the default parameters.</p></li>
-<li><p>Some inputs can simply be typed in, while others are options.</p></li>
-<li><p>Each input field includes a description and its purpose on the right of the input box. Here you will also see the <em>type</em> of the input.</p></li>
-<li><p>The form might ask you for a file. In order to provide a file that you have locally on your computer, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders.</p></li>
-<li><p><strong>Please ensure each input matches the required type that is specified in the input description.</strong> <strong>For any details on input types, please refer to Step 3 of <a href="./how_to_contribute.html">this page</a>.</strong></p></li>
-<li><p>The <code>Input yaml</code> tab can be used to see how your inputs are being passed in to the script. By scrolling down, you can also see how the inputs were defined by the author(s).</p></li>
-</ul></li>
-<li><p>Click on <code>Run script</code>. To terminate the execution of the script at any point, use the <code>Stop</code> button.</p></li>
+<li><p>open source, written in the coding languages R, Julia, or Python</p></li>
+<li><p>relevant to many contexts (different species, countries, and regions)</p></li>
+</ul>
+</section>
+<section id="steps-for-contributing" class="level1">
+<h1>Steps for contributing</h1>
+<p>We strongly encourage those who have created or are developing code to calculate Essential Biodiversity Variables or indicators to share it through BON in a Box. The purpose of the modeling tool is to have state of the art processing pipelines shared across the community, for the benefit of all. We recommend following these steps:&nbsp;</p>
+<ol type="1">
+<li><p>Identify a workflow with a good potential for reuse by other organisations, and that can be mostly automated.</p></li>
+<li><p>Draw a high-level view of the pipeline that identifies each step, the inputs and outputs, how the scripts are put together, and the format of the final results.</p></li>
+<li><p>Meet the BON in a Box team. We will help design the pipeline, ensuring that each step is modular, identifying scripts that are already in the modeling tool to avoid rewriting code, and finding places where the existing code would need to be modified. For example, using cloud-optimized approaches such as STAC and Parquet files instead of downloading large files during the pipeline’s execution.</p></li>
+<li><p>Secure the resources. This could be the time of a graduate student or work study student. If applying for funding, include BON in a Box in your proposal as a tool.</p></li>
+<li><p>Create the pipeline following the steps in the <a href="./how_to_contribute.html">contribution instructions</a>. We recommend starting with the simplest version and then adding complexity or features when needed.</p></li>
+<li><p>When you feel that the pipeline is complete and you have verified that it meets the <a href="./pipeline_standards.html">quality requirement standards</a>, you can submit the pipeline for <a href="./peer_review.html">peer review</a>. While you are waiting, why not contribute by reviewing someone else’s contribution?</p></li>
+<li><p>Once the reviews are complete, implement any necessary changes.</p></li>
+<li><p>If accepted, the pipeline will be published in BON in a Box and Zenodo and will receive a DOI for identification. Now, the pipeline can be used by others.</p></li>
 </ol>
-<p>After the script runs, you’ll see a detailed results box, which includes drop down arrows to view your inputs and script outputs. To simply view your output, click on the blue name or arrow. A gray box containing the script logs can be found under the outputs, which can help with figuring out any issues that you might have.</p>
-<div style="margin-top: 40px;">
-
-</div>
-<p><img src="images/Image10.png" class="img-fluid"></p>
-<div style="margin-top: 40px;">
-
-</div>
-<p>If you see a red exclamation mark, the script failed to completely execute and an error message will be displayed. If you encounter an error due to the script’s internal structure (i.e.&nbsp;not a problem with your input parameters), please contact us on <a href="https://discourse.geobon.org">Discourse</a> or email us at boninabox@geobon.org.</p>
-<p>To download outputs, simply cilck the link next the output name.</p>
-<div style="margin-top: 40px;">
-
-</div>
-<p><img src="images/Image11.png" class="img-fluid"></p>
-<div style="margin-top: 40px;">
-
-</div>
-<p>To run the script again, click <code>Run script</code> in the input form.</p>
-</section>
-<section id="run-a-pipeline" class="level2">
-<h2 class="anchored" data-anchor-id="run-a-pipeline">Run a pipeline</h2>
-<p>The <code>Run a pipeline</code> tab can be used to run an entire pipeline and works very similarly to the <code>Run a script</code> tab. Pipelines run a full sequence of connected scripts and are designed to carry out a full analysis from start to finish. Each pipeline integrates multiple steps like pulling data, cleaning data, performing analyses, and plotting and formatting outputs into one automated workflow.</p>
-<div style="margin-top: 40px;">
-
-</div>
-<p><img src="images/Image12.png" class="img-fluid"></p>
-<div style="margin-top: 40px;">
-
-</div>
-<p>Simply fill out the desired inputs and click on <code>Run pipeline</code>. To terminate the execution of the pipeline at any point, use the <code>stop</code> button. While the pipeline is running, you may see its progress under <code>Results</code>.</p>
-<p>The <code>Results</code> box displays the outputs of the pipeline. You may view them using the drop down menu for each, or use <code>See in results viewer</code> for a more detailed view. Outputs can be downloaded by using the link next to the output name.</p>
-<p>In the <code>Detailed results</code> you will find all the individual scripts used throughout the pipeline, as well as their inputs and outputs.</p>
-<div style="margin-top: 40px;">
-
-</div>
-<p><img src="images/Image13.png" class="img-fluid"></p>
-<div style="margin-top: 40px;">
-
-</div>
-</section>
-<section id="pipeline-editor" class="level2">
-<h2 class="anchored" data-anchor-id="pipeline-editor">Pipeline editor</h2>
-<p>Under the <code>Pipeline editor</code> tab, users can create and edit pipelines. For more information on how to do so, please refer to Step 6 of <a href="./how_to_contribute.html">this page</a>.</p>
-<div style="margin-top: 40px;">
-
-</div>
-<p><img src="images/Image14.png" class="img-fluid"></p>
-<div style="margin-top: 40px;">
-
-</div>
-</section>
-<section id="history" class="level2">
-<h2 class="anchored" data-anchor-id="history">History</h2>
-<p>The <code>History</code> tab shows previous script and pipeline runs.</p>
-<div style="margin-top: 40px;">
-
-</div>
-<p><img src="images/Image15.png" class="img-fluid"></p>
-<div style="margin-top: 40px;">
-
-</div>
-<p>Use the drop down arrow to see the inputs of a run and <code>See run in UI</code> to view the details of a run, including the inputs, outputs, and logs. The latter can be used to try the run again with some or all of the same inputs. For pipelines, you may see outputs in the results viewer using <code>See in viewer</code>.</p>
-<div style="margin-top: 40px;">
-
-</div>
-<p><img src="images/Image16.png" class="img-fluid"></p>
-<div style="margin-top: 40px;">
-
-</div>
-<p><strong>For any further questions, please contact us on <a href="https://discourse.geobon.org">Discourse</a> or email us at boninabox@geobon.org.</strong></p>
+<p><strong>If you wish to contribute a pipeline, please email us at boninabox@geobon.org.</strong></p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

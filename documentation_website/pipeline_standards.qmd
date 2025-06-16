@@ -50,8 +50,6 @@ Additionally, all analyses must be:
 
 -   **Transparent:** All pipelines must be open access and all code must be publicly available; intermediate steps should display outputs relevant for auditing purposes; any calculations run outside of BON in a Box and imported using APIs must be run on open access platforms so all results can be audited and reproduced. Analyses should, whenever possible, have some estimates of uncertainty, predictive power and goodness of fit measures. 
 
-    \*ADD TABLE HERE
-
 ### Data standards
 
 BON in a Box is a data processing platform, not a data repository. However, to ensure that pipelines follow FAIR principles, the data that is analyzed must meet a set of standards.
@@ -184,7 +182,7 @@ Each pipeline contains metadata, which can be edited in the right sliding pane o
 
 #### **Pipeline markdown tutorial**
 
-Each pipeline should be accompanied by a tutorial in markdown format. This document should have the same name as the pipeline JSON file but with a .md extension and be contained in the same folder as the pipeline it describes. This tutorial should contain a more thorough description of the methods (around 2-3 paragraphs). The tutorial should provide guidance on how to parameterize the pipeline, and walk through a full example analysis. This document should also more thoroughly communicate the limitations of the pipeline in terms of the species, regions, and scales at which it is relevant. See example [here](https://boninabox.geobon.org/indicator?i=ProtConn).
+Each pipeline should be accompanied by a tutorial in markdown format. This document should have the same name as the pipeline JSON file but with a .md extension and be contained in the same folder as the pipeline it describes. This tutorial should contain a more thorough description of the methods (around 2-3 paragraphs). The tutorial should provide guidance on how to parameterize the pipeline, and walk through a full example analysis. This document should also more thoroughly communicate the limitations of the pipeline in terms of the species, regions, and scales at which it is relevant. You can create the tutorial using [this template](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/pipelines/New-pipeline/pipeline-tutorial-template.md).
 
 ### **Versioning**
 

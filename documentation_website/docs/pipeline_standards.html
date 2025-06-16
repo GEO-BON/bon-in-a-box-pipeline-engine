@@ -101,12 +101,23 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">User Guide</span></a>
   </li>  
   <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-pipelines" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Pipelines</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-pipelines">    
+        <li>
+    <a class="dropdown-item" href="./protconn_pipeline.html">
+ <span class="dropdown-text">Protected Connected Index</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribute-a-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Contribute a pipeline</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-contribute-a-pipeline">    
         <li>
-    <a class="dropdown-item" href="./what_to_contribute.html">
+    <a class="dropdown-item" href="./contributing.html">
  <span class="dropdown-text">Interested in Contributing?</span></a>
   </li>  
         <li>
@@ -266,8 +277,7 @@ ul.task-list li input[type="checkbox"] {
 <li><p><strong>Scalable:</strong> Pipelines should be able to be calculated at different scales.</p></li>
 <li><p><strong>Scientifically robust:</strong> Pipelines should follow a method that has been published in the literature or verified in some way. Sometimes, pipeline and method development will happen concurrently but pipelines will keep the “experimental pipeline” tag until the science has been verified by independent experts. Ideally, models will be ground-truthed with independent data sources.</p></li>
 <li><p><strong>FAIR:</strong> Findable, accessible, interoperable, and reproducible*</p></li>
-<li><p><strong>Transparent:</strong> All pipelines must be open access and all code must be publicly available; intermediate steps should display outputs relevant for auditing purposes; any calculations run outside of BON in a Box and imported using APIs must be run on open access platforms so all results can be audited and reproduced. Analyses should, whenever possible, have some estimates of uncertainty, predictive power and goodness of fit measures.&nbsp;</p>
-<p>*ADD TABLE HERE</p></li>
+<li><p><strong>Transparent:</strong> All pipelines must be open access and all code must be publicly available; intermediate steps should display outputs relevant for auditing purposes; any calculations run outside of BON in a Box and imported using APIs must be run on open access platforms so all results can be audited and reproduced. Analyses should, whenever possible, have some estimates of uncertainty, predictive power and goodness of fit measures.&nbsp;</p></li>
 </ul>
 </section>
 <section id="data-standards" class="level3">
@@ -388,7 +398,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="pipeline-markdown-tutorial" class="level4">
 <h4 class="anchored" data-anchor-id="pipeline-markdown-tutorial"><strong>Pipeline markdown tutorial</strong></h4>
-<p>Each pipeline should be accompanied by a tutorial in markdown format. This document should have the same name as the pipeline JSON file but with a .md extension and be contained in the same folder as the pipeline it describes. This tutorial should contain a more thorough description of the methods (around 2-3 paragraphs). The tutorial should provide guidance on how to parameterize the pipeline, and walk through a full example analysis. This document should also more thoroughly communicate the limitations of the pipeline in terms of the species, regions, and scales at which it is relevant. See example <a href="https://boninabox.geobon.org/indicator?i=ProtConn">here</a>.</p>
+<p>Each pipeline should be accompanied by a tutorial in markdown format. This document should have the same name as the pipeline JSON file but with a .md extension and be contained in the same folder as the pipeline it describes. This tutorial should contain a more thorough description of the methods (around 2-3 paragraphs). The tutorial should provide guidance on how to parameterize the pipeline, and walk through a full example analysis. This document should also more thoroughly communicate the limitations of the pipeline in terms of the species, regions, and scales at which it is relevant. You can create the tutorial using <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/pipelines/New-pipeline/pipeline-tutorial-template.md">this template</a>.</p>
 </section>
 </section>
 <section id="versioning" class="level3">
