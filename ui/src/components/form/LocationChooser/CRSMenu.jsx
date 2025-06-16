@@ -1,8 +1,14 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useRef, useCallback } from "react";
 import TextField from "@mui/material/TextField";
+import { Checkbox, CircularProgress } from "@mui/material";
 import { CustomButtonGreen } from "../../CustomMUI";
 import Autocomplete from "@mui/material/Autocomplete";
+import InputBase from "@mui/material/InputBase";
+import IconButton from "@mui/material/IconButton";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import PlayCircleIcon from "@mui/icons-material/PlayCircle";
+import Paper from "@mui/material/Paper";
 import { getProjestAPI, transformBboxAPI, getCRSDef } from "./utils";
 import * as turf from "@turf/turf";
 import _ from "lodash";
@@ -17,11 +23,16 @@ export default function CRSMenu({
   bboxGeoJSON,
 }) {
   const [CRSList, setCRSList] = useState([]);
-  const [selectedCRS, setSelectedCRS] = useState({label: 'WGS84 - Lat/long', value: '4326'});
-  const [inputValue, setInputValue] = useState("4326")
+  const [selectedCRS, setSelectedCRS] = useState({
+    label: "WGS84 - Lat/long",
+    value: "EPSG:4326",
+  });
+  const [inputValue, setInputValue] = useState("");
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     if (bboxGeoJSONShrink === null) return;
+    setSearching(true);
     let bbj = { type: "FeatureCollection", features: [bboxGeoJSONShrink] };
     getProjestAPI(bbj).then((result) => {
       if (result && result.length > 0) {
@@ -36,41 +47,82 @@ export default function CRSMenu({
             " (EPSG:" +
             proj.properties.coord_ref_sys_code +
             ")",
-          value: parseInt(proj.properties.coord_ref_sys_code),
-          /*units: proj.units_of_meas_name,*/
+          value: `EPSG:${parseInt(proj.properties.coord_ref_sys_code)}`,
         }));
         setCRSList(suggestions);
       } else {
         setCRSList([]);
       }
+      setSearching(false);
     });
   }, [bboxGeoJSONShrink]);
 
-  useEffect(()=>{
-    setSelectedCRS({label: 'WGS84 - Lat/long', value: '4326'})
-  },[])
+  useEffect(() => {
+    const c = `${CRS.authority}:${CRS.code}`;
+    if (c !== inputValue) {
+      setInputValue(c);
+    }
+  }, [CRS]);
 
   const updateCRS = (value) => {
-    setAction("CRSButton");
-    if(value && value?.value){
-      getCRSDef(`EPSG:${value.value}`).then((def) => {
-        if(def){
-          setCRS({name: def.name, authority: def.id.authority, code: def.id.code, def: def.exports.proj4, unit: def.unit, bbox: def.bbox})
+    setAction("CRSChange");
+    if (value) {
+      getCRSDef(value.value).then((def) => {
+        if (def) {
+          setCRS({
+            name: def.name,
+            authority: def.id.authority,
+            code: def.id.code,
+            def: def.exports.proj4,
+            unit: def.unit,
+            bbox: def.bbox,
+          });
+          if (value && value.value == value.label) {
+            const fl = CRSList.filter((fl) => fl.value === value.value);
+            if (fl.length > 0) {
+              setSelectedCRS(fl[0]);
+            } else {
+              setSelectedCRS({ label: value.label, label: def.name });
+            }
+          } else {
+            setSelectedCRS(value);
+          }
         }
-      })
-    }else{
-      setCRS({name: 'WGS84 - Lat/long', authority: 'EPSG', code: '4326', def: '+proj=longlat +datum=WGS84 +no_defs', unit: 'degree'})
-      setSelectedCRS({label: '', value: ''})
+      });
+    } else {
+      setCRS({
+        name: "WGS84 - Lat/long",
+        authority: "EPSG",
+        code: "4326",
+        def: "+proj=longlat +datum=WGS84 +no_defs",
+        unit: "degree",
+      });
+      setSelectedCRS({ label: "", value: "" });
     }
   };
 
   return (
-    <div style={{ width: "100%" }}>
+    <div
+      style={{
+        width: "90%",
+        borderRadius: "10px",
+        border: "1px solid #aaa",
+        padding: "10px",
+        margin: "10px",
+        boxShadow: "2px 2px 4px #999",
+      }}
+    >
+      <h4 style={{ marginTop: "3px", marginBottom: "3px" }}>
+        Choose coordinate reference system
+      </h4>
+      {searching && <CircularProgress size="14px" />}
       <Autocomplete
         freeSolo
-        disablePortal
         options={CRSList}
-        //getOptionLabel={(option) => option.label || ""}
+        size="small"
+        getOptionLabel={(option) => {
+          return option.label || "";
+        }}
         sx={{
           width: "90%",
           background: "#fff",
@@ -79,15 +131,61 @@ export default function CRSMenu({
           marginTop: "10px",
           marginBottom: "10px",
         }}
-        renderInput={(params) => <TextField {...params} label="Select CRS" />}
+        renderInput={(params) => (
+          <TextField {...params} label="Select or type CRS" />
+        )}
         onChange={(event, value) => {
-          setSelectedCRS(value);
-          updateCRS(value)
+          updateCRS(value);
+          //setInputValue(val ? val : "");
         }}
+        /*inputValue={inputValue}
+        onInputChange={(event, newInputValue, reason) => {
+          // Show value in the input after selection
+          if (reason === "reset" && selectedCRS) {
+            setInputValue(selectedCRS.value);
+          } else if (reason === "createOption") {
+            //ENTER KEY PRESSED
+            setInputValue(event.target.value);
+          } else {
+            setInputValue(newInputValue);
+          }
+        }}*/
         value={selectedCRS}
-        inputValue={inputValue}
-        onInputChange={(e, val)=>{setInputValue(val)}}
       />
+      <Paper
+        component="form"
+        sx={{
+          p: "2px 4px",
+          display: "flex",
+          alignItems: "center",
+          width: "90%",
+          border: "1px solid #aaa",
+          borderRadius: "6px",
+        }}
+      >
+        <InputBase
+          sx={{ ml: 1, flex: 1 }}
+          label="Enter code"
+          variant="outlined"
+          size="small"
+          value={inputValue}
+          onChange={(event) => {
+            setInputValue(event.target.value);
+          }}
+        />
+        <IconButton
+          type="button"
+          sx={{ p: "10px" }}
+          aria-label="search"
+          onClick={(event) => {
+            updateCRS({ value: inputValue, label: inputValue });
+          }}
+        >
+          <CheckBoxIcon
+            sx={{ color: "var(--biab-green-main)", padding: "4px" }}
+          />
+        </IconButton>
+      </Paper>
       {false && (
         <CustomButtonGreen
           variant="contained"

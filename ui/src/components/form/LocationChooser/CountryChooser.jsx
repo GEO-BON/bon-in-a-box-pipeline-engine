@@ -1,7 +1,5 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useRef, useCallback } from "react";
-
-import "maplibre-gl/dist/maplibre-gl.css";
 import { styled } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -61,7 +59,6 @@ export default function CountryChooser({
   }, [country, countryOptions]);
 
   const buttonClicked = () => {
-    //setClearFeatures(Math.random());
     setAction("CountryButton");
     const countryObj = countryOptionsJSON.geonames.find(
       (c) => c.geonameId === country
@@ -94,8 +91,17 @@ export default function CountryChooser({
   };
 
   return (
-    <div style={{ width: "100%" }}>
-      <h4>Choose Country/Region</h4>
+    <div
+      style={{
+        width: "90%",
+        borderRadius: "10px",
+        border: "1px solid #aaa",
+        padding: "10px",
+        margin: "10px",
+        boxShadow: "2px 2px 4px #999",
+      }}
+    >
+      <h4 style={{ marginTop: "3px" }}>Or choose Country/Region</h4>
       <Autocomplete
         disablePortal
         options={countryOptions}

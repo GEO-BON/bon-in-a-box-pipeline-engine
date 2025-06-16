@@ -2,21 +2,16 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
 import Paper from "@mui/material/Paper";
-import Box from "@mui/material/Box";
-import Alert from "@mui/material/Alert";
-import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { styled } from "@mui/material";
 import Grid from "@mui/material/Grid";
+import CropIcon from "@mui/icons-material/Crop";
 import MapOL from "./MapOL";
-import { geometry } from "@turf/turf";
 import * as turf from "@turf/turf";
 import CountryChooser from "./CountryChooser";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
-import { transformBboxAPI, validTerraPolygon } from "./utils";
 import { v4 as uuidv4 } from "uuid";
-import { set } from "lodash";
 import { CustomButtonGreen } from "../../CustomMUI";
 
 export default function LocationChooser({ locationFile }) {
@@ -40,17 +35,16 @@ export default function LocationChooser({ locationFile }) {
   const [digitize, setDigitize] = useState(false);
 
   useEffect(() => {
-    if (bbox.length > 0) {
+    if (bbox.length > 0 && ![("CRSChange", "")].includes(action)) {
+      //Shrink bbox for projestion which wont provide a crs suggestion if even a small part of the bbox is outside the area of coverage of the CRS
       if (drawFeatures.length > 0) {
         setPreviousId(drawFeatures[0].id);
       } else {
         setPreviousId(uuidv4()); //Random ID for the first feature
       }
-      //Shrink bbox for projestion which wont provide a crs suggestion if even a small part of the bbox is outside the area of coverage of the CRS
-      //let b = turf.bbox(bboxGeoJSON);
       const b = bbox.map((c) => parseFloat(c));
-      const scale_width = (b[2] - b[0]) / 2;
-      const scale_height = (b[3] - b[1]) / 2;
+      const scale_width = Math.abs((b[2] - b[0]) / 3);
+      const scale_height = Math.abs((b[3] - b[1]) / 3);
       const bbox_shrink = [
         b[0] + scale_width,
         b[1] + scale_height,
@@ -91,6 +85,13 @@ export default function LocationChooser({ locationFile }) {
             overflowY: "scroll",
           }}
         >
+          <CustomButtonGreen
+            onClick={() => {
+              setDigitize(true);
+            }}
+          >
+            Draw area of interest on map <CropIcon />
+          </CustomButtonGreen>
           <CountryChooser
             {...{
               setBbox,
@@ -102,14 +103,7 @@ export default function LocationChooser({ locationFile }) {
               setAction,
             }}
           />
-          <h4>Or </h4>
-          <CustomButtonGreen
-            onClick={() => {
-              setDigitize(true);
-            }}
-          >
-            Draw area of interest on map
-          </CustomButtonGreen>
+
           <CRSMenu
             {...{
               CRS,

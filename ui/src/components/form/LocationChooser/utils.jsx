@@ -50,7 +50,7 @@ export const getProjestAPI = async (geojson) => {
   let allData = [];
   let start = 1;
 
-  while (start) {
+  while (start && start < 100) {
     try {
       result = await axios({
         method: "post",

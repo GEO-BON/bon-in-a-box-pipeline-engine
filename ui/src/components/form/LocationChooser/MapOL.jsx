@@ -272,7 +272,7 @@ export default function MapOL({
     }
   }, [CRS, mapp]);
 
-  // The Country Bounding box or the CRS are updated, we need to update and reproject
+  // The Country Bounding box or the CRS are updated, we need to update and reproject the bbox
   useEffect(() => {
     if (countryBbox.length > 0 && mapp) {
       setDigitize(false);
@@ -285,16 +285,24 @@ export default function MapOL({
   useEffect(() => {
     setDigitize(false);
     if (bbox.length > 0) {
+      //Current map projection
+      const mapProjection = mapp.getView().getProjection().getCode();
+      const currentCRS = `${CRS.authority}:${CRS.code}`;
       if (oldCRS && CRS && CRS.code === oldCRS.code) {
         if (mapp && bbox && bbox.length > 0) {
           setFeatures(new GeoJSON().readFeatures(turf.bboxPolygon(bbox)));
         }
-      } else if (oldCRS && CRS && CRS.code !== oldCRS.code) {
+      } else if (
+        oldCRS &&
+        CRS &&
+        CRS.code !== oldCRS.code &&
+        currentCRS == mapProjection
+      ) {
         let newpoly = turf.bboxPolygon(bbox);
         if (CRS.code !== oldCRS.code) {
           newpoly = transformPolyToBboxCRS(newpoly, oldCRS, CRS);
         }
-        setBbox(cleanBbox(newpoly, CRS.unit)); // Set updated BBox in new CRS and re-run this block
+        setBbox(cleanBbox(newpoly, CRS.unit)); // Set update BBox in new CRS and re-run this block
         setOldCRS(CRS);
       } else if (CRS) {
         setOldCRS(CRS);
