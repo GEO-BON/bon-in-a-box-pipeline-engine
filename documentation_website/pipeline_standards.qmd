@@ -50,8 +50,6 @@ Additionally, all analyses must be:
 
 -   **Transparent:** All pipelines must be open access and all code must be publicly available; intermediate steps should display outputs relevant for auditing purposes; any calculations run outside of BON in a Box and imported using APIs must be run on open access platforms so all results can be audited and reproduced. Analyses should, whenever possible, have some estimates of uncertainty, predictive power and goodness of fit measures. 
 
-    \*ADD TABLE HERE
-
 ### Data standards
 
 BON in a Box is a data processing platform, not a data repository. However, to ensure that pipelines follow FAIR principles, the data that is analyzed must meet a set of standards.

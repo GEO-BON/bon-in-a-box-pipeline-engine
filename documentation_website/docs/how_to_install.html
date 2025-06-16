@@ -215,14 +215,14 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>The user interface allows the user to run and edit pipelines. It is used through a browser, but doesn’t need to be installed on a web server. This can all happen locally. The code for the scripts, however, is not edited through the UI but rather with a standard text editor such as VS Code or RStudio.</p>
+<p>The user interface allows the user to run and edit pipelines. You can access BON in a Box through the browser, but it accesses your local pipeline repository. The code for the scripts, however, is not edited through the UI but rather with a standard code editor such as VS Code or RStudio.</p>
 <section id="video-tutorial" class="level2">
 <h2 class="anchored" data-anchor-id="video-tutorial">Video tutorial</h2>
 <div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/h3T36nLvg1E" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 </section>
 <section id="deploying-bon-in-a-box-locally" class="level2">
 <h2 class="anchored" data-anchor-id="deploying-bon-in-a-box-locally">Deploying BON in a Box locally</h2>
-<p>BON in a Box can be installed and ran on a local computer. While personal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can directly run them through BON in a Box.</p>
+<p>BON in a Box can be installed and ran on a local computer. While personal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can run them directly through BON in a Box in the user interface.</p>
 <p>Prerequisites:</p>
 <ul>
 <li><p>A GitHub account, and git installed on your computer</p></li>
@@ -263,7 +263,7 @@ ul.task-list li input[type="checkbox"] {
 </ul></li>
 <li><p>If you do not already have a key, generate one by running <code>ssh-keygen -t ed25519 -C "your_email@example.com"</code> replacing the email with the email address associated with your GitHub account.</p>
 <ul>
-<li>This will prompt you to make a passphrase. If you choose to have a passphrase, although more secure, it will prompt you to enter it many times while creating a pipeline so consider skipping this step for easier use. You can keep pressing enter to skip creating a passphrase.</li>
+<li>This will prompt you to make a passphrase. If you choose to have a passphrase, although more secure, it will prompt you to enter it many times while creating a pipeline so consider skipping this step for easier use. You can keep pressing enter to continue without creating a passphrase.</li>
 </ul></li>
 <li><p>To check if you successfully generated the SSH key, you can run <code>ls -al ~/.ssh</code> in the terminal. Your SSH key should be there now.</p></li>
 <li><p>Now, open the file with your SSH key by running <code>cat ~/.ssh/&lt;name of SSH key&gt;</code> e.g.&nbsp;<code>cat ~/.ssh/id_ed25519.pub</code> and copy your SSH key.</p></li>
@@ -273,7 +273,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="step-3-clone-repository" class="level3">
 <h3 class="anchored" data-anchor-id="step-3-clone-repository">Step 3: Clone repository</h3>
 <ol type="1">
-<li>Clone repository (Windows users: make sure the cloned repo is under the user folder (`C:\Users\yourname\…`), and also <strong>not</strong> under OneDrive.) This can be done in terminal using the following code: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git</code> or in GitHub desktop.</li>
+<li>Clone repository (Windows users: make sure the cloned repo is under the user folder (`C:\Users\yourname\…`), and <strong>not</strong> under OneDrive.) This can be done in terminal using the following code: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git</code> or in GitHub desktop.</li>
 </ol>
 </section>
 <section id="step-4-set-environment-file" class="level3">
@@ -284,7 +284,7 @@ ul.task-list li input[type="checkbox"] {
 <li><p>Find the file called <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env"><code>runner-sample.env</code></a></p></li>
 <li><p>Duplicate the file and rename the copy to <code>runner.env</code>.</p></li>
 <li><p>Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g.&nbsp;GBIF or IUCN)</p></li>
-<li><p>Adjust any server option as you see fit.</p></li>
+<li><p>Adjust any server option as you see fit (optional).</p></li>
 </ol></li>
 <li><p>Using a Linux terminal (terminal on Mac, Git Bash or WSL on Windows), navigate to the folder of the cloned repository.</p></li>
 <li><p>If you are not in the same folder as the cloned repository, navigate to that folder so it can access the files. This can be done with `cd &lt;folder name&gt;`</p>
@@ -319,7 +319,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="updating-bon-in-a-box" class="level3">
 <h3 class="anchored" data-anchor-id="updating-bon-in-a-box">Updating BON in a Box</h3>
-<p>Each time that the server is started, the startup script will check for updates and propose them. Type <code>y</code> for yes or press enter to update.</p>
+<p>Each time that the server is started, the startup script will check for updates and propose them. Type Y for yes or press enter to update.</p>
 <p>Accepting the updates are generally recommended, unless:</p>
 <ul>
 <li><p>You are currently using an unstable, rate-limited, or billable Internet connection. Defer the update by typing <code>n</code> (no) until a better internet connection is available. You can also use <code>./server-up.sh --offline</code> option to completely skip update checks. Use with caution, since this may create errors if elements of the repository depend on new server features.</p></li>
@@ -337,7 +337,7 @@ In this case, defer the update until you can afford the time to start a run that
 <li><p>In <code>runner.env</code>, select the “partial” cache cleaning mode. This will allow for calculated results to be long-lived on the server, as long as they are not run again with a new version of the script. The results in the output folder are always accessible by URL.</p></li>
 <li><p>In the case where a server is used for demonstration purposes only, set environment variable <code>BLOCK_RUNS=true</code></p></li>
 <li><p>The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.</p></li>
-<li><p>By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy and activate https with certbot. How to do this is out of scope for this readme.</p></li>
+<li><p>By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy (documentation <a href="https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/">here</a>) and activate https with certbot (documentation <a href="https://certbot.eff.org/">here</a>).</p></li>
 </ul>
 </section>
 <section id="troubleshooting" class="level1">

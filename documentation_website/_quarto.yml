@@ -23,7 +23,7 @@ website:
             text: "Protected Connected Index"
       - text: "Contribute a pipeline"
         menu:
-          - href: what_to_contribute.qmd
+          - href: contributing.qmd
             text: "Interested in Contributing?"
           - href: how_to_contribute.qmd
             text: "Contribution instructions"

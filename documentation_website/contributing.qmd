@@ -1,5 +1,5 @@
 ---
-title: "what_to_contribute"
+title: ""
 format: html
 ---
 
@@ -23,12 +23,12 @@ We strongly encourage those who have created or are developing code to calculate
 
 4.  Secure the resources. This could be the time of a graduate student or work study student. If applying for funding, include BON in a Box in your proposal as a tool.
 
-5.  Create the pipeline following the steps below. We recommend starting with the simplest version and then adding complexity or features when needed.
+5.  Create the pipeline following the steps in the [contribution instructions](how_to_contribute.qmd). We recommend starting with the simplest version and then adding complexity or features when needed.
 
-6.  When you feel that the pipeline is complete and you have verified that it meets the \[quality requirement standards\](pipeline_standards.qmd), you can submit the pipeline for peer review. While you are waiting, why not contribute by reviewing someone else’s contribution?
+6.  When you feel that the pipeline is complete and you have verified that it meets the [quality requirement standards](pipeline_standards.qmd), you can submit the pipeline for [peer review](peer_review.qmd). While you are waiting, why not contribute by reviewing someone else’s contribution?
 
 7.  Once the reviews are complete, implement any necessary changes.
 
-8.  If accepted, the pipeline will be published in BON in a Box and will receive a DOI for identification. Now, the pipeline can be used by others.
+8.  If accepted, the pipeline will be published in BON in a Box and Zenodo and will receive a DOI for identification. Now, the pipeline can be used by others.
 
 **If you wish to contribute a pipeline, please email us at boninabox\@geobon.org.**

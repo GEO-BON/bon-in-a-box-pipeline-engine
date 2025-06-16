@@ -18,7 +18,7 @@ Here is a detailed guide on how to run BON in a Box locally on your computer. Th
 
 ## Home
 
-Under the `Home` tab, you will find a description of the BON in a Box modeling tool, as well as all of its featured pipelines.
+Under the `Home` tab, you will find a description of the BON in a Box modeling tool, as well as all of its featured pipelines. And your most recent pipeline runs.
 
 ::: {style="margin-top: 40px;"}
 :::
@@ -46,21 +46,21 @@ The `Run a script` tab lets you run an individual script. Scripts are individual
 
 2.  Fill out the form with the input parameters the script should use.
 
-    -   Scripts will run with default parameters if no inputs are specified. You may use as many or as little of the default inputs as you wish.
+    -   Scripts will run with default parameters if no inputs are specified. Sometimes scripts require specific files that are pulled from other parts of a pipeline, so you may not be able to run the script by itself with the default parameters. However, all pipelines should run successfully with the default parameters.
 
     -   Some inputs can simply be typed in, while others are options.
 
     -   Each input field includes a description and its purpose on the right of the input box. Here you will also see the *type* of the input.
 
-    -   The form might ask you for a file. In order to provide a file that you own locally, upload or copy it to the `userdata` folder. You can then refer to it with a url as such: `/userdata/myFile.shp`, or `/userdata/myFolder/myFile.shp` if there are subfolders.
+    -   The form might ask you for a file. In order to provide a file that you have locally on your computer, upload or copy it to the `userdata` folder. You can then refer to it with a url as such: `/userdata/myFile.shp`, or `/userdata/myFolder/myFile.shp` if there are subfolders.
 
-    -   **Please ensure each input matches the required type.** **For any details on input types, please refer to Step 3 of [this page](how_to_contribute.qmd).**
+    -   **Please ensure each input matches the required type that is specified in the input description.** **For any details on input types, please refer to Step 3 of [this page](how_to_contribute.qmd).**
 
     -   The `Input yaml` tab can be used to see how your inputs are being passed in to the script. By scrolling down, you can also see how the inputs were defined by the author(s).
 
-3.  Click on `Run script`. To terminate the execution of the script at any point, use the `stop` button.
+3.  Click on `Run script`. To terminate the execution of the script at any point, use the `Stop` button.
 
-After the script runs, you'll see a detailed results box, which includes tabs for your inputs and script outputs. You can click on them to see details. A gray box containing the script logs can be found under the outputs.
+After the script runs, you'll see a detailed results box, which includes drop down arrows to view your inputs and script outputs. To simply view your output, click on the blue name or arrow. A gray box containing the script logs can be found under the outputs, which can help with figuring out any issues that you might have.
 
 ::: {style="margin-top: 40px;"}
 :::
@@ -70,9 +70,9 @@ After the script runs, you'll see a detailed results box, which includes tabs fo
 ::: {style="margin-top: 40px;"}
 :::
 
-If you see a red exclamation mark, the script failed to completely execute and an error message will be displayed. If you encounter an error due to the script’s internal structure, please contact us on [Discourse](https://discourse.geobon.org) or email us at boninabox\@geobon.org.
+If you see a red exclamation mark, the script failed to completely execute and an error message will be displayed. If you encounter an error due to the script’s internal structure (i.e. not a problem with your input parameters), please contact us on [Discourse](https://discourse.geobon.org) or email us at boninabox\@geobon.org.
 
-To download outputs, simply use the link next the output name.
+To download outputs, simply cilck the link next the output name.
 
 ::: {style="margin-top: 40px;"}
 :::
@@ -86,7 +86,7 @@ To run the script again, click `Run script` in the input form.
 
 ## Run a pipeline
 
-The `Run a pipeline` tab can be used to run an entire pipeline and works very similarly to the `Run a script` tab. Pipelines run a full sequence of connected scripts and are designed specifically to carry out a complete assessment of biodiversity indicators. Each pipeline integrates multiple steps like data cleaning, processing, metric computation, and final reporting into one automated workflow.
+The `Run a pipeline` tab can be used to run an entire pipeline and works very similarly to the `Run a script` tab. Pipelines run a full sequence of connected scripts and are designed to carry out a full analysis from start to finish. Each pipeline integrates multiple steps like pulling data, cleaning data, performing analyses, and plotting and formatting outputs into one automated workflow.
 
 ::: {style="margin-top: 40px;"}
 :::

@@ -117,7 +117,7 @@ ul.task-list li input[type="checkbox"] {
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-contribute-a-pipeline">    
         <li>
-    <a class="dropdown-item" href="./what_to_contribute.html">
+    <a class="dropdown-item" href="./contributing.html">
  <span class="dropdown-text">Interested in Contributing?</span></a>
   </li>  
         <li>
@@ -179,9 +179,11 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#protected-connected-index" id="toc-protected-connected-index" class="nav-link active" data-scroll-target="#protected-connected-index">Protected Connected Index</a>
   <ul class="collapse">
   <li><a href="#authors-jory-griffith" id="toc-authors-jory-griffith" class="nav-link" data-scroll-target="#authors-jory-griffith">Author(s): Jory Griffith</a></li>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#use-casecontext" id="toc-use-casecontext" class="nav-link" data-scroll-target="#use-casecontext">‘Use Case’/Context</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#uses" id="toc-uses" class="nav-link" data-scroll-target="#uses">Uses</a></li>
   <li><a href="#pipeline-limitations" id="toc-pipeline-limitations" class="nav-link" data-scroll-target="#pipeline-limitations">Pipeline limitations</a></li>
+  </ul></li>
   <li><a href="#before-you-start" id="toc-before-you-start" class="nav-link" data-scroll-target="#before-you-start">Before you start</a></li>
   <li><a href="#running-the-pipeline" id="toc-running-the-pipeline" class="nav-link" data-scroll-target="#running-the-pipeline">Running the pipeline</a>
   <ul class="collapse">
@@ -212,58 +214,58 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>The Protected Connected Index (ProtConn) is a component indicator in the Global Biodiversity Framework (GBF). ProtConn measures the percent of a given country or region that is conserved and managed through well-connected protected areas. This is an important indicator for assessing progress towards goals A and Target 3 of the GBF, which aim to have 30% of land area protected by a network of well-connected protected areas by 2030.</p>
+<p>The Protected Connected Index (ProtConn) is a component indicator in the Global Biodiversity Framework (GBF). ProtConn measures the percent of a given country or region that is conserved and managed through well-connected protected areas. This is an important indicator for assessing progress towards Goal A and Target 3 of the Kunming-Montreal Global Biodiversity Framework, which aim to have 30% of land area protected by a network of well-connected protected areas by 2030.</p>
+<section id="uses" class="level3">
+<h3 class="anchored" data-anchor-id="uses">Uses</h3>
+<p>ProtConn can be used to assess current progress towards Goal A and Target 3 of the the GBF. The pipeline can also be used to compare the connectedness of different proposed protected areas, assisting with planning and design.</p>
 </section>
-<section id="use-casecontext" class="level2">
-<h2 class="anchored" data-anchor-id="use-casecontext">‘Use Case’/Context</h2>
-<p>ProtConn can be used to assess current progress towards the goals outlined in the introduction and for protected area planning and design.</p>
-</section>
-<section id="pipeline-limitations" class="level2">
-<h2 class="anchored" data-anchor-id="pipeline-limitations">Pipeline limitations</h2>
+<section id="pipeline-limitations" class="level3">
+<h3 class="anchored" data-anchor-id="pipeline-limitations">Pipeline limitations</h3>
 <ul>
 <li>On larger datasets, the pipeline is slow and uses a lot of memory</li>
-<li>The pipeline does not take into account landscape resistance (ie. whether areas between protected areas are easily traversed by species)</li>
+<li>Currently, the pipeline does not take into account landscape resistance (ie. whether areas between protected areas are easily traversed by species)</li>
 </ul>
+</section>
 </section>
 <section id="before-you-start" class="level2">
 <h2 class="anchored" data-anchor-id="before-you-start">Before you start</h2>
-<p>To use this pipeline, you’ll need a WDPA API key. If you would like to run the pipeline with custom protected area data, ensure your data is in GeoPackage format and use the <code>ProtConn Analysis with custom PAs</code> pipeline.</p>
+<p>To use this pipeline, you’ll need a <a href="https://api.protectedplanet.net/request">Protected Planet API key</a> to access data on the World Database of Protected Areas. If you would like to run the pipeline with custom protected area data, ensure your data is in GeoPackage format and use the <code>ProtConn Analysis with custom PAs</code> pipeline.</p>
 </section>
 <section id="running-the-pipeline" class="level2">
 <h2 class="anchored" data-anchor-id="running-the-pipeline">Running the pipeline</h2>
 <section id="pipeline-inputs" class="level3">
 <h3 class="anchored" data-anchor-id="pipeline-inputs">Pipeline inputs</h3>
-<p>BON in a Box has created a pipeline to calculate ProtConn for a given country or region of interest. The pipeline has the following user inputs:</p>
+<p>BON in a Box contains a pipeline to calculate ProtConn for a given country or region of interest. The pipeline has the following user inputs:</p>
 <ul>
-<li><p><strong>ISO3 country code:</strong> the user can input the ISO3 country code of the country of interest and the pipeline will pull the polygon and protected areas for this country.</p></li>
-<li><p><strong>State/Province:</strong> the user can specify a state/province within the country of interest and the pipeline will pull the polygon and protected areas for this region.</p></li>
+<li><p><strong>ISO3 country code:</strong> the user can input the <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3">ISO3 country code</a> of the country of interest and the pipeline will pull the polygon and protected areas for this country.</p></li>
+<li><p><strong>State/Province:</strong> the user can specify a state/province within the country of interest and the pipeline will pull the polygon and protected areas for this region. This is input as the full name of the state.</p></li>
 </ul>
 <p><strong>Polygon of study area:</strong> there is also an option to add a custom study area file, which will override the polygon from the specified country or region of interest.</p>
 <ul>
-<li><p><strong>Polygon of protected areas:</strong> this input should only be used if the user wants to use custom protected area data. If you use the <code>ProtConn Analysis with WDPA</code> pipeline, this input is optional and any file added will be combined with WDPA data of the country of interest. If you use the <code>ProtConn Analysis with custom PAs</code> pipeline, this input is mandatory and the pipeline will only work the custom data.</p></li>
-<li><p><strong>Coordinate Reference System:</strong> the user can specify the coordinate reference system.</p></li>
+<li><p><strong>Polygon of protected areas:</strong> this input should only be used if the user wants to use custom protected area data, for example if they want to calculate ProtConn for proposed protected areas or protected areas that are not yet in WDPA. If you use the <code>ProtConn Analysis with WDPA</code> pipeline, this input is optional and any file added will be combined with WDPA data of the country of interest. If you use the <code>ProtConn Analysis with custom PAs</code> pipeline, this input is mandatory and the pipeline will analyze only user-input protected area polygons.</p></li>
+<li><p><strong>Coordinate Reference System:</strong> the coordinate reference system of choice. Search for a CRS of interest <a href="https://epsg.io/">here</a>. This needs to be a projected coordinate reference system for ProtConn calculations.</p></li>
 <li><p><strong>Date Column Name:</strong> the user must indicate the name of the column in the custom protected area data file that specifies when the protected area was created (leave blank if only using WDPA data).</p></li>
-<li><p><strong>Distance analysis threshold:</strong> the user can specify one or more dispersal distances depending on which species they are interested in. Common dispersal distances are 1000 meters (1km), 10000 m (10km) and 100 m (100 km) The dispersal distance is the median of the negative dispersal kernel, meaning that at that distance there is a dispersal probability of 0.5. Note that larger dispersal distances will be more computationally intensive. <img src="images/Image17.png" class="img-fluid"></p></li>
+<li><p><strong>Distance analysis threshold:</strong> the user can specify one or more dispersal distances depending on which species they are interested in. Common dispersal distances are 1,000 meters (1km), 10,000 m (10km) and 100,000 m (100 km) The dispersal distance is the median of the negative exponential dispersal kernel, meaning that at that distance there is a dispersal probability of 0.5. Note that larger dispersal distances will be more computationally intensive. <img src="images/Image17.png" class="img-fluid"></p></li>
 <li><p><strong>Type of distance matrix:</strong> the user can specify whether the distances between protected areas should be measured using the centroid (geometric center) of the protected area or the closest edge.</p>
 <p><img src="images/Image18.PNG" class="img-fluid"> <img src="images/Image19.PNG" class="img-fluid"></p></li>
 <li><p><strong>Year for cutoff:</strong> the user can specify a year for the analysis. The analysis will only calculate values for protected areas that were established before this cutoff year.</p></li>
-<li><p><strong>Start year:</strong> the user can specify the start year of the time series of ProtConn values. The time series will calculate ProtConn for the protected areas established on or before the chosen year, and will count up to the cutoff year by the specified interval.</p></li>
-<li><p><strong>Year interval:</strong> the user can specify the year interval for the time series of ProtConn values. (eg. an input of 10 will calculate ProtConn values every 10 years).</p></li>
-<li><p><strong>PA legal status types to include:</strong> the user can specify legal status types of WDPA data to include in the analysis. The protected areas can have a legal status of <code>Designated</code>, <code>Inscribed</code>, or <code>Established</code>.</p></li>
+<li><p><strong>Start year:</strong> the start year of the time series of ProtConn values. The time series will calculate ProtConn for the protected areas established on or before the chosen year, and will count up to the cutoff year by the specified interval.</p></li>
+<li><p><strong>Year interval:</strong> the year interval for the time series of ProtConn values. (eg. an input of 10 will calculate ProtConn values every 10 years).</p></li>
+<li><p><strong>PA legal status types to include:</strong> the user can choose legal status types of WDPA data to include in the analysis. The protected areas can have a legal status of <code>Designated</code>, <code>Inscribed</code>, or <code>Established</code>.</p></li>
 <li><p>Designated means that it is officially established under national or international law/policy.</p></li>
 <li><p>Inscribed means that it is inscribed in an international list (e.g.&nbsp;World Heritage). This can overlap with designated.</p></li>
 <li><p>Established means that it is protected and managed, but possibly lacks formal legal designation.</p></li>
-<li><p><strong>Include UNESCO Biosphere reserves:</strong> the user can specify whether they want to include UNESCO Man and the Biosphere reserves in the analysis or not. These serve as learning sites for sustainable development and combine biodiversity conservation with the sustainable use of natural resources and sustainable development. They may not be legally protected and may not be fully conserved, because they are often used for development or human settlement. Excluding these will limit the dataset to meeting stricter conservation standards. Note that this is only relevant if using WDPA data.</p></li>
-<li><p><strong>Buffer protected area points:</strong> the user can specify whether they want to buffer protected area points such that they become a part of the analysis. If left unchecked, all protected areas represented as points will be removed. Note that this is only relevant if using WDPA data.</p></li>
-<li><p><strong>Include marine protected areas:</strong> the user can specify whether they want to include marine protected areas in the analysis or not. Note that the analysis is still limited to the bounds of the study area polygon.Note that this is only relevant if using WDPA data.</p></li>
-<li><p><strong>Include OECMs:</strong> the user can specify whether they want to include other effective area-based conservation measures (OECMs) in the analysis or not. These areas are not officially designated protected areas but are still achieving conservation outcomes. Note that this is only relevant if using WDPA data.</p></li>
+<li><p><strong>Include UNESCO Biosphere reserves:</strong> the user can specify whether they want to include UNESCO Man and the Biosphere reserves in the analysis or not. These serve as learning sites for sustainable development and combine biodiversity conservation with the sustainable use of natural resources and sustainable development. They may not be legally protected and may not be fully conserved, as they are often used for development or human settlement. Excluding these will limit the dataset to meeting stricter conservation standards. Note that this is only relevant if using WDPA data.</p></li>
+<li><p><strong>Buffer protected area points:</strong> the user can specify whether they want to buffer protected area points. For any protected areas that are represented as single points instead of polygons, this will create a circle around the polygon that is equal to the reported area. This will not affect the connectivity metrics if using centroids but may cause inaccuracies if assessing connectivity using the nearest edge. If left unchecked, all protected areas represented as points will be removed. Note that this is only relevant if using WDPA data.</p></li>
+<li><p><strong>Include marine protected areas:</strong> the user can specify whether they want to include marine protected areas in the analysis or not. Note that the analysis is still limited to the bounds of the study area polygon. This input is only relevant if using WDPA data.</p></li>
+<li><p><strong>Include OECMs:</strong> the user can specify whether they want to include other effective area-based conservation measures (OECMs) in the analysis or not. These areas are not officially designated protected areas but are still achieving conservation outcomes. This input is only relevant if using WDPA data.</p></li>
 </ul>
 </section>
 <section id="pipeline-steps" class="level3">
 <h3 class="anchored" data-anchor-id="pipeline-steps">Pipeline steps</h3>
 <section id="getting-protected-areas-from-world-database-on-protected-areas-wdpa" class="level4">
 <h4 class="anchored" data-anchor-id="getting-protected-areas-from-world-database-on-protected-areas-wdpa"><strong>1. Getting protected areas from World Database on Protected Areas (WDPA)</strong></h4>
-<p>This step retrieves protected areas of the country/region of interest from the WDPA database using the WDPA API. (This step is skipped if you are only using custom data).</p>
+<p>This step retrieves protected areas in the country/region of interest from the WDPA database using the WDPA API. (This step is skipped if you are only using custom PA data).</p>
 </section>
 <section id="getting-the-country-polygon" class="level4">
 <h4 class="anchored" data-anchor-id="getting-the-country-polygon"><strong>2. Getting the country polygon</strong></h4>
@@ -271,11 +273,11 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="cleaning-the-protected-areas-data" class="level4">
 <h4 class="anchored" data-anchor-id="cleaning-the-protected-areas-data"><strong>3. Cleaning the protected areas data</strong></h4>
-<p>This step cleans the data retrieved from the WDPA using the <code>sf</code> R package. (This step is skipped if you are only using custom data).</p>
+<p>This step cleans the data retrieved from the WDPA by correcting any geometry issues and filtering by the desired inputs. This step also crops the protected areas by the study area (This step is skipped if you are only using custom PA data).</p>
 </section>
 <section id="performing-the-protconn-analysis" class="level4">
 <h4 class="anchored" data-anchor-id="performing-the-protconn-analysis"><strong>3. Performing the ProtConn analysis</strong></h4>
-<p>This step performs the ProtConn analysis on the protected areas of interest. ProtConn is calculated by measuring the distances between protected areas and creating a matrix of these distances. Then, it calculates the probability of a species dispersing between these protected areas using a negative exponential dispersal kernel. This means that if the protected areas are very near one another, there is a high probability that species will be able to disperse between them, but this probability decays exponentially with increasing distance. Different dispersal distances can be specified based on the species of interest, as very small species such as rodents can not disperse as far as large mammals such as deer, so the connectedness would not be the same for those groups. Then, the dispersal probabilities between each of the protected areas are summed together, multiplied by the area of the protected areas, and divided by the area of the study area. Thus, ProtConn is the percentage of the total study area (country or region) that is protected with well-connected protected areas.</p>
+<p>This step performs the ProtConn analysis on the protected areas of interest. ProtConn is calculated by creating a pairwise matrix of the distances between each protected area. Then, it calculates the probability of a species dispersing between these protected areas using a negative exponential dispersal kernel with the input distance assigned to a probability of 0.5. This means that if the protected areas are very near one another, there is a high probability that species will be able to disperse between them, but this probability decays exponentially with increasing distance. Different dispersal distances can be specified based on the species of interest, as very small species such as rodents can not disperse as far as large mammals such as deer, so the connectedness would not be the same for those groups. Then, the dispersal probabilities between each of the protected areas are summed together, multiplied by the area of the protected areas, and divided by the area of the study area. Thus, ProtConn is the percentage of the total study area (country or region) that is protected with well-connected protected areas.</p>
 </section>
 </section>
 <section id="pipeline-outputs" class="level3">
@@ -294,15 +296,14 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="example" class="level2">
 <h2 class="anchored" data-anchor-id="example">Example</h2>
-<p><strong>Sample run:</strong> <a href="https://pipelines-results.geobon.org/pipeline-form/Protconn-pipeline%3EProtConn_pipeline/1809e8c81dd453dd652d7904224e6522">See an example ProtConn run here</a></p>
-<p><strong>Expected output:</strong> <a href="https://pipelines-results.geobon.org/viewer/Protconn-pipeline%3EProtConn_pipeline%3E1809e8c81dd453dd652d7904224e6522">See an example ProtConn output here</a></p>
+<p><strong>Sample run:</strong> See an example ProtConn run here in the [run ui] (https://pipelines-results.geobon.org/pipeline-form/Protconn-pipeline%3EProtConn_pipeline/1809e8c81dd453dd652d7904224e6522) and <a href="https://pipelines-results.geobon.org/viewer/Protconn-pipeline%3EProtConn_pipeline%3E1809e8c81dd453dd652d7904224e6522">viewer</a>.</p>
 </section>
 <section id="troubleshooting" class="level2">
 <h2 class="anchored" data-anchor-id="troubleshooting">Troubleshooting</h2>
 <p><strong>Common errors:</strong></p>
 <ul>
 <li><p><code>Error: Could not retrieve protected areas from WDPA</code>: if you encounter this error, it means the WDPA API is not able to retrieve the data for the country/region of interest. This sometimes happens with very large datasets and is a problem with the API itself, not the pipeline.</p></li>
-<li><p><code>Error: Script produced no results. Check log for errors and make sure that the script calls biab_output.</code>: if you encounter this error and you are running ProtConn for a large area with many protected areas, it is likely that Docker has terminated the process because you have run out of computer RAM. You can try to reduce memory usage by further simplifying the geometry of your protected area. If this still does not work, you may need to run the analysis on a computer with more RAM.</p></li>
+<li><p><code>Error: Script produced no results. Check log for errors and make sure that the script calls biab_output.</code>: if you encounter this error and you are running ProtConn for a large area with many protected areas, it is likely that Docker has terminated the process because you have run out of computer RAM. You may need to run the analysis with smaller areas or on a computer with more RAM.</p></li>
 </ul>
 </section>
 <section id="references" class="level2">
