@@ -18,7 +18,7 @@ lifecycle:
     - schema:
         status:
           type: string
-          allowed: ["in_development", "in_review", "reviewed"]
+          allowed: ["in_development", "in_review", "reviewed", "example"]
           required: true
         message:
           type: string
@@ -47,6 +47,11 @@ author:
       identifier:
         type: string
         required: false
+      role:
+        type: list
+        required: false
+        schema:
+          type: string
 
 reviewer:
   type: list

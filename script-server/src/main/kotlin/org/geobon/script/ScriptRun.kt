@@ -500,7 +500,7 @@ class ScriptRun( // Constructor used in single script run
             if (!results.containsKey(ERROR_KEY)) {
                 val outputs = results.toMutableMap()
                 outputs[ERROR_KEY] =
-                    if (results.isEmpty()) "Script produced no results. Check log for errors."
+                    if (results.isEmpty()) "Script produced no results. Check log for errors and make sure that the script calls biab_output."
                     else "An error occurred. Check log for details."
 
                 // Rewrite output file with error

@@ -3,6 +3,14 @@ using JSON
 
 biab_output_dict = Dict{String, Any}()
 
+# Read the inputs from input.json
+function biab_inputs()
+    if !isfile("input.json")
+        biab_error_stop("Input file 'input.json' not found.")
+    end
+    return JSON.parsefile("input.json")
+end
+
 # Add outputs throughout the script
 function biab_output(key::String, value)
     global biab_output_dict

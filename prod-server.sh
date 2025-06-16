@@ -20,6 +20,16 @@ if [[ $? -ne 0 ]] ; then
     echo -e "${RED}Git is required to run the latest version of the pipeline engine.${ENDCOLOR}" ; exit 1
 fi
 
+function excludeStrings {
+   # excludes must be a regex
+   local excludes=$1
+
+   while read -r pipedString
+   do
+       [[ "$pipedString" =~ $excludes ]] || echo $pipedString
+   done
+}
+
 function assertSuccess {
     if [[ $? -ne 0 ]] ; then
         echo -e "${RED}FAILED${ENDCOLOR}" ; exit 1
@@ -185,14 +195,14 @@ function checkout {
 # Docker pull should be able to tell us. In the meantime, comparing digests.
 # See https://github.com/docker/cli/issues/6059
 function checkForUpdates {
-    local images=$1
+    local images="$1"
 
     check_image_update() {
         local image="$1"
         # Get the local digest in the format sha256:<hash>
-        local localDigest=$(docker image inspect --format='{{index .Id}}' "$image" 2>/dev/null)
-        if [[ $? -ne 0 ]]; then
-            echo "$image"
+        local localDigest=$(docker image inspect --format='{{index .RepoDigests 0}}' "$image" 2>/dev/null | cut -d '@' -f2)
+        if [[ -z "$localDigest" ]]; then
+            echo "$image" # Not available locally
             return
         fi
 
@@ -228,6 +238,18 @@ function up {
         exit 1
     fi
 
+    # Checking for compose files referring to legacy Docker Hub images.
+    images=$(command config --images)
+    if echo "$images" | grep -q "geobon/bon-in-a-box:runner"; then # migrating from v1.0.x to v1.1.0
+        echo -e "${YELLOW}Legacy Docker Hub images detected in your configuration."
+        echo -e "Please update your branch by merging the changes from the main branch to use the images from GitHub Packages (ghcr.io).${ENDCOLOR}"
+        echo "This can be done visually or on the command line with the following commands:"
+        echo "    git fetch"
+        echo "    git merge origin/main"
+        echo -e "${RED}FAILED${ENDCOLOR}"
+        exit 1
+    fi
+
     echo "Building (if necessary)..."
     command build ; assertSuccess
 
@@ -244,6 +266,11 @@ function up {
             echo -e "${YELLOW}Please be patient while we save some disk space: this may take a while.${ENDCOLOR}"
 
             clean
+
+            echo "Removing obsolete containers..."
+            docker container rm $(docker container ls -a --format '{{.Image}} {{.ID}}'  \
+                | grep "geobon/bon-in-a-box:" \
+                | cut -d' ' -f2)
 
             echo "Removing obsolete images..."
             docker image rm $(docker image ls --format '{{.Repository}}:{{.Tag}} {{.ID}}' \
@@ -278,7 +305,6 @@ function up {
 
         echo "Checking for updates to docker images..."
         # see https://github.com/docker/cli/issues/6059
-        images=$(command config --images)
         services=$(command config --services)
 
         # There are some images for which we want to keep the containers, others can be discarded.
@@ -287,10 +313,12 @@ function up {
         otherServices=$(echo "$services" | grep -vE "^$savedContainerRegex")
 
         # Get all images that have an update available.
-        imagesToUpdate=$(checkForUpdates "$images")
+        excludedImages="ghcr.io/developmentseed/titiler:.*" # Add for images we don't want to check for updates as regex
+        imagesToCheck=$(echo "$images" | excludeStrings "$excludedImages")
+        imagesToUpdate=$(checkForUpdates "$imagesToCheck")
 
         # Sublist of the images for which the containers should be kept whenever possible.
-        containersToDiscard=$(echo $images | tr ' ' "\n" | grep -E "$savedContainerRegex")
+        containersToDiscard=$(echo $imagesToUpdate | tr ' ' "\n" | grep -E "$savedContainerRegex")
 
         if [[ -n "$imagesToUpdate" ]]; then
             echo "Updates found."
