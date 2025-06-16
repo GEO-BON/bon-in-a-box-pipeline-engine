@@ -202,8 +202,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="start-bon-in-a-box" class="level2">
 <h2 class="anchored" data-anchor-id="start-bon-in-a-box">Start BON in a Box</h2>
 <ol type="1">
-<li>Start the server by running <code>./server-up.sh</code> in a Linux terminal (e.g.&nbsp;Git Bash or WSL on Windows or Terminal on Mac). Make sure you are in the bon-in-a-box-pipeline directory on your computer.</li>
-<li>Open a web browser and navigate to&nbsp;<a href="http://localhost/" class="uri">http://localhost/</a>.</li>
+<li>Start the services by running <code>./server-up.sh</code> in a Linux terminal (e.g.&nbsp;Git Bash or WSL on Windows or Terminal on Mac). Make sure you are in the bon-in-a-box-pipeline directory on your computer.</li>
+<li>Open a web browser and navigate to&nbsp;<a href="http://localhost/" class="uri">http://localhost/</a> for a local setup, or the instance’s address on the web if hosted on a server.</li>
 </ol>
 </section>
 <section id="user-guide" class="level1">
@@ -223,6 +223,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="run-a-script" class="level2">
 <h2 class="anchored" data-anchor-id="run-a-script">Run a script</h2>
 <p>The <code>Run a script</code> tab lets you run an individual script. Scripts are individual parts of pipelines designed to perform one well-defined task at a time, like extracting data from a file, cleaning files, or applying a specific formulas.</p>
+<p>The <code>Run a script</code> functionality is usually used for testing individual components of a pipeline rather than producing usable outputs. Additionally, unlike pipelines, scripts often require inputs that are produced by other scripts, and so they may not run successfully with the default parameters. However, running a script can be useful for development, bug fixing, or trying to understand the purpose and outputs of a given step.</p>
 <div style="margin-top: 40px;">
 
 </div>
@@ -237,16 +238,16 @@ ul.task-list li input[type="checkbox"] {
 </ul></li>
 <li><p>Fill out the form with the input parameters the script should use.</p>
 <ul>
-<li><p>Scripts will run with default parameters if no inputs are specified. Sometimes scripts require specific files that are pulled from other parts of a pipeline, so you may not be able to run the script by itself with the default parameters. However, all pipelines should run successfully with the default parameters.</p></li>
+<li><p>Some inputs have default parameters, but will not always run successfully with these parameters if they require file inputs that are created by other scripts. You may have to input your own files from the “userdata” folder.</p></li>
 <li><p>Some inputs can simply be typed in, while others are options.</p></li>
 <li><p>Each input field includes a description and its purpose on the right of the input box. Here you will also see the <em>type</em> of the input.</p></li>
-<li><p>The form might ask you for a file. In order to provide a file that you have locally on your computer, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders.</p></li>
-<li><p><strong>Please ensure each input matches the required type that is specified in the input description.</strong> <strong>For any details on input types, please refer to Step 3 of <a href="./how_to_contribute.html">this page</a>.</strong></p></li>
-<li><p>The <code>Input yaml</code> tab can be used to see how your inputs are being passed in to the script. By scrolling down, you can also see how the inputs were defined by the author(s).</p></li>
+<li><p>The form might ask you for a file. In order to provide a file that you have locally on your computer, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders. Most scripts can also accept remote files (https://). That will be specified in the input documentation.</p></li>
+<li><p><strong>Please ensure each input matches the required type that is specified in the input description.</strong> The input will either be a primitive type (i.e.&nbsp;text, int, float, boolean, etc.) which the user will type in or a MIME type representing a file (e.g.&nbsp;text/csv, application/geo+json, etc.) where the user will provide the path to that file. The square brackets <code>[]</code> after a type represent an array of that type (i.e.&nbsp;text[], application/geo+json[], etc.). <strong>For more details on input types, please refer to “Step 3: Create a YAML File” on <a href="./how_to_contribute.html">this page</a>.</strong></p></li>
+<li><p>The <code>Input yaml</code> tab can be used to see how your inputs are being passed in to the script. This is useful for sharing pipeline inputs for recreating results, as it can be copied and pasted to fill the input form. By scrolling down, you can also see how the inputs were defined by the author(s).</p></li>
 </ul></li>
 <li><p>Click on <code>Run script</code>. To terminate the execution of the script at any point, use the <code>Stop</code> button.</p></li>
 </ol>
-<p>After the script runs, you’ll see a detailed results box, which includes drop down arrows to view your inputs and script outputs. To simply view your output, click on the blue name or arrow. A gray box containing the script logs can be found under the outputs, which can help with figuring out any issues that you might have.</p>
+<p>After the script runs, you’ll see a detailed results box, which includes drop down arrows to view your inputs and script outputs. To simply view your output, click on the blue name or arrow. A gray box containing the script logs can be found under the outputs, which can help with debugging problems that occured.</p>
 <div style="margin-top: 40px;">
 
 </div>
