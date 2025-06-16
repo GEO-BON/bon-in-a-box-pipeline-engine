@@ -191,6 +191,7 @@ function checkout {
     echo -e "${GREEN}Server configuration updated.${ENDCOLOR}"
 }
 
+
 # This function echoes the images that need to be updated.
 # Docker pull should be able to tell us. In the meantime, comparing digests.
 # See https://github.com/docker/cli/issues/6059
@@ -305,6 +306,7 @@ function up {
 
         echo "Checking for updates to docker images..."
         # see https://github.com/docker/cli/issues/6059
+
         services=$(command config --services)
 
         # There are some images for which we want to keep the containers, others can be discarded.
