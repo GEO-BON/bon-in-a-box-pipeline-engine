@@ -17,7 +17,7 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
 </style>
@@ -89,51 +89,51 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page">
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
 <span class="menu-text">About</span></a>
-  </li>
+  </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./how_to_install.html">
+    <a class="nav-link" href="./how_to_install.html"> 
 <span class="menu-text">Install</span></a>
-  </li>
+  </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./how_to_use.html">
+    <a class="nav-link" href="./how_to_use.html"> 
 <span class="menu-text">User Guide</span></a>
-  </li>
+  </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-pipelines" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Pipelines</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-pipelines">
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-pipelines">    
         <li>
     <a class="dropdown-item" href="./protconn_pipeline.html">
  <span class="dropdown-text">Protected Connected Index</span></a>
-  </li>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribute-a-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Contribute a pipeline</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-contribute-a-pipeline">
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-contribute-a-pipeline">    
         <li>
-    <a class="dropdown-item" href="./what_to_contribute.html">
+    <a class="dropdown-item" href="./contributing.html">
  <span class="dropdown-text">Interested in Contributing?</span></a>
-  </li>
+  </li>  
         <li>
     <a class="dropdown-item" href="./how_to_contribute.html">
  <span class="dropdown-text">Contribution instructions</span></a>
-  </li>
+  </li>  
         <li>
     <a class="dropdown-item" href="./pipeline_standards.html">
  <span class="dropdown-text">Pipeline standards</span></a>
-  </li>
+  </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="./peer_review.html">
+    <a class="nav-link" href="./peer_review.html"> 
 <span class="menu-text">Peer review</span></a>
-  </li>
+  </li>  
 </ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
@@ -146,7 +146,7 @@ ul.task-list li input[type="checkbox"] {
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Install</li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
         <i class="bi bi-search"></i>
@@ -174,7 +174,7 @@ ul.task-list li input[type="checkbox"] {
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
-
+   
   <ul>
   <li><a href="#video-tutorial" id="toc-video-tutorial" class="nav-link active" data-scroll-target="#video-tutorial">Video tutorial</a></li>
   <li><a href="#deploying-bon-in-a-box-locally" id="toc-deploying-bon-in-a-box-locally" class="nav-link" data-scroll-target="#deploying-bon-in-a-box-locally">Deploying BON in a Box locally</a>
@@ -205,11 +205,11 @@ ul.task-list li input[type="checkbox"] {
 
 <div class="quarto-title-meta">
 
-
-
-
+    
+  
+    
   </div>
-
+  
 
 
 </header>
@@ -319,7 +319,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="updating-bon-in-a-box" class="level3">
 <h3 class="anchored" data-anchor-id="updating-bon-in-a-box">Updating BON in a Box</h3>
-<p>Each time that the server is started, the startup script will check for updates and propose them. Type Y for yes or press enter to update.</p>
+<p>Each time that the server is started, the startup script will check for updates and propose them. Type <code>y</code> for yes or press enter to update.</p>
 <p>Accepting the updates are generally recommended, unless:</p>
 <ul>
 <li><p>You are currently using an unstable, rate-limited, or billable Internet connection. Defer the update by typing <code>n</code> (no) until a better internet connection is available. You can also use <code>./server-up.sh --offline</code> option to completely skip update checks. Use with caution, since this may create errors if elements of the repository depend on new server features.</p></li>
@@ -346,8 +346,14 @@ In this case, defer the update until you can afford the time to start a run that
 <ol type="1">
 <li><p><strong>You cannot launch the server</strong></p>
 <p>If you are having issues connecting to the server, make sure that you (1) have the docker desktop app open on your computer (2) are running <code>./server-up.sh</code> in a Linux terminal (e.g.&nbsp;Git Bash or WSL on Windows or Terminal on Mac), launching the server locally will not work with PowerShell nor CMD and (3) make sure you have an ssh key that is registered to your computer and GitHub.</p></li>
-<li><p><strong>BON in a Box does not load on localhost</strong></p>
-<p>This may be an issue if you are on a Mac, or have Apache or NGINX installed. To fix this, edit the runner.env file and specify a different port (<code>HTTP_PORT</code>). For example, if you set <code>HTTP_PORT=5522</code>, you can then access BON in a Box at http://localhost:5522.</p></li>
+<li><p><strong>Docker crashes with Bad Gateway error</strong></p>
+<p>If you get an error that looks like <code>unable to get image 'ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia:mamba_update_staging': request returned 502 Bad Gateway for API route and version http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.49/images/ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia:mamba_update_staging/json, check if the server supports the requested API version</code></p>
+<p><a href="https://github.com/docker/desktop-linux/issues/156">This discussion</a> suggests a few different causes for this type of error. One that proved to work with one of our users was to disable the “containerd image store” from the Docker Desktop settings.</p></li>
+<li><p><strong>BON in a Box is not visible on http://localhost</strong></p>
+<p>Conflicting ports may be an issue if you are on a Mac, or have Apache or NGINX installed. To fix this, edit the runner.env file and specify a different port (<code>HTTP_PORT</code>). For example, if you set <code>HTTP_PORT=5522</code>, you can then access BON in a Box at http://localhost:5522.</p></li>
+<li><p><strong>On my Mac, a script is taking way too long</strong></p>
+<p>If there is a significant difference in the duration of the scripts compared to users on Linux or Windows, and you have a Mac with an Apple Silicon chip, enable the “Use Rosetta for x86_64/amd64 emulation on Apple Silicon” in Docker Desktop settings.</p>
+<p>On the contrary, if the script completely hangs and never completes, try to turn off that option.</p></li>
 </ol>
 <p>If you encounter further errors, please contact us on <a href="https://discourse.geobon.org">Discourse</a> or email us at boninabox@geobon.org.</p>
 </section>
@@ -380,7 +386,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       toggleBodyColorMode(bsSheetEl);
     }
   }
-  toggleBodyColorPrimary();
+  toggleBodyColorPrimary();  
   const icon = "";
   const anchorJS = new window.AnchorJS();
   anchorJS.options = {
@@ -390,7 +396,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   anchorJS.add('.anchored');
   const isCodeAnnotation = (el) => {
     for (const clz of el.classList) {
-      if (clz.startsWith('code-annotation-')) {
+      if (clz.startsWith('code-annotation-')) {                     
         return true;
       }
     }
@@ -410,11 +416,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       button.setAttribute("data-bs-toggle", "tooltip");
       button.setAttribute("data-bs-placement", "left");
       button.setAttribute("data-bs-title", "Copied!");
-      tooltip = new bootstrap.Tooltip(button,
-        { trigger: "manual",
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
           customClass: "code-copy-button-tooltip",
           offset: [0, -8]});
-      tooltip.show();
+      tooltip.show();    
     }
     setTimeout(function() {
       if (tooltip) {
@@ -492,7 +498,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     if (onUntriggerFn) {
       config.onUntrigger = onUntriggerFn;
     }
-    window.tippy(el, config);
+    window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
   for (var i=0; i<noterefs.length; i++) {
@@ -568,7 +574,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     tippyHover(xref, undefined, function(instance) {
       instance.disable();
       let url = xref.getAttribute('href');
-      let hash = undefined;
+      let hash = undefined; 
       if (url.startsWith('#')) {
         hash = url;
       } else {
@@ -596,7 +602,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             if (note !== null) {
               const html = processXRef(id, note);
               instance.setContent(html);
-            }
+            } 
           }).finally(() => {
             instance.enable();
             instance.show();
@@ -620,7 +626,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             const html = processXRef(null, note);
             instance.setContent(html);
-          }
+          } 
         }).finally(() => {
           instance.enable();
           instance.show();
@@ -660,7 +666,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             height = bottom - top;
           }
           if (top !== null && height !== null && parent !== null) {
-            // cook up a div (if necessary) and position it
+            // cook up a div (if necessary) and position it 
             let div = window.document.getElementById("code-annotation-line-highlight");
             if (div === null) {
               div = window.document.createElement("div");
