@@ -1,9 +1,9 @@
 ---
-title: "what_to_contribute"
+title: "Getting Started"
 format: html
 ---
 
-# Does your analysis pipeline fit in BON in a Box?
+# Is your analysis pipeline a good fit?
 
 We are looking for pipelines that calculate biodiversity metrics that are relevant to policy and biodiversity reporting, such as Essential Biodiversity Variables (EBVs) and Indicators. These pipelines should be
 
