@@ -141,7 +141,8 @@ export const transformCoordCRS = (poly, source_crs_epsg, dest_crs_epsg) => {
 };
 
 export const transformPolyToBboxCRS = (poly, src_crs, dest_crs) => {
-  const d = densifyPolygon(poly, 0.25); //Densify vertices of polygon in Eucledian space before reprojection
+  const dist = src_crs.unit == "degree" ? 0.25 : 500000;
+  const d = densifyPolygon(poly, dist); //Densify vertices of polygon in Eucledian space before reprojection
   poly = transformCoordCRS(d, src_crs.def, dest_crs.def);
   if (poly.geometry.coordinates.length > 0) {
     const feat = {

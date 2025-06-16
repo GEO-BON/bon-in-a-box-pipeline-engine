@@ -2,7 +2,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
 import Paper from "@mui/material/Paper";
-import "maplibre-gl/dist/maplibre-gl.css";
 import { styled } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import CropIcon from "@mui/icons-material/Crop";
