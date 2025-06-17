@@ -53,12 +53,12 @@ BON in a Box contains a pipeline to calculate ProtConn for a given country or re
 
 - **Year interval:** the year interval for the time series of ProtConn values. (eg. an input of 10 will calculate ProtConn values every 10 years).
 
-- **PA legal status types to include:** the user can choose legal status types of WDPA data to include in the analysis. The protected areas can have a legal status of `Designated`, `Inscribed`, or `Established`. 
- - Designated means that it is officially established under national or international law/policy. 
- - Inscribed means that it is inscribed in an international list (e.g. World Heritage). This can overlap with designated. 
+- **PA legal status types to include:** the user can choose legal status types of WDPA data to include in the analysis. The protected areas can have a legal status of `Designated`, `Inscribed`, or `Established`.
+ - Designated means that it is officially established under national or international law/policy.
+ - Inscribed means that it is inscribed in an international list (e.g. World Heritage). This can overlap with designated.
  - Established means that it is protected and managed, but possibly lacks formal legal designation.
 
-- **Include UNESCO Biosphere reserves:** the user can specify whether they want to include UNESCO Man and the Biosphere reserves in the analysis or not. These serve as learning sites for sustainable development and combine biodiversity conservation with the sustainable use of natural resources and sustainable development. They may not be legally protected and may not be fully conserved, as they are often used for development or human settlement. Excluding these will limit the dataset to meeting stricter conservation standards. Note that this is only relevant if using WDPA data. 
+- **Include UNESCO Biosphere reserves:** the user can specify whether they want to include UNESCO Man and the Biosphere reserves in the analysis or not. These serve as learning sites for sustainable development and combine biodiversity conservation with the sustainable use of natural resources and sustainable development. They may not be legally protected and may not be fully conserved, as they are often used for development or human settlement. Excluding these will limit the dataset to meeting stricter conservation standards. Note that this is only relevant if using WDPA data.
 
 - **Buffer protected area points:** the user can specify whether they want to buffer protected area points. For any protected areas that are represented as single points instead of polygons, this will create a circle around the polygon that is equal to the reported area. This will not affect the connectivity metrics if using centroids but may cause inaccuracies if assessing connectivity using the nearest edge. If left unchecked, all protected areas represented as points will be removed. Note that this is only relevant if using WDPA data.
 
@@ -74,7 +74,7 @@ This step retrieves protected areas in the country/region of interest from the W
 
 #### **2. Getting the country polygon**
 
-This step returns the polygon for the country/region of interest. 
+This step returns the polygon for the country/region of interest.
 
 #### **3. Cleaning the protected areas data**
 
@@ -97,7 +97,7 @@ This step performs the ProtConn analysis on the protected areas of interest. Pro
 
 ## Example
 
-**Sample run:** See an example ProtConn run here in the [run ui] (https://pipelines-results.geobon.org/pipeline-form/Protconn-pipeline%3EProtConn_pipeline/1809e8c81dd453dd652d7904224e6522) and [viewer](https://pipelines-results.geobon.org/viewer/Protconn-pipeline%3EProtConn_pipeline%3E1809e8c81dd453dd652d7904224e6522).
+**Sample run:** See an example ProtConn run here in the [run ui](https://pipelines-results.geobon.org/pipeline-form/Protconn-pipeline%3EProtConn_pipeline/1809e8c81dd453dd652d7904224e6522) and [viewer](https://pipelines-results.geobon.org/viewer/Protconn-pipeline%3EProtConn_pipeline%3E1809e8c81dd453dd652d7904224e6522).
 
 ## Troubleshooting
 
@@ -105,7 +105,7 @@ This step performs the ProtConn analysis on the protected areas of interest. Pro
 
 - `Error: Could not retrieve protected areas from WDPA`: if you encounter this error, it means the WDPA API is not able to retrieve the data for the country/region of interest. This sometimes happens with very large datasets and is a problem with the API itself, not the pipeline.
 
-- `Error: Script produced no results. Check log for errors and make sure that the script calls biab_output.`: if you encounter this error and you are running ProtConn for a large area with many protected areas, it is likely that Docker has terminated the process because you have run out of computer RAM. You may need to run the analysis with smaller areas or on a computer with more RAM. 
+- `Error: Script produced no results. Check log for errors and make sure that the script calls biab_output.`: if you encounter this error and you are running ProtConn for a large area with many protected areas, it is likely that Docker has terminated the process because you have run out of computer RAM. You may need to run the analysis with smaller areas or on a computer with more RAM.
 
 ## References
 
