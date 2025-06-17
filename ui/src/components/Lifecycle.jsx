@@ -1,10 +1,10 @@
 import Alert from '@mui/material/Alert';
 import Chip from '@mui/material/Chip';
 
-function LifecycleMessage({ status, message }) {
+export function LifecycleMessage({ status, message, style }) {
   if (status == 'deprecated')
-    return <Alert severity="warning">{message}</Alert>
-  return <Alert severity="info">{message}</Alert>
+    return <Alert style={style} severity="warning">{message}</Alert>
+  return <Alert style={style} severity="info">{message}</Alert>
 }
 
 function ChipFromStatus({ status }) {

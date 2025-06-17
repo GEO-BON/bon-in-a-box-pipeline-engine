@@ -120,6 +120,13 @@ export default function StepChooser(props) {
           // leaf
           return groupedFiles.get(key).map(([fileName, stepName]) => {
             let descriptionFile = [...splitPathBefore, fileName].join(">");
+            let isDeprecated = false;
+
+            fetchStepDescription(descriptionFile, (metadata) => {
+              if (metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+                isDeprecated = true;
+              } 
+            });
             return (
               <div
                 key={fileName}
@@ -130,9 +137,9 @@ export default function StepChooser(props) {
                 title="Click for info, drag and drop to add to pipeline."
                 className={
                   "dndnode" +
-                  (descriptionFile === selectedStep ? " selected" : "")
+                  (descriptionFile === selectedStep ? " selected" : "") + (isDeprecated ? " deprecated" : "")
                 }
-                onClick={() => onStepClick(descriptionFile)}
+                onClick={() => {onStepClick(descriptionFile); console.log(descriptionFile)} }
               >
                 {stepName}
               </div>
@@ -169,10 +176,7 @@ export default function StepChooser(props) {
           <div>
             {isValidElement(pipelineFiles) && pipelineFiles.type === HttpError ? pipelineFiles : renderTree(
               [],
-              Object.entries(pipelineFiles).map((entry) => [
-                entry[0].split(">"),
-                entry[1],
-              ])
+              Object.entries(pipelineFiles).map((entry) => [ entry[0].split(">"), entry[1] ])
             )}
           </div>
         </div>
