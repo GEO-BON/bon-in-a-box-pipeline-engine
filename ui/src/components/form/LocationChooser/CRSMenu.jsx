@@ -42,7 +42,7 @@ export default function CRSMenu({
     if (bboxGeoJSONShrink === null) return;
     setSearching(true);
     let bbj = { type: "FeatureCollection", features: [bboxGeoJSONShrink] };
-    const searchName = stateProvName ? stateProvName : country;
+    const searchName = stateProvName ? stateProvName : countryName;
     getCRSListFromName(searchName).then((result) => {
       if (result) {
         const suggestions = result.map((proj) => {
