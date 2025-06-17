@@ -1,6 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import { LifecycleDescription } from './Lifecycle';
 import { HoverCard } from './HoverCard';
+import Typography from "@mui/material/Typography";
 import LinkedinLogo from "../img/LinkedIn_icon.svg";
 import ResearchGateLogo from "../img/ResearchGate_icon.svg";
 import OrcIDLogo from "../img/ORCID_ID_green.svg";
@@ -40,32 +41,42 @@ function findLogoImageFromURL(url) {
     }
 }
 
-function LogoFromUrl({ src }) {
-    return <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <a href={src} target="_blank">
-            <img src={findLogoImageFromURL(src)} alt="ID" title="ID" width="20px"></img>
+function LogoFromUrl({ src, style}) {
+    return <a style={style} href={src} target="_blank">
+            <img src={src} alt={src} title="ID" width="20px"></img>
         </a>
-    </div>
 }
 
 function generatePersonList(list) {
     return list.map((person, i, array) => {
-        let email = person.email && <a href={'mailto:' + person.email} style={{ textDecoration: 'none' }}>{person.email}</a>
+        let email = person.email && <a href={'mailto:' + person.email} style={{ textDecoration: 'none', color: "var(--biab-green-main)" }}>{person.email}</a>
         let role = person.role && <span>{person.role.join(', ')}</span>
         let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
+        let isAuthorProperties = person.email || person.role || person.identifier;
+        let identifierLogo = person.identifier && findLogoImageFromURL(person.identifier);
 
         let hoverCardDisplay = <>
+            {identifierLogo && <LogoFromUrl style={{ float: "right", paddingTop: "4px", paddingBottom: "4px"}} src={identifierLogo} />}
             <h3 style={{
                 marginTop: "0px",
-                marginBottom: email && "0px"
+                marginBottom: "0px",
+                marginRight: "30px",
+                float: "left"
             }}>{person.name}</h3>
+            <br/>
+            <br />
+            <hr/>
             {email}
             {role && <p>Contribution: {role}</p> || <p></p>}
-            {person.identifier && <LogoFromUrl src={person.identifier} />}
+            { identifierLogo ? null : <LogoFromUrl src={person.identifier} /> }
         </>
 
         let hoverCardName = person.name && <HoverCard popoverContent={hoverCardDisplay}>{person.name}</HoverCard>
-        return <><span key={i}>{hoverCardName}{comma}</span> </>
+        return <><span key={i}>
+                  {
+                    (isAuthorProperties && hoverCardName) || <Typography style={{display: "inline"}}>{person.name}</Typography>
+                  }{comma}
+                </span> </>
 
     })
 }

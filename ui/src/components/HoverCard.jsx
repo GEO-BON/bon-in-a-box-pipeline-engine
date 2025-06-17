@@ -16,6 +16,7 @@ export function HoverCard({children, popoverContent}) {
 
   return (
     <span>
+    {/*
       <Typography
         aria-owns={"mouse-over-popover"}
         aria-haspopup="true"
@@ -24,6 +25,16 @@ export function HoverCard({children, popoverContent}) {
       >
         {children}
       </Typography>
+    */}
+      <a
+        aria-owns="mouse-over-popover"
+        aria-haspopup="true"
+        href="#"
+        onClick={handleClick}
+      >
+        {children}
+      </a>
+
       <Popover
         id="mouse-over-popover"
         sx={{ zIndex: 11000 /* Author or reviewer popup */ }}
@@ -38,7 +49,7 @@ export function HoverCard({children, popoverContent}) {
           horizontal: 'left',
         }}
         onClose={handleClose}
-        slotProps={{ paper: { elevation: "0", variant:"outlined", borderRadius: "20px"}}}
+        slotProps={{ paper: { elevation: "0", variant:"outlined", sx: { borderRadius: "20px", borderColor: "black"}} }}
       >
         <Typography sx={{ p: 1 }}>
           {popoverContent}
