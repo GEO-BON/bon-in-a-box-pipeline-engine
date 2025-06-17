@@ -8,10 +8,10 @@ import { CustomButtonGreen } from "../../CustomMUI";
 import countryOptionsJSON from "./countries.json"; // Assuming you have a JSON file with country data
 import { getStateAPI, validTerraPolygon } from "./utils";
 
-export default function CountryChooser({
-  setBbox,
+export default function CountryRegionDialog({
+  setBbox=()=>{},
   setCountryISO,
-  setCountryBbox,
+  setCountryBbox=()=>{},
   countryName,
   setCountryName,
   setStateProvName,
@@ -20,6 +20,7 @@ export default function CountryChooser({
   setCountry,
   stateProv,
   setStateProv,
+  showAcceptButton=true,
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
   const [stateOptions, setStateOptions] = useState([]);
@@ -107,10 +108,11 @@ export default function CountryChooser({
         boxShadow: "2px 2px 4px #999",
       }}
     >
-      <h4 style={{ marginTop: "3px" }}>Or choose Country/Region</h4>
+      <h4 style={{ marginTop: "3px", marginBottom: "6px"}}>Country/Region</h4>
       <Autocomplete
         disablePortal
         options={countryOptions}
+        size="small"
         sx={{
           width: "90%",
           background: "#fff",
@@ -129,13 +131,14 @@ export default function CountryChooser({
       <Autocomplete
         disablePortal
         options={stateOptions}
+        size="small"
         sx={{
           marginTop: "20px",
           width: "90%",
           background: "#fff",
           color: "#fff",
           borderRadius: "4px",
-          marginBottom: "20px",
+          marginBottom: "10px",
         }}
         renderInput={(params) => (
           <TextField {...params} label="Select subregion" />
@@ -145,6 +148,7 @@ export default function CountryChooser({
           setStateProv(value ? value.value : "");
         }}
       />
+      {showAcceptButton && (
       <CustomButtonGreen
         variant="contained"
         endIcon={<CheckIcon />}
@@ -156,6 +160,7 @@ export default function CountryChooser({
       >
         Accept Selection
       </CustomButtonGreen>
+      )}
     </div>
   );
 }

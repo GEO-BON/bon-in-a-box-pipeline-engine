@@ -5,15 +5,14 @@ import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import CropIcon from "@mui/icons-material/Crop";
-import MapOL from "./MapOL";
 import * as turf from "@turf/turf";
-import CountryChooser from "./CountryChooser";
+import CountryRegionDialog from "./CountryRegionDialog";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
 import { v4 as uuidv4 } from "uuid";
 import { CustomButtonGreen } from "../../CustomMUI";
 
-export default function LocationChooser({ locationFile }) {
+export default function CountryRegionCRSChooser({ setOpenChooser={setOpenChooser} }) {
   const [bbox, setBbox] = useState([]);
   const [countryBbox, setCountryBbox] = useState([]);
   const [countryISO, setCountryISO] = useState("");
@@ -54,7 +53,6 @@ export default function LocationChooser({ locationFile }) {
         b[3] - scale_height,
       ];
       setBboxGeoJSONShrink(turf.bboxPolygon(bbox_shrink));
-      //setDrawFeatures([bboxGeoJSON]);
     }
   }, [bbox]);
 
@@ -69,32 +67,19 @@ export default function LocationChooser({ locationFile }) {
     <div
       className="location-chooser-modal"
       style={{
-        width: "90%",
-        height: "90%",
-        backgroundColor: "#666",
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: "25%",
+        height: "auto",
+        backgroundColor: "#fff",
         padding: "20px",
         borderRadius: "8px",
         margin: "30px auto",
       }}
     >
-      <Grid container spacing={0} sx={{ height: "100%" }}>
-        <Grid
-          xs={3}
-          sx={{
-            padding: "10px",
-            backgroundColor: "#fff",
-            height: "100%",
-            overflowY: "scroll",
-          }}
-        >
-          <CustomButtonGreen
-            onClick={() => {
-              setDigitize(true);
-            }}
-          >
-            Draw area of interest on map <CropIcon />
-          </CustomButtonGreen>
-          <CountryChooser
+          <CountryRegionDialog
             {...{
               setBbox,
               setBboxGeoJSON,
@@ -126,38 +111,20 @@ export default function LocationChooser({ locationFile }) {
               stateProvName,
             }}
           />
-          <BBox
-            {...{
-              action,
-              setAction,
-              bbox,
-              setBbox,
-              bboxGeoJSON,
-              setBboxGeoJSON,
-              CRS,
+          <CustomButtonGreen
+            onClick={() => {
+              setOpenChooser(false)
             }}
-          />
-        </Grid>
-        <Grid
-          xs={9}
-          sx={{ padding: "0px", backgroundColor: "#", height: "100%" }}
-        >
-          <MapOL
-            {...{
-              bbox,
-              setBbox,
-              countryBbox,
-              drawFeatures,
-              clearFeatures,
-              CRS,
-              previousId,
-              setAction,
-              digitize,
-              setDigitize,
+          >
+            Accept
+          </CustomButtonGreen>
+          <CustomButtonGreen
+            onClick={() => {
+              setOpenChooser(false)
             }}
-          />
-        </Grid>
-      </Grid>
+          >
+            Cancel
+          </CustomButtonGreen>
     </div>
   );
 }

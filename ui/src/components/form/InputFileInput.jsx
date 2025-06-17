@@ -5,7 +5,10 @@ import { InputsDescription } from "../StepDescription";
 import ReactMarkdown from "react-markdown";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
-import LocationChooser from "./LocationChooser";
+import BBoxChooser from "./Choosers/BBoxChooser";
+import CRSChooser from "./Choosers/CRSChooser";
+import CountryRegionChooser from './Choosers/CountryRegionChooser';
+import CountryRegionCRSChooser from './Choosers/CountryRegionCRSChooser';
 
 import yaml from "js-yaml";
 import { isEmptyObject } from "../../utils/isEmptyObject";
@@ -14,7 +17,7 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Alert from "@mui/material/Alert";
-import TravelExploreIcon from '@mui/icons-material/TravelExplore';
+import CropFreeIcon from '@mui/icons-material/CropFree';
 import Modal from "@mui/material/Modal";
 import { CustomButtonGreen } from "../CustomMUI";
 
@@ -99,7 +102,7 @@ export default function InputFileInput({
 
 const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   if (!inputs) return <p>No Inputs</p>;
-  const [openLocationChooser, setOpenLocationChooser] = useState(false);
+  const [openBBoxChooser, setOpenBBoxChooser] = useState(false);
 
   function updateInputFile(inputId, value) {
     setInputFileContent((content) => {
@@ -112,17 +115,17 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   return (
     <div className="inputFileForm">
       <CustomButtonGreen variant="contained" 
-        endIcon={<TravelExploreIcon/>} 
-        onClick={() => {setOpenLocationChooser(true);}} 
+        endIcon={<CropFreeIcon/>} 
+        onClick={() => {setOpenBBoxChooser(true);}} 
         className="locationChooserButton">
-          Location Chooser   
+          Choose Bounding Box
       </CustomButtonGreen>
       <Modal
-        open={openLocationChooser}
-        onClose={() => setOpenLocationChooser(false)}
+        open={openBBoxChooser}
+        onClose={() => setOpenBBoxChooser(false)}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
-      ><LocationChooser/></Modal>
+      ><CRSChooser setOpenChooser={setOpenBBoxChooser} /></Modal>
     <table className="inputFileFields">
       <tbody>
         {Object.entries(inputs)

@@ -338,7 +338,7 @@ export default function MapOL({
         projection: `EPSG:${CRS.code}`,
       }),
     });
-    setMapp(map);
+    setMapp(map)
     return () => {
       map.setTarget(null);
     };
