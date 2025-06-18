@@ -53,23 +53,19 @@ The `Run a pipeline` tab can be used to run an entire pipeline to calculate an i
 
     -   Each input field includes a description and its purpose on the right of the input box. Here you will also see the *type* of the input.
 
-    -   The form might ask you for a file. In order to provide a file that you have locally on your computer, upload or copy it to the `userdata` folder. You can then refer to it with a url as such: `/userdata/myFile.shp`, or `/userdata/myFolder/myFile.shp` if there are subfolders. Most pipelines can also accept remote files (https://). That will be specified in the input documentation.
-
     -   **Please ensure each input matches the required type that is specified in the input description.** The input will either be a primitive type (i.e. text, int, float, boolean, etc.) which the user will type in or a MIME type representing a file (e.g. text/csv, application/geo+json, etc.) where the user will provide the path to that file. The square brackets `[]` after a type represent an array of that type, meaning you can input several parameters separated by a comma (i.e. text\[\], application/geo+json\[\], etc.). **For more details on input types, please refer to "Step 3: Create a YAML File" on [this page](how_to_contribute.qmd).**
+
+    -   The form might ask you for a file. In order to provide a file that you have locally on your computer, upload or copy it to the `userdata` folder. You can then refer to it with a url as such: `/userdata/myFile.shp`, or `/userdata/myFolder/myFile.shp` if there are subfolders. Most pipelines can also accept remote files (https://). That will be specified in the input documentation.
 
     -   The `Input yaml` tab can be used to see how your inputs are being passed in to the pipeline. This is useful for sharing pipeline inputs for recreating results, as it can be copied and pasted to fill the input form. By scrolling down, you can also see how the inputs were defined by the author(s).
 
-<!-- -->
-
-1.  Click on `Run pipeline`. To terminate the execution of the script at any point, use the `Stop` button.
+3.  Click on `Run pipeline`. To terminate the execution of the script at any point, use the `Stop` button. If the pipeline or any of its steps has previously been run with the exact same inputs and the code has not changed, the existing results will be loaded.
 
 After the script runs, you'll see a detailed `Results` box, which includes drop down arrows to view your inputs and script outputs. To simply view your output, click on the blue name or arrow. A gray box containing the logs of each individual script can be found under the outputs, where you can monitor the progress of the script. The logs also help with any debugging problems that occurred.
 
 You can view the results using the drop down menu for each, or use `See in results viewer` for a more detailed and user-friendly (less technical) view of the outputs. Outputs can be downloaded by using the blue link next to the output name.
 
 In the `Detailed results` you will find all the individual scripts used throughout the pipeline, as well as their inputs and outputs.
-
-Simply fill out the desired inputs and click on `Run pipeline`. To terminate the execution of the pipeline at any point, use the `Stop` button. While the pipeline is running, you may see its progress under `Results`.
 
 ::: {style="margin-top: 40px;"}
 :::
@@ -83,7 +79,7 @@ Simply fill out the desired inputs and click on `Run pipeline`. To terminate the
 
 The `Run a script` tab lets you run an individual script and works very similarly to the `Run a pipeline` tab. Scripts are individual parts of pipelines designed to perform one well-defined task at a time, like extracting data from a file, cleaning files, or applying a specific formulas.
 
-The `Run a script` functionality is usually used for testing individual components of a pipeline rather than producing usable outputs. Additionally, unlike pipelines, scripts often require inputs that are produced by other scripts, and so they may not run successfully with the default parameters. However, running a script can be useful for development, bug fixing, or trying to understand the purpose and outputs of a given step.
+The `Run a script` functionality is normally used for testing individual components of a pipeline rather than producing usable outputs. Additionally, unlike pipelines, scripts often require inputs that are produced by other scripts, and so they may not run successfully with the default parameters. However, running a script can be useful for development, bug fixing, or trying to understand the purpose and outputs of a given step.
 
 ::: {style="margin-top: 40px;"}
 :::
@@ -96,9 +92,6 @@ The `Run a script` functionality is usually used for testing individual componen
 Simply fill out the desired inputs and click on `Run script`. To terminate the execution of the pipeline at any point, use the `stop` button. While the pipeline is running, you may see its progress under `Results`.
 
 Individual scripts sometimes rely on files that are output by other scripts, and therefore may not run with default parameters. You may need to input files from the "userdata" folder or files downloaded from the outputs of other scripts to make the scripts run.
-
-::: {style="margin-top: 40px;"}
-:::
 
 After the script runs, you'll see a detailed `Results` box, which includes drop down arrows to view your inputs and script outputs. To simply view your output, click on the blue name or arrow. A gray box containing the script logs can be found under the outputs, which can help with debugging problems that occurred.
 
@@ -126,7 +119,7 @@ To run the script again, click `Run script` in the input form.
 
 ## Pipeline editor
 
-Under the `Pipeline editor` tab, users can create and edit pipelines. For more information on how to do so, please refer to Step 6 of [this page](how_to_contribute.qmd).
+Under the `Pipeline editor` tab, users can create and edit pipelines. For more information on how to do so, please refer to Step 6 "Connect your scripts with the BON in a Box pipeline editor" of the [how to contribute](how_to_contribute.qmd#pipeline_editor) page.
 
 ::: {style="margin-top: 40px;"}
 :::
@@ -149,6 +142,8 @@ The `History` tab shows previous script and pipeline runs.
 :::
 
 Use the drop down arrow to see the inputs of a run and `See run in UI` to view the details of a run, including the inputs, outputs, and logs. The latter can be used to try the run again with some or all of the same inputs. For pipelines, you may see outputs in the results viewer using `See in viewer`.
+
+If you run the same pipeline with the same input parameters multiple times, it will only show once in the history view.
 
 ::: {style="margin-top: 40px;"}
 :::

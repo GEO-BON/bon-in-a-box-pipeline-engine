@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.6.42">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -69,10 +69,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-1720701508f0da8833bce7b2e881049e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -134,17 +134,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="nav-link" href="./how_to_use.html"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
-  <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-pipelines" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Pipelines</span>
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-pipelines">    
-        <li>
-    <a class="dropdown-item" href="./protconn_pipeline.html">
- <span class="dropdown-text">Protected Connected Index</span></a>
-  </li>  
-    </ul>
-  </li>
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribute-a-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Contribute a pipeline</span>
@@ -233,7 +222,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#reporting-problems" id="toc-reporting-problems" class="nav-link" data-scroll-target="#reporting-problems">Reporting problems</a></li>
   </ul></li>
   <li><a href="#step-5-testing-your-script" id="toc-step-5-testing-your-script" class="nav-link" data-scroll-target="#step-5-testing-your-script">Step 5: Testing your script</a></li>
-  <li><a href="#step-6-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" id="toc-step-6-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" class="nav-link" data-scroll-target="#step-6-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor">Step 6: Connect your scripts with the BON in a Box pipeline editor</a>
+  <li><a href="#pipeline_editor" id="toc-pipeline_editor" class="nav-link" data-scroll-target="#pipeline_editor">Step 6: Connect your scripts with the BON in a Box pipeline editor</a>
   <ul class="collapse">
   <li><a href="#pipeline-editor" id="toc-pipeline-editor" class="nav-link" data-scroll-target="#pipeline-editor">Pipeline editor</a></li>
   <li><a href="#pipeline-inputs-and-outputs" id="toc-pipeline-inputs-and-outputs" class="nav-link" data-scroll-target="#pipeline-inputs-and-outputs">Pipeline inputs and outputs</a></li>
@@ -895,8 +884,8 @@ conda: # Optional, only needed if your script has specific package dependencies
 </ol>
 <p>You can test your script in the “run script” tab of the tool. This will generate a form where you can enter sample inputs or use your default parameters to run the script for debugging.</p>
 </section>
-<section id="step-6-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor" class="level2">
-<h2 class="anchored" data-anchor-id="step-6-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor">Step 6: Connect your scripts with the BON in a Box pipeline editor</h2>
+<section id="pipeline_editor" class="level2">
+<h2 class="anchored" data-anchor-id="pipeline_editor">Step 6: Connect your scripts with the BON in a Box pipeline editor</h2>
 <p>Next, create your pipeline in the BON in a Box pipeline editor by connecting your inputs and outputs.</p>
 <p>Once you have saved your scripts and YAML files to your local computer in the Bon-in-a-box pipelines folder that was cloned from GitHub, they will show up as scripts in the pipeline editor. You can drag the scripts into the editor and connect the inputs and outputs to create your pipeline.</p>
 <p>A pipeline is a collection of steps that are connected to automate an analysis workflow. Each script becomes a pipeline step.</p>
@@ -1062,8 +1051,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -1174,7 +1161,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.56">
+<meta name="generator" content="quarto-1.6.42">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -35,10 +35,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-1720701508f0da8833bce7b2e881049e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -100,17 +100,6 @@ ul.task-list li input[type="checkbox"] {
     <a class="nav-link" href="./how_to_use.html"> 
 <span class="menu-text">User Guide</span></a>
   </li>  
-  <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-pipelines" role="link" data-bs-toggle="dropdown" aria-expanded="false">
- <span class="menu-text">Pipelines</span>
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-pipelines">    
-        <li>
-    <a class="dropdown-item" href="./protconn_pipeline.html">
- <span class="dropdown-text">Protected Connected Index</span></a>
-  </li>  
-    </ul>
-  </li>
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribute-a-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Contribute a pipeline</span>
@@ -190,7 +179,7 @@ ul.task-list li input[type="checkbox"] {
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
 
 
@@ -241,19 +230,15 @@ ul.task-list li input[type="checkbox"] {
 <li><p>The pipeline will run with the default parameters, so you can run the pipeline right away to see what the outputs should look like.</p></li>
 <li><p>Some inputs can be typed in, while others are options.</p></li>
 <li><p>Each input field includes a description and its purpose on the right of the input box. Here you will also see the <em>type</em> of the input.</p></li>
-<li><p>The form might ask you for a file. In order to provide a file that you have locally on your computer, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders. Most pipelines can also accept remote files (https://). That will be specified in the input documentation.</p></li>
 <li><p><strong>Please ensure each input matches the required type that is specified in the input description.</strong> The input will either be a primitive type (i.e.&nbsp;text, int, float, boolean, etc.) which the user will type in or a MIME type representing a file (e.g.&nbsp;text/csv, application/geo+json, etc.) where the user will provide the path to that file. The square brackets <code>[]</code> after a type represent an array of that type, meaning you can input several parameters separated by a comma (i.e.&nbsp;text[], application/geo+json[], etc.). <strong>For more details on input types, please refer to “Step 3: Create a YAML File” on <a href="./how_to_contribute.html">this page</a>.</strong></p></li>
+<li><p>The form might ask you for a file. In order to provide a file that you have locally on your computer, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders. Most pipelines can also accept remote files (https://). That will be specified in the input documentation.</p></li>
 <li><p>The <code>Input yaml</code> tab can be used to see how your inputs are being passed in to the pipeline. This is useful for sharing pipeline inputs for recreating results, as it can be copied and pasted to fill the input form. By scrolling down, you can also see how the inputs were defined by the author(s).</p></li>
 </ul></li>
-</ol>
-<!-- -->
-<ol type="1">
-<li>Click on <code>Run pipeline</code>. To terminate the execution of the script at any point, use the <code>Stop</code> button.</li>
+<li><p>Click on <code>Run pipeline</code>. To terminate the execution of the script at any point, use the <code>Stop</code> button. If the pipeline or any of its steps has previously been run with the exact same inputs and the code has not changed, the existing results will be loaded.</p></li>
 </ol>
 <p>After the script runs, you’ll see a detailed <code>Results</code> box, which includes drop down arrows to view your inputs and script outputs. To simply view your output, click on the blue name or arrow. A gray box containing the logs of each individual script can be found under the outputs, where you can monitor the progress of the script. The logs also help with any debugging problems that occurred.</p>
 <p>You can view the results using the drop down menu for each, or use <code>See in results viewer</code> for a more detailed and user-friendly (less technical) view of the outputs. Outputs can be downloaded by using the blue link next to the output name.</p>
 <p>In the <code>Detailed results</code> you will find all the individual scripts used throughout the pipeline, as well as their inputs and outputs.</p>
-<p>Simply fill out the desired inputs and click on <code>Run pipeline</code>. To terminate the execution of the pipeline at any point, use the <code>Stop</code> button. While the pipeline is running, you may see its progress under <code>Results</code>.</p>
 <div style="margin-top: 40px;">
 
 </div>
@@ -265,7 +250,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="run-a-script" class="level2">
 <h2 class="anchored" data-anchor-id="run-a-script">Run a script</h2>
 <p>The <code>Run a script</code> tab lets you run an individual script and works very similarly to the <code>Run a pipeline</code> tab. Scripts are individual parts of pipelines designed to perform one well-defined task at a time, like extracting data from a file, cleaning files, or applying a specific formulas.</p>
-<p>The <code>Run a script</code> functionality is usually used for testing individual components of a pipeline rather than producing usable outputs. Additionally, unlike pipelines, scripts often require inputs that are produced by other scripts, and so they may not run successfully with the default parameters. However, running a script can be useful for development, bug fixing, or trying to understand the purpose and outputs of a given step.</p>
+<p>The <code>Run a script</code> functionality is normally used for testing individual components of a pipeline rather than producing usable outputs. Additionally, unlike pipelines, scripts often require inputs that are produced by other scripts, and so they may not run successfully with the default parameters. However, running a script can be useful for development, bug fixing, or trying to understand the purpose and outputs of a given step.</p>
 <div style="margin-top: 40px;">
 
 </div>
@@ -275,9 +260,6 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <p>Simply fill out the desired inputs and click on <code>Run script</code>. To terminate the execution of the pipeline at any point, use the <code>stop</code> button. While the pipeline is running, you may see its progress under <code>Results</code>.</p>
 <p>Individual scripts sometimes rely on files that are output by other scripts, and therefore may not run with default parameters. You may need to input files from the “userdata” folder or files downloaded from the outputs of other scripts to make the scripts run.</p>
-<div style="margin-top: 40px;">
-
-</div>
 <p>After the script runs, you’ll see a detailed <code>Results</code> box, which includes drop down arrows to view your inputs and script outputs. To simply view your output, click on the blue name or arrow. A gray box containing the script logs can be found under the outputs, which can help with debugging problems that occurred.</p>
 <div style="margin-top: 40px;">
 
@@ -299,7 +281,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="pipeline-editor" class="level2">
 <h2 class="anchored" data-anchor-id="pipeline-editor">Pipeline editor</h2>
-<p>Under the <code>Pipeline editor</code> tab, users can create and edit pipelines. For more information on how to do so, please refer to Step 6 of <a href="./how_to_contribute.html">this page</a>.</p>
+<p>Under the <code>Pipeline editor</code> tab, users can create and edit pipelines. For more information on how to do so, please refer to Step 6 “Connect your scripts with the BON in a Box pipeline editor” of the <a href="./how_to_contribute.html#pipeline_editor">how to contribute</a> page.</p>
 <div style="margin-top: 40px;">
 
 </div>
@@ -319,6 +301,7 @@ ul.task-list li input[type="checkbox"] {
 
 </div>
 <p>Use the drop down arrow to see the inputs of a run and <code>See run in UI</code> to view the details of a run, including the inputs, outputs, and logs. The latter can be used to try the run again with some or all of the same inputs. For pipelines, you may see outputs in the results viewer using <code>See in viewer</code>.</p>
+<p>If you run the same pipeline with the same input parameters multiple times, it will only show once in the history view.</p>
 <div style="margin-top: 40px;">
 
 </div>
@@ -415,8 +398,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-    // For code content inside modals, clipBoardJS needs to be initialized with a container option
-    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -527,7 +508,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
