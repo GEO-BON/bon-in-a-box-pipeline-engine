@@ -44,31 +44,26 @@ function findLogoImageFromURL(url) {
 function LogoFromUrl({ src, style}) {
     return <a style={style} href={src} target="_blank">
             <img src={src} alt={src} title="ID" width="20px"></img>
-        </a>
+          </a>
 }
 
 function generatePersonList(list) {
     return list.map((person, i, array) => {
-        let email = person.email && <a href={'mailto:' + person.email} style={{ textDecoration: 'none', color: "var(--biab-green-main)" }}>{person.email}</a>
+        let email = person.email && <a href={'mailto:' + person.email}>{person.email}</a>
         let role = person.role && <span>{person.role.join(', ')}</span>
         let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
         let isAuthorProperties = person.email || person.role || person.identifier;
         let identifierLogo = person.identifier && findLogoImageFromURL(person.identifier);
 
         let hoverCardDisplay = <>
-            {identifierLogo && <LogoFromUrl style={{ float: "right", paddingTop: "4px", paddingBottom: "4px"}} src={identifierLogo} />}
-            <h3 style={{
-                marginTop: "0px",
-                marginBottom: "0px",
-                marginRight: "30px",
-                float: "left"
-            }}>{person.name}</h3>
-            <br/>
-            <br />
+            <div className="popover-heading">
+              <h3>{person.name}</h3>
+              {identifierLogo && <LogoFromUrl  src={identifierLogo} />}
+            </div>
             <hr/>
             {email}
             {role && <p>Contribution: {role}</p> || <p></p>}
-            { identifierLogo ? null : <LogoFromUrl src={person.identifier} /> }
+            {identifierLogo ? null : <LogoFromUrl src={person.identifier} /> }
         </>
 
         let hoverCardName = person.name && <HoverCard popoverContent={hoverCardDisplay}>{person.name}</HoverCard>

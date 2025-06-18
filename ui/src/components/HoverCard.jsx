@@ -16,16 +16,6 @@ export function HoverCard({children, popoverContent}) {
 
   return (
     <span>
-    {/*
-      <Typography
-        aria-owns={"mouse-over-popover"}
-        aria-haspopup="true"
-        onClick={handleClick}
-        style={{display: "inline"}}
-      >
-        {children}
-      </Typography>
-    */}
       <a
         aria-owns="mouse-over-popover"
         aria-haspopup="true"
