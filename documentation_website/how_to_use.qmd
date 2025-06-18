@@ -49,7 +49,7 @@ The `Run a pipeline` tab can be used to run an entire pipeline to calculate an i
 
     -   The pipeline will run with the default parameters, so you can run the pipeline right away to see what the outputs should look like.
 
-    -   Some inputs can be typed in, while others are options.
+    -   Some inputs can be typed in, while others are in a drop down menu.
 
     -   Each input field includes a description and its purpose on the right of the input box. Here you will also see the *type* of the input.
 
