@@ -5,12 +5,8 @@ import { InputsDescription } from "../StepDescription";
 import ReactMarkdown from "react-markdown";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
-import BBoxChooser from "./Choosers/BBoxChooser";
-import CRSChooser from "./Choosers/CRSChooser";
-import CountryRegionChooser from './Choosers/CountryRegionChooser';
-import CountryRegionCRSChooser from './Choosers/CountryRegionCRSChooser';
-import Choosers from './Choosers'
-
+import Choosers from './Choosers';
+import _ from 'lodash';
 import yaml from "js-yaml";
 import { isEmptyObject } from "../../utils/isEmptyObject";
 import Typography from "@mui/material/Typography";
@@ -18,8 +14,6 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Alert from "@mui/material/Alert";
-import CropFreeIcon from '@mui/icons-material/CropFree';
-import Modal from "@mui/material/Modal";
 import { CustomButtonGreen } from "../CustomMUI";
 
 import { styled } from "@mui/material";
@@ -103,7 +97,7 @@ export default function InputFileInput({
 
 const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   if (!inputs) return <p>No Inputs</p>;
-  const [openBBoxChooser, setOpenBBoxChooser] = useState(false);
+  const [openChooser, setOpenChooser] = useState("");
 
   function updateInputFile(inputId, value) {
     setInputFileContent((content) => {
@@ -115,18 +109,6 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
 
   return (
     <div className="inputFileForm">
-      <CustomButtonGreen variant="contained" 
-        endIcon={<CropFreeIcon/>} 
-        onClick={() => {setOpenBBoxChooser(true);}} 
-        className="locationChooserButton">
-          Choose Bounding Box
-      </CustomButtonGreen>
-      <Modal
-        open={openBBoxChooser}
-        onClose={() => setOpenBBoxChooser(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      ><Choosers setOpenChooser={setOpenBBoxChooser} /></Modal>
     <table className="inputFileFields">
       <tbody>
         {Object.entries(inputs)
@@ -134,7 +116,10 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
           .map(([inputId, inputDescription]) => {
             const { label, description, options, example, weight, ...theRest } =
               inputDescription;
-
+            if(["country", "region", "countryRegion", "CRS", "countryRegionCRS", "bboxCRS"].includes(inputDescription.type)){
+                return (<Choosers key={inputId} openChooser={openChooser} setOpenChooser={setOpenChooser} inputId={inputId} inputDescription={inputDescription} inputFileContent={inputFileContent} updateInputFile={updateInputFile} />
+                )
+              }else{
             return (
               <tr key={inputId}>
                 <td className="inputCell">
@@ -199,6 +184,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                 </td>
               </tr>
             );
+          }
           })}
       </tbody>
     </table>

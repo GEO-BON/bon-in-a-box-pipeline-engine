@@ -220,7 +220,7 @@ export default function CRSMenu({
             onChange={(event) => {
               setInputValue(event.target.value);
             }}
-            endAdornment={<InputAdornment position="end" style={{cursor:'pointer'}} onClick={(event) => {
+            endAdornment={<InputAdornment position="end" style={{cursor:'pointer', marginRight:'20px'}} onClick={(event) => {
               updateCRS({ value: inputValue, label: inputValue });
             }}> <CheckBoxIcon
               sx={{ color: "var(--biab-green-main)" }}

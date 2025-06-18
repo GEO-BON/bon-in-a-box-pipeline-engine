@@ -10,7 +10,7 @@ import { getStateAPI,defaultCountry,defaultRegion} from "./utils";
 
 
 
-export default function CountryRegionDialog({
+export default function CountryRegionMenu({
   setBbox=()=>{},
   country=defaultCountry,
   setCountry=()=>{},
@@ -18,6 +18,7 @@ export default function CountryRegionDialog({
   setRegion=()=>{},
   setAction,
   showAcceptButton=true,
+  showRegion=true
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
   const [regionOptions, setRegionOptions] = useState([]);
@@ -74,13 +75,24 @@ export default function CountryRegionDialog({
     }
   }, [selectedCountry]);
 
-  const buttonClicked = () => {
+  const buttonClicked = (type, value) => {
     setAction("CountryButton");
     setBbox([]);
+    let countryValue, regionValue
+    if(type===''){
+      countryValue=selectedCountry.value
+      regionValue=selectedRegion.value
+    }else if(type==='region'){
+      countryValue=selectedCountry.value
+      regionValue=value
+    }else if(type==='country'){
+      countryValue=value
+      regionValue=''
+    }
     const countryObj = countryOptionsJSON.geonames.find(
-      (c) => c.geonameId === selectedCountry
+      (c) => c.isoAlpha3 === countryValue
     );
-    if (selectedCountry && !selectedRegion.value) {
+    if (countryValue) {
       let b = [
         countryObj.west,
         countryObj.south,
@@ -89,9 +101,10 @@ export default function CountryRegionDialog({
       ];
       b = b.map((c) => c.toFixed(6));
       setBbox(b)
-      setCountry({englishName: countryObj.countryName, ISO3: isoAlpha3, code: countryObj.countryCode , bboxLL: b})
-    } else  if (selectedRegion.value!=="") {
-      const regionObj = regionJSON.find((s) => s.geonameId === selectedRegion.value);
+      setCountry({englishName: countryObj.countryName, ISO3: countryObj.isoAlpha3, code: countryObj.countryCode , bboxLL: b})
+    }
+    if (regionValue) {
+      const regionObj = regionJSON.find((s) => s.geonameId === regionValue);
       let b = [
         regionObj.bbox.west,
         regionObj.bbox.south,
@@ -101,7 +114,8 @@ export default function CountryRegionDialog({
       b = b.map((c) => c.toFixed(6));
       setBbox(b)
       setRegion(stateObj ? { regionName: stateObj.name, bboxLL: b, countryEnglishName: countryObj.countryName } : defaultRegion);
-    } else {
+    } 
+    if(countryValue==='' && regionValue===''){
       setCountry(defaultCountry)
       setRegion(defaultRegion)
     }
@@ -136,8 +150,12 @@ export default function CountryRegionDialog({
         onChange={(event, value) => {
           setSelectedCountry(value);
           setSelectedRegion("");
+          if(!showAcceptButton){
+            buttonClicked('country',value.value);
+          }
         }}
       />
+      {showRegion && (
       <Autocomplete
         disablePortal
         options={regionOptions}
@@ -155,9 +173,13 @@ export default function CountryRegionDialog({
         )}
         onChange={(event, value) => {
           setSelectedRegion(value)
+          if(!showAcceptButton){
+            buttonClicked('region', value.value);
+          }
         }}
         value={selectedRegion}
       />
+    )}
       {showAcceptButton && (
       <CustomButtonGreen
         variant="contained"
