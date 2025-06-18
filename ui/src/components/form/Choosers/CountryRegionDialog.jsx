@@ -6,25 +6,24 @@ import Autocomplete from "@mui/material/Autocomplete";
 import CheckIcon from "@mui/icons-material/Check";
 import { CustomButtonGreen } from "../../CustomMUI";
 import countryOptionsJSON from "./countries.json"; // Assuming you have a JSON file with country data
-import { getStateAPI, validTerraPolygon } from "./utils";
+import { getStateAPI,defaultCountry,defaultRegion} from "./utils";
+
+
 
 export default function CountryRegionDialog({
   setBbox=()=>{},
-  setCountryISO,
-  setCountryBbox=()=>{},
-  countryName,
-  setCountryName,
-  setStateProvName,
+  country=defaultCountry,
+  setCountry=()=>{},
+  region=defaultRegion, 
+  setRegion=()=>{},
   setAction,
-  country,
-  setCountry,
-  stateProv,
-  setStateProv,
   showAcceptButton=true,
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
-  const [stateOptions, setStateOptions] = useState([]);
-  const [stateProvJSON, setStateProvJSON] = useState([]);
+  const [regionOptions, setRegionOptions] = useState([]);
+  const [regionJSON, setRegionJSON] = useState([]);
+  const [selectedRegion, setSelectedRegion] = useState("")
+  const [selectedCountry, setSelectedCountry] = useState([])
 
   useEffect(() => {
     // Fetch country options from the JSON file
@@ -36,44 +35,52 @@ export default function CountryRegionDialog({
     });
     countryOpts = countryOpts.map((country) => ({
       label: country.countryName,
-      value: country.geonameId,
+      value: country.isoAlpha3,
     }));
     setCountryOptions(countryOpts);
   }, []);
 
+  // Set from controlled values coming in
+  useEffect(()=> {
+    if(country.ISO3 && country.ISO3 !== selectedCountry.value && countryOptions.length > 1){
+      setSelectedCountry({label: country.englishName, value: country.ISO3})
+    }
+    if(region.regionName && region.regionName !== selectedRegion.value && regionOptions.length > 1){
+      setSelectedRegion(region.regionName)
+    }
+  },[region, country, countryOptions, regionOptions])
+
   useEffect(() => {
-    if (country) {
+    if (selectedCountry.value) {
       // Fetch states or provinces based on the selected country
-      getStateAPI(country).then((response) => {
+      const countryObj = countryOptionsJSON.geonames.find(
+        (c) => c.isoAlpha3 === selectedCountry.value
+      );
+      getStateAPI(countryObj.geonameId).then((response) => {
         if (response.data && response.data.geonames) {
-          const stateOpts = response.data.geonames.map((state) => ({
+          const regionOpts = response.data.geonames.map((state) => ({
             label: state.name,
             value: state.geonameId,
           }));
-          setStateOptions(stateOpts);
-          setStateProvJSON(response.data.geonames);
+          setRegionOptions(regionOpts);
+          setRegionJSON(response.data.geonames);
         } else {
-          setStateOptions([]);
+          setRegionOptions([]);
         }
       });
     } else {
-      setStateOptions([]);
-      setCountryBbox([]);
+      setRegionOptions([]);
       setBbox([]);
     }
-  }, [country, countryOptions]);
+  }, [selectedCountry]);
 
   const buttonClicked = () => {
     setAction("CountryButton");
     setBbox([]);
     const countryObj = countryOptionsJSON.geonames.find(
-      (c) => c.geonameId === country
+      (c) => c.geonameId === selectedCountry
     );
-    if (country) {
-      setCountryISO(countryObj.isoAlpha3);
-      setCountryName(countryObj.countryName);
-    }
-    if (country && !stateProv) {
+    if (selectedCountry && !selectedRegion.value) {
       let b = [
         countryObj.west,
         countryObj.south,
@@ -81,19 +88,22 @@ export default function CountryRegionDialog({
         countryObj.north,
       ];
       b = b.map((c) => c.toFixed(6));
-      setCountryBbox(b);
-    }
-    if (stateProv) {
-      const stateObj = stateProvJSON.find((s) => s.geonameId === stateProv);
-      setStateProvName(stateObj ? stateObj.name : "");
+      setBbox(b)
+      setCountry({englishName: countryObj.countryName, ISO3: isoAlpha3, code: countryObj.countryCode , bboxLL: b})
+    } else  if (selectedRegion.value!=="") {
+      const regionObj = regionJSON.find((s) => s.geonameId === selectedRegion.value);
       let b = [
-        stateObj.bbox.west,
-        stateObj.bbox.south,
-        stateObj.bbox.east,
-        stateObj.bbox.north,
+        regionObj.bbox.west,
+        regionObj.bbox.south,
+        regionObj.bbox.east,
+        regionObj.bbox.north,
       ];
       b = b.map((c) => c.toFixed(6));
-      setCountryBbox(b);
+      setBbox(b)
+      setRegion(stateObj ? { regionName: stateObj.name, bboxLL: b, countryEnglishName: countryObj.countryName } : defaultRegion);
+    } else {
+      setCountry(defaultCountry)
+      setRegion(defaultRegion)
     }
   };
 
@@ -119,18 +129,18 @@ export default function CountryRegionDialog({
           color: "#fff",
           borderRadius: "4px",
         }}
+        value={selectedCountry}
         renderInput={(params) => (
           <TextField {...params} label="Select country" />
         )}
         onChange={(event, value) => {
-          setCountry(value ? value.value : "");
-          setCountryBbox([]);
-          setStateProv("");
+          setSelectedCountry(value);
+          setSelectedRegion("");
         }}
       />
       <Autocomplete
         disablePortal
-        options={stateOptions}
+        options={regionOptions}
         size="small"
         sx={{
           marginTop: "20px",
@@ -141,18 +151,18 @@ export default function CountryRegionDialog({
           marginBottom: "10px",
         }}
         renderInput={(params) => (
-          <TextField {...params} label="Select subregion" />
+          <TextField {...params} label="Select region" />
         )}
         onChange={(event, value) => {
-          setCountryBbox([]);
-          setStateProv(value ? value.value : "");
+          setSelectedRegion(value)
         }}
+        value={selectedRegion}
       />
       {showAcceptButton && (
       <CustomButtonGreen
         variant="contained"
         endIcon={<CheckIcon />}
-        disabled={!country}
+        disabled={!selectedCountry}
         onClick={() => {
           buttonClicked();
         }}

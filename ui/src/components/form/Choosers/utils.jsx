@@ -37,6 +37,10 @@ export const defaultCRS = {
   unit: "degree",
 };
 
+export const defaultCountry = { englishName: "", ISO3: "", code: "" , bboxLL: []}
+export const defaultRegion = { name: "", bboxLL: [], countryEnglishName: "" }
+
+
 export const getStateAPI = async (geonameId) => {
   let result;
   const base_url = "http://api.geonames.org/childrenJSON";

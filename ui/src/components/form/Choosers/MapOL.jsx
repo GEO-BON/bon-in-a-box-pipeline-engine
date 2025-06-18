@@ -32,13 +32,14 @@ import Modify from "ol/interaction/Modify.js";
 import { get as getProjection } from "ol/proj";
 import * as turf from "@turf/turf";
 import proj4 from "proj4";
-import { transformPolyToBboxCRS, cleanBbox } from "./utils";
+import { transformPolyToBboxCRS, cleanBbox, defaultCRS, defaultCountry, defaultRegion} from "./utils";
 
 export default function MapOL({
   bbox = [],
   setBbox = () => {},
-  countryBbox,
-  CRS,
+  country=defaultCountry,
+  region=defaultRegion,
+  CRS=defaultCRS,
   digitize,
   setDigitize,
 }) {
@@ -253,9 +254,9 @@ export default function MapOL({
       };
       mapp.addInteraction(modify);
       setDraw(drawInt);
-    } else if (countryBbox.length == 0 && mapp && !digitize) {
+    }/* else if (countr.length == 0 && mapp && !digitize) {
       clearLayers();
-    }
+    }*/
   }, [mapp, features, digitize]);
 
   // The CRS gets updated. We need to reproject the map
@@ -274,13 +275,14 @@ export default function MapOL({
 
   // The Country Bounding box or the CRS are updated, we need to update and reproject the bbox
   useEffect(() => {
-    if (countryBbox.length > 0 && mapp) {
+    if ((country.bboxLL.length > 0 || region.bboxLL.length > 0) && mapp) {
       setDigitize(false);
-      setBbox(cleanBbox(countryBbox, "degree"));
-    } else if (countryBbox.length == 0 && mapp) {
+      const b = region.bboxLL.length > 0 ? region.bboxLL : country.bboxLL
+      setBbox(cleanBbox(b, "degree"));
+    } else if ((country.bboxLL.length == 0 && region.bboxLL.length == 0) && mapp) {
       clearLayers();
     }
-  }, [countryBbox]);
+  }, [country, region]);
 
   useEffect(() => {
     setDigitize(false);

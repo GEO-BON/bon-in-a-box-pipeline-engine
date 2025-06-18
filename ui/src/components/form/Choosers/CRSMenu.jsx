@@ -20,6 +20,8 @@ import {
   getCRSDef,
   defaultCRS,
   getCRSListFromName,
+  defaultCountry,
+  defaultRegion
 } from "./utils";
 import * as turf from "@turf/turf";
 import _ from "lodash";
@@ -29,11 +31,9 @@ export default function CRSMenu({
   setCRS,
   setAction,
   bbox,
-  setBbox,
   bboxGeoJSONShrink,
-  bboxGeoJSON,
-  countryName,
-  stateProvName,
+  country=defaultCountry,
+  region=defaultRegion,
 }) {
   const [CRSList, setCRSList] = useState([]);
   const [selectedCRS, setSelectedCRS] = useState({
@@ -45,11 +45,11 @@ export default function CRSMenu({
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
 
   useEffect(() => {
-    if (bboxGeoJSONShrink === null && (!stateProvName && !countryName)) return;
+    if (bboxGeoJSONShrink === null && (!region.name && !country.englishName)) return;
     setSearching(true);
     // Suggest from names
-    if(stateProvName || countryName){
-      const searchName = stateProvName ? stateProvName : countryName;
+    if(region.name || country.englishName){
+      const searchName = region.name ? region.name : country.englishName;
       getCRSListFromName(searchName).then((result) => {
         if (result) {
           const suggestions = result.map((proj) => {
@@ -67,7 +67,7 @@ export default function CRSMenu({
       });
     }
     // Suggest from area coverage
-    if (!stateProvName && !countryName && bboxGeoJSONShrink) {
+    if (!region.name && !country.englishName && bboxGeoJSONShrink) {
       let bbj = { type: "FeatureCollection", features: [bboxGeoJSONShrink] };
       getProjestAPI(bbj).then((result) => {
         if (result && result.length > 0) {
@@ -91,7 +91,7 @@ export default function CRSMenu({
         setSearching(false);
       });  
     }
-  }, [bboxGeoJSONShrink, countryName, stateProvName]);
+  }, [bboxGeoJSONShrink, country.englishName, region.name]);
 
   useEffect(() => {
     const c = `${CRS.authority}:${CRS.code}`;

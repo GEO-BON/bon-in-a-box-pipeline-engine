@@ -9,6 +9,7 @@ import BBoxChooser from "./Choosers/BBoxChooser";
 import CRSChooser from "./Choosers/CRSChooser";
 import CountryRegionChooser from './Choosers/CountryRegionChooser';
 import CountryRegionCRSChooser from './Choosers/CountryRegionCRSChooser';
+import Choosers from './Choosers'
 
 import yaml from "js-yaml";
 import { isEmptyObject } from "../../utils/isEmptyObject";
@@ -125,7 +126,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
         onClose={() => setOpenBBoxChooser(false)}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
-      ><CRSChooser setOpenChooser={setOpenBBoxChooser} /></Modal>
+      ><Choosers setOpenChooser={setOpenBBoxChooser} /></Modal>
     <table className="inputFileFields">
       <tbody>
         {Object.entries(inputs)

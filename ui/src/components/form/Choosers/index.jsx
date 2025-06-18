@@ -7,43 +7,26 @@ import Grid from "@mui/material/Grid";
 import CropIcon from "@mui/icons-material/Crop";
 import MapOL from "./MapOL";
 import * as turf from "@turf/turf";
-import CountryRegionDialog from "./CountryRegionDialog";
+import CountryChooser from "./CountryRegionDialog";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
 import { v4 as uuidv4 } from "uuid";
 import { CustomButtonGreen } from "../../CustomMUI";
+import { defaultCRS, defaultCountry, defaultRegion } from "./utils"
 
-export default function BBoxChooser({ setOpenBBoxChooser }) {
+export default function Choosers({ setOpenBBoxChooser }) {
   const [bbox, setBbox] = useState([]);
-  const [countryBbox, setCountryBbox] = useState([]);
-  const [countryISO, setCountryISO] = useState("");
-  const [countryName, setCountryName] = useState("");
-  const [stateProvName, setStateProvName] = useState("");
-  const [drawFeatures, setDrawFeatures] = useState([]);
+  const [country, setCountry] = useState(defaultCountry);
+  const [region, setRegion] = useState(defaultRegion)
   const [clearFeatures, setClearFeatures] = useState(0);
-  const [previousId, setPreviousId] = useState("");
-  const [bboxGeoJSON, setBboxGeoJSON] = useState(null);
-  const [country, setCountry] = useState("");
-  const [stateProv, setStateProv] = useState("");
   const [bboxGeoJSONShrink, setBboxGeoJSONShrink] = useState(null);
-  const [CRS, setCRS] = useState({
-    name: "WGS84 - Lat/long",
-    authority: "EPSG",
-    code: "4326",
-    def: "+proj=longlat +datum=WGS84 +no_defs",
-    unit: "degree",
-  });
+  const [CRS, setCRS] = useState(defaultCRS);
   const [action, setAction] = useState("");
   const [digitize, setDigitize] = useState(false);
 
   useEffect(() => {
     if (bbox.length > 0 && ![("CRSChange", "")].includes(action)) {
       //Shrink bbox for projestion which wont provide a crs suggestion if even a small part of the bbox is outside the area of coverage of the CRS
-      if (drawFeatures.length > 0) {
-        setPreviousId(drawFeatures[0].id);
-      } else {
-        setPreviousId(uuidv4()); //Random ID for the first feature
-      }
       const b = bbox.map((c) => parseFloat(c));
       const scale_width = Math.abs((b[2] - b[0]) / 3);
       const scale_height = Math.abs((b[3] - b[1]) / 3);
@@ -87,22 +70,15 @@ export default function BBoxChooser({ setOpenBBoxChooser }) {
           >
             Draw area of interest on map <CropIcon />
           </CustomButtonGreen>
-          <CountryRegionDialog
+          <CountryChooser
             {...{
               setBbox,
-              setBboxGeoJSON,
-              setCountryISO,
-              setCountryBbox,
-              countryName,
-              setCountryName,
-              setStateProvName,
-              stateProv,
-              setStateProv,
-              stateProvName,
-              setClearFeatures,
-              setAction,
               country,
               setCountry,
+              region,
+              setRegion,
+              setClearFeatures,
+              setAction,
             }}
           />
 
@@ -112,11 +88,9 @@ export default function BBoxChooser({ setOpenBBoxChooser }) {
               setCRS,
               bbox,
               bboxGeoJSONShrink,
-              bboxGeoJSON,
-              setBboxGeoJSON,
               setAction,
-              countryName,
-              stateProvName,
+              country,
+              region,
             }}
           />
           <BBox
@@ -125,8 +99,6 @@ export default function BBoxChooser({ setOpenBBoxChooser }) {
               setAction,
               bbox,
               setBbox,
-              bboxGeoJSON,
-              setBboxGeoJSON,
               CRS,
             }}
           />
@@ -152,11 +124,10 @@ export default function BBoxChooser({ setOpenBBoxChooser }) {
             {...{
               bbox,
               setBbox,
-              countryBbox,
-              drawFeatures,
+              country,
+              region,
               clearFeatures,
               CRS,
-              previousId,
               setAction,
               digitize,
               setDigitize,
