@@ -299,7 +299,8 @@ class ScriptRun( // Constructor used in single script run
                                     cat(" done.\n")
                                 }
                                 unlink("${pidFile.absolutePath}")
-                                gc()'
+                                gc()
+                                capture.output(sessionInfo(), file = paste0(outputFolder, "/RVersion.txt"))'
                             """.trimIndent()
                         )
                     }
@@ -326,6 +327,8 @@ class ScriptRun( // Constructor used in single script run
                                 if biab_output_list:
                                     with open(output_folder + "/output.json", "w") as outfile:
                                         outfile.write(json.dumps(biab_output_list, indent = 2))
+
+                                os.system("/opt/conda/bin/pip freeze > " + output_folder + "/PythonVersion.txt")
                         """.trimIndent()
 
                         if(useRunners) {
