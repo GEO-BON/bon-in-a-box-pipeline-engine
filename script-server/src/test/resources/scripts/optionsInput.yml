@@ -1,6 +1,9 @@
 script: optionsInput.py
 name: Options Input
 description: Sample script that outputs the received option input
+lifecycle:
+  status: in_development
+  message: bla bla
 author:
   - name: Jean-Michel Lord
 inputs:

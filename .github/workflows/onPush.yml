@@ -1,6 +1,16 @@
 name: On push, any branch
 
-on: [push]
+on:
+  push:
+    paths:
+      - "script-server/**"
+      - "script-stubs/**"
+      - ".github/workflows/onPush.yml"
+      - ".github/scriptValidationSchema.yml"
+      - ".github/pipelineValidationSchema.yml"
+      - ".github/validateCerberusSchema.py"
+      - ".github/findDuplicateDescriptions.sh"
+      - ".github/findDuplicateIds.sh"
 
 jobs:
   run-script-server-test:

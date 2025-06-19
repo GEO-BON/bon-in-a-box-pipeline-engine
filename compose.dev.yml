@@ -66,7 +66,3 @@ services:
       BASE_URL: /swagger
     volumes:
       - ./script-server/api/:/app
-
-volumes:
-  conda-env-yml:
-    name: "conda-env-yml-dev"

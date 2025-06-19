@@ -89,6 +89,10 @@
   "metadata": {
     "name": "Subpipeline with two branches",
     "description": "Pipeline for automated tests. Only one of the branches should execute.",
+    "lifecycle": {
+      "status": "in_development",
+      "message": "bla bla"
+    },
     "author": [
       {
         "name": "Jean-Michel Lord",

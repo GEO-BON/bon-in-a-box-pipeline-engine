@@ -5,19 +5,15 @@ name: bon-in-a-box
 services:
 
   script-server:
-    image: geobon/bon-in-a-box:script-server${DOCKER_SUFFIX}
+    image: ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/script-server:${DOCKER_SUFFIX}
     # build:
     #   context: ./script-server/
     #   dockerfile: Dockerfile.prod
 
   gateway:
-    image: geobon/bon-in-a-box:gateway${DOCKER_SUFFIX}
+    image: ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/gateway:${DOCKER_SUFFIX}
     # build:
     #   context: .
     #   dockerfile: Dockerfile.gateway.prod
     expose:
       - "80"
-
-volumes:
-  conda-env-yml:
-    name: "conda-env-yml"

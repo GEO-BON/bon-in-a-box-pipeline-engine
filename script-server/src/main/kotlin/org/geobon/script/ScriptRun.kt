@@ -215,12 +215,35 @@ class ScriptRun( // Constructor used in single script run
                     "jl", "JL" -> {
                         container = Containers.JULIA
                         command = container.dockerCommandList + listOf(
-                            "julia", "-e",
+                            "bash", "-c",
                             """
-                            open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
-                            ARGS=["${context.outputFolder.absolutePath}"];
-                            include("${scriptFile.absolutePath}")
-                            rm("${pidFile.absolutePath}")
+                                source importEnvVars.sh
+                                julia --project=${"$"}JULIA_DEPOT_PATH -e '
+                                    open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
+                                    output_folder="${context.outputFolder.absolutePath}"
+                                    ARGS=[output_folder];
+                                    include("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.jl")
+                                    try
+                                        include("${scriptFile.absolutePath}")
+                                    catch e
+                                        msg = sprint(showerror, e)
+                                        biab_output_dict["error"] = msg
+                                        println("\n${"$"}msg")
+                                        Base.show_backtrace(stdout, catch_backtrace())
+                                        println("\n\n")
+                                    finally
+                                        if !isempty(biab_output_dict)
+                                            println("Writing outputs to BON in a Box...")
+                                            jsonData = JSON.json(biab_output_dict, 2)
+                                            open(joinpath(output_folder, "output.json"), "w") do f
+                                                write(f, jsonData)
+                                            end
+                                            println(" done.")
+                                        end
+
+                                        rm("${pidFile.absolutePath}")
+                                    end
+                                '
                             """
                         )
                     }
@@ -310,7 +333,6 @@ class ScriptRun( // Constructor used in single script run
                         if(useRunners) {
                             val runner = CondaRunner(logFile, pidFile, "python", condaEnvName, condaEnvYml)
                             container = CondaRunner.container
-                            forceStopCleanup = runner.getForceStopCleanup()
 
                             val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
                             command = container.dockerCommandList + listOf(
@@ -373,6 +395,22 @@ class ScriptRun( // Constructor used in single script run
                                         if (!process.waitFor(30, TimeUnit.SECONDS)) {
                                             log(logger::info, "$event: cancellation timeout elapsed.")
                                             process.destroyForcibly()
+
+                                            if(container == Containers.JULIA) {
+                                                log(logger::info, """
+
+
+                                                    Julia processes may not terminate well and continue consuming resources in the background.
+                                                    You can wait for it to finish on its own.
+                                                    If it is problematic, discard the container by running the following commands:
+                                                        docker container stop biab-runner-julia
+                                                        .server/prod-server.sh command up -d biab-runner-julia
+
+                                                    Updates on this issue can be found at https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/issues/150
+
+
+                                                """.trimIndent())
+                                            }
                                         }
 
                                         // Cleanup after stop
@@ -467,7 +505,7 @@ class ScriptRun( // Constructor used in single script run
             if (!results.containsKey(ERROR_KEY)) {
                 val outputs = results.toMutableMap()
                 outputs[ERROR_KEY] =
-                    if (results.isEmpty()) "Script produced no results. Check log for errors."
+                    if (results.isEmpty()) "Script produced no results. Check log for errors and make sure that the script calls biab_output."
                     else "An error occurred. Check log for details."
 
                 // Rewrite output file with error

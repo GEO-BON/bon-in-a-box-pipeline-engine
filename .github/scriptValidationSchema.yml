@@ -11,6 +11,27 @@ description:
   required: true
   type: string
 
+lifecycle:
+  required: false
+  type: dict
+  oneof:
+    - schema:
+        status:
+          type: string
+          allowed: ["in_development", "in_review", "reviewed", "example"]
+          required: true
+        message:
+          type: string
+          required: false
+    - schema:
+        status:
+          type: string
+          allowed: ["deprecated"]
+          required: true
+        message:
+          type: string
+          required: true
+
 author:
   type: list
   required: true
@@ -26,6 +47,11 @@ author:
       identifier:
         type: string
         required: false
+      role:
+        type: list
+        required: false
+        schema:
+          type: string
 
 reviewer:
   type: list

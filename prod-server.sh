@@ -5,13 +5,10 @@ GREEN="\033[32m"
 YELLOW="\033[33m"
 ENDCOLOR="\033[0m"
 
-# Checking that this script is ran from the .server folder, and not from the dev repo,
-# which would break the relative file path.
-(cd .. && ls "server-up.sh" 2> /dev/null 1>&2) # true if in .server folder with dev symlink
-if [[ 0 -ne $? && ! -f "server-up.sh" ]]; then
-    echo -e "${RED}ERROR: Do not run directly! This script is meant to be run by server-up.sh or validate.sh in the pipeline-repo folder.${ENDCOLOR}"
-    exit 1
-fi
+# Checking for symlink development setup
+[[ -L ".server" || -L "./pipeline-repo/.server" ]]
+symlink=$?
+if [[ $symlink -eq 0 ]] ; then echo "Detected a symlink on .server folder: this is a development setup!"; fi
 
 which docker > /dev/null
 if [[ $? -ne 0 ]] ; then
@@ -22,6 +19,16 @@ which git > /dev/null
 if [[ $? -ne 0 ]] ; then
     echo -e "${RED}Git is required to run the latest version of the pipeline engine.${ENDCOLOR}" ; exit 1
 fi
+
+function excludeStrings {
+   # excludes must be a regex
+   local excludes=$1
+
+   while read -r pipedString
+   do
+       [[ "$pipedString" =~ $excludes ]] || echo $pipedString
+   done
+}
 
 function assertSuccess {
     if [[ $? -ne 0 ]] ; then
@@ -43,9 +50,10 @@ function help {
     echo "Commands:"
     echo "    help                 Display this help"
     echo "    checkout [BRANCH]    Checkout config files from given branch of pipeline engine repo."
-    echo "    up                   Start the server, accessible in http://localhost"
+    echo "    up [-y]              Start the server, accessible in http://localhost"
+    echo "                         Use -y or --yes to skip confirmation prompts (for automation)"
     echo "    down                 Stops the server"
-    echo "    validate             Run basic basic validation on pipelines and scripts. "
+    echo "    validate             Run basic validation on pipelines and scripts. "
     echo "    clean                Removes the docker containers of all services and the volume "
     echo "                         used to store the conda sub-environment info."
     echo "                         This is useful in development switching from prod to dev server,"
@@ -56,29 +64,35 @@ function help {
     echo
 }
 
-# Run your docker commands on the server manually.
-# `command <command>` with command such as pull/run/up/down/build/logs...
-# args are appended to the docker compose command with @$
-function command {
-    # Logs are useful to display to the user but only once, on the up command.
-    # They could interfere with other command outputs such as config
-    if [[ "$@" == "up"* ]] ; then log=0; else log=1; fi
-
+# Must be called once before command function can be called
+function prepareCommands {
     # Get docker group. Will not work on Windows, silencing the warning with 2> /dev/null
     export DOCKER_GID="$(getent group docker 2> /dev/null | cut -d: -f3)"
 
+    # This file's directory, see https://stackoverflow.com/a/246128/3519951
+    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    echo "Server config location: $SCRIPT_DIR"
+
     # Set the branch suffix. This allows to use a staging build.
     # We use remote.origin.fetch because of the partial checkout, see server-up.sh.
-    branch=$(git -C .server config remote.origin.fetch | sed 's/.*remotes\/origin\///')
-    if [[ $branch == *"staging" ]]; then
-        export DOCKER_SUFFIX="-$branch"
-        if [ $log -eq 0 ]; then echo "Using staging containers with suffix \"-$branch\"" ; fi
-    elif [[ $branch == "edge" ]]; then
-        export DOCKER_SUFFIX="-edge"
-        if [ $log -eq 0 ]; then echo "Using edge releases: you'll be up to date with the latest possible server." ; fi
+    if [[ $symlink -eq 0 ]] ; then
+        branch=$(git branch --show-current) # dev setup
     else
-        export DOCKER_SUFFIX=""
-        if [ $log -eq 0 ]; then echo "Using default branch." ; fi
+        branch=$(git -C $SCRIPT_DIR config remote.origin.fetch | sed 's/.*remotes\/origin\///')
+    fi
+
+    # In "dev symlink" setup, just get the regular branch
+    if [[ $branch == "*" ]]; then branch=$(git branch --show-current); fi
+
+    if [[ $branch == *"staging" ]]; then
+        export DOCKER_SUFFIX="$branch"
+        echo "Using staging containers with tag \"$branch\""
+    elif [[ $branch == "edge" ]]; then
+        export DOCKER_SUFFIX="edge"
+        echo "Using edge releases: you'll be up to date with the latest possible server."
+    else
+        export DOCKER_SUFFIX="latest"
+        echo "Using default branch."
     fi
 
     # On Windows, getent will not work. We leave the default users (anyways permissions don't matter).
@@ -99,10 +113,16 @@ function command {
             composeFiles+=" -f .server/compose.apple.yml"
         fi
     fi
+}
 
-    #echo "docker compose $composeFiles --env-file runner.env --env-file .server/.prod-paths.env $@"
+# Run your docker commands on the server manually.
+# `command <command>` with command such as pull/run/up/down/build/logs...
+# args are appended to the docker compose command with @$
+function command {
+    #set -ex
     docker compose $composeFiles \
         --env-file runner.env --env-file .server/.prod-paths.env $@
+    #set +ex
 }
 
 function validate {
@@ -136,7 +156,7 @@ function validate {
         -v /$(pwd)/.server/.github/validateCerberusSchema.py://validator/validateCerberusSchema.py:ro \
         -v /$(pwd)/.server/.github/pipelineValidationSchema.yml://validator/pipelineValidationSchema.yml:ro \
         -w //toValidate/ \
-        geobon/bon-in-a-box:script-server \
+        ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/script-server \
         python3 //validator/validateCerberusSchema.py //validator/pipelineValidationSchema.yml
     flagErrors
 
@@ -171,37 +191,30 @@ function checkout {
     echo -e "${GREEN}Server configuration updated.${ENDCOLOR}"
 }
 
+
+# This function echoes the images that need to be updated.
 # Docker pull should be able to tell us. In the meantime, comparing digests.
 # See https://github.com/docker/cli/issues/6059
 function checkForUpdates {
-    local images=$1
-    for image in $images; do
+    local images="$1"
+
+    check_image_update() {
+        local image="$1"
         # Get the local digest in the format sha256:<hash>
-        localDigest=$(docker image inspect --format='{{index .Id}}' $image 2>/dev/null)
-        if [[ $? -ne 0 ]]; then
-            echo -e "${YELLOW} ! ${ENDCOLOR}At least one image not found locally: $image"
-            return 0
+        local localDigest=$(docker image inspect --format='{{index .RepoDigests 0}}' "$image" 2>/dev/null | cut -d '@' -f2)
+        if [[ -z "$localDigest" ]]; then
+            echo "$image" # Not available locally
+            return
         fi
-        # echo $localDigest
 
-        # Get the remote digest in format sha256:<hash>
-        # Would have been cleaner with jq but it is not available in a git bash on Windows...
-        # WARNING: Works only on single architecture builds or if Linux happens to be the first variant.
-        remoteDigest=$(docker manifest inspect -v $image \
-            | awk '/"config":/ {found=1} found&& /"digest"/ {print $2; exit}' \
-            | tr -d '",')
-        # echo $remoteDigest
-
-        # Perform comparison
-        if [[ "$localDigest" != "$remoteDigest" ]]; then
-            echo -e "${YELLOW} ! ${ENDCOLOR}At least one image outdated: $image"
-            return 0
-        else
-            echo -e "${GREEN} ✔ ${ENDCOLOR}Up to date: $image"
+        local remoteDigest=$(docker manifest inspect -v "$image")
+        if ! echo "$remoteDigest" | grep -q "$localDigest"; then
+            echo "$image"
         fi
-    done
+    }
 
-    return 1
+    export -f check_image_update # Export function for xargs subshells
+    echo "$images" | xargs -n1 -P8 bash -c 'check_image_update "$0"'
 }
 
 function up {
@@ -221,8 +234,20 @@ function up {
         echo "    ./server-up.sh pre-conda-staging"
         exit 1
 
-    elif [[ $output == *"geobon/bon-in-a-box:gateway"* ]] ; then
+    elif [[ $output == *"ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/gateway"* ]] ; then
         echo -e "${RED}BON in a Box is already running.${ENDCOLOR}"
+        exit 1
+    fi
+
+    # Checking for compose files referring to legacy Docker Hub images.
+    images=$(command config --images)
+    if echo "$images" | grep -q "geobon/bon-in-a-box:runner"; then # migrating from v1.0.x to v1.1.0
+        echo -e "${YELLOW}Legacy Docker Hub images detected in your configuration."
+        echo -e "Please update your branch by merging the changes from the main branch to use the images from GitHub Packages (ghcr.io).${ENDCOLOR}"
+        echo "This can be done visually or on the command line with the following commands:"
+        echo "    git fetch"
+        echo "    git merge origin/main"
+        echo -e "${RED}FAILED${ENDCOLOR}"
         exit 1
     fi
 
@@ -232,15 +257,56 @@ function up {
     # These are the "saved" containers that we would normally keep, but that we will discard due to the update.
     containersToDiscard=""
 
-    docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
+    # Installing or updating
+    docker image ls | grep ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/ 2> /dev/null 1>&2
     if [[ $? -eq 1 ]] ; then
+        # Not installed, or legacy installation
+        docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
+        if [[ $? -eq 0 ]] ; then
+            echo -e "${YELLOW}Docker Hub containers found: cleaning up before installing the new version.${ENDCOLOR}"
+            echo -e "${YELLOW}Please be patient while we save some disk space: this may take a while.${ENDCOLOR}"
+
+            clean
+
+            echo "Removing obsolete containers..."
+            docker container rm $(docker container ls -a --format '{{.Image}} {{.ID}}'  \
+                | grep "geobon/bon-in-a-box:" \
+                | cut -d' ' -f2)
+
+            echo "Removing obsolete images..."
+            docker image rm $(docker image ls --format '{{.Repository}}:{{.Tag}} {{.ID}}' \
+                | grep '^geobon/bon-in-a-box' \
+                | cut -d' ' -f2)
+
+            echo "Removing obsolete volumes..."
+            docker volume rm \
+                conda-dir-dev \
+                conda-cache-dev \
+                conda-env-yml \
+                r-libs-user-dev 2> /dev/null 1>&2
+
+            echo -e "${GREEN}Clean complete.${ENDCOLOR}"
+        fi
+
         echo "Installing..."
         command pull ; assertSuccess
 
-    else # Already installed
+    # Already installed
+    else
+        # Check for migrations
+        # lastVersion=$(docker run --rm ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/script-server:$DOCKER_SUFFIX cat /version.txt)
+        # Extract semver (major.minor.patch) only, ignore any suffix like -SNAPSHOT
+        # semver=$(echo "$lastVersion" | grep -oE '^[0-9]+\.[0-9]+\.[0-9]+')
+        # echo "Existing server: $semver"
+
+        # For next migrations, we can check the following variables
+        #major=$(echo "$semver" | cut -d. -f1)
+        #minor=$(echo "$semver" | cut -d. -f2)
+        #patch=$(echo "$semver" | cut -d. -f3)
+
         echo "Checking for updates to docker images..."
         # see https://github.com/docker/cli/issues/6059
-        images=$(command config --images)
+
         services=$(command config --services)
 
         # There are some images for which we want to keep the containers, others can be discarded.
@@ -248,27 +314,15 @@ function up {
         savedContainerServices="runner-conda runner-julia"
         otherServices=$(echo "$services" | grep -vE "^$savedContainerRegex")
 
-        savedContainerImages=$(echo "$images" | grep -E "^geobon/bon-in-a-box:$savedContainerRegex")
-        otherImages=$(echo "$images" | grep -vE "^geobon/bon-in-a-box:$savedContainerRegex")
+        # Get all images that have an update available.
+        excludedImages="ghcr.io/developmentseed/titiler:.*" # Add for images we don't want to check for updates as regex
+        imagesToCheck=$(echo "$images" | excludeStrings "$excludedImages")
+        imagesToUpdate=$(checkForUpdates "$imagesToCheck")
 
-        updatesFound=1 # Will become 0 if there is an update
+        # Sublist of the images for which the containers should be kept whenever possible.
+        containersToDiscard=$(echo $imagesToUpdate | tr ' ' "\n" | grep -E "$savedContainerRegex")
 
-        # Check the images for which the containers should be kept whenever possible.
-        for savedContainerImage in $savedContainerImages; do
-            checkForUpdates "$savedContainerImage"
-            if [[ $? -eq 0 ]]; then
-                containersToDiscard="$containersToDiscard $savedContainerImage"
-                updatesFound=0
-            fi
-        done
-
-        if [[ $updatesFound -ne 0 ]] ; then
-            # Check the other images
-            checkForUpdates "$otherImages"
-            updatesFound=$?
-        fi
-
-        if [[ $updatesFound -eq 0 ]]; then
+        if [[ -n "$imagesToUpdate" ]]; then
             echo "Updates found."
             if [[ -n "$containersToDiscard" ]]; then
                 echo -e "${YELLOW}This update will discard the following runner containers: ${ENDCOLOR}"
@@ -278,12 +332,17 @@ function up {
                 echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
             fi
 
-            read -p "Do you want to update? (Y/n): " choice
+            if [[ " $@ " == *" -y "* || " $@ " == *" --yes "* ]]; then
+                choice="y"
+            else
+                read -p "Do you want to update? (Y/n): " choice
+            fi
+
             if [[ -z "$choice" || "$choice" == "y" || "$choice" == "Y" ]]; then
                 command pull ; assertSuccess
 
             else # Ok then, let's pretend there are no updates.
-                updatesFound=1 # 1=false in bash
+                imagesToUpdate=""
                 containersToDiscard=""
             fi
         else
@@ -334,7 +393,7 @@ function down {
 }
 
 function clean {
-    echo "Removing docker containers and volumes..."
+    echo "Removing docker containers..."
     output=$(docker container rm \
         biab-gateway \
         biab-script-server \
@@ -346,17 +405,6 @@ function clean {
         echo -e "${RED}Cannot clean while BON in a Box is running.${ENDCOLOR}"
         exit 1
     fi
-
-    # Currently used volumes
-    docker volume rm conda-env-yml 2> /dev/null 2>&1
-
-    # Removing legacy volumes
-    docker volume rm \
-        conda-dir-dev \
-        conda-cache-dev \
-        r-libs-user-dev 2> /dev/null 2>&1
-
-    echo -e "${GREEN}Clean complete.${ENDCOLOR}"
 }
 
 case "$1" in
@@ -368,24 +416,33 @@ case "$1" in
         ;;
     up)
         shift
-        up
+        prepareCommands
+        up $@
         ;;
     down)
+        prepareCommands
         down
         ;;
     validate)
+        prepareCommands
         validate
         ;;
     command)
         shift
+        prepareCommands
         command $@
         assertSuccess
         ;;
-    clean)
-        clean
-        ;;
     purge)
         echo "Deprecated: Purge is now an alias to the clean command."
+        prepareCommands
+        clean
+        echo -e "${GREEN}Clean complete.${ENDCOLOR}"
+        ;;
+    clean)
+        prepareCommands
+        clean
+        echo -e "${GREEN}Clean complete.${ENDCOLOR}"
         ;;
     *)
         help
