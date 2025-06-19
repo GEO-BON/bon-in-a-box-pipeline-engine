@@ -32,9 +32,9 @@ export default function Choosers({openChooser, setOpenChooser, inputFileContent,
     <>
     {type==='bboxCRS' && (
       <tr>
-      <td>
-      <strong>{inputDescription.label}</strong>: <pre>{yaml.dump(inputFileContent[inputId])}</pre><br/>
-      </td>
+        <td>
+          <strong>{inputDescription.label}</strong>: <pre>{yaml.dump(inputFileContent[inputId])}</pre><br/>
+        </td>
       <td>
       <CustomButtonGreen variant="contained" 
                 endIcon={<CropFreeIcon/>} 
@@ -84,13 +84,12 @@ export function Chooser({ setOpenThisChooser, inputId, inputDescription, updateI
   const [clearFeatures, setClearFeatures] = useState(0);
   const [bboxGeoJSONShrink, setBboxGeoJSONShrink] = useState(null);
   const [CRS, setCRS] = useState(defaultCRS);
-  const [action, setAction] = useState("");
+  const [action, setAction] = useState("load");
   const [digitize, setDigitize] = useState(false);
 
   const type = inputDescription.type;
   const showBBox = type === 'bboxCRS'? true: false;
   const showMap = showBBox;
-  console.log(`${type}:${showBBox}`)
   const showCountry = ['country', 'countryRegion', 'countryRegionCRS', 'bboxCRS'].includes(type)
   const showRegion = ['countryRegion', 'countryRegionCRS', 'bboxCRS'].includes(type)
   const showCRS = ['countryRegionCRS', 'bboxCRS', 'CRS'].includes(type)
@@ -172,6 +171,7 @@ export function Chooser({ setOpenThisChooser, inputId, inputDescription, updateI
               setRegion,
               setClearFeatures,
               setAction,
+              action,
               showRegion,
               showAcceptButton: ['country','countryRegion'].includes(type)? false:true
             }}

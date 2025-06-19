@@ -27,21 +27,24 @@ export default function BBox({ bbox, CRS, setBbox, action, setAction }) {
   }, [bbox]);
 
   useEffect(() => {
-    if (bbox) {
-      setMinX(bbox[0]);
-      setMinY(bbox[1]);
-      setMaxX(bbox[2]);
-      setMaxY(bbox[3]);
+    if (bbox.length>0) {
+      if(action!=="ModifyBbox"){
+        setMinX(bbox[0]);
+        setMinY(bbox[1]);
+        setMaxX(bbox[2]);
+        setMaxY(bbox[3]);
+      }
     } else {
       setMinX(null);
       setMinY(null);
       setMaxX(null);
       setMaxY(null);
     }
-  }, [bbox]);
+  }, [bbox, action]);
 
   useEffect(() => {
     if (MinX && MinY && MaxX && MaxY) {
+      setAction('ModifyBbox')
       setBbox([MinX, MinY, MaxX, MaxY]);
     }
   }, [MinX, MinY, MaxX, MaxY]);
@@ -98,11 +101,6 @@ export default function BBox({ bbox, CRS, setBbox, action, setAction }) {
         sx={{ marginBottom: "10px" }}
         inputProps={inputProps}
       />
-      {false && (
-        <CustomButtonGreen variant="contained" onClick={(e) => updateBbox(e)}>
-          Update coordinates
-        </CustomButtonGreen>
-      )}
     </div>
   );
 }

@@ -33,13 +33,14 @@ import { get as getProjection } from "ol/proj";
 import * as turf from "@turf/turf";
 import proj4 from "proj4";
 import { transformPolyToBboxCRS, cleanBbox, defaultCRS, defaultCountry, defaultRegion} from "./utils";
+import ImageCanvasSource from "ol/source/ImageCanvas";
 
 export default function MapOL({
   bbox = [],
   setBbox = () => {},
-  country=defaultCountry,
-  region=defaultRegion,
-  CRS=defaultCRS,
+  country = defaultCountry,
+  region = defaultRegion,
+  CRS = defaultCRS,
   digitize,
   setDigitize,
 }) {
@@ -153,7 +154,7 @@ export default function MapOL({
     return result;
   };
 
-  // New bounding box is coming in or the digitize button was clicked
+  // New map features are coming in or the digitize button was clicked
   useEffect(() => {
     if (mapp && (digitize || features.length > 0)) {
       clearLayers();
@@ -262,31 +263,38 @@ export default function MapOL({
   // The CRS gets updated. We need to reproject the map
   useEffect(() => {
     if (CRS && mapp) {
-      proj4.defs(`EPSG:${CRS.code}`, CRS.def);
-      register(proj4);
-      const newView = new View({
-        center: [0, 0],
-        zoom: 2,
-        projection: `EPSG:${CRS.code}`,
-      });
-      mapp.setView(newView);
+      const mapProjection = mapp.getView().getProjection().getCode();
+      const crsCode = `${CRS.authority}:${CRS.code}`
+      if(mapProjection !== crsCode){
+        proj4.defs(crsCode, CRS.def);
+        register(proj4);
+        const newView = new View({
+          center: [0, 0],
+          zoom: 2,
+          projection: crsCode,
+        });
+        mapp.setView(newView);
+      }
     }
   }, [CRS, mapp]);
 
-  // The Country Bounding box or the CRS are updated, we need to update and reproject the bbox
+  // The Country/Region Bounding box or CRS are updated, we need to update and reproject the bbox
   useEffect(() => {
     if ((country.bboxLL.length > 0 || region.bboxLL.length > 0) && mapp) {
       setDigitize(false);
       const b = region.bboxLL.length > 0 ? region.bboxLL : country.bboxLL
+      setOldCRS(defaultCRS) 
       setBbox(cleanBbox(b, "degree"));
     } else if ((country.bboxLL.length == 0 && region.bboxLL.length == 0) && mapp) {
       clearLayers();
     }
-  }, [country, region]);
+  }, [country.bboxLL, region.bboxLL, CRS]);
 
+  //Reproject the BBox if necessary and set features
   useEffect(() => {
+    let ignore=false;
     setDigitize(false);
-    if (bbox.length > 0) {
+    if (bbox.length > 0 && !ignore) {
       //Current map projection
       const mapProjection = mapp.getView().getProjection().getCode();
       const currentCRS = `${CRS.authority}:${CRS.code}`;
@@ -299,18 +307,19 @@ export default function MapOL({
         CRS &&
         CRS.code !== oldCRS.code &&
         currentCRS == mapProjection
-      ) {
+      ) { //Just do this if the map projection has been set to the new CRS
         let newpoly = turf.bboxPolygon(bbox);
         if (CRS.code !== oldCRS.code) {
           newpoly = transformPolyToBboxCRS(newpoly, oldCRS, CRS);
         }
-        setBbox(cleanBbox(newpoly, CRS.unit)); // Set update BBox in new CRS and re-run this block
+        setBbox(cleanBbox(newpoly, CRS.unit)); // Set update BBox in new CRS and re-run this block to set features
         setOldCRS(CRS);
       } else if (CRS) {
         setOldCRS(CRS);
       }
     }
-  }, [bbox, mapp, CRS, oldCRS]);
+    return (()=>ignore=true)
+  }, [bbox, CRS, oldCRS]);
 
   useEffect(() => {
     const map = new Map({

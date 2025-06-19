@@ -16,7 +16,8 @@ export default function CountryRegionMenu({
   setCountry=()=>{},
   region=defaultRegion, 
   setRegion=()=>{},
-  setAction,
+  action='',
+  setAction=()=>{},
   showAcceptButton=true,
   showRegion=true
 }) {
@@ -43,13 +44,15 @@ export default function CountryRegionMenu({
 
   // Set from controlled values coming in
   useEffect(()=> {
-    if(country.ISO3 && country.ISO3 !== selectedCountry.value && countryOptions.length > 1){
-      setSelectedCountry({label: country.englishName, value: country.ISO3})
+    if(['load'].includes(action)){
+      if(country.ISO3 && country.ISO3 !== selectedCountry.value && countryOptions.length > 1){
+        setSelectedCountry({label: country.englishName, value: country.ISO3})
+      }
+      if(region.regionName && region.regionName !== selectedRegion.value && regionOptions.length > 1){
+        setSelectedRegion({label: region.regionName, value: region.regionName})
+      }
     }
-    if(region.regionName && region.regionName !== selectedRegion.value && regionOptions.length > 1){
-      setSelectedRegion(region.regionName)
-    }
-  },[region, country, countryOptions, regionOptions])
+  },[region, country, countryOptions, regionOptions, action])
 
   useEffect(() => {
     if (selectedCountry.value) {
@@ -79,7 +82,7 @@ export default function CountryRegionMenu({
     setAction("CountryButton");
     setBbox([]);
     let countryValue, regionValue
-    if(type===''){
+    if(type==='both'){
       countryValue=selectedCountry.value
       regionValue=selectedRegion.value
     }else if(type==='region'){
@@ -99,8 +102,7 @@ export default function CountryRegionMenu({
         countryObj.east,
         countryObj.north,
       ];
-      b = b.map((c) => c.toFixed(6));
-      setBbox(b)
+      b = b.map((c) => parseFloat(c.toFixed(6)));
       setCountry({englishName: countryObj.countryName, ISO3: countryObj.isoAlpha3, code: countryObj.countryCode , bboxLL: b})
     }
     if (regionValue) {
@@ -111,9 +113,8 @@ export default function CountryRegionMenu({
         regionObj.bbox.east,
         regionObj.bbox.north,
       ];
-      b = b.map((c) => c.toFixed(6));
-      setBbox(b)
-      setRegion(stateObj ? { regionName: stateObj.name, bboxLL: b, countryEnglishName: countryObj.countryName } : defaultRegion);
+      b = b.map((c) => parseFloat(c.toFixed(6)));
+      setRegion(regionObj ? { regionName: regionObj.name, bboxLL: b, countryEnglishName: countryObj.countryName } : defaultRegion);
     } 
     if(countryValue==='' && regionValue===''){
       setCountry(defaultCountry)
@@ -143,11 +144,15 @@ export default function CountryRegionMenu({
           color: "#fff",
           borderRadius: "4px",
         }}
+        getOptionLabel={(option) => {
+          return option.label || "";
+        }}
         value={selectedCountry}
         renderInput={(params) => (
           <TextField {...params} label="Select country" />
         )}
         onChange={(event, value) => {
+          setAction('ChangeCountry')
           setSelectedCountry(value);
           setSelectedRegion("");
           if(!showAcceptButton){
@@ -168,10 +173,14 @@ export default function CountryRegionMenu({
           borderRadius: "4px",
           marginBottom: "10px",
         }}
+        getOptionLabel={(option) => {
+          return option.label || "";
+        }}
         renderInput={(params) => (
           <TextField {...params} label="Select region" />
         )}
         onChange={(event, value) => {
+          setAction('ChangeRegion')
           setSelectedRegion(value)
           if(!showAcceptButton){
             buttonClicked('region', value.value);
@@ -186,7 +195,7 @@ export default function CountryRegionMenu({
         endIcon={<CheckIcon />}
         disabled={!selectedCountry}
         onClick={() => {
-          buttonClicked();
+          buttonClicked('both','');
         }}
         className="stateCountryButton"
       >
