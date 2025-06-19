@@ -205,7 +205,7 @@ ul.task-list li input[type="checkbox"] {
 <li><p>Fill out the form with the input parameters the pipeline should use.</p>
 <ul>
 <li><p>The pipeline will run with the default parameters, so you can run the pipeline right away to see what the outputs should look like.</p></li>
-<li><p>Some inputs can be typed in, while others are options.</p></li>
+<li><p>Some inputs can be typed in, while others are in a drop down menu.</p></li>
 <li><p>Each input field includes a description and its purpose on the right of the input box. Here you will also see the <em>type</em> of the input.</p></li>
 <li><p><strong>Please ensure each input matches the required type that is specified in the input description.</strong> The input will either be a primitive type (i.e.&nbsp;text, int, float, boolean, etc.) which the user will type in or a MIME type representing a file (e.g.&nbsp;text/csv, application/geo+json, etc.) where the user will provide the path to that file. The square brackets <code>[]</code> after a type represent an array of that type, meaning you can input several parameters separated by a comma (i.e.&nbsp;text[], application/geo+json[], etc.). <strong>For more details on input types, please refer to “Step 3: Create a YAML File” on <a href="./how_to_contribute.html">this page</a>.</strong></p></li>
 <li><p>The form might ask you for a file. In order to provide a file that you have locally on your computer, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders. Most pipelines can also accept remote files (https://). That will be specified in the input documentation.</p></li>

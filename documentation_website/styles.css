@@ -7,14 +7,9 @@
     translate: 0rem 0.3rem;
 }
 
-.navbar {
-    overflow-y: visible;
-}
-
 .navbar-title {
     position: absolute;
     content: url(./BiaB_logo_small.png) / "BON in a Box";
-    overflow: visible;
     z-index: 2;
     height: 100px;
     translate: -20px 50px;
