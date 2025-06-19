@@ -702,8 +702,25 @@ export default function PipelineEditor(props) {
     return JSON.stringify(flow, null, 2);
   }, [inputList, outputList, metadata, reactFlowInstance]);
 
+  const warnDeprecatedNode = (jsonString) => {
+    const toSave = JSON.parse(jsonString);
+    if (toSave.nodes) {
+      for (const node of toSave.nodes) {
+        if (node.data && node.data.descriptionFile) {
+          fetchStepDescription(node.data.descriptionFile, (metadata) => {
+            if (metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+              showAlert('warning', 'Pipeline contains a deprecated script', `${node.data.descriptionFile} is deprecated`)
+            }
+          });
+        }
+      }
+    }
+  }
+
+
   const onSave = useCallback((fileName) => {
     let saveJSON = generateSaveJSON();
+    warnDeprecatedNode(saveJSON);
     if (saveJSON) {
       if (fileName) {
         let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
