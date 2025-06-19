@@ -713,6 +713,7 @@ textarea.autoResizeWidth {
 .deprecated {
   text-decoration: line-through;
 }
+
 .stepInputs h3 {
   color: var(--biab-yellow-main);
 }

@@ -18,7 +18,7 @@ const onDragStart = (event, nodeType, descriptionFile) => {
   event.dataTransfer.effectAllowed = "move";
 };
 
-export default function StepChooser(props) { 
+export default function StepChooser(props) {
   const [scriptFiles, setScriptFiles] = useState([]);
   const [pipelineFiles, setPipelineFiles] = useState([]);
   const [selectedStep, setSelectedStep] = useState([]);
@@ -125,7 +125,7 @@ export default function StepChooser(props) {
             fetchStepDescription(descriptionFile, (metadata) => {
               if (metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
                 isDeprecated = true;
-              } 
+              }
             });
             return (
               <div
@@ -139,7 +139,7 @@ export default function StepChooser(props) {
                   "dndnode" +
                   (descriptionFile === selectedStep ? " selected" : "") + (isDeprecated ? " deprecated" : "")
                 }
-                onClick={() => {onStepClick(descriptionFile); console.log(descriptionFile)} }
+                onClick={() => onStepClick(descriptionFile)}
               >
                 {stepName}
               </div>
