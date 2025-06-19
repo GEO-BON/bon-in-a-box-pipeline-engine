@@ -41,10 +41,10 @@ function findLogoImageFromURL(url) {
     }
 }
 
-function LogoFromUrl({ src, style}) {
-    return <a style={style} href={src} target="_blank">
-            <img src={src} alt={src} title="ID" width="20px"></img>
-          </a>
+function IdentifierLogo({ src, href }) {
+    return <a href={href} target="_blank">
+        <img src={src} alt="Identifier logo" title="Go to profile" width="20px"></img>
+    </a>
 }
 
 function generatePersonList(list) {
@@ -58,12 +58,12 @@ function generatePersonList(list) {
         let hoverCardDisplay = <>
             <div className="popover-heading">
               <h3>{person.name}</h3>
-              {identifierLogo && <LogoFromUrl  src={identifierLogo} />}
+              {identifierLogo && <IdentifierLogo src={identifierLogo} href={person.identifier} />}
             </div>
             <hr/>
             {email}
             {role && <p>Contribution: {role}</p> || <p></p>}
-            {identifierLogo ? null : <LogoFromUrl src={person.identifier} /> }
+            {identifierLogo ? null : <IdentifierLogo src={person.identifier} href={person.identifier} /> }
         </>
 
         let hoverCardName = person.name && <HoverCard popoverContent={hoverCardDisplay}>{person.name}</HoverCard>
