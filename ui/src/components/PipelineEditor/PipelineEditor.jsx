@@ -702,18 +702,15 @@ export default function PipelineEditor(props) {
     return JSON.stringify(flow, null, 2);
   }, [inputList, outputList, metadata, reactFlowInstance]);
 
-  const warnDeprecatedNode = (descriptionFile) => {
-    showAlert('warning', 'Pipeline contains a deprecated script', `${descriptionFile} is deprecated`);
-  }
-
-  const checkDeprecatedNode = (jsonString) => {
+  const warnDeprecatedNode = (jsonString) => {
     const toSave = JSON.parse(jsonString);
     if (toSave.nodes) {
       for (const node of toSave.nodes) {
         if (node.data && node.data.descriptionFile) {
           fetchStepDescription(node.data.descriptionFile, (metadata) => {
-            if (metadata.lifecycle && metadata.lifecycle.status == "deprecated")
-              warnDeprecatedNode(node.data.descriptionFile);
+            if (metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+              showAlert('warning', 'Pipeline contains a deprecated script', `${node.data.descriptionFile} is deprecated`)
+            }
           });
         }
       }
@@ -723,7 +720,7 @@ export default function PipelineEditor(props) {
 
   const onSave = useCallback((fileName) => {
     let saveJSON = generateSaveJSON();
-    checkDeprecatedNode(saveJSON);
+    warnDeprecatedNode(saveJSON);
     if (saveJSON) {
       if (fileName) {
         let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;

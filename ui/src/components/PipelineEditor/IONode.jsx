@@ -56,7 +56,10 @@ export default function IONode({ id, data }) {
       </td>
       <td className='name' onMouseEnter={showScriptTooltip} onMouseLeave={hideTooltip}>
         {pathList.map((s, i) => <span key={i} className={i!==pathList.length-1?'ioNode-folder':'ioNode-script'}>{s}{i!==pathList.length-1?' >':''}</span>)}
-        {(metadata.lifecycle && metadata.lifecycle.status == "deprecated") && <LifecycleMessage status={metadata.lifecycle.status} message={`Deprecated: ${metadata.lifecycle.message}`} />}
+        {
+          metadata.lifecycle?.status == "deprecated"
+          && <LifecycleMessage status={metadata.lifecycle.status} message={`Deprecated: ${metadata.lifecycle.message}`} />
+        }
       </td>
       <td className='outputs'>
         {metadata.outputs && Object.entries(metadata.outputs).map(([outputName, desc]) => {
