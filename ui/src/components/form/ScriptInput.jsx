@@ -66,7 +66,6 @@ export default function ScriptInput({
 
       return (
         <Autocomplete
-          defaultValue={[]}
           label={label}
           size={size}
           multiple={multiple}
