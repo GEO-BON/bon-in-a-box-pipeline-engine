@@ -5,7 +5,8 @@ import { InputsDescription } from "../StepDescription";
 import ReactMarkdown from "react-markdown";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
-
+import Choosers from './Choosers';
+import _ from 'lodash';
 import yaml from "js-yaml";
 import { isEmptyObject } from "../../utils/isEmptyObject";
 import Typography from "@mui/material/Typography";
@@ -13,8 +14,10 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Alert from "@mui/material/Alert";
+import { CustomButtonGreen } from "../CustomMUI";
 
 import { styled } from "@mui/material";
+import { set } from "lodash";
 
 /**
  * An input that we use to fill the input file's content.
@@ -94,6 +97,7 @@ export default function InputFileInput({
 
 const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   if (!inputs) return <p>No Inputs</p>;
+  const [openChooser, setOpenChooser] = useState("");
 
   function updateInputFile(inputId, value) {
     setInputFileContent((content) => {
@@ -104,6 +108,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   }
 
   return (
+    <div className="inputFileForm">
     <table className="inputFileFields">
       <tbody>
         {Object.entries(inputs)
@@ -111,7 +116,10 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
           .map(([inputId, inputDescription]) => {
             const { label, description, options, example, weight, ...theRest } =
               inputDescription;
-
+            if(["country", "region", "countryRegion", "CRS", "countryRegionCRS", "bboxCRS"].includes(inputDescription.type)){
+                return (<Choosers key={inputId} openChooser={openChooser} setOpenChooser={setOpenChooser} inputId={inputId} inputDescription={inputDescription} inputFileContent={inputFileContent} updateInputFile={updateInputFile} />
+                )
+              }else{
             return (
               <tr key={inputId}>
                 <td className="inputCell">
@@ -177,8 +185,10 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                 </td>
               </tr>
             );
+          }
           })}
       </tbody>
     </table>
+    </div>
   );
 };
