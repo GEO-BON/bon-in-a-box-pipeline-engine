@@ -177,6 +177,7 @@ function checkout {
     git checkout $branch -- compose.yml ; assertSuccess
     git checkout $branch -- compose.prod.yml ; assertSuccess
     git checkout $branch -- compose.apple.yml; assertSuccess
+    git checkout $branch -- version.txt; ## Don't assert. Only informative, plus hasn't always been there.
 
     git checkout $branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
     git checkout $branch -- .github/findDuplicateIds.sh ; assertSuccess
