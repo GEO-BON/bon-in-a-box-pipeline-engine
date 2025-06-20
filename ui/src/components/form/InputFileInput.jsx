@@ -156,8 +156,10 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                             color: "#555",
                           }}
                         >
-                          Example:&nbsp;
-                          {typeof example.join === "function" ? example.join(", ") : example}
+                          <>
+                            Example:&nbsp;
+                            {typeof example.join === "function" ? example.join(", ") : example}
+                          </>
                         </Typography>
                       </Box>
                     )}
