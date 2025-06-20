@@ -152,7 +152,11 @@ export default function CountryRegionMenu({
 
   return (
     <div style={paperStyle(dialog)}>
-      <h4 style={{ marginTop: "3px", marginBottom: "6px" }}>Country/Region</h4>
+      {dialog && (
+        <h4 style={{ marginTop: "3px", marginBottom: "6px" }}>
+          Country/Region
+        </h4>
+      )}
       <Autocomplete
         disablePortal
         options={countryOptions}

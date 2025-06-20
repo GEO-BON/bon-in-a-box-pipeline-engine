@@ -139,9 +139,11 @@ export default function CRSMenu({
 
   return (
     <div style={paperStyle(dialog)}>
-      <h4 style={{ marginTop: "3px", marginBottom: "3px" }}>
-        Coordinate reference system
-      </h4>
+      {dialog && (
+        <h4 style={{ marginTop: "3px", marginBottom: "3px" }}>
+          Coordinate reference system
+        </h4>
+      )}
       {searching && <CircularProgress size="14px" />}
       <Autocomplete
         freeSolo

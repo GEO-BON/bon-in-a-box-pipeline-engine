@@ -40,7 +40,9 @@ export default function Choosers({
         <tr>
           <td>
             <strong>{inputDescription.label}</strong>:{" "}
-            <pre>{yaml.dump(inputFileContent[inputId])}</pre>
+            {inputFileContent[inputId] && (
+              <pre>{yaml.dump(inputFileContent[inputId])}</pre>
+            )}
             <br />
           </td>
           <td>
