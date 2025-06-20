@@ -57,7 +57,7 @@ class InfoAuthorInner {
                 obj['identifier'] = ApiClient.convertToType(data['identifier'], 'String');
             }
             if (data.hasOwnProperty('role')) {
-                obj['role'] = ApiClient.convertToType(data['role'], ['String']);
+                obj['role'] = ApiClient.convertToType(data['role'], 'String');
             }
         }
         return obj;
@@ -81,9 +81,9 @@ class InfoAuthorInner {
         if (data['identifier'] && !(typeof data['identifier'] === 'string' || data['identifier'] instanceof String)) {
             throw new Error("Expected the field `identifier` to be a primitive type in the JSON string but got " + data['identifier']);
         }
-        // ensure the json data is an array
-        if (!Array.isArray(data['role'])) {
-            throw new Error("Expected the field `role` to be an array in the JSON data but got " + data['role']);
+        // ensure the json data is a string
+        if (data['role'] && !(typeof data['role'] === 'string' || data['role'] instanceof String)) {
+            throw new Error("Expected the field `role` to be a primitive type in the JSON string but got " + data['role']);
         }
 
         return true;
@@ -113,8 +113,8 @@ InfoAuthorInner.prototype['email'] = undefined;
 InfoAuthorInner.prototype['identifier'] = undefined;
 
 /**
- * Role of the author in the contribution. Suggested to use CRediT roles (https://credit.niso.org/)
- * @member {Array.<String>} role
+ * Role of the author in the contribution. We recommend to use CRediT roles (https://credit.niso.org/)
+ * @member {String} role
  */
 InfoAuthorInner.prototype['role'] = undefined;
 
