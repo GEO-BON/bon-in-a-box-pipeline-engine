@@ -1,1 +1,27 @@
 /* css styles */
+
+.bi-boninabox {
+    content: url(./BiaB_logo_small.png) / "BON in a Box";
+    max-height: 21px;
+    display: inline-block;
+    translate: 0rem 0.3rem;
+}
+
+.navbar-title {
+    position: absolute;
+    content: url(./BiaB_logo_small.png) / "BON in a Box";
+    z-index: 2;
+    height: 100px;
+    translate: -20px 50px;
+}
+
+@media screen and (max-width: 991px) {
+    .navbar-brand {
+        padding: 0;
+    }
+    .navbar-title {
+        position: relative;
+        height: 70px;
+        translate: unset;
+    }
+}
