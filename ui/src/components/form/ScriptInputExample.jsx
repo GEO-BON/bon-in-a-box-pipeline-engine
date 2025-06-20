@@ -4,7 +4,6 @@ export const ScriptInputExample = ({ example, type }) => {
     if (example === null || example === undefined)
         return null
 
-    // console.log(example)
     let exampleString
     if(typeof example.join === "function")
         exampleString = example.join(", ")
