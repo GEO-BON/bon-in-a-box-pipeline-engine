@@ -6,9 +6,7 @@ lifecycle:
   message: bla bla
 author:
   - name: Jean-Michel Lord
-    role:
-      - Software
-      - Visualization
+    role: Visualization, Software
 reviewer:
   - name: No One
 inputs:
