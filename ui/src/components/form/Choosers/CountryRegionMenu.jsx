@@ -6,26 +6,30 @@ import Autocomplete from "@mui/material/Autocomplete";
 import CheckIcon from "@mui/icons-material/Check";
 import { CustomButtonGreen } from "../../CustomMUI";
 import countryOptionsJSON from "./countries.json"; // Assuming you have a JSON file with country data
-import { getStateAPI,defaultCountry,defaultRegion} from "./utils";
-
-
+import {
+  getStateAPI,
+  defaultCountry,
+  defaultRegion,
+  paperStyle,
+} from "./utils";
 
 export default function CountryRegionMenu({
-  setBbox=()=>{},
-  country=defaultCountry,
-  setCountry=()=>{},
-  region=defaultRegion, 
-  setRegion=()=>{},
-  action='',
-  setAction=()=>{},
-  showAcceptButton=true,
-  showRegion=true
+  setBbox = () => {},
+  country = defaultCountry,
+  setCountry = () => {},
+  region = defaultRegion,
+  setRegion = () => {},
+  action = "",
+  setAction = () => {},
+  showAcceptButton = true,
+  showRegion = true,
+  dialog = false,
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
   const [regionOptions, setRegionOptions] = useState([]);
   const [regionJSON, setRegionJSON] = useState([]);
-  const [selectedRegion, setSelectedRegion] = useState("")
-  const [selectedCountry, setSelectedCountry] = useState([])
+  const [selectedRegion, setSelectedRegion] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState([]);
 
   useEffect(() => {
     // Fetch country options from the JSON file
@@ -43,16 +47,27 @@ export default function CountryRegionMenu({
   }, []);
 
   // Set from controlled values coming in
-  useEffect(()=> {
-    if(['load'].includes(action)){
-      if(country.ISO3 && country.ISO3 !== selectedCountry.value && countryOptions.length > 1){
-        setSelectedCountry({label: country.englishName, value: country.ISO3})
+  useEffect(() => {
+    if (["load"].includes(action)) {
+      if (
+        country.ISO3 &&
+        country.ISO3 !== selectedCountry.value &&
+        countryOptions.length > 1
+      ) {
+        setSelectedCountry({ label: country.englishName, value: country.ISO3 });
       }
-      if(region.regionName && region.regionName !== selectedRegion.value && regionOptions.length > 1){
-        setSelectedRegion({label: region.regionName, value: region.regionName})
+      if (
+        region.regionName &&
+        region.regionName !== selectedRegion.value &&
+        regionOptions.length > 1
+      ) {
+        setSelectedRegion({
+          label: region.regionName,
+          value: region.regionName,
+        });
       }
     }
-  },[region, country, countryOptions, regionOptions, action])
+  }, [region, country, countryOptions, regionOptions, action]);
 
   useEffect(() => {
     if (selectedCountry.value) {
@@ -81,16 +96,16 @@ export default function CountryRegionMenu({
   const buttonClicked = (type, value) => {
     setAction("CountryButton");
     setBbox([]);
-    let countryValue, regionValue
-    if(type==='both'){
-      countryValue=selectedCountry.value
-      regionValue=selectedRegion.value
-    }else if(type==='region'){
-      countryValue=selectedCountry.value
-      regionValue=value
-    }else if(type==='country'){
-      countryValue=value
-      regionValue=''
+    let countryValue, regionValue;
+    if (type === "both") {
+      countryValue = selectedCountry.value;
+      regionValue = selectedRegion.value;
+    } else if (type === "region") {
+      countryValue = selectedCountry.value;
+      regionValue = value;
+    } else if (type === "country") {
+      countryValue = value;
+      regionValue = "";
     }
     const countryObj = countryOptionsJSON.geonames.find(
       (c) => c.isoAlpha3 === countryValue
@@ -103,7 +118,12 @@ export default function CountryRegionMenu({
         countryObj.north,
       ];
       b = b.map((c) => parseFloat(c.toFixed(6)));
-      setCountry({englishName: countryObj.countryName, ISO3: countryObj.isoAlpha3, code: countryObj.countryCode , bboxLL: b})
+      setCountry({
+        englishName: countryObj.countryName,
+        ISO3: countryObj.isoAlpha3,
+        code: countryObj.countryCode,
+        bboxLL: b,
+      });
     }
     if (regionValue) {
       const regionObj = regionJSON.find((s) => s.geonameId === regionValue);
@@ -114,26 +134,25 @@ export default function CountryRegionMenu({
         regionObj.bbox.north,
       ];
       b = b.map((c) => parseFloat(c.toFixed(6)));
-      setRegion(regionObj ? { regionName: regionObj.name, bboxLL: b, countryEnglishName: countryObj.countryName } : defaultRegion);
-    } 
-    if(countryValue==='' && regionValue===''){
-      setCountry(defaultCountry)
-      setRegion(defaultRegion)
+      setRegion(
+        regionObj
+          ? {
+              regionName: regionObj.name,
+              bboxLL: b,
+              countryEnglishName: countryObj.countryName,
+            }
+          : defaultRegion
+      );
+    }
+    if (countryValue === "" && regionValue === "") {
+      setCountry(defaultCountry);
+      setRegion(defaultRegion);
     }
   };
 
   return (
-    <div
-      style={{
-        width: "90%",
-        borderRadius: "10px",
-        border: "1px solid #aaa",
-        padding: "10px",
-        margin: "10px",
-        boxShadow: "2px 2px 4px #999",
-      }}
-    >
-      <h4 style={{ marginTop: "3px", marginBottom: "6px"}}>Country/Region</h4>
+    <div style={paperStyle(dialog)}>
+      <h4 style={{ marginTop: "3px", marginBottom: "6px" }}>Country/Region</h4>
       <Autocomplete
         disablePortal
         options={countryOptions}
@@ -152,55 +171,55 @@ export default function CountryRegionMenu({
           <TextField {...params} label="Select country" />
         )}
         onChange={(event, value) => {
-          setAction('ChangeCountry')
+          setAction("ChangeCountry");
           setSelectedCountry(value);
           setSelectedRegion("");
-          if(!showAcceptButton){
-            buttonClicked('country',value.value);
+          if (!showAcceptButton) {
+            buttonClicked("country", value.value);
           }
         }}
       />
       {showRegion && (
-      <Autocomplete
-        disablePortal
-        options={regionOptions}
-        size="small"
-        sx={{
-          marginTop: "20px",
-          width: "90%",
-          background: "#fff",
-          color: "#fff",
-          borderRadius: "4px",
-          marginBottom: "10px",
-        }}
-        getOptionLabel={(option) => {
-          return option.label || "";
-        }}
-        renderInput={(params) => (
-          <TextField {...params} label="Select region" />
-        )}
-        onChange={(event, value) => {
-          setAction('ChangeRegion')
-          setSelectedRegion(value)
-          if(!showAcceptButton){
-            buttonClicked('region', value.value);
-          }
-        }}
-        value={selectedRegion}
-      />
-    )}
+        <Autocomplete
+          disablePortal
+          options={regionOptions}
+          size="small"
+          sx={{
+            marginTop: "20px",
+            width: "90%",
+            background: "#fff",
+            color: "#fff",
+            borderRadius: "4px",
+            marginBottom: "10px",
+          }}
+          getOptionLabel={(option) => {
+            return option.label || "";
+          }}
+          renderInput={(params) => (
+            <TextField {...params} label="Select region" />
+          )}
+          onChange={(event, value) => {
+            setAction("ChangeRegion");
+            setSelectedRegion(value);
+            if (!showAcceptButton) {
+              buttonClicked("region", value.value);
+            }
+          }}
+          value={selectedRegion}
+        />
+      )}
       {showAcceptButton && (
-      <CustomButtonGreen
-        variant="contained"
-        endIcon={<CheckIcon />}
-        disabled={!selectedCountry}
-        onClick={() => {
-          buttonClicked('both','');
-        }}
-        className="stateCountryButton"
-      >
-        Accept Selection
-      </CustomButtonGreen>
+        <CustomButtonGreen
+          variant="contained"
+          endIcon={<CheckIcon />}
+          disabled={!selectedCountry}
+          onClick={() => {
+            buttonClicked("both", "");
+          }}
+          className="stateCountryButton"
+        >
+          Set BBox and search CRS
+        </CustomButtonGreen>
       )}
     </div>
   );

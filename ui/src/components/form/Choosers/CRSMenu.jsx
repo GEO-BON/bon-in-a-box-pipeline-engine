@@ -13,7 +13,7 @@ import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import Paper from "@mui/material/Paper";
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import {
   getProjestAPI,
   transformBboxAPI,
@@ -21,7 +21,8 @@ import {
   defaultCRS,
   getCRSListFromName,
   defaultCountry,
-  defaultRegion
+  defaultRegion,
+  paperStyle,
 } from "./utils";
 import * as turf from "@turf/turf";
 import _ from "lodash";
@@ -32,8 +33,9 @@ export default function CRSMenu({
   setAction,
   bbox,
   bboxGeoJSONShrink,
-  country=defaultCountry,
-  region=defaultRegion,
+  country = defaultCountry,
+  region = defaultRegion,
+  dialog = false,
 }) {
   const [CRSList, setCRSList] = useState([]);
   const [selectedCRS, setSelectedCRS] = useState({
@@ -45,10 +47,11 @@ export default function CRSMenu({
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
 
   useEffect(() => {
-    if (bboxGeoJSONShrink === null && (!region.name && !country.englishName)) return;
+    if (bboxGeoJSONShrink === null && !region.name && !country.englishName)
+      return;
     setSearching(true);
     // Suggest from names
-    if(region.name || country.englishName){
+    if (region.name || country.englishName) {
       const searchName = region.name ? region.name : country.englishName;
       getCRSListFromName(searchName).then((result) => {
         if (result) {
@@ -89,7 +92,7 @@ export default function CRSMenu({
           setCRSList([]);
         }
         setSearching(false);
-      });  
+      });
     }
   }, [bboxGeoJSONShrink, country.englishName, region.name]);
 
@@ -135,16 +138,7 @@ export default function CRSMenu({
   };
 
   return (
-    <div
-      style={{
-        width: "90%",
-        borderRadius: "10px",
-        border: "1px solid #aaa",
-        padding: "10px",
-        margin: "10px",
-        boxShadow: "2px 2px 4px #999",
-      }}
-    >
+    <div style={paperStyle(dialog)}>
       <h4 style={{ marginTop: "3px", marginBottom: "3px" }}>
         Coordinate reference system
       </h4>
@@ -170,25 +164,33 @@ export default function CRSMenu({
           },
         }}
         renderInput={(params) => (
-          <TextField {...params} multiline label="Select CRS" 
-          InputProps={{
-            ...params.InputProps,
-            endAdornment: (
-              <>
-              {CRSList.length>0 &&(<>
-                <InputAdornment position="end"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    setOpenCRSMenu(true)
-                 }}>
-                  <KeyboardArrowDownIcon sx={{ color: "var(--biab-green-main)" }} />
-                </InputAdornment>
-                {params.InputProps.endAdornment}
+          <TextField
+            {...params}
+            multiline
+            label="Select CRS"
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {CRSList.length > 0 && (
+                    <>
+                      <InputAdornment
+                        position="end"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => {
+                          setOpenCRSMenu(true);
+                        }}
+                      >
+                        <KeyboardArrowDownIcon
+                          sx={{ color: "var(--biab-green-main)" }}
+                        />
+                      </InputAdornment>
+                      {params.InputProps.endAdornment}
+                    </>
+                  )}
                 </>
-              )}
-              </>
-            ),
-          }}
+              ),
+            }}
           />
         )}
         onChange={(event, value) => {
@@ -197,36 +199,44 @@ export default function CRSMenu({
         value={selectedCRS}
         endAdornment={
           <InputAdornment position="end">
-          <CheckBoxIcon sx={{ color: "var(--biab-green-main)" }}/>
-          </InputAdornment>}
-/>
-      <FormControl sx={{ width: "90%"}}>
-      <InputLabel
-        htmlFor="crs-code"
-        sx={{
-          color: "var(--biab-green-main)", 
-        }}
-        variant="outlined"
-      >
-        Enter code (e.g. EPSG:4326)
-      </InputLabel>
-      <OutlinedInput
-            id="crs-code"
-            value={inputValue}
-            label="Enter code (e.g. EPSG:4326)"
-            variant="outlined"
-            size="small"
-            sx={{ width: "100%"}}
-            onChange={(event) => {
-              setInputValue(event.target.value);
-            }}
-            endAdornment={<InputAdornment position="end" style={{cursor:'pointer', marginRight:'20px'}} onClick={(event) => {
-              updateCRS({ value: inputValue, label: inputValue });
-            }}> <CheckBoxIcon
-              sx={{ color: "var(--biab-green-main)" }}
-            /></InputAdornment>}
-          />
-          </FormControl>
+            <CheckBoxIcon sx={{ color: "var(--biab-green-main)" }} />
+          </InputAdornment>
+        }
+      />
+      <FormControl sx={{ width: "90%" }}>
+        <InputLabel
+          htmlFor="crs-code"
+          sx={{
+            color: "var(--biab-green-main)",
+          }}
+          variant="outlined"
+        >
+          Enter code (e.g. EPSG:4326)
+        </InputLabel>
+        <OutlinedInput
+          id="crs-code"
+          value={inputValue}
+          label="Enter code (e.g. EPSG:4326)"
+          variant="outlined"
+          size="small"
+          sx={{ width: "100%" }}
+          onChange={(event) => {
+            setInputValue(event.target.value);
+          }}
+          endAdornment={
+            <InputAdornment
+              position="end"
+              style={{ cursor: "pointer", marginRight: "20px" }}
+              onClick={(event) => {
+                updateCRS({ value: inputValue, label: inputValue });
+              }}
+            >
+              {" "}
+              <CheckBoxIcon sx={{ color: "var(--biab-green-main)" }} />
+            </InputAdornment>
+          }
+        />
+      </FormControl>
       <div
         style={{
           fontSize: "11px",

@@ -3,6 +3,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import TextField from "@mui/material/TextField";
 import { CustomButtonGreen } from "../../CustomMUI";
+import { paperStyle } from "./utils";
 
 export default function BBox({ bbox, CRS, setBbox, action, setAction }) {
   const [MinX, setMinX] = useState("");
@@ -10,16 +11,6 @@ export default function BBox({ bbox, CRS, setBbox, action, setAction }) {
   const [MinY, setMinY] = useState("");
   const [MaxY, setMaxY] = useState("");
 
-  const updateBbox = () => {
-    setAction("BboxButton");
-    const b = [
-      parseFloat(MinX.toFixed(6)),
-      parseFloat(MinY.toFixed(6)),
-      parseFloat(MaxX.toFixed(6)),
-      parseFloat(MaxY.toFixed(6)),
-    ];
-    setBbox(b);
-  };
   useEffect(() => {
     if (CRS !== "" && bbox.length > 0) {
       setAction("");
@@ -27,8 +18,8 @@ export default function BBox({ bbox, CRS, setBbox, action, setAction }) {
   }, [bbox]);
 
   useEffect(() => {
-    if (bbox.length>0) {
-      if(action!=="ModifyBbox"){
+    if (bbox.length > 0) {
+      if (action !== "ModifyBbox") {
         setMinX(bbox[0]);
         setMinY(bbox[1]);
         setMaxX(bbox[2]);
@@ -44,7 +35,7 @@ export default function BBox({ bbox, CRS, setBbox, action, setAction }) {
 
   useEffect(() => {
     if (MinX && MinY && MaxX && MaxY) {
-      setAction('ModifyBbox')
+      setAction("ModifyBbox");
       setBbox([MinX, MinY, MaxX, MaxY]);
     }
   }, [MinX, MinY, MaxX, MaxY]);
@@ -54,16 +45,7 @@ export default function BBox({ bbox, CRS, setBbox, action, setAction }) {
   };
 
   return (
-    <div
-      style={{
-        width: "90%",
-        borderRadius: "10px",
-        border: "1px solid #aaa",
-        padding: "10px",
-        margin: "10px",
-        boxShadow: "2px 2px 4px #999",
-      }}
-    >
+    <div style={paperStyle(true)}>
       <h4 style={{ marginTop: "3px", marginBottom: "3px" }}>Bounding Box</h4>
       <TextField
         type="number"

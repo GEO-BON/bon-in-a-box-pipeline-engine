@@ -37,9 +37,33 @@ export const defaultCRS = {
   unit: "degree",
 };
 
-export const defaultCountry = { englishName: "", ISO3: "", code: "" , bboxLL: []}
-export const defaultRegion = { name: "", bboxLL: [], countryEnglishName: "" }
+export const defaultCountry = {
+  englishName: "",
+  ISO3: "",
+  code: "",
+  bboxLL: [],
+};
+export const defaultRegion = { name: "", bboxLL: [], countryEnglishName: "" };
 
+export const paperStyle = (dialog) => {
+  if (dialog) {
+    return {
+      width: "90%",
+      borderRadius: "10px",
+      border: "1px solid #aaa",
+      padding: "10px",
+      margin: "10px",
+      boxShadow: "2px 2px 4px #999",
+    };
+  } else {
+    return {
+      width: "90%",
+      border: "0px",
+      padding: "2px",
+      margin: "0px",
+    };
+  }
+};
 
 export const getStateAPI = async (geonameId) => {
   let result;
