@@ -164,10 +164,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                 </td>
                 <td className="descriptionCell">
                   {description ? (
-                    <ReactMarkdown
-                      className="reactMarkdown"
-                      children={description}
-                    />
+                    <ReactMarkdown className="reactMarkdown">{description}</ReactMarkdown>
                   ) : (
                     <Alert severity="warning">
                       Missing description for input "{inputId}"
