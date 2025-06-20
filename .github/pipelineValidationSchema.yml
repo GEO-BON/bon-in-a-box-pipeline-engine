@@ -46,10 +46,8 @@ metadata:
             type: string
             required: false
           role:
-            type: list
+            type: string
             required: false
-            schema:
-              type: string
 
 
     reviewer:
