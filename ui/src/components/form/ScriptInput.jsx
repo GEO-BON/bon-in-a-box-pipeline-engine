@@ -64,6 +64,11 @@ export default function ScriptInput({
         return { value: choice, label: choice };
       });
 
+      let value = fieldValue;
+      if(multiple) {
+        value = fieldValue ? optionObjects.filter((opt)=>fieldValue.includes(opt.value)) : []
+      }
+
       return (
         <Autocomplete
           label={label}
@@ -107,11 +112,7 @@ export default function ScriptInput({
             },
           }}
           disabled={passedProps.disabled}
-          value={
-            multiple
-            ? fieldValue && optionObjects.filter((opt)=>fieldValue.includes(opt.value))
-            : fieldValue
-          }
+          value={value}
           onChange={(event, newOptions) => {
             var newValue;
             if (typeof newOptions.map === 'function') {
