@@ -20,6 +20,8 @@ Name | Type | Description | Notes
 
 * `deprecated` (value: `"deprecated"`)
 
+* `example` (value: `"example"`)
+
 
 
 

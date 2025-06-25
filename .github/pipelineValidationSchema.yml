@@ -17,7 +17,7 @@ metadata:
         - schema:
             status:
               type: string
-              allowed: ["in_development", "in_review", "reviewed"]
+              allowed: ["in_development", "in_review", "reviewed", "example"]
               required: true
             message:
               type: string
@@ -45,6 +45,12 @@ metadata:
           identifier:
             type: string
             required: false
+          role:
+            type: list
+            required: false
+            schema:
+              type: string
+
 
     reviewer:
       type: list

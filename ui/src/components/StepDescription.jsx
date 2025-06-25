@@ -3,7 +3,7 @@ import { LifecycleDescription } from './Lifecycle';
 
 export function StepDescription({ descriptionFile, metadata }) {
     return <>
-        <h2>{getFolderAndNameFromMetadata(descriptionFile, metadata)}</h2>
+        <h2 style={{marginBottom: "0px"}} >{getFolderAndNameFromMetadata(descriptionFile, metadata)}</h2>
         <GeneralDescription ymlPath={descriptionFile} metadata={metadata} />
         <InputsDescription metadata={metadata} />
         <OutputsDescription metadata={metadata} />
@@ -27,17 +27,19 @@ function generatePersonList(list) {
     return list.map((person, i, array) => {
         let email = person.email && <a href={'mailto:' + person.email} style={{textDecoration:'none'}}> &#9993;</a>
         let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
+        let role = person.role && <span> ({person.role.join(', ')})</span>
         if (person.identifier)
             return <span key={i}>
                 <a href={person.identifier} target="_blank">
                     {person.name}{!email && comma}
                 </a>
+                {role}
                 {email && <>{email}{comma}</>}
                 &nbsp;
             </span>
 
         else
-            return <span key={i}>{person.name}{email}{comma} </span>
+            return <span key={i}>{person.name}{role}{email}{comma} </span>
     })
 }
 

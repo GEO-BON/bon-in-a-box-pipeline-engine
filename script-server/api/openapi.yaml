@@ -428,7 +428,7 @@ components:
           properties:
             status:
               type: string
-              enum: [in_development, in_review, reviewed, deprecated]
+              enum: [in_development, in_review, reviewed, deprecated, example]
               default: in_development
             message:
               type: string
@@ -451,11 +451,18 @@ components:
               identifier:
                 type: string
                 description: Full URL of a unique digital identifier such as an ORCID
+              role:
+                type: array
+                description: Role of the author in the contribution. We recommend to use CRediT roles (https://credit.niso.org/)
+                items:
+                  type: string
+
           example:
             - name: Jane Doe
             - name: John Doe
               email: john.doe@example.org
               identifier: https://orcid.org/0000-0000-0000-0000
+              role: Software
         reviewer:
           type: array
           items:

@@ -19,37 +19,37 @@ const onDragStart = (event, nodeType, descriptionFile) => {
 };
 
 function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick }) {
-            let [isDeprecated, setIsDeprecated] = useState(false);
-            // async loading of metadata
+  let [isDeprecated, setIsDeprecated] = useState(false);
+  // async loading of metadata
 
-            useEffect(() => {
-              fetchStepDescription(descriptionFile, (metadata) => {
-                if (metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
-                  setIsDeprecated(true);
-                } 
-              });
-            }, []);
+  useEffect(() => {
+    fetchStepDescription(descriptionFile, (metadata) => {
+      if (metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+        setIsDeprecated(true);
+      } 
+    });
+  }, []);
 
-            return (
-              <div
-                key={fileName}
-                onDragStart={(event) =>
-                  onDragStart(event, "io", descriptionFile)
-                }
-                draggable
-                title="Click for info, drag and drop to add to pipeline."
-                className={
-                  "dndnode" +
-                  (descriptionFile === selectedStep ? " selected" : "") + (isDeprecated ? " deprecated" : "")
-                }
-                onClick={() => {onStepClick(descriptionFile)} }
-              >
-                {stepName}
-              </div>
-            );
+  return (
+    <div
+    key={fileName}
+    onDragStart={(event) =>
+      onDragStart(event, "io", descriptionFile)
+    }
+    draggable
+    title="Click for info, drag and drop to add to pipeline."
+    className={
+      "dndnode" +
+      (descriptionFile === selectedStep ? " selected" : "") + (isDeprecated ? " deprecated" : "")
+    }
+    onClick={() => {onStepClick(descriptionFile)} }
+    >
+    {stepName}
+    </div>
+  );
 }
 
-export default function StepChooser(props) { 
+export default function StepChooser(props) {
   const [scriptFiles, setScriptFiles] = useState([]);
   const [pipelineFiles, setPipelineFiles] = useState([]);
   const [selectedStep, setSelectedStep] = useState([]);

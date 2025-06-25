@@ -105,7 +105,7 @@ export const SingleIOResult = memo(
           error = `Missing mime type in ${sectionName} description.`;
         }
       } else {
-        error = `The ${sectionName} description was not found in this script's YML description file.`;
+        error = `The ${sectionName} was not found in this script's YML description file.`;
       }
 
       return (

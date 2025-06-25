@@ -27,16 +27,19 @@ export default function HomePage() {
                 </div>
                 <p style={{
                     lineHeight: "1.75",
-                    textAlign: "justify",
-                    textJustify: "inter-word",
-                    fontSize : "16px",
+                    textAlign: "justify"
                 }} >
-                    As a whole, the <a href="https://boninabox.geobon.org/index">BON in a Box</a> platform is
-                    designed to facilitate the establishment and operation of <b>Biodiversity Observation Networks
-                    (BONs)</b>. It does so by providing a pipeline engine aiming to enhance the capacity of BONs and
-                    countries to report on biodiversity effectively. It runs user-contributed code on a shared
-                    infrastructure, the outputs of which can be shared for auditability, reproducibility,
-                    and transparency.
+                    The BON in a Box modelling tool is an open tool aiming to enhance the capacity of
+                    Biodiversity Observation Networks and countries to report on biodiversity effectively.
+
+                    It connects individual analyses scripts into automated pipelines that convert data into
+                    Essential Biodiversity Variables (EBVs) and indicators.
+
+                    These community-built pipelines can analyze public or user datasets, and can be
+                    shared for auditability, reproducibility, and transparency.
+                </p>
+                <p>
+                    Developed by <a href="https://geobon.org">GEO BON</a>.
                 </p>
             </div>
         </div>

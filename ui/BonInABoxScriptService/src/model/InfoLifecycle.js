@@ -125,7 +125,13 @@ InfoLifecycle['StatusEnum'] = {
      * value: "deprecated"
      * @const
      */
-    "deprecated": "deprecated"
+    "deprecated": "deprecated",
+
+    /**
+     * value: "example"
+     * @const
+     */
+    "example": "example"
 };
 
 

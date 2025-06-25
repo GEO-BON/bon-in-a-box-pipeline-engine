@@ -69,7 +69,8 @@
     "author": [
       {
         "name": "Jean-Michel Lord",
-        "identifier": "https://orcid.org/0009-0007-3826-1125"
+        "identifier": "https://orcid.org/0009-0007-3826-1125",
+        "role": ["Conceptualization", "Data Curation", "Investigation"]
       }
     ]
   }

@@ -2,9 +2,9 @@ import Alert from '@mui/material/Alert';
 import Chip from '@mui/material/Chip';
 
 export function LifecycleMessage({ status, message, style }) {
-  if (status == 'deprecated')
-    return <Alert style={style} severity="warning">{message}</Alert>
-  return <Alert style={style} severity="info">{message}</Alert>
+  return <Alert style={style} severity={status == 'deprecated' ? "warning" : "info"}>
+    {message}
+  </Alert>
 }
 
 function ChipFromStatus({ status }) {
@@ -32,6 +32,10 @@ function ChipFromStatus({ status }) {
       chipStyle.color = 'white';
       displayText = "Deprecated";
       break;
+    case 'example':
+      chipStyle.backgroundColor = '#c7a9ff';
+      displayText = "Example";
+      break;
     default:
       console.warn(`Unknown lifecycle status: ${status}`);
   }
@@ -40,8 +44,8 @@ function ChipFromStatus({ status }) {
 }
 
 export function LifecycleDescription({ lifecycle }) {
-  return <div style={{marginTop: "-19px", marginBottom: "20px"}}>
+  return <div style={{marginBottom: "20px"}}>
           <ChipFromStatus status={(lifecycle && lifecycle.status) || "in_development"} />
-          {lifecycle && lifecycle.message && <LifecycleMessage status={lifecycle.status} message={lifecycle.message} />}
+          {lifecycle?.message && <LifecycleMessage status={lifecycle.status} message={lifecycle.message} />}
          </div>
 }
