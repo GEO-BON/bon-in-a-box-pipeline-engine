@@ -51,4 +51,4 @@ Download the pipeline review form to fill out while testing and reviewing the pi
 4.  Test the pipeline several times with different parameters. If you have your own data on hand, test the pipeline with that data. It is preferential to test the data in areas or with parameters that you are familiar with so you can evaluate the accuracy of the results. If the pipeline crashes or there are incorrect results, make note of this in the pipeline review form.
 5.  Make a decision about whether the pipeline is ready to publish.
 
-#### [Download pipeline review form here](./peer_review_form.docx)
+#### [Download pipeline review form here](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/raw/refs/heads/documentation_peer_review/main/peer_review_form.docx)

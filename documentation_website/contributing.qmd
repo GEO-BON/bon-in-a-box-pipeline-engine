@@ -1,9 +1,9 @@
 ---
-title: "Contributing"
+title: ""
 format: html
 ---
 
-## Is your analysis pipeline a good fit?
+# Is your analysis pipeline a good fit?
 
 We are looking for pipelines that calculate biodiversity metrics that are relevant to policy and biodiversity reporting, such as Essential Biodiversity Variables (EBVs) and Indicators. These pipelines should be
 
@@ -11,7 +11,7 @@ We are looking for pipelines that calculate biodiversity metrics that are releva
 
 -   relevant to many contexts (different species, countries, and regions)
 
-## Steps for contributing
+# Steps for contributing
 
 We strongly encourage those who have created or are developing code to calculate Essential Biodiversity Variables or indicators to share it through BON in a Box. The purpose of the modeling tool is to have state of the art processing pipelines shared across the community, for the benefit of all. We recommend following these steps: 
 

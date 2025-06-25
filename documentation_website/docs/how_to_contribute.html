@@ -591,7 +591,7 @@ author:
   - name: Jane Doe
     email: jane.doe@example.com
     identifier: https://orcid.org/0000-0000-0000-0000
-    role: Software, Visualization, Conceptualization
+    role: [Software, Visualization, Conceptualization]
 reviewer:
   - name: John Smith
     email: john.smith@example.com
@@ -646,7 +646,7 @@ author: # 1 to many
   - name: # Full name
     email: # Optional, email address of the author. This will be publicly available
     identifier: # Optional, full URL of a unique digital identifier, such as an ORCID.
-    role: # Optional, string with roles undertaken by the author in their contribution. We recommend to use CRediT roles (https://credit.niso.org/).
+    role: # Optional, array of roles undertaken by the author in their contribution. We recommend to use CRediT roles (https://credit.niso.org/).
 license: # Optional. If unspecified, the project's MIT license will apply.
 external_link: # Optional, link to a separate project, GitHub repo, etc.
 timeout: # Optional, in minutes. By defaults scripts time out after 24h to avoid hung process to consume resources. It can be made longer for heavy processes.
