@@ -50,20 +50,20 @@ function IdentifierLogo({ src, href }) {
 function generatePersonList(list) {
     return list.map((person, i, array) => {
         let email = person.email && <a href={'mailto:' + person.email}>{person.email}</a>
-        let role = person.role && <span>{person.role.join(', ')}</span>
+        let role = person.role && <span>{person.role}</span>
         let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
         let isAuthorProperties = person.email || person.role || person.identifier;
         let identifierLogo = person.identifier && findLogoImageFromURL(person.identifier);
 
         let hoverCardDisplay = <>
             <div className="popover-heading">
-              <h3>{person.name}</h3>
-              {identifierLogo && <IdentifierLogo src={identifierLogo} href={person.identifier} />}
+                <h3>{person.name}</h3>
+                {identifierLogo && <IdentifierLogo src={identifierLogo} href={person.identifier} />}
             </div>
-            <hr/>
+            <hr />
             {email}
             {role && <p>Contribution: {role}</p> || <p></p>}
-            {identifierLogo ? null : <IdentifierLogo src={person.identifier} href={person.identifier} /> }
+            {identifierLogo ? null : <a href={person.identifier} target="_blank">{person.identifier.replace(/https?:\/\//, '')}</a>}
         </>
 
         let hoverCardName = person.name && <HoverCard popoverContent={hoverCardDisplay}>{person.name}</HoverCard>
@@ -71,6 +71,7 @@ function generatePersonList(list) {
             {(isAuthorProperties && hoverCardName) || <Typography style={{ display: "inline" }}>{person.name}</Typography>}
             {comma}
         </span>
+
 
     })
 }
