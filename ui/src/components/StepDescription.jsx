@@ -67,11 +67,11 @@ function generatePersonList(list) {
         </>
 
         let hoverCardName = person.name && <HoverCard popoverContent={hoverCardDisplay}>{person.name}</HoverCard>
-        return <><span key={i}>
-            {
-                (isAuthorProperties && hoverCardName) || <Typography style={{ display: "inline" }}>{person.name}</Typography>
-            }{comma}
-        </span> </>
+        return <span key={person.name + "-" + i}>
+            {(isAuthorProperties && hoverCardName) || <Typography style={{ display: "inline" }}>{person.name}</Typography>}
+            {comma}
+        </span>
+
 
     })
 }

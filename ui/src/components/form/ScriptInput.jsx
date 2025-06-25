@@ -42,11 +42,11 @@ export default function ScriptInput({
   keepWidth,
   ...passedProps
 }) {
-  const [fieldValue, setFieldValue] = useState(value || "");
+  const [fieldValue, setFieldValue] = useState(value);
   const small = size == "small";
 
   useEffect(() => {
-    setFieldValue(value || "");
+    setFieldValue(value);
   }, [value]);
 
   if (!type) {
@@ -63,6 +63,12 @@ export default function ScriptInput({
       const optionObjects = options.map((choice) => {
         return { value: choice, label: choice };
       });
+
+      let optionsValue;
+      if(multiple)
+        optionsValue = fieldValue ? optionObjects.filter((opt)=>fieldValue.includes(opt.value)) : []
+      else
+        optionsValue = fieldValue || ""
 
       return (
         <Autocomplete
@@ -107,11 +113,7 @@ export default function ScriptInput({
             },
           }}
           disabled={passedProps.disabled}
-          value={
-            multiple
-            ? fieldValue && optionObjects.filter((opt)=>fieldValue.includes(opt.value))
-            : fieldValue
-          }
+          value={optionsValue}
           onChange={(event, newOptions) => {
             var newValue;
             if (typeof newOptions.map === 'function') {
@@ -147,7 +149,7 @@ export default function ScriptInput({
         size={size}
         label={label}
         {...passedProps}
-        value={joinIfArray(fieldValue)}
+        value={joinIfArray(fieldValue) || ""}
         onChange={(e) => setFieldValue(e.target.value)}
         placeholder={ARRAY_PLACEHOLDER}
         cols={cols}
@@ -161,6 +163,8 @@ export default function ScriptInput({
 
   switch (type) {
     case "boolean":
+      const booleanValue = fieldValue === undefined || fieldValue === null ? false : value
+
       return (
         <FormGroup size={size}>
           <FormControlLabel
@@ -169,7 +173,7 @@ export default function ScriptInput({
                 type="checkbox"
                 size={size}
                 {...passedProps}
-                checked={fieldValue}
+                checked={booleanValue}
                 onChange={(e) => {
                   setFieldValue(e.target.checked);
                   onValueUpdated(e.target.checked);
@@ -190,7 +194,7 @@ export default function ScriptInput({
           variant="outlined"
           size={size}
           {...passedProps}
-          value={fieldValue}
+          value={fieldValue || ""}
           onChange={(e) => {
             setFieldValue(e.target.value);
             onValueUpdated(parseInt(e.target.value));
@@ -212,7 +216,7 @@ export default function ScriptInput({
           label={label}
           step="any"
           {...passedProps}
-          value={fieldValue}
+          value={fieldValue || ""}
           onChange={(e) => {
             setFieldValue(e.target.value);
             onValueUpdated(parseFloat(e.target.value));
@@ -236,7 +240,7 @@ export default function ScriptInput({
         );
 
       const props = {
-        value: fieldValue,
+        value: fieldValue || "",
         onChange: (e) => setFieldValue(e.target.value),
         placeholder: "null",
         onBlur: updateValue,
