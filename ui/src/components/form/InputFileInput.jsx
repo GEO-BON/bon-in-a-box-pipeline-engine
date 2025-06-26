@@ -8,13 +8,14 @@ import ScriptInput from "./ScriptInput";
 
 import yaml from "js-yaml";
 import { isEmptyObject } from "../../utils/isEmptyObject";
-import Typography from "@mui/material/Typography";
+import _lang from "lodash/lang";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Alert from "@mui/material/Alert";
 
 import { styled } from "@mui/material";
+import { ScriptInputExample } from "./ScriptInputExample";
 
 /**
  * An input that we use to fill the input file's content.
@@ -143,30 +144,13 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                     size="medium"
                     keepWidth={true}
                   />
-                  {(!inputFileContent || inputFileContent[inputId] == "" || inputFileContent[inputId] == null)
-                    && example !== undefined
-                    && example !== null
-                    && (
-                      <Box>
-                        <Typography
-                          sx={{
-                            marginLeft: 2,
-                            fontFamily: "Roboto",
-                            fontSize: "0.75em",
-                            color: "#555",
-                          }}
-                        >
-                          Example: {example}
-                        </Typography>
-                      </Box>
-                    )}
+                  {!inputFileContent || !_lang.isEqual(inputFileContent[inputId], example)
+                    && <ScriptInputExample example={example} type={inputDescription.type} />
+                  }
                 </td>
                 <td className="descriptionCell">
                   {description ? (
-                    <ReactMarkdown
-                      className="reactMarkdown"
-                      children={description}
-                    />
+                    <ReactMarkdown className="reactMarkdown">{description}</ReactMarkdown>
                   ) : (
                     <Alert severity="warning">
                       Missing description for input "{inputId}"
