@@ -4,7 +4,7 @@ import { React, isValidElement, useContext, useState, useEffect, useCallback } f
 import { PopupContentContext } from "../../Layout.jsx";
 
 import { HttpError } from "../HttpErrors";
-import { fetchStepDescription } from "./StepDescriptionStore";
+import { fetchStepDescription, fetchStepDescriptionAsync } from "./StepDescriptionStore";
 import { StepDescription } from "../StepDescription";
 import { Spinner } from "../Spinner";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
@@ -19,34 +19,37 @@ const onDragStart = (event, nodeType, descriptionFile) => {
 };
 
 function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick }) {
-            let [isDeprecated, setIsDeprecated] = useState(false);
-            // async loading of metadata
+  let [isDeprecated, setIsDeprecated] = useState(false);
+  // async loading of metadata
 
-            useEffect(() => {
-              fetchStepDescription(descriptionFile, (metadata) => {
-                if (metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
-                  setIsDeprecated(true);
-                } 
-              });
-            }, []);
+  useEffect(() => {
+    let cancelled = false;
+    fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
+      if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+        setIsDeprecated(true);
+      } 
+    });
 
-            return (
-              <div
-                key={fileName}
-                onDragStart={(event) =>
-                  onDragStart(event, "io", descriptionFile)
-                }
-                draggable
-                title="Click for info, drag and drop to add to pipeline."
-                className={
-                  "dndnode" +
-                  (descriptionFile === selectedStep ? " selected" : "") + (isDeprecated ? " deprecated" : "")
-                }
-                onClick={() => {onStepClick(descriptionFile)} }
-              >
-                {stepName}
-              </div>
-            );
+    return () => { cancelled = true; };
+  }, []);
+
+  return (
+    <div
+      key={fileName}
+      onDragStart={(event) =>
+        onDragStart(event, "io", descriptionFile)
+      }
+      draggable
+      title="Click for info, drag and drop to add to pipeline."
+      className={
+        "dndnode" +
+        (descriptionFile === selectedStep ? " selected" : "") + (isDeprecated ? " deprecated" : "")
+      }
+      onClick={() => {onStepClick(descriptionFile)} }
+    >
+      {stepName}
+    </div>
+  );
 }
 
 export default function StepChooser(props) { 
