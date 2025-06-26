@@ -63,7 +63,7 @@ function generatePersonList(list) {
             <hr />
             {email}
             {role && <p>Contribution: {role}</p> || <p></p>}
-            {identifierLogo ? null : <a href={person.identifier} target="_blank">{person.identifier.replace(/https?:\/\//, '')}</a>}
+            {identifierLogo ? null : <a href={person.identifier} target="_blank">{person.identifier?.replace(/https?:\/\//, '')}</a>}
         </>
 
         let hoverCardName = person.name && <HoverCard popoverContent={hoverCardDisplay}>{person.name}</HoverCard>
