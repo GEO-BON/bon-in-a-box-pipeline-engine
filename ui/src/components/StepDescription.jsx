@@ -51,7 +51,7 @@ function generatePersonList(list) {
     return list.map((person, i, array) => {
         let email = person.email && <a href={'mailto:' + person.email}>{person.email}</a>
         let role = person.role && <span>{person.role}</span>
-        let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
+        let comma = (i !== array.length - 1) && ', '
         let isAuthorProperties = person.email || person.role || person.identifier;
         let identifierLogo = person.identifier && findLogoImageFromURL(person.identifier);
 
