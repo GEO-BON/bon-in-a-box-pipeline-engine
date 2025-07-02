@@ -287,24 +287,19 @@ fun Application.configureRouting() {
         }
 
         get("/api/versions") {
-            call.respond(
-                """
-                    UI: ${Containers.UI.version}
-                    Script server: ${Containers.SCRIPT_SERVER.version}
-                        ${Containers.SCRIPT_SERVER.environment}
-                    Conda runner: ${Containers.CONDA.version}
-                        ${Containers.CONDA.environment}
-                    Julia runner: ${Containers.JULIA.version}
-                        ${Containers.JULIA.environment}
-                    TiTiler: ${
+
+            call.respondText("""
+                    { "UI": "${Containers.UI.version}",
+                    "Script server": "${Containers.SCRIPT_SERVER.version} ${Containers.SCRIPT_SERVER.environment}",
+                    "Conda runner": "${Containers.CONDA.version} ${Containers.CONDA.environment.replace("\n", " ")}",
+                    "Julia runner": "${Containers.JULIA.version} ${Containers.JULIA.environment}",
+                    "TiTiler": "${
                     Containers.TILER.version.let {
                         val end = it.lastIndexOf(':')
                         if (end == -1) it
                         else it.substring(0, end).replace('T', ' ')
                     }
-                }
-                """.trimIndent()
-            )
+                }" }""".lines().joinToString("").trimIndent(), ContentType.Application.Json)
         }
 
 
