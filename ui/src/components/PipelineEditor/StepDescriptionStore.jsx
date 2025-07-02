@@ -33,25 +33,13 @@ export function fetchStepDescription(descriptionFileLocation, callback) {
 }
 
 export function fetchStepDescriptionAsync(descriptionFileLocation) {
-  let existingDescription = descriptions[descriptionFileLocation];
-  if (existingDescription) return Promise.resolve(existingDescription);
-
   return new Promise((resolve) => {
-    api.getInfo(
-      descriptionFileLocation.endsWith(".json") ? "pipeline" : "script",
-      descriptionFileLocation,
-      (error, callbackData, response) => {
-        if (error) {
-          console.error("Error loading " + descriptionFileLocation + ":", error);
-          resolve(null);
-        } else {
-          descriptions[descriptionFileLocation] = callbackData;
-          resolve(callbackData);
-        }
-      }
-    );
+    fetchStepDescription(descriptionFileLocation, (callbackData) => {
+      resolve(callbackData);
+    });
   });
 }
+
 /**
  * Provided we know the metadata is already fetched, this immediately returns the metadata.
  * Otherwise it will return null without attempting to get the data.
