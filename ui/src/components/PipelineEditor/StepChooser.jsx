@@ -24,11 +24,14 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
 
   useEffect(() => {
     let cancelled = false;
-    fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
-      if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
-        setIsDeprecated(true);
-      } 
-    });
+    // use setTimeout so that our other async tasks are prioritized and this is loaded after
+    setTimeout(() => {
+      fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
+        if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+          setIsDeprecated(true);
+        } 
+      });
+    }, 1000);
 
     return () => { cancelled = true; };
   }, []);
