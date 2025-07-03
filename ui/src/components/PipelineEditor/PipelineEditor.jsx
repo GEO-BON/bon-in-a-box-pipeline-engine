@@ -709,7 +709,7 @@ export default function PipelineEditor(props) {
         if (node.data && node.data.descriptionFile) {
           fetchStepDescription(node.data.descriptionFile, (metadata) => {
             if (metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
-              showAlert('warning', 'Pipeline contains a deprecated script', `${node.data.descriptionFile} is deprecated`)
+              showAlert('warning', 'Pipeline contains a deprecated script', `"${metadata.name}" is deprecated in file ${node.data.descriptionFile}`)
             }
           });
         }
