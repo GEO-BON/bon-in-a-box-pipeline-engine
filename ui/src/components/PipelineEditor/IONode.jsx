@@ -58,7 +58,7 @@ export default function IONode({ id, data }) {
         {pathList.map((s, i) => <span key={i} className={i!==pathList.length-1?'ioNode-folder':'ioNode-script'}>{s}{i!==pathList.length-1?' >':''}</span>)}
         {
           metadata.lifecycle?.status == "deprecated"
-          && <LifecycleMessage status={metadata.lifecycle.status} message={`Deprecated: ${metadata.lifecycle.message}`} />
+          && <LifecycleMessage status={metadata.lifecycle.status} message={metadata.lifecycle.message ? `Deprecated: ${metadata.lifecycle.message}` : "Deprecated"} />
         }
       </td>
       <td className='outputs'>
