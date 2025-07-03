@@ -290,9 +290,9 @@ fun Application.configureRouting() {
 
             call.respondText("""
                     { "UI": "${Containers.UI.version}",
-                    "Script server": "${Containers.SCRIPT_SERVER.version} ${Containers.SCRIPT_SERVER.environment}",
-                    "Conda runner": "${Containers.CONDA.version} ${Containers.CONDA.environment.replace("\n", " ")}",
-                    "Julia runner": "${Containers.JULIA.version} ${Containers.JULIA.environment}",
+                    "Script server": "${Containers.SCRIPT_SERVER.version}\n\t${Containers.SCRIPT_SERVER.environment}",
+                    "Conda runner": "${Containers.CONDA.version}\n\t${Containers.CONDA.environment.replaceFirst("\n", "\\n\\t")}",
+                    "Julia runner": "${Containers.JULIA.version}\n\t${Containers.JULIA.environment}",
                     "TiTiler": "${
                     Containers.TILER.version.let {
                         val end = it.lastIndexOf(':')
