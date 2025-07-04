@@ -68,6 +68,8 @@ const getId = () => `${id++}`;
 
 // Capture ctrl + s and ctrl + shift + s to quickly save the pipeline
 document.addEventListener('keydown', e => {
+  if (e.repeat) return;
+
   if (e.ctrlKey) {
     let button;
     if (e.key === 's') {
@@ -702,8 +704,25 @@ export default function PipelineEditor(props) {
     return JSON.stringify(flow, null, 2);
   }, [inputList, outputList, metadata, reactFlowInstance]);
 
+  const warnDeprecatedNode = (jsonString) => {
+    const toSave = JSON.parse(jsonString);
+    if (toSave.nodes) {
+      for (const node of toSave.nodes) {
+        if (node.data && node.data.descriptionFile) {
+          fetchStepDescription(node.data.descriptionFile, (metadata) => {
+            if (metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+              showAlert('warning', 'Pipeline contains a deprecated step', `"${metadata.name}" is deprecated in file ${node.data.descriptionFile}`)
+            }
+          });
+        }
+      }
+    }
+  }
+
+
   const onSave = useCallback((fileName) => {
     let saveJSON = generateSaveJSON();
+    warnDeprecatedNode(saveJSON);
     if (saveJSON) {
       if (fileName) {
         let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
@@ -766,7 +785,7 @@ export default function PipelineEditor(props) {
 
       // TODO: Use loaded JSON and test
       setSavedJSON(null); //this file is not saved on the server
-      localStorage.setItem("currentFileName", '');
+      localStorage.removeItem("currentFileName");
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
     }
@@ -804,7 +823,7 @@ export default function PipelineEditor(props) {
   const onLoadFromLocalStorage = (descriptionFile) => {
     api.getPipeline(descriptionFile, (error, data, response) => {
       if (error) {
-        localStorage.setItem("currentFileName", '');
+        localStorage.removeItem("currentFileName");
         showAlert(
           'error',
           'Error while loading the previously opened pipeline "' + descriptionFile + '"',
@@ -1005,6 +1024,7 @@ export default function PipelineEditor(props) {
     setInputList([]);
     setOutputList([]);
     setSavedJSON(null);
+    localStorage.removeItem("currentFileName");
   })
 
   //useCallback with empty dependencies so that addEventListener and removeEventListener only work on this one function only created once

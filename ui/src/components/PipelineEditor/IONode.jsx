@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Handle, Position } from 'react-flow-renderer/nocss';
+import { LifecycleMessage } from '../Lifecycle.jsx';
 import isObject from '../../utils/isObject'
 import ReactMarkdown from 'react-markdown'
 
@@ -55,6 +56,10 @@ export default function IONode({ id, data }) {
       </td>
       <td className='name' onMouseEnter={showScriptTooltip} onMouseLeave={hideTooltip}>
         {pathList.map((s, i) => <span key={i} className={i!==pathList.length-1?'ioNode-folder':'ioNode-script'}>{s}{i!==pathList.length-1?' >':''}</span>)}
+        {
+          metadata.lifecycle?.status == "deprecated"
+          && <LifecycleMessage status={metadata.lifecycle.status} message={metadata.lifecycle.message ? `Deprecated: ${metadata.lifecycle.message}` : "Deprecated"} />
+        }
       </td>
       <td className='outputs'>
         {metadata.outputs && Object.entries(metadata.outputs).map(([outputName, desc]) => {
