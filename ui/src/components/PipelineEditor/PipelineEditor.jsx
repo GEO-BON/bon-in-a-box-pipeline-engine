@@ -785,7 +785,7 @@ export default function PipelineEditor(props) {
 
       // TODO: Use loaded JSON and test
       setSavedJSON(null); //this file is not saved on the server
-      localStorage.setItem("currentFileName", '');
+      localStorage.removeItem("currentFileName");
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
     }
@@ -823,7 +823,7 @@ export default function PipelineEditor(props) {
   const onLoadFromLocalStorage = (descriptionFile) => {
     api.getPipeline(descriptionFile, (error, data, response) => {
       if (error) {
-        localStorage.setItem("currentFileName", '');
+        localStorage.removeItem("currentFileName");
         showAlert(
           'error',
           'Error while loading the previously opened pipeline "' + descriptionFile + '"',
@@ -1024,6 +1024,7 @@ export default function PipelineEditor(props) {
     setInputList([]);
     setOutputList([]);
     setSavedJSON(null);
+    localStorage.removeItem("currentFileName");
   })
 
   //useCallback with empty dependencies so that addEventListener and removeEventListener only work on this one function only created once
