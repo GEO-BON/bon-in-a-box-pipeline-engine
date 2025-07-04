@@ -68,6 +68,8 @@ const getId = () => `${id++}`;
 
 // Capture ctrl + s and ctrl + shift + s to quickly save the pipeline
 document.addEventListener('keydown', e => {
+  if (e.repeat) return;
+
   if (e.ctrlKey) {
     let button;
     if (e.key === 's') {
