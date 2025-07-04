@@ -147,16 +147,11 @@
 
 .ioNode td.name {
   padding: 0.5em;
-  max-width: min-content;
-}
-
-.ioNode td.name > div {
-  min-width: 300px;
+  max-width: 400px;
 }
 
 .ioNode .ioNode-folder, .ioNode .ioNode-script{
   display: block;
-  white-space: nowrap;
 }
 .ioNode .ioNode-folder{
     font-size: 0.6em;
