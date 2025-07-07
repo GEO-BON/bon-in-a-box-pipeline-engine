@@ -1,36 +1,33 @@
-import React, { useState, useEffect } from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
 import { TableVirtuoso } from "react-virtuoso";
-import { colors } from "../../styles";
 
-export default function CustomTable(props) {
-  const { tableData } = props;
+export default function CustomTable({ tableData }) {
 
-  const tableD = tableData.filter(
+  console.log("tableData", tableData)
+  // Remove empty rows
+  const filteredData = tableData.filter(
     (f) =>
       !Object.values(f).every((e) => {
         e === "";
       })
   );
 
-  const head = Object.keys(tableData[0]);
-
   const itemContent = (index, data) => {
-    const head = Object.keys(tableD[0]);
     if (data) {
-      return head.map((h) => (
+      console.log(index, data)
+      const head = Object.keys(filteredData[0]);
+      return head.map((h, i) => (
         <TableCell
           key={h}
           sx={{
             backgroundColor: "background.paper",
             color: "primary.contrastText",
+
+            // Fixed 1st column
+            position: i === 0 ? 'sticky' : undefined,
+            left: i === 0 ? 0 : undefined
           }}
         >
           {data[h]}
@@ -41,10 +38,10 @@ export default function CustomTable(props) {
   };
 
   const headerContent = () => {
-    const head = Object.keys(tableD[0]);
+    const head = Object.keys(filteredData[0]);
     return (
       <TableRow>
-        {head.map((column) => (
+        {head.map((column, i) => (
           <TableCell
             key={column}
             variant="head"
@@ -52,6 +49,10 @@ export default function CustomTable(props) {
               backgroundColor: "background.paper",
               color: "primary.light",
               fontWeight: "bold",
+
+              // Fixed 1st column
+              position: i === 0 && 'sticky',
+              left: i === 0 && 0
             }}
           >
             {column}
@@ -61,14 +62,10 @@ export default function CustomTable(props) {
     );
   };
 
-  useEffect(() => {
-    const head = Object.keys(tableD[0]);
-  }, [tableD]);
-
   return (
     <Paper style={{ height: "100%", width: "100%", padding: "30px" }}>
       <TableVirtuoso
-        data={tableD}
+        data={filteredData}
         fixedHeaderContent={headerContent}
         itemContent={itemContent}
         color="primary.contrastText"
