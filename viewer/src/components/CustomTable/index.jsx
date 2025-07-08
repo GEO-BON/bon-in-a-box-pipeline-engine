@@ -5,22 +5,20 @@ import { TableVirtuoso } from "react-virtuoso";
 
 export default function CustomTable({ tableData }) {
 
-  console.log("tableData", tableData)
   // Remove empty rows
   const filteredData = tableData.filter(
-    (f) =>
-      !Object.values(f).every((e) => {
-        e === "";
+    (row) =>
+      !row.values().every((cell) => {
+        cell === "";
       })
   );
 
   const itemContent = (index, data) => {
     if (data) {
-      console.log(index, data)
-      const head = Object.keys(filteredData[0]);
-      return head.map((h, i) => (
+      const headerRow = Array.from(filteredData[0].keys());
+      return headerRow.map((columnHeader, i) => (
         <TableCell
-          key={h}
+          key={columnHeader}
           sx={{
             backgroundColor: "background.paper",
             color: "primary.contrastText",
@@ -30,20 +28,20 @@ export default function CustomTable({ tableData }) {
             left: i === 0 ? 0 : undefined
           }}
         >
-          {data[h]}
+          {data.get(columnHeader)}
         </TableCell>
       ));
     }
-    return;
+    console.error("No data found for index", index);
   };
 
   const headerContent = () => {
-    const head = Object.keys(filteredData[0]);
+    const headerRow = Array.from(filteredData[0].keys());
     return (
       <TableRow>
-        {head.map((column, i) => (
+        {headerRow.map((columnHeader, i) => (
           <TableCell
-            key={column}
+            key={columnHeader}
             variant="head"
             sx={{
               backgroundColor: "background.paper",
@@ -55,7 +53,7 @@ export default function CustomTable({ tableData }) {
               left: i === 0 && 0
             }}
           >
-            {column}
+            {columnHeader}
           </TableCell>
         ))}
       </TableRow>
