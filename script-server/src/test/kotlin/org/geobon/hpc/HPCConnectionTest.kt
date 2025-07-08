@@ -6,7 +6,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
-import org.geobon.server.plugins.configureRouting
+import org.geobon.server.scriptModule
 import kotlin.test.*
 
 class HPCConnectionTest {
@@ -27,7 +27,7 @@ class HPCConnectionTest {
 
     @Test
     fun givenNotConfigured_thenStatusAsSuch() = testApplication {
-        application { configureRouting() }
+        application { scriptModule() }
 
         client.get("/hpc/status").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -45,7 +45,7 @@ class HPCConnectionTest {
             "HPC_SSH_CREDENTIALS" to "HPC-name"
         )) {
 
-            application { configureRouting() }
+            application { scriptModule() }
 
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
@@ -64,7 +64,7 @@ class HPCConnectionTest {
             "HPC_SSH_CREDENTIALS" to "HPC-name"
         )) {
 
-            application { configureRouting() }
+            application { scriptModule() }
 
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
@@ -103,7 +103,7 @@ class HPCConnectionTest {
             "HPC_SSH_CREDENTIALS" to "HPC-name"
         )) {
 
-            application { configureRouting() }
+            application { scriptModule() }
 
             // Forcefully waiting because we launch the server connection on GlobalScope,
             // we cannot wait for it via join
