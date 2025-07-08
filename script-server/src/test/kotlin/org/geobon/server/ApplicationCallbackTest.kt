@@ -59,7 +59,7 @@ class ApplicationCallbackTest {
 
     @Test
     fun `given pipeline run with callback_when run completes_then callback received`() = testApplication {
-        application { module() }
+        application { scriptModule() }
         // Callback url being called
         client.post("/pipeline/helloWorld.json/run?callback=$callbackURL") {
             setBody("{\"helloWorld>helloPython.yml@0|some_int\":1}")
@@ -77,7 +77,7 @@ class ApplicationCallbackTest {
 
     @Test
     fun `given pipeline run with callback_when run fails_then callback received`() = testApplication {
-            application { module() }
+            application { scriptModule() }
             // Callback url being called
             client.post("/pipeline/helloWorld.json/run?callback=$callbackURL") {
                 setBody("{\"helloWorld>helloPython.yml@0|some_int\":13}")
@@ -96,7 +96,7 @@ class ApplicationCallbackTest {
     @Test
     fun `given pipeline with callback_when error code 500 returned_then there is no callback`() =
         testApplication {
-            application { module() }
+            application { scriptModule() }
             client.post("/pipeline/helloWorld.json/run?callback=$callbackURL") {
                 setBody("{\"helloWorld>helloPython.yml@0|some_int\":\"wrongType\"}")
 
@@ -114,7 +114,7 @@ class ApplicationCallbackTest {
     @Test
     fun `given pipeline with callback_when error code 404 returned_then there is no callback`() =
         testApplication {
-            application { module() }
+            application { scriptModule() }
             client.post("/pipeline/doesNotExist.json/run?callback=$callbackURL") {
                 setBody("{\"helloWorld>helloPython.yml@0|some_int\":1}")
 

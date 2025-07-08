@@ -27,7 +27,7 @@ class ApplicationTest {
 
     @Test
     fun testPipelineRun() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/pipeline/list").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -70,7 +70,7 @@ class ApplicationTest {
 
     @Test
     fun testScriptRun() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/script/list").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -117,9 +117,7 @@ class ApplicationTest {
 
     @Test
     fun testPipelineWithSubfolder() = testApplication {
-        application {
-            module()
-        }
+        application { scriptModule() }
 
         var id: String
         client.post("/pipeline/subfolder>in_subfolder.json/run") {
@@ -146,7 +144,7 @@ class ApplicationTest {
 
     @Test
     fun `given script exists_when getting info_then info returned`() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/script/helloWorld>helloPython.yml/info").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -160,7 +158,7 @@ class ApplicationTest {
 
     @Test
     fun `given script does not exist_when getting info_then 404`() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/script/non-existing/info").apply {
             assertEquals(HttpStatusCode.NotFound, status)
@@ -169,7 +167,7 @@ class ApplicationTest {
 
     @Test
     fun `given pipeline exists_when getting info_then info returned`() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/pipeline/helloWorld.json/info").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -188,7 +186,7 @@ class ApplicationTest {
 
     @Test
     fun `given pipeline does not exist_when getting info_then 404`() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/pipeline/non-existing/info").apply {
             assertEquals(HttpStatusCode.NotFound, status)
@@ -197,7 +195,7 @@ class ApplicationTest {
 
     @Test
     fun `given pipeline exists_when getting structure_then returned`() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/pipeline/helloWorld.json/get").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -211,7 +209,7 @@ class ApplicationTest {
 
     @Test
     fun `given pipeline does not exist_when getting structure_then 404`() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/pipeline/non-existing/get").apply {
             assertEquals(HttpStatusCode.NotFound, status)
@@ -220,7 +218,7 @@ class ApplicationTest {
 
     @Test
     fun `given run does not exist_when getting outputs_then 404`() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/pipeline/1234/outputs").apply {
             assertEquals(HttpStatusCode.NotFound, status)
@@ -229,7 +227,7 @@ class ApplicationTest {
 
     @Test
     fun `given run does not exist_when trying to stop_then 412`() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/pipeline/1234/stop").apply {
             assertEquals(HttpStatusCode.PreconditionFailed, status)
@@ -241,7 +239,7 @@ class ApplicationTest {
 
     @Test
     fun testIgnoreTrailingSlash() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/pipeline/list").apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -258,7 +256,7 @@ class ApplicationTest {
      */
     @Test
     fun testGetVersion() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/api/versions").apply {
             assertEquals(HttpStatusCode.OK, status)
