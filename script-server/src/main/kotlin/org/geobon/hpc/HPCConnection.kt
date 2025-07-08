@@ -4,7 +4,7 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.geobon.utils.runCommand
+import org.geobon.utils.runToText
 import java.util.concurrent.TimeUnit
 
 @OptIn(DelicateCoroutinesApi::class)
@@ -66,7 +66,7 @@ class HPCConnection(private val sshCredentials: String?) {
         try {
             // imageDigestResult: [geobon/bon-in-a-box@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
             val imageDigestResult = "docker image inspect --format '{{.RepoDigests}}' geobon/bon-in-a-box:$dockerImage"
-                .runCommand()
+                .runToText()
                 ?.trim()
 
             if (imageDigestResult.isNullOrBlank()
