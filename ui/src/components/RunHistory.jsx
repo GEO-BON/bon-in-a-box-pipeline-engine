@@ -227,9 +227,7 @@ const RunCard = (props) => {
         </CardContent>
         <CardActions disableSpacing>
           {run.type === "pipeline"
-            && status !== "error"
-            && status !== "unavailable"
-            && status !== "running"
+            && status === "completed"
             && (
               <a href={`/viewer/${run.runId}`} target="_blank">
                 <CustomButtonGreen>See in viewer</CustomButtonGreen>
