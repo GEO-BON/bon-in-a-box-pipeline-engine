@@ -14,14 +14,17 @@ import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
 import org.geobon.pipeline.RunContext.Companion.scriptRoot
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
-import kotlin.system.measureTimeMillis
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+
 
 /**
  * Used to transport paths through path param.
@@ -35,12 +38,27 @@ private val scriptStubsRoot = File(System.getenv("SCRIPT_STUBS_LOCATION"))
 private val runningPipelines = mutableMapOf<String, Pipeline>()
 private val logger: Logger = LoggerFactory.getLogger("Server")
 
+
 fun Application.configureRouting() {
 
     val hpcCredentials = System.getenv("HPC_SSH_CREDENTIALS")
     val hpc = HPCConnection(hpcCredentials)
 
     routing {
+        get("/api/systemStatus") {
+            val systemStatus = SystemStatus()
+            // Perform server sanity check
+            if (!systemStatus.check()) {
+                call.respondText(
+                    text = systemStatus.errorMessage,
+                    status = HttpStatusCode.ServiceUnavailable
+                )
+                return@get
+            }
+
+            call.respondText(text = "OK", status = HttpStatusCode.OK)
+            return@get
+        }
 
         get("/{type}/list") {
             val type = call.parameters["type"]
@@ -83,7 +101,7 @@ fun Application.configureRouting() {
                             } else { // Pipelines
                                 JSONObject(file.readText()).getJSONObject(METADATA).getString(METADATA__NAME)
                             }
-                        } catch (e: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
+                        } catch (_: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
                             null
                         }
 
@@ -96,29 +114,9 @@ fun Application.configureRouting() {
         }
 
         get("/api/history") {
-            val history = JSONArray()
-            var timeTaken = measureTimeMillis {
-                runningPipelines.keys.forEach { runId ->
-                    val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
-                    history.put(getHistoryFromFolder(pipelineOutputFolder, true))
-                }
-            }
-            logger.info("Time taken to get running ${runningPipelines.size} pipelines: ${timeTaken}", timeTaken)
-
-            var outputRootList = listOf<File>()
-            timeTaken = measureTimeMillis {
-                outputRootList = outputRoot.walk().filter { it.isFile && it.name == "pipelineOutput.json" }.toList()
-            }
-            logger.info("Time taken for folder walk: ${timeTaken}", timeTaken)
-
-            timeTaken = measureTimeMillis {
-                outputRootList.forEach {
-                    history.put(getHistoryFromFolder(it.parentFile, false))
-                }
-            }
-            logger.info("Time taken to run getHistoryFromFolder ${outputRootList.size} times: ${timeTaken}", timeTaken)
-
-            call.respondText(history.toString(), ContentType.Application.Json)
+            val start = call.request.queryParameters["start"]
+            val limit = call.request.queryParameters["limit"]
+            handleHistoryCall(call, start, limit, runningPipelines)
         }
 
         get("/script/{scriptPath}/info") {
@@ -195,6 +193,8 @@ fun Application.configureRouting() {
                 return@post
             }
 
+            val callbackUrl = call.request.queryParameters["callback"]
+
             val singleScript = call.parameters["type"] == "script"
 
             val inputFileContent = call.receive<String>()
@@ -241,10 +241,20 @@ fun Application.configureRouting() {
                     resultFile.writeText(gson.toJson(scriptOutputFolders))
                 } catch (ex: Exception) {
                     ex.printStackTrace()
+
                 } finally {
                     runningPipelines.remove(runId)
-                }
 
+                    if (callbackUrl != null) {
+                        val request = HttpRequest.newBuilder()
+                            .uri(URI.create(callbackUrl))
+                            .GET()
+                            .build()
+
+                        val response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString())
+                        logger.debug("Callback called ${response?.statusCode()} for $runId")
+                    }
+                }
             }.onFailure {
                 call.respondText(text = it.message ?: "", status = HttpStatusCode.InternalServerError)
                 logger.debug("run: ${it.message}")
@@ -311,11 +321,11 @@ fun Application.configureRouting() {
                 """
                     UI: ${Containers.UI.version}
                     Script server: ${Containers.SCRIPT_SERVER.version}
-                       ${Containers.SCRIPT_SERVER.environment}
+                        ${Containers.SCRIPT_SERVER.environment}
                     Conda runner: ${Containers.CONDA.version}
                         ${Containers.CONDA.environment}
                     Julia runner: ${Containers.JULIA.version}
-                       ${Containers.JULIA.environment}
+                        ${Containers.JULIA.environment}
                     TiTiler: ${
                     Containers.TILER.version.let {
                         val end = it.lastIndexOf(':')

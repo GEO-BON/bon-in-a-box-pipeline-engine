@@ -2,14 +2,13 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 val ktorVersion: String by project
 val kotlinVersion: String by project
-val logbackVersion: String by project
 
 plugins {
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm") version "2.1.20"
     id("io.ktor.plugin")
 
     // Better behavior of trimIndent() when it includes variables
-    id("com.bennyhuo.kotlin.trimindent") version "1.9.20-1.1.0"
+    id("com.bennyhuo.kotlin.trimindent") version "2.1.20-1.1.0"
 }
 
 group = "org.geobon"
@@ -23,6 +22,7 @@ application {
 
 repositories {
     mavenCentral()
+    maven("https://s01.oss.sonatype.org/content/repositories/releases")
 }
 
 tasks.test {
@@ -41,12 +41,12 @@ tasks.test {
 
     testLogging {
         showStandardStreams = true
-		events("skipped", "failed")
-		exceptionFormat = TestExceptionFormat.FULL
-	}
+        events("skipped", "failed")
+        exceptionFormat = TestExceptionFormat.FULL
+    }
 }
 
-task("runValidator", JavaExec::class) {
+tasks.register("runValidator", JavaExec::class) {
     mainClass.set("org.geobon.pipeline.Validator")
     classpath = sourceSets["main"].runtimeClasspath
 }
@@ -60,15 +60,14 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml:$ktorVersion")
 
     // https://mvnrepository.com/artifact/org.json/json
-    implementation("org.json:json:20240303")
+    implementation("org.json:json:20250107")
 
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
-    implementation("org.yaml:snakeyaml:2.2")
+    implementation("org.yaml:snakeyaml:2.4")
 
-    testImplementation("io.ktor:ktor-server-tests-jvm:$ktorVersion")
+    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
-    testImplementation("io.mockk:mockk:1.13.11")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
-    testImplementation("io.kotest:kotest-runner-junit5:5.9.0")
-
+    testImplementation("io.mockk:mockk:1.13.17")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
+    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
 }

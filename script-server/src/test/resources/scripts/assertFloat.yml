@@ -1,6 +1,9 @@
 script: assertFloat.py
 name: Assert float
 description: "Test python script that fails if it doesn't receive a float."
+lifecycle:
+  status: in_development
+  message: bla bla
 author:
   - name: Jean-Michel Lord
 inputs:

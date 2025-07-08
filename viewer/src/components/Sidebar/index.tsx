@@ -7,10 +7,10 @@ import {
   Paper,
   Link,
 } from "@mui/material";
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import CustomTable from "../CustomTable";
-import CsvToGeojson, { CsvToObject } from "../../helpers/csv_processing";
+import CsvToGeojson, { CsvToMapArray } from "../../helpers/csv_processing";
 import { Item } from "./styles";
 import { GetPipelineRunInputs, GetJSON } from "../../helpers/biab_api";
 import _ from "underscore";
@@ -102,9 +102,9 @@ export default function Sidebar(props: any) {
       type.includes("csv") ||
       type.includes("tsv")
     ) {
-      CsvToObject(output).then((r) => {
+      CsvToMapArray(output).then((r) => {
         if (r) {
-          setModalContent(<CustomTable tableData={r}></CustomTable>);
+          setModalContent(<CustomTable tableData={r} />);
           setOpenModal(true);
         }
       });
@@ -166,7 +166,7 @@ export default function Sidebar(props: any) {
       setGeoPackage("")
     }
   }
-  
+
   useEffect(() => {
     const pips: any = [];
     if (

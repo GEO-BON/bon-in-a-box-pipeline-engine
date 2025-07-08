@@ -81,16 +81,22 @@ export default class DefaultApi {
      */
 
     /**
-     * Get the history of runs for all pipelines on this server
+     * Get the history of runs for all pipelines on this server, or using pagination with start and limit.
+     * @param {Object} opts Optional parameters
+     * @param {Number} [start] Start index for pagination
+     * @param {Number} [limit] Limit the number of results
      * @param {module:api/DefaultApi~getHistoryCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/GetHistory200ResponseInner>}
      */
-    getHistory(callback) {
+    getHistory(opts, callback) {
+      opts = opts || {};
       let postBody = null;
 
       let pathParams = {
       };
       let queryParams = {
+        'start': opts['start'],
+        'limit': opts['limit']
       };
       let headerParams = {
       };
@@ -289,6 +295,42 @@ export default class DefaultApi {
     }
 
     /**
+     * Callback function to receive the result of the getSystemStatus operation.
+     * @callback module:api/DefaultApi~getSystemStatusCallback
+     * @param {String} error Error message, if any.
+     * @param {String} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Returns the system status.
+     * @param {module:api/DefaultApi~getSystemStatusCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link String}
+     */
+    getSystemStatus(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['text/plain'];
+      let returnType = 'String';
+      return this.apiClient.callApi(
+        '/api/systemStatus', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the getVersions operation.
      * @callback module:api/DefaultApi~getVersionsCallback
      * @param {String} error Error message, if any.
@@ -372,6 +414,7 @@ export default class DefaultApi {
      * @param {module:model/String} type Script or pipeline
      * @param {String} descriptionPath Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.
      * @param {Object} opts Optional parameters
+     * @param {String} [callback] Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully.
      * @param {String} [body] Content of input.json for this run
      * @param {module:api/DefaultApi~runCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link String}
@@ -393,6 +436,7 @@ export default class DefaultApi {
         'descriptionPath': descriptionPath
       };
       let queryParams = {
+        'callback': opts['callback']
       };
       let headerParams = {
       };

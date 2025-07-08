@@ -5,11 +5,12 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**getHPCStatus**](DefaultApi.md#getHPCStatus) | **GET** /hpc/status | Get status of HPC connection.
-[**getHistory**](DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server
+[**getHistory**](DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 [**getInfo**](DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
 [**getListOf**](DefaultApi.md#getListOf) | **GET** /{type}/list | Get a list of available steps of given type and their names.
 [**getOutputFolders**](DefaultApi.md#getOutputFolders) | **GET** /{type}/{id}/outputs | Get the output folders of the scripts composing this pipeline
 [**getPipeline**](DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
+[**getSystemStatus**](DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 [**getVersions**](DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
 [**hpcPrepareGet**](DefaultApi.md#hpcPrepareGet) | **GET** /hpc/prepare | Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.
 [**run**](DefaultApi.md#run) | **POST** /{type}/{descriptionPath}/run | Runs the script or pipeline matching &#x60;descriptionPath&#x60;.
@@ -59,9 +60,9 @@ No authorization required
 
 ## getHistory
 
-> [GetHistory200ResponseInner] getHistory()
+> [GetHistory200ResponseInner] getHistory(opts)
 
-Get the history of runs for all pipelines on this server
+Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 
 ### Example
 
@@ -69,7 +70,11 @@ Get the history of runs for all pipelines on this server
 import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
-apiInstance.getHistory((error, data, response) => {
+let opts = {
+  'start': 56, // Number | Start index for pagination
+  'limit': 56 // Number | Limit the number of results
+};
+apiInstance.getHistory(opts, (error, data, response) => {
   if (error) {
     console.error(error);
   } else {
@@ -80,7 +85,11 @@ apiInstance.getHistory((error, data, response) => {
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **start** | **Number**| Start index for pagination | [optional]
+ **limit** | **Number**| Limit the number of results | [optional]
 
 ### Return type
 
@@ -124,8 +133,8 @@ apiInstance.getInfo(type, descriptionPath, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline | 
- **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. | 
+ **type** | **String**| Script or pipeline |
+ **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
 
 ### Return type
 
@@ -168,7 +177,7 @@ apiInstance.getListOf(type, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline | 
+ **type** | **String**| Script or pipeline |
 
 ### Return type
 
@@ -197,7 +206,7 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script or pipeline
-let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
+let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
 apiInstance.getOutputFolders(type, id, (error, data, response) => {
   if (error) {
     console.error(error);
@@ -212,8 +221,8 @@ apiInstance.getOutputFolders(type, id, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline | 
- **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  | 
+ **type** | **String**| Script or pipeline |
+ **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  |
 
 ### Return type
 
@@ -256,7 +265,7 @@ apiInstance.getPipeline(descriptionPath, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. | 
+ **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
 
 ### Return type
 
@@ -270,6 +279,45 @@ No authorization required
 
 - **Content-Type**: Not defined
 - **Accept**: application/json
+
+
+## getSystemStatus
+
+> String getSystemStatus()
+
+Returns the system status.
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+apiInstance.getSystemStatus((error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+**String**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: text/plain
 
 
 ## getVersions
@@ -365,6 +413,7 @@ let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script or pipeline
 let descriptionPath = "descriptionPath_example"; // String | Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.
 let opts = {
+  'callback': "callback_example", // String | Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully.
   'body': "body_example" // String | Content of input.json for this run
 };
 apiInstance.run(type, descriptionPath, opts, (error, data, response) => {
@@ -381,9 +430,10 @@ apiInstance.run(type, descriptionPath, opts, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline | 
- **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. | 
- **body** | **String**| Content of input.json for this run | [optional] 
+ **type** | **String**| Script or pipeline |
+ **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
+ **callback** | **String**| Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully. | [optional]
+ **body** | **String**| Content of input.json for this run | [optional]
 
 ### Return type
 
@@ -427,8 +477,8 @@ apiInstance.savePipeline(filename, requestBody, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **filename** | **String**| The name of the JSON file (without extension). | 
- **requestBody** | [**{String: Object}**](Object.md)| Content of pipeline.json to save | 
+ **filename** | **String**| The name of the JSON file (without extension). |
+ **requestBody** | [**{String: Object}**](Object.md)| Content of pipeline.json to save |
 
 ### Return type
 
@@ -457,7 +507,7 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script or pipeline
-let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
+let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
 apiInstance.stop(type, id, (error, data, response) => {
   if (error) {
     console.error(error);
@@ -472,8 +522,8 @@ apiInstance.stop(type, id, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline | 
- **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  | 
+ **type** | **String**| Script or pipeline |
+ **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  |
 
 ### Return type
 

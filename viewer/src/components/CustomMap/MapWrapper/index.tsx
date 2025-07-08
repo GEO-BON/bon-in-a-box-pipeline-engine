@@ -1,41 +1,24 @@
 /* eslint-disable dot-notation */
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
-  MapContainer,
   ScaleControl,
   ZoomControl,
   Popup,
-  GeoJSON,
 } from "react-leaflet";
 import L from "leaflet";
-import Control from "react-leaflet-custom-control";
 import {
   Button,
-  Autocomplete,
-  TextField,
   Typography,
   Box,
 } from "@mui/material";
-import InsightsIcon from "@mui/icons-material/Insights";
-import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
-import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import MSMapSlider from "../MSMapSlider";
 import CustomLayer from "../CustomLayer";
-import { MapWrapperContainer } from "../custommapstyles";
 import Digitizer from "../../Digitizer";
-import { LatLngExpression, popup } from "leaflet";
-import type { FeatureCollection } from "geojson";
 
 import {
-  GetCOGStatsGeojson,
   GetCountryList,
-  GetStateList,
-  GetCountryStats,
-  GetCountryGeojson,
-  GetStateGeojson,
-  GetMultipleCOGStatsGeojson,
 } from "../../../helpers/api";
 
 /**

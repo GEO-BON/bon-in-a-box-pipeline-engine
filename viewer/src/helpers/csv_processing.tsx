@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import proj4 from "proj4";
 
 proj4.defs([
@@ -55,7 +54,6 @@ export default async function CsvToGeojson(
           "EPSG:4326",
           row.pos.map((str: string) => parseFloat(str)).reverse()
         );
-        /*const coords = row.pos.map((str: string) => parseFloat(str)).reverse();*/
 
         return {
           type: "Feature",
@@ -141,19 +139,22 @@ const readRows = (data: any) => {
     delimiter = ",";
   }
   const rowsWithColumns = parseCsvToRowsAndColumn(data, delimiter);
-  const headerRow = rowsWithColumns.splice(0, 1)[0];
+  const headerRow = rowsWithColumns
+    .splice(0, 1)[0]
+    .map(header => stripQuotes(header))
+
   return rowsWithColumns.map((row) => {
-    const thisRow: any = {};
+    const thisRow = new Map();
     headerRow.map((header: any, index: number) => {
       if (row[index]) {
-        thisRow[stripQuotes(header)] = stripQuotes(row[index]);
+        thisRow.set(header, stripQuotes(row[index]));
       }
     });
     return thisRow;
   });
 };
 
-export async function CsvToObject(url: string) {
+export async function CsvToMapArray(url: string) {
   return fetch(url)
     .then((response) => {
       if (response.ok) return response.text();

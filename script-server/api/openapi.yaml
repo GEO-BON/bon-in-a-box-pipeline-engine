@@ -36,8 +36,23 @@ paths:
                   }
   /api/history:
     get:
-      summary: Get the history of runs for all pipelines on this server
+      summary: Get the history of runs for all pipelines on this server, or using pagination with start and limit.
       operationId: getHistory
+      parameters:
+        - name: start
+          in: query
+          description: Start index for pagination
+          required: false
+          schema:
+            type: integer
+            format: int32
+        - name: limit
+          in: query
+          description: Limit the number of results
+          required: false
+          schema:
+            type: integer
+            format: int32
       responses:
         "200":
           description: |
@@ -51,10 +66,6 @@ paths:
                 items:
                   type: object
                   properties:
-                    name:
-                      description: Human readable name of the pipeline.
-                      type: string
-                      example: Very interesting index
                     runId:
                       description: Where to find the pipeline outputs in ./output folder.
                       type: string
@@ -79,12 +90,12 @@ paths:
                 example:
                   [
                     {
-                      runId: path>to>script>hash,
-                      type: script,
-                      startDate: "2024-01-01 00:00",
+                      runId: "path>to>script>hash",
+                      type: "script",
+                      startTime: "2024-01-01 00:00",
                       inputs: {
-                        input1: value,
-                        input2: value
+                        input1: "value",
+                        input2: "value"
                       },
                       status: "completed"
                     },
@@ -235,6 +246,14 @@ paths:
       parameters:
         - $ref: '#/components/parameters/stepType'
         - $ref: '#/components/parameters/descriptionPath'
+        - in: query
+          name: callback
+          schema:
+            type: string
+          description:
+            Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK.
+            When receiving the callback, check the outputs or the history to know
+            if the pipeline completed successfully.
       requestBody:
         $ref: '#/components/requestBodies/run_input_body'
       responses:
@@ -252,6 +271,21 @@ paths:
           description: Bad request
         "404":
           description: Script or pipeline not found
+      callbacks:
+        runComplete:
+          "{$request.query.callbackUrl}":
+            get:
+              responses:
+                "202":
+                  description:
+                    Your server implementation should return this HTTP status code
+                    if the callback was received successfully.
+                "500":
+                  description: |
+                    500 or any error code can be returned when a problem occurs.
+                    Nothing special will be done with it: the current
+                    script-server implementation simply discard the error.
+
   /{type}/{id}/outputs:
     get:
       tags: []
@@ -298,6 +332,27 @@ paths:
           description: Bad request
         "404":
           description: id not found
+  /api/systemStatus:
+    get:
+      summary: Returns the system status.
+      operationId: getSystemStatus
+      responses:
+        "200":
+          description: System is in good condition.
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+                example: OK
+        "503":
+          description: System has a bad configuration
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+                example: Output folder is improperly configured
   /api/versions:
     get:
       summary: Returns the version of system components.
@@ -414,6 +469,19 @@ components:
         description:
           type: string
           example: This sample script shows how it works.
+        lifecycle:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [in_development, in_review, reviewed, deprecated, example]
+              default: in_development
+            message:
+              type: string
+          example:
+            - status: in_development
+            - status: deprecated
+              message: Message explaining why it's deprecated and what to choose instead
         author:
           type: array
           items:
@@ -421,7 +489,7 @@ components:
             properties:
               name:
                 type: string
-                description: Full name
+                description: Full name of the author
               email:
                 type: string
                 format: email
@@ -429,9 +497,34 @@ components:
               identifier:
                 type: string
                 description: Full URL of a unique digital identifier such as an ORCID
+              role:
+                type: string
+                description: Role of the author in the contribution. We recommend to use CRediT roles (https://credit.niso.org/)
           example:
             - name: Jane Doe
             - name: John Doe
+              email: john.doe@example.org
+              identifier: https://orcid.org/0000-0000-0000-0000
+              role: Software
+        reviewer:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Full name of the reviewer
+              email:
+                type: string
+                format: email
+                description: Email of the reviewer
+              identifier:
+                type: string
+                description: Full URL of a unique digital identifier such as an ORCID
+          example:
+            - name: Jane Doe
+            - name: John Doe
+              email: john.doe@example.org
               identifier: https://orcid.org/0000-0000-0000-0000
         license:
           type: string
@@ -561,3 +654,5 @@ components:
                 "occurence":"/output/result/from/previous/script",
                 "intensity":3
               }
+
+

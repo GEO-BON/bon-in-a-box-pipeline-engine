@@ -122,6 +122,10 @@
   "metadata": {
     "name": "Array Constant",
     "description": "Pipeline for automated tests",
+    "lifecycle": {
+      "status": "in_development",
+      "message": "bla bla"
+    },
     "author": [
       {
         "name": "Jean-Michel Lord",

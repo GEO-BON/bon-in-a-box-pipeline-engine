@@ -11,9 +11,48 @@ description:
   required: true
   type: string
 
+lifecycle:
+  required: false
+  type: dict
+  oneof:
+    - schema:
+        status:
+          type: string
+          allowed: ["in_development", "in_review", "reviewed", "example"]
+          required: true
+        message:
+          type: string
+          required: false
+    - schema:
+        status:
+          type: string
+          allowed: ["deprecated"]
+          required: true
+        message:
+          type: string
+          required: true
+
 author:
   type: list
   required: true
+  schema:
+    type: dict
+    schema:
+      name:
+        type: string
+        required: true
+      email:
+        type: string
+        required: false
+      identifier:
+        type: string
+        required: false
+      role:
+        type: string
+        required: false
+
+reviewer:
+  type: list
   schema:
     type: dict
     schema:

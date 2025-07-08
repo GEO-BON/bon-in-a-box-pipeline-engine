@@ -14,43 +14,84 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import Tooltip from "@mui/material/Tooltip";
+import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { styled } from "@mui/material/styles";
-import { CustomButtonGreen } from "./CustomMUI";
+import ReactMarkdown from "react-markdown";
+import { CustomButtonGreen, CustomButtonGrey } from "./CustomMUI";
 import { Alert } from "@mui/material";
+import Warning from "@mui/icons-material/Warning";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export default function RunHistory() {
   let [runHistory, setRunHistory] = useState(null);
+  let [start, setStart] = useState(0);
+  let limit=30;
   useEffect(() => {
-    api.getHistory((error, _, response) => {
+    api.getHistory({start, limit},(error, _, response) => {
+      document.getElementById('pageTop')?.scrollIntoView({ behavior: 'smooth' });
       if (error) {
-        setRunHistory(<HttpError httpError={error} response={response} context={"getting run history"} />);
-      } else if (response && response.text) {
+        setRunHistory(
+          <Box sx={{ padding: '50px' }}>
+            <HttpError httpError={error} response={response} context={"getting run history"} />
+          </Box>
+        );
+      } else if (response && response.body.length === 0) {
+        setRunHistory(
+          <Box sx={{ padding: '50px' }}>
+            <h1>Previous runs</h1>
+            <Alert severity="info">There are no runs in history.</Alert>
+          </Box>
+        );
+      } else if (response && response.body.length > 0) {
         const runs = response.body.sort((a, b) => {
           const aa = new Date(a.startTime);
           const bb = new Date(b.startTime);
           return bb - aa;
         });
         setRunHistory(
-          <Grid container spacing={2}>
-            {runs.map((res) => (
-              <RunCard run={res} />
-            ))}
-          </Grid>
+          <div id='pageTop' style={{padding:"20px"}}>
+            <h1>Previous runs</h1>
+              <Grid container spacing={2}>
+                {runs.map((res, i) => (
+                  <RunCard key={i} run={res} />
+                ))}
+              </Grid>
+              <PreviousNext start={start} limit={limit} runsLength={runs.length} showNext={response.status===206} setStart={setStart}/>
+          </div>
         );
       } else {
         setRunHistory(<Alert severity="warning">Could not retrieve history: empty response.</Alert>);
       }
     });
-  }, []);
+  }, [start, limit]);
 
   return runHistory ? runHistory : <Spinner variant='light' />;
 }
+
+export const LastNRuns = (n) => {
+    const [lastRuns, setLastRuns] = useState(null);
+    useEffect(() => {
+        api.getHistory({start:0, limit:4}, (error, _, response) => {
+          let resp=null
+          if (error) {
+          } else if (response && response.body?.length > 0) {
+            resp =
+              <Grid container spacing={3}>
+                {response.body.map((res, i) => (
+                  <RunCard key={i} run={res} />
+                ))}
+              </Grid>
+          }
+          setLastRuns(resp);
+        });
+    }, []);
+    return <>{lastRuns && (<div><div className="home-page-subtitle" style={{marginTop: '30px', marginBottom:'20px'}}>LATEST RUNS</div>{lastRuns}</div>)}</>;
+  }
 
 const color = (status) => {
   switch (status) {
@@ -92,6 +133,26 @@ const ExpandMore = styled((props) => {
   ],
 }));
 
+const PreviousNext = (props)=> {
+  const { start, limit, runsLength, showNext, setStart } = props;
+  return(
+  <Grid container spacing={2} justifyContent="flex-center" sx={{ marginTop: "20px", paddingBottom: "100px" }}>
+      {start > 0 && (
+        <Grid item xs={12} md={6}>
+          <CustomButtonGrey onClick={() => { setStart((prev) => (Math.max(prev - limit, 0))) }}>
+            {"<< Previous page"}
+          </CustomButtonGrey>
+        </Grid>
+      )}
+      {showNext && runsLength === limit && (
+        <Grid xs={12} md={6}>
+        <CustomButtonGrey onClick={()=>{setStart((prev)=>(prev+limit))}}>{"Next page >>"}</CustomButtonGrey>
+        </Grid>
+      )}
+  </Grid>
+  )
+}
+
 const RunCard = (props) => {
   const { run } = props;
   const [expanded, setExpanded] = useState(false);
@@ -105,12 +166,15 @@ const RunCard = (props) => {
   };
 
   var date = new Date(run.startTime);
-  const ind = run.runId.lastIndexOf(">");
-  const pipeline = run.runId.substring(0, ind);
-  const runHash = run.runId.substring(ind + 1);
-  const debug_url = `/pipeline-form/${pipeline}/${runHash}`;
+  let index = run.runId.lastIndexOf(">");
+
+  const pipeline = run.runId.substring(0, index);
+  const runHash = run.runId.substring(index + 1);
+  const debug_url = `/${run.type}-form/${pipeline}/${runHash}`;
   useEffect(() => {
-    api.getInfo("pipeline", `${pipeline}.json`, (error, _, response) => {
+    setExpanded(false) // close card if card reused for another history item
+    const descriptionPath = `${pipeline}.${run.type === "script" ? "yaml" : "json"}`
+    api.getInfo(run.type, descriptionPath, (error, _, response) => {
       if (response.status !== 404) {
         const res = JSON.parse(response.text);
         setDesc(res.description);
@@ -122,7 +186,7 @@ const RunCard = (props) => {
         setStatus("unavailable");
       }
     });
-  }, [pipeline, run]);
+  }, [pipeline, run, setExpanded]);
   return (
     <Grid item size={{ md: 10, lg: 5 }}>
       <Card
@@ -135,15 +199,17 @@ const RunCard = (props) => {
         }}
       >
         <Tooltip title={runHash}>
-          <CardHeader
-            avatar={
-              <Avatar sx={{ bgcolor: color(run.status) }}>
-                <AccountTreeIcon sx={{ color: "#f3f3f1" }} />
-              </Avatar>
-            }
-            title={run.runId.substring(0, ind)}
-            subheader={date.toLocaleString(navigator.language)}
-          />
+          <>
+            <CardHeader
+              avatar={
+                <Avatar sx={{ bgcolor: color(run.status) }}>
+                  <AccountTreeIcon sx={{ color: "#f3f3f1" }} />
+                </Avatar>
+              }
+              title={run.runId.substring(0, index)}
+              subheader={date.toLocaleString(navigator.language)}
+            />
+          </>
         </Tooltip>
         <CardContent>
           <Tooltip title={desc}>
@@ -160,9 +226,9 @@ const RunCard = (props) => {
           </Typography>
         </CardContent>
         <CardActions disableSpacing>
-          {status !== "error" &&
-            status !== "unavailable" &&
-            status !== "running" && (
+          {run.type === "pipeline"
+            && status === "completed"
+            && (
               <a href={`/viewer/${run.runId}`} target="_blank">
                 <CustomButtonGreen>See in viewer</CustomButtonGreen>
               </a>
@@ -184,24 +250,20 @@ const RunCard = (props) => {
             />
           </ExpandMore>
         </CardActions>
-        {Object.entries(run.inputs).length > 0 && (
+        {run.inputs && Object.entries(run.inputs).length > 0 && (
           <Collapse in={expanded} timeout="auto" unmountOnExit>
-            <CardContent>
-              <Typography
-                sx={{
-                  color: "#444",
-                  fontSize: "0.9em",
-                  marginBottom: "10px",
-                }}
-              >
+            {expanded && <CardContent>
+              <ReactMarkdown className="historyDescription">
                 {desc}
-              </Typography>
+              </ReactMarkdown>
               <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>
               <Table size="small">
                 <TableBody>
                   {Object.entries(run.inputs).map((i) => {
+                    const inputId = i[0]
+                    const value = i[1]
                     return (
-                      <TableRow>
+                      <TableRow key={inputId}>
                         <TableCell
                           sx={{
                             maxWidth: "300px",
@@ -209,21 +271,48 @@ const RunCard = (props) => {
                             fontWeight: "bold",
                           }}
                         >
-                          {i[0] in inputs && !!inputs[i[0]] && (
-                            <Tooltip title={i[0]}>{inputs[i[0]].label}</Tooltip>
-                          )}
-                          {!(i[0] in inputs) && <>{i[0]}</>}
+                          {inputId in inputs && !!inputs[inputId]
+                            ? <Tooltip title={inputId}><>{inputs[inputId].label}</></Tooltip>
+                            : <UnknownInputId id={inputId} />
+                          }
                         </TableCell>
-                        <TableCell>{i[1]}</TableCell>
+                        <TableCell style={{whiteSpace: "pre-wrap"}}>
+                          <>{Array.isArray(value) ? value.join(", ") : value}</>
+                        </TableCell>
                       </TableRow>
                     );
                   })}
                 </TableBody>
               </Table>
-            </CardContent>
+            </CardContent>}
           </Collapse>
         )}
       </Card>
     </Grid>
   );
 };
+
+// When input's info not found on the server.
+// Either the whole script / pipeline is missing,
+// or the input does not exist anymore.
+const UnknownInputId = ({ id }) => {
+  const warningIcon =
+    <Tooltip title="Input description not found">
+      <Warning color="warning" style={{height: "1rem", transform: "translate(0, 0.15rem)"}} />
+    </Tooltip>
+
+  const pipeIx = id.lastIndexOf('|')
+  if (pipeIx > 0) {
+    return <>
+      {id.substring(pipeIx + 1)}
+      {warningIcon}
+      <br />
+      <small style={{fontWeight: "normal"}}>{id.substring(0, pipeIx)}</small>
+    </>
+  } else {
+    return <>
+      {id}
+      {warningIcon}
+    </>
+  }
+}

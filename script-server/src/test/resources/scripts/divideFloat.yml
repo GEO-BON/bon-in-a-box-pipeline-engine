@@ -1,6 +1,9 @@
 script: divideFloat.py
 name: Divide Float
 description: Sample script that divides a float
+lifecycle:
+  status: in_development
+  message: bla bla
 author:
   - name: Jean-Michel Lord
 inputs:

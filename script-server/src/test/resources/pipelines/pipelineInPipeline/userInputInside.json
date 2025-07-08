@@ -75,6 +75,10 @@
   "metadata": {
     "name": "Subpipeline with userInput left implicit",
     "description": "Pipeline for automated tests. The subpipeline userInput was left implicit in parent pipeline.",
+    "lifecycle": {
+      "status": "in_development",
+      "message": "bla bla"
+    },
     "author": [
       {
         "name": "Jean-Michel Lord",

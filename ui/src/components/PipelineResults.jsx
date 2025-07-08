@@ -11,7 +11,6 @@ import Info from "@mui/icons-material/Info";
 
 import Box from "@mui/material/Box";
 
-import Button from "@mui/material/Button";
 import { CustomButtonGreen } from "./CustomMUI";
 import Alert from "@mui/material/Alert";
 import { getScriptOutput, getBreadcrumbs } from "../utils/IOId";
@@ -98,17 +97,22 @@ export function PipelineResults({
                       value = inputFileContent[breadcrumbs];
                     }
 
+                                                    
                     if (!value) {
+                      let noValueStatus = null;
+                      if (/pipeline@\d+|default_output/.test(ioId)) {
+                        noValueStatus = <span>N/A</span>;
+                      } else if (runningScripts.size > 0) {
+                        noValueStatus = <InlineSpinner />;
+                      } else {
+                        noValueStatus = <Alert severity="warning">
+                                  See detailed results
+                                </Alert>;
+                      }
                       return (
                         <div key={ioId} className="outputTitle">
                           <h3>{outputDescription.label}</h3>
-                          {runningScripts.size > 0 ? (
-                            <InlineSpinner />
-                          ) : (
-                            <Alert severity="warning">
-                              See detailed results
-                            </Alert>
-                          )}
+                          {noValueStatus}
                         </div>
                       );
                     }
@@ -223,8 +227,37 @@ export function DelayedResult({
       fetch("/output/" + folder + "/output.json?t=" + displayTimeStamp)
         .then((response) => {
           if (response.ok) {
-            clearInterval(interval);
-            return response.json();
+            response.text()
+              .then((text) => {
+                if(!text) {
+                  // Covers the case where Julia scripts allow reading the file before it is written
+                  console.log("Output file empty: retrying...");
+                  return Promise.resolve(null);
+                }
+
+                const json = JSON.parse(text)
+                clearInterval(interval);
+
+                // Detailed results
+                setOutputData(json);
+
+                // Contribute to pipeline outputs (if this script is relevant)
+                setPipelineOutputResults((results) => {
+                  if (breadcrumbs in results)
+                    results[breadcrumbs] = json;
+
+                  return results;
+                });
+              })
+              .catch(e => {
+                console.error(e)
+                clearInterval(interval);
+                setOutputData({
+                  error: e.message,
+                });
+              });
+
+            return
           }
 
           // Script not done yet: wait for next attempt
@@ -233,17 +266,6 @@ export function DelayedResult({
           }
 
           return Promise.reject(response);
-        })
-        .then((json) => {
-          // Detailed results
-          setOutputData(json);
-
-          // Contribute to pipeline outputs (if this script is relevant)
-          setPipelineOutputResults((results) => {
-            if (breadcrumbs in results) results[breadcrumbs] = json;
-
-            return results;
-          });
         })
         .catch((response) => {
           clearInterval(interval);

@@ -275,6 +275,9 @@
   "metadata": {
     "name": "0 in 2 out - Two branches",
     "description": "Pipeline for automated tests",
+    "lifecycle": {
+      "status": "in_development"
+    },
     "author": [
       {
         "name": "Jean-Michel Lord",

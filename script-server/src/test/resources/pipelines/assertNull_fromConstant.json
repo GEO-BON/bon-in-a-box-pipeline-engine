@@ -62,10 +62,15 @@
   "metadata": {
     "name": "Assert null from constant",
     "description": "Pipeline for automated tests",
+    "lifecycle": {
+      "status": "in_development",
+      "message": "bla bla"
+    },
     "author": [
       {
         "name": "Jean-Michel Lord",
-        "identifier": "https://orcid.org/0009-0007-3826-1125"
+        "identifier": "https://orcid.org/0009-0007-3826-1125",
+        "role": "Conceptualization"
       }
     ]
   }

@@ -20,9 +20,11 @@ import InfoAuthorInner from './model/InfoAuthorInner';
 import InfoInputsValue from './model/InfoInputsValue';
 import InfoInputsValueExample from './model/InfoInputsValueExample';
 import InfoInputsValueExampleOneOfInner from './model/InfoInputsValueExampleOneOfInner';
+import InfoLifecycle from './model/InfoLifecycle';
 import InfoOutputsValue from './model/InfoOutputsValue';
 import InfoOutputsValueExample from './model/InfoOutputsValueExample';
 import InfoReferencesInner from './model/InfoReferencesInner';
+import InfoReviewerInner from './model/InfoReviewerInner';
 import DefaultApi from './api/DefaultApi';
 
 
@@ -107,6 +109,12 @@ export {
     InfoInputsValueExampleOneOfInner,
 
     /**
+     * The InfoLifecycle model constructor.
+     * @property {module:model/InfoLifecycle}
+     */
+    InfoLifecycle,
+
+    /**
      * The InfoOutputsValue model constructor.
      * @property {module:model/InfoOutputsValue}
      */
@@ -123,6 +131,12 @@ export {
      * @property {module:model/InfoReferencesInner}
      */
     InfoReferencesInner,
+
+    /**
+     * The InfoReviewerInner model constructor.
+     * @property {module:model/InfoReviewerInner}
+     */
+    InfoReviewerInner,
 
     /**
     * The DefaultApi service constructor.

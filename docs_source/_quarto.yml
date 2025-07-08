@@ -1,0 +1,45 @@
+project:
+  type: website
+  output-dir: ../docs
+  render:
+    - "*.qmd"
+    - "*.md"
+    - "!ui/"
+
+website:
+  title: BON in a Box
+  description: BON in a Box user and contributor documentation
+  favicon: /BiaB_logo_small.png
+  navbar:
+    background: primary
+    search: true
+    left:
+      - href: index.qmd
+      - href: how_to_install.qmd
+      - href: how_to_use.qmd
+        text: User Guide
+      - text: Contribute a pipeline
+        menu:
+          - href: contributing.qmd
+            text: Interested in Contributing?
+          - href: how_to_contribute.qmd
+            text: Contribution instructions
+          - href: pipeline_standards.qmd
+            text: Pipeline standards
+      - peer_review.qmd
+    tools:
+      - icon: box-arrow-up-right
+        href: https://boninabox.geobon.org/
+        text: BON in a Box website
+      - icon: github
+        href: https://github.com/GEO-BON/bon-in-a-box-pipelines/
+        text: BON in a Box GitHub
+
+format:
+  html:
+    theme: flatly
+    css: styles.css
+    toc: true
+
+editor: visual
+

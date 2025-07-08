@@ -1,13 +1,12 @@
-FROM openjdk:11-jre-bullseye as base-image
+FROM openjdk:11-jre-bullseye AS base-image
 
-# Installing
-# - python (to run python scripts directly on the server)
+# Installing python for pipeline validation with cerberus schema
+# TODO: This should be moved out to the conda-runner
 RUN set -ex; \
     apt-get update; \
-    apt-get install -y --no-install-recommends python3 pip libc6-dev; \
+    apt-get install -y --no-install-recommends python3 pip; \
     apt-get clean all;
 
-# Necessary for pipeline validation with cerberus schema
 RUN pip3 install pyyaml cerberus;
 
 #INSTALL DOCKER CLI
@@ -23,7 +22,7 @@ RUN chmod 755 /usr/local/bin/docker-compose
 RUN chmod 755 /usr/local/bin/docker
 
 ## This image builds the server code
-FROM gradle:7.5.1-jdk11 as builder
+FROM gradle:8.13-jdk11 AS builder
 COPY . /home/gradle/project
 WORKDIR /home/gradle/project
 RUN gradle assemble
@@ -36,4 +35,5 @@ RUN chmod 755 /root
 WORKDIR /root
 CMD ["java", "-server", "-Xms4g", "-Xmx4g", "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=100", "-XX:+UseStringDeduplication", "-jar", "biab-script-server.jar"]
 
-RUN date +"%Y-%m-%d %R" > /version.txt
+ARG BIAB_VERSION
+RUN echo $BIAB_VERSION "($(date +'%Y-%m-%d %R'))" > /version.txt
