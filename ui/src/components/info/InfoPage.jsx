@@ -31,6 +31,10 @@ export default function InfoPage() {
       </p>
 
       <h2>HPC Status</h2>
+      <p>
+        BON in a Box instances can delegate jobs to a High Performance Computer (HPC) when configured in runner.env.
+        Only the scripts that are marked as supporting HPC in their metadata will be sent.
+      </p>
       <HPCStatus />
 
       <h2>Server versions</h2>

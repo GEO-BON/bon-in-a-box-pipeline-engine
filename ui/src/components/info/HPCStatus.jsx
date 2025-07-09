@@ -103,7 +103,7 @@ export default function HPCStatus() {
           {status[key]['image'] &&
             <>
               <br />
-              <small>Image:
+              <small>Image:&nbsp;
                 <a href={"https://hub.docker.com/layers/" + status[key]['image'].replace(':', '-').replace('@', '/' + imageName + '/images/')}
                   target="_blank">
                   {digest}
