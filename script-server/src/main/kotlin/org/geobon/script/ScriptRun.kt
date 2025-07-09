@@ -2,8 +2,10 @@ package org.geobon.script
 
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import org.geobon.pipeline.RunContext
 import org.geobon.server.plugins.Containers
+import org.geobon.server.plugins.getContainerVersionsJSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -12,12 +14,80 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import java.io.InputStreamReader
+import java.io.BufferedReader
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
+/*
+*/
+fun runCommand(command: List<String>): String {
+    val processBuilder = ProcessBuilder(command)
+    processBuilder.redirectErrorStream(true) // merge stderr with stdout
+
+    val process = processBuilder.start()
+    val output = StringBuilder()
+
+    BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
+        var line: String?
+        while (reader.readLine().also { line = it } != null) {
+            output.appendLine(line)
+        }
+    }
+
+    val exitCode = process.waitFor()
+    if (exitCode != 0) {
+        println("Command exited with code $exitCode")
+    }
+
+    return output.toString()
+}
+
+fun getGitInfoJSONObject(): JSONObject {
+
+    val gitInfo = JSONObject()
+    val gitBinPath = "/usr/bin/git"
+    val container: Containers = Containers.SCRIPT_SERVER
+    val gitDirOpt = "--git-dir=/.git"
+    val gitCommandCommitID = listOf(gitBinPath, gitDirOpt, "log", "--format=%h", "-1")
+    val gitCommandCurrentBranch =  listOf(gitBinPath, gitDirOpt, "branch", "--show-current")
+    val gitCommandTimeStamp = listOf(gitBinPath, gitDirOpt, "log", "--format=%cd", "-1")
+
+    gitInfo.put("commit ", runCommand( gitCommandCommitID))
+    gitInfo.put("branch", runCommand(gitCommandCurrentBranch))
+    gitInfo.put("timestamp", runCommand(gitCommandTimeStamp))
+
+    return gitInfo
+}
+
+fun getRunnerJSONObject(scriptFile: File): JSONObject {
+    when (scriptFile.extension) {
+        "py", "PY", "r", "R" -> {
+            return JSONObject(mapOf("environment" to Containers.CONDA.environment, "version" to Containers.CONDA.version))
+        }
+        "jl", "JL" -> {
+            return JSONObject(mapOf("environment" to Containers.JULIA.environment, "version" to Containers.JULIA.version))
+        }
+    }
+    return JSONObject()
+}
+
+fun getDependencies(context: RunContext): String {
+    val container = Containers.SCRIPT_SERVER
+    return runCommand(container.dockerCommandList + listOf("cat", "${context.outputFolder.absolutePath}/dependencies.txt"))
+}
+
+fun makeEnvironmentJSONObject(scriptFile: File, context: RunContext): JSONObject {
+    val environment = JSONObject()
+    environment.put("server", getContainerVersionsJSONObject())
+    environment.put("git", getGitInfoJSONObject())
+    environment.put("runner", getRunnerJSONObject(scriptFile))
+    environment.put("dependencies", getDependencies(context))
+    return environment
+}
 
 class ScriptRun( // Constructor used in single script run
     private val scriptFile: File,
@@ -218,6 +288,14 @@ class ScriptRun( // Constructor used in single script run
                             """
                                 source importEnvVars.sh
                                 julia --project=${"$"}JULIA_DEPOT_PATH -e '
+                                    using Pkg
+                                    deps = Pkg.dependencies()
+                                    direct_deps = filter(x -> x[2].is_direct_dep, deps)
+                                    open("${context.outputFolder.absolutePath}/dependencies.txt", "w") do file
+                                        for (uuid, pkg) in direct_deps
+                                            println(file, "$(pkg.name) $(pkg.version)")
+                                        end
+                                    end
                                     open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
                                     output_folder="${context.outputFolder.absolutePath}"
                                     ARGS=[output_folder];
@@ -300,7 +378,7 @@ class ScriptRun( // Constructor used in single script run
                                 }
                                 unlink("${pidFile.absolutePath}")
                                 gc()
-                                capture.output(sessionInfo(), file = paste0(outputFolder, "/RVersion.txt"))'
+                                capture.output(sessionInfo(), file = paste0(outputFolder, "/dependencies.txt"))'
                             """.trimIndent()
                         )
                     }
@@ -328,7 +406,7 @@ class ScriptRun( // Constructor used in single script run
                                     with open(output_folder + "/output.json", "w") as outfile:
                                         outfile.write(json.dumps(biab_output_list, indent = 2))
 
-                                os.system("/opt/conda/bin/pip freeze > " + output_folder + "/PythonVersion.txt")
+                                os.system("/opt/conda/bin/pip freeze > " + output_folder + "/dependencies.txt")
                         """.trimIndent()
 
                         if(useRunners) {
@@ -484,6 +562,8 @@ class ScriptRun( // Constructor used in single script run
             }
 
             pidFile.delete()
+            val environment: JSONObject = makeEnvironmentJSONObject(scriptFile, context)
+            File("${context.outputFolder.absolutePath}/environment.json").writeText(environment.toString(2))
         }
 
         log(logger::debug, "Runner: ${container.containerName} version ${container.version}")
