@@ -22,8 +22,6 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
-/*
-*/
 fun runCommand(command: List<String>): String {
     val processBuilder = ProcessBuilder(command)
     processBuilder.redirectErrorStream(true) // merge stderr with stdout
@@ -43,7 +41,7 @@ fun runCommand(command: List<String>): String {
         println("Command exited with code $exitCode")
     }
 
-    return output.toString()
+    return output.toString().trimEnd()
 }
 
 fun getGitInfoJSONObject(): JSONObject {
@@ -52,9 +50,10 @@ fun getGitInfoJSONObject(): JSONObject {
     val gitBinPath = "/usr/bin/git"
     val container: Containers = Containers.SCRIPT_SERVER
     val gitDirOpt = "--git-dir=/.git"
-    val gitCommandCommitID = listOf(gitBinPath, gitDirOpt, "log", "--format=%h", "-1")
-    val gitCommandCurrentBranch =  listOf(gitBinPath, gitDirOpt, "branch", "--show-current")
-    val gitCommandTimeStamp = listOf(gitBinPath, gitDirOpt, "log", "--format=%cd", "-1")
+    val gitCmd = listOf(gitBinPath, gitDirOpt)
+    val gitCommandCommitID = gitCmd + listOf("log", "--format=%h", "-1")
+    val gitCommandCurrentBranch =  gitCmd + listOf("branch", "--show-current")
+    val gitCommandTimeStamp = gitCmd + listOf("log", "--format=%cd", "-1")
 
     gitInfo.put("commit ", runCommand( gitCommandCommitID))
     gitInfo.put("branch", runCommand(gitCommandCurrentBranch))
@@ -66,10 +65,10 @@ fun getGitInfoJSONObject(): JSONObject {
 fun getRunnerJSONObject(scriptFile: File): JSONObject {
     when (scriptFile.extension) {
         "py", "PY", "r", "R" -> {
-            return JSONObject(mapOf("environment" to Containers.CONDA.environment, "version" to Containers.CONDA.version))
+            return JSONObject(mapOf("environment" to Containers.CONDA.environment.trimEnd(), "version" to Containers.CONDA.version.trimEnd()))
         }
         "jl", "JL" -> {
-            return JSONObject(mapOf("environment" to Containers.JULIA.environment, "version" to Containers.JULIA.version))
+            return JSONObject(mapOf("environment" to Containers.JULIA.environment.trimEnd(), "version" to Containers.JULIA.version.trimEnd()))
         }
     }
     return JSONObject()
