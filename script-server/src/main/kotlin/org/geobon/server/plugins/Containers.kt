@@ -1,6 +1,7 @@
 package org.geobon.server.plugins
 
 import org.geobon.utils.runToText
+import org.json.JSONObject
 
 enum class Containers(
     val containerName: String,
@@ -62,4 +63,15 @@ enum class Containers(
     fun isExternal(): Boolean {
         return this != SCRIPT_SERVER
     }
+}
+
+
+fun getContainerVersionsJSONObject(): JSONObject {
+    val versions = JSONObject()
+    versions.put("UI", Containers.UI.version)
+    versions.put("Script server", "${Containers.SCRIPT_SERVER.version}\n\t${Containers.SCRIPT_SERVER.environment}")
+    versions.put("Conda runner", "${Containers.CONDA.version}\n\t${Containers.CONDA.environment.replaceFirst("\n", "\n\t")}")
+    versions.put("Julia runner", "${Containers.JULIA.version}\n\t${Containers.JULIA.environment}")
+    versions.put("TiTiler", "${Containers.TILER.version.let { val end = it.lastIndexOf(':'); if (end == -1) it; else it.substring(0, end).replace('T', ' ') }}")
+    return versions
 }

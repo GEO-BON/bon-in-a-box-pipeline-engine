@@ -287,19 +287,7 @@ fun Application.configureRouting() {
         }
 
         get("/api/versions") {
-
-            call.respondText("""
-                    { "UI": "${Containers.UI.version}",
-                    "Script server": "${Containers.SCRIPT_SERVER.version}\n\t${Containers.SCRIPT_SERVER.environment}",
-                    "Conda runner": "${Containers.CONDA.version}\n\t${Containers.CONDA.environment.replaceFirst("\n", "\\n\\t")}",
-                    "Julia runner": "${Containers.JULIA.version}\n\t${Containers.JULIA.environment}",
-                    "TiTiler": "${
-                    Containers.TILER.version.let {
-                        val end = it.lastIndexOf(':')
-                        if (end == -1) it
-                        else it.substring(0, end).replace('T', ' ')
-                    }
-                }" }""".lines().joinToString("").trimIndent(), ContentType.Application.Json)
+            call.respondText(getContainerVersionsJSONObject().toString(), ContentType.Application.Json)
         }
 
 
