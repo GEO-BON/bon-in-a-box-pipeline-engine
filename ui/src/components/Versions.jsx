@@ -25,7 +25,6 @@ export default function Versions() {
       else setVersions(null);
     });
   }, []);
-  console.log(JSON.parse(versions));
 
   return (
     <p style={{ whiteSpace: "pre-wrap" }}>
