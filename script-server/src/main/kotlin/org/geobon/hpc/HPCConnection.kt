@@ -37,7 +37,12 @@ class HPCConnection(
                 // and not interested immediately in the result,
                 // hence using this DelicateCoroutinesApi
                 GlobalScope.launch {
-                    prepare()
+                    try {
+                        prepare()
+                    } catch (ex: Exception) {
+                        // Silently fail in the background when auto-connecting
+                        ex.printStackTrace()
+                    }
                 }
             }
         }
@@ -119,7 +124,8 @@ class HPCConnection(
 
             process.waitFor(10, TimeUnit.MINUTES)
 
-            logger.info(process.inputStream.bufferedReader().readText()) // excludes error stream
+            val sysOut = process.inputStream.bufferedReader().readText()
+            if(sysOut.isNotBlank()) logger.info(sysOut) // excludes error stream
 
             apptainerImage.state = if (process.exitValue() == 0) {
                 ApptainerImageState.READY
