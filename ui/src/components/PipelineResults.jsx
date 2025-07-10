@@ -165,6 +165,8 @@ function EnvironmentInfo({folder}) {
           .then((json) => {
             setEnvironmentData(json);
           });
+      } else if (response.status == 404) {
+        setEnvironmentData({ error: "environment file was not created"});
       } else {
         setEnvironmentData({ error: response.status + " (" + response.statusText + ")"});
 
@@ -177,7 +179,7 @@ function EnvironmentInfo({folder}) {
 
   }, []);
   if (environmentData)
-    return environmentData.error ? <Alert severity="error">{environmentData.error}</Alert>:<pre>{yaml.dump(environmentData)}</pre>
+    return environmentData.error ? <Alert severity="error">{environmentData.error}</Alert>: <pre>{yaml.dump(environmentData)}</pre>
   return <Spinner />
 }
 
