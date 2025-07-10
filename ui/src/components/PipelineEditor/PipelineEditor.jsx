@@ -731,8 +731,8 @@ export default function PipelineEditor(props) {
         fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
         api.savePipeline(fileNameWithoutExtension, saveJSON, (error, data, response) => {
           if (error) {
+            setAlertMessage(getErrorString(error, response));
             setModal('saveError');
-            setAlertMessage(getErrorString(error, response))
 
           } else if (response.text) {
             showAlert('warning', 'Pipeline saved with errors', response.text)
