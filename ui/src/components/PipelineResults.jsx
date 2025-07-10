@@ -165,16 +165,19 @@ function EnvironmentInfo({folder}) {
           .then((json) => {
             setEnvironmentData(json);
           });
+      } else {
+        setEnvironmentData({ error: response.status + " (" + response.statusText + ")"});
+
       }
     })
       .catch(response => {
         console.error(response);
-        setEnvironmentData({error: e.status + " (" + response.statusText + ")"});
+        setEnvironmentData({error: response.status + " (" + response.statusText + ")"});
       });
 
   }, []);
   if (environmentData)
-    return <pre>{yaml.dump(environmentData)}</pre>
+    return environmentData.error ? <Alert severity="error">{environmentData.error}</Alert>:<pre>{yaml.dump(environmentData)}</pre>
   return <Spinner />
 }
 
@@ -344,6 +347,7 @@ export function DelayedResult({
           sectionName="output"
         />
       );
+      
       environmentContent = (
         <FoldableOutput title="Environment" className="stepEnvironment">
           <EnvironmentInfo folder={folder}/>
