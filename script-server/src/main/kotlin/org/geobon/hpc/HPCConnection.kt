@@ -2,8 +2,8 @@ package org.geobon.hpc
 
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.geobon.utils.runToText
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -39,14 +39,14 @@ class HPCConnection(private val sshCredentials: String?) {
 
     suspend fun prepare() {
         coroutineScope {
-            val condaJob = launch {
+            launch {
                 // Checking if already preparing to avoid launching the process 2 times in parallel by accident
                 if (rStatus.state != ApptainerImageState.PREPARING) {
                     prepareApptainer(rStatus, "runner-conda")
                 }
             }
 
-            val juliaJob = launch {
+            launch {
                 if (juliaStatus.state != ApptainerImageState.PREPARING) {
                     prepareApptainer(juliaStatus, "runner-julia")
                 }
@@ -63,13 +63,13 @@ class HPCConnection(private val sshCredentials: String?) {
         apptainerImage.state = ApptainerImageState.PREPARING
 
         try {
+            logger.debug("Preparing remote $service")
             val imageName = "docker inspect --format '{{.Config.Image}}' biab-$service"
                 .runToText()
                 ?.trim()
-            logger.debug("Preparing remote $imageName")
 
-            if (imageName.isNullOrBlank()) {
-                throw RuntimeException("Could not read image name for service $service. Is the service running?")
+            if (imageName.isNullOrBlank() || imageName.startsWith("Error:")) {
+                throw RuntimeException("""Could not read image name for service "$service". Is the service running?""")
             }
 
             // imageDigestResult: [ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
@@ -81,7 +81,7 @@ class HPCConnection(private val sshCredentials: String?) {
                 || !imageDigestResult.startsWith('[')
                 || !imageDigestResult.endsWith(']')
             ) {
-                throw RuntimeException("Could not read image digest:\n$imageDigestResult")
+                throw RuntimeException("""Could not read digest for image "$imageName".""")
             }
             // imageDigest: ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:62849e38bc9105a53c34828009b3632d23d2485ade7f0da285c888074313782e
             val imageDigest = imageDigestResult.removePrefix("[").removeSuffix("]")
