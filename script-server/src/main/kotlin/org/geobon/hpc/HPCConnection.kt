@@ -4,16 +4,22 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import org.geobon.hpc.ApptainerImage.Companion.ApptainerImageState
+import org.geobon.server.plugins.Containers
 import org.geobon.utils.runToText
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
 @OptIn(DelicateCoroutinesApi::class)
-class HPCConnection(private val sshCredentials: String?) {
+class HPCConnection(
+    private val sshCredentials: String?,
+    condaContainer: Containers = Containers.CONDA,
+    juliaContainer: Containers = Containers.JULIA
+) {
 
-    var juliaStatus = ApptainerImage()
-    var rStatus = ApptainerImage()
+    var juliaStatus = ApptainerImage(juliaContainer)
+    var rStatus = ApptainerImage(condaContainer)
     val pythonStatus: ApptainerImage
         get() = rStatus
 
@@ -42,19 +48,19 @@ class HPCConnection(private val sshCredentials: String?) {
             launch {
                 // Checking if already preparing to avoid launching the process 2 times in parallel by accident
                 if (rStatus.state != ApptainerImageState.PREPARING) {
-                    prepareApptainer(rStatus, "runner-conda")
+                    prepareApptainer(rStatus)
                 }
             }
 
             launch {
                 if (juliaStatus.state != ApptainerImageState.PREPARING) {
-                    prepareApptainer(juliaStatus, "runner-julia")
+                    prepareApptainer(juliaStatus)
                 }
             }
         }
     }
 
-    private fun prepareApptainer(apptainerImage: ApptainerImage, service: String) {
+    private fun prepareApptainer(apptainerImage: ApptainerImage) {
         if(sshCredentials.isNullOrBlank()){
             apptainerImage.message = "Configure HPC_SSH_CREDENTIALS before attenpting to connect to the HPC."
             return
@@ -63,13 +69,12 @@ class HPCConnection(private val sshCredentials: String?) {
         apptainerImage.state = ApptainerImageState.PREPARING
 
         try {
-            logger.debug("Preparing remote $service")
-            val imageName = "docker inspect --format '{{.Config.Image}}' biab-$service"
-                .runToText()
-                ?.trim()
+            val container = apptainerImage.container
+            logger.debug("Preparing remote ${container.containerName}")
 
-            if (imageName.isNullOrBlank() || imageName.startsWith("Error:")) {
-                throw RuntimeException("""Could not read image name for service "$service". Is the service running?""")
+            val imageName = container.imageName
+            if (imageName.isEmpty()) {
+                throw RuntimeException("""Could not read image name for service "${container.containerName}". Is the service running?""")
             }
 
             // imageDigestResult: [ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
@@ -92,7 +97,7 @@ class HPCConnection(private val sshCredentials: String?) {
             if (imageSha.length != 64) throw RuntimeException("Unexpected sha length for runner image: $imageSha")
 
             // Launch the container creation for that digest (if not already existing)
-            val apptainerImageName = "${service}_$imageSha.sif"
+            val apptainerImageName = "${container.containerName}_$imageSha.sif"
             val process = ProcessBuilder("ssh",
                 "-i", "/run/secrets/hpc_ssh_key",
                 "-o", "IdentitiesOnly=yes",
@@ -132,23 +137,5 @@ class HPCConnection(private val sshCredentials: String?) {
 
     companion object {
         private val logger: Logger = LoggerFactory.getLogger("HPCConnection")
-
-        enum class ApptainerImageState {
-            NOT_CONFIGURED, CONFIGURED, PREPARING, READY, ERROR
-        }
-
-        data class ApptainerImage(
-            var state: ApptainerImageState = ApptainerImageState.NOT_CONFIGURED,
-            var image: String? = null,
-            var message: String? = null
-        ) {
-            fun toMap(): Map<String, String?> {
-                return mapOf(
-                    "state" to state.toString(),
-                    "image" to image,
-                    "message" to message
-                )
-            }
-        }
     }
 }

@@ -294,9 +294,9 @@ fun Application.configureRouting() {
 
         get("/hpc/status") {
             call.respond(mapOf(
-                "R" to hpc.rStatus.toMap(),
-                "Python" to hpc.pythonStatus.toMap(),
-                "Julia" to hpc.juliaStatus.toMap()
+                "R" to hpc.rStatus.statusMap(),
+                "Python" to hpc.pythonStatus.statusMap(),
+                "Julia" to hpc.juliaStatus.statusMap()
             ))
         }
 

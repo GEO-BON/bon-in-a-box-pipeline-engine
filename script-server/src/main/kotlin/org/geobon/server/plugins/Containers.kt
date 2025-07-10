@@ -55,6 +55,13 @@ enum class Containers(
         (dockerCommand + envCommand).runToText(showErrors = false) ?: ""
     }
 
+    val imageName: String by lazy {
+        "docker inspect --format '{{.Config.Image}}' $containerName"
+            .runToText(showErrors = false)
+            ?.trim()
+            ?: ""
+    }
+
     /**
      * @return true if this is an external container to the script server.
      *         Only the script server will return false.
