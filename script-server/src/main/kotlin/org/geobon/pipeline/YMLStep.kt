@@ -27,6 +27,10 @@ abstract class YMLStep(
     protected var context:RunContext? = null
 
     val inputsDefinition = readInputs(yamlParsed, logger)
+    override fun getDisplayBreadcrumbs(): String {
+        return if (yamlParsed.containsKey(NAME)) "${yamlParsed[NAME]} (${id.toBreadcrumbs()})"
+        else id.toBreadcrumbs()
+    }
 
     override fun validateInputsConfiguration(): String {
 
@@ -55,7 +59,7 @@ abstract class YMLStep(
                     }
 
                     // Everything else refused
-                    else -> "Wrong type \"${it.type}\" for input \"$inputKey\", \"$expectedType\" expected.\n"
+                    else -> "Wrong type for input \"$inputKey\": expected \"$expectedType\" but \"${it.type}\" was received.\n"
                 }
             } ?: "Missing key $inputKey\n\tYAML spec: ${inputsDefinition.keys}\n\tReceived:  ${inputs.keys}\n"
         }
