@@ -1,6 +1,7 @@
 package org.geobon.pipeline
 
 import org.geobon.script.Description.INPUTS
+import org.geobon.script.Description.LABEL
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
 import org.geobon.script.Description.TYPE
@@ -11,6 +12,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import kotlin.collections.get
 
 
 abstract class YMLStep(
@@ -28,7 +30,7 @@ abstract class YMLStep(
 
     val inputsDefinition = readInputs(yamlParsed, logger)
     override fun getDisplayBreadcrumbs(): String {
-        return if (yamlParsed.containsKey(NAME)) "${yamlParsed[NAME]} (${id.toBreadcrumbs()})"
+        return if (yamlParsed.containsKey(NAME)) "\"${yamlParsed[NAME]}\" (${id.toBreadcrumbs()})"
         else id.toBreadcrumbs()
     }
 
@@ -55,11 +57,15 @@ abstract class YMLStep(
                     // Non-array to single-element array accepted
                     expectedType.endsWith("[]") && it.type == expectedType.dropLast(2) -> {
                         inputs[inputKey] = AggregatePipe(listOf(it))
-                        return@let ""
+                        ""
                     }
 
                     // Everything else refused
-                    else -> "Wrong type for input \"$inputKey\": expected \"$expectedType\" but \"${it.type}\" was received.\n"
+                    else -> {
+                        val description = readIODescription(INPUTS, inputKey)
+                        val label = description?.get(LABEL) as? String
+                        "Wrong type for input \"$label\" ($inputKey): expected \"$expectedType\" but \"${it.type}\" was received.\n"
+                    }
                 }
             } ?: "Missing key $inputKey\n\tYAML spec: ${inputsDefinition.keys}\n\tReceived:  ${inputs.keys}\n"
         }
