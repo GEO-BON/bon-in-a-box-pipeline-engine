@@ -65,7 +65,7 @@ fun makeEnvironmentJSONObject(context: RunContext, container: Containers): JSONO
     val environment = JSONObject()
     environment.put("server", Containers.toJSONObject())
     environment.put("git", getGitInfoJSONObject())
-    environment.put("runner2",
+    environment.put("runner",
         JSONObject(mapOf(
             "containerName" to container.containerName.trimEnd(),
             "environment" to container.environment.trimEnd(),
