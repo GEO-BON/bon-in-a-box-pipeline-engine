@@ -5,12 +5,16 @@ import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
-function formatVersionJson(jsonString) {
+function formatVersionJson(jsonString, indent) {
   let formattedString = "";
   const versionInfo = JSON.parse(jsonString);
 
   for (const key in versionInfo) {
-    formattedString += `${key}: ${versionInfo[key]}\n\n`;
+    if (typeof versionInfo[key] === 'object' && versionInfo[key] !== null) {
+      formattedString += "\t".repeat(indent) + `${key}:\n${formatVersionJson(JSON.stringify(versionInfo[key]), indent + 1)}`;
+    } else {
+      formattedString += "\t".repeat(indent) + `${key}: ${versionInfo[key]}\n\n`;
+    }
   }
   return formattedString;
 }
@@ -28,7 +32,7 @@ export default function Versions() {
 
   return (
     <p style={{ whiteSpace: "pre-wrap" }}>
-      {versions ? formatVersionJson(versions) : <Spinner variant='light' />}
+      {versions ? formatVersionJson(versions, 0) : <Spinner variant='light' />}
     </p>
   );
 }
