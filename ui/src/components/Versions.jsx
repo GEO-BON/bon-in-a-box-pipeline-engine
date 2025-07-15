@@ -13,7 +13,10 @@ function formatVersionJson(jsonString, indent) {
     if (typeof versionInfo[key] === 'object' && versionInfo[key] !== null) {
       formattedString += "\t".repeat(indent) + `${key}:\n${formatVersionJson(JSON.stringify(versionInfo[key]), indent + 1)}`;
     } else {
-      formattedString += "\t".repeat(indent) + `${key}: ${versionInfo[key]}\n\n`;
+      if(indent === 0) {
+        formattedString += "\n";
+      }
+      formattedString += "\t".repeat(indent) + `${key}: ${versionInfo[key]}\n`;
     }
   }
   return formattedString;
@@ -32,7 +35,7 @@ export default function Versions() {
 
   return (
     <p style={{ whiteSpace: "pre-wrap" }}>
-      {versions ? formatVersionJson(versions, 0) : <Spinner variant='light' />}
+      {versions ? formatVersionJson(versions, 0).trim() : <Spinner variant='light' />}
     </p>
   );
 }
