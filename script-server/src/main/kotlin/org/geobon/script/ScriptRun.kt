@@ -61,28 +61,22 @@ fun getGitInfoJSONObject(): JSONObject {
     return gitInfo
 }
 
-fun getRunnerJSONObject(scriptFile: File): JSONObject {
-    when (scriptFile.extension) {
-        "py", "PY", "r", "R" -> {
-            return JSONObject(mapOf("environment" to Containers.CONDA.environment.trimEnd(), "version" to Containers.CONDA.version.trimEnd()))
-        }
-        "jl", "JL" -> {
-            return JSONObject(mapOf("environment" to Containers.JULIA.environment.trimEnd(), "version" to Containers.JULIA.version.trimEnd()))
-        }
-    }
-    return JSONObject()
-}
-
 fun getDependencies(context: RunContext): String {
     val container = Containers.SCRIPT_SERVER
     return runCommand(container.dockerCommandList + listOf("cat", "${context.outputFolder.absolutePath}/dependencies.txt"))
 }
 
-fun makeEnvironmentJSONObject(scriptFile: File, context: RunContext): JSONObject {
+fun makeEnvironmentJSONObject(context: RunContext, container: Containers): JSONObject {
     val environment = JSONObject()
     environment.put("server", Containers.toJSONObject())
     environment.put("git", getGitInfoJSONObject())
-    environment.put("runner", getRunnerJSONObject(scriptFile))
+    environment.put("runner2",
+        JSONObject(mapOf(
+            "containerName" to container.containerName.trimEnd(),
+            "environment" to container.environment.trimEnd(),
+            "version" to container.version.trimEnd())
+        )
+    )
     environment.put("dependencies", getDependencies(context))
     return environment
 }
@@ -557,7 +551,7 @@ class ScriptRun( // Constructor used in single script run
             }
 
             pidFile.delete()
-            val environment: JSONObject = makeEnvironmentJSONObject(scriptFile, context)
+            val environment: JSONObject = makeEnvironmentJSONObject(context, container)
             File("${context.outputFolder.absolutePath}/environment.json").writeText(environment.toString(2))
         }
 
