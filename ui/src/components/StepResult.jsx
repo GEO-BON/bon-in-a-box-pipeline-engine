@@ -1,6 +1,5 @@
 import { memo, useState } from "react";
 import MapResult from "./map/Map";
-import React from "react";
 import RenderedCSV from "./csv/RenderedCSV";
 import {
   FoldableOutputWithContext,
@@ -79,9 +78,9 @@ function AllSectionResults({ results, sectionMetadata, sectionName }) {
 
   const {error, warning, info, ...rest} = results
   return <>
-      {error && <Alert key="error" severity="error">{error}</Alert>}
-      {warning && <Alert key="warning" severity="warning">{warning}</Alert>}
-      {info && <Alert key="info" severity="info">{info}</Alert>}
+      {error && <Alert key="error" severity="error"><ReactMarkdown>{error}</ReactMarkdown></Alert>}
+      {warning && <Alert key="warning" severity="warning"><ReactMarkdown>{warning}</ReactMarkdown></Alert>}
+      {info && <Alert key="info" severity="info"><ReactMarkdown>{info}</ReactMarkdown></Alert>}
       {Object.entries(rest).map(([key, value]) => {
           const ioMetadata = sectionMetadata && sectionMetadata[key]
           return <SingleIOResult key={key} ioId={key} value={value} ioMetadata={ioMetadata} sectionName={sectionName} />

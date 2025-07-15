@@ -13,6 +13,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Box from "@mui/material/Box";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ReactMarkdown from 'react-markdown';
 
 const pipelineConfig = { extension: ".json", defaultFile: "helloWorld.json" };
 const scriptConfig = {
@@ -300,7 +301,7 @@ export function PipelinePage({ runType }) {
       )}
       {httpError && (
         <Alert severity="error" key="httpError">
-          {httpError}
+          <ReactMarkdown>{httpError}</ReactMarkdown>
         </Alert>
       )}
       {pipelineMetadata && (

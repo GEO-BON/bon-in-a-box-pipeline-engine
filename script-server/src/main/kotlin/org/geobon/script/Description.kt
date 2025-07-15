@@ -13,6 +13,7 @@ object Description {
     const val TIMEOUT = "timeout"
 
     // IO description
+    const val LABEL = "label"
     const val TYPE = "type"
     const val TYPE_OPTIONS = "options"
 

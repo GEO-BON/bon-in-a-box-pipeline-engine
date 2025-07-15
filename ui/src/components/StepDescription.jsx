@@ -41,37 +41,37 @@ function findLogoImageFromURL(url) {
     }
 }
 
-function LogoFromUrl({ src, style}) {
-    return <a style={style} href={src} target="_blank">
-            <img src={src} alt={src} title="ID" width="20px"></img>
-          </a>
+
+function IdentifierLogo({ src, href }) {
+    return <a href={href} target="_blank">
+        <img src={src} alt="Identifier logo" title="Go to profile" width="20px"></img>
+    </a>
 }
 
 function generatePersonList(list) {
     return list.map((person, i, array) => {
         let email = person.email && <a href={'mailto:' + person.email}>{person.email}</a>
-        let role = person.role && <span>{person.role.join(', ')}</span>
-        let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
+        let role = person.role && <span>{person.role}</span>
+        let comma = (i !== array.length - 1) && ', '
         let isAuthorProperties = person.email || person.role || person.identifier;
         let identifierLogo = person.identifier && findLogoImageFromURL(person.identifier);
 
         let hoverCardDisplay = <>
             <div className="popover-heading">
-              <h3>{person.name}</h3>
-              {identifierLogo && <LogoFromUrl  src={identifierLogo} />}
+                <h3>{person.name}</h3>
+                {identifierLogo && <IdentifierLogo src={identifierLogo} href={person.identifier} />}
             </div>
-            <hr/>
+            <hr />
             {email}
             {role && <p>Contribution: {role}</p> || <p></p>}
-            {identifierLogo ? null : <LogoFromUrl src={person.identifier} /> }
+            {identifierLogo ? null : person.identifier && <a href={person.identifier} target="_blank">{person.identifier.replace(/https?:\/\//, '')}</a>}
         </>
 
         let hoverCardName = person.name && <HoverCard popoverContent={hoverCardDisplay}>{person.name}</HoverCard>
-        return <><span key={i}>
-                  {
-                    (isAuthorProperties && hoverCardName) || <Typography style={{display: "inline"}}>{person.name}</Typography>
-                  }{comma}
-                </span> </>
+        return <span key={person.name + "-" + i}>
+            {(isAuthorProperties && hoverCardName) || <Typography style={{ display: "inline" }}>{person.name}</Typography>}
+            {comma}
+        </span>
 
     })
 }
