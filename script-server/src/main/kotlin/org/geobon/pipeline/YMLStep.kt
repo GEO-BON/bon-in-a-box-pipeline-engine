@@ -63,8 +63,10 @@ abstract class YMLStep(
                     // Everything else refused
                     else -> {
                         val description = readIODescription(INPUTS, inputKey)
-                        val label = description?.get(LABEL) as? String
-                        "Wrong type for input \"$label\" ($inputKey): expected \"$expectedType\" but \"${it.type}\" was received.\n"
+                        val label = description?.get(LABEL) as? String?
+                        var displayName = if (label != null) "\"$label\" ($inputKey)" else inputKey
+
+                        "Wrong type for input $displayName: expected \"$expectedType\" but \"${it.type}\" was received.\n"
                     }
                 }
             } ?: "Missing key $inputKey\n\tYAML spec: ${inputsDefinition.keys}\n\tReceived:  ${inputs.keys}\n"
