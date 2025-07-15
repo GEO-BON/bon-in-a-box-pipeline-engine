@@ -31,6 +31,10 @@ class CondaRunner(
         """.trimIndent()
     }
 
+    fun getForceStopCleanup(): List<String> {
+        return listOf("rm", "-rf", "$condaEnvFile.lock")
+    }
+
     private fun useBase(language: String) {
         activateEnvironment = "mamba activate ${language}base ; assertSuccess"
     }
