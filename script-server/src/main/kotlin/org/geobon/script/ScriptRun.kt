@@ -5,7 +5,6 @@ import kotlinx.coroutines.*
 import org.json.JSONObject
 import org.geobon.pipeline.RunContext
 import org.geobon.server.plugins.Containers
-import org.geobon.server.plugins.getContainerVersionsJSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -81,7 +80,7 @@ fun getDependencies(context: RunContext): String {
 
 fun makeEnvironmentJSONObject(scriptFile: File, context: RunContext): JSONObject {
     val environment = JSONObject()
-    environment.put("server", getContainerVersionsJSONObject())
+    environment.put("server", Containers.toJSONObject())
     environment.put("git", getGitInfoJSONObject())
     environment.put("runner", getRunnerJSONObject(scriptFile))
     environment.put("dependencies", getDependencies(context))

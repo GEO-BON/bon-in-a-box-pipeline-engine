@@ -64,16 +64,21 @@ enum class Containers(
     fun isExternal(): Boolean {
         return this != SCRIPT_SERVER
     }
-}
 
-
-fun getContainerVersionsJSONObject(includeGit: Boolean=false): JSONObject {
-    val versions = JSONObject()
-    versions.put("UI", Containers.UI.version.trimEnd())
-    versions.put("Script server", "${Containers.SCRIPT_SERVER.version}\n\t${Containers.SCRIPT_SERVER.environment}".trimEnd())
-    versions.put("Conda runner", "${Containers.CONDA.version}\n\t${Containers.CONDA.environment.replaceFirst("\n", "\n\t")}".trimEnd())
-    versions.put("Julia runner", "${Containers.JULIA.version}\n\t${Containers.JULIA.environment}".trimEnd())
-    versions.put("TiTiler", "${Containers.TILER.version.let { val end = it.lastIndexOf(':'); if (end == -1) it; else it.substring(0, end).replace('T', ' ') }}".trimEnd())
-    if (includeGit) versions.put("git", getGitInfoJSONObject())
-    return versions
+    companion object {
+        fun toJSONObject(): JSONObject {
+            val versions = JSONObject()
+            versions.put("UI", UI.version.trimEnd())
+            versions.put("Script server", SCRIPT_SERVER.version)
+            versions.put("Conda runner", "${CONDA.version}\n\t${CONDA.environment.replaceFirst("\n", "\n\t")}".trimEnd())
+            versions.put("Julia runner", "${JULIA.version}\n\t${JULIA.environment}".trimEnd())
+            versions.put(
+                "TiTiler",
+                TILER.version.let {
+                    val end = it.lastIndexOf(':'); if (end == -1) it; else it.substring(0, end).replace('T', ' ')
+                }.trimEnd()
+            )
+            return versions
+        }
+    }
 }

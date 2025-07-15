@@ -11,6 +11,7 @@ import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
 import org.geobon.pipeline.RunContext.Companion.scriptRoot
+import org.geobon.script.getGitInfoJSONObject
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -21,6 +22,7 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import kotlin.toString
 
 
 /**
@@ -287,7 +289,9 @@ fun Application.configureRouting() {
         }
 
         get("/api/versions") {
-            call.respondText(getContainerVersionsJSONObject(includeGit = true).toString(), ContentType.Application.Json)
+            val versions = Containers.toJSONObject()
+            versions.put("git", getGitInfoJSONObject())
+            call.respondText(versions.toString(), ContentType.Application.Json)
         }
 
 
