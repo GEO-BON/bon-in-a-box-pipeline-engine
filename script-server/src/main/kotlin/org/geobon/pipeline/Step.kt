@@ -75,11 +75,12 @@ abstract class Step(
 
         var problems = validateStep()
         problems += validateInputsConfiguration()
+        // Prepend id to better identify problem source
+        if(problems.isNotEmpty()) problems = "${problems}In ${getDisplayBreadcrumbs()}\n\n"
 
         inputs.values.forEach { problems += it.validateGraph() }
 
-        // Prepend id to better identify problem source
-        return if(problems.isEmpty()) "" else "$id: $problems"
+        return problems
     }
 
     protected open fun validateStep(): String {

@@ -28,6 +28,9 @@ data class StepId(val step: String, val nodeId: String, val parent:StepId? = nul
             else "$step@$nodeId"
     }
 
+    /**
+     * @return the breadcrumbs to get to this Step, from the outer pipeline to the script.
+     */
     fun toBreadcrumbs(): String {
         var parentBreadcrumbs = parent?.toBreadcrumbs() ?: ""
         if(parentBreadcrumbs.isNotEmpty())
