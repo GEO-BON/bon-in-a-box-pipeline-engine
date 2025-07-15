@@ -61,11 +61,6 @@ fun getGitInfoJSONObject(): JSONObject {
     return gitInfo
 }
 
-fun getDependencies(context: RunContext): String {
-    val container = Containers.SCRIPT_SERVER
-    return runCommand(container.dockerCommandList + listOf("cat", "${context.outputFolder.absolutePath}/dependencies.txt"))
-}
-
 fun makeEnvironmentJSONObject(context: RunContext, container: Containers): JSONObject {
     val environment = JSONObject()
     environment.put("server", Containers.toJSONObject())
@@ -77,7 +72,9 @@ fun makeEnvironmentJSONObject(context: RunContext, container: Containers): JSONO
             "version" to container.version.trimEnd())
         )
     )
-    environment.put("dependencies", getDependencies(context))
+    environment.put("dependencies",
+        runCommand(Containers.SCRIPT_SERVER.dockerCommandList
+                + listOf("cat", "${context.outputFolder.absolutePath}/dependencies.txt")))
     return environment
 }
 
