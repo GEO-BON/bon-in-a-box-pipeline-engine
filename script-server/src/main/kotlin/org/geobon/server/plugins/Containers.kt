@@ -1,4 +1,5 @@
 package org.geobon.server.plugins
+import org.geobon.script.getGitInfoJSONObject
 
 import org.geobon.utils.runToText
 import org.json.JSONObject
@@ -73,5 +74,6 @@ fun getContainerVersionsJSONObject(): JSONObject {
     versions.put("Conda runner", "${Containers.CONDA.version}\n\t${Containers.CONDA.environment.replaceFirst("\n", "\n\t")}".trimEnd())
     versions.put("Julia runner", "${Containers.JULIA.version}\n\t${Containers.JULIA.environment}".trimEnd())
     versions.put("TiTiler", "${Containers.TILER.version.let { val end = it.lastIndexOf(':'); if (end == -1) it; else it.substring(0, end).replace('T', ' ') }}".trimEnd())
+    versions.put("git", getGitInfoJSONObject())
     return versions
 }
