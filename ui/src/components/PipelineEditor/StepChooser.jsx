@@ -4,7 +4,7 @@ import { React, isValidElement, useContext, useState, useEffect, useCallback } f
 import { PopupContentContext } from "../../Layout.jsx";
 
 import { HttpError } from "../HttpErrors";
-import { fetchStepDescription } from "./StepDescriptionStore";
+import { fetchStepDescription, fetchStepDescriptionAsync } from "./StepDescriptionStore";
 import { StepDescription } from "../StepDescription";
 import { Spinner } from "../Spinner";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
@@ -17,6 +17,43 @@ const onDragStart = (event, nodeType, descriptionFile) => {
   event.dataTransfer.setData("descriptionFile", descriptionFile);
   event.dataTransfer.effectAllowed = "move";
 };
+
+function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick }) {
+  let [isDeprecated, setIsDeprecated] = useState(false);
+  // async loading of metadata
+
+  useEffect(() => {
+    let cancelled = false;
+    // use setTimeout so that our other async tasks are prioritized and this is loaded after
+    setTimeout(() => {
+      fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
+        if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+          setIsDeprecated(true);
+        } 
+      });
+    }, 1000);
+
+    return () => { cancelled = true; };
+  }, []);
+
+  return (
+    <div
+      key={fileName}
+      onDragStart={(event) =>
+        onDragStart(event, "io", descriptionFile)
+      }
+      draggable
+      title="Click for info, drag and drop to add to pipeline."
+      className={
+        "dndnode" +
+        (descriptionFile === selectedStep ? " selected" : "") + (isDeprecated ? " deprecated" : "")
+      }
+      onClick={() => {onStepClick(descriptionFile)} }
+    >
+      {stepName}
+    </div>
+  );
+}
 
 export default function StepChooser(props) { 
   const [scriptFiles, setScriptFiles] = useState([]);
@@ -120,23 +157,7 @@ export default function StepChooser(props) {
           // leaf
           return groupedFiles.get(key).map(([fileName, stepName]) => {
             let descriptionFile = [...splitPathBefore, fileName].join(">");
-            return (
-              <div
-                key={fileName}
-                onDragStart={(event) =>
-                  onDragStart(event, "io", descriptionFile)
-                }
-                draggable
-                title="Click for info, drag and drop to add to pipeline."
-                className={
-                  "dndnode" +
-                  (descriptionFile === selectedStep ? " selected" : "")
-                }
-                onClick={() => onStepClick(descriptionFile)}
-              >
-                {stepName}
-              </div>
-            );
+            return <PipelineStep descriptionFile={descriptionFile} fileName={fileName} selectedStep={selectedStep} stepName={stepName} onStepClick={onStepClick} />
           });
         }
 
@@ -169,10 +190,7 @@ export default function StepChooser(props) {
           <div>
             {isValidElement(pipelineFiles) && pipelineFiles.type === HttpError ? pipelineFiles : renderTree(
               [],
-              Object.entries(pipelineFiles).map((entry) => [
-                entry[0].split(">"),
-                entry[1],
-              ])
+              Object.entries(pipelineFiles).map((entry) => [ entry[0].split(">"), entry[1] ])
             )}
           </div>
         </div>

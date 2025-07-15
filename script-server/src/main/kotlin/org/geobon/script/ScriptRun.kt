@@ -208,11 +208,8 @@ class ScriptRun( // Constructor used in single script run
                             with(File(stringValue)) {
                                 // check if missing or newer than cache
                                 if (!exists()) {
-                                    logBuffer += "Cannot reuse cache: input file $this does not exist.\n".also {
-                                        logger.warn(
-                                            it
-                                        )
-                                    }
+                                    logBuffer += "Cannot reuse cache: input file $this does not exist.\n"
+                                        .also { logger.warn(it) }
                                     return false
                                 }
 
@@ -582,8 +579,13 @@ class ScriptRun( // Constructor used in single script run
             if (!results.containsKey(ERROR_KEY)) {
                 val outputs = results.toMutableMap()
                 outputs[ERROR_KEY] =
-                    if (results.isEmpty()) "Script produced no results. Check log for errors and make sure that the script calls biab_output."
-                    else "An error occurred. Check log for details."
+                    if (results.isEmpty())
+                        "Script produced no results. Check log for errors and make sure that the script calls biab_output. " +
+                                "Also, monitor the memory usage on next run, as this error can be caused by insufficient " +
+                                "memory for the script's usage. See " +
+                                "[troubleshooting documentation](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#troubleshooting)."
+                    else
+                        "An error occurred. Check log for details."
 
                 // Rewrite output file with error
                 resultFile.writeText(RunContext.gson.toJson(outputs))
