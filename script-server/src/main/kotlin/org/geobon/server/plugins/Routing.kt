@@ -287,7 +287,7 @@ fun Application.configureRouting() {
         }
 
         get("/api/versions") {
-            call.respondText(getContainerVersionsJSONObject().toString(), ContentType.Application.Json)
+            call.respondText(getContainerVersionsJSONObject(includeGit = true).toString(), ContentType.Application.Json)
         }
 
 
