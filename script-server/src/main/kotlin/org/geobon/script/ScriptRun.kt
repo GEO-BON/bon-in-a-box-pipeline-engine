@@ -256,30 +256,12 @@ class ScriptRun( // Constructor used in single script run
                             """
                                 ${runner.getSetupBash()}
                                 Rscript -e '
-                                options(error=traceback, keep.source=TRUE, show.error.locations=TRUE)
-
-                                # Define repo for install.packages
-                                repositories = getOption("repos")
-                                repositories["CRAN"] = "https://cloud.r-project.org/"
-                                options(repos = repositories)
-
                                 fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
                                 outputFolder<-"${context.outputFolder.absolutePath}"
-                                library(rjson)
-                                biab_inputs <- function(){
-                                    fromJSON(file=file.path(outputFolder, "input.json"))
-                                }
+                                
                                 biab_output_list <- list()
-                                biab_output <- function(key, value){
-                                    biab_output_list[[ key ]] <<- value
-                                    cat("Output added for \"", key, "\"\n")
-                                }
-                                biab_info <- function(message) biab_output("info", message)
-                                biab_warning <- function(message) biab_output("warning", message)
-                                biab_error_stop <- function(errorMessage){
-                                    biab_output_list[[ "error" ]] <<- errorMessage
-                                    stop(errorMessage)
-                                }
+                                source("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.R")
+                                
                                 withCallingHandlers(source("${scriptFile.absolutePath}"),
                                     error=function(e){
                                         if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {

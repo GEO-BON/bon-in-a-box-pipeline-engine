@@ -1,7 +1,7 @@
 import json
 import sys
 
-# Read inputs, calling script shoud assign the return value to a variable
+# Read inputs, calling script should assign the return value to a variable
 def biab_inputs():
 	inputFile = open(sys.argv[1] + '/input.json')
 	return json.load(inputFile)
