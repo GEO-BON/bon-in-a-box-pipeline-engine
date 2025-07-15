@@ -14,7 +14,7 @@ enum class Containers(
      * Script server container hosts the server but can also run scripts that
      * don't require a specific environment (such as shell scripts).
      */
-    SCRIPT_SERVER("biab-script-server", envCommand = "python3 --version"),
+    SCRIPT_SERVER("biab-script-server"),
 
     /**
      * Runner for Julia scripts
