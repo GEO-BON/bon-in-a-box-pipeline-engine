@@ -21,7 +21,6 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import kotlin.toString
 
 
 /**
@@ -289,7 +288,7 @@ fun Application.configureRouting() {
 
         get("/api/versions") {
             val gitInfo = "Git" to RunContext.getGitInfo()
-            call.respond(Containers.toMap() + gitInfo)
+            call.respond(Containers.toVersionsMap() + gitInfo)
         }
 
 

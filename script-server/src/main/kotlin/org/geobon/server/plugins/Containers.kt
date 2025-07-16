@@ -1,7 +1,6 @@
 package org.geobon.server.plugins
 
 import org.geobon.utils.runToText
-import org.json.JSONObject
 
 enum class Containers(
     val containerName: String,
@@ -65,7 +64,7 @@ enum class Containers(
     }
 
     companion object {
-        fun toMap(): Map<String, Any> {
+        fun toVersionsMap(): Map<String, Any> {
             val versions = mapOf(
                 "UI" to UI.version,
                 "Script server" to SCRIPT_SERVER.version,
