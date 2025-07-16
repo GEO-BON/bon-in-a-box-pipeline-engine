@@ -10,15 +10,16 @@ function formatVersionJson(jsonString, indent) {
   const versionInfo = JSON.parse(jsonString);
 
   for (const key in versionInfo) {
+    if (indent === 0) {
+      formattedString += "\n";
+    }
     if (typeof versionInfo[key] === 'object' && versionInfo[key] !== null) {
       formattedString += "\t".repeat(indent) + `${key}:\n${formatVersionJson(JSON.stringify(versionInfo[key]), indent + 1)}`;
     } else {
-      if(indent === 0) {
-        formattedString += "\n";
-      }
       formattedString += "\t".repeat(indent) + `${key}: ${versionInfo[key]}\n`;
     }
   }
+
   return formattedString;
 }
 
