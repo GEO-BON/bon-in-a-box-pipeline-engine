@@ -22,38 +22,6 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
-fun getGitInfo(): Map<String, String?> {
-    val container: Containers = Containers.SCRIPT_SERVER
-    val gitBinPath = "/usr/bin/git"
-    val gitDirOpt = "--git-dir=/.git"
-    val gitCmd = "$gitBinPath $gitDirOpt"
-
-    val gitCommitIDCommand = "$gitCmd log --format=%h -1"
-    val commit = "commit" to gitCommitIDCommand.runToText()
-
-    val gitCurrentBranchCommand =  "$gitCmd  branch --show-current"
-    val branch = "branch" to gitCurrentBranchCommand.runToText()
-
-    val gitTimeStampCommand = "$gitCmd log --format=%cd -1"
-    val timestamp = "timestamp" to gitTimeStampCommand.runToText()
-
-    return mapOf(commit, branch, timestamp)
-}
-
-fun makeEnvironment(context: RunContext, container: Containers): Map<String, Any?> {
-    val environment = mapOf(
-        "server" to Containers.toMap(),
-        "git" to getGitInfo(),
-        "runner" to mapOf(
-            "containerName" to container.containerName.trimEnd(),
-            "environment" to container.environment,
-            "version" to container.version
-        ),
-    "dependencies" to "$Containers.SCRIPT_SERVER.dockerCommandList cat ${context.outputFolder.absolutePath}/dependencies.txt".runToText()
-    )
-    return environment
-}
-
 class ScriptRun( // Constructor used in single script run
     private val scriptFile: File,
     private val context: RunContext,
@@ -524,8 +492,7 @@ class ScriptRun( // Constructor used in single script run
             }
 
             pidFile.delete()
-            val environment = makeEnvironment(context, container)
-            File("${context.outputFolder.absolutePath}/environment.json").writeText(JSONObject(environment).toString(2))
+            context.createEnvironmentFile(container)
         }
 
         log(logger::debug, "Runner: ${container.containerName} version ${container.version}")
