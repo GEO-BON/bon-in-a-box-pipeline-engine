@@ -11,11 +11,12 @@ import Info from "@mui/icons-material/Info";
 
 import Box from "@mui/material/Box";
 
+import yaml from "js-yaml";
 import { CustomButtonGreen } from "./CustomMUI";
 import Alert from "@mui/material/Alert";
 import { getScriptOutput, getBreadcrumbs } from "../utils/IOId";
 import { isEmptyObject } from "../utils/isEmptyObject";
-import { InlineSpinner } from "./Spinner";
+import { InlineSpinner, Spinner } from "./Spinner";
 import { FoldableOutputWithContext } from "./FoldableOutput";
 import { useInterval } from "../UseInterval";
 import { LogViewer } from "./LogViewer";
@@ -153,6 +154,35 @@ export function PipelineResults({
   } else return null;
 }
 
+function EnvironmentInfo({folder}) {
+  const [environmentData, setEnvironmentData] = useState(null);
+
+  useEffect(() => {
+    fetch("/output/" + folder + "/environment.json")
+    .then((response) => {
+      if (response.ok) {
+        response.json()
+          .then((json) => {
+            setEnvironmentData(json);
+          });
+      } else if (response.status == 404) {
+        setEnvironmentData({ error: "environment file was not created"});
+      } else {
+        setEnvironmentData({ error: response.status + " (" + response.statusText + ")"});
+
+      }
+    })
+      .catch(response => {
+        console.error(response);
+        setEnvironmentData({error: response.status + " (" + response.statusText + ")"});
+      });
+
+  }, []);
+  if (environmentData)
+    return environmentData.error ? <Alert severity="error">{environmentData.error}</Alert> : <pre>{yaml.dump(environmentData)}</pre>
+  return <Spinner />
+}
+
 export function DelayedResult({
   breadcrumbs,
   folder,
@@ -198,6 +228,8 @@ export function DelayedResult({
     // Execute only when folder changes (omitting resultData on purpose)
   }, [folder]);
 
+  
+
   const interval = useInterval(
     () => {
       if (!inputData && scriptMetadata) {
@@ -222,7 +254,8 @@ export function DelayedResult({
           });
         }
       }
-
+      
+      
       // Fetch the output
       fetch("/output/" + folder + "/output.json?t=" + displayTimeStamp)
         .then((response) => {
@@ -290,6 +323,7 @@ export function DelayedResult({
 
   let inputsContent,
     outputsContent,
+    environmentContent,
     inline = null,
     icon = null;
   let className = "foldableScriptResult";
@@ -306,6 +340,7 @@ export function DelayedResult({
       );
     }
 
+    
     if (outputData) {
       outputsContent = (
         <StepResult
@@ -314,6 +349,13 @@ export function DelayedResult({
           sectionName="output"
         />
       );
+      
+      environmentContent = (
+        <FoldableOutput title="Environment" className="stepEnvironment">
+          <EnvironmentInfo folder={folder}/>
+        </FoldableOutput>
+      );
+
       icon = (
         <>
           {outputData.error && <Error color="error" />}
@@ -345,6 +387,7 @@ export function DelayedResult({
       <GeneralDescription ymlPath={script} metadata={scriptMetadata} />
       {inputsContent}
       {outputsContent}
+      {environmentContent}
       {folder && !skippedMessage && (
         <LogViewer address={logsAddress} autoUpdate={!outputData} />
       )}

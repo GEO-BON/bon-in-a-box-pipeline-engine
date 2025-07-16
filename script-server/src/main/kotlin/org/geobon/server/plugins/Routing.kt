@@ -287,24 +287,8 @@ fun Application.configureRouting() {
         }
 
         get("/api/versions") {
-            call.respond(
-                """
-                    UI: ${Containers.UI.version}
-                    Script server: ${Containers.SCRIPT_SERVER.version}
-                        ${Containers.SCRIPT_SERVER.environment}
-                    Conda runner: ${Containers.CONDA.version}
-                        ${Containers.CONDA.environment}
-                    Julia runner: ${Containers.JULIA.version}
-                        ${Containers.JULIA.environment}
-                    TiTiler: ${
-                    Containers.TILER.version.let {
-                        val end = it.lastIndexOf(':')
-                        if (end == -1) it
-                        else it.substring(0, end).replace('T', ' ')
-                    }
-                }
-                """.trimIndent()
-            )
+            val gitInfo = "Git" to RunContext.getGitInfo()
+            call.respond(Containers.toVersionsMap() + gitInfo)
         }
 
 

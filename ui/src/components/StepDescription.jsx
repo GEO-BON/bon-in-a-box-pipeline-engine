@@ -41,6 +41,7 @@ function findLogoImageFromURL(url) {
     }
 }
 
+
 function IdentifierLogo({ src, href }) {
     return <a href={href} target="_blank">
         <img src={src} alt="Identifier logo" title="Go to profile" width="20px"></img>
@@ -71,7 +72,6 @@ function generatePersonList(list) {
             {(isAuthorProperties && hoverCardName) || <Typography style={{ display: "inline" }}>{person.name}</Typography>}
             {comma}
         </span>
-
 
     })
 }
