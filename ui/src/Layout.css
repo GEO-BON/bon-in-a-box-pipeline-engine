@@ -414,6 +414,10 @@ img#greenSquares {
   font-weight: bold;
 }
 
+.MuiAlert-message p {
+  margin: 0;
+}
+
 .outputContent .stepDescription {
   font-size: small;
   background: #444;
