@@ -16,7 +16,7 @@ fun String.runToText(
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
         .redirectErrorStream(showErrors) // Merges stderr into stdout
         .start().also { it.waitFor(timeoutAmount, timeoutUnit) }
-        .inputStream.bufferedReader().readText()
+        .inputStream.bufferedReader().readText().trimEnd()
 }.onFailure { it.printStackTrace() }.getOrNull()
 
 
