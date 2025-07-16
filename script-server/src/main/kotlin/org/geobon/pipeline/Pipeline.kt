@@ -25,12 +25,10 @@ open class Pipeline constructor(
 
     fun getPipelineOutputs(): List<Pipe> = outputs.values.map { it }
 
-    private val finalSteps: Set<Step>
-
     private var job: Job? = null
 
+    private val finalSteps: Set<Step> = outputs.values.mapNotNullTo(mutableSetOf()) { it.step }
     init {
-        finalSteps = outputs.values.mapNotNullTo(mutableSetOf()) { it.step }
         if (finalSteps.isEmpty())
             throw Exception("Pipeline has no designated output")
     }
@@ -83,12 +81,11 @@ open class Pipeline constructor(
                     execute()
                 }
             }
-
-            job?.apply { cancelled = isCancelled }
         } catch (ex: RuntimeException) {
             error = ex.message ?: ex.stackTraceToString()
             logger.debug(error)
 
+            job?.apply { cancelled = isCancelled }
             if (!cancelled) failure = true
         } catch (ex: Exception) {
             error =
@@ -360,7 +357,7 @@ open class Pipeline constructor(
             return if (type.endsWith("[]")) {
                 val jsonArray = try {
                     obj.getJSONArray(valueProperty)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     throw RuntimeException("Constant array #$idForUser has no value in JSON file.")
                 }
 
