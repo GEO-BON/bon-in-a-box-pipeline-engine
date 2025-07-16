@@ -15,7 +15,7 @@ import {
   DialogContentText,
 } from "@mui/material";
 
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useBlocker } from "react-router-dom";
 import ReactFlow, {
   ReactFlowProvider,
@@ -113,12 +113,14 @@ export default function PipelineEditor(props) {
     setAlertSeverity(severity)
     setAlertTitle(title)
     setAlertMessage(message)
+    setModal("alert")
   }, [setAlertTitle, setAlertSeverity, setAlertMessage])
 
   const clearAlert = useCallback(() => {
     setAlertMessage("")
     setAlertSeverity("")
     setAlertTitle("")
+    hideModal("alert")
   }, [setAlertTitle, setAlertSeverity, setAlertMessage])
 
   const hideModal = useCallback((modalName) => {
@@ -729,11 +731,8 @@ export default function PipelineEditor(props) {
         fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
         api.savePipeline(fileNameWithoutExtension, saveJSON, (error, data, response) => {
           if (error) {
-            showAlert(
-              'error',
-              'Error saving the pipeline',
-              getErrorString(error, response)
-            )
+            setAlertMessage(getErrorString(error, response));
+            setModal('saveError');
 
           } else if (response.text) {
             showAlert('warning', 'Pipeline saved with errors', response.text)
@@ -759,7 +758,7 @@ export default function PipelineEditor(props) {
           });
       }
     }
-  }, [showAlert, generateSaveJSON]);
+  }, [showAlert, setSavedJSON, setModal, generateSaveJSON]);
 
   const onLoadFromFileBtnClick = useCallback(() => {
     if(hasUnsavedChanges) {
@@ -1142,6 +1141,22 @@ export default function PipelineEditor(props) {
       </Dialog>
 
       <Dialog
+        open={modal === 'saveError'}
+        onClose={() => hideModal('saveError')}
+      >
+        <DialogTitle>Error saving the pipeline</DialogTitle>
+        <DialogContent>
+          <Alert severity="error" style={{ whiteSpace: "pre-wrap" }}>
+            {alertMessage}
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={(_) => { hideModal('saveError'); onSave() }}>Save to clipboard</Button>
+          <Button onClick={(_) => hideModal('saveError')}>Dismiss</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
         open={modal === 'clear'}
         onClose={() => hideModal('clear')}
       >
@@ -1211,7 +1226,7 @@ export default function PipelineEditor(props) {
         </DialogActions>
       </Dialog>
 
-      {alertMessage && alertMessage !== '' && // when in open={...}, there was a flash frame while closing.
+      {modal === "alert" && // when in open={...}, there was a flash frame while closing.
         <Dialog open={true} onClose={clearAlert}>
           <Alert severity={alertSeverity} id="alert-dialog-description" style={{ whiteSpace: "pre-wrap" }}>
             <AlertTitle>{alertTitle}</AlertTitle>
@@ -1266,14 +1281,9 @@ export default function PipelineEditor(props) {
                 <button onClick={onLoadFromServerBtnClick}>
                   Load from server
                 </button>
-                {/^deny$/i.test(import.meta.env.VITE_APP_SAVE_PIPELINE_TO_SERVER)
-                  ? <button id="saveBtn" onClick={() => onSave()}>Save to clipboard</button>
-                  : <>
-                    <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
-                    <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
-                    <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
-                  </>
-                }
+                <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
+                <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
+                <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
               </div>
 
               <Controls />

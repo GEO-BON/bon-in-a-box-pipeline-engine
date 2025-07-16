@@ -14,6 +14,7 @@ object Description {
     const val OUTPUTS = "outputs"
     const val IO__TYPE = "type"
     const val IO__TYPE_OPTIONS = "options"
+    const val IO__LABEL = "label"
 
     const val CONDA = "conda"
     const val CONDA__NAME = "name"

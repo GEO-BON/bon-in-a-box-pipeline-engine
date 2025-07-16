@@ -65,8 +65,8 @@ export default function ScriptInput({
       });
 
       let optionsValue;
-      if(multiple)
-        optionsValue = fieldValue ? optionObjects.filter((opt)=>fieldValue.includes(opt.value)) : []
+      if (multiple)
+        optionsValue = fieldValue ? optionObjects.filter((opt) => fieldValue.includes(opt.value)) : []
       else
         optionsValue = fieldValue || ""
 
@@ -239,15 +239,16 @@ export default function ScriptInput({
           /^(null)?$/i.test(e.target.value) ? null : e.target.value
         );
 
+      const stringValue = fieldValue ? fieldValue.toString() : "";
       const props = {
-        value: fieldValue || "",
+        value: stringValue,
         onChange: (e) => setFieldValue(e.target.value),
         placeholder: "null",
         onBlur: updateValue,
         ...passedProps,
       };
 
-      if (fieldValue && fieldValue.includes("\n")) {
+      if (stringValue.includes("\n")) {
         props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
         return (
           <AutoResizeTextArea
