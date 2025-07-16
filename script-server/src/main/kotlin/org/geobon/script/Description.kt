@@ -8,13 +8,12 @@ object Description {
     // General script description
     const val SCRIPT = "script"
     const val NAME = "name"
-    const val INPUTS = "inputs"
-    const val OUTPUTS = "outputs"
     const val TIMEOUT = "timeout"
 
-    // IO description
-    const val TYPE = "type"
-    const val TYPE_OPTIONS = "options"
+    const val INPUTS = "inputs"
+    const val OUTPUTS = "outputs"
+    const val IO__TYPE = "type"
+    const val IO__TYPE_OPTIONS = "options"
 
     const val CONDA = "conda"
     const val CONDA__NAME = "name"

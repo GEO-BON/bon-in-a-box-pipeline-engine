@@ -3,8 +3,8 @@ package org.geobon.pipeline
 import org.geobon.script.Description.INPUTS
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
-import org.geobon.script.Description.TYPE
-import org.geobon.script.Description.TYPE_OPTIONS
+import org.geobon.script.Description.IO__TYPE
+import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.ScriptRun
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -68,8 +68,8 @@ abstract class YMLStep(
         context = RunContext(yamlFile, resolvedInputs)
 
         try { // Validation
-            inputs.filter { (_, pipe) -> pipe.type == TYPE_OPTIONS }.forEach { (key, _) ->
-                val options = readIODescription(INPUTS, key)?.get(TYPE_OPTIONS) as? List<*>
+            inputs.filter { (_, pipe) -> pipe.type == IO__TYPE_OPTIONS }.forEach { (key, _) ->
+                val options = readIODescription(INPUTS, key)?.get(IO__TYPE_OPTIONS) as? List<*>
                     ?: throw RuntimeException("$yamlFile: No options found for input parameter $key.")
 
                 if (!options.contains(resolvedInputs[key])) {
@@ -160,7 +160,7 @@ abstract class YMLStep(
                     it.forEach { (key, description) ->
                         key?.let {
                             if (description is Map<*, *>) {
-                                description[TYPE]?.let { type ->
+                                description[IO__TYPE]?.let { type ->
                                     toExecute(key.toString(), type.toString())
                                 } ?: logger.error("Invalid type")
                             } else {
