@@ -9,7 +9,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.geobon.hpc.HPCConnection
+import org.geobon.hpc.HPC
 import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
@@ -41,8 +41,7 @@ private val logger: Logger = LoggerFactory.getLogger("Server")
 
 fun Application.configureRouting() {
 
-    val hpcCredentials = System.getenv("HPC_SSH_CREDENTIALS")
-    val hpc = HPCConnection(hpcCredentials)
+    val hpc = HPC.instance
 
     routing {
         get("/api/systemStatus") {
@@ -293,22 +292,18 @@ fun Application.configureRouting() {
         }
 
         get("/hpc/status") {
-            call.respond(mapOf(
-                "R" to hpc.rStatus.statusMap(),
-                "Python" to hpc.pythonStatus.statusMap(),
-                "Julia" to hpc.juliaStatus.statusMap()
-            ))
+            call.respond(hpc.connection.statusMap())
         }
 
         get("/hpc/prepare") {
-            if(!hpc.configured) {
+            if(!hpc.connection.configured) {
                 call.respond(HttpStatusCode.ServiceUnavailable, "HPC not configured on this server")
                 return@get
             }
 
             runBlocking {
                 launch {
-                    hpc.prepare()
+                    hpc.connection.prepare()
                 }
 
                 // We respond OK immediately when started, status API can be checked for progress.

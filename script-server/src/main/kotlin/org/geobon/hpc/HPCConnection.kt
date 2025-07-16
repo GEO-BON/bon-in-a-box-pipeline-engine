@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit
 @OptIn(DelicateCoroutinesApi::class)
 class HPCConnection(
     private val sshCredentials: String?,
+    autoConnect: Boolean,
     condaContainer: Containers = Containers.CONDA,
     juliaContainer: Containers = Containers.JULIA
 ) {
@@ -25,14 +26,14 @@ class HPCConnection(
 
     val configured: Boolean
         get() = rStatus.state != ApptainerImageState.NOT_CONFIGURED
-            && juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
+                && juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
 
     init {
-        if(!sshCredentials.isNullOrBlank()){
+        if (!sshCredentials.isNullOrBlank()) {
             juliaStatus.state = ApptainerImageState.CONFIGURED
             rStatus.state = ApptainerImageState.CONFIGURED
 
-            if(System.getenv("HPC_AUTO_CONNECT") == "true") {
+            if (autoConnect) {
                 // We are launching preparation non-blocking,
                 // and not interested immediately in the result,
                 // hence using this DelicateCoroutinesApi
@@ -66,7 +67,7 @@ class HPCConnection(
     }
 
     private fun prepareApptainer(apptainerImage: ApptainerImage) {
-        if(sshCredentials.isNullOrBlank()){
+        if (sshCredentials.isNullOrBlank()) {
             apptainerImage.message = "Configure HPC_SSH_CREDENTIALS before attenpting to connect to the HPC."
             return
         }
@@ -107,7 +108,7 @@ class HPCConnection(
                 "-i", "/run/secrets/hpc_ssh_key",
                 "-o", "IdentitiesOnly=yes",
                 "-o", "RequestTTY=no",
-                "-o",  "UserKnownHostsFile=/run/secrets/hpc_known_hosts",
+                "-o", "UserKnownHostsFile=/run/secrets/hpc_known_hosts",
                 sshCredentials,
                 """
                     if [ -f $apptainerImageName ]; then
@@ -125,7 +126,7 @@ class HPCConnection(
             process.waitFor(10, TimeUnit.MINUTES)
 
             val sysOut = process.inputStream.bufferedReader().readText()
-            if(sysOut.isNotBlank()) logger.info(sysOut) // excludes error stream
+            if (sysOut.isNotBlank()) logger.info(sysOut) // excludes error stream
 
             apptainerImage.state = if (process.exitValue() == 0) {
                 ApptainerImageState.READY
@@ -139,6 +140,14 @@ class HPCConnection(
             apptainerImage.message = ex.message
             apptainerImage.state = ApptainerImageState.ERROR
         }
+    }
+
+    fun statusMap(): Map<String, Map<String, String?>> {
+        return mapOf(
+            "R" to rStatus.statusMap(),
+            "Python" to pythonStatus.statusMap(),
+            "Julia" to juliaStatus.statusMap()
+        )
     }
 
     companion object {
