@@ -5,6 +5,7 @@ import kotlinx.coroutines.*
 import org.json.JSONObject
 import org.geobon.pipeline.RunContext
 import org.geobon.server.plugins.Containers
+import org.geobon.utils.runToText
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -21,60 +22,35 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
-fun runCommand(command: List<String>): String {
-    val processBuilder = ProcessBuilder(command)
-    processBuilder.redirectErrorStream(true) // merge stderr with stdout
-
-    val process = processBuilder.start()
-    val output = StringBuilder()
-
-    BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
-        var line: String?
-        while (reader.readLine().also { line = it } != null) {
-            output.appendLine(line)
-        }
-    }
-
-    val exitCode = process.waitFor()
-    if (exitCode != 0) {
-        println("Command exited with code $exitCode")
-    }
-
-    return output.toString().trimEnd()
-}
-
-fun getGitInfoJSONObject(): JSONObject {
-
-    val gitInfo = JSONObject()
-    val gitBinPath = "/usr/bin/git"
+fun getGitInfo(): Map<String, String?> {
     val container: Containers = Containers.SCRIPT_SERVER
+    val gitBinPath = "/usr/bin/git"
     val gitDirOpt = "--git-dir=/.git"
-    val gitCmd = listOf(gitBinPath, gitDirOpt)
-    val gitCommandCommitID = gitCmd + listOf("log", "--format=%h", "-1")
-    val gitCommandCurrentBranch =  gitCmd + listOf("branch", "--show-current")
-    val gitCommandTimeStamp = gitCmd + listOf("log", "--format=%cd", "-1")
+    val gitCmd = "$gitBinPath $gitDirOpt"
 
-    gitInfo.put("commit ", runCommand( gitCommandCommitID))
-    gitInfo.put("branch", runCommand(gitCommandCurrentBranch))
-    gitInfo.put("timestamp", runCommand(gitCommandTimeStamp))
+    val gitCommitIDCommand = "$gitCmd log --format=%h -1"
+    val commit = "commit" to gitCommitIDCommand.runToText()
 
-    return gitInfo
+    val gitCommandCurrentBranch =  "$gitCmd  branch --show-current"
+    val branch = "branch" to gitCommandCurrentBranch.runToText()
+
+    val gitCommandTimeStamp = "$gitCmd log --format=%cd -1"
+    val timestamp = "timestamp" to gitCommandTimeStamp.runToText()
+
+    return mapOf(commit, branch, timestamp)
 }
 
-fun makeEnvironmentJSONObject(context: RunContext, container: Containers): JSONObject {
-    val environment = JSONObject()
-    environment.put("server", Containers.toJSONObject())
-    environment.put("git", getGitInfoJSONObject())
-    environment.put("runner",
-        JSONObject(mapOf(
+fun makeEnvironment(context: RunContext, container: Containers): Map<String, Any?> {
+    val environment = mapOf(
+        "server" to Containers.toMap(),
+        "git" to getGitInfo(),
+        "runner" to mapOf(
             "containerName" to container.containerName.trimEnd(),
-            "environment" to container.environment.trimEnd(),
-            "version" to container.version.trimEnd())
-        )
+            "environment" to container.environment,
+            "version" to container.version
+        ),
+    "dependencies" to "$Containers.SCRIPT_SERVER.dockerCommandList cat ${context.outputFolder.absolutePath}/dependencies.txt".runToText()
     )
-    environment.put("dependencies",
-        runCommand(Containers.SCRIPT_SERVER.dockerCommandList
-                + listOf("cat", "${context.outputFolder.absolutePath}/dependencies.txt")))
     return environment
 }
 
@@ -548,8 +524,8 @@ class ScriptRun( // Constructor used in single script run
             }
 
             pidFile.delete()
-            val environment: JSONObject = makeEnvironmentJSONObject(context, container)
-            File("${context.outputFolder.absolutePath}/environment.json").writeText(environment.toString(2))
+            val environment = makeEnvironment(context, container)
+            File("${context.outputFolder.absolutePath}/environment.json").writeText(JSONObject(environment).toString(2))
         }
 
         log(logger::debug, "Runner: ${container.containerName} version ${container.version}")

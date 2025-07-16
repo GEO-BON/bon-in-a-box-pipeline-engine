@@ -1,5 +1,4 @@
 package org.geobon.server.plugins
-import org.geobon.script.getGitInfoJSONObject
 
 import org.geobon.utils.runToText
 import org.json.JSONObject
@@ -66,15 +65,13 @@ enum class Containers(
     }
 
     companion object {
-        fun toJSONObject(): JSONObject {
-            val versions = JSONObject()
-            versions.put("UI", UI.version.trimEnd())
-            versions.put("Script server", SCRIPT_SERVER.version)
-            versions.put("Conda runner", "${CONDA.version}\n\t${CONDA.environment.replaceFirst("\n", "\n\t")}".trimEnd())
-            versions.put("Julia runner", "${JULIA.version}\n\t${JULIA.environment}".trimEnd())
-            versions.put(
-                "TiTiler",
-                TILER.version.let {
+        fun toMap(): Map<String, Any> {
+            val versions = mapOf(
+                "UI" to UI.version,
+                "Script server" to SCRIPT_SERVER.version,
+                "Conda runner" to mapOf("container version" to CONDA.version, "environment" to CONDA.environment.replaceFirst("\n", " ")),
+                "Julia runner" to mapOf("container version" to JULIA.version, "environment" to JULIA.environment),
+                "TiTiler" to TILER.version.let {
                     val end = it.lastIndexOf(':'); if (end == -1) it; else it.substring(0, end).replace('T', ' ')
                 }.trimEnd()
             )

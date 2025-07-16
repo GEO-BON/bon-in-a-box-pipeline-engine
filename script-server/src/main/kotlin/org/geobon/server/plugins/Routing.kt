@@ -11,7 +11,7 @@ import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
 import org.geobon.pipeline.RunContext.Companion.scriptRoot
-import org.geobon.script.getGitInfoJSONObject
+import org.geobon.script.getGitInfo
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -289,9 +289,8 @@ fun Application.configureRouting() {
         }
 
         get("/api/versions") {
-            val versions = Containers.toJSONObject()
-            versions.put("git", getGitInfoJSONObject())
-            call.respondText(versions.toString(), ContentType.Application.Json)
+            val gitInfo = "Git" to getGitInfo()
+            call.respond(Containers.toMap() + gitInfo)
         }
 
 
