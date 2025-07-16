@@ -31,11 +31,11 @@ fun getGitInfo(): Map<String, String?> {
     val gitCommitIDCommand = "$gitCmd log --format=%h -1"
     val commit = "commit" to gitCommitIDCommand.runToText()
 
-    val gitCommandCurrentBranch =  "$gitCmd  branch --show-current"
-    val branch = "branch" to gitCommandCurrentBranch.runToText()
+    val gitCurrentBranchCommand =  "$gitCmd  branch --show-current"
+    val branch = "branch" to gitCurrentBranchCommand.runToText()
 
-    val gitCommandTimeStamp = "$gitCmd log --format=%cd -1"
-    val timestamp = "timestamp" to gitCommandTimeStamp.runToText()
+    val gitTimeStampCommand = "$gitCmd log --format=%cd -1"
+    val timestamp = "timestamp" to gitTimeStampCommand.runToText()
 
     return mapOf(commit, branch, timestamp)
 }
