@@ -281,7 +281,7 @@ No authorization required
 
 ## getVersions
 
-> String getVersions()
+> Object getVersions()
 
 Returns the version of system components.
 
@@ -306,7 +306,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-**String**
+**Object**
 
 ### Authorization
 
@@ -315,7 +315,7 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: text/plain
+- **Accept**: application/json
 
 
 ## run
