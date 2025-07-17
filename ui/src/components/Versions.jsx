@@ -5,7 +5,7 @@ import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
-function formatVersionJson(jsonString, indent) {
+function formatVersionJson(jsonString, indent = 0) {
   let formattedString = "";
   const versionInfo = JSON.parse(jsonString);
 
@@ -29,14 +29,14 @@ export default function Versions() {
   useEffect(() => {
     api.getVersions((error, _, response) => {
       if (error) setVersions(<HttpError httpError={error} response={response} context="fetching version information" />);
-      else if (response && response.text) setVersions(response.text);
+      else if (response && response.text) setVersions(formatVersionJson(response.text).trim());
       else setVersions(null);
     });
   }, []);
 
   return (
     <p style={{ whiteSpace: "pre-wrap" }}>
-      {versions ? formatVersionJson(versions, 0).trim() : <Spinner variant='light' />}
+      {versions || <Spinner variant='light' />}
     </p>
   );
 }
