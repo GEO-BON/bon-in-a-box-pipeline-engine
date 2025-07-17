@@ -46,14 +46,14 @@ data class RunContext(val runId: String, val inputs: String?) {
 
     fun getEnvironment(container: Containers): Map<String, Any?> {
         val environment = mapOf(
-            "server" to Containers.toMap(),
+            "server" to Containers.toVersionsMap(),
             "git" to getGitInfo(),
             "runner" to mapOf(
-                "containerName" to container.containerName.trimEnd(),
+                "containerName" to container.containerName,
                 "environment" to container.environment,
                 "version" to container.version
             ),
-            "dependencies" to "${Containers.SCRIPT_SERVER.dockerCommandList.joinToString(" ") } cat ${outputFolder.absolutePath}/dependencies.txt".runToText(showErrors = false)
+            "dependencies" to "cat ${outputFolder.absolutePath}/dependencies.txt".runToText(showErrors = false)
         )
         return environment
     }
@@ -93,7 +93,6 @@ data class RunContext(val runId: String, val inputs: String?) {
             .create()
 
         fun getGitInfo(): Map<String, String?> {
-            val container: Containers = Containers.SCRIPT_SERVER
             val gitBinPath = "/usr/bin/git"
             val gitDirOpt = "--git-dir=/.git"
             val gitCmd = "$gitBinPath $gitDirOpt"
@@ -106,6 +105,7 @@ data class RunContext(val runId: String, val inputs: String?) {
 
             val gitTimeStampCommand = "$gitCmd log --format=%cd -1"
             val timestamp = "timestamp" to gitTimeStampCommand.runToText(showErrors = false)
+
 
             return mapOf(commit, branch, timestamp)
         }

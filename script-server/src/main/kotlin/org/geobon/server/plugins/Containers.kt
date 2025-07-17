@@ -65,7 +65,7 @@ enum class Containers(
     }
 
     companion object {
-        fun toMap(): Map<String, Any> {
+        fun toVersionsMap(): Map<String, Any> {
             val versions = mapOf(
                 "UI" to UI.version,
                 "Script server" to SCRIPT_SERVER.version,

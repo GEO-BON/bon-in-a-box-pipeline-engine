@@ -13,6 +13,7 @@ function formatVersionJson(jsonString, indent = 0) {
     if (indent === 0) {
       formattedString += "\n";
     }
+
     if (typeof versionInfo[key] === 'object' && versionInfo[key] !== null) {
       formattedString += "\t".repeat(indent) + `${key}:\n${formatVersionJson(JSON.stringify(versionInfo[key]), indent + 1)}`;
     } else {

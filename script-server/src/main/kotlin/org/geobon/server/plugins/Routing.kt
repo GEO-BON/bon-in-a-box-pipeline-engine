@@ -289,7 +289,7 @@ fun Application.configureRouting() {
 
         get("/api/versions") {
             val gitInfo = "Git" to RunContext.getGitInfo()
-            call.respond(Containers.toMap() + gitInfo)
+            call.respond(Containers.toVersionsMap() + gitInfo)
         }
 
 
