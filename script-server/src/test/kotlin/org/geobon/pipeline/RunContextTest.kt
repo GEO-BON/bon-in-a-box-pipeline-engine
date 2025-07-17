@@ -1,6 +1,5 @@
 package org.geobon.pipeline
 
-import io.kotest.extensions.system.OverrideMode
 import org.geobon.server.plugins.Containers
 import java.io.File
 import kotlin.test.*
@@ -8,8 +7,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 import io.kotest.extensions.system.withEnvironment
-import io.kotest.matchers.string.shouldHaveLength
-import io.kotest.mpp.env
 import org.json.JSONObject
 
 internal class RunContextTest {
@@ -94,11 +91,11 @@ internal class RunContextTest {
         withEnvironment("GIT_LOCATION", "../.git") {
             val gitInfo: Map<String, String?> = RunContext.getGitInfo()
             assertTrue(gitInfo.contains("commit"))
-            assertEquals(8, gitInfo.get("commit")?.length)
+            assertEquals(8, gitInfo["commit"]?.length)
             assertTrue(gitInfo.contains("branch"))
-            assertTrue(gitInfo.get("branch")?.length?.let{it > 0} == true)
+            assertTrue(gitInfo["branch"]!!.isNotEmpty())
             assertTrue(gitInfo.contains("timestamp"))
-            assertTrue(gitInfo.get("timestamp")?.length?.let{it > 0} == true)
+            assertTrue(gitInfo["timestamp"]!!.isNotEmpty())
         }
     }
 
