@@ -2,13 +2,26 @@ package org.geobon.pipeline
 
 import org.geobon.server.plugins.Containers
 import java.io.File
-import kotlin.test.Test
+import kotlin.test.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 internal class RunContextTest {
+    @BeforeTest
+    fun setupOutputFolder() {
+        with(outputRoot) {
+            assertTrue(!exists())
+            mkdirs()
+            assertTrue(exists())
+        }
+    }
 
+    @AfterTest
+    fun removeOutputFolder() {
+        assertTrue(outputRoot.deleteRecursively())
+    }
+    
     @Test
     fun givenSameInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdSame() {
         val someFile = File(RunContext.scriptRoot, "someFile")
@@ -78,5 +91,18 @@ internal class RunContextTest {
         // git info is tested done above
         // only need to test for dependencies
         assertTrue(environmentInfo.contains("dependencies"))
+    }
+
+    @Test
+    fun givenCreateEnvironmentFile_thenFileExists() {
+        val someFile = File(RunContext.scriptRoot, "someFile")
+        val inputs1 = "{aaa:111, bbb:222}"
+        val run = RunContext(someFile, inputs1)
+        run.outputFolder.mkdirs()
+       run.createEnvironmentFile(Containers.SCRIPT_SERVER)
+
+        val folder = File( run.outputFolder.absolutePath, "environment.json" )
+        assertTrue(folder.isFile)
+        run.outputFolder.deleteRecursively()
     }
 }
