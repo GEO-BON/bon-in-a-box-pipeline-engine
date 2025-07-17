@@ -59,7 +59,7 @@ class ApplicationTest {
             assertTrue(folder.isDirectory)
 
             val files = folder.listFiles()
-            assertTrue(files!!.size == 3, "Expected input, output and log files to be there.\nFound ${files.toList()}")
+            assertTrue(files!!.size == 5, "Expected input, output, dependencies, environment and log files to be there.\nFound ${files.toList()}")
         }
 
         client.get("/api/history").apply {
@@ -101,8 +101,8 @@ class ApplicationTest {
 
             val files = folder.listFiles()
             assertTrue(
-                files!!.size == 4,
-                "Expected input, pipeline output, script output and log files to be there.\nFound ${files.toList()}"
+                files!!.size == 6,
+                "Expected input, pipeline output, dependencies, envrionment, script output and log files to be there.\nFound ${files.toList()}"
             )
 
             assertEquals(
@@ -260,17 +260,14 @@ class ApplicationTest {
     fun testGetVersion() = testApplication {
         application { module() }
 
-        client.get("/api/versions").apply {
-            assertEquals(HttpStatusCode.OK, status)
-            bodyAsText().also { body ->
-                assertContains(body, "UI: offline")
-                assertContains(body, "Script server: offline")
-                assertContains(body, "Conda runner: offline")
-                assertContains(body, "Julia runner: offline")
-                assertContains(body, "TiTiler: ") // There can be one or not when testing locally...
-                println(body)
-            }
-        }
+        val response = client.get("/api/versions")
+        assertEquals(HttpStatusCode.OK, response.status)
+        val result = JSONObject(response.bodyAsText())
+        assertEquals(result.get("UI"),"offline" )
+        assertEquals(result.get("Script server"),"offline" )
+        assertEquals(result.get("Conda runner").toString(),"{\"container version\":\"offline\",\"environment\":\"\"}" )
+        assertEquals(result.get("Julia runner").toString(),"{\"container version\":\"offline\",\"environment\":\"\"}" )
+        assertEquals(result.get("TiTiler"),"offline" )
     }
 
 }

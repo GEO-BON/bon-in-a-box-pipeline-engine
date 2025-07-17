@@ -53,7 +53,7 @@ data class RunContext(val runId: String, val inputs: String?) {
                 "environment" to container.environment,
                 "version" to container.version
             ),
-            "dependencies" to "${Containers.SCRIPT_SERVER.dockerCommandList.joinToString(" ") } cat ${outputFolder.absolutePath}/dependencies.txt".runToText()
+            "dependencies" to "${Containers.SCRIPT_SERVER.dockerCommandList.joinToString(" ") } cat ${outputFolder.absolutePath}/dependencies.txt".runToText(showErrors = false)
         )
         return environment
     }
@@ -99,13 +99,13 @@ data class RunContext(val runId: String, val inputs: String?) {
             val gitCmd = "$gitBinPath $gitDirOpt"
 
             val gitCommitIDCommand = "$gitCmd log --format=%h -1"
-            val commit = "commit" to gitCommitIDCommand.runToText()
+            val commit = "commit" to gitCommitIDCommand.runToText(showErrors = false)
 
             val gitCurrentBranchCommand =  "$gitCmd  branch --show-current"
-            val branch = "branch" to gitCurrentBranchCommand.runToText()
+            val branch = "branch" to gitCurrentBranchCommand.runToText(showErrors = false)
 
             val gitTimeStampCommand = "$gitCmd log --format=%cd -1"
-            val timestamp = "timestamp" to gitTimeStampCommand.runToText()
+            val timestamp = "timestamp" to gitTimeStampCommand.runToText(showErrors = false)
 
             return mapOf(commit, branch, timestamp)
         }

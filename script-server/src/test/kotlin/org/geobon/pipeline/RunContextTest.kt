@@ -1,9 +1,11 @@
 package org.geobon.pipeline
 
+import org.geobon.server.plugins.Containers
 import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 internal class RunContextTest {
 
@@ -56,5 +58,25 @@ internal class RunContextTest {
         val run2 = RunContext(someFile, inputs2)
 
         assertNotEquals(run1.runId, run2.runId)
+    }
+
+    @Test
+    fun givenNoGitFolder_whenQueried_thenGetGitInfo() {
+        val gitInfo: Map<String, String?> = RunContext.getGitInfo()
+        assertTrue(gitInfo.contains("commit"))
+        assertTrue(gitInfo.contains("branch"))
+        assertTrue(gitInfo.contains("timestamp"))
+    }
+
+    @Test
+    fun givenEnvironmentInfo_whenQueried_thenGetEnvironmentInfo() {
+        val someFile = File(RunContext.scriptRoot, "someFile")
+        val inputs1 = "{aaa:111, bbb:222}"
+        val run = RunContext(someFile, inputs1)
+        val environmentInfo = run.getEnvironment(Containers.SCRIPT_SERVER)
+        // server info is a test of verions, done in routing
+        // git info is tested done above
+        // only need to test for dependencies
+        assertTrue(environmentInfo.contains("dependencies"))
     }
 }
