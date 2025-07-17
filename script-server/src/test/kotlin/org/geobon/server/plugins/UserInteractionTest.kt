@@ -54,7 +54,7 @@ class UserInteractionTest {
             assertTrue(folder.isDirectory)
 
             val files = folder.listFiles()
-            assertTrue(files!!.size == 3, "Expected input, output and log files to be there.\nFound ${files.toList()}")
+            assertTrue(files!!.size == 5, "Expected input, output, environment, dependencies and log files to be there.\nFound ${files.toList()}")
         }
     }
 }
