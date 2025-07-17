@@ -1,11 +1,16 @@
 package org.geobon.pipeline
 
+import io.kotest.extensions.system.OverrideMode
 import org.geobon.server.plugins.Containers
 import java.io.File
 import kotlin.test.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
+import io.kotest.extensions.system.withEnvironment
+import io.kotest.matchers.string.shouldHaveLength
+import io.kotest.mpp.env
+import org.json.JSONObject
 
 internal class RunContextTest {
     @BeforeTest
@@ -21,7 +26,7 @@ internal class RunContextTest {
     fun removeOutputFolder() {
         assertTrue(outputRoot.deleteRecursively())
     }
-    
+
     @Test
     fun givenSameInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdSame() {
         val someFile = File(RunContext.scriptRoot, "someFile")
@@ -74,35 +79,58 @@ internal class RunContextTest {
     }
 
     @Test
-    fun givenNoGitFolder_whenQueried_thenGetGitInfo() {
+    fun givenNoGitFolder_whenGetGitInfo_thenEmptyWithNoErrorMessage() {
         val gitInfo: Map<String, String?> = RunContext.getGitInfo()
         assertTrue(gitInfo.contains("commit"))
+        assertEquals("", gitInfo.get("commit"))
         assertTrue(gitInfo.contains("branch"))
+        assertEquals("", gitInfo.get("branch"))
         assertTrue(gitInfo.contains("timestamp"))
+        assertEquals("", gitInfo.get("timestamp"))
     }
 
     @Test
-    fun givenEnvironmentInfo_whenQueried_thenGetEnvironmentInfo() {
+    fun givenGitFolder_whenGetGitInfo_thenShouldHaveGitInfo() {
+        withEnvironment("GIT_LOCATION", "../.git") {
+            val gitInfo: Map<String, String?> = RunContext.getGitInfo()
+            assertTrue(gitInfo.contains("commit"))
+            assertEquals(8, gitInfo.get("commit")?.length)
+            assertTrue(gitInfo.contains("branch"))
+            assertTrue(gitInfo.get("branch")?.length?.let{it > 0} == true)
+            assertTrue(gitInfo.contains("timestamp"))
+            assertTrue(gitInfo.get("timestamp")?.length?.let{it > 0} == true)
+        }
+    }
+
+    @Test
+    fun givenScriptHasRun_whenGettingEnvironment_thenDependenciesAreRead() {
         val someFile = File(RunContext.scriptRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val run = RunContext(someFile, inputs1)
+        run.outputFolder.mkdirs()
+        File("${run.outputFolder.absolutePath}/dependencies.txt").writeText("here are some dependencies")
         val environmentInfo = run.getEnvironment(Containers.SCRIPT_SERVER)
         // server info is a test of verions, done in routing
         // git info is tested done above
         // only need to test for dependencies
         assertTrue(environmentInfo.contains("dependencies"))
+        assertEquals("here are some dependencies", environmentInfo.get("dependencies"))
     }
 
     @Test
-    fun givenCreateEnvironmentFile_thenFileExists() {
+    fun givenRunContext_whenCreateEnvironmentFile_thenFileExistsAndContainsEnvInfo() {
         val someFile = File(RunContext.scriptRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val run = RunContext(someFile, inputs1)
         run.outputFolder.mkdirs()
        run.createEnvironmentFile(Containers.SCRIPT_SERVER)
 
-        val folder = File( run.outputFolder.absolutePath, "environment.json" )
-        assertTrue(folder.isFile)
-        run.outputFolder.deleteRecursively()
+        val environmentFile = File( run.outputFolder.absolutePath, "environment.json" )
+        assertTrue(environmentFile.isFile)
+        val environmentInfo: JSONObject = JSONObject(environmentFile.readText())
+        assertTrue(environmentInfo.has("server"))
+        assertTrue(environmentInfo.has("git"))
+        assertTrue(environmentInfo.has("runner"))
+        assertTrue(environmentInfo.has("dependencies"))
     }
 }

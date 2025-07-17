@@ -25,6 +25,7 @@ services:
       USERDATA_LOCATION: /userdata
       PIPELINES_LOCATION: /pipelines
       OUTPUT_LOCATION: /output
+      GIT_LOCATION: /.git
       PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
       USE_RUNNERS: true
 

@@ -94,7 +94,8 @@ data class RunContext(val runId: String, val inputs: String?) {
 
         fun getGitInfo(): Map<String, String?> {
             val gitBinPath = "/usr/bin/git"
-            val gitDirOpt = "--git-dir=/.git"
+            val gitDir = System.getenv("GIT_LOCATION")
+            val gitDirOpt = "--git-dir=$gitDir"
             val gitCmd = "$gitBinPath $gitDirOpt"
 
             val gitCommitIDCommand = "$gitCmd log --format=%h -1"
