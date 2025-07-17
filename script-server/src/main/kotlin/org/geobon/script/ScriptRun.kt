@@ -2,10 +2,8 @@ package org.geobon.script
 
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
-import org.json.JSONObject
 import org.geobon.pipeline.RunContext
 import org.geobon.server.plugins.Containers
-import org.geobon.utils.runToText
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -14,8 +12,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
-import java.io.InputStreamReader
-import java.io.BufferedReader
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.DurationUnit
@@ -52,6 +48,8 @@ class ScriptRun( // Constructor used in single script run
         val DEFAULT_TIMEOUT = 24.hours
         private val TIMESTAMP_FORMAT: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
         private val useRunners = System.getenv("USE_RUNNERS").equals("true", ignoreCase = true)
+
+        private val CONDA_ENV_SCRIPT = "${System.getenv("SCRIPT_STUBS_LOCATION")}/system/condaEnvironment.sh"
     }
 
     suspend fun execute() {
@@ -209,6 +207,7 @@ class ScriptRun( // Constructor used in single script run
                     }
                 }
 
+                val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
                 val command: List<String>
                 when (scriptFile.extension) {
                     "jl", "JL" -> {
@@ -256,20 +255,19 @@ class ScriptRun( // Constructor used in single script run
                     }
 
                     "r", "R" -> {
-                        val runner = CondaRunner(logFile, pidFile, "r", condaEnvName, condaEnvYml)
-                        container = CondaRunner.container
+                        container = Containers.CONDA
 
                         command = container.dockerCommandList + listOf(
                             "bash", "-c",
                             """
-                                ${runner.getSetupBash()}
+                                source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
                                 Rscript -e '
                                 fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
                                 outputFolder<-"${context.outputFolder.absolutePath}"
-                                
+
                                 biab_output_list <- list()
                                 source("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.R")
-                                
+
                                 withCallingHandlers(source("${scriptFile.absolutePath}"),
                                     error=function(e){
                                         if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
@@ -298,17 +296,14 @@ class ScriptRun( // Constructor used in single script run
                     "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
                     "py", "PY" -> {
                         val scriptPath = scriptFile.absolutePath
-                        val pythonWrapper = "${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/scriptWrapper.py"
+                        val pythonWrapper = "${System.getenv("SCRIPT_STUBS_LOCATION")}/system/scriptWrapper.py"
 
                         if(useRunners) {
-                            val runner = CondaRunner(logFile, pidFile, "python", condaEnvName, condaEnvYml)
-                            container = CondaRunner.container
-
-                            val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
+                            container = Containers.CONDA
                             command = container.dockerCommandList + listOf(
                                 "bash", "-c",
                                 """
-                                    ${runner.getSetupBash()}
+                                    source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
                                     python3 $pythonWrapper $escapedOutputFolder $scriptPath
                                 """.trimIndent()
                             )

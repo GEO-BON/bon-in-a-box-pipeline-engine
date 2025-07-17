@@ -1,3 +1,4 @@
+#!/bin/python3
 import os, sys, json
 
 biab_output_list = {}
