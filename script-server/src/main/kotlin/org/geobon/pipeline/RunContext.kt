@@ -62,7 +62,6 @@ data class RunContext(val runId: String, val inputs: String?) {
         val environment = getEnvironment(container)
         File("${outputFolder.absolutePath}/environment.json").writeText(JSONObject(environment).toString(2))
     }
-
     companion object {
         val scriptRoot
             get() = File(System.getenv("SCRIPT_LOCATION"))
@@ -95,17 +94,19 @@ data class RunContext(val runId: String, val inputs: String?) {
 
         fun getGitInfo(): Map<String, String?> {
             val gitBinPath = "/usr/bin/git"
-            val gitDirOpt = "--git-dir=/.git"
+            val gitDir = System.getenv("GIT_LOCATION")
+            val gitDirOpt = "--git-dir=$gitDir"
             val gitCmd = "$gitBinPath $gitDirOpt"
 
             val gitCommitIDCommand = "$gitCmd log --format=%h -1"
-            val commit = "commit" to gitCommitIDCommand.runToText()
+            val commit = "commit" to gitCommitIDCommand.runToText(showErrors = false)
 
             val gitCurrentBranchCommand =  "$gitCmd  branch --show-current"
-            val branch = "branch" to gitCurrentBranchCommand.runToText()
+            val branch = "branch" to gitCurrentBranchCommand.runToText(showErrors = false)
 
             val gitTimeStampCommand = "$gitCmd log --format=%cd -1"
-            val timestamp = "timestamp" to gitTimeStampCommand.runToText()
+            val timestamp = "timestamp" to gitTimeStampCommand.runToText(showErrors = false)
+
 
             return mapOf(commit, branch, timestamp)
         }
