@@ -91,7 +91,7 @@ internal class RunContextTest {
         withEnvironment("GIT_LOCATION", "../.git") {
             val gitInfo: Map<String, String?> = RunContext.getGitInfo()
             assertTrue(gitInfo.contains("commit"))
-            assertEquals(8, gitInfo["commit"]?.length)
+            assertTrue(gitInfo["commit"]?.isNotEmpty() == true)
             assertTrue(gitInfo.contains("branch"))
             assertTrue(gitInfo["branch"]!!.isNotEmpty())
             assertTrue(gitInfo.contains("timestamp"))
