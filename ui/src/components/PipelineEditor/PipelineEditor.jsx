@@ -1079,15 +1079,8 @@ export default function PipelineEditor(props) {
 
   return (
     <div id="editorLayout">
-      <p className="documentationLink">
-        Need help? Check out{" "}
-        <a
-          href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor"
-          target="_blank"
-          rel="noreferrer"
-        >
-          the documentation
-        </a>
+      <p className="pipelineTitle">
+        {metadata ? yaml.load(metadata).name : currentFileName}
       </p>
       <div className="narrowWarning">
         <p>The pipeline engine cannot be used on a narrow display.</p>
