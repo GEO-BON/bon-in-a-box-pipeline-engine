@@ -64,7 +64,6 @@ const customNodeTypes = {
 };
 
 let id = 0;
-let metadataObj = null;
 const getId = () => `${id++}`;
 
 // Capture ctrl + s and ctrl + shift + s to quickly save the pipeline
@@ -95,6 +94,7 @@ export default function PipelineEditor(props) {
   const [inputList, setInputList] = useState([]);
   const [outputList, setOutputList] = useState([]);
   const [metadata, setMetadata] = useState("");
+  const [title, setTitle] = useState(<>&nbsp;</>);
   const [metadataError, setMetadataError] = useState(null);
   const [currentFileName, setCurrentFileName] = useState("");
   const [savedJSON, setSavedJSON] = useState(null);
@@ -867,7 +867,6 @@ export default function PipelineEditor(props) {
 
       // Read metadata
       setMetadata(flow.metadata ? yaml.dump(flow.metadata) : "")
-      metadataObj = flow.metadata || null;
 
       // Read inputs
       let inputsFromFile = [];
@@ -1079,18 +1078,25 @@ export default function PipelineEditor(props) {
     }
   }, [blocker.state])
 
-  const getPipelineTitle = () => {
-    if (metadataObj) {
-      if (metadataObj.name)
-        return metadataObj.name
+  useEffect(() => {
+    console.debug("Metadata changed", metadata);
+    try {
+      const metadataObj = yaml.load(metadata)
+      if (metadataObj && metadataObj.name) {
+        setTitle(metadataObj.name);
+      } else {
+        setTitle(currentFileName || <>&nbsp;</>);
+      }
+    } catch (ex) {
+      console.error("Invalid YAML metadata", ex);
+      // keep previous title. It's OK for YAML to be temporary invalid.
     }
-    return currentFileName
-  }
+  }, [metadata]);
 
   return (
     <div id="editorLayout">
       <h2 className="pipelineTitle">
-        {getPipelineTitle()}
+        {title}
       </h2>
       <div className="narrowWarning">
         <p>The pipeline engine cannot be used on a narrow display.</p>
