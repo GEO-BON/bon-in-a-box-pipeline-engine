@@ -1079,7 +1079,6 @@ export default function PipelineEditor(props) {
   }, [blocker.state])
 
   useEffect(() => {
-    console.debug("Metadata changed", metadata);
     try {
       const metadataObj = yaml.load(metadata)
       if (metadataObj && metadataObj.name) {
@@ -1088,7 +1087,6 @@ export default function PipelineEditor(props) {
         setTitle(currentFileName || <>&nbsp;</>);
       }
     } catch (ex) {
-      console.error("Invalid YAML metadata", ex);
       // keep previous title. It's OK for YAML to be temporary invalid.
     }
   }, [metadata]);
