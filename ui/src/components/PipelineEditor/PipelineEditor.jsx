@@ -64,6 +64,7 @@ const customNodeTypes = {
 };
 
 let id = 0;
+let metadataObj = null;
 const getId = () => `${id++}`;
 
 // Capture ctrl + s and ctrl + shift + s to quickly save the pipeline
@@ -866,6 +867,7 @@ export default function PipelineEditor(props) {
 
       // Read metadata
       setMetadata(flow.metadata ? yaml.dump(flow.metadata) : "")
+      metadataObj = flow.metadata || null;
 
       // Read inputs
       let inputsFromFile = [];
@@ -1077,11 +1079,19 @@ export default function PipelineEditor(props) {
     }
   }, [blocker.state])
 
+  const getPipelineTitle = () => {
+    if (metadataObj) {
+      if (metadataObj.name)
+        return metadataObj.name
+    }
+    return currentFileName
+  }
+
   return (
     <div id="editorLayout">
-      <p className="pipelineTitle">
-        {metadata ? yaml.load(metadata).name : currentFileName}
-      </p>
+      <h2 className="pipelineTitle">
+        {getPipelineTitle()}
+      </h2>
       <div className="narrowWarning">
         <p>The pipeline engine cannot be used on a narrow display.</p>
         <p><strong>A computer is recommended for pipeline edition.</strong></p>

@@ -771,6 +771,12 @@ h2.MuiDialogTitle-root {
   display: none;
 }
 
+.pipelineTitle {
+  font-size: 1.25em;
+  color: white;
+  font-weight: 1000;
+}
+
 @media (max-width: 1100px) {
   .navigation-bar-link {
     margin-left: 10px;
