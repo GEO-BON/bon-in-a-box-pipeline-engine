@@ -56,14 +56,18 @@ export const MetadataPane = ({
       if (model) {
         if (metadataError) {
           if (!isTyping) {
-            monaco.editor.setModelMarkers(model, "owner", [
-              {
-                startLineNumber: metadataError.line,
-                endColumn: model.getLineLength(metadataError.line) + 1,
-                message: metadataError.message,
-                severity: monaco.MarkerSeverity.Error
-              }
-            ]);
+            try {
+              monaco.editor.setModelMarkers(model, "owner", [
+                {
+                  startLineNumber: metadataError.line,
+                  endColumn: model.getLineLength(metadataError.line) + 1,
+                  message: metadataError.message,
+                  severity: monaco.MarkerSeverity.Error
+                }
+              ]);
+            } catch (ex) {
+              console.error("Error setting model markers:", ex);
+            }
           }
         } else {
           monaco.editor.setModelMarkers(model, "owner", []);
