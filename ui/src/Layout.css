@@ -303,6 +303,10 @@ ul.pipeline-bullets li::before {
   color: hsl(0, 0%, 20%);
 }
 
+.react-flow__attribution.bottom.right {
+  border-bottom-right-radius: 10px;
+}
+
 .fullScreenPopup {
   position: absolute;
   top: 100px;
@@ -793,9 +797,13 @@ h2.MuiDialogTitle-root {
   button#saveBtn,
   button#saveAsBtn,
   button#loadFromFileBtn,
-  .stepChooser,
-  .pipelineTitle {
+  .stepChooser {
     display: none;
+  }
+
+  .pipelineTitle {
+    font-size: unset;
+    margin: 8px 0px;
   }
 
   div.left-pane:has(.stepChooser) img#logo {
@@ -805,15 +813,12 @@ h2.MuiDialogTitle-root {
 
   .previewMode {
     display: inline;
-  }
-
-  .previewMode p {
-    margin-block-start: 0.3em;
-    margin-block-end: 0.3em;
+    color: #555 !important;
+    border-bottom-left-radius: 10px;
   }
 
   div.right-content main {
-    padding: 0px 5px;
+    padding: 0px 10px;
   }
 
   .home-page-content {

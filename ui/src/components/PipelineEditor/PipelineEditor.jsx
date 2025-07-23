@@ -1102,10 +1102,6 @@ export default function PipelineEditor(props) {
         <p>A phone can be used horizontally to preview a pipeline.</p>
       </div>
 
-      <div className="previewMode">
-        <p>Currently in <strong>preview mode</strong>. Use a larger screen to edit.</p>
-      </div>
-
       <Dialog
         open={modal === 'saveAs'}
         onClose={() => hideModal('saveAs')}
@@ -1331,6 +1327,10 @@ export default function PipelineEditor(props) {
                   }
                 }}
               />
+
+              <div class="react-flow__attribution bottom left previewMode">
+                  Currently in <strong>preview mode</strong>. Use a larger screen to edit.
+              </div>
             </ReactFlow>
           </div>
         </ReactFlowProvider>
