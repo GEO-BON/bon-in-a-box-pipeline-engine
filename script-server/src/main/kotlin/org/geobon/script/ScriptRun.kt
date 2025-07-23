@@ -197,7 +197,8 @@ class ScriptRun( // Constructor used in single script run
 
                     // Create the output folder for this invocation
                     context.outputFolder.mkdirs()
-                    logger.debug("Script run outputting to {}", context.outputFolder)
+                    logBuffer += "Script run outputting to ${context.outputFolder}\n"
+                        .also { logger.debug(it) }
 
                     // Script run pre-requisites
                     logFile.writeText(logBuffer)
@@ -261,34 +262,7 @@ class ScriptRun( // Constructor used in single script run
                             "bash", "-c",
                             """
                                 source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
-                                Rscript -e '
-                                fileConn<-file("${pidFile.absolutePath}"); writeLines(c(as.character(Sys.getpid())), fileConn); close(fileConn);
-                                outputFolder<-"${context.outputFolder.absolutePath}"
-
-                                biab_output_list <- list()
-                                source("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.R")
-
-                                withCallingHandlers(source("${scriptFile.absolutePath}"),
-                                    error=function(e){
-                                        if(grepl("ignoring SIGPIPE signal",e${"$"}message)) {
-                                            cat("Suppressed: ignoring SIGPIPE signal\n");
-                                        } else if (is.null(biab_output_list[["error"]])) {
-                                            biab_output_list[["error"]] <<- conditionMessage(e)
-                                            cat("Caught error, stack trace:\n")
-                                            print(sys.calls()[-seq(1:5)])
-                                        }
-                                    }
-                                )
-
-                                if(length(biab_output_list) > 0) {
-                                    cat("Writing outputs to BON in a Box...")
-                                    jsonData <- toJSON(biab_output_list, indent=2)
-                                    write(jsonData, file.path(outputFolder,"output.json"))
-                                    cat(" done.\n")
-                                }
-                                unlink("${pidFile.absolutePath}")
-                                gc()
-                                capture.output(sessionInfo(), file = paste0(outputFolder, "/dependencies.txt"))'
+                                Rscript ${System.getenv("SCRIPT_STUBS_LOCATION")}/system/scriptWrapper.R ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
                             """.trimIndent()
                         )
                     }
