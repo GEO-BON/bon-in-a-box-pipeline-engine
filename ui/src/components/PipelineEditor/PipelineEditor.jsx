@@ -94,6 +94,7 @@ export default function PipelineEditor(props) {
   const [inputList, setInputList] = useState([]);
   const [outputList, setOutputList] = useState([]);
   const [metadata, setMetadata] = useState("");
+  const [title, setTitle] = useState(<>&nbsp;</>);
   const [metadataError, setMetadataError] = useState(null);
   const [currentFileName, setCurrentFileName] = useState("");
   const [savedJSON, setSavedJSON] = useState(null);
@@ -1077,26 +1078,28 @@ export default function PipelineEditor(props) {
     }
   }, [blocker.state])
 
+  useEffect(() => {
+    try {
+      const metadataObj = yaml.load(metadata)
+      if (metadataObj && metadataObj.name) {
+        setTitle(metadataObj.name);
+      } else {
+        setTitle(currentFileName || <>&nbsp;</>);
+      }
+    } catch (ex) {
+      // keep previous title. It's OK for YAML to be temporary invalid.
+    }
+  }, [metadata]);
+
   return (
     <div id="editorLayout">
-      <p className="documentationLink">
-        Need help? Check out{" "}
-        <a
-          href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor"
-          target="_blank"
-          rel="noreferrer"
-        >
-          the documentation
-        </a>
-      </p>
+      <h2 className="pipelineTitle">
+        {title}
+      </h2>
       <div className="narrowWarning">
         <p>The pipeline engine cannot be used on a narrow display.</p>
         <p><strong>A computer is recommended for pipeline edition.</strong></p>
         <p>A phone can be used horizontally to preview a pipeline.</p>
-      </div>
-
-      <div className="previewMode">
-        <p>Currently in <strong>preview mode</strong>. Use a larger screen to edit.</p>
       </div>
 
       <Dialog
@@ -1324,6 +1327,10 @@ export default function PipelineEditor(props) {
                   }
                 }}
               />
+
+              <div class="react-flow__attribution bottom left previewMode">
+                  Currently in <strong>preview mode</strong>. Use a larger screen to edit.
+              </div>
             </ReactFlow>
           </div>
         </ReactFlowProvider>
