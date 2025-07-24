@@ -9,7 +9,6 @@ library(rjson)
 
 # Load variables
 args <- commandArgs(trailingOnly = TRUE)
-print(args)
 outputFolder <- args[1]
 scriptFile <- args[2]
 
@@ -60,10 +59,10 @@ if(length(biab_output_list) > 0) {
     cat("Writing outputs to BON in a Box...")
     jsonData <- toJSON(biab_output_list, indent=2)
     write(jsonData, file.path(outputFolder,"output.json"))
-    cat(" done.\n")
 }
 
 cat("Writing dependencies to file...")
 capture.output(sessionInfo(), file = paste0(outputFolder, "/dependencies.txt"))
+cat(" done.\n")
 
 gc()
