@@ -394,7 +394,7 @@ open class Pipeline constructor(
                             "float" -> obj.getFloat(valueProperty)
                             "boolean" -> obj.getBoolean(valueProperty)
                             // Everything else is read as text
-                            else -> obj.getString(valueProperty)
+                            else -> obj.optJSONObject(valueProperty) ?: obj.getString(valueProperty)
                         }
                     )
                 } catch (e: Exception) {
