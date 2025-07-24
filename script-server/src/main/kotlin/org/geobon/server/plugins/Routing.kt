@@ -42,7 +42,7 @@ private val logger: Logger = LoggerFactory.getLogger("Server")
 
 fun Application.configureRouting() {
 
-    val hpc = HPC.instance
+    val hpc = HPC()
 
     routing {
         get("/api/systemStatus") {
