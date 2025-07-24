@@ -251,7 +251,7 @@ Since runner-conda and runner-julia run in a separate docker, when the user stop
 
 The PID file is called `.pid` and is located in the output folder of the run. It is deleted when the script completes. For details, see [ScriptRun.kt](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/blob/main/script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt).
 
-## Setting up DRAC cluster connection
+## Setting up Digital Research Alliance of Canada (DRAC) cluster connection
 To connect to the DRAC automation node, you will need
 - A valid account
 - Manual authorisation from tech support
@@ -259,6 +259,17 @@ To connect to the DRAC automation node, you will need
 - The [allowed_commands.sh](./script-stubs/helpers/allowed_commands.sh) script, with execute permissions in the node.
 
 1. Follow [these instructions](https://docs.alliancecan.ca/wiki/Automation_in_the_context_of_multifactor_authentication/)
-2. Connect to the automation now via SSH, and accept the fingerprint of the HPC's node. This is mandatory since known_hosts will be used to connect.
+2. Manually connect once to the automation node via SSH to accept the fingerprint of the HPC's node. This is mandatory since known_hosts will be used to connect.
 3. Configure all the HPC_ environment variables in runner.env. (Make sure your runner.env contains all the HPC_ variables in the up-to-date runner-sample.env)
 4. Start the BON in a Box server normally.
+5. Check the info tag of the UI to see if the HPC connection is successful. If not, check the logs of the script-server for errors.
+
+### HPC connection states
+```mermaid
+stateDiagram-v2
+    [*] --> NOT_CONFIGURED
+    NOT_CONFIGURED --> CONFIGURED
+    CONFIGURED --> PREPARING
+    PREPARING --> READY
+    PREPARING --> ERROR
+```

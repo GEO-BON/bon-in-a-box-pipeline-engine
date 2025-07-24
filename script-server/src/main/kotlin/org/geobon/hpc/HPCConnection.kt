@@ -53,15 +53,15 @@ class HPCConnection(
         coroutineScope {
             launch {
                 // Checking if already preparing to avoid launching the process 2 times in parallel by accident
-                if (rStatus.state == ApptainerImageState.CONFIGURED
-                    || rStatus.state == ApptainerImageState.ERROR) {
+                if (rStatus.state != ApptainerImageState.PREPARING
+                    && rStatus.state != ApptainerImageState.READY) {
                     prepareApptainer(rStatus)
                 }
             }
 
             launch {
-                if (juliaStatus.state == ApptainerImageState.CONFIGURED
-                    || juliaStatus.state == ApptainerImageState.ERROR) {
+                if (juliaStatus.state != ApptainerImageState.PREPARING
+                    && juliaStatus.state != ApptainerImageState.READY) {
                     prepareApptainer(juliaStatus)
                 }
             }
