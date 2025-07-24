@@ -210,6 +210,7 @@ class ScriptRun( // Constructor used in single script run
 
                 val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
                 val command: List<String>
+                val scriptStubsDir = System.getenv("SCRIPT_STUBS_LOCATION")
                 when (scriptFile.extension) {
                     "jl", "JL" -> {
                         container = Containers.JULIA
@@ -217,40 +218,7 @@ class ScriptRun( // Constructor used in single script run
                             "bash", "-c",
                             """
                                 source importEnvVars.sh
-                                julia --project=${"$"}JULIA_DEPOT_PATH -e '
-                                    using Pkg
-                                    deps = Pkg.dependencies()
-                                    direct_deps = filter(x -> x[2].is_direct_dep, deps)
-                                    open("${context.outputFolder.absolutePath}/dependencies.txt", "w") do file
-                                        for (uuid, pkg) in direct_deps
-                                            println(file, "$(pkg.name) $(pkg.version)")
-                                        end
-                                    end
-                                    open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
-                                    output_folder="${context.outputFolder.absolutePath}"
-                                    ARGS=[output_folder];
-                                    include("${System.getenv("SCRIPT_STUBS_LOCATION")}/helpers/helperFunctions.jl")
-                                    try
-                                        include("${scriptFile.absolutePath}")
-                                    catch e
-                                        msg = sprint(showerror, e)
-                                        biab_output_dict["error"] = msg
-                                        println("\n${"$"}msg")
-                                        Base.show_backtrace(stdout, catch_backtrace())
-                                        println("\n\n")
-                                    finally
-                                        if !isempty(biab_output_dict)
-                                            println("Writing outputs to BON in a Box...")
-                                            jsonData = JSON.json(biab_output_dict, 2)
-                                            open(joinpath(output_folder, "output.json"), "w") do f
-                                                write(f, jsonData)
-                                            end
-                                            println(" done.")
-                                        end
-
-                                        rm("${pidFile.absolutePath}")
-                                    end
-                                '
+                                julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsDir/system/scriptWrapper.jl ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
                             """
                         )
                     }
@@ -262,7 +230,7 @@ class ScriptRun( // Constructor used in single script run
                             "bash", "-c",
                             """
                                 source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
-                                Rscript ${System.getenv("SCRIPT_STUBS_LOCATION")}/system/scriptWrapper.R ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
+                                Rscript $scriptStubsDir/system/scriptWrapper.R ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
                             """.trimIndent()
                         )
                     }
@@ -270,7 +238,7 @@ class ScriptRun( // Constructor used in single script run
                     "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
                     "py", "PY" -> {
                         val scriptPath = scriptFile.absolutePath
-                        val pythonWrapper = "${System.getenv("SCRIPT_STUBS_LOCATION")}/system/scriptWrapper.py"
+                        val pythonWrapper = "$scriptStubsDir/system/scriptWrapper.py"
 
                         if(useRunners) {
                             container = Containers.CONDA
