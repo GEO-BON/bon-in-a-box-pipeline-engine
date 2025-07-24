@@ -2,9 +2,9 @@ package org.geobon.server
 
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import org.geobon.hpc.HPCConnection
-import org.geobon.server.plugins.*
-import java.io.File
+import org.geobon.server.plugins.checkCacheVersion
+import org.geobon.server.plugins.configureRouting
+import org.geobon.server.plugins.configureSerialization
 
 fun main(args: Array<String>): Unit =
     io.ktor.server.netty.EngineMain.main(args)

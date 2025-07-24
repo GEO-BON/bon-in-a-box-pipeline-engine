@@ -1,5 +1,6 @@
 package org.geobon.pipeline
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
@@ -85,7 +86,7 @@ open class Pipeline constructor(
             error = ex.message ?: ex.stackTraceToString()
             logger.debug(error)
 
-            job?.apply { cancelled = isCancelled }
+            cancelled = ex is CancellationException
             if (!cancelled) failure = true
         } catch (ex: Exception) {
             error =
