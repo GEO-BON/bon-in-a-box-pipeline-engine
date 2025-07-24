@@ -52,6 +52,10 @@ export default function Choosers({
               onClick={() => {
                 setOpenChooser(inputId);
               }}
+              onClose={() => {
+                setOpenThisChooser(false);
+                setOpenChooser(false);
+              }}
               className="locationChooserButton"
             >
               {`Choose ${inputDescription.label}`}

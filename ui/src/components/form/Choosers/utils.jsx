@@ -43,7 +43,7 @@ export const defaultCountry = {
   code: "",
   bboxLL: [],
 };
-export const defaultRegion = { name: "", bboxLL: [], countryEnglishName: "" };
+export const defaultRegion = { name: "", ISO3166_2: "", bboxLL: [], countryEnglishName: "" };
 
 export const paperStyle = (dialog) => {
   if (dialog) {

@@ -138,6 +138,7 @@ export default function CountryRegionMenu({
         regionObj
           ? {
               regionName: regionObj.name,
+              ISO3166_2	: regionObj.adminCodes1.ISO3166_2? regionObj.adminCodes1.ISO3166_2 : "",
               bboxLL: b,
               countryEnglishName: countryObj.countryName,
             }
