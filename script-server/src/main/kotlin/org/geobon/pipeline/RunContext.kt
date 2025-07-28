@@ -66,6 +66,9 @@ data class RunContext(val runId: String, val inputs: String?) {
         val scriptRoot
             get() = File(System.getenv("SCRIPT_LOCATION"))
 
+        val scriptStubsRoot
+            get() = File(System.getenv("SCRIPT_STUBS_LOCATION"))
+
         val pipelineRoot
             get() = File(System.getenv("PIPELINES_LOCATION"))
 

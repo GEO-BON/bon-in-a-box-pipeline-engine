@@ -1,11 +1,12 @@
 package org.geobon.pipeline
 
+import org.geobon.pipeline.RunContext.Companion.scriptStubsRoot
 import org.json.JSONObject
 import java.io.File
 
 
 class PullLayersById(stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()) :
-    YMLStep(File(System.getenv("SCRIPT_STUBS_LOCATION"), "pipeline/PullLayersById.yml"), stepId, inputs = inputs) {
+    YMLStep(File(scriptStubsRoot, "pipeline/PullLayersById.yml"), stepId, inputs = inputs) {
 
     override suspend fun resolveInputs(): Map<String, Any?> {
         val resolvedInputs = mutableMapOf<String, Any>()
