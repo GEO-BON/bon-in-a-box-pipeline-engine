@@ -118,7 +118,12 @@ class HPCConnection(
                     else
                         module load apptainer
                         apptainer build $apptainerImageName docker://$imageDigest
-                        echo "Image created: $apptainerImageName"
+                        if [[ $? -eq 0 ]]; then
+                            echo "Image created: $apptainerImageName"
+                        else
+                            echo "Failed to create image: $apptainerImageName" >&2
+                            exit 1
+                        fi
                     fi
                 """.trimIndent())
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)

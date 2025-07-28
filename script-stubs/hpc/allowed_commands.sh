@@ -62,6 +62,7 @@ function is_safe_command() {
 		"^fi( |$)"
 		"^else( |$)"
 		"^elif "
+		"^exit( [0-9]+)?$"
 
 		# DO NOT ALLOW "sed"!
 		# someone could do
@@ -150,6 +151,8 @@ function test_command_filter() {
 			apptainer build apptainerImageName docker://imageDigest
 			echo "Image created: apptainerImageName"
 		fi=PASS'
+		"exit=PASS"
+		"exit 1=PASS"
 
 		## Supposed to FAIL
 		"module load python; forbiddenCommand=FAIL"   # this test is failing
