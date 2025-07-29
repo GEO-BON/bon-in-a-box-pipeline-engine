@@ -7,13 +7,40 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.scriptModule
+import java.io.File
 import kotlin.test.*
 
 class HPCConnectionTest {
 
+    private val tmpDir = File(outputRoot.parentFile, "tmp")
+    private val configFile = File(tmpDir, "config")
+    private val sshKeyFile = File(tmpDir, "key")
+    private val knownHostsFile = File(tmpDir, "hosts")
+    private val testEnvironment = mutableMapOf(
+        "HPC_SSH_CONFIG" to "HPC-name",
+        "HPC_SSH_CONFIG_FILE" to configFile.absolutePath,
+        "HPC_SSH_KEY" to sshKeyFile.absolutePath,
+        "HPC_KNOWN_HOSTS_FILE" to knownHostsFile.absolutePath,
+        "HPC_AUTO_CONNECT" to "false"
+    )
+
+    private fun createSshFiles() {
+        configFile.createNewFile()
+        sshKeyFile.createNewFile()
+        knownHostsFile.createNewFile()
+
+        assertTrue { configFile.exists() }
+    }
+
     @BeforeTest
-    fun setupOutputFolder() {
+    fun setupFolders() {
         with(outputRoot) {
+            assertTrue(!exists())
+            mkdirs()
+            assertTrue(exists())
+        }
+
+        with(tmpDir) {
             assertTrue(!exists())
             mkdirs()
             assertTrue(exists())
@@ -21,8 +48,9 @@ class HPCConnectionTest {
     }
 
     @AfterTest
-    fun removeOutputFolder() {
+    fun removeFolders() {
         assertTrue(outputRoot.deleteRecursively())
+        assertTrue(tmpDir.deleteRecursively())
     }
 
     @Test
@@ -40,10 +68,8 @@ class HPCConnectionTest {
 
     @Test
     fun givenConfigured_thenStatusAsSuch() = testApplication {
-        withEnvironment(mapOf(
-            "HPC_AUTO_CONNECT" to "false",
-            "HPC_SSH_CREDENTIALS" to "HPC-name"
-        )) {
+        withEnvironment(testEnvironment) {
+            createSshFiles()
 
             application { scriptModule() }
 
@@ -58,11 +84,25 @@ class HPCConnectionTest {
     }
 
     @Test
+    fun givenConfigured_whenFileMissing_thenNotConfigured() = testApplication {
+        withEnvironment(testEnvironment) {
+
+            application { scriptModule() }
+
+            client.get("/hpc/status").apply {
+                assertEquals(HttpStatusCode.OK, status)
+                assertEquals(
+                    """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"}}""",
+                    bodyAsText()
+                )
+            }
+        }
+    }
+
+    @Test
     fun givenConfiguredWithErrors_whenPreparedManually_thenGetFailureMessage() = testApplication {
-        withEnvironment(mapOf(
-            "HPC_AUTO_CONNECT" to "false",
-            "HPC_SSH_CREDENTIALS" to "HPC-name"
-        )) {
+        withEnvironment(testEnvironment) {
+            createSshFiles()
 
             application { scriptModule() }
 
@@ -97,10 +137,8 @@ class HPCConnectionTest {
 
     @Test
     fun givenConfiguredWithErrors_whenPreparedAutomatically_thenGetFailureMessage() = testApplication {
-        withEnvironment(mapOf(
-            "HPC_AUTO_CONNECT" to "true",
-            "HPC_SSH_CREDENTIALS" to "HPC-name"
-        )) {
+        withEnvironment(testEnvironment.apply { set("HPC_AUTO_CONNECT", "true") }) {
+            createSshFiles()
 
             application { scriptModule() }
 
@@ -118,7 +156,7 @@ class HPCConnectionTest {
                 }
 
                 if (i == 10) {
-                    fail("request did not complete under 100ms")
+                    fail("request did not complete under 100ms.\nCurrent response: $body")
                 }
             }
 

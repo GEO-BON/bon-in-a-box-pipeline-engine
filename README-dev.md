@@ -260,6 +260,14 @@ To connect to the DRAC automation node, you will need
 
 1. Follow [these instructions](https://docs.alliancecan.ca/wiki/Automation_in_the_context_of_multifactor_authentication/)
 2. Manually connect once to the automation node via SSH to accept the fingerprint of the HPC's node. This is mandatory since known_hosts will be used to connect.
+3. Create an ssh config file dedicated to BON in a Box, with the details for your HPC's automation node as such:
+    ```
+    host yourHPC
+     hostname robot.yourHPC.domain.edu
+     user yourUser
+     identitiesonly yes
+     requesttty no
+    ```
 3. Configure all the HPC_ environment variables in runner.env. (Make sure your runner.env contains all the HPC_ variables in the up-to-date runner-sample.env)
 4. Start the BON in a Box server normally.
 5. Check the info tag of the UI to see if the HPC connection is successful. If not, check the logs of the script-server for errors.

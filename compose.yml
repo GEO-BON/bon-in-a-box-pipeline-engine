@@ -28,9 +28,13 @@ services:
       GIT_LOCATION: /.git
       PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
       USE_RUNNERS: true
+      HPC_SSH_CONFIG_FILE: /run/secrets/hpc_ssh_config_file
+      HPC_SSH_KEY: /run/secrets/hpc_ssh_key
+      HPC_KNOWN_HOSTS_FILE: /run/secrets/hpc_known_hosts
     secrets:
       - hpc_ssh_key
-      - hpc_known_hosts
+      - hpc_known_hosts_file
+      - hpc_ssh_config_file
 
   runner-conda:
     container_name: biab-runner-conda
@@ -90,5 +94,7 @@ services:
 secrets:
   hpc_ssh_key:
     file: $HPC_SSH_KEY
-  hpc_known_hosts:
+  hpc_known_hosts_file:
     file: $HPC_KNOWN_HOSTS_FILE
+  hpc_ssh_config_file:
+    file: $HPC_SSH_CONFIG_FILE

@@ -9,15 +9,20 @@ import org.geobon.server.plugins.Containers
 import org.geobon.utils.runToText
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.util.concurrent.TimeUnit
 
 @OptIn(DelicateCoroutinesApi::class)
 class HPCConnection(
-    private val sshCredentials: String?,
-    autoConnect: Boolean,
     condaContainer: Containers = Containers.CONDA,
     juliaContainer: Containers = Containers.JULIA
 ) {
+    val sshConfig: String? = System.getenv("HPC_SSH_CONFIG")
+    val configPath: String? = System.getenv("HPC_SSH_CONFIG_FILE")
+    val sshKeyPath: String? = System.getenv("HPC_SSH_KEY")
+    val knownHostsPath: String? = System.getenv("HPC_KNOWN_HOSTS_FILE")
+
+    val autoConnect = System.getenv("HPC_AUTO_CONNECT") == "true"
 
     var juliaStatus = ApptainerImage(juliaContainer)
     var rStatus = ApptainerImage(condaContainer)
@@ -29,13 +34,24 @@ class HPCConnection(
                 && juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
 
     init {
-        if (!sshCredentials.isNullOrBlank()) {
+        if (configPath == null || !File(configPath).exists()) {
+            logger.info("HPC not configured: missing HPC_SSH_CONFIG_FILE ($configPath)")
+
+        } else if (sshConfig.isNullOrBlank()) {
+            logger.info("HPC not configured: missing HPC_SSH_CONFIG ($sshConfig).")
+
+        } else if (sshKeyPath == null || !File(sshKeyPath).exists()) {
+            logger.info("HPC not configured: missing HPC_SSH_KEY ($sshKeyPath).")
+
+        } else if (knownHostsPath == null || !File(knownHostsPath).exists()) {
+            logger.info("HPC not configured: missing HPC_KNOWN_HOSTS_FILE ($knownHostsPath).")
+
+        } else {
             juliaStatus.state = ApptainerImageState.CONFIGURED
             rStatus.state = ApptainerImageState.CONFIGURED
 
             if (autoConnect) {
-                // We are launching preparation non-blocking,
-                // and not interested immediately in the result,
+                // We are launching preparation non-blocking, and not interested immediately in the result,
                 // hence using this DelicateCoroutinesApi
                 GlobalScope.launch {
                     try {
@@ -53,14 +69,16 @@ class HPCConnection(
         coroutineScope {
             launch {
                 // Checking if already preparing to avoid launching the process 2 times in parallel by accident
-                if (rStatus.state != ApptainerImageState.PREPARING
+                if (rStatus.state != ApptainerImageState.NOT_CONFIGURED
+                    && rStatus.state != ApptainerImageState.PREPARING
                     && rStatus.state != ApptainerImageState.READY) {
                     prepareApptainer(rStatus)
                 }
             }
 
             launch {
-                if (juliaStatus.state != ApptainerImageState.PREPARING
+                if (juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
+                    && juliaStatus.state != ApptainerImageState.PREPARING
                     && juliaStatus.state != ApptainerImageState.READY) {
                     prepareApptainer(juliaStatus)
                 }
@@ -69,11 +87,6 @@ class HPCConnection(
     }
 
     private fun prepareApptainer(apptainerImage: ApptainerImage) {
-        if (sshCredentials.isNullOrBlank()) {
-            apptainerImage.message = "Configure HPC_SSH_CREDENTIALS before attenpting to connect to the HPC."
-            return
-        }
-
         apptainerImage.state = ApptainerImageState.PREPARING
         apptainerImage.message = null
         apptainerImage.image = null
@@ -109,11 +122,10 @@ class HPCConnection(
             // Launch the container creation for that digest (if not already existing)
             val apptainerImageName = "${container.containerName}_$imageSha.sif"
             val process = ProcessBuilder("ssh",
-                "-i", "/run/secrets/hpc_ssh_key",
-                "-o", "IdentitiesOnly=yes",
-                "-o", "RequestTTY=no",
-                "-o", "UserKnownHostsFile=/run/secrets/hpc_known_hosts",
-                sshCredentials,
+                "-F", configPath,
+                "-i", sshKeyPath,
+                "-o", "UserKnownHostsFile=$knownHostsPath",
+                sshConfig,
                 """
                     if [ -f $apptainerImageName ]; then
                         echo "Image already exists: $apptainerImageName"
