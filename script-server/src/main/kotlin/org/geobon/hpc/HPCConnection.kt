@@ -75,6 +75,8 @@ class HPCConnection(
         }
 
         apptainerImage.state = ApptainerImageState.PREPARING
+        apptainerImage.message = null
+        apptainerImage.image = null
 
         try {
             val container = apptainerImage.container
