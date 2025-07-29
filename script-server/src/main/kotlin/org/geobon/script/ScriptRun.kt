@@ -3,6 +3,7 @@ package org.geobon.script
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import org.geobon.pipeline.RunContext
+import org.geobon.pipeline.RunContext.Companion.scriptStubsRoot
 import org.geobon.server.plugins.Containers
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -210,7 +211,6 @@ class ScriptRun( // Constructor used in single script run
 
                 val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
                 val command: List<String>
-                val scriptStubsDir = System.getenv("SCRIPT_STUBS_LOCATION")
                 when (scriptFile.extension) {
                     "jl", "JL" -> {
                         container = Containers.JULIA
@@ -218,7 +218,7 @@ class ScriptRun( // Constructor used in single script run
                             "bash", "-c",
                             """
                                 source importEnvVars.sh
-                                julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsDir/system/scriptWrapper.jl ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
+                                julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
                             """
                         )
                     }
@@ -230,7 +230,7 @@ class ScriptRun( // Constructor used in single script run
                             "bash", "-c",
                             """
                                 source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
-                                Rscript $scriptStubsDir/system/scriptWrapper.R ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
+                                Rscript $scriptStubsRoot/system/scriptWrapper.R ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
                             """.trimIndent()
                         )
                     }
@@ -238,7 +238,7 @@ class ScriptRun( // Constructor used in single script run
                     "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
                     "py", "PY" -> {
                         val scriptPath = scriptFile.absolutePath
-                        val pythonWrapper = "$scriptStubsDir/system/scriptWrapper.py"
+                        val pythonWrapper = "$scriptStubsRoot/system/scriptWrapper.py"
 
                         if(useRunners) {
                             container = Containers.CONDA
