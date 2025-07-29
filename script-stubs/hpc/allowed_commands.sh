@@ -19,7 +19,7 @@ function is_safe_command() {
 	local cmd="$1"
 
 	local safe_patterns=(
-		# always available commands
+		## always available commands
 		"^ls( |$)"
 		"^cat "
 		"^cd "
@@ -27,44 +27,44 @@ function is_safe_command() {
 		"^uname( |$)"
 		"^id( |$)"
 		"^groups( |$)"
-		# file commands
+		## file commands
 		"^mv "
 		"^cp "
 		"^rm "
 		"^mkdir "
-		# python commands
-		"^python[0-9.]* "
-		# git
+		## python commands
+		# "^python[0-9.]* "
+		## git
 		"^git "
-		# archiving commands
-		"^tar "
-		"^dar "
-		"^gzip "
-		"^zip "
-		"^bzip2 "
-		# rsync
+		## archiving commands
+		#"^tar "
+		#"^dar "
+		#"^gzip "
+		#"^zip "
+		#"^bzip2 "
+		## rsync
 		"^rsync "
-		# sftp and new scp
+		## sftp and new scp
 		"^/usr/libexec/openssh/sftp-server "
-		# old scp
+		## old scp
 		"^scp "
-		# slurm commands
+		## slurm commands
 		"^squeue "
 		"^scancel "
 		"^sbatch "
 		"^scontrol "
 		"^sq "
-		# commands needed for apptainer
+		## commands needed for apptainer
 		"^module "
 		"^apptainer "
-		# conditionals
+		## conditionals
 		"^if "
 		"^fi( |$)"
 		"^else( |$)"
 		"^elif "
 		"^exit( [0-9]+)?$"
 
-		# DO NOT ALLOW "sed"!
+		# DO NOT ALLOW "sed" and "awk"!
 		# someone could do
 		# sed -i 's/\# Validate and execute/testing=true/' allowed_commands.sh
 	)
