@@ -3,14 +3,47 @@ package org.geobon.utils
 import java.io.File
 import java.util.concurrent.TimeUnit
 
+open class SystemCall {
+    open fun run(
+        call: List<String>,
+        workingDir: File = File("."),
+        timeoutAmount: Long = 1,
+        timeoutUnit: TimeUnit = TimeUnit.SECONDS,
+        showErrors: Boolean = true
+    ): CallResult? = runCatching {
+        val process = ProcessBuilder(call)
+            .directory(workingDir)
+            .redirectOutput(ProcessBuilder.Redirect.PIPE)
+            .redirectErrorStream(showErrors) // Merges stderr into stdout
+            .start()
 
-fun String.runToText(
+        process.waitFor(timeoutAmount, timeoutUnit)
+
+        return CallResult(process)
+
+    }.onFailure {
+        it.printStackTrace()
+        return CallResult(1, "", it.message ?: it.javaClass.name)
+    }.getOrNull()
+}
+
+data class CallResult(val exitCode: Int, val output: String, val error:String) {
+    constructor(process:Process) : this(
+        process.exitValue(),
+        process.inputReader().readText(),
+        process.errorReader().readText()
+    )
+
+    val success: Boolean
+        get() = exitCode == 0
+}
+
+fun String.run(
     workingDir: File = File("."),
     timeoutAmount: Long = 1,
     timeoutUnit: TimeUnit = TimeUnit.SECONDS,
     showErrors:Boolean = true
 ): String? = runCatching {
-    println("runToText: bash -c $this")
     ProcessBuilder("bash", "-c", this)
         .directory(workingDir)
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
