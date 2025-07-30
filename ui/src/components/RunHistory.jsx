@@ -24,6 +24,7 @@ import ReactMarkdown from "react-markdown";
 import { CustomButtonGreen, CustomButtonGrey } from "./CustomMUI";
 import { Alert } from "@mui/material";
 import Warning from "@mui/icons-material/Warning";
+import yaml from "js-yaml";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -264,6 +265,7 @@ const RunCard = (props) => {
                   {Object.entries(run.inputs).map((i) => {
                     const inputId = i[0]
                     const value = i[1]
+                    console.log(i);
                     return (
                       <TableRow key={inputId}>
                         <TableCell
@@ -279,7 +281,18 @@ const RunCard = (props) => {
                           }
                         </TableCell>
                         <TableCell style={{whiteSpace: "pre-wrap"}}>
-                          <>{Array.isArray(value) ? value.join(", ") : value}</>
+                          <>{
+                            (() => {
+                              // Format the value for the table, handle types
+                              if (Array.isArray(value)) {
+                                return value.join(", ") 
+                              } else if (typeof value === 'object' && value  !== null) {
+                                return <pre>{yaml.dump(value)}</pre>
+                              } else {
+                                return value
+                              }
+                            })()
+                          }</>
                         </TableCell>
                       </TableRow>
                     );
