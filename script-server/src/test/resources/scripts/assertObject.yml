@@ -11,10 +11,12 @@ inputs:
     label: Some object
     description: The object body to check.
     type: object
+    properties: [some_data]
     example: "{ 'some_data': 'bla bla' }"
 outputs:
   the_same:
     label: Same value
     description: The same object as in the inputs.
     type: object
+    properties: [some_data]
     example: "{ 'some_data': 'bla bla' }"
