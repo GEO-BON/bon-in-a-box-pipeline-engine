@@ -48,7 +48,7 @@ export default function CountryRegionMenu({
 
   // Set from controlled values coming in
   useEffect(() => {
-    if (["load"].includes(action)) {
+    if (action === "load") {
       if (
         country.ISO3 &&
         country.ISO3 !== selectedCountry.value &&

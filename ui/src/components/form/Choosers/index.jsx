@@ -65,6 +65,10 @@ export default function Choosers({
                 setOpenThisChooser(false);
                 setOpenChooser(false);
               }}
+              onOpen={() => {
+                setOpenChooser(inputId);
+                setOpenThisChooser(true)
+              }}
               aria-labelledby="modal-modal-title"
               aria-describedby="modal-modal-description"
             >
@@ -189,7 +193,7 @@ export function Chooser({
 
   useEffect(() => {
     const input = inputFileContent[inputId];
-    if (input) {
+    if (input && action === "load") {
       if ("bbox" in input) {
         setBbox(input["bbox"]);
       }
@@ -202,8 +206,9 @@ export function Chooser({
       if ("region" in input) {
         setRegion(input["region"]);
       }
+      //setAction("loaded")
     }
-  }, [inputFileContent, inputId]);
+  }, [inputId]);
 
   return (
     <div
@@ -232,6 +237,7 @@ export function Chooser({
           }}
         >
           {showBBox && (
+            <>
             <CustomButtonGreen
               onClick={() => {
                 setAction("Digitize");
@@ -240,6 +246,8 @@ export function Chooser({
             >
               Draw area of interest on map <CropIcon />
             </CustomButtonGreen>
+            <div style={{marginLeft: '15px'}}>or choose</div>
+            </>
           )}
           {showCountry && (
             <CountryRegionMenu
