@@ -26,7 +26,7 @@ export default function Choosers({
   updateInputFile,
 }) {
   const [openModal, setOpenModal] = useState(false);
-  
+
   const type = inputDescription.type;
   return (
     <>
@@ -58,6 +58,10 @@ export default function Choosers({
               open={openModal}
               onClose={() => {
                 setOpenModal(false);
+              }}
+              onOpen={() => {
+                setOpenChooser(inputId);
+                setOpenThisChooser(true)
               }}
               aria-labelledby="modal-modal-title"
               aria-describedby="modal-modal-description"
@@ -160,6 +164,11 @@ export function Chooser({
       updateInputFile(inputId, { CRS: CRS });
     }
   };
+
+  useEffect(()=>{
+    updateValues()
+  },[bbox, CRS, country, region]);
+
   useEffect(() => {
     if (bbox.length > 0 && ![("CRSChange", "")].includes(action)) {
       //Shrink bbox for projestion which wont provide a crs suggestion if even a small part of the bbox is outside the area of coverage of the CRS
@@ -178,21 +187,22 @@ export function Chooser({
 
   useEffect(() => {
     const input = inputFileContent[inputId];
-    if (input) {
-      if (bbox in input) {
+    if (input && action === "load") {
+      if ("bbox" in input) {
         setBbox(input["bbox"]);
       }
-      if (CRS in input) {
+      if ("CRS" in input) {
         setCRS(input["CRS"]);
       }
-      if (country in input) {
+      if ("country" in input) {
         setCountry(input["country"]);
       }
-      if (region in input) {
+      if ("region" in input) {
         setRegion(input["region"]);
       }
+      //setAction("loaded")
     }
-  }, [inputFileContent, inputId]);
+  }, [inputId]);
 
   return (
     <div
@@ -221,6 +231,7 @@ export function Chooser({
           }}
         >
           {showBBox && (
+            <>
             <CustomButtonGreen
               onClick={() => {
                 setAction("Digitize");
@@ -229,6 +240,8 @@ export function Chooser({
             >
               Draw area of interest on map <CropIcon />
             </CustomButtonGreen>
+            <div style={{marginLeft: '15px'}}>or choose</div>
+            </>
           )}
           {showCountry && (
             <CountryRegionMenu
