@@ -271,6 +271,7 @@ export function Chooser({
                 bbox,
                 bboxGeoJSONShrink,
                 setAction,
+                action,
                 country,
                 region,
                 dialog: showMap,

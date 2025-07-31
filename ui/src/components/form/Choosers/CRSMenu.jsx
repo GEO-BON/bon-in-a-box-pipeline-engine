@@ -31,6 +31,7 @@ export default function CRSMenu({
   CRS,
   setCRS,
   setAction,
+  action,
   bbox,
   bboxGeoJSONShrink,
   country = defaultCountry,
@@ -101,8 +102,11 @@ export default function CRSMenu({
     const c = `${CRS.authority}:${CRS.code}`;
     if (c !== inputValue) {
       setInputValue(c);
+      if(action=== 'load'){
+        updateCRS({ value: c, label: c });
+      }
     }
-  }, [CRS]);
+  }, [CRS, action]);
 
   const updateCRS = (value) => {
     setAction("CRSChange");
