@@ -96,7 +96,6 @@ export default function InputFileInput({
 
 const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   if (!inputs) return <p>No Inputs</p>;
-  const [openChooser, setOpenChooser] = useState("");
 
   function updateInputFile(inputId, value) {
     setInputFileContent((content) => {
@@ -105,6 +104,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
       return newContent;
     });
   }
+  console.log(inputs);
 
   return (
     <div className="inputFileForm">
@@ -116,7 +116,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
             const { label, description, options, example, weight, ...theRest } =
               inputDescription;
             if(["country", "region", "countryRegion", "CRS", "countryRegionCRS", "bboxCRS"].includes(inputDescription.type)){
-                return (<Choosers key={inputId} openChooser={openChooser} setOpenChooser={setOpenChooser} inputId={inputId} inputDescription={inputDescription} inputFileContent={inputFileContent} updateInputFile={updateInputFile} />
+                return (<Choosers key={inputId} inputId={inputId} inputDescription={inputDescription} inputFileContent={inputFileContent} updateInputFile={updateInputFile} />
                 )
               }else{
             return (

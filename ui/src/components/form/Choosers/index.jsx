@@ -20,19 +20,13 @@ import CropFreeIcon from "@mui/icons-material/CropFree";
 import Modal from "@mui/material/Modal";
 
 export default function Choosers({
-  openChooser,
-  setOpenChooser,
   inputFileContent,
   inputId,
   inputDescription,
   updateInputFile,
 }) {
-  const [openThisChooser, setOpenThisChooser] = useState(false);
-  useEffect(() => {
-    if (openChooser === inputId) {
-      setOpenThisChooser(true);
-    }
-  }, [inputId, openChooser]);
+  const [openModal, setOpenModal] = useState(false);
+  
   const type = inputDescription.type;
   return (
     <>
@@ -50,11 +44,10 @@ export default function Choosers({
               variant="contained"
               endIcon={<CropFreeIcon />}
               onClick={() => {
-                setOpenChooser(inputId);
+                setOpenModal(true);
               }}
               onClose={() => {
-                setOpenThisChooser(false);
-                setOpenChooser(false);
+                setOpenModal(false);
               }}
               className="locationChooserButton"
             >
@@ -62,20 +55,19 @@ export default function Choosers({
             </CustomButtonGreen>
             <Modal
               key={`modal-chooser`}
-              open={openThisChooser}
+              open={openModal}
               onClose={() => {
-                setOpenThisChooser(false);
-                setOpenChooser(false);
+                setOpenModal(false);
               }}
               aria-labelledby="modal-modal-title"
               aria-describedby="modal-modal-description"
             >
               <>
-                {openThisChooser && (
+                {openModal && (
                   <Chooser
                     key={`choosers-modal-${inputId}`}
                     {...{
-                      setOpenThisChooser,
+                      setOpenModal,
                       inputId,
                       inputDescription,
                       inputFileContent,
@@ -94,7 +86,7 @@ export default function Choosers({
             <Chooser
               key={`choosers-modal-${inputId}`}
               {...{
-                setOpenThisChooser,
+                setOpenModal,
                 inputId,
                 inputDescription,
                 inputFileContent,
@@ -121,7 +113,7 @@ export default function Choosers({
 }
 
 export function Chooser({
-  setOpenThisChooser,
+  setOpenModal,
   inputId,
   inputDescription,
   inputFileContent,
@@ -287,14 +279,14 @@ export function Chooser({
               <CustomButtonGreen
                 onClick={() => {
                   updateValues();
-                  setOpenThisChooser(false);
+                  setOpenModal(false);
                 }}
               >
                 Accept
               </CustomButtonGreen>
               <CustomButtonGreen
                 onClick={() => {
-                  setOpenThisChooser(false);
+                  setOpenModal(false);
                 }}
               >
                 Cancel
