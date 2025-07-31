@@ -36,6 +36,7 @@ export default function CRSMenu({
   country = defaultCountry,
   region = defaultRegion,
   dialog = false,
+  updateValues = () => {},
 }) {
   const [CRSList, setCRSList] = useState([]);
   const [selectedCRS, setSelectedCRS] = useState({
@@ -108,14 +109,16 @@ export default function CRSMenu({
     if (value) {
       getCRSDef(value.value).then((def) => {
         if (def) {
-          setCRS({
+          const c = {
             name: def.name,
             authority: def.id.authority,
             code: def.id.code,
             def: def.exports.proj4,
             unit: def.unit,
             bbox: def.bbox,
-          });
+          }
+          setCRS(c);
+          updateValues('CRS',c)
           if (value && value.value == value.label) {
             const fl = CRSList.filter((fl) => fl.value === value.value);
             if (fl.length > 0) {
@@ -128,6 +131,7 @@ export default function CRSMenu({
           }
         } else {
           setCRS({});
+          updateValues('CRS',{})
           setSelectedCRS(value);
         }
       });

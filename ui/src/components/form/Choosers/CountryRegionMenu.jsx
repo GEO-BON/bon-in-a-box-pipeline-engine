@@ -24,6 +24,7 @@ export default function CountryRegionMenu({
   showAcceptButton = true,
   showRegion = true,
   dialog = false,
+  updateValues = () => {},
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
   const [regionOptions, setRegionOptions] = useState([]);
@@ -118,12 +119,14 @@ export default function CountryRegionMenu({
         countryObj.north,
       ];
       b = b.map((c) => parseFloat(c.toFixed(6)));
-      setCountry({
+      let countr = {
         englishName: countryObj.countryName,
         ISO3: countryObj.isoAlpha3,
         code: countryObj.countryCode,
         bboxLL: b,
-      });
+      }
+      setCountry(countr);
+      updateValues('country', countr);
     }
     if (regionValue) {
       const regionObj = regionJSON.find((s) => s.geonameId === regionValue);
@@ -134,8 +137,7 @@ export default function CountryRegionMenu({
         regionObj.bbox.north,
       ];
       b = b.map((c) => parseFloat(c.toFixed(6)));
-      setRegion(
-        regionObj
+      let reg =  regionObj
           ? {
               regionName: regionObj.name,
               ISO3166_2	: regionObj.adminCodes1.ISO3166_2? regionObj.adminCodes1.ISO3166_2 : "",
@@ -143,11 +145,14 @@ export default function CountryRegionMenu({
               countryEnglishName: countryObj.countryName,
             }
           : defaultRegion
-      );
+      setRegion(reg);
+      updateValues('region', reg);
     }
     if (countryValue === "" && regionValue === "") {
       setCountry(defaultCountry);
+      updateValues('country', defaultCountry);
       setRegion(defaultRegion);
+      updateValues('region', defaultRegion);
     }
   };
 
@@ -209,6 +214,7 @@ export default function CountryRegionMenu({
             if (!showAcceptButton) {
               buttonClicked("region", value.value);
             }
+            updateValues();
           }}
           value={selectedRegion}
         />

@@ -1,12 +1,12 @@
 /* eslint-disable prettier/prettier */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import YAMLTextArea from "./YAMLTextArea";
 import { InputsDescription } from "../StepDescription";
 import ReactMarkdown from "react-markdown";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
 import Choosers from './Choosers';
-import _ from 'lodash';
+import _, { set } from 'lodash';
 import yaml from "js-yaml";
 import { isEmptyObject } from "../../utils/isEmptyObject";
 import _lang from "lodash/lang";
@@ -96,21 +96,10 @@ export default function InputFileInput({
 
 const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   if (!inputs) return <p>No Inputs</p>;
+  const [ formContent, setFormContent ] = useState([]);
 
-  function updateInputFile(inputId, value) {
-    setInputFileContent((content) => {
-      const newContent = { ...content };
-      newContent[inputId] = value;
-      return newContent;
-    });
-  }
-  console.log(inputs);
-
-  return (
-    <div className="inputFileForm">
-    <table className="inputFileFields">
-      <tbody>
-        {Object.entries(inputs)
+  useEffect(() => {       
+    const content = Object.entries(inputs)
           .sort((a, b) => a[1].weight - b[1].weight)
           .map(([inputId, inputDescription]) => {
             const { label, description, options, example, weight, ...theRest } =
@@ -167,7 +156,24 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
               </tr>
             );
           }
-          })}
+          })
+      setFormContent(content);
+  },[inputs, inputFileContent])
+
+  function updateInputFile(inputId, value) {
+    setInputFileContent((content) => {
+      const newContent = { ...content };
+      newContent[inputId] = value;
+      return newContent;
+    });
+  }
+  console.log(inputs);
+
+  return (
+    <div className="inputFileForm">
+    <table className="inputFileFields">
+      <tbody>
+        {formContent}
       </tbody>
     </table>
     </div>

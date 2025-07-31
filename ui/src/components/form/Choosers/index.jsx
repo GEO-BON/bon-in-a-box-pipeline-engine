@@ -59,10 +59,6 @@ export default function Choosers({
               onClose={() => {
                 setOpenModal(false);
               }}
-              onOpen={() => {
-                setOpenChooser(inputId);
-                setOpenThisChooser(true)
-              }}
               aria-labelledby="modal-modal-title"
               aria-describedby="modal-modal-description"
             >
@@ -146,28 +142,32 @@ export function Chooser({
   );
   const showCRS = ["countryRegionCRS", "bboxCRS", "CRS"].includes(type);
 
-  const updateValues = () => {
-    if (type === "bboxCRS") {
-      updateInputFile(inputId, {
-        bbox: bbox,
-        CRS: CRS,
-        country: country,
-        region: region,
-      });
-    } else if (type === "country") {
-      updateInputFile(inputId, { country: country });
-    } else if (type === "countryRegion") {
-      updateInputFile(inputId, { country: country, region: region });
-    } else if (type === "countryRegionCRS") {
-      updateInputFile(inputId, { country: country, region: region, CRS: CRS });
-    } else if (type === "CRS") {
-      updateInputFile(inputId, { CRS: CRS });
+  const updateValues = (what, value) => {
+    if(action !== 'load'){
+      if (type === "bboxCRS") {
+        let inp = {
+          "bbox": bbox,
+          "CRS": CRS,
+          "country": country,
+          "region": region,
+        }
+        inp[what] = value;
+        updateInputFile(inputId, inp);
+      } else if (type === "country" && what === "country") {
+        updateInputFile(inputId, { "country": value });
+      } else if (type === "countryRegion" && (what === "country" || what === "region")) {
+        let inp = { "country": country, "region": region }
+        inp[what] = value;
+        updateInputFile(inputId, inp);
+      } else if (type === "countryRegionCRS" && (what === "country" || what === "region" || what === "CRS")) {
+        let inp = { "country": country, "region": region, "CRS": CRS }
+        inp[what] = value;
+        updateInputFile(inputId, inp);
+      } else if (type === "CRS" && what === "CRS") {
+        updateInputFile(inputId, { "CRS": value });
+      }
     }
   };
-
-  useEffect(()=>{
-    updateValues()
-  },[bbox, CRS, country, region]);
 
   useEffect(() => {
     if (bbox.length > 0 && ![("CRSChange", "")].includes(action)) {
@@ -202,7 +202,7 @@ export function Chooser({
       }
       //setAction("loaded")
     }
-  }, [inputId]);
+  }, [inputId, inputFileContent, action]);
 
   return (
     <div
@@ -259,6 +259,7 @@ export function Chooser({
                   ? false
                   : true,
                 dialog: showMap,
+                updateValues
               }}
             />
           )}
@@ -273,6 +274,7 @@ export function Chooser({
                 country,
                 region,
                 dialog: showMap,
+                updateValues
               }}
             />
           )}
@@ -284,6 +286,7 @@ export function Chooser({
                 bbox,
                 setBbox,
                 CRS,
+                updateValues
               }}
             />
           )}
@@ -291,7 +294,6 @@ export function Chooser({
             <>
               <CustomButtonGreen
                 onClick={() => {
-                  updateValues();
                   setOpenModal(false);
                 }}
               >

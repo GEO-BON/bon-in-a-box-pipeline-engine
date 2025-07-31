@@ -5,7 +5,7 @@ import TextField from "@mui/material/TextField";
 import { CustomButtonGreen } from "../../CustomMUI";
 import { paperStyle } from "./utils";
 
-export default function BBox({ bbox, CRS, setBbox, action, setAction }) {
+export default function BBox({ bbox, CRS, setBbox, action, setAction, updateValues }) {
   const [MinX, setMinX] = useState("");
   const [MaxX, setMaxX] = useState("");
   const [MinY, setMinY] = useState("");
@@ -37,6 +37,7 @@ export default function BBox({ bbox, CRS, setBbox, action, setAction }) {
     if (MinX && MinY && MaxX && MaxY) {
       setAction("ModifyBbox");
       setBbox([MinX, MinY, MaxX, MaxY]);
+      updateValues('bbox', [MinX, MinY, MaxX, MaxY]);
     }
   }, [MinX, MinY, MaxX, MaxY]);
 
