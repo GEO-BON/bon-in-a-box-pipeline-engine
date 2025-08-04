@@ -94,7 +94,7 @@ export default function HPCStatus() {
               </>,
               CONFIGURED: <>
                 <Tooltip title="Configured">
-                  <PlayCircleIcon style={{ height: "1rem" }} onClick={connect} />
+                  <PlayCircleIcon style={{ height: "1rem", cursor: "pointer" }} onClick={connect} />
                 </Tooltip>
                 <small>Press play to connect.</small>
               </>,
