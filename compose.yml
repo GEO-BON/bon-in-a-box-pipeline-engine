@@ -30,7 +30,7 @@ services:
       USE_RUNNERS: true
       HPC_SSH_CONFIG_FILE: /run/secrets/hpc_ssh_config_file
       HPC_SSH_KEY: /run/secrets/hpc_ssh_key
-      HPC_KNOWN_HOSTS_FILE: /run/secrets/hpc_known_hosts
+      HPC_KNOWN_HOSTS_FILE: /run/secrets/hpc_known_hosts_file
     secrets:
       - hpc_ssh_key
       - hpc_known_hosts_file
