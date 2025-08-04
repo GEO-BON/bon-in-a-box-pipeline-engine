@@ -19,15 +19,32 @@ export default function HPCStatus() {
   useEffect(() => { if (!status) refreshStatus() }, [])
 
   const refreshStatus = useCallback(() => {
+    let timeout = null
     api.getHPCStatus((error, data, response) => {
       if (error) {
         setErrorMessage(<HttpError httpError={error} response={response} context={"while getting HPC status"} />)
         setStatus(null)
+
       } else {
         setStatus(data)
-        // TODO: If preparing, launch a timer that refreshed every second until stops preparing
+
+        // If preparing, launch a timer that refreshes every second until stops preparing
+        if (data) {
+          if ((data['R'] && data['R']['state'] === "PREPARING")
+            || (data['Python'] && data['Python']['state'] === "PREPARING")
+            || (data['Julia'] && data['Julia']['state'] === "PREPARING")) {
+
+            timeout = setTimeout(refreshStatus, 1000);
+          }
+        }
       }
     })
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    }
   }, [api, setStatus])
 
   const connect = useCallback(() => {
@@ -97,7 +114,7 @@ export default function HPCStatus() {
           {status[key]['message'] &&
             <>
               <br />
-              {status[key]['message']}
+              <pre style={{ maxHeight: "20em", overflowY: "scroll" }}>{status[key]['message']}</pre>
             </>
           }
           {status[key]['image'] &&
