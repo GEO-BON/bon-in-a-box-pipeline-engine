@@ -17,7 +17,7 @@ class HPCConnection(
     condaContainer: Containers = Containers.CONDA,
     juliaContainer: Containers = Containers.JULIA
 ) {
-    val sshConfig: String? = System.getenv("HPC_SSH_CONFIG")
+    val sshConfig: String? = System.getenv("HPC_SSH_CONFIG_NAME")
     val configPath: String? = System.getenv("HPC_SSH_CONFIG_FILE")
     val sshKeyPath: String? = System.getenv("HPC_SSH_KEY")
     val knownHostsPath: String? = System.getenv("HPC_KNOWN_HOSTS_FILE")
@@ -38,7 +38,7 @@ class HPCConnection(
             logger.info("HPC not configured: missing HPC_SSH_CONFIG_FILE ($configPath)")
 
         } else if (sshConfig.isNullOrBlank()) {
-            logger.info("HPC not configured: missing HPC_SSH_CONFIG ($sshConfig).")
+            logger.info("HPC not configured: missing HPC_SSH_CONFIG_NAME ($sshConfig).")
 
         } else if (sshKeyPath == null || !File(sshKeyPath).exists()) {
             logger.info("HPC not configured: missing HPC_SSH_KEY ($sshKeyPath).")

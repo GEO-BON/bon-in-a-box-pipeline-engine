@@ -17,7 +17,7 @@ class HPCConnectionTest {
     private val sshKeyFile = File(tmpDir, "key")
     private val knownHostsFile = File(tmpDir, "hosts")
     private val testEnvironment = mutableMapOf(
-        "HPC_SSH_CONFIG" to "HPC-name",
+        "HPC_SSH_CONFIG_NAME" to "HPC-name",
         "HPC_SSH_CONFIG_FILE" to configFile.absolutePath,
         "HPC_SSH_KEY" to sshKeyFile.absolutePath,
         "HPC_KNOWN_HOSTS_FILE" to knownHostsFile.absolutePath,
