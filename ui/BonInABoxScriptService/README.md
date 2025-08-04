@@ -103,10 +103,6 @@ var BonInABoxScriptService = require('bon_in_a_box_script_service');
 
 
 var api = new BonInABoxScriptService.DefaultApi()
-var opts = {
-  'start': 56, // {Number} Start index for pagination
-  'limit': 56 // {Number} Limit the number of results
-};
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -124,7 +120,6 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-<<<<<<< HEAD
 *BonInABoxScriptService.DefaultApi* | [**getHPCStatus**](docs/DefaultApi.md#getHPCStatus) | **GET** /hpc/status | Get status of HPC connection.
 *BonInABoxScriptService.DefaultApi* | [**getHistory**](docs/DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 *BonInABoxScriptService.DefaultApi* | [**getInfo**](docs/DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
