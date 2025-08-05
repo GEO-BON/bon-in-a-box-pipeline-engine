@@ -1,3 +1,4 @@
+#TODO: Deprecated. Switch to eclipse-temurin:23 ?
 FROM openjdk:11-jre-bullseye AS base-image
 
 # Installing python for pipeline validation with cerberus schema
@@ -22,7 +23,7 @@ RUN chmod 755 /usr/local/bin/docker-compose
 RUN chmod 755 /usr/local/bin/docker
 
 ## This image builds the server code
-FROM gradle:8.13-jdk11 AS builder
+FROM gradle:8.13-jdk17 AS builder
 COPY . /home/gradle/project
 WORKDIR /home/gradle/project
 RUN gradle assemble
