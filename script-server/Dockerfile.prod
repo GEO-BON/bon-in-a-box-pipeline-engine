@@ -1,14 +1,5 @@
-#TODO: Deprecated. Switch to eclipse-temurin:23 ?
-FROM openjdk:11-jre-bullseye AS base-image
-
-# Installing python for pipeline validation with cerberus schema
-# TODO: This should be moved out to the conda-runner
-RUN set -ex; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends python3 pip; \
-    apt-get clean all;
-
-RUN pip3 install pyyaml cerberus;
+#TODO: Deprecated. Switch to  ?
+FROM eclipse-temurin:17 AS base-image
 
 #INSTALL DOCKER CLI
 ENV DOCKER_VERSION=20.10.9
