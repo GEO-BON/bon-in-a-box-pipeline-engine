@@ -5,8 +5,16 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import io.mockk.confirmVerified
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import io.mockk.verifyCount
+import org.geobon.pipeline.RunContext.Companion.scriptRoot
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.scriptModule
+import org.geobon.utils.CallResult
+import org.geobon.utils.SystemCall
 import java.io.File
 import kotlin.test.*
 
@@ -180,4 +188,94 @@ class HPCConnectionTest {
 //    fun givenConfiguredCorrectly_whenPreparedManually_thenGetSuccessMessage() = testApplication {
 //        // Unfortunately cannot test the successful case in a mocked environment.
 //    }
+
+    @Test
+    fun givenAListOfValidFiles_whenSent_thenAllAreSent() {
+        withEnvironment(testEnvironment) {
+            val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/output.txt")
+            someOutput.parentFile.mkdirs()
+            someOutput.writeText("Some content.")
+            val toSync = listOf(
+                someOutput,
+                File(scriptRoot, "1in1out.yml"),
+                File(scriptRoot, "1in1out.py"),
+            )
+            val systemCall = mockk<SystemCall>()
+            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            val connection = HPCConnection(systemCall = systemCall)
+
+            connection.sendFiles(toSync)
+
+            verify {
+                systemCall.run(
+                    listOf(
+                        "echo", """
+                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/outputs/someScript/hasdfdflgjkl/output.txt
+                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/scripts/1in1out.yml
+                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/scripts/1in1out.py
+                """.trimIndent(), "|", "rsync", "--files-from=-", ".", "HPC-name:~/bon-in-a-box/"
+                    ), any(), any(), any(), any()
+                )
+            }
+            confirmVerified(systemCall)
+        }
+    }
+
+    @Test
+    fun givenAListWithInvalidFiles_whenSent_thenInvalidAreNotSent() {
+        withEnvironment(testEnvironment) {
+            val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/output.txt")
+            someOutput.parentFile.mkdirs()
+            someOutput.writeText("Some content.")
+            val toSync = listOf(
+                someOutput,
+                File(scriptRoot, "1in1out.yml"),
+                File(scriptRoot, "1in1out.py"),
+                File(scriptRoot, "somethingWrong.py"),
+            )
+            val systemCall = mockk<SystemCall>()
+            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            val connection = HPCConnection(systemCall = systemCall)
+
+            connection.sendFiles(toSync)
+
+            verify { // somethingWrong.py should not be there
+                systemCall.run(
+                    listOf(
+                        "echo", """
+                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/outputs/someScript/hasdfdflgjkl/output.txt
+                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/scripts/1in1out.yml
+                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/scripts/1in1out.py
+                """.trimIndent(), "|", "rsync", "--files-from=-", ".", "HPC-name:~/bon-in-a-box/"
+                    ), any(), any(), any(), any()
+                )
+            }
+            confirmVerified(systemCall)
+        }
+    }
+
+    @Test
+    fun givenNoValidFiles_whenSent_thenNothingHappens() {
+        withEnvironment(testEnvironment) {
+            val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/outputIsNotCreated.txt")
+            someOutput.parentFile.mkdirs()
+            // output folder is there but not the file!
+            val toSync = listOf(
+                someOutput,
+                File(scriptRoot, "somethingWrong.py"),
+                File(scriptRoot, "imLost.yml"),
+            )
+            val systemCall = mockk<SystemCall>()
+            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            val connection = HPCConnection(systemCall = systemCall)
+
+            connection.sendFiles(toSync)
+
+            verify(exactly = 0) { // somethingWrong.py should not be there
+                systemCall.run(any(), any(), any(), any(), any()
+                )
+            }
+            confirmVerified(systemCall)
+        }
+    }
 }

@@ -5,17 +5,23 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.geobon.hpc.ApptainerImage.Companion.ApptainerImageState
+import org.geobon.pipeline.RunContext.Companion.scriptRoot
+import org.geobon.pipeline.RunContext.Companion.scriptStubsRoot
+import org.geobon.pipeline.outputRoot
 import org.geobon.server.plugins.Containers
-import org.geobon.utils.runToText
+import org.geobon.utils.SystemCall
+import org.geobon.utils.run
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MINUTES
 
 @OptIn(DelicateCoroutinesApi::class)
 class HPCConnection(
     condaContainer: Containers = Containers.CONDA,
-    juliaContainer: Containers = Containers.JULIA
+    juliaContainer: Containers = Containers.JULIA,
+    private val systemCall: SystemCall = SystemCall()
 ) {
     val sshConfig: String? = System.getenv("HPC_SSH_CONFIG_NAME")
     val configPath: String? = System.getenv("HPC_SSH_CONFIG_FILE")
@@ -102,7 +108,7 @@ class HPCConnection(
 
             // imageDigestResult: [ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
             val imageDigestResult = "docker image inspect --format '{{.RepoDigests}}' $imageName"
-                .runToText()
+                .run()
                 ?.trim()
 
             if (imageDigestResult.isNullOrBlank()
@@ -121,7 +127,8 @@ class HPCConnection(
 
             // Launch the container creation for that digest (if not already existing)
             val apptainerImageName = "${container.containerName}_$imageSha.sif"
-            val process = ProcessBuilder("ssh",
+            val process = ProcessBuilder(
+                "ssh",
                 "-F", configPath,
                 "-i", sshKeyPath,
                 "-o", "UserKnownHostsFile=$knownHostsPath",
@@ -169,6 +176,58 @@ class HPCConnection(
             "Python" to pythonStatus.statusMap(),
             "Julia" to juliaStatus.statusMap()
         )
+    }
+
+    private fun validatePath(file: File): Boolean {
+        if(file.startsWith(outputRoot)
+            || file.startsWith(scriptRoot)
+            || file.startsWith(scriptStubsRoot)) {
+            if(file.exists()) {
+                return true
+            } else {
+                logger.warn("Ignoring non-existing file \"$file\"")
+            }
+        } else {
+            logger.warn("Ignoring alien file \"$file\"")
+        }
+        return false
+    }
+
+    /**
+     * Syncs the files/folders towards the remote host via rsync
+     */
+    fun sendFiles(files: List<File>) {
+        var filesString = ""
+        files.forEach { file ->
+            filesString = filesString +
+                if (validatePath(file)) file.absolutePath + "\n"
+                else ""
+        }
+
+        if(filesString.isBlank()) {
+            logger.warn("No valid files to sync.")
+            return
+        }
+
+        val result = systemCall.run(
+            listOf("echo", filesString.trim(), "|", "rsync", "--files-from=-", ".", "$sshConfig:~/bon-in-a-box/"),
+            timeoutAmount = 10, timeoutUnit = MINUTES)
+
+        if(!result.success) {
+            throw RuntimeException(result.error)
+        }
+    }
+
+    /**
+     * Syncs the files/folders from the remote host to script server via rsync
+     */
+    fun retrieveResults(files: List<File>) {
+        val filesString = files.map {
+            if (validatePath(it)) it.absolutePath + "\n"
+            else ""
+        }
+
+        // TODO: Retrieve the files
     }
 
     companion object {

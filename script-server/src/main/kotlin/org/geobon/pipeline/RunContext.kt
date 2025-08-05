@@ -6,7 +6,7 @@ import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.MalformedJsonException
 import org.geobon.server.plugins.Containers
-import org.geobon.utils.runToText
+import org.geobon.utils.run
 import org.geobon.utils.toMD5
 import org.json.JSONObject
 import java.io.File
@@ -53,7 +53,7 @@ data class RunContext(val runId: String, val inputs: String?) {
                 "environment" to container.environment,
                 "version" to container.version
             ),
-            "dependencies" to "cat ${outputFolder.absolutePath}/dependencies.txt".runToText(showErrors = false)
+            "dependencies" to "cat ${outputFolder.absolutePath}/dependencies.txt".run(showErrors = false)
         )
         return environment
     }
@@ -102,13 +102,13 @@ data class RunContext(val runId: String, val inputs: String?) {
             val gitCmd = "$gitBinPath $gitDirOpt"
 
             val gitCommitIDCommand = "$gitCmd log --format=%h -1"
-            val commit = "commit" to gitCommitIDCommand.runToText(showErrors = false)
+            val commit = "commit" to gitCommitIDCommand.run(showErrors = false)
 
             val gitCurrentBranchCommand =  "$gitCmd  branch --show-current"
-            val branch = "branch" to gitCurrentBranchCommand.runToText(showErrors = false)
+            val branch = "branch" to gitCurrentBranchCommand.run(showErrors = false)
 
             val gitTimeStampCommand = "$gitCmd log --format=%cd -1"
-            val timestamp = "timestamp" to gitTimeStampCommand.runToText(showErrors = false)
+            val timestamp = "timestamp" to gitTimeStampCommand.run(showErrors = false)
 
 
             return mapOf(commit, branch, timestamp)
