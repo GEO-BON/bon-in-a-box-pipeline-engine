@@ -143,34 +143,40 @@ export function Chooser({
   const showCRS = ["countryRegionCRS", "bboxCRS", "CRS"].includes(type);
 
   const updateValues = (what, value) => {
-    if(action !== 'load'){
+    if (action !== "load") {
       if (type === "bboxCRS") {
         let inp = {
-          "bbox": bbox,
-          "CRS": CRS,
-          "country": country,
-          "region": region,
-        }
+          bbox: bbox,
+          CRS: CRS,
+          country: country,
+          region: region,
+        };
         inp[what] = value;
         updateInputFile(inputId, inp);
       } else if (type === "country" && what === "country") {
-        updateInputFile(inputId, { "country": value });
-      } else if (type === "countryRegion" && (what === "country" || what === "region")) {
-        let inp = { "country": country, "region": region }
+        updateInputFile(inputId, { country: value });
+      } else if (
+        type === "countryRegion" &&
+        (what === "country" || what === "region")
+      ) {
+        let inp = { country: country, region: region };
         inp[what] = value;
         updateInputFile(inputId, inp);
-      } else if (type === "countryRegionCRS" && (what === "country" || what === "region" || what === "CRS")) {
-        let inp = { "country": country, "region": region, "CRS": CRS }
+      } else if (
+        type === "countryRegionCRS" &&
+        (what === "country" || what === "region" || what === "CRS")
+      ) {
+        let inp = { country: country, region: region, CRS: CRS };
         inp[what] = value;
         updateInputFile(inputId, inp);
       } else if (type === "CRS" && what === "CRS") {
-        updateInputFile(inputId, { "CRS": value });
+        updateInputFile(inputId, { CRS: value });
       }
     }
   };
 
   useEffect(() => {
-    if (bbox.length > 0 && ![("CRSChange", "")].includes(action)) {
+    if (bbox.length > 0 && ![("CRSChange", "", "load")].includes(action)) {
       //Shrink bbox for projestion which wont provide a crs suggestion if even a small part of the bbox is outside the area of coverage of the CRS
       const b = bbox.map((c) => parseFloat(c));
       const scale_width = Math.abs((b[2] - b[0]) / 3);
@@ -232,15 +238,15 @@ export function Chooser({
         >
           {showBBox && (
             <>
-            <CustomButtonGreen
-              onClick={() => {
-                setAction("Digitize");
-                setDigitize(true);
-              }}
-            >
-              Draw area of interest on map <CropIcon />
-            </CustomButtonGreen>
-            <div style={{marginLeft: '15px'}}>or choose</div>
+              <CustomButtonGreen
+                onClick={() => {
+                  setAction("Digitize");
+                  setDigitize(true);
+                }}
+              >
+                Draw area of interest on map <CropIcon />
+              </CustomButtonGreen>
+              <div style={{ marginLeft: "15px" }}>or choose</div>
             </>
           )}
           {showCountry && (
@@ -259,7 +265,7 @@ export function Chooser({
                   ? false
                   : true,
                 dialog: showMap,
-                updateValues
+                updateValues,
               }}
             />
           )}
@@ -275,7 +281,7 @@ export function Chooser({
                 country,
                 region,
                 dialog: showMap,
-                updateValues
+                updateValues,
               }}
             />
           )}
@@ -287,7 +293,7 @@ export function Chooser({
                 bbox,
                 setBbox,
                 CRS,
-                updateValues
+                updateValues,
               }}
             />
           )}

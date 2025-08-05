@@ -1,18 +1,14 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useRef, useCallback } from "react";
 import TextField from "@mui/material/TextField";
-import { Checkbox, CircularProgress } from "@mui/material";
 import { CustomButtonGreen } from "../../CustomMUI";
+import CircularProgress from "@mui/material/CircularProgress";
 import Autocomplete from "@mui/material/Autocomplete";
-import InputBase from "@mui/material/InputBase";
-import IconButton from "@mui/material/IconButton";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import PlayCircleIcon from "@mui/icons-material/PlayCircle";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
-import Paper from "@mui/material/Paper";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import {
   getProjestAPI,
@@ -24,8 +20,6 @@ import {
   defaultRegion,
   paperStyle,
 } from "./utils";
-import * as turf from "@turf/turf";
-import _ from "lodash";
 
 export default function CRSMenu({
   CRS,
@@ -41,8 +35,8 @@ export default function CRSMenu({
 }) {
   const [CRSList, setCRSList] = useState([]);
   const [selectedCRS, setSelectedCRS] = useState({
-    label: "WGS84 - Lat/long",
-    value: "EPSG:4326",
+    label: CRS.name,
+    value: `${CRS.authority}:${CRS.code}`,
   });
   const [inputValue, setInputValue] = useState("");
   const [searching, setSearching] = useState(false);
@@ -99,44 +93,53 @@ export default function CRSMenu({
   }, [bboxGeoJSONShrink, country.englishName, region.name]);
 
   useEffect(() => {
+    let ignore = false;
     const c = `${CRS.authority}:${CRS.code}`;
     if (c !== inputValue) {
       setInputValue(c);
-      if(action=== 'load'){
-        updateCRS({ value: c, label: c });
+      if (action === "load") {
+        updateCRS({ value: c, label: c }, "load", ignore);
       }
     }
+    return () => {
+      ignore = true;
+    };
   }, [CRS, action]);
 
-  const updateCRS = (value) => {
-    setAction("CRSChange");
+  const updateCRS = (value, action = "", ignore = false) => {
+    if (action !== "load") {
+      setAction("CRSChange");
+    }
+    console.log(action);
     if (value) {
       getCRSDef(value.value).then((def) => {
-        if (def) {
-          const c = {
-            name: def.name,
-            authority: def.id.authority,
-            code: def.id.code,
-            def: def.exports.proj4,
-            unit: def.unit,
-            bbox: def.bbox,
-          }
-          setCRS(c);
-          updateValues('CRS',c)
-          if (value && value.value == value.label) {
-            const fl = CRSList.filter((fl) => fl.value === value.value);
-            if (fl.length > 0) {
-              setSelectedCRS(fl[0]);
+        if (!ignore) {
+          if (def) {
+            const c = {
+              name: def.name,
+              authority: def.id.authority,
+              code: def.id.code,
+              def: def.exports.proj4,
+              unit: def.unit,
+              bbox: def.bbox,
+            };
+            setCRS(c);
+            updateValues("CRS", c);
+            if (value && value.value == value.label) {
+              const fl = CRSList.filter((fl) => fl.value === value.value);
+              if (fl.length > 0) {
+                setSelectedCRS(fl[0]);
+              } else {
+                setSelectedCRS({ value: value.label, label: def.name });
+              }
             } else {
-              setSelectedCRS({ value: value.label, label: def.name });
+              setSelectedCRS(value);
             }
           } else {
+            setCRS({});
+            updateValues("CRS", {});
             setSelectedCRS(value);
           }
-        } else {
-          setCRS({});
-          updateValues('CRS',{})
-          setSelectedCRS(value);
         }
       });
     } else {

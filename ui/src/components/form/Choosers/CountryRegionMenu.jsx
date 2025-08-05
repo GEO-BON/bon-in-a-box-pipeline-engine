@@ -124,9 +124,9 @@ export default function CountryRegionMenu({
         ISO3: countryObj.isoAlpha3,
         code: countryObj.countryCode,
         bboxLL: b,
-      }
+      };
       setCountry(countr);
-      updateValues('country', countr);
+      updateValues("country", countr);
     }
     if (regionValue) {
       const regionObj = regionJSON.find((s) => s.geonameId === regionValue);
@@ -137,22 +137,24 @@ export default function CountryRegionMenu({
         regionObj.bbox.north,
       ];
       b = b.map((c) => parseFloat(c.toFixed(6)));
-      let reg =  regionObj
-          ? {
-              regionName: regionObj.name,
-              ISO3166_2	: regionObj.adminCodes1.ISO3166_2? regionObj.adminCodes1.ISO3166_2 : "",
-              bboxLL: b,
-              countryEnglishName: countryObj.countryName,
-            }
-          : defaultRegion
+      let reg = regionObj
+        ? {
+            regionName: regionObj.name,
+            ISO3166_2: regionObj.adminCodes1.ISO3166_2
+              ? regionObj.adminCodes1.ISO3166_2
+              : "",
+            bboxLL: b,
+            countryEnglishName: countryObj.countryName,
+          }
+        : defaultRegion;
       setRegion(reg);
-      updateValues('region', reg);
+      updateValues("region", reg);
     }
     if (countryValue === "" && regionValue === "") {
       setCountry(defaultCountry);
-      updateValues('country', defaultCountry);
+      updateValues("country", defaultCountry);
       setRegion(defaultRegion);
-      updateValues('region', defaultRegion);
+      updateValues("region", defaultRegion);
     }
   };
 
@@ -184,9 +186,7 @@ export default function CountryRegionMenu({
           setAction("ChangeCountry");
           setSelectedCountry(value);
           setSelectedRegion("");
-          if (!showAcceptButton) {
-            buttonClicked("country", value.value);
-          }
+          buttonClicked("country", value.value);
         }}
       />
       {showRegion && (
@@ -211,9 +211,7 @@ export default function CountryRegionMenu({
           onChange={(event, value) => {
             setAction("ChangeRegion");
             setSelectedRegion(value);
-            if (!showAcceptButton) {
-              buttonClicked("region", value.value);
-            }
+            buttonClicked("region", value.value);
             updateValues();
           }}
           value={selectedRegion}
@@ -229,7 +227,7 @@ export default function CountryRegionMenu({
           }}
           className="stateCountryButton"
         >
-          Set BBox and search CRS
+          Search CRS
         </CustomButtonGreen>
       )}
     </div>

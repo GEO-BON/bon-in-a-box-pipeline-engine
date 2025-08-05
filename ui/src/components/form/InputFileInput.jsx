@@ -5,8 +5,8 @@ import { InputsDescription } from "../StepDescription";
 import ReactMarkdown from "react-markdown";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
-import Choosers from './Choosers';
-import _, { set } from 'lodash';
+import Choosers from "./Choosers";
+import _, { set } from "lodash";
 import yaml from "js-yaml";
 import { isEmptyObject } from "../../utils/isEmptyObject";
 import _lang from "lodash/lang";
@@ -79,7 +79,8 @@ export default function InputFileInput({
       )}
       {selectedTab == 1 && (
         <Box className="yamlInput">
-          <YAMLTextArea metadata={metadata}
+          <YAMLTextArea
+            metadata={metadata}
             data={inputFileContent}
             setData={setInputFileContent}
             setValidationError={setValidationError}
@@ -96,69 +97,91 @@ export default function InputFileInput({
 
 const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   if (!inputs) return <p>No Inputs</p>;
-  const [ formContent, setFormContent ] = useState([]);
+  const [formContent, setFormContent] = useState([]);
 
-  useEffect(() => {       
+  useEffect(() => {
     const content = Object.entries(inputs)
-          .sort((a, b) => a[1].weight - b[1].weight)
-          .map(([inputId, inputDescription]) => {
-            const { label, description, options, example, weight, ...theRest } =
-              inputDescription;
-            if(["country", "region", "countryRegion", "CRS", "countryRegionCRS", "bboxCRS"].includes(inputDescription.type)){
-                return (<Choosers key={inputId} inputId={inputId} inputDescription={inputDescription} inputFileContent={inputFileContent} updateInputFile={updateInputFile} />
-                )
-              }else{
-            return (
-              <tr key={inputId}>
-                <td className="inputCell">
-                  {false && (
-                    <label htmlFor={inputId}>
-                      {label ? (
-                        <strong>{label}</strong>
-                      ) : (
-                        <Alert severity="error" className="error">
-                          Missing label for input "{inputId}"
+      .sort((a, b) => a[1].weight - b[1].weight)
+      .map(([inputId, inputDescription]) => {
+        const { label, description, options, example, weight, ...theRest } =
+          inputDescription;
+        if (
+          [
+            "country",
+            "region",
+            "countryRegion",
+            "CRS",
+            "countryRegionCRS",
+            "bboxCRS",
+          ].includes(inputDescription.type)
+        ) {
+          return (
+            <Choosers
+              key={inputId}
+              inputId={inputId}
+              inputDescription={inputDescription}
+              inputFileContent={inputFileContent}
+              updateInputFile={updateInputFile}
+            />
+          );
+        } else {
+          return (
+            <tr key={inputId}>
+              <td className="inputCell">
+                {false && (
+                  <label htmlFor={inputId}>
+                    {label ? (
+                      <strong>{label}</strong>
+                    ) : (
+                      <Alert severity="error" className="error">
+                        Missing label for input "{inputId}"
+                      </Alert>
+                    )}
+                    {!/^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId) &&
+                      !/pipeline@\d+$/.test(inputId) && (
+                        <Alert severity="warning">
+                          Input id {inputId.replace(/^(.*\|)/, "")} should be a
+                          snake_case id
                         </Alert>
                       )}
-                      {!/^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId) &&
-                        !/pipeline@\d+$/.test(inputId) && (
-                          <Alert severity="warning">
-                            Input id {inputId.replace(/^(.*\|)/, "")} should be
-                            a snake_case id
-                          </Alert>
-                        )}
-                    </label>
-                  )}
-                  <ScriptInput
-                    id={inputId}
-                    type={inputDescription.type}
-                    options={options}
-                    value={inputFileContent && inputFileContent[inputId]}
-                    onValueUpdated={(value) => updateInputFile(inputId, value)}
-                    label={label}
-                    size="medium"
-                    keepWidth={true}
-                  />
-                  {!inputFileContent || !_lang.isEqual(inputFileContent[inputId], example)
-                    && <ScriptInputExample example={example} type={inputDescription.type} />
-                  }
-                </td>
-                <td className="descriptionCell">
-                  {description ? (
-                    <ReactMarkdown className="reactMarkdown">{description}</ReactMarkdown>
-                  ) : (
-                    <Alert severity="warning">
-                      Missing description for input "{inputId}"
-                    </Alert>
-                  )}
-                  {!isEmptyObject(theRest) && yaml.dump(theRest)}
-                </td>
-              </tr>
-            );
-          }
-          })
-      setFormContent(content);
-  },[inputs, inputFileContent])
+                  </label>
+                )}
+                <ScriptInput
+                  id={inputId}
+                  type={inputDescription.type}
+                  options={options}
+                  value={inputFileContent && inputFileContent[inputId]}
+                  onValueUpdated={(value) => updateInputFile(inputId, value)}
+                  label={label}
+                  size="medium"
+                  keepWidth={true}
+                />
+                {!inputFileContent ||
+                  (!_lang.isEqual(inputFileContent[inputId], example) && (
+                    <ScriptInputExample
+                      example={example}
+                      type={inputDescription.type}
+                    />
+                  ))}
+              </td>
+              <td className="descriptionCell">
+                {description ? (
+                  <ReactMarkdown className="reactMarkdown">
+                    {description}
+                  </ReactMarkdown>
+                ) : (
+                  <Alert severity="warning">
+                    Missing description for input "{inputId}"
+                  </Alert>
+                )}
+                {!isEmptyObject(theRest) && yaml.dump(theRest)}
+              </td>
+            </tr>
+          );
+        }
+      });
+    setFormContent(content);
+  }, [inputs, inputFileContent]);
 
   function updateInputFile(inputId, value) {
     setInputFileContent((content) => {
@@ -167,15 +190,12 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
       return newContent;
     });
   }
-  console.log(inputs);
 
   return (
     <div className="inputFileForm">
-    <table className="inputFileFields">
-      <tbody>
-        {formContent}
-      </tbody>
-    </table>
+      <table className="inputFileFields">
+        <tbody>{formContent}</tbody>
+      </table>
     </div>
   );
 };
