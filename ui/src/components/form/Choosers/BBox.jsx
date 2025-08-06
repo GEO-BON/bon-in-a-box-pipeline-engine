@@ -26,7 +26,7 @@ export default function BBox({
     console.log("BBox component updated with bbox:", bbox);
     if (["ModifyBbox", "load", ""].includes(action)) {
       if (bbox.length > 0) {
-          updateBBox(4, bbox);
+        updateBBox(4, bbox);
       }
     }
   }, [bbox, action]);

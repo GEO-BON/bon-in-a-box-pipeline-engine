@@ -172,12 +172,12 @@ export default function MapOL({
         source.clear(); // Remove all existing features
       });
       drawInt.on("drawend", function (e) {
+        setAction("ModifyBbox");
         var shape = e.feature.getGeometryName();
         var extent = e.feature.getGeometry().getExtent();
         setBbox(cleanBbox(extent, CRS.unit));
         e.feature.set("shape", shape);
         e.feature.setId(++featureId);
-        setAction("ModifyBbox");
       });
       mapp.addLayer(vector);
       mapp.addInteraction(drawInt);
@@ -223,6 +223,7 @@ export default function MapOL({
           }
           var extent = rectangleInteraction.getExtent();
           setBbox(cleanBbox(extent, CRS.unit));
+          setAction("ModifyBbox");
           var poly = new Feature(polygonFromExtent(extent));
           b.getGeometry().setCoordinates(poly.getGeometry().getCoordinates());
           b.unset("coordinates");

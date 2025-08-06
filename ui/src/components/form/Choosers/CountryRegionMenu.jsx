@@ -180,7 +180,7 @@ export default function CountryRegionMenu({
         }}
         value={selectedCountry}
         renderInput={(params) => (
-          <TextField {...params} label="Select country" />
+          <TextField size="small "{...params} label="Select country" />
         )}
         onChange={(event, value) => {
           setAction("ChangeCountry");
