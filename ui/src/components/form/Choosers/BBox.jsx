@@ -18,7 +18,7 @@ export default function BBox({
   // BBox values coming in
   useEffect(() => {
     console.log("BBox component updated with bbox:", bbox);
-    if (["ModifyBbox", "load", ""].includes(action)) {
+    if (["ModifyBbox", "load", "", "CountryButton"].includes(action)) {
       if (bbox.length > 0) {
         updateBBox(4, bbox);
       }
