@@ -217,19 +217,6 @@ export default function CountryRegionMenu({
           value={selectedRegion}
         />
       )}
-      {false && (
-        <CustomButtonGreen
-          variant="contained"
-          endIcon={<CheckIcon />}
-          disabled={!selectedCountry}
-          onClick={() => {
-            buttonClicked("both", "");
-          }}
-          className="stateCountryButton"
-        >
-          Search CRS
-        </CustomButtonGreen>
-      )}
     </div>
   );
 }

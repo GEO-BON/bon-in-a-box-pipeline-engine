@@ -4,36 +4,23 @@ import "ol/ol.css";
 import Map from "ol/Map";
 import View from "ol/View";
 import GeoJSON from "ol/format/GeoJSON";
-import TileLayer from "ol/layer/Tile";
-import TileWMS from "ol/source/TileWMS";
 import { OSM, Vector as VectorSource } from "ol/source";
-import MVT from "ol/format/MVT.js";
 import VectorLayer from "ol/layer/Vector";
-import VectorTileLayer from "ol/layer/VectorTile";
-import VectorTileSource from "ol/source/VectorTile";
-import olms from "ol-mapbox-style";
 import Layer from "ol/layer/WebGLTile.js";
-import { useGeographic } from "ol/proj.js";
 import Source from "ol/source/ImageTile.js";
 import Fill from "ol/style/Fill";
-import Icon from "ol/style/Icon";
 import Stroke from "ol/style/Stroke";
 import Style from "ol/style/Style";
 import { boundingExtent } from "ol/extent";
-import Text from "ol/style/Text";
 import Feature from "ol/Feature";
-import Polygon, { fromExtent as polygonFromExtent } from "ol/geom/Polygon";
+import { fromExtent as polygonFromExtent } from "ol/geom/Polygon";
 import { register } from "ol/proj/proj4";
-import { fromLonLat, getUserProjection } from "ol/proj";
 import Draw, { createBox } from "ol/interaction/Draw.js";
 import Extent from "ol/interaction/Extent";
-import Snap from "ol/interaction/Snap.js";
 import Modify from "ol/interaction/Modify.js";
-import { get as getProjection } from "ol/proj";
 import * as turf from "@turf/turf";
 import proj4 from "proj4";
 import { transformPolyToBboxCRS, cleanBbox, defaultCRS, defaultCountry, defaultRegion} from "./utils";
-import ImageCanvasSource from "ol/source/ImageCanvas";
 
 export default function MapOL({
   bbox = [],
@@ -43,6 +30,7 @@ export default function MapOL({
   CRS = defaultCRS,
   digitize,
   setDigitize,
+  setAction = () => {},
   action
 }) {
   const mapRef = useRef(null);
@@ -189,6 +177,7 @@ export default function MapOL({
         setBbox(cleanBbox(extent, CRS.unit));
         e.feature.set("shape", shape);
         e.feature.setId(++featureId);
+        setAction("ModifyBbox");
       });
       mapp.addLayer(vector);
       mapp.addInteraction(drawInt);
@@ -347,7 +336,7 @@ export default function MapOL({
       view: new View({
         center: [0, 0],
         zoom: 3,
-        projection: `EPSG:${CRS.code}`,
+        projection: `${CRS.authority}:${CRS.code}`,
       }),
     });
     setMapp(map)

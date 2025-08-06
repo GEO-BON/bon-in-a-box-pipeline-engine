@@ -11,6 +11,7 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import debounce from 'lodash.debounce';
+import _ from "lodash";
 import {
   getProjestAPI,
   transformBboxAPI,
@@ -118,12 +119,10 @@ export default function CRSMenu({
     if (action !== "load") {
       setAction("CRSChange");
     }
-    console.log(action);
     if(value && value?.value){
       let code = "";
       code = value.value.split(":")[1]
       if (code && code.length > 3) {
-        console.log("Updating CRS with value:", value.value);
         getCRSDef(value.value).then((def) => {
           if (!ignore) {
             if (def) {
@@ -231,11 +230,6 @@ export default function CRSMenu({
           updateCRS(value);
         }}
         value={selectedCRS}
-        endAdornment={
-          <InputAdornment position="end">
-            <CheckBoxIcon sx={{ color: "var(--biab-green-main)" }} />
-          </InputAdornment>
-        }
       />
       <FormControl sx={{ width: "90%" }}>
         <InputLabel
@@ -258,17 +252,6 @@ export default function CRSMenu({
             setInputValue(event.target.value);
             debouncedSearch(event.target.value);
           }}
-          /*endAdornment={
-            <InputAdornment
-              position="end"
-              style={{ cursor: "pointer", marginRight: "20px" }}
-              onClick={(event) => {
-                updateCRS({ value: inputValue, label: inputValue });
-              }}
-            >
-              <CheckBoxIcon sx={{ color: "var(--biab-green-main)" }} />
-            </InputAdornment>
-          }*/
         />
       </FormControl>
       <div

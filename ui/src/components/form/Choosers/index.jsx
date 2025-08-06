@@ -141,7 +141,14 @@ export function Chooser({
     type
   );
   const showCRS = ["countryRegionCRS", "bboxCRS", "CRS"].includes(type);
+  const [oldValues, setOldValues] = useState({})
 
+
+  useEffect(() => {
+    if (inputFileContent && inputFileContent[inputId]) {
+      setOldValues(inputFileContent[inputId]);
+    }
+  },[])
   // Update values in the input file content
   const updateValues = (what, value) => {
     if (action !== "load") {
@@ -225,7 +232,7 @@ export function Chooser({
         backgroundColor: showMap ? "#666" : "#fff",
         padding: showMap ? "20px" : "0px",
         borderRadius: "8px",
-        margin: showMap ? "30px auto" : "0px",
+        margin: showMap ? "0px auto" : "0px",
       }}
     >
       <Grid container spacing={0} sx={{ height: "100%" }}>
@@ -311,6 +318,7 @@ export function Chooser({
               <CustomButtonGreen
                 onClick={() => {
                   setOpenModal(false);
+                  updateInputFile(inputId, oldValues)
                 }}
               >
                 Cancel

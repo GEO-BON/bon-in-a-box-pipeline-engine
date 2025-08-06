@@ -245,7 +245,7 @@ export const validTerraPolygon = (feature) => {
 };
 
 export const cleanBbox = (bbox, units) => {
-  const dec = units === "degree" ? 5 : 0;
+  const dec = units.includes("degree") ? 5 : 0;
   return bbox.map((b) => parseFloat(parseFloat(b).toFixed(dec)));
 };
 
