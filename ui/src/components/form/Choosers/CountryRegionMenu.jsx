@@ -217,7 +217,7 @@ export default function CountryRegionMenu({
           value={selectedRegion}
         />
       )}
-      {showAcceptButton && (
+      {false && (
         <CustomButtonGreen
           variant="contained"
           endIcon={<CheckIcon />}

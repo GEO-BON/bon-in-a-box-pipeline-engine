@@ -43,6 +43,7 @@ export default function MapOL({
   CRS = defaultCRS,
   digitize,
   setDigitize,
+  action
 }) {
   const mapRef = useRef(null);
   const mapContainer = useRef(null);
@@ -280,7 +281,7 @@ export default function MapOL({
 
   // The Country/Region Bounding box or CRS are updated, we need to update and reproject the bbox
   useEffect(() => {
-    if ((country.bboxLL.length > 0 || region.bboxLL.length > 0) && mapp) {
+    if ((country.bboxLL.length > 0 || region.bboxLL.length > 0) && mapp && action !== "load") {
       setDigitize(false);
       const b = region.bboxLL.length > 0 ? region.bboxLL : country.bboxLL
       setOldCRS(defaultCRS) 

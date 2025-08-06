@@ -1,9 +1,22 @@
 /* eslint-disable prettier/prettier */
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useReducer } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import TextField from "@mui/material/TextField";
 import { CustomButtonGreen } from "../../CustomMUI";
 import { paperStyle } from "./utils";
+
+function reducer(state, action) {
+  if (action.type === 'valueChange') {
+    return {
+      ...state,
+      bbox: {
+        ...state.bbox,
+        ...action.bbox}
+    };
+  }
+  throw Error('Unknown action.');
+}
+
 
 export default function BBox({
   bbox,
@@ -13,10 +26,7 @@ export default function BBox({
   setAction,
   updateValues,
 }) {
-  const [MinX, setMinX] = useState("");
-  const [MaxX, setMaxX] = useState("");
-  const [MinY, setMinY] = useState("");
-  const [MaxY, setMaxY] = useState("");
+  const [state, dispatch] = useReducer(reducer, { type: 'init', bbox: { MinX: "", MinY: "", MaxX: "", MaxY: "" }});
 
   useEffect(() => {
     if (CRS !== "" && bbox.length > 0) {
@@ -27,27 +37,24 @@ export default function BBox({
   useEffect(() => {
     console.log("BBox component updated with bbox:", bbox);
     if (bbox.length > 0) {
-      if (action !== "ModifyBbox") {
-        setMinX(bbox[0]);
-        setMinY(bbox[1]);
-        setMaxX(bbox[2]);
-        setMaxY(bbox[3]);
+      if (["ModifyBbox", "load"].includes(action)) {
+        dispatch({type: 'valueChange', bbox: { MinX: bbox[0], MinY: bbox[1], MaxX: bbox[2], MaxY: bbox[3]}});
       }
     } else {
-      setMinX(null);
-      setMinY(null);
-      setMaxX(null);
-      setMaxY(null);
+      dispatch({type: 'valueChange', bbox: { MinX: "", MinY: "", MaxX: "", MaxY: "" }});
     }
   }, [bbox, action]);
 
-  useEffect(() => {
-    if (MinX && MinY && MaxX && MaxY) {
-      setAction("ModifyBbox");
-      setBbox([MinX, MinY, MaxX, MaxY]);
-      updateValues("bbox", [MinX, MinY, MaxX, MaxY]);
-    }
-  }, [MinX, MinY, MaxX, MaxY]);
+ 
+  const updateBBox = (what, value) => {
+    dispatch({type: 'valueChange', bbox: {[what]: value}});
+    let a = { ...state.bbox };
+    a[what] = value;
+    let b = [a.MinX, a.MinY, a.MaxX, a.MaxY]
+    setBbox(b);
+    updateValues("bbox", b)
+    updateValues(what, value);
+  }
 
   const inputProps = {
     step: CRS.unit === "degree" ? 0.5 : 5000,
@@ -60,8 +67,8 @@ export default function BBox({
         type="number"
         label="Minimum X"
         size="small"
-        value={MinX}
-        onChange={(e) => setMinX(e.target.value)}
+        value={state.bbox.MinX}
+        onChange={(e) => updateBBox('MinX', e.target.value)}
         sx={{ marginTop: "15px", marginBottom: "10px" }}
         inputProps={inputProps}
       />
@@ -69,8 +76,8 @@ export default function BBox({
         type="number"
         size="small"
         label="Minimum Y"
-        value={MinY}
-        onChange={(e) => setMinY(e.target.value)}
+        value={state.bbox.MinY}
+        onChange={(e) => updateBBox('MinY', e.target.value)}
         sx={{ marginBottom: "10px" }}
         inputProps={inputProps}
       />
@@ -78,8 +85,8 @@ export default function BBox({
         type="number"
         label="Maximum X"
         size="small"
-        value={MaxX}
-        onChange={(e) => setMaxX(e.target.value)}
+        value={state.bbox.MaxX}
+        onChange={(e) => updateBBox('MaxX', e.target.value)}
         sx={{ marginBottom: "10px" }}
         inputProps={inputProps}
       />
@@ -87,8 +94,8 @@ export default function BBox({
         type="number"
         label="Maximum Y"
         size="small"
-        value={MaxY}
-        onChange={(e) => setMaxY(e.target.value)}
+        value={state.bbox.MaxY}
+        onChange={(e) => updateBBox('MaxY', e.target.value)}
         sx={{ marginBottom: "10px" }}
         inputProps={inputProps}
       />
