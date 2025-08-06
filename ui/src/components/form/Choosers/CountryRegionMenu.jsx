@@ -52,7 +52,7 @@ export default function CountryRegionMenu({
     if (["load"].includes(action)) {
       if (
         country.ISO3 &&
-        country.ISO3 !== selectedCountry.value &&
+        country.ISO3 !== selectedCountry?.value &&
         countryOptions.length > 1
       ) {
         setSelectedCountry({ label: country.englishName, value: country.ISO3 });
@@ -71,7 +71,7 @@ export default function CountryRegionMenu({
   }, [region, country, countryOptions, regionOptions, action]);
 
   useEffect(() => {
-    if (selectedCountry.value) {
+    if (selectedCountry && selectedCountry.value) {
       // Fetch states or provinces based on the selected country
       const countryObj = countryOptionsJSON.geonames.find(
         (c) => c.isoAlpha3 === selectedCountry.value

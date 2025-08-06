@@ -15,12 +15,6 @@ export default function BBox({
 }) {
   const [bbInput, setBboxInput] = useState(["", "", "", ""]);
 
-  /*useEffect(() => {
-    if (CRS !== "" && bbox.length > 0) {
-      setAction("");
-    }
-  }, [bbox]);*/
-
   // BBox values coming in
   useEffect(() => {
     console.log("BBox component updated with bbox:", bbox);
