@@ -159,6 +159,18 @@ inputs:
     example: null
 ```
 
+The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying 'country' as input type will create a dropdown menu with a standardized list of countries. Selecting 'bboxCRS' will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:
+
+| Input name | Description |
+|------------------|----------------------------|--------------------------|
+| country | Creates a selector (dropdown menu) with a standardized list of countries. GeoNames is used as the reference for the country list.  |
+| countryRegion | Creates a selector (dropdown menu) with a standardized list of regions (provinces, states, etc) within a selected country. GeoNames is used as the reference for the list of regions.|
+| countryRegionCRS | Creates a selector (dropdown menu) for choosing a coordinate reference system adapted for a specific country and/or region. |
+| CRS | Creates a selector for specifying a coordinate reference system.|
+| bboxCRS | Creates a button to open an interface that allows to specify a bounding box (geographical minima and maxima) based on an optional selection of country/region and on a CRS, or by clicking on the map to set the bounds of the area of interest for the analysis.|
+
+Note that the use of these selectors will create objects that contain multiple elements. For example, the country selector will create an input object that contains the country name in English, the ISO3 code of the country, the ISO2 code, as well as the bounding box of that country, in longitude, latitude coordinates. 
+
 ### Outputs
 
 After specifying the inputs, you can specify the files that you want to output for that script. These can either be final pipeline outputs, outputs for that step to connect to another step, or both.
