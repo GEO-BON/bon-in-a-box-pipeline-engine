@@ -28,6 +28,12 @@ import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { Alert } from "@mui/material";
 export const api = new BonInABoxScriptService.DefaultApi();
 
+if (import.meta.hot) {
+  import.meta.hot.on("vite:beforeFullReload", () => {
+    throw "(skipping full reload)";
+  });
+}
+
 function NotFound() {
   const location = useLocation();
   return (
@@ -46,19 +52,21 @@ const router = createBrowserRouter([
   },
   {
     path: "script-form/:pipeline?/:runHash?",
-    element: <Layout right={<PipelinePage key="singleScriptRun" runType="script" />} />,
+    element: (
+      <Layout right={<PipelinePage key="singleScriptRun" runType="script" />} />
+    ),
   },
   {
     path: "pipeline-form/:pipeline?/:runHash?",
-    element: <Layout right={<PipelinePage key="pipelineRun" runType="pipeline" />} />,
+    element: (
+      <Layout right={<PipelinePage key="pipelineRun" runType="pipeline" />} />
+    ),
   },
   {
     path: "pipeline-editor",
     element: (
       <Layout
-        left={
-          <StepChooser />
-        }
+        left={<StepChooser />}
         right={
           <Suspense fallback={<Spinner />}>
             <PipelineEditor />
@@ -82,11 +90,13 @@ const router = createBrowserRouter([
 ]);
 
 const staticRouter = (content) => {
-  return <BrowserRouter>
-    <Routes>
-      <Route path="*" element={<Layout right={content} />} />
-    </Routes>
-  </BrowserRouter>
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="*" element={<Layout right={content} />} />
+      </Routes>
+    </BrowserRouter>
+  );
 };
 
 function App() {
@@ -96,7 +106,7 @@ function App() {
   useEffect(() => {
     api.getSystemStatus((error, _, response) => {
       setStatusChecked(true);
-      let pollingTimer = null
+      let pollingTimer = null;
 
       if (error) {
         setSystemError({ error, response });
@@ -108,12 +118,11 @@ function App() {
                 keepPollingStatus();
                 setSystemError({ error, response });
               } else {
-                setSystemError(null)
+                setSystemError(null);
               }
             });
-
           }, 5000);
-        }
+        };
         keepPollingStatus();
       }
 
@@ -121,19 +130,24 @@ function App() {
     });
   }, [setSystemError, setStatusChecked]);
 
-  if (!statusChecked)
-    return staticRouter(<Spinner />);
+  if (!statusChecked) return staticRouter(<Spinner />);
 
   if (systemError) {
     if (systemError.error.status === 502) {
       return staticRouter(
         <Alert severity="error" className="systemError">
-          502 error: Script server appears to be offline.
-          If it is starting, it is not yet ready to respond.
+          502 error: Script server appears to be offline. If it is starting, it
+          is not yet ready to respond.
         </Alert>
       );
     }
-    return staticRouter(<HttpError className="systemError" error={systemError.error} response={systemError.response} />);
+    return staticRouter(
+      <HttpError
+        className="systemError"
+        error={systemError.error}
+        response={systemError.response}
+      />
+    );
   }
 
   return <RouterProvider router={router} />;
