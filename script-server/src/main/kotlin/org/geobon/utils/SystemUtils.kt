@@ -10,13 +10,13 @@ fun String.runToText(
     timeoutUnit: TimeUnit = TimeUnit.SECONDS,
     showErrors:Boolean = true
 ): String? = runCatching {
-    println("bash -c $this")
+    println("runToText: bash -c $this")
     ProcessBuilder("bash", "-c", this)
         .directory(workingDir)
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
         .redirectErrorStream(showErrors) // Merges stderr into stdout
         .start().also { it.waitFor(timeoutAmount, timeoutUnit) }
-        .inputStream.bufferedReader().readText()
+        .inputStream.bufferedReader().readText().trim()
 }.onFailure { it.printStackTrace() }.getOrNull()
 
 

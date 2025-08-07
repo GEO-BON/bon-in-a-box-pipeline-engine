@@ -5,7 +5,10 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.MalformedJsonException
+import org.geobon.server.plugins.Containers
+import org.geobon.utils.runToText
 import org.geobon.utils.toMD5
+import org.json.JSONObject
 import java.io.File
 import kotlin.math.floor
 
@@ -41,6 +44,24 @@ data class RunContext(val runId: String, val inputs: String?) {
     val resultFile: File
         get() = File(outputFolder, "output.json")
 
+    fun getEnvironment(container: Containers): Map<String, Any?> {
+        val environment = mapOf(
+            "server" to Containers.toVersionsMap(),
+            "git" to getGitInfo(),
+            "runner" to mapOf(
+                "containerName" to container.containerName,
+                "environment" to container.environment,
+                "version" to container.version
+            ),
+            "dependencies" to "cat ${outputFolder.absolutePath}/dependencies.txt".runToText(showErrors = false)
+        )
+        return environment
+    }
+
+    fun createEnvironmentFile(container: Containers): Unit {
+        val environment = getEnvironment(container)
+        File("${outputFolder.absolutePath}/environment.json").writeText(JSONObject(environment).toString(2))
+    }
     companion object {
         val scriptRoot
             get() = File(System.getenv("SCRIPT_LOCATION"))
@@ -71,6 +92,25 @@ data class RunContext(val runId: String, val inputs: String?) {
             }
             .create()
 
+        fun getGitInfo(): Map<String, String?> {
+            val gitBinPath = "/usr/bin/git"
+            val gitDir = System.getenv("GIT_LOCATION")
+            val gitDirOpt = "--git-dir=$gitDir"
+            val gitCmd = "$gitBinPath $gitDirOpt"
+
+            val gitCommitIDCommand = "$gitCmd log --format=%h -1"
+            val commit = "commit" to gitCommitIDCommand.runToText(showErrors = false)
+
+            val gitCurrentBranchCommand =  "$gitCmd  branch --show-current"
+            val branch = "branch" to gitCurrentBranchCommand.runToText(showErrors = false)
+
+            val gitTimeStampCommand = "$gitCmd log --format=%cd -1"
+            val timestamp = "timestamp" to gitTimeStampCommand.runToText(showErrors = false)
+
+
+            return mapOf(commit, branch, timestamp)
+        }
+
         /**
          * Makes sure the file gives the same hash, regardless of the key order.
          */
@@ -82,6 +122,7 @@ data class RunContext(val runId: String, val inputs: String?) {
 
             return gson.toJson(sorted).toMD5()
         }
+
 
     }
 }

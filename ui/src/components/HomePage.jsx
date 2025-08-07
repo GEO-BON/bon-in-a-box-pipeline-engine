@@ -23,7 +23,7 @@ export default function HomePage() {
                 <div className="title-container">
                     <h1 className="home-page-title"
                         style={{ marginTop: "30px" , marginBottom: "10px"}}
-                    >The BON in a Box Modeling Tool</h1>
+                    >The BON in a Box Pipeline Engine</h1>
                 </div>
                 <p style={{
                     lineHeight: "1.75",
