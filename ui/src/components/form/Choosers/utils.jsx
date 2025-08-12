@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { polygon, bbox } from "@turf/turf";
 import proj4 from "proj4";
 
+const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=")
 let defs = [
   [
     "EPSG:4326",
@@ -121,7 +122,7 @@ export const transformBboxAPI = async (bbox, source_crs, dest_crs) => {
       params: {
         s_srs: source_crs,
         t_srs: dest_crs,
-        key: "U4hNLWRENxTa7CfHUUnN",
+        key: key,
       },
     });
   } catch (error) {
@@ -140,7 +141,7 @@ export const getCRSDef = async (epsg_number) => {
       params: {
         limit: 2,
         exports: true,
-        key: "U4hNLWRENxTa7CfHUUnN",
+        key: key,
       },
     });
     // Check if the response is valid and contains the proj4 definition
@@ -171,7 +172,7 @@ export const getCRSListFromName = async (name) => {
       params: {
         limit: 50,
         exports: true,
-        key: "U4hNLWRENxTa7CfHUUnN",
+        key: key,
       },
     });
     // Check if the response is valid and contains the proj4 definition
