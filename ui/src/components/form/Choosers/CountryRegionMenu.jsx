@@ -171,6 +171,7 @@ export default function CountryRegionMenu({
         size="small"
         sx={{
           width: "90%",
+          minWidth: "265px",
           background: "#fff",
           color: "#fff",
           borderRadius: "4px",
