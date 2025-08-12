@@ -32,6 +32,14 @@ export function fetchStepDescription(descriptionFileLocation, callback) {
   );
 }
 
+export function fetchStepDescriptionAsync(descriptionFileLocation) {
+  return new Promise((resolve) => {
+    fetchStepDescription(descriptionFileLocation, (callbackData) => {
+      resolve(callbackData);
+    });
+  });
+}
+
 /**
  * Provided we know the metadata is already fetched, this immediately returns the metadata.
  * Otherwise it will return null without attempting to get the data.

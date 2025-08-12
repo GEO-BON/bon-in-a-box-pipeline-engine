@@ -10,6 +10,8 @@ import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import debounce from 'lodash.debounce';
+import _ from "lodash";
 import {
   getProjestAPI,
   transformBboxAPI,
@@ -43,6 +45,7 @@ export default function CRSMenu({
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
 
   useEffect(() => {
+    let ignore = false;
     if (bboxGeoJSONShrink === null && !region.name && !country.englishName)
       return;
     setSearching(true);
@@ -50,7 +53,8 @@ export default function CRSMenu({
     if (region.name || country.englishName) {
       const searchName = region.name ? region.name : country.englishName;
       getCRSListFromName(searchName).then((result) => {
-        if (result) {
+        if(!ignore){
+          if (result) {
           const suggestions = result.map((proj) => {
             const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
             return {
@@ -59,39 +63,44 @@ export default function CRSMenu({
             };
           });
           setCRSList(suggestions);
-        } else {
-          setCRSList([defaultCRS]);
+          } else {
+            setCRSList([defaultCRS]);
+          }
+          setSearching(false);
         }
-        setSearching(false);
       });
     }
     // Suggest from area coverage
     if (!region.name && !country.englishName && bboxGeoJSONShrink) {
       let bbj = { type: "FeatureCollection", features: [bboxGeoJSONShrink] };
       getProjestAPI(bbj).then((result) => {
-        if (result && result.length > 0) {
-          let suggestions = _.uniqBy(result, function (e) {
-            return e.properties.coord_ref_sys_code;
-          });
-          suggestions = suggestions.map((proj) => ({
-            label:
-              proj.properties.area_name +
-              " " +
-              proj.properties.coord_ref_sys_name +
-              " (EPSG:" +
-              proj.properties.coord_ref_sys_code +
-              ")",
-            value: `EPSG:${parseInt(proj.properties.coord_ref_sys_code)}`,
-          }));
-          setCRSList(suggestions);
-        } else {
-          setCRSList([]);
+        if(!ignore){
+          if (result && result.length > 0) {
+            let suggestions = _.uniqBy(result, function (e) {
+              return e.properties.coord_ref_sys_code;
+            });
+            suggestions = suggestions.map((proj) => ({
+              label:
+                proj.properties.area_name +
+                " " +
+                proj.properties.coord_ref_sys_name +
+                " (EPSG:" +
+                proj.properties.coord_ref_sys_code +
+                ")",
+              value: `EPSG:${parseInt(proj.properties.coord_ref_sys_code)}`,
+            }));
+            setCRSList(suggestions);
+          } else {
+            setCRSList([]);
+          }
+          setSearching(false);
         }
-        setSearching(false);
       });
     }
+    return () => {ignore = true;}
   }, [bboxGeoJSONShrink, country.englishName, region.name]);
 
+  // Update CRS from controlled values coming in
   useEffect(() => {
     let ignore = false;
     const c = `${CRS.authority}:${CRS.code}`;
@@ -110,43 +119,54 @@ export default function CRSMenu({
     if (action !== "load") {
       setAction("CRSChange");
     }
-    console.log(action);
-    if (value) {
-      getCRSDef(value.value).then((def) => {
-        if (!ignore) {
-          if (def) {
-            const c = {
-              name: def.name,
-              authority: def.id.authority,
-              code: def.id.code,
-              def: def.exports.proj4,
-              unit: def.unit,
-              bbox: def.bbox,
-            };
-            setCRS(c);
-            updateValues("CRS", c);
-            if (value && value.value == value.label) {
-              const fl = CRSList.filter((fl) => fl.value === value.value);
-              if (fl.length > 0) {
-                setSelectedCRS(fl[0]);
+    if(value && value?.value){
+      let code = "";
+      code = value.value.split(":")[1]
+      if (code && code.length > 3) {
+        getCRSDef(value.value).then((def) => {
+          if (!ignore) {
+            if (def) {
+              const c = {
+                name: def.name,
+                authority: def.id.authority,
+                code: def.id.code,
+                def: def.exports.proj4,
+                unit: def.unit,
+                bbox: def.bbox,
+              };
+              setCRS(c);
+              updateValues("CRS", c);
+              if (value && value.value == value.label) {
+                const fl = CRSList.filter((fl) => fl.value === value.value);
+                if (fl.length > 0) {
+                  setSelectedCRS(fl[0]);
+                } else {
+                  setSelectedCRS({ value: value.label, label: def.name });
+                }
               } else {
-                setSelectedCRS({ value: value.label, label: def.name });
+                setSelectedCRS(value);
               }
             } else {
+              setCRS({});
+              updateValues("CRS", {});
               setSelectedCRS(value);
             }
-          } else {
-            setCRS({});
-            updateValues("CRS", {});
-            setSelectedCRS(value);
           }
-        }
-      });
+        });
+      }
     } else {
       setCRS(defaultCRS);
       setSelectedCRS({ label: "", value: "" });
     }
   };
+
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      updateCRS({label: value, value: value});
+    }, 1000),
+    []
+  );
+
 
   return (
     <div style={paperStyle(dialog)}>
@@ -210,11 +230,6 @@ export default function CRSMenu({
           updateCRS(value);
         }}
         value={selectedCRS}
-        endAdornment={
-          <InputAdornment position="end">
-            <CheckBoxIcon sx={{ color: "var(--biab-green-main)" }} />
-          </InputAdornment>
-        }
       />
       <FormControl sx={{ width: "90%" }}>
         <InputLabel
@@ -233,21 +248,10 @@ export default function CRSMenu({
           variant="outlined"
           size="small"
           sx={{ width: "100%" }}
-          onChange={(event) => {
+          onChange={(event)=>{
             setInputValue(event.target.value);
+            debouncedSearch(event.target.value);
           }}
-          endAdornment={
-            <InputAdornment
-              position="end"
-              style={{ cursor: "pointer", marginRight: "20px" }}
-              onClick={(event) => {
-                updateCRS({ value: inputValue, label: inputValue });
-              }}
-            >
-              {" "}
-              <CheckBoxIcon sx={{ color: "var(--biab-green-main)" }} />
-            </InputAdornment>
-          }
         />
       </FormControl>
       <div

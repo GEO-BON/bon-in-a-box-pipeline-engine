@@ -159,6 +159,18 @@ inputs:
     example: null
 ```
 
+The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying 'country' as input type will create a dropdown menu with a standardized list of countries. Selecting 'bboxCRS' will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:
+
+| Input name | Description |
+|------------------|----------------------------|--------------------------|
+| country | Creates a selector (dropdown menu) with a standardized list of countries. GeoNames is used as the reference for the country list.  |
+| countryRegion | Creates a selector (dropdown menu) with a standardized list of regions (provinces, states, etc) within a selected country. GeoNames is used as the reference for the list of regions.|
+| countryRegionCRS | Creates a selector (dropdown menu) for choosing a coordinate reference system adapted for a specific country and/or region. |
+| CRS | Creates a selector for specifying a coordinate reference system.|
+| bboxCRS | Creates a button to open an interface that allows to specify a bounding box (geographical minima and maxima) based on an optional selection of country/region and on a CRS, or by clicking on the map to set the bounds of the area of interest for the analysis.|
+
+Note that the use of these selectors will create objects that contain multiple elements. For example, the country selector will create an input object that contains the country name in English, the ISO3 code of the country, the ISO2 code, as well as the bounding box of that country, in longitude, latitude coordinates. 
+
 ### Outputs
 
 After specifying the inputs, you can specify the files that you want to output for that script. These can either be final pipeline outputs, outputs for that step to connect to another step, or both.
@@ -556,7 +568,7 @@ This validates that the syntax and structure are correct, but not that it's cont
 
 ### Reporting problems
 
-The output keys `info`, `warning` and `error` can be used to report problems in script execution. They do not need to be described in the `outputs` section of the description. They will be displayed with special formatting in the UI.
+The output keys `info`, `warning` and `error` can be used to report problems in script execution. They do not need to be described in the `outputs` section of the description. They will be displayed with special formatting in the UI, and markdown can be used to emphasize or link to debugging resources.
 
 Any `error` message will also halt the script and the rest of the pipeline. It is recommended to output specific error messages to avoid crashes when errors can be foreseen. This can be done using the `biab_error_stop` helper function, or by writing an "error" attribute to the `output.json` file.
 
@@ -727,6 +739,20 @@ Here are some common issues when trying to run pipelines in BON in a Box and how
 2.  **The script can't find your packages**
 
     Make sure that all of packages available on [anaconda.org](https://anaconda.org/) are in the Conda sub-environment in the script description YAML file. If they are not on anaconda, install them via the regular installation mechanism of your programming language.
+
+3.  **"Script produced no results."**
+
+    a\. Check log for errors: the script might have crashed without leaving any error message for BON in a Box to display. If you are developing the script, detecting the preconditions for this crash and adding a call to `biab_error_stop` before it crashes is recommended.
+
+    b\. Make sure that the script calls `biab_output`: BON in a Box displays only the outputs that were specified using the `biab_output` function during the script's execution. These outputs should have a corresponding definition in the script description yml file.
+
+    c\. Monitor the memory usage on next run: see memory section below.
+
+4.  **Not enough memory (RAM)**
+
+    The memory usage of BON in a Box alone is around 1GB. Then, depending on the analysis that is run, the scripts will take more memory. Normally, large datasets or large regions take more memory. That relation can be linear or exponential depending on the analysis.
+
+    Operating systems have programs that one can use to monitor the memory usage. Use the Task Manager on Windows, the Activity Monitor on a Mac, or for Linux use `htop` or similar.
 
 If you encounter further errors, please contact us on [Discourse](https://discourse.geobon.org) or email us at boninabox\@geobon.org.
 

@@ -52,7 +52,7 @@ export default function CountryRegionMenu({
     if (["load"].includes(action)) {
       if (
         country.ISO3 &&
-        country.ISO3 !== selectedCountry.value &&
+        country.ISO3 !== selectedCountry?.value &&
         countryOptions.length > 1
       ) {
         setSelectedCountry({ label: country.englishName, value: country.ISO3 });
@@ -71,7 +71,7 @@ export default function CountryRegionMenu({
   }, [region, country, countryOptions, regionOptions, action]);
 
   useEffect(() => {
-    if (selectedCountry.value) {
+    if (selectedCountry && selectedCountry.value) {
       // Fetch states or provinces based on the selected country
       const countryObj = countryOptionsJSON.geonames.find(
         (c) => c.isoAlpha3 === selectedCountry.value
@@ -181,7 +181,7 @@ export default function CountryRegionMenu({
         }}
         value={selectedCountry}
         renderInput={(params) => (
-          <TextField {...params} label="Select country" />
+          <TextField size="small "{...params} label="Select country" />
         )}
         onChange={(event, value) => {
           setAction("ChangeCountry");
@@ -217,19 +217,6 @@ export default function CountryRegionMenu({
           }}
           value={selectedRegion}
         />
-      )}
-      {showAcceptButton && (
-        <CustomButtonGreen
-          variant="contained"
-          endIcon={<CheckIcon />}
-          disabled={!selectedCountry}
-          onClick={() => {
-            buttonClicked("both", "");
-          }}
-          className="stateCountryButton"
-        >
-          Search CRS
-        </CustomButtonGreen>
       )}
     </div>
   );

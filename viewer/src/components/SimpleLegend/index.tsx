@@ -1,8 +1,5 @@
-import React, { useRef } from 'react';
-import Control from 'react-leaflet';
 import L from 'leaflet';
 import ReactDOMServer from 'react-dom/server';
-import { FormGroup, FormControlLabel, Switch } from '@mui/material';
 import './simple_legend.css';
 
 function LegendItem(props: any) {
@@ -41,7 +38,6 @@ export function createRangeLegendControl(
 ) {
   const legend = new L.Control({ position: 'bottomright' });
   legend.onAdd = function (map: any) {
-    const div0 = L.DomUtil.create('div', 'legend-group');
     const div = L.DomUtil.create('div', 'legend');
 
     const step = (max - min) / (scaleColors.length - 1);

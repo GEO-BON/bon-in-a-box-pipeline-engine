@@ -297,14 +297,14 @@ export default class DefaultApi {
      * Callback function to receive the result of the getVersions operation.
      * @callback module:api/DefaultApi~getVersionsCallback
      * @param {String} error Error message, if any.
-     * @param {String} data The data returned by the service call.
+     * @param {Object} data The data returned by the service call.
      * @param {String} response The complete HTTP response.
      */
 
     /**
      * Returns the version of system components.
      * @param {module:api/DefaultApi~getVersionsCallback} callback The callback function, accepting three arguments: error, data, response
-     * data is of type: {@link String}
+     * data is of type: {@link Object}
      */
     getVersions(callback) {
       let postBody = null;
@@ -320,8 +320,8 @@ export default class DefaultApi {
 
       let authNames = [];
       let contentTypes = [];
-      let accepts = ['text/plain'];
-      let returnType = 'String';
+      let accepts = ['application/json'];
+      let returnType = Object;
       return this.apiClient.callApi(
         '/api/versions', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,

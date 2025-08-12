@@ -146,7 +146,15 @@ export function Chooser({
     type
   );
   const showCRS = ["countryRegionCRS", "bboxCRS", "CRS"].includes(type);
+  const [oldValues, setOldValues] = useState({})
 
+
+  useEffect(() => {
+    if (inputFileContent && inputFileContent[inputId]) {
+      setOldValues(inputFileContent[inputId]);
+    }
+  },[])
+  // Update values in the input file content
   const updateValues = (what, value) => {
     if (action !== "load") {
       if (type === "bboxCRS") {
@@ -181,7 +189,7 @@ export function Chooser({
   };
 
   useEffect(() => {
-    if (bbox.length > 0 && ![("CRSChange", "", "load")].includes(action)) {
+    if (bbox.length > 0 && !["CRSChange", "", "load"].includes(action)) {
       //Shrink bbox for projestion which wont provide a crs suggestion if even a small part of the bbox is outside the area of coverage of the CRS
       const b = bbox.map((c) => parseFloat(c));
       const scale_width = Math.abs((b[2] - b[0]) / 3);
@@ -196,6 +204,7 @@ export function Chooser({
     }
   }, [bbox]);
 
+  // Set from controlled values coming in
   useEffect(() => {
     const input = inputFileContent[inputId];
     if (input && action === "load") {
@@ -228,7 +237,7 @@ export function Chooser({
         backgroundColor: showMap ? "#666" : "#fff",
         padding: showMap ? "20px" : "0px",
         borderRadius: "8px",
-        margin: showMap ? "30px auto" : "0px",
+        margin: showMap ? "0px auto" : "0px",
       }}
     >
       <Grid container spacing={0} sx={{ height: "100%" }}>
@@ -314,6 +323,7 @@ export function Chooser({
               <CustomButtonGreen
                 onClick={() => {
                   setOpenModal(false);
+                  updateInputFile(inputId, oldValues)
                 }}
               >
                 Cancel
@@ -335,6 +345,7 @@ export function Chooser({
                 clearFeatures,
                 CRS,
                 setAction,
+                action,
                 digitize,
                 setDigitize,
               }}

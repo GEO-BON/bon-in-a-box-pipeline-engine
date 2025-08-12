@@ -1,6 +1,7 @@
 package org.geobon.server.plugins
 
 import org.geobon.utils.runToText
+import org.json.JSONObject
 
 enum class Containers(
     val containerName: String,
@@ -12,7 +13,7 @@ enum class Containers(
      * Script server container hosts the server but can also run scripts that
      * don't require a specific environment (such as shell scripts).
      */
-    SCRIPT_SERVER("biab-script-server", envCommand = "python3 --version"),
+    SCRIPT_SERVER("biab-script-server"),
 
     /**
      * Runner for Julia scripts
@@ -61,5 +62,20 @@ enum class Containers(
      */
     fun isExternal(): Boolean {
         return this != SCRIPT_SERVER
+    }
+
+    companion object {
+        fun toVersionsMap(): Map<String, Any> {
+            val versions = mapOf(
+                "UI" to UI.version,
+                "Script server" to SCRIPT_SERVER.version,
+                "Conda runner" to mapOf("container version" to CONDA.version, "environment" to CONDA.environment.replaceFirst("\n", " ")),
+                "Julia runner" to mapOf("container version" to JULIA.version, "environment" to JULIA.environment),
+                "TiTiler" to TILER.version.let {
+                    val end = it.lastIndexOf(':'); if (end == -1) it; else it.substring(0, end).replace('T', ' ')
+                }.trimEnd()
+            )
+            return versions
+        }
     }
 }

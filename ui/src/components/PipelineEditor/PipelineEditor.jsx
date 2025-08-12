@@ -15,7 +15,7 @@ import {
   DialogContentText,
 } from "@mui/material";
 
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useBlocker } from "react-router-dom";
 import ReactFlow, {
   ReactFlowProvider,
@@ -68,6 +68,8 @@ const getId = () => `${id++}`;
 
 // Capture ctrl + s and ctrl + shift + s to quickly save the pipeline
 document.addEventListener('keydown', e => {
+  if (e.repeat) return;
+
   if (e.ctrlKey) {
     let button;
     if (e.key === 's') {
@@ -92,6 +94,7 @@ export default function PipelineEditor(props) {
   const [inputList, setInputList] = useState([]);
   const [outputList, setOutputList] = useState([]);
   const [metadata, setMetadata] = useState("");
+  const [title, setTitle] = useState(<>&nbsp;</>);
   const [metadataError, setMetadataError] = useState(null);
   const [currentFileName, setCurrentFileName] = useState("");
   const [savedJSON, setSavedJSON] = useState(null);
@@ -111,12 +114,14 @@ export default function PipelineEditor(props) {
     setAlertSeverity(severity)
     setAlertTitle(title)
     setAlertMessage(message)
+    setModal("alert")
   }, [setAlertTitle, setAlertSeverity, setAlertMessage])
 
   const clearAlert = useCallback(() => {
     setAlertMessage("")
     setAlertSeverity("")
     setAlertTitle("")
+    hideModal("alert")
   }, [setAlertTitle, setAlertSeverity, setAlertMessage])
 
   const hideModal = useCallback((modalName) => {
@@ -702,19 +707,33 @@ export default function PipelineEditor(props) {
     return JSON.stringify(flow, null, 2);
   }, [inputList, outputList, metadata, reactFlowInstance]);
 
+  const warnDeprecatedNode = (jsonString) => {
+    const toSave = JSON.parse(jsonString);
+    if (toSave.nodes) {
+      for (const node of toSave.nodes) {
+        if (node.data && node.data.descriptionFile) {
+          fetchStepDescription(node.data.descriptionFile, (metadata) => {
+            if (metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+              showAlert('warning', 'Pipeline contains a deprecated step', `"${metadata.name}" is deprecated in file ${node.data.descriptionFile}`)
+            }
+          });
+        }
+      }
+    }
+  }
+
+
   const onSave = useCallback((fileName) => {
     let saveJSON = generateSaveJSON();
+    warnDeprecatedNode(saveJSON);
     if (saveJSON) {
       if (fileName) {
         let fileNameWithoutExtension = fileName.endsWith(".json") ? fileName.slice(0, -5) : fileName;
         fileNameWithoutExtension = fileNameWithoutExtension.replaceAll("/", ">")
         api.savePipeline(fileNameWithoutExtension, saveJSON, (error, data, response) => {
           if (error) {
-            showAlert(
-              'error',
-              'Error saving the pipeline',
-              getErrorString(error, response)
-            )
+            setAlertMessage(getErrorString(error, response));
+            setModal('saveError');
 
           } else if (response.text) {
             showAlert('warning', 'Pipeline saved with errors', response.text)
@@ -740,7 +759,7 @@ export default function PipelineEditor(props) {
           });
       }
     }
-  }, [showAlert, generateSaveJSON]);
+  }, [showAlert, setSavedJSON, setModal, generateSaveJSON]);
 
   const onLoadFromFileBtnClick = useCallback(() => {
     if(hasUnsavedChanges) {
@@ -766,7 +785,7 @@ export default function PipelineEditor(props) {
 
       // TODO: Use loaded JSON and test
       setSavedJSON(null); //this file is not saved on the server
-      localStorage.setItem("currentFileName", '');
+      localStorage.removeItem("currentFileName");
       // Now that it's done, reset the value of the input file.
       inputFile.current.value = "";
     }
@@ -804,7 +823,7 @@ export default function PipelineEditor(props) {
   const onLoadFromLocalStorage = (descriptionFile) => {
     api.getPipeline(descriptionFile, (error, data, response) => {
       if (error) {
-        localStorage.setItem("currentFileName", '');
+        localStorage.removeItem("currentFileName");
         showAlert(
           'error',
           'Error while loading the previously opened pipeline "' + descriptionFile + '"',
@@ -1005,6 +1024,7 @@ export default function PipelineEditor(props) {
     setInputList([]);
     setOutputList([]);
     setSavedJSON(null);
+    localStorage.removeItem("currentFileName");
   })
 
   //useCallback with empty dependencies so that addEventListener and removeEventListener only work on this one function only created once
@@ -1058,26 +1078,28 @@ export default function PipelineEditor(props) {
     }
   }, [blocker.state])
 
+  useEffect(() => {
+    try {
+      const metadataObj = yaml.load(metadata)
+      if (metadataObj && metadataObj.name) {
+        setTitle(metadataObj.name);
+      } else {
+        setTitle(currentFileName || <>&nbsp;</>);
+      }
+    } catch (ex) {
+      // keep previous title. It's OK for YAML to be temporary invalid.
+    }
+  }, [metadata]);
+
   return (
     <div id="editorLayout">
-      <p className="documentationLink">
-        Need help? Check out{" "}
-        <a
-          href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#step-5-connect-your-scripts-with-the-bon-in-a-box-pipeline-editor"
-          target="_blank"
-          rel="noreferrer"
-        >
-          the documentation
-        </a>
-      </p>
+      <h2 className="pipelineTitle">
+        {title}
+      </h2>
       <div className="narrowWarning">
         <p>The pipeline engine cannot be used on a narrow display.</p>
         <p><strong>A computer is recommended for pipeline edition.</strong></p>
         <p>A phone can be used horizontally to preview a pipeline.</p>
-      </div>
-
-      <div className="previewMode">
-        <p>Currently in <strong>preview mode</strong>. Use a larger screen to edit.</p>
       </div>
 
       <Dialog
@@ -1118,6 +1140,22 @@ export default function PipelineEditor(props) {
         <DialogActions>
           <Button onClick={() => hideModal('saveAs')}>Cancel</Button>
           <Button type="submit">Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={modal === 'saveError'}
+        onClose={() => hideModal('saveError')}
+      >
+        <DialogTitle>Error saving the pipeline</DialogTitle>
+        <DialogContent>
+          <Alert severity="error" style={{ whiteSpace: "pre-wrap" }}>
+            {alertMessage}
+          </Alert>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={(_) => { hideModal('saveError'); onSave() }}>Save to clipboard</Button>
+          <Button onClick={(_) => hideModal('saveError')}>Dismiss</Button>
         </DialogActions>
       </Dialog>
 
@@ -1191,7 +1229,7 @@ export default function PipelineEditor(props) {
         </DialogActions>
       </Dialog>
 
-      {alertMessage && alertMessage !== '' && // when in open={...}, there was a flash frame while closing.
+      {modal === "alert" && // when in open={...}, there was a flash frame while closing.
         <Dialog open={true} onClose={clearAlert}>
           <Alert severity={alertSeverity} id="alert-dialog-description" style={{ whiteSpace: "pre-wrap" }}>
             <AlertTitle>{alertTitle}</AlertTitle>
@@ -1246,14 +1284,9 @@ export default function PipelineEditor(props) {
                 <button onClick={onLoadFromServerBtnClick}>
                   Load from server
                 </button>
-                {/^deny$/i.test(import.meta.env.VITE_APP_SAVE_PIPELINE_TO_SERVER)
-                  ? <button id="saveBtn" onClick={() => onSave()}>Save to clipboard</button>
-                  : <>
-                    <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
-                    <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
-                    <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
-                  </>
-                }
+                <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
+                <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
+                <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
               </div>
 
               <Controls />
@@ -1294,6 +1327,10 @@ export default function PipelineEditor(props) {
                   }
                 }}
               />
+
+              <div class="react-flow__attribution bottom left previewMode">
+                  Currently in <strong>preview mode</strong>. Use a larger screen to edit.
+              </div>
             </ReactFlow>
           </div>
         </ReactFlowProvider>

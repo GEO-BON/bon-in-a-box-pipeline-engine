@@ -154,6 +154,7 @@
 
 .ioNode td.name {
   padding: 0.5em;
+  max-width: 400px;
 }
 
 .ioNode .ioNode-folder, .ioNode .ioNode-script{
