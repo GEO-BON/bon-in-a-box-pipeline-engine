@@ -231,7 +231,7 @@ export default function CRSMenu({
         }}
         value={selectedCRS}
       />
-      <FormControl sx={{ width: "90%" }}>
+      <FormControl sx={{ width: "90%", backgroundColor: "white" }}>
         <InputLabel
           htmlFor="crs-code"
           sx={{
