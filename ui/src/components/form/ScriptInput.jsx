@@ -6,6 +6,7 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 import AutoResizeTextArea from "./AutoResizeTextArea";
+import Choosers from "./Choosers";
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
 export const CONSTANT_PLACEHOLDER = "Constant";
 
@@ -230,6 +231,28 @@ export default function ScriptInput({
           }}
           sx={{ width: small ? 220 : 328 }}
         />
+      );
+    case "country":
+      return (
+        <Choosers inputId="country" inputDescription={{ type: type }} descriptionCell={false}/>
+      );
+    case "countryRegionCRS":
+      return (
+        <Choosers inputId="country_region_crs" inputDescription={{ type: type }} descriptionCell={false}/>
+      );
+
+    case "bboxCRS":
+      return (
+        <Choosers inputId="bbox_crs" inputDescription={{ type: type, label: "Bounding Box" }} leftLabel={false} descriptionCell={false}/>
+      );
+
+    case "CRS":
+      return (
+        <Choosers inputId="crs" inputDescription={{ type: type }} descriptionCell={false}/>
+      );
+    case "countryRegion":
+      return (
+        <Choosers inputId="country_region" inputDescription={{ type: type }} descriptionCell={false}/>
       );
 
     default:

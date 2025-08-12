@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useRef, useCallback } from "react";
-
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material";
 import Grid from "@mui/material/Grid";
@@ -20,10 +19,16 @@ import CropFreeIcon from "@mui/icons-material/CropFree";
 import Modal from "@mui/material/Modal";
 
 export default function Choosers({
-  inputFileContent,
+  inputFileContent = {},
   inputId,
-  inputDescription,
-  updateInputFile,
+  inputDescription = {
+    "description": "",
+    "label": "",
+    "type": ""
+  },
+  updateInputFile = () => {},
+  descriptionCell = true,
+  leftLabel = true,
 }) {
   const [openModal, setOpenModal] = useState(false);
 
@@ -33,7 +38,7 @@ export default function Choosers({
       {type === "bboxCRS" && (
         <tr>
           <td>
-            <strong>{inputDescription.label}</strong>:{" "}
+        { (leftLabel && inputDescription.label) && (<><strong>{inputDescription.label}</strong>{": "}</>)  }
             {inputFileContent[inputId] && (
               <pre>{yaml.dump(inputFileContent[inputId])}</pre>
             )}
@@ -94,7 +99,7 @@ export default function Choosers({
               }}
             />
           </td>
-          <td className="descriptionCell">
+          {descriptionCell && (<td className="descriptionCell">
             {inputDescription.description ? (
               <ReactMarkdown
                 className="reactMarkdown"
@@ -105,7 +110,7 @@ export default function Choosers({
                 Missing description for input "{inputId}"
               </Alert>
             )}
-          </td>
+          </td>)}
         </tr>
       )}
     </>
