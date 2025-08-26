@@ -25,12 +25,14 @@ export default function CountryRegionMenu({
   showRegion = true,
   dialog = false,
   updateValues = () => {},
+  onChange = () => {},
+  value = null,
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
   const [regionOptions, setRegionOptions] = useState([]);
   const [regionJSON, setRegionJSON] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(value);
 
   useEffect(() => {
     // Fetch country options from the JSON file
@@ -184,6 +186,7 @@ export default function CountryRegionMenu({
           <TextField size="small "{...params} label="Select country" />
         )}
         onChange={(event, value) => {
+          onChange(event, value);
           setAction("ChangeCountry");
           setSelectedCountry(value);
           setSelectedRegion("");
@@ -210,6 +213,7 @@ export default function CountryRegionMenu({
             <TextField {...params} label="Select region" />
           )}
           onChange={(event, value) => {
+            onChange(event, value);
             setAction("ChangeRegion");
             setSelectedRegion(value);
             buttonClicked("region", value.value);

@@ -27,8 +27,10 @@ export default function Choosers({
     "type": ""
   },
   updateInputFile = () => {},
+  onChange = () => {},
   descriptionCell = true,
   leftLabel = true,
+  value = null,
 }) {
   const [openModal, setOpenModal] = useState(false);
 
@@ -77,6 +79,8 @@ export default function Choosers({
                       inputDescription,
                       inputFileContent,
                       updateInputFile,
+                      onChange,
+                      value,
                     }}
                   />
                 )}
@@ -96,6 +100,8 @@ export default function Choosers({
                 inputDescription,
                 inputFileContent,
                 updateInputFile,
+                onChange,
+                value,
               }}
             />
           </td>
@@ -123,6 +129,8 @@ export function Chooser({
   inputDescription,
   inputFileContent,
   updateInputFile,
+  onChange,
+  value,
 }) {
   const [bbox, setBbox] = useState([]);
   const [country, setCountry] = useState(defaultCountry);
@@ -280,6 +288,8 @@ export function Chooser({
                   : true,
                 dialog: showMap,
                 updateValues,
+                onChange,
+                value,
               }}
             />
           )}

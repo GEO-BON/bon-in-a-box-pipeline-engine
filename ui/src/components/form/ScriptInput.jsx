@@ -234,7 +234,7 @@ export default function ScriptInput({
       );
     case "country":
       return (
-        <Choosers inputId="country" inputDescription={{ type: type }} descriptionCell={false}/>
+        <Choosers inputId="country" inputDescription={{ type: type }} descriptionCell={false} value={value} onChange={(event, value) => { onValueUpdated(value) }}/>
       );
     case "countryRegionCRS":
       return (
