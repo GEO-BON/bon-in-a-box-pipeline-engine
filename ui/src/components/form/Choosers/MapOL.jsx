@@ -11,6 +11,7 @@ import Source from "ol/source/ImageTile.js";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
 import Style from "ol/style/Style";
+import { get } from 'ol/proj';
 import { boundingExtent } from "ol/extent";
 import Feature from "ol/Feature";
 import { fromExtent as polygonFromExtent } from "ol/geom/Polygon";
@@ -253,10 +254,10 @@ export default function MapOL({
 
   // The CRS gets updated. We need to reproject the map
   useEffect(() => {
-    if (CRS && mapp) {
+    const crsCode = `${CRS.authority}:${CRS.code}`
+    if (CRS && CRS?.code && mapp && get(crsCode)) {
       const mapProjection = mapp.getView().getProjection().getCode();
-      const crsCode = `${CRS.authority}:${CRS.code}`
-      if(mapProjection !== crsCode){
+      if(CRS.def && mapProjection !== crsCode){
         proj4.defs(crsCode, CRS.def);
         register(proj4);
         const newView = new View({
@@ -271,7 +272,7 @@ export default function MapOL({
 
   // The Country/Region Bounding box or CRS are updated, we need to update and reproject the bbox
   useEffect(() => {
-    if ((country.bboxLL.length > 0 || region.bboxLL.length > 0) && mapp && action !== "load") {
+    if ((country.bboxLL.length > 0 || region.bboxLL.length > 0) && mapp && CRS.code && get(`${CRS.authority}:${CRS.code}`) && action !== "load") {
       setDigitize(false);
       const b = region.bboxLL.length > 0 ? region.bboxLL : country.bboxLL
       setOldCRS(defaultCRS) 
@@ -285,7 +286,7 @@ export default function MapOL({
   useEffect(() => {
     let ignore=false;
     setDigitize(false);
-    if (bbox.length > 0 && !ignore) {
+    if (bbox.length > 0 && CRS.code && get(`${CRS.authority}:${CRS.code}`) && !ignore) {
       //Current map projection
       const mapProjection = mapp.getView().getProjection().getCode();
       const currentCRS = `${CRS.authority}:${CRS.code}`;
@@ -313,37 +314,39 @@ export default function MapOL({
   }, [bbox, CRS, oldCRS]);
 
   useEffect(() => {
-    const map = new Map({
-      target: "map",
-      layers: [
-        /*new TileLayer({
-          source: new OSM(),
-          projection: `EPSG:3857`
-        }),*/
-        /*new TileLayer({
-            source: new OGCMapTile({
-              url: 'https://maps.gnosis.earth/ogcapi/collections/blueMarble/map/tiles/WebMercatorQuad',
-              projection: `EPSG:3857`
-            }),
+    if(CRS.code && get(`${CRS.authority}:${CRS.code}`)){
+      const map = new Map({
+        target: "map",
+        layers: [
+          /*new TileLayer({
+            source: new OSM(),
+            projection: `EPSG:3857`
           }),*/
-        new Layer({
-          source: new Source({
-            attributions: ["Carto"],
-            url: "https://2.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+          /*new TileLayer({
+              source: new OGCMapTile({
+                url: 'https://maps.gnosis.earth/ogcapi/collections/blueMarble/map/tiles/WebMercatorQuad',
+                projection: `EPSG:3857`
+              }),
+            }),*/
+          new Layer({
+            source: new Source({
+              attributions: ["Carto"],
+              url: "https://2.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+            }),
+            projection: `EPSG:3857`,
           }),
-          projection: `EPSG:3857`,
+        ],
+        view: new View({
+          center: [0, 0],
+          zoom: 3,
+          projection: `${CRS.authority}:${CRS.code}`,
         }),
-      ],
-      view: new View({
-        center: [0, 0],
-        zoom: 3,
-        projection: `${CRS.authority}:${CRS.code}`,
-      }),
-    });
-    setMapp(map)
-    return () => {
-      map.setTarget(null);
-    };
+      });
+      setMapp(map)
+      return () => {
+        map.setTarget(null);
+      };
+    }
   }, [CRS]);
 
   return (
