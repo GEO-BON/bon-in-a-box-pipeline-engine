@@ -1,8 +1,7 @@
 import sys, json;
 
 # Reading json
-inputFile = open(sys.argv[1] + '/input.json')
-data = json.load(inputFile)
+data = biab_inputs()
 value = data['float_value']
 divider = data['divider']
 

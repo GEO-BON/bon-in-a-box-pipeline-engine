@@ -347,7 +347,7 @@ internal class PipelineTest {
         val pipeline = createMiniPipelineFromScript(
             File(RunContext.scriptRoot, "assertObject.yml"),
             "assertObject.yml",
-            """{ "some_object" : '{ "some_data" : "bla bla" }' }""".trimMargin()
+            """{ "some_object" : { "some_data" : "bla bla" } }""".trimMargin()
         )
 
         val outputs = pipeline.pullFinalOutputs()
@@ -356,7 +356,7 @@ internal class PipelineTest {
         assertTrue(scriptOutputFile.exists())
 
         // The results are there
-        assertContains(scriptOutputFile.readText(), """{ \"some_data\" : \"bla bla\" }""")
+        assertContains(scriptOutputFile.readText(), """\{\s+"some_data": "bla bla"\s+}""".toRegex())
     }
 
     @Test
