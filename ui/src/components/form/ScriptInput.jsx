@@ -233,12 +233,13 @@ export default function ScriptInput({
         />
       );
     case "country":
+      console.log(value);
       return (
         <Choosers inputId="country" inputDescription={{ type: type }} descriptionCell={false} value={value} onChange={(event, value) => { onValueUpdated(value) }}/>
       );
     case "countryRegionCRS":
       return (
-        <Choosers inputId="country_region_crs" inputDescription={{ type: type }} descriptionCell={false}/>
+        <Choosers inputId="country_region_crs" inputDescription={{ type: type }} descriptionCell={false} value={value}/>
       );
 
     case "bboxCRS":
@@ -252,7 +253,7 @@ export default function ScriptInput({
       );
     case "countryRegion":
       return (
-        <Choosers inputId="country_region" inputDescription={{ type: type }} descriptionCell={false}/>
+        <Choosers inputId="country_region" inputDescription={{ type: type }} descriptionCell={false} value={value} onChange={(event, value) => { onValueUpdated(value) }}/>
       );
 
     default:
