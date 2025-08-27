@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef, useReducer } from "react";
 import TextField from "@mui/material/TextField";
 import { paperStyle } from "./utils";
+import _ from "lodash";
 
 
 
@@ -18,8 +19,8 @@ export default function BBox({
   // BBox values coming in
   useEffect(() => {
     console.log("BBox component updated with bbox:", bbox);
-    if (["ModifyBbox", "load", "", "CountryButton"].includes(action)) {
-      if (bbox.length > 0) {
+    if (["ModifyBbox", "load", "", "CountryButton","CRSChange"].includes(action)) {
+      if (bbox.length > 0 && !_.isEqual(bbInput, bbox)  ) {
         updateBBox(4, bbox);
       }
     }
@@ -41,7 +42,7 @@ export default function BBox({
   }
 
   const inputProps = {
-    step: CRS.unit.includes("degree") ? 0.5 : 5000,
+    step: CRS.unit && CRS.unit.includes("degree") ? 0.5 : 5000,
   };
 
   return (

@@ -32,7 +32,7 @@ data class RunContext(val runId: String, val inputs: String?) {
 
     constructor(descriptionFile: File, inputMap: Map<String, Any?>) : this(
         descriptionFile,
-        if (inputMap.isEmpty()) null else gson.toJson(inputMap)
+        if (inputMap.isEmpty()) null else JSONObject(preserveNulls(inputMap)).toString()
     )
 
     val outputFolder
@@ -68,6 +68,10 @@ data class RunContext(val runId: String, val inputs: String?) {
 
         val pipelineRoot
             get() = File(System.getenv("PIPELINES_LOCATION"))
+
+        private fun preserveNulls(inputMap: Map<String, Any?>) : Map<String, Any> {
+            return inputMap.mapValues { it.value ?: JSONObject.NULL }
+        }
 
         val gson: Gson = GsonBuilder()
             .serializeNulls()

@@ -37,7 +37,7 @@ export default function CRSMenu({
 }) {
   const [CRSList, setCRSList] = useState([]);
   const [selectedCRS, setSelectedCRS] = useState({
-    label: CRS.name,
+    label: CRS.name?CRS.name:`${CRS.authority}:${CRS.code}`,
     value: `${CRS.authority}:${CRS.code}`,
   });
   const [inputValue, setInputValue] = useState("");
@@ -103,6 +103,7 @@ export default function CRSMenu({
   // Update CRS from controlled values coming in
   useEffect(() => {
     let ignore = false;
+    if(CRS.code === undefined) return;
     const c = `${CRS.authority}:${CRS.code}`;
     if (c !== inputValue) {
       setInputValue(c);
@@ -147,9 +148,9 @@ export default function CRSMenu({
                 setSelectedCRS(value);
               }
             } else {
-              setCRS({});
+              setCRS(value.value);
               updateValues("CRS", {});
-              setSelectedCRS(value);
+              setSelectedCRS("");
             }
           }
         });
@@ -157,6 +158,7 @@ export default function CRSMenu({
     } else {
       setCRS(defaultCRS);
       setSelectedCRS({ label: "", value: "" });
+      updateValues("CRS", defaultCRS);
     }
   };
 
@@ -196,6 +198,9 @@ export default function CRSMenu({
             fontSize: 13,
           },
         }}
+        InputProps={{
+          readOnly: true
+        }}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -203,6 +208,7 @@ export default function CRSMenu({
             label="Select CRS"
             InputProps={{
               ...params.InputProps,
+              readOnly: true,
               endAdornment: (
                 <>
                   {CRSList.length > 0 && (
@@ -260,7 +266,7 @@ export default function CRSMenu({
           margin: "5px 0px 2px 5px",
         }}
       >
-        Units: {CRS.unit}
+        Units: {CRS && CRS?.unit?CRS.unit:"n/a"}
       </div>
       {false && (
         <CustomButtonGreen
