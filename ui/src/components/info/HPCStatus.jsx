@@ -121,7 +121,7 @@ export default function HPCStatus() {
           {status[key]['image'] &&
             <p>
               <small>Image:&nbsp;
-                <a href={"" + status[key]['image'].replace(':', '-').replace('@', '/' + imageName + '/images/')}
+                <a href={"https://" + status[key]['image']}
                   target="_blank">
                   {digest}
                 </a>
