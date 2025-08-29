@@ -1,9 +1,6 @@
 package org.geobon.hpc
 
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.geobon.hpc.ApptainerImage.Companion.ApptainerImageState
 import org.geobon.pipeline.RunContext.Companion.scriptRoot
 import org.geobon.pipeline.RunContext.Companion.scriptStubsRoot
@@ -74,19 +71,23 @@ class HPCConnection(
     suspend fun prepare() {
         coroutineScope {
             launch {
-                // Checking if already preparing to avoid launching the process 2 times in parallel by accident
-                if (rStatus.state != ApptainerImageState.NOT_CONFIGURED
-                    && rStatus.state != ApptainerImageState.PREPARING
-                    && rStatus.state != ApptainerImageState.READY) {
-                    prepareApptainer(rStatus)
+                withContext(Dispatchers.IO) {
+                    // Checking if already preparing to avoid launching the process 2 times in parallel by accident
+                    if (rStatus.state != ApptainerImageState.NOT_CONFIGURED
+                        && rStatus.state != ApptainerImageState.PREPARING
+                        && rStatus.state != ApptainerImageState.READY) {
+                        prepareApptainer(rStatus)
+                    }
                 }
             }
 
             launch {
-                if (juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
-                    && juliaStatus.state != ApptainerImageState.PREPARING
-                    && juliaStatus.state != ApptainerImageState.READY) {
-                    prepareApptainer(juliaStatus)
+                withContext(Dispatchers.IO) {
+                    if (juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
+                        && juliaStatus.state != ApptainerImageState.PREPARING
+                        && juliaStatus.state != ApptainerImageState.READY) {
+                        prepareApptainer(juliaStatus)
+                    }
                 }
             }
         }
