@@ -8,9 +8,9 @@ YELLOW="\033[33m"
 ENDCOLOR="\033[0m"
 
 function reject_command() {
-	echo -e "${YELLOW}Command rejected by $THIS_SCRIPT: $1${ENDCOLOR}"
+	echo -e "${YELLOW}Command rejected: $1${ENDCOLOR}" >&2
 	logger -t automation -p local0.info "Command rejected by $THIS_SCRIPT for user $USER: $1"
-	if ! $testing; then
+	if [[ $testing != "true" ]]; then
 		exit 1
 	fi
 }
@@ -32,8 +32,6 @@ function is_safe_command() {
 		"^cp "
 		"^rm "
 		"^mkdir "
-		## python commands
-		# "^python[0-9.]* "
 		## git
 		"^git "
 		## archiving commands
@@ -64,9 +62,11 @@ function is_safe_command() {
 		"^elif "
 		"^exit( [0-9]+)?$"
 
-		# DO NOT ALLOW "sed" and "awk"!
-		# someone could do
+		## DO NOT ALLOW "sed" and "awk": someone could do
 		# sed -i 's/\# Validate and execute/testing=true/' allowed_commands.sh
+
+		## DO NOT ALLOW python commands: Allowing this basically allows to bypass all the other checks: python can do system calls!
+		# "^python[0-9.]* "
 	)
 
 	local safe_file_tests=(
@@ -127,8 +127,7 @@ function validate_complex_command() {
 }
 
 function test_command_filter() {
-	testing=true
-	passed=true
+	passed= true
 
 	# Command, Expected Result (PASS/FAIL)
 	local test_cases=(
@@ -136,7 +135,6 @@ function test_command_filter() {
 		"ls -l=PASS"
 		"cat file.txt=PASS"
 		"if [ -f image.sif ]; then apptainer build image.sif docker://ubuntu; fi=PASS"
-		"python3 script.py=PASS"
 		"rm some_file=PASS"
 		"rm -rf some_folder=PASS"
 		"if [ -d /tmp ]; then echo 'Directory exists'; else echo 'No directory'; fi=PASS"
@@ -165,6 +163,7 @@ function test_command_filter() {
             forbiddenCommand
         fi=FAIL" # this test is failing
 		"sudo su=FAIL"
+		"python3 script.py=FAIL"
 	)
 
 	echo "Starting Command Filter Test Suite"
@@ -196,6 +195,7 @@ function test_command_filter() {
 		echo "Test suite completed successfully"
 	else
 		echo -e "${RED}Test suite completed with errors${ENDCOLOR}"
+		exit 1
 	fi
 }
 
@@ -204,9 +204,11 @@ logger -t automation -p local0.info "Command called by $THIS_SCRIPT for user $US
 
 # Check if this is a test run
 if [[ "$SSH_ORIGINAL_COMMAND" == "test_command_filter" || $1 == "test_command_filter" ]]; then
+	testing="true"
 	test_command_filter
-	exit 0
+	exit
 fi
+testing="false"
 
 # Check script name condition from original DRAC sample script
 if [[ "$THIS_SCRIPT" == "allowed_commands.sh" ]]; then

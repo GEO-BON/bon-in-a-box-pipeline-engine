@@ -148,7 +148,7 @@ class HPCConnection(
                     fi
                 """.trimIndent())
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .redirectErrorStream(false) // Merges stderr into stdout
+                .redirectErrorStream(false)
                 .start()
 
             process.waitFor(10, TimeUnit.MINUTES)
