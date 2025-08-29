@@ -8,7 +8,7 @@ YELLOW="\033[33m"
 ENDCOLOR="\033[0m"
 
 function reject_command() {
-	echo -e "${YELLOW}Command rejected: $1${ENDCOLOR}" >&2
+	echo -e "Command rejected: $1" >&2
 	logger -t automation -p local0.info "Command rejected by $THIS_SCRIPT for user $USER: $1"
 	if [[ $testing != "true" ]]; then
 		exit 1
