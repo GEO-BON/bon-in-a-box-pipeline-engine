@@ -66,7 +66,7 @@ export default function HPCStatus() {
     return <Spinner variant='light' />
 
   return (
-    <p>
+    <div>
       {Object.keys(status).sort().map(key => {
         const digest = [status[key]['image']]
         let imageName
@@ -83,54 +83,53 @@ export default function HPCStatus() {
               console.error("Unknown runner " + key)
           }
         }
+        console.log(imageName, status)
 
         return <span key={key}>
-          <strong>{key}</strong>
-          {
+          <p>
+            <strong>{key}</strong>
             {
-              NOT_CONFIGURED: <>
-                <Tooltip title="Not configured"><HideSourceIcon style={{ height: "1rem" }} /></Tooltip>
-                <small>Not Configured.</small>
-              </>,
-              CONFIGURED: <>
-                <Tooltip title="Configured">
-                  <PlayCircleIcon style={{ height: "1rem", cursor: "pointer" }} onClick={connect} />
-                </Tooltip>
-                <small>Press play to connect.</small>
-              </>,
-              PREPARING: <>
-                <Tooltip title="Preparing"><PendingIcon style={{ height: "1rem" }} /></Tooltip>
-                <small>Connection in progress...</small>
-              </>,
-              READY: <>
-                <Tooltip title="Ready"><CheckCircleIcon style={{ height: "1rem" }} /></Tooltip>
-              </>,
-              ERROR: <>
-                <Tooltip title="Error"><ErrorIcon style={{ height: "1rem" }} onClick={connect} /></Tooltip>
-                <a onClick={connect} style={{ cursor: 'pointer' }}>Try again</a>
-              </>,
-            }[status[key]['state']]
-          }
+              {
+                NOT_CONFIGURED: <>
+                  <Tooltip title="Not configured"><HideSourceIcon style={{ height: "1rem" }} /></Tooltip>
+                  <small>Not Configured.</small>
+                </>,
+                CONFIGURED: <>
+                  <Tooltip title="Configured">
+                    <PlayCircleIcon style={{ height: "1rem", cursor: "pointer" }} onClick={connect} />
+                  </Tooltip>
+                  <small>Press play to connect.</small>
+                </>,
+                PREPARING: <>
+                  <Tooltip title="Preparing"><PendingIcon style={{ height: "1rem" }} /></Tooltip>
+                  <small>Connection in progress...</small>
+                </>,
+                READY: <>
+                  <Tooltip title="Ready"><CheckCircleIcon style={{ height: "1rem" }} /></Tooltip>
+                </>,
+                ERROR: <>
+                  <Tooltip title="Error"><ErrorIcon style={{ height: "1rem" }} onClick={connect} /></Tooltip>
+                  <a onClick={connect} style={{ cursor: 'pointer' }}>Try again</a>
+                </>,
+              }[status[key]['state']]
+            }
+          </p>
+
           {status[key]['message'] &&
-            <>
-              <br />
-              <pre style={{ maxHeight: "20em", overflowY: "scroll" }}>{status[key]['message']}</pre>
-            </>
+            <pre style={{ maxHeight: "20em", overflowY: "scroll" }}>{status[key]['message']}</pre>
           }
           {status[key]['image'] &&
-            <>
-              <br />
+            <p>
               <small>Image:&nbsp;
-                <a href={"https://hub.docker.com/layers/" + status[key]['image'].replace(':', '-').replace('@', '/' + imageName + '/images/')}
+                <a href={"" + status[key]['image'].replace(':', '-').replace('@', '/' + imageName + '/images/')}
                   target="_blank">
                   {digest}
                 </a>
               </small>
-            </>
+            </p>
           }
-          <br />
         </span>
       })}
-    </p>
+    </div>
   );
 }
