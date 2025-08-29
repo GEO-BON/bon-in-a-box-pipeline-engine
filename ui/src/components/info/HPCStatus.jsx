@@ -22,7 +22,7 @@ export default function HPCStatus() {
     let timeout = null
     api.getHPCStatus((error, data, response) => {
       if (error) {
-        setErrorMessage(<HttpError httpError={error} response={response} context={"while getting HPC status"} />)
+        setErrorMessage(<HttpError error={error} response={response} context={"while getting HPC status"} />)
         setStatus(null)
 
       } else {
