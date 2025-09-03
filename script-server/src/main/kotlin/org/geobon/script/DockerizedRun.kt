@@ -5,27 +5,22 @@ import kotlinx.coroutines.*
 import org.geobon.pipeline.RunContext
 import org.geobon.pipeline.RunContext.Companion.scriptStubsRoot
 import org.geobon.server.plugins.Containers
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
-class ScriptRun( // Constructor used in single script run
-    private val scriptFile: File,
-    private val context: RunContext,
+class DockerizedRun ( // Constructor used in single script run
+    scriptFile: File,
+    context: RunContext,
     private val timeout: Duration = DEFAULT_TIMEOUT,
     private val condaEnvName: String? = null,
     private val condaEnvYml: String? = null
-) {
+) : Run(scriptFile, context) {
 
     // Constructor used in pipelines & tests
     constructor(
@@ -35,149 +30,13 @@ class ScriptRun( // Constructor used in single script run
         timeout: Duration = DEFAULT_TIMEOUT
     ) : this(scriptFile, RunContext(scriptFile, inputMap), timeout)
 
-    lateinit var results: Map<String, Any>
-        private set
-
-    val resultFile get() = context.resultFile
-
-    private val logger: Logger = LoggerFactory.getLogger(scriptFile.name)
-    private var logBuffer: String = ""
-    private val logFile = File(context.outputFolder, "logs.txt")
-
     companion object {
-        const val ERROR_KEY = "error"
-        val DEFAULT_TIMEOUT = 24.hours
-        private val TIMESTAMP_FORMAT: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
-        private val useRunners = System.getenv("USE_RUNNERS").equals("true", ignoreCase = true)
-
+        private val USE_RUNNERS = System.getenv("USE_RUNNERS").equals("true", ignoreCase = true)
         private val CONDA_ENV_SCRIPT = "${System.getenv("SCRIPT_STUBS_LOCATION")}/system/condaEnvironment.sh"
     }
 
-    suspend fun execute() {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
-        logBuffer += "${dateFormat.format(Calendar.getInstance().time)}\n"
-
-        results = loadFromCache()
-            ?: runScript()
-    }
-
-    /**
-     * It is possible that two scripts are executed with the same parameters at the same time.
-     * If so, we wait for the other one to complete and then use its result as cache.
-     */
-    suspend fun waitForResults() {
-        logger.debug("Waiting for run completion... {}", context.outputFolder)
-        while (!this::results.isInitialized) {
-            delay(100L)
-        }
-    }
-
-    private fun loadFromCache(): Map<String, Any>? {
-        // Looking for a cached result most recent than the script
-        if (resultFile.exists()) {
-            if (scriptFile.lastModified() < resultFile.lastModified()) {
-                kotlin.runCatching {
-                    RunContext.gson.fromJson<Map<String, Any>>(
-                        resultFile.readText().also { logger.trace("Cached outputs: $it") },
-                        object : TypeToken<Map<String, Any>>() {}.type
-                    )
-                }.onSuccess { previousOutputs ->
-                    // Use this result only if there was no error and inputs have not changed
-                    if (previousOutputs[ERROR_KEY] == null) {
-                        if (inputsOlderThanCache()) {
-                            logger.debug("Loading from cache")
-                            return previousOutputs
-                        }
-                    } else {
-                        logBuffer += "There was an error in previous run: running again.\n".also { logger.debug(it) }
-                    }
-                }.onFailure { e ->
-                    logBuffer += "Cache could not be reused: ${e.message}\n".also { logger.warn(it) }
-                }
-
-            } else {
-                val cleanOption = System.getenv("SCRIPT_SERVER_CACHE_CLEANER")
-                logBuffer += (
-                        "Script was updated, flushing the cache for this script with option $cleanOption.\n" +
-                                "Script timestamp: ${TIMESTAMP_FORMAT.format(Date(scriptFile.lastModified()))}\n" +
-                                "Result timestamp: ${TIMESTAMP_FORMAT.format(Date(resultFile.lastModified()))}\n"
-                        ).also { logger.debug(it) }
-
-                when (cleanOption) {
-                    "partial" ->
-                        if (!context.outputFolder.deleteRecursively()) {
-                            throw RuntimeException("Failed to delete cache for modified script at ${context.outputFolder.parentFile.path}")
-                        }
-
-                    else -> // "full" or unset
-                        if (!context.outputFolder.parentFile.deleteRecursively()) {
-                            throw RuntimeException("Failed to delete cache for modified script at ${context.outputFolder.parentFile.path}")
-                        }
-                }
-            }
-        } else {
-            logBuffer += "Previous results not found: running for the first time.\n".also { logger.debug(it) }
-        }
-
-        return null
-    }
-
-    /**
-     * @return true if all inputs are older than cached result
-     */
-    private fun inputsOlderThanCache(): Boolean {
-        if (context.inputFile.exists()) {
-            val cacheTime = resultFile.lastModified()
-            kotlin.runCatching {
-                RunContext.gson.fromJson<Map<String, Any?>>(
-                    context.inputFile.readText().also { logger.trace("Cached inputs: $it") },
-                    object : TypeToken<Map<String, Any?>>() {}.type
-                )
-            }.onSuccess { inputs ->
-                inputs.forEach { (_, value) ->
-                    value?.toString().let { stringValue ->
-                        // We assume that all local paths start with / and that URLs won't.
-                        if (stringValue?.startsWith('/') == true) {
-                            with(File(stringValue)) {
-                                // check if missing or newer than cache
-                                if (!exists()) {
-                                    logBuffer += "Cannot reuse cache: input file $this does not exist.\n"
-                                        .also { logger.warn(it) }
-                                    return false
-                                }
-
-                                if (cacheTime < lastModified()) {
-                                    logBuffer += ("Cannot reuse cache: input file has been modified.\n" +
-                                            "Cache time: $cacheTime\n" +
-                                            "File time:  ${lastModified()}\n" +
-                                            "File: $this \n").also { logger.warn(it) }
-                                    return false
-                                }
-                            }
-                        }
-                    }
-                }
-            }.onFailure { e ->
-                logger.warn("Error reading previous inputs: ${e.message}")
-                return false // We could not validate inputs, discard the cache.
-            }
-
-            return true
-
-        } else {
-            return true // no input file => cache valid
-        }
-    }
-
     @OptIn(ExperimentalTime::class)
-    private suspend fun runScript(): Map<String, Any> {
-        if (!scriptFile.exists()) {
-            val message = "Script $scriptFile not found"
-            logger.warn(message)
-            return flagError(mapOf(ERROR_KEY to message), true)
-        }
-
-        // Run the script
+    override suspend fun runScript(): Map<String, Any> {
         var error = false
         var outputs: Map<String, Any>? = null
 
@@ -240,7 +99,7 @@ class ScriptRun( // Constructor used in single script run
                         val scriptPath = scriptFile.absolutePath
                         val pythonWrapper = "$scriptStubsRoot/system/scriptWrapper.py"
 
-                        if(useRunners) {
+                        if(USE_RUNNERS) {
                             container = Containers.CONDA
                             command = container.dockerCommandList + listOf(
                                 "bash", "-c",
@@ -255,8 +114,7 @@ class ScriptRun( // Constructor used in single script run
                     }
 
                     else -> {
-                        log(logger::warn, "Unsupported script extension ${scriptFile.extension}")
-                        return flagError(mapOf(), true)
+                        return flagError(mapOf(ERROR_KEY to "Unsupported script extension ${scriptFile.extension}"), true)
                     }
                 }
 
@@ -403,25 +261,4 @@ class ScriptRun( // Constructor used in single script run
         logFile.appendText("$line\n") // record
     }
 
-    private fun flagError(results: Map<String, Any>, error: Boolean): Map<String, Any> {
-        if (error || results.isEmpty()) {
-            if (!results.containsKey(ERROR_KEY)) {
-                val outputs = results.toMutableMap()
-                outputs[ERROR_KEY] =
-                    if (results.isEmpty())
-                        "Script produced no results. Check log for errors and make sure that the script calls biab_output. " +
-                                "Also, monitor the memory usage on next run, as this error can be caused by insufficient " +
-                                "memory for the script's usage. See " +
-                                "[troubleshooting documentation](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#troubleshooting)."
-                    else
-                        "An error occurred. Check log for details."
-
-                // Rewrite output file with error
-                resultFile.writeText(RunContext.gson.toJson(outputs))
-
-                return outputs
-            }
-        }
-        return results
-    }
 }

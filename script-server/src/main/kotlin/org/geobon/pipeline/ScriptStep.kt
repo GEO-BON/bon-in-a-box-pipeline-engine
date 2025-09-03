@@ -5,8 +5,8 @@ import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
 import org.geobon.script.Description.SCRIPT
 import org.geobon.script.Description.TIMEOUT
-import org.geobon.script.ScriptRun
-import org.geobon.script.ScriptRun.Companion.DEFAULT_TIMEOUT
+import org.geobon.script.DockerizedRun
+import org.geobon.script.Run
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import kotlin.time.Duration.Companion.minutes
@@ -58,10 +58,10 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
                     }
                 }
 
-                ScriptRun(
+                DockerizedRun(
                     scriptFile,
                     context!!,
-                    specificTimeout ?: DEFAULT_TIMEOUT,
+                    specificTimeout ?: Run.DEFAULT_TIMEOUT,
                     condaEnvName,
                     condaEnvYml
                 )
@@ -77,8 +77,8 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
             scriptRun.waitForResults()
         }
 
-        if (scriptRun.results.containsKey(ScriptRun.ERROR_KEY))
-            throw RuntimeException("Script \"${toDisplayName()}\": ${scriptRun.results[ScriptRun.ERROR_KEY]}")
+        if (scriptRun.results.containsKey(Run.ERROR_KEY))
+            throw RuntimeException("Script \"${toDisplayName()}\": ${scriptRun.results[Run.ERROR_KEY]}")
 
         return scriptRun.results
     }
@@ -87,7 +87,7 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
         /**
          * runId to ScriptRun
          */
-        val currentRuns = mutableMapOf<String, ScriptRun>()
+        val currentRuns = mutableMapOf<String, DockerizedRun>()
     }
 
 }

@@ -2,17 +2,16 @@ package org.geobon.pipeline
 
 import org.geobon.script.Description.INPUTS
 import org.geobon.script.Description.IO__LABEL
-import org.geobon.script.Description.NAME
-import org.geobon.script.Description.OUTPUTS
 import org.geobon.script.Description.IO__TYPE
 import org.geobon.script.Description.IO__TYPE_OPTIONS
-import org.geobon.script.ScriptRun
+import org.geobon.script.Description.NAME
+import org.geobon.script.Description.OUTPUTS
+import org.geobon.script.Run
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
-import kotlin.collections.get
 
 
 abstract class YMLStep(
@@ -89,7 +88,7 @@ abstract class YMLStep(
                 }
             }
         } catch (e:RuntimeException) {
-            record(mapOf(ScriptRun.ERROR_KEY to (e.message ?: e.toString())))
+            record(mapOf(Run.ERROR_KEY to (e.message ?: e.toString())))
             throw e
         }
     }
