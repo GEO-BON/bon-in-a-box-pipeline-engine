@@ -122,7 +122,7 @@ internal class RunContextTest {
 
         val environmentFile = File( run.outputFolder.absolutePath, "environment.json" )
         assertTrue(environmentFile.isFile)
-        val environmentInfo: JSONObject = JSONObject(environmentFile.readText())
+        val environmentInfo = JSONObject(environmentFile.readText())
         assertTrue(environmentInfo.has("server"))
         assertTrue(environmentInfo.has("git"))
         assertTrue(environmentInfo.has("runner"))

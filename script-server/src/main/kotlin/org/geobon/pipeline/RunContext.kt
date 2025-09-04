@@ -59,7 +59,7 @@ data class RunContext(val runId: String, val inputs: String?) {
         return environment
     }
 
-    fun createEnvironmentFile(container: Containers): Unit {
+    fun createEnvironmentFile(container: Containers) {
         val environment = getEnvironment(container)
         File("${outputFolder.absolutePath}/environment.json").writeText(JSONObject(environment).toString(2))
     }

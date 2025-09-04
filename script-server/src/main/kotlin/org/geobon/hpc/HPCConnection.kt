@@ -152,7 +152,7 @@ class HPCConnection(
                 .redirectErrorStream(false)
                 .start()
 
-            process.waitFor(10, TimeUnit.MINUTES)
+            process.waitFor(10, MINUTES)
 
             val sysOut = process.inputStream.bufferedReader().readText()
             if (sysOut.isNotBlank()) logger.info(sysOut) // excludes error stream
