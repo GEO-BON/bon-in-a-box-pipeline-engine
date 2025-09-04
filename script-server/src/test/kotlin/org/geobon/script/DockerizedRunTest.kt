@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.geobon.utils.noHPCContext
 import java.io.File
 import java.lang.System.currentTimeMillis
 import kotlin.test.*
@@ -29,13 +30,13 @@ internal class DockerizedRunTest {
 
     @Test
     fun `given script has been run previously_when running again_then cache is used`() = runTest {
-        val run1 = DockerizedRun(File(scriptsRoot, "1in1out.py"), mapOf("some_int" to 5))
+        val run1 = DockerizedRun(noHPCContext, File(scriptsRoot, "1in1out.py"), mapOf("some_int" to 5))
         run1.execute()
         assertNotNull(run1.results["increment"], "increment key not found in ${run1.results}")
         assertEquals(6, run1.results["increment"]!!)
         val run1Time = run1.resultFile.lastModified()
 
-        val run2 = DockerizedRun(File(scriptsRoot, "1in1out.py"), mapOf("some_int" to 5))
+        val run2 = DockerizedRun(noHPCContext, File(scriptsRoot, "1in1out.py"), mapOf("some_int" to 5))
         run2.execute()
         assertNotNull(run2.results["increment"], "increment key not found in ${run2.results}")
         assertEquals(6, run2.results["increment"]!!)
@@ -46,13 +47,17 @@ internal class DockerizedRunTest {
 
     @Test
     fun `given script has been run previously_when running with different parameters_then script ran again`() = runTest {
-        val run1 = DockerizedRun(File(scriptsRoot, "1in1out.py"), mapOf("some_int" to 5))
+        val run1 = DockerizedRun(noHPCContext, File(scriptsRoot, "1in1out.py"), mapOf("some_int" to 5))
         run1.execute()
         assertNotNull(run1.results["increment"], "increment key not found in ${run1.results}")
         assertEquals(6, run1.results["increment"]!!)
         val run1Time = run1.resultFile.lastModified()
 
-        val run2 = DockerizedRun(File(scriptsRoot, "1in1out.py"), mapOf("some_int" to 10))
+        val run2 = DockerizedRun(
+            noHPCContext,
+            File(scriptsRoot, "1in1out.py"),
+            mapOf("some_int" to 10)
+        )
         run2.execute()
         assertNotNull(run2.results["increment"], "increment key not found in ${run2.results}")
         assertEquals(11, run2.results["increment"]!!)
@@ -67,7 +72,7 @@ internal class DockerizedRunTest {
         scriptFile.setLastModified(currentTimeMillis())
         val scriptTime1 = scriptFile.lastModified()
 
-        val run1 = DockerizedRun(scriptFile, mapOf("some_int" to 5))
+        val run1 = DockerizedRun(noHPCContext, scriptFile, mapOf("some_int" to 5))
         run1.execute()
         assertNotNull(run1.results["increment"], "increment key not found in ${run1.results}")
         assertEquals(6, run1.results["increment"]!!)
@@ -76,7 +81,7 @@ internal class DockerizedRunTest {
         scriptFile.setLastModified(currentTimeMillis())
         assertNotEquals(scriptTime1, scriptFile.lastModified())
 
-        val run2 = DockerizedRun(scriptFile, mapOf("some_int" to 5))
+        val run2 = DockerizedRun(noHPCContext, scriptFile, mapOf("some_int" to 5))
         run2.execute()
         assertNotNull(run2.results["increment"], "increment key not found in ${run2.results}")
         assertEquals(6, run2.results["increment"]!!)
@@ -90,14 +95,14 @@ internal class DockerizedRunTest {
         val scriptFile = File(scriptsRoot, "1in1out.py")
         scriptFile.setLastModified(currentTimeMillis())
 
-        DockerizedRun(scriptFile, mapOf("some_int" to 5)).execute()
-        DockerizedRun(scriptFile, mapOf("some_int" to 6)).execute()
+        DockerizedRun(noHPCContext, scriptFile, mapOf("some_int" to 5)).execute()
+        DockerizedRun(noHPCContext, scriptFile, mapOf("some_int" to 6)).execute()
 
         // We expect two folder in the cache
         assertEquals(2, outputRoot.listFiles()!![0].listFiles()!!.size)
 
         scriptFile.setLastModified(currentTimeMillis())
-        DockerizedRun(scriptFile, mapOf("some_int" to 5)).execute()
+        DockerizedRun(noHPCContext, scriptFile, mapOf("some_int" to 5)).execute()
 
         // We expect cache was deleted and only one folder is left
         assertEquals(1, outputRoot.listFiles()!![0].listFiles()!!.size)
@@ -109,17 +114,17 @@ internal class DockerizedRunTest {
             val scriptFile = File(scriptsRoot, "1in1out.py")
             scriptFile.setLastModified(currentTimeMillis())
 
-            val val5Run1 = DockerizedRun(scriptFile, mapOf("some_int" to 5))
+            val val5Run1 = DockerizedRun(noHPCContext, scriptFile, mapOf("some_int" to 5))
             val5Run1.execute()
             val val5Run1LastModified = val5Run1.resultFile.lastModified()
-            val val6Run1 = DockerizedRun(scriptFile, mapOf("some_int" to 6))
+            val val6Run1 = DockerizedRun(noHPCContext, scriptFile, mapOf("some_int" to 6))
             val6Run1.execute()
 
             // We expect two folder in the cache
             assertEquals(2, outputRoot.listFiles()!![0].listFiles()!!.size)
 
             scriptFile.setLastModified(currentTimeMillis())
-            val val5Run2 = DockerizedRun(scriptFile, mapOf("some_int" to 5))
+            val val5Run2 = DockerizedRun(noHPCContext, scriptFile, mapOf("some_int" to 5))
             val5Run2.execute()
 
             // We still expect two folders in the cache
@@ -147,14 +152,14 @@ internal class DockerizedRunTest {
         // First run
         val inputFile = File(outputRoot, "someinputfile.csv")
         inputFile.createNewFile()
-        val run1Time = DockerizedRun(scriptFile, mapOf("file" to inputFile.path)).let {
+        val run1Time = DockerizedRun(noHPCContext, scriptFile, mapOf("file" to inputFile.path)).let {
             it.execute()
             it.resultFile.lastModified()
         }
 
         // Second run, input has changed
         inputFile.setLastModified(currentTimeMillis())
-        val run2Time = DockerizedRun(scriptFile, mapOf("file" to inputFile.path)).let {
+        val run2Time = DockerizedRun(noHPCContext, scriptFile, mapOf("file" to inputFile.path)).let {
             it.execute()
             it.resultFile.lastModified()
         }
@@ -170,14 +175,14 @@ internal class DockerizedRunTest {
         // First run
         val inputFile = File(outputRoot, "someinputfile.csv")
         inputFile.createNewFile()
-        val run1Time = DockerizedRun(scriptFile, mapOf("file" to inputFile.path)).let {
+        val run1Time = DockerizedRun(noHPCContext, scriptFile, mapOf("file" to inputFile.path)).let {
             it.execute()
             it.resultFile.lastModified()
         }
 
         // Second run, input missing
         inputFile.delete()
-        val run2Time = DockerizedRun(scriptFile, mapOf("file" to inputFile.path)).let {
+        val run2Time = DockerizedRun(noHPCContext, scriptFile, mapOf("file" to inputFile.path)).let {
             it.execute()
             it.resultFile.lastModified()
         }

@@ -25,11 +25,12 @@ class DockerizedRun ( // Constructor used in single script run
 
     // Constructor used in pipelines & tests
     constructor(
+        serverContext: ServerContext,
         scriptFile: File,
         /** The JSON content of the input file */
         inputMap: Map<String, Any?>,
         timeout: Duration = DEFAULT_TIMEOUT
-    ) : this(scriptFile, RunContext(scriptFile, inputMap), timeout)
+    ) : this(scriptFile, RunContext(scriptFile, inputMap, serverContext), timeout)
 
     companion object {
         private val USE_RUNNERS = System.getenv("USE_RUNNERS").equals("true", ignoreCase = true)

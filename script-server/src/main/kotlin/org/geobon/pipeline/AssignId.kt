@@ -2,12 +2,13 @@ package org.geobon.pipeline
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.json.JSONObject
 import java.io.File
 
-class AssignId(stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()) :
-    YMLStep(File(scriptStubsRoot,"pipeline/AssignId.yml"), stepId, inputs = inputs) {
+class AssignId(serverContext: ServerContext, stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()) :
+    YMLStep(serverContext, File(scriptStubsRoot,"pipeline/AssignId.yml"), stepId, inputs = inputs) {
 
     var idForLayer:String? = null
 

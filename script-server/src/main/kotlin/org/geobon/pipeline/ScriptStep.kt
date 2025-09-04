@@ -6,18 +6,33 @@ import org.geobon.script.Description.SCRIPT
 import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.DockerizedRun
 import org.geobon.script.Run
+import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import kotlin.time.Duration.Companion.minutes
 
 
-class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()) :
-    YMLStep(yamlFile, stepId, inputs = inputs) {
+class ScriptStep(
+    serverContext: ServerContext,
+    yamlFile: File,
+    stepId: StepId,
+    inputs: MutableMap<String, Pipe> = mutableMapOf()
+) :
+    YMLStep(serverContext, yamlFile, stepId, inputs) {
 
     private val scriptFile = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
 
-    constructor(fileName: String, stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()) : this(
+    /**
+     * Used for a lighter test syntax
+     */
+    constructor(
+        fileName: String,
+        stepId: StepId,
+        serverContext: ServerContext = ServerContext(),
+        inputs: MutableMap<String, Pipe> = mutableMapOf()
+    ) : this(
+        serverContext,
         File(scriptsRoot, fileName),
         stepId,
         inputs

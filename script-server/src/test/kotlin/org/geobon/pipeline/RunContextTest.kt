@@ -3,6 +3,7 @@ package org.geobon.pipeline
 import io.kotest.extensions.system.withEnvironment
 import org.geobon.server.ServerContext
 import org.geobon.server.plugins.Containers
+import org.geobon.utils.noHPCContext
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
@@ -28,8 +29,8 @@ internal class RunContextTest {
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{bbb:222, aaa:111}"
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = RunContext(someFile, inputs1, noHPCContext)
+        val run2 = RunContext(someFile, inputs2, noHPCContext)
 
         println(run1.runId)
         println(run2.runId)
@@ -43,8 +44,8 @@ internal class RunContextTest {
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{aaa:111, bbb:222}"
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = RunContext(someFile, inputs1, noHPCContext)
+        val run2 = RunContext(someFile, inputs2, noHPCContext)
 
         assertEquals(run1.runId, run2.runId)
     }
@@ -55,8 +56,8 @@ internal class RunContextTest {
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{bbb:222, aaa:123}"
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = RunContext(someFile, inputs1, noHPCContext)
+        val run2 = RunContext(someFile, inputs2, noHPCContext)
 
         assertNotEquals(run1.runId, run2.runId)
     }
@@ -67,8 +68,8 @@ internal class RunContextTest {
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{aaa:123, bbb:222}"
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = RunContext(someFile, inputs1, noHPCContext)
+        val run2 = RunContext(someFile, inputs2, noHPCContext)
 
         assertNotEquals(run1.runId, run2.runId)
     }
@@ -101,7 +102,7 @@ internal class RunContextTest {
     fun givenScriptHasRun_whenGettingEnvironment_thenDependenciesAreRead() {
         val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
-        val run = RunContext(someFile, inputs1)
+        val run = RunContext(someFile, inputs1, noHPCContext)
         run.outputFolder.mkdirs()
         File("${run.outputFolder.absolutePath}/dependencies.txt").writeText("here are some dependencies")
         val environmentInfo = run.getEnvironment(Containers.SCRIPT_SERVER)
@@ -116,7 +117,7 @@ internal class RunContextTest {
     fun givenRunContext_whenCreateEnvironmentFile_thenFileExistsAndContainsEnvInfo() {
         val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
-        val run = RunContext(someFile, inputs1)
+        val run = RunContext(someFile, inputs1, noHPCContext)
         run.outputFolder.mkdirs()
        run.createEnvironmentFile(Containers.SCRIPT_SERVER)
 

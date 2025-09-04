@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.MalformedJsonException
+import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.run
@@ -19,8 +20,8 @@ val outputRoot = File(System.getenv("OUTPUT_LOCATION"))
  * @param runId A unique string identifier representing a run of this step with these specific parameters.
  *           i.e. Calling the same script with the same param would result in the same ID.
  */
-data class RunContext(val runId: String, val inputs: String?) {
-    constructor(descriptionFile: File, inputs: String?) : this(
+data class RunContext(val runId: String, val inputs: String?, val serverContext: ServerContext) {
+    constructor(descriptionFile: File, inputs: String?, serverContext: ServerContext) : this(
         File(
             // Unique to this script
             descriptionFile.relativeTo(scriptsRoot).path.removeSuffix(".yml")
@@ -28,12 +29,14 @@ data class RunContext(val runId: String, val inputs: String?) {
             // Unique to these params
             if (inputs.isNullOrEmpty()) "no_params" else inputsToMd5(inputs)
         ).path,
-        inputs
+        inputs,
+        serverContext
     )
 
-    constructor(descriptionFile: File, inputMap: Map<String, Any?>) : this(
+    constructor(descriptionFile: File, inputMap: Map<String, Any?>, serverContext: ServerContext) : this(
         descriptionFile,
-        if (inputMap.isEmpty()) null else gson.toJson(inputMap)
+        if (inputMap.isEmpty()) null else gson.toJson(inputMap),
+        serverContext
     )
 
     val outputFolder

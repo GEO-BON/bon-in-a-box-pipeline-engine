@@ -13,6 +13,7 @@ import org.geobon.hpc.HPC
 import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
+import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
@@ -42,6 +43,7 @@ private val logger: Logger = LoggerFactory.getLogger("Server")
 fun Application.configureRouting() {
 
     val hpc = HPC()
+    val serverContext = ServerContext(hpc)
 
     routing {
         get("/api/systemStatus") {
@@ -221,9 +223,9 @@ fun Application.configureRouting() {
 
             runCatching {
                 if (singleScript) {
-                    createMiniPipelineFromScript(descriptionFile, descriptionPath, inputFileContent)
+                    createMiniPipelineFromScript(serverContext, descriptionFile, descriptionPath, inputFileContent)
                 } else {
-                    createRootPipeline(descriptionFile, inputFileContent)
+                    createRootPipeline(serverContext, descriptionFile, inputFileContent)
                 }
             }.onSuccess { pipeline ->
                 runningPipelines[runId] = pipeline
@@ -353,7 +355,7 @@ fun Application.configureRouting() {
             val fakeInputs = Validator.generateInputFromExamples(pipelineJSON)
             var message = ""
             try {
-                createRootPipeline(filename, pipelineJSON, fakeInputs)
+                createRootPipeline(serverContext, filename, pipelineJSON, fakeInputs)
             } catch (e: Exception) {
                 message = "${e.message}"
             }

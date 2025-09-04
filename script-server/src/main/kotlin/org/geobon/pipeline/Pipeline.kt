@@ -1,13 +1,14 @@
 package org.geobon.pipeline
 
 import kotlinx.coroutines.*
+import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.File
 
-open class Pipeline constructor(
+open class Pipeline (
     override val id: StepId,
     private val debugName: String,
     /** Node id to Step */
@@ -141,12 +142,14 @@ open class Pipeline constructor(
 
     companion object {
         fun createMiniPipelineFromScript(
+            serverContext: ServerContext,
             descriptionFile: File,
             descriptionFileId: String,
             inputsJSON: String? = null
         ): Pipeline {
             val pipelineId = StepId("", "")
             val step = ScriptStep(
+                serverContext,
                 descriptionFile,
                 StepId(
                     descriptionFileId,
@@ -168,11 +171,12 @@ open class Pipeline constructor(
             return miniPipeline
         }
 
-        fun createRootPipeline(relPath: String, inputsJSON: String? = null) =
-            createRootPipeline(File(pipelinesRoot, relPath), inputsJSON)
+        fun createRootPipeline(serverContext: ServerContext, relPath: String, inputsJSON: String? = null) =
+            createRootPipeline(serverContext, File(pipelinesRoot, relPath), inputsJSON)
 
-        fun createRootPipeline(descriptionFile: File, inputsJSON: String? = null): Pipeline {
+        fun createRootPipeline(serverContext: ServerContext, descriptionFile: File, inputsJSON: String? = null): Pipeline {
             return createFromFile(
+                serverContext,
                 StepId("", ""),
                 descriptionFile,
                 inputsJSON
@@ -181,8 +185,12 @@ open class Pipeline constructor(
             }
         }
 
-        fun createRootPipeline(debugName: String, pipelineJSON: JSONObject, inputsJSON: JSONObject): Pipeline {
+        fun createRootPipeline(
+            serverContext: ServerContext, debugName: String, pipelineJSON: JSONObject,
+            inputsJSON: JSONObject
+        ): Pipeline {
             return createFromJSON(
+                serverContext,
                 StepId("", ""),
                 debugName,
                 pipelineJSON,
@@ -192,18 +200,28 @@ open class Pipeline constructor(
             }
         }
 
-        private fun createFromFile(stepId: StepId, relPath: String, inputsJSON: String? = null): Pipeline =
-            createFromFile(stepId, File(pipelinesRoot, relPath), inputsJSON)
+        private fun createFromFile(
+            serverContext: ServerContext, stepId: StepId, relPath: String,
+            inputsJSON: String? = null
+        ): Pipeline =
+            createFromFile(serverContext, stepId, File(pipelinesRoot, relPath), inputsJSON)
 
-        private fun createFromFile(stepId: StepId, descriptionFile: File, inputsJSON: String? = null): Pipeline =
+        private fun createFromFile(
+            serverContext: ServerContext, stepId: StepId, descriptionFile: File,
+            inputsJSON: String? = null
+        ): Pipeline =
             createFromJSON(
+                serverContext,
                 stepId,
                 descriptionFile.relativeTo(pipelinesRoot.parentFile).path,
                 JSONObject(descriptionFile.readText()),
                 inputsJSON?.let { JSONObject(inputsJSON) } ?: JSONObject()
             )
 
-        private fun createFromJSON(stepId: StepId, debugName: String, pipelineJSON: JSONObject, inputsJSON: JSONObject): Pipeline {
+        private fun createFromJSON(
+            serverContext: ServerContext, stepId: StepId, debugName: String, pipelineJSON: JSONObject,
+            inputsJSON: JSONObject
+        ): Pipeline {
             val logger = LoggerFactory.getLogger(debugName)
 
             val constants = mutableMapOf<String, ConstantPipe>()
@@ -223,16 +241,16 @@ open class Pipeline constructor(
 
                             val innerStepId = StepId(script, nodeId, stepId)
                             steps[nodeId] = when {
-                                scriptFile.endsWith(".json") -> createFromFile(innerStepId, scriptFile)
+                                scriptFile.endsWith(".json") -> createFromFile(serverContext, innerStepId, scriptFile)
 
                                 // Instantiating kotlin "special steps".
                                 // Not done with reflection on purpose, since this could allow someone to instantiate any class,
                                 // resulting in a security breach.
-                                scriptFile == "pipeline/AssignId.yml" -> AssignId(innerStepId)
-                                scriptFile == "pipeline/PullLayersById.yml" -> PullLayersById(innerStepId)
+                                scriptFile == "pipeline/AssignId.yml" -> AssignId(serverContext, innerStepId)
+                                scriptFile == "pipeline/PullLayersById.yml" -> PullLayersById(serverContext, innerStepId)
 
                                 // Regular script steps
-                                else -> ScriptStep(scriptFile, innerStepId)
+                                else -> ScriptStep(scriptFile, innerStepId, serverContext)
                             }
                         }
 

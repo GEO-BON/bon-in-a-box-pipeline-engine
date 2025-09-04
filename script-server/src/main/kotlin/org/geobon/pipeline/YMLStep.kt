@@ -16,6 +16,7 @@ import java.io.File
 
 
 abstract class YMLStep(
+    protected val serverContext: ServerContext,
     protected val yamlFile: File,
     stepId:StepId,
     inputs: MutableMap<String, Pipe> = mutableMapOf(),
@@ -77,7 +78,7 @@ abstract class YMLStep(
 
     override fun onInputsReceived(resolvedInputs: Map<String, Any?>) {
         // Now that we know the inputs are valid, record the id
-        context = RunContext(yamlFile, resolvedInputs)
+        context = RunContext(yamlFile, resolvedInputs, serverContext)
 
         try { // Validation
             inputs.filter { (_, pipe) -> pipe.type == IO__TYPE_OPTIONS }.forEach { (key, _) ->

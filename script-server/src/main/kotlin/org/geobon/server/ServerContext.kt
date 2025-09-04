@@ -1,8 +1,10 @@
 package org.geobon.server
 
+import org.geobon.hpc.HPC
 import java.io.File
 
-class ServerContext {
+class ServerContext(val hpc: HPC? = null) {
+
     companion object {
         val scriptsRoot
             get() = File(System.getenv("SCRIPT_LOCATION"))

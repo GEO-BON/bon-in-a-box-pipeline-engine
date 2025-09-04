@@ -4,6 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
 import org.geobon.pipeline.teststeps.RecordPipe
+import org.geobon.utils.noHPCContext
 import org.json.JSONObject
 import kotlin.test.*
 
@@ -23,17 +24,17 @@ internal class PullLayersByIdTest {
 
         finishLine = mutableListOf()
 
-        step = PullLayersById(StepId("pull", "0"), mutableMapOf(
+        step = PullLayersById(noHPCContext, StepId("pull", "0"), mutableMapOf(
             PullLayersById.IN_IDENTIFIED_LAYERS to AggregatePipe(listOf(
-                AssignId(StepId("assign", "1"), mutableMapOf(
+                AssignId(noHPCContext, StepId("assign", "1"), mutableMapOf(
                     AssignId.IN_ID to ConstantPipe("text", "first"),
                     AssignId.IN_LAYER to RecordPipe("1.tiff", finishLine, type = "image/tiff;application=geotiff")
                 )).outputs[AssignId.OUT_IDENTIFIED_LAYER]!!,
-                AssignId(StepId("assign", "2"), mutableMapOf(
+                AssignId(noHPCContext, StepId("assign", "2"), mutableMapOf(
                     AssignId.IN_ID to ConstantPipe("text", "second"),
                     AssignId.IN_LAYER to RecordPipe("2.tiff", finishLine, type = "image/tiff;application=geotiff")
                 )).outputs[AssignId.OUT_IDENTIFIED_LAYER]!!,
-                AssignId(StepId("assign", "3"), mutableMapOf(
+                AssignId(noHPCContext, StepId("assign", "3"), mutableMapOf(
                     AssignId.IN_ID to ConstantPipe("text", "third"),
                     AssignId.IN_LAYER to RecordPipe("3.tiff", finishLine, type = "image/tiff;application=geotiff")
                 )).outputs[AssignId.OUT_IDENTIFIED_LAYER]!!
@@ -65,7 +66,7 @@ internal class PullLayersByIdTest {
 
     @Test
     fun whenPullingConditionally_thenTypesAreRespected() = runTest {
-        val singlePullIf = AssignId(StepId("assign", "0"), mutableMapOf(
+        val singlePullIf = AssignId(noHPCContext, StepId("assign", "0"), mutableMapOf(
             AssignId.IN_ID to ConstantPipe("text", "first"),
             AssignId.IN_LAYER to RecordPipe("1.tiff", finishLine, type = "image/tiff;application=geotiff")
         )).outputs[AssignId.OUT_IDENTIFIED_LAYER]!!.pullIf { true }
@@ -184,10 +185,13 @@ internal class PullLayersByIdTest {
 
     @Test
     fun `given a pipeline with PullLayersById_when ran_then replaces the expected layer`() = runTest {
-        val pipeline = createRootPipeline("pullLayersByIdTest.json",
-        """{
-            "pipeline>PullLayersById.yml@9|with_ids": "layer, current, change\nfirstId, 0.2, 0.5\nGFW170E, 0.5, 0.2\nthirdId, 0.3, 0.3\n"
-        }""".trimIndent())
+        val pipeline = createRootPipeline(
+            noHPCContext,
+            "pullLayersByIdTest.json",
+            """{
+                "pipeline>PullLayersById.yml@9|with_ids": "layer, current, change\nfirstId, 0.2, 0.5\nGFW170E, 0.5, 0.2\nthirdId, 0.3, 0.3\n"
+            }""".trimIndent()
+        )
 
         pipeline.pullFinalOutputs()
 
