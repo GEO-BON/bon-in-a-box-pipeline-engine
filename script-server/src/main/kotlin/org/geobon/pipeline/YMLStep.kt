@@ -24,7 +24,7 @@ abstract class YMLStep(
 ) : Step(stepId, inputs, readOutputs(yamlParsed, logger)) {
 
     /**
-     * Context becomes set in validateInputsReceived(), once the invocation inputs are known.
+     * Context becomes set in onInputsReceived(), once the invocation inputs are known.
      */
     protected var context:RunContext? = null
 
