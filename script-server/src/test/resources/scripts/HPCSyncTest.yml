@@ -1,0 +1,24 @@
+script: HPCSyncTest.py
+name: HPC sync test
+description: The file input should be synced along with the output folder.
+lifecycle:
+  status: example
+author:
+  - name: Jean-Michel Lord
+inputs:
+  some_int:
+    label: Some int
+    description: A number, which should be ignored
+    type: int
+    example: 3
+  some_file:
+    label: Some file
+    description: A file, which will be synced
+    type: text/csv
+    example: myFile.csv
+outputs:
+  increment:
+    label: A number (input++)
+    description: bla bla
+    type: int
+    example: 4

@@ -218,3 +218,12 @@ conda:
     dependencies:
       required: true
       type: list
+
+hpc:
+  required: false
+  type: dict
+  schema:
+    memory:
+      required: false
+      type: string
+      regex: "^[0-9]+[GM]$"

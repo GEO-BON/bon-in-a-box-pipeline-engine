@@ -18,4 +18,6 @@ object Description {
 
     const val CONDA = "conda"
     const val CONDA__NAME = "name"
+
+    const val HPC = "hpc"
 }

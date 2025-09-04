@@ -35,6 +35,10 @@ class HPCConnection(
         get() = rStatus.state != ApptainerImageState.NOT_CONFIGURED
                 && juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
 
+    val ready: Boolean
+        get() = rStatus.state == ApptainerImageState.READY
+                && juliaStatus.state == ApptainerImageState.READY
+
     init {
         if (configPath == null || !File(configPath).exists()) {
             logger.info("HPC not configured: missing HPC_SSH_CONFIG_FILE ($configPath)")
@@ -178,56 +182,47 @@ class HPCConnection(
         )
     }
 
-    private fun validatePath(file: File): Boolean {
+    private fun validatePath(file: File, logFile: File?): Boolean {
         if(file.startsWith(outputRoot)
             || file.startsWith(scriptsRoot)
             || file.startsWith(scriptStubsRoot)) {
             if(file.exists()) {
                 return true
             } else {
-                logger.warn("Ignoring non-existing file \"$file\"")
+                logFile?.appendText("Ignoring non-existing file \"$file\"\n")
             }
         } else {
-            logger.warn("Ignoring alien file \"$file\"")
+            logFile?.appendText("Ignoring file from unexpected location \"$file\"")
         }
         return false
     }
 
     /**
      * Syncs the files/folders towards the remote host via rsync
+     * @return logging information
      */
-    fun sendFiles(files: List<File>) {
+    fun sendFiles(files: List<File>, logFile: File? = null) {
         var filesString = ""
         files.forEach { file ->
             filesString = filesString +
-                if (validatePath(file)) file.absolutePath + "\n"
+                if (validatePath(file, logFile)) file.absolutePath + "\n"
                 else ""
         }
 
         if(filesString.isBlank()) {
-            logger.warn("No valid files to sync.")
-            return
+            "No valid files to sync.".let { logger.warn(it); logFile?.appendText(it) }
+
+        } else {
+            val result = systemCall.run(
+                listOf("echo", filesString.trim(), "|", "rsync", "--files-from=-", ".", "$sshConfig:~/bon-in-a-box/"),
+                timeoutAmount = 10, timeoutUnit = MINUTES)
+
+            logFile?.appendText(result.output)
+
+            if(!result.success) {
+                throw RuntimeException(result.error)
+            }
         }
-
-        val result = systemCall.run(
-            listOf("echo", filesString.trim(), "|", "rsync", "--files-from=-", ".", "$sshConfig:~/bon-in-a-box/"),
-            timeoutAmount = 10, timeoutUnit = MINUTES)
-
-        if(!result.success) {
-            throw RuntimeException(result.error)
-        }
-    }
-
-    /**
-     * Syncs the files/folders from the remote host to script server via rsync
-     */
-    fun retrieveResults(files: List<File>) {
-        val filesString = files.map {
-            if (validatePath(it)) it.absolutePath + "\n"
-            else ""
-        }
-
-        // TODO: Retrieve the files
     }
 
     companion object {

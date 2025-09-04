@@ -16,8 +16,8 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 class DockerizedRun ( // Constructor used in single script run
-    scriptFile: File,
     context: RunContext,
+    scriptFile: File,
     private val timeout: Duration = DEFAULT_TIMEOUT,
     private val condaEnvName: String? = null,
     private val condaEnvYml: String? = null
@@ -30,7 +30,7 @@ class DockerizedRun ( // Constructor used in single script run
         /** The JSON content of the input file */
         inputMap: Map<String, Any?>,
         timeout: Duration = DEFAULT_TIMEOUT
-    ) : this(scriptFile, RunContext(scriptFile, inputMap, serverContext), timeout)
+    ) : this(RunContext(scriptFile, inputMap, serverContext), scriptFile, timeout)
 
     companion object {
         private val USE_RUNNERS = System.getenv("USE_RUNNERS").equals("true", ignoreCase = true)

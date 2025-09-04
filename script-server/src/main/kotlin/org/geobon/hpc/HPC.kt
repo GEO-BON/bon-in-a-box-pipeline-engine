@@ -1,6 +1,6 @@
 package org.geobon.hpc
 
-open class HPC protected constructor (val connection: HPCConnection) {
+open class HPC (val connection: HPCConnection) {
 
     constructor() : this(HPCConnection())
 

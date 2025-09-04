@@ -2,9 +2,11 @@ package org.geobon.pipeline
 
 import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
+import org.geobon.script.Description.HPC
 import org.geobon.script.Description.SCRIPT
 import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.DockerizedRun
+import org.geobon.hpc.HPCRun
 import org.geobon.script.Run
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
@@ -50,59 +52,72 @@ class ScriptStep(
     }
 
     override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
+        context?.let { context ->
+            val specificTimeout = (yamlParsed[TIMEOUT] as? Int)?.minutes
 
-        val specificTimeout = (yamlParsed[TIMEOUT] as? Int)?.minutes
+            var runOwner = false
+            val run = synchronized(currentRuns) {
+                currentRuns.getOrPut(context.runId) {
+                    runOwner = true
 
-        var runOwner = false
-        val scriptRun = synchronized(currentRuns) {
-            currentRuns.getOrPut(context!!.runId) {
-                runOwner = true
+                    // Optional specific conda environment for this script
+                    var condaEnvName: String? = null
+                    val condaEnvYml = yamlParsed[CONDA]?.let { condaSection ->
+                        try {
+                            condaEnvName = yamlFile.relativeTo(scriptsRoot).path
+                                .replace("/", "__").replace(' ', '_').removeSuffix(".yml")
 
-                // Optional specific conda environment for this script
-                var condaEnvName:String? = null
-                val condaEnvYml = yamlParsed[CONDA]?.let { condaSection ->
-                    try {
-                        condaEnvName = yamlFile.relativeTo(scriptsRoot).path
-                            .replace("/", "__").replace(' ', '_').removeSuffix(".yml")
+                            @Suppress("UNCHECKED_CAST")
+                            (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName
+                            Yaml().dump(condaSection)
+                        } catch (_: Exception) {
+                            null
+                        }
+                    }
 
-                        @Suppress("UNCHECKED_CAST")
-                        (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName
-                        Yaml().dump(condaSection)
-                    } catch (_: Exception) {
-                        null
+                    if (context.serverContext.hpc?.connection?.ready == true && yamlParsed[HPC] != null) {
+                        HPCRun(
+                            context,
+                            scriptFile,
+                            inputs,
+                            resolvedInputs
+//                        specificTimeout ?: Run.DEFAULT_TIMEOUT,
+//                        condaEnvName,
+//                        condaEnvYml
+                        )
+                    } else {
+                        DockerizedRun(
+                            context,
+                            scriptFile,
+                            specificTimeout ?: Run.DEFAULT_TIMEOUT,
+                            condaEnvName,
+                            condaEnvYml
+                        )
                     }
                 }
-
-                DockerizedRun(
-                    scriptFile,
-                    context!!,
-                    specificTimeout ?: Run.DEFAULT_TIMEOUT,
-                    condaEnvName,
-                    condaEnvYml
-                )
             }
-        }
 
-        if(runOwner) {
-            scriptRun.execute()
-            synchronized(currentRuns) {
-                currentRuns.remove(context!!.runId)
+            if (runOwner) {
+                run.execute()
+                synchronized(currentRuns) {
+                    currentRuns.remove(context.runId)
+                }
+            } else {
+                run.waitForResults()
             }
-        } else {
-            scriptRun.waitForResults()
-        }
 
-        if (scriptRun.results.containsKey(Run.ERROR_KEY))
-            throw RuntimeException("Script \"${toDisplayName()}\": ${scriptRun.results[Run.ERROR_KEY]}")
+            if (run.results.containsKey(Run.ERROR_KEY))
+                throw RuntimeException("Script \"${toDisplayName()}\": ${run.results[Run.ERROR_KEY]}")
 
-        return scriptRun.results
+            return run.results
+        } ?: throw RuntimeException("Context not defined.")
     }
 
     companion object {
         /**
          * runId to ScriptRun
          */
-        val currentRuns = mutableMapOf<String, DockerizedRun>()
+        val currentRuns = mutableMapOf<String, Run>()
     }
 
 }
