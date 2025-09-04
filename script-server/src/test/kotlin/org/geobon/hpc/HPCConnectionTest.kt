@@ -9,9 +9,8 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import io.mockk.verifyCount
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
 import org.geobon.pipeline.outputRoot
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.scriptModule
 import org.geobon.utils.CallResult
 import org.geobon.utils.SystemCall
@@ -197,8 +196,8 @@ class HPCConnectionTest {
             someOutput.writeText("Some content.")
             val toSync = listOf(
                 someOutput,
-                File(scriptRoot, "1in1out.yml"),
-                File(scriptRoot, "1in1out.py"),
+                File(scriptsRoot, "1in1out.yml"),
+                File(scriptsRoot, "1in1out.py"),
             )
             val systemCall = mockk<SystemCall>()
             every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
@@ -229,9 +228,9 @@ class HPCConnectionTest {
             someOutput.writeText("Some content.")
             val toSync = listOf(
                 someOutput,
-                File(scriptRoot, "1in1out.yml"),
-                File(scriptRoot, "1in1out.py"),
-                File(scriptRoot, "somethingWrong.py"),
+                File(scriptsRoot, "1in1out.yml"),
+                File(scriptsRoot, "1in1out.py"),
+                File(scriptsRoot, "somethingWrong.py"),
             )
             val systemCall = mockk<SystemCall>()
             every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
@@ -244,8 +243,8 @@ class HPCConnectionTest {
                     listOf(
                         "echo", """
                 ${outputRoot.absolutePath}/someScript/hasdfdflgjkl/output.txt
-                ${scriptRoot.absolutePath}/1in1out.yml
-                ${scriptRoot.absolutePath}/1in1out.py
+                ${scriptsRoot.absolutePath}/1in1out.yml
+                ${scriptsRoot.absolutePath}/1in1out.py
                 """.trimIndent(), "|", "rsync", "--files-from=-", ".", "HPC-name:~/bon-in-a-box/"
                     ), any(), any(), any(), any()
                 )
@@ -262,8 +261,8 @@ class HPCConnectionTest {
             // output folder is there but not the file!
             val toSync = listOf(
                 someOutput,
-                File(scriptRoot, "somethingWrong.py"),
-                File(scriptRoot, "imLost.yml"),
+                File(scriptsRoot, "somethingWrong.py"),
+                File(scriptsRoot, "imLost.yml"),
             )
             val systemCall = mockk<SystemCall>()
             every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }

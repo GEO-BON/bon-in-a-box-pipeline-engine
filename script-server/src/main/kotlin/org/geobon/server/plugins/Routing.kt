@@ -13,7 +13,9 @@ import org.geobon.hpc.HPC
 import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
+import org.geobon.server.ServerContext.Companion.pipelinesRoot
+import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -32,8 +34,6 @@ import java.net.http.HttpResponse
  */
 const val FILE_SEPARATOR = '>'
 private val gson = Gson()
-private val pipelinesRoot = File(System.getenv("PIPELINES_LOCATION"))
-private val scriptStubsRoot = File(System.getenv("SCRIPT_STUBS_LOCATION"))
 
 private val runningPipelines = mutableMapOf<String, Pipeline>()
 private val logger: Logger = LoggerFactory.getLogger("Server")
@@ -70,7 +70,7 @@ fun Application.configureRouting() {
                 }
 
                 "script" -> {
-                    roots = listOf(scriptRoot, scriptStubsRoot)
+                    roots = listOf(scriptsRoot, scriptStubsRoot)
                     extension = "yml"
                 }
 
@@ -125,7 +125,7 @@ fun Application.configureRouting() {
                     replace(FILE_SEPARATOR, '/').replace(Regex("""\.\w+$"""), ".yml")
                 }
 
-                var scriptFile = File(scriptRoot, ymlPath)
+                var scriptFile = File(scriptsRoot, ymlPath)
 
                 if (scriptFile.exists()) {
                     call.respond(Yaml().load(scriptFile.readText()) as Map<String, Any>)
@@ -208,7 +208,7 @@ fun Application.configureRouting() {
 
             // Validate the existence of the file
             val descriptionFile = File(
-                if (singleScript) scriptRoot else pipelinesRoot,
+                if (singleScript) scriptsRoot else pipelinesRoot,
                 descriptionPath.replace(FILE_SEPARATOR, '/')
             )
             if (!descriptionFile.exists()) {

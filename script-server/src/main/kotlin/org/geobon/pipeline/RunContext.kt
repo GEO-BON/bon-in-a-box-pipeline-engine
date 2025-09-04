@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.MalformedJsonException
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.run
 import org.geobon.utils.toMD5
@@ -22,7 +23,7 @@ data class RunContext(val runId: String, val inputs: String?) {
     constructor(descriptionFile: File, inputs: String?) : this(
         File(
             // Unique to this script
-            descriptionFile.relativeTo(scriptRoot).path.removeSuffix(".yml")
+            descriptionFile.relativeTo(scriptsRoot).path.removeSuffix(".yml")
                 .replace("../", ""), // This replacement is to accommodate script-stubs
             // Unique to these params
             if (inputs.isNullOrEmpty()) "no_params" else inputsToMd5(inputs)
@@ -63,14 +64,6 @@ data class RunContext(val runId: String, val inputs: String?) {
         File("${outputFolder.absolutePath}/environment.json").writeText(JSONObject(environment).toString(2))
     }
     companion object {
-        val scriptRoot
-            get() = File(System.getenv("SCRIPT_LOCATION"))
-
-        val scriptStubsRoot
-            get() = File(System.getenv("SCRIPT_STUBS_LOCATION"))
-
-        val pipelineRoot
-            get() = File(System.getenv("PIPELINES_LOCATION"))
 
         val gson: Gson = GsonBuilder()
             .serializeNulls()

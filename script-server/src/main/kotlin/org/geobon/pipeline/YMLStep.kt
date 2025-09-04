@@ -7,6 +7,7 @@ import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
 import org.geobon.script.Run
+import org.geobon.server.ServerContext
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -130,7 +131,7 @@ abstract class YMLStep(
     }
 
     override fun toString(): String {
-        return "${javaClass.simpleName} (id=$id, name=\"${yamlParsed[NAME]}\", file=${yamlFile.relativeTo(RunContext.scriptRoot)})"
+        return "${javaClass.simpleName} (id=$id, name=\"${yamlParsed[NAME]}\", file=${yamlFile.relativeTo(ServerContext.scriptsRoot)})"
     }
 
     companion object {

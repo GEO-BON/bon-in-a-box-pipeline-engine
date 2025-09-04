@@ -1,11 +1,11 @@
 package org.geobon.pipeline
 
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
+import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.json.JSONObject
 import java.io.File
 import kotlin.system.exitProcess
 
-private val pipelinesRoot = File(System.getenv("PIPELINES_LOCATION"))
 
 object Validator {
     /**

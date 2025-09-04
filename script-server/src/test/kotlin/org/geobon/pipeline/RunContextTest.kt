@@ -1,13 +1,11 @@
 package org.geobon.pipeline
 
+import io.kotest.extensions.system.withEnvironment
+import org.geobon.server.ServerContext
 import org.geobon.server.plugins.Containers
+import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
-import kotlin.test.assertTrue
-import io.kotest.extensions.system.withEnvironment
-import org.json.JSONObject
 
 internal class RunContextTest {
     @BeforeTest
@@ -26,7 +24,7 @@ internal class RunContextTest {
 
     @Test
     fun givenSameInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdSame() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{bbb:222, aaa:111}"
 
@@ -41,7 +39,7 @@ internal class RunContextTest {
 
     @Test
     fun givenSameInputs_whenTheOrderOfEntriesIsSame_thenRunIdSame() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{aaa:111, bbb:222}"
 
@@ -53,7 +51,7 @@ internal class RunContextTest {
 
     @Test
     fun givenDifferentInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdDifferent() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{bbb:222, aaa:123}"
 
@@ -65,7 +63,7 @@ internal class RunContextTest {
 
     @Test
     fun givenDifferentInputs_whenTheOrderOfEntriesIsSame_thenRunIdDifferent() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{aaa:123, bbb:222}"
 
@@ -101,7 +99,7 @@ internal class RunContextTest {
 
     @Test
     fun givenScriptHasRun_whenGettingEnvironment_thenDependenciesAreRead() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val run = RunContext(someFile, inputs1)
         run.outputFolder.mkdirs()
@@ -116,7 +114,7 @@ internal class RunContextTest {
 
     @Test
     fun givenRunContext_whenCreateEnvironmentFile_thenFileExistsAndContainsEnvInfo() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val run = RunContext(someFile, inputs1)
         run.outputFolder.mkdirs()

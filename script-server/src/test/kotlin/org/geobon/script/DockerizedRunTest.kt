@@ -4,8 +4,8 @@ import io.kotest.extensions.system.OverrideMode
 import io.kotest.extensions.system.withEnvironment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
 import org.geobon.pipeline.outputRoot
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import java.io.File
 import java.lang.System.currentTimeMillis
 import kotlin.test.*
@@ -29,13 +29,13 @@ internal class DockerizedRunTest {
 
     @Test
     fun `given script has been run previously_when running again_then cache is used`() = runTest {
-        val run1 = DockerizedRun(File(scriptRoot, "1in1out.py"), mapOf("some_int" to 5))
+        val run1 = DockerizedRun(File(scriptsRoot, "1in1out.py"), mapOf("some_int" to 5))
         run1.execute()
         assertNotNull(run1.results["increment"], "increment key not found in ${run1.results}")
         assertEquals(6, run1.results["increment"]!!)
         val run1Time = run1.resultFile.lastModified()
 
-        val run2 = DockerizedRun(File(scriptRoot, "1in1out.py"), mapOf("some_int" to 5))
+        val run2 = DockerizedRun(File(scriptsRoot, "1in1out.py"), mapOf("some_int" to 5))
         run2.execute()
         assertNotNull(run2.results["increment"], "increment key not found in ${run2.results}")
         assertEquals(6, run2.results["increment"]!!)
@@ -46,13 +46,13 @@ internal class DockerizedRunTest {
 
     @Test
     fun `given script has been run previously_when running with different parameters_then script ran again`() = runTest {
-        val run1 = DockerizedRun(File(scriptRoot, "1in1out.py"), mapOf("some_int" to 5))
+        val run1 = DockerizedRun(File(scriptsRoot, "1in1out.py"), mapOf("some_int" to 5))
         run1.execute()
         assertNotNull(run1.results["increment"], "increment key not found in ${run1.results}")
         assertEquals(6, run1.results["increment"]!!)
         val run1Time = run1.resultFile.lastModified()
 
-        val run2 = DockerizedRun(File(scriptRoot, "1in1out.py"), mapOf("some_int" to 10))
+        val run2 = DockerizedRun(File(scriptsRoot, "1in1out.py"), mapOf("some_int" to 10))
         run2.execute()
         assertNotNull(run2.results["increment"], "increment key not found in ${run2.results}")
         assertEquals(11, run2.results["increment"]!!)
@@ -63,7 +63,7 @@ internal class DockerizedRunTest {
 
     @Test
     fun `given script has been modified since previous run_when ran with same parameters_then script ran again`() = runTest {
-        val scriptFile = File(scriptRoot, "1in1out.py")
+        val scriptFile = File(scriptsRoot, "1in1out.py")
         scriptFile.setLastModified(currentTimeMillis())
         val scriptTime1 = scriptFile.lastModified()
 
@@ -87,7 +87,7 @@ internal class DockerizedRunTest {
 
     @Test
     fun `given other results existed_when cache cleaned with option full_then all cache removed`() = runTest {
-        val scriptFile = File(scriptRoot, "1in1out.py")
+        val scriptFile = File(scriptsRoot, "1in1out.py")
         scriptFile.setLastModified(currentTimeMillis())
 
         DockerizedRun(scriptFile, mapOf("some_int" to 5)).execute()
@@ -106,7 +106,7 @@ internal class DockerizedRunTest {
     @Test
     fun `given other results existed_when cache cleaned with option partial_then all cache removed`() = runTest {
         withEnvironment("SCRIPT_SERVER_CACHE_CLEANER", "partial", OverrideMode.SetOrOverride) {
-            val scriptFile = File(scriptRoot, "1in1out.py")
+            val scriptFile = File(scriptsRoot, "1in1out.py")
             scriptFile.setLastModified(currentTimeMillis())
 
             val val5Run1 = DockerizedRun(scriptFile, mapOf("some_int" to 5))
@@ -142,7 +142,7 @@ internal class DockerizedRunTest {
 
     @Test
     fun `given input has changed_when scripts executed_then cache discarded`() = runTest {
-        val scriptFile = File(scriptRoot, "checkFile.py")
+        val scriptFile = File(scriptsRoot, "checkFile.py")
 
         // First run
         val inputFile = File(outputRoot, "someinputfile.csv")
@@ -165,7 +165,7 @@ internal class DockerizedRunTest {
 
     @Test
     fun `given input missing_when scripts executed_then cache discarded`() = runTest {
-        val scriptFile = File(scriptRoot, "checkFile.py")
+        val scriptFile = File(scriptsRoot, "checkFile.py")
 
         // First run
         val inputFile = File(outputRoot, "someinputfile.csv")

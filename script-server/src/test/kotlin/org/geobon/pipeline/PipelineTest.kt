@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
-import org.geobon.utils.productionPipelinesRoot
+import org.geobon.server.ServerContext
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
@@ -317,7 +317,7 @@ internal class PipelineTest {
     @Test
     fun `given a mini pipeline_when ran_then outputs generated`() = runTest {
         val pipeline = createMiniPipelineFromScript(
-            File(RunContext.scriptRoot, "helloWorld/helloPython.yml"),
+            File(ServerContext.scriptsRoot, "helloWorld/helloPython.yml"),
             "helloWorld>helloPython.yml",
             """{ "some_int": "7" }"""
         )
@@ -335,7 +335,7 @@ internal class PipelineTest {
     fun `given a mini pipeline_when ran with bad key_then exception occurs`() = runTest {
         assertFailsWith<RuntimeException> {
             createMiniPipelineFromScript(
-                File(RunContext.scriptRoot, "helloWorld/helloPython.yml"),
+                File(ServerContext.scriptsRoot, "helloWorld/helloPython.yml"),
                 "helloWorld>helloPython.yml",
                 """{ "bad_key": "7" }"""
             )

@@ -1,12 +1,8 @@
 package org.geobon.pipeline
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import org.geobon.pipeline.RunContext.Companion.pipelineRoot
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
+import kotlinx.coroutines.*
+import org.geobon.server.ServerContext.Companion.pipelinesRoot
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -161,7 +157,7 @@ open class Pipeline constructor(
 
             val miniPipeline = Pipeline(
                 pipelineId,
-                descriptionFile.relativeTo(scriptRoot.parentFile).path,
+                descriptionFile.relativeTo(scriptsRoot.parentFile).path,
                 mapOf(step.id.nodeId to step),
                 inputsToConstants(inputsJSON, step),
                 step.outputs.toMutableMap()
@@ -173,7 +169,7 @@ open class Pipeline constructor(
         }
 
         fun createRootPipeline(relPath: String, inputsJSON: String? = null) =
-            createRootPipeline(File(pipelineRoot, relPath), inputsJSON)
+            createRootPipeline(File(pipelinesRoot, relPath), inputsJSON)
 
         fun createRootPipeline(descriptionFile: File, inputsJSON: String? = null): Pipeline {
             return createFromFile(
@@ -197,12 +193,12 @@ open class Pipeline constructor(
         }
 
         private fun createFromFile(stepId: StepId, relPath: String, inputsJSON: String? = null): Pipeline =
-            createFromFile(stepId, File(pipelineRoot, relPath), inputsJSON)
+            createFromFile(stepId, File(pipelinesRoot, relPath), inputsJSON)
 
         private fun createFromFile(stepId: StepId, descriptionFile: File, inputsJSON: String? = null): Pipeline =
             createFromJSON(
                 stepId,
-                descriptionFile.relativeTo(pipelineRoot.parentFile).path,
+                descriptionFile.relativeTo(pipelinesRoot.parentFile).path,
                 JSONObject(descriptionFile.readText()),
                 inputsJSON?.let { JSONObject(inputsJSON) } ?: JSONObject()
             )

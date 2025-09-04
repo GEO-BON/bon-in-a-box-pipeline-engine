@@ -2,9 +2,9 @@ package org.geobon.hpc
 
 import kotlinx.coroutines.*
 import org.geobon.hpc.ApptainerImage.Companion.ApptainerImageState
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
-import org.geobon.pipeline.RunContext.Companion.scriptStubsRoot
 import org.geobon.pipeline.outputRoot
+import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.SystemCall
 import org.geobon.utils.run
@@ -181,7 +181,7 @@ class HPCConnection(
 
     private fun validatePath(file: File): Boolean {
         if(file.startsWith(outputRoot)
-            || file.startsWith(scriptRoot)
+            || file.startsWith(scriptsRoot)
             || file.startsWith(scriptStubsRoot)) {
             if(file.exists()) {
                 return true

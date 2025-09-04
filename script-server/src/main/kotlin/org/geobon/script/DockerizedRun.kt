@@ -3,7 +3,8 @@ package org.geobon.script
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import org.geobon.pipeline.RunContext
-import org.geobon.pipeline.RunContext.Companion.scriptStubsRoot
+import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.plugins.Containers
 import java.io.File
 import java.io.IOException
@@ -119,7 +120,7 @@ class DockerizedRun ( // Constructor used in single script run
                 }
 
                 ProcessBuilder(command)
-                    .directory(RunContext.scriptRoot)
+                    .directory(ServerContext.scriptsRoot)
                     .redirectOutput(ProcessBuilder.Redirect.PIPE)
                     .redirectErrorStream(true) // Merges stderr into stdout
                     .start().also { process ->

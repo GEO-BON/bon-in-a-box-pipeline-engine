@@ -2,7 +2,7 @@ package org.geobon.pipeline
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.geobon.pipeline.RunContext.Companion.scriptStubsRoot
+import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.json.JSONObject
 import java.io.File
 

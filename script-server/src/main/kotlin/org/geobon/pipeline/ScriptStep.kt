@@ -1,12 +1,12 @@
 package org.geobon.pipeline
 
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
 import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
 import org.geobon.script.Description.SCRIPT
 import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.DockerizedRun
 import org.geobon.script.Run
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import kotlin.time.Duration.Companion.minutes
@@ -18,7 +18,7 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
     private val scriptFile = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
 
     constructor(fileName: String, stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()) : this(
-        File(scriptRoot, fileName),
+        File(scriptsRoot, fileName),
         stepId,
         inputs
     )
@@ -28,7 +28,7 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
             return "Description file not found: ${yamlFile.path}"
 
         if (!scriptFile.exists()) {
-            return "Script file not found: ${scriptFile.relativeTo(scriptRoot)}\n"
+            return "Script file not found: ${scriptFile.relativeTo(scriptsRoot)}\n"
         }
 
         return ""
@@ -47,7 +47,7 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
                 var condaEnvName:String? = null
                 val condaEnvYml = yamlParsed[CONDA]?.let { condaSection ->
                     try {
-                        condaEnvName = yamlFile.relativeTo(scriptRoot).path
+                        condaEnvName = yamlFile.relativeTo(scriptsRoot).path
                             .replace("/", "__").replace(' ', '_').removeSuffix(".yml")
 
                         @Suppress("UNCHECKED_CAST")
