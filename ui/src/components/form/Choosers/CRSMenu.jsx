@@ -10,35 +10,30 @@ import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import debounce from 'lodash.debounce';
-import _ from "lodash";
+import debounce from "lodash.debounce";
+import _, { update } from "lodash";
 import {
   getProjestAPI,
   transformBboxAPI,
   getCRSDef,
   defaultCRS,
   getCRSListFromName,
-  defaultCountry,
-  defaultRegion,
   paperStyle,
 } from "./utils";
 
 export default function CRSMenu({
-  CRS,
-  setCRS,
-  setAction,
-  action,
-  bbox,
+  states,
+  dispatch,
   bboxGeoJSONShrink,
-  country = defaultCountry,
-  region = defaultRegion,
   dialog = false,
   updateValues = () => {},
 }) {
   const [CRSList, setCRSList] = useState([]);
   const [selectedCRS, setSelectedCRS] = useState({
-    label: CRS.name?CRS.name:`${CRS.authority}:${CRS.code}`,
-    value: `${CRS.authority}:${CRS.code}`,
+    label: states.CRS.name
+      ? states.CRS.name
+      : `${states.CRS.authority}:${states.CRS.code}`,
+    value: `${states.CRS.authority}:${states.CRS.code}`,
   });
   const [inputValue, setInputValue] = useState("");
   const [searching, setSearching] = useState(false);
@@ -46,35 +41,43 @@ export default function CRSMenu({
 
   useEffect(() => {
     let ignore = false;
-    if (bboxGeoJSONShrink === null && !region.name && !country.englishName)
-      return;
-    setSearching(true);
-    // Suggest from names
-    if (region.name || country.englishName) {
-      const searchName = region.name ? region.name : country.englishName;
-      getCRSListFromName(searchName).then((result) => {
-        if(!ignore){
+    if (!states.region.name && !states.country.englishName) return;
+    if (states.actions.includes("updateCRSListFromNames")) {
+      setSearching(true);
+      // Suggest from names
+      if (states.region.name || states.country.englishName) {
+        const searchName = states.region.name
+          ? states.region.name
+          : states.country.englishName;
+        getCRSListFromName(searchName).then((result) => {
+          //if (!ignore) {
           if (result) {
-          const suggestions = result.map((proj) => {
-            const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
-            return {
-              label: `${proj.name} (${p})`,
-              value: `${p}`,
-            };
-          });
-          setCRSList(suggestions);
+            const suggestions = result.map((proj) => {
+              const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
+              return {
+                label: `${proj.name} (${p})`,
+                value: `${p}`,
+              };
+            });
+            setCRSList(suggestions);
           } else {
             setCRSList([defaultCRS]);
           }
           setSearching(false);
-        }
-      });
+          //}
+        });
+      }
     }
-    // Suggest from area coverage
-    if (!region.name && !country.englishName && bboxGeoJSONShrink) {
-      let bbj = { type: "FeatureCollection", features: [bboxGeoJSONShrink] };
+    return () => {
+      ignore = true;
+    };
+  }, [states.actions]);
+
+  useEffect(() => {
+    let bbj = { type: "FeatureCollection", features: [bboxGeoJSONShrink] };
+    if (states.actions.includes("updateCRSListFromArea") && bboxGeoJSONShrink) {
       getProjestAPI(bbj).then((result) => {
-        if(!ignore){
+        if (!ignore) {
           if (result && result.length > 0) {
             let suggestions = _.uniqBy(result, function (e) {
               return e.properties.coord_ref_sys_code;
@@ -97,32 +100,28 @@ export default function CRSMenu({
         }
       });
     }
-    return () => {ignore = true;}
-  }, [bboxGeoJSONShrink, country.englishName, region.name]);
+  }, [states.actions, bboxGeoJSONShrink]);
 
   // Update CRS from controlled values coming in
   useEffect(() => {
     let ignore = false;
-    if(CRS.code === undefined) return;
-    const c = `${CRS.authority}:${CRS.code}`;
-    if (c !== inputValue) {
-      setInputValue(c);
-      if (action === "load") {
-        updateCRS({ value: c, label: c }, "load", ignore);
+    if (states.actions.includes("updateCRSInput")) {
+      if (states.CRS.code === undefined) return;
+      const c = `${states.CRS.authority}:${states.CRS.code}`;
+      if (c !== inputValue) {
+        setInputValue(c);
+        updateCRS({ label: c, value: c }, ignore);
       }
     }
     return () => {
       ignore = true;
     };
-  }, [CRS, action]);
+  }, [states.actions]);
 
-  const updateCRS = (value, action = "", ignore = false) => {
-    if (action !== "load") {
-      setAction("CRSChange");
-    }
-    if(value && value?.value){
+  const updateCRS = (value, ignore = false) => {
+    if (value && value?.value) {
       let code = "";
-      code = value.value.split(":")[1]
+      code = value.value.split(":")[1];
       if (code && code.length > 3) {
         getCRSDef(value.value).then((def) => {
           if (!ignore) {
@@ -135,7 +134,7 @@ export default function CRSMenu({
                 unit: def.unit,
                 bbox: def.bbox,
               };
-              setCRS(c);
+              dispatch({ type: "changeCRSFromDropdown", CRS: c });
               updateValues("CRS", c);
               if (value && value.value == value.label) {
                 const fl = CRSList.filter((fl) => fl.value === value.value);
@@ -148,7 +147,7 @@ export default function CRSMenu({
                 setSelectedCRS(value);
               }
             } else {
-              setCRS(value.value);
+              dispatch({ type: "changeCRSFromInput", CRS: value.value });
               updateValues("CRS", {});
               setSelectedCRS("");
             }
@@ -164,11 +163,10 @@ export default function CRSMenu({
 
   const debouncedSearch = useCallback(
     debounce((value) => {
-      updateCRS({label: value, value: value});
+      updateCRS({ label: value, value: value });
     }, 1000),
     []
   );
-
 
   return (
     <div style={paperStyle(dialog)}>
@@ -199,7 +197,7 @@ export default function CRSMenu({
           },
         }}
         InputProps={{
-          readOnly: true
+          readOnly: true,
         }}
         renderInput={(params) => (
           <TextField
@@ -254,7 +252,7 @@ export default function CRSMenu({
           variant="outlined"
           size="small"
           sx={{ width: "100%" }}
-          onChange={(event)=>{
+          onChange={(event) => {
             setInputValue(event.target.value);
             debouncedSearch(event.target.value);
           }}
@@ -266,16 +264,8 @@ export default function CRSMenu({
           margin: "5px 0px 2px 5px",
         }}
       >
-        Units: {CRS && CRS?.unit?CRS.unit:"n/a"}
+        Units: {states.CRS && states.CRS?.unit ? states.CRS.unit : "n/a"}
       </div>
-      {false && (
-        <CustomButtonGreen
-          variant="contained"
-          onClick={(e) => updateCRS(e, bbox, CRS)}
-        >
-          Set CRS
-        </CustomButtonGreen>
-      )}
     </div>
   );
 }

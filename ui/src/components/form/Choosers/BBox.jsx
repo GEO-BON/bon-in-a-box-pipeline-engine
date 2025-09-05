@@ -4,45 +4,40 @@ import TextField from "@mui/material/TextField";
 import { paperStyle } from "./utils";
 import _ from "lodash";
 
-
-
-export default function BBox({
-  bbox,
-  CRS,
-  setBbox,
-  action,
-  setAction,
-  updateValues,
-}) {
+export default function BBox({ states, dispatch, updateValues }) {
   const [bbInput, setBboxInput] = useState(["", "", "", ""]);
 
   // BBox values coming in
   useEffect(() => {
-    console.log("BBox component updated with bbox:", bbox);
-    if (["ModifyBbox", "load", "", "CountryButton","CRSChange"].includes(action)) {
-      if (bbox.length > 0 && !_.isEqual(bbInput, bbox)  ) {
-        updateBBox(4, bbox);
+    if (
+      states.actions.includes("updateBbox") ||
+      states.actions.includes("redrawBbox")
+    ) {
+      let b = ["", "", "", ""];
+      if (states.bbox && states.bbox.length === 4) {
+        b = states.bbox;
+      }
+      if (!_.isEqual(bbInput, b)) {
+        updateBBox(4, b);
       }
     }
-  }, [bbox, action]);
+  }, [states.actions]);
 
- 
   const updateBBox = (index, value) => {
     setBboxInput((prev) => {
-      let newInput = value
-      if(index !== 4){
+      let newInput = value;
+      if (index !== 4) {
         newInput = [...prev];
         newInput[index] = value;
       }
-      setBbox(newInput);
+      dispatch({ type: "changeBbox", bbox: newInput });
       updateValues("bbox", newInput);
-      setAction("BBoxUpdated")
       return newInput;
     });
-  }
+  };
 
   const inputProps = {
-    step: CRS.unit && CRS.unit.includes("degree") ? 0.5 : 5000,
+    step: states.CRS.unit && states.CRS.unit.includes("degree") ? 0.5 : 5000,
   };
 
   return (

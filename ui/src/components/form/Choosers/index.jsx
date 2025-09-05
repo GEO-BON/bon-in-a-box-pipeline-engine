@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useReducer } from "react";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material";
 import Grid from "@mui/material/Grid";
@@ -17,14 +17,15 @@ import Alert from "@mui/material/Alert";
 import { defaultCRS, defaultCountry, defaultRegion } from "./utils";
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import Modal from "@mui/material/Modal";
+import { chooserReducer } from "./chooserReducer";
 
 export default function Choosers({
   inputFileContent = {},
   inputId,
   inputDescription = {
-    "description": "",
-    "label": "",
-    "type": ""
+    description: "",
+    label: "",
+    type: "",
   },
   updateInputFile = () => {},
   onChange = () => {},
@@ -40,7 +41,12 @@ export default function Choosers({
       {type === "bboxCRS" && (
         <tr>
           <td>
-        { (leftLabel && inputDescription.label) && (<><strong>{inputDescription.label}</strong>{": "}</>)  }
+            {leftLabel && inputDescription.label && (
+              <>
+                <strong>{inputDescription.label}</strong>
+                {": "}
+              </>
+            )}
             {inputFileContent[inputId] && (
               <pre>{yaml.dump(inputFileContent[inputId])}</pre>
             )}
@@ -105,18 +111,20 @@ export default function Choosers({
               }}
             />
           </td>
-          {descriptionCell && (<td className="descriptionCell">
-            {inputDescription.description ? (
-              <ReactMarkdown
-                className="reactMarkdown"
-                children={inputDescription.description}
-              />
-            ) : (
-              <Alert severity="warning">
-                Missing description for input "{inputId}"
-              </Alert>
-            )}
-          </td>)}
+          {descriptionCell && (
+            <td className="descriptionCell">
+              {inputDescription.description ? (
+                <ReactMarkdown
+                  className="reactMarkdown"
+                  children={inputDescription.description}
+                />
+              ) : (
+                <Alert severity="warning">
+                  Missing description for input "{inputId}"
+                </Alert>
+              )}
+            </td>
+          )}
         </tr>
       )}
     </>
@@ -132,14 +140,16 @@ export function Chooser({
   onChange,
   value,
 }) {
-  const [bbox, setBbox] = useState([]);
-  const [country, setCountry] = useState(defaultCountry);
-  const [region, setRegion] = useState(defaultRegion);
   const [clearFeatures, setClearFeatures] = useState(0);
   const [bboxGeoJSONShrink, setBboxGeoJSONShrink] = useState(null);
-  const [CRS, setCRS] = useState(defaultCRS);
-  const [action, setAction] = useState("load");
   const [digitize, setDigitize] = useState(false);
+  const [states, dispatch] = useReducer(chooserReducer, {
+    bbox: [],
+    CRS: defaultCRS,
+    country: defaultCountry,
+    region: defaultRegion,
+    actions: ["load"],
+  });
 
   const type = inputDescription.type;
   const showBBox = type === "bboxCRS" ? true : false;
@@ -154,23 +164,22 @@ export function Chooser({
     type
   );
   const showCRS = ["countryRegionCRS", "bboxCRS", "CRS"].includes(type);
-  const [oldValues, setOldValues] = useState({})
-
+  const [oldValues, setOldValues] = useState({});
 
   useEffect(() => {
     if (inputFileContent && inputFileContent[inputId]) {
       setOldValues(inputFileContent[inputId]);
     }
-  },[])
+  }, []);
   // Update values in the input file content
   const updateValues = (what, value) => {
-    if (action !== "load") {
+    if (states.actions.includes["load"]) {
       if (type === "bboxCRS") {
         let inp = {
-          bbox: bbox,
-          CRS: CRS,
-          country: country,
-          region: region,
+          bbox: states.bbox,
+          CRS: states.CRS,
+          country: states.country,
+          region: states.region,
         };
         inp[what] = value;
         updateInputFile(inputId, inp);
@@ -180,14 +189,18 @@ export function Chooser({
         type === "countryRegion" &&
         (what === "country" || what === "region")
       ) {
-        let inp = { country: country, region: region };
+        let inp = { country: states.country, region: states.region };
         inp[what] = value;
         updateInputFile(inputId, inp);
       } else if (
         type === "countryRegionCRS" &&
         (what === "country" || what === "region" || what === "CRS")
       ) {
-        let inp = { country: country, region: region, CRS: CRS };
+        let inp = {
+          country: states.country,
+          region: states.region,
+          CRS: states.CRS,
+        };
         inp[what] = value;
         updateInputFile(inputId, inp);
       } else if (type === "CRS" && what === "CRS") {
@@ -197,9 +210,9 @@ export function Chooser({
   };
 
   useEffect(() => {
-    if (bbox.length > 0 && !["CRSChange", "", "load"].includes(action)) {
+    if (states.bbox.length > 0 && states.actions.includes("updateBboxShrink")) {
       //Shrink bbox for projestion which wont provide a crs suggestion if even a small part of the bbox is outside the area of coverage of the CRS
-      const b = bbox.map((c) => parseFloat(c));
+      const b = states.bbox.map((c) => parseFloat(c));
       const scale_width = Math.abs((b[2] - b[0]) / 3);
       const scale_height = Math.abs((b[3] - b[1]) / 3);
       const bbox_shrink = [
@@ -210,27 +223,21 @@ export function Chooser({
       ];
       setBboxGeoJSONShrink(turf.bboxPolygon(bbox_shrink));
     }
-  }, [bbox]);
+  }, [states.actions]);
 
   // Set from controlled values coming in
   useEffect(() => {
     const input = inputFileContent[inputId];
-    if (input && action === "load") {
-      if ("bbox" in input) {
-        setBbox(input["bbox"]);
-      }
-      if ("CRS" in input) {
-        setCRS(input["CRS"]);
-      }
-      if ("country" in input) {
-        setCountry(input["country"]);
-      }
-      if ("region" in input) {
-        setRegion(input["region"]);
-      }
-      //setAction("loaded")
+    if (input && states.actions.includes("load")) {
+      dispatch({
+        type: "load",
+        bbox: "bbox" in input ? input["bbox"] : [],
+        CRS: "CRS" in input ? input["CRS"] : defaultCRS,
+        country: "country" in input ? input["country"] : defaultCountry,
+        region: "region" in input ? input["region"] : defaultRegion,
+      });
     }
-  }, [inputId, inputFileContent, action]);
+  }, [inputId, inputFileContent, states.actions]);
 
   return (
     <div
@@ -262,7 +269,6 @@ export function Chooser({
             <>
               <CustomButtonGreen
                 onClick={() => {
-                  setAction("Digitize");
                   setDigitize(true);
                 }}
               >
@@ -274,14 +280,9 @@ export function Chooser({
           {showCountry && (
             <CountryRegionMenu
               {...{
-                setBbox,
-                country,
-                setCountry,
-                region,
-                setRegion,
+                states,
+                dispatch,
                 setClearFeatures,
-                setAction,
-                action,
                 showRegion,
                 showAcceptButton: ["country", "countryRegion"].includes(type)
                   ? false
@@ -296,14 +297,9 @@ export function Chooser({
           {showCRS && (
             <CRSMenu
               {...{
-                CRS,
-                setCRS,
-                bbox,
+                states,
+                dispatch,
                 bboxGeoJSONShrink,
-                setAction,
-                action,
-                country,
-                region,
                 dialog: showMap,
                 updateValues,
               }}
@@ -312,11 +308,8 @@ export function Chooser({
           {showBBox && (
             <BBox
               {...{
-                action,
-                setAction,
-                bbox,
-                setBbox,
-                CRS,
+                states,
+                dispatch,
                 updateValues,
               }}
             />
@@ -333,7 +326,7 @@ export function Chooser({
               <CustomButtonGreen
                 onClick={() => {
                   setOpenModal(false);
-                  updateInputFile(inputId, oldValues)
+                  updateInputFile(inputId, oldValues);
                 }}
               >
                 Cancel
@@ -348,14 +341,9 @@ export function Chooser({
           >
             <MapOL
               {...{
-                bbox,
-                setBbox,
-                country,
-                region,
+                states,
+                dispatch,
                 clearFeatures,
-                CRS,
-                setAction,
-                action,
                 digitize,
                 setDigitize,
               }}

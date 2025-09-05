@@ -11,7 +11,7 @@ import Source from "ol/source/ImageTile.js";
 import Fill from "ol/style/Fill";
 import Stroke from "ol/style/Stroke";
 import Style from "ol/style/Style";
-import { get } from 'ol/proj';
+import { get } from "ol/proj";
 import { boundingExtent } from "ol/extent";
 import Feature from "ol/Feature";
 import { fromExtent as polygonFromExtent } from "ol/geom/Polygon";
@@ -21,18 +21,21 @@ import Extent from "ol/interaction/Extent";
 import Modify from "ol/interaction/Modify.js";
 import * as turf from "@turf/turf";
 import proj4 from "proj4";
-import { transformPolyToBboxCRS, cleanBbox, defaultCRS, defaultCountry, defaultRegion} from "./utils";
+import {
+  transformPolyToBboxCRS,
+  cleanBbox,
+  defaultCRS,
+  defaultCountry,
+  defaultRegion,
+} from "./utils";
 
 export default function MapOL({
-  bbox = [],
-  setBbox = () => {},
-  country = defaultCountry,
-  region = defaultRegion,
-  CRS = defaultCRS,
+  states,
+  dispatch,
   digitize,
   setDigitize,
   setAction = () => {},
-  action
+  action,
 }) {
   const mapRef = useRef(null);
   const mapContainer = useRef(null);
@@ -73,6 +76,7 @@ export default function MapOL({
   };
 
   const clearLayers = () => {
+    dispatch({ type: "changeBbox", bbox: [] });
     if (draw) {
       mapp.removeInteraction(draw);
       setDraw(null);
@@ -173,10 +177,12 @@ export default function MapOL({
         source.clear(); // Remove all existing features
       });
       drawInt.on("drawend", function (e) {
-        setAction("ModifyBbox");
         var shape = e.feature.getGeometryName();
         var extent = e.feature.getGeometry().getExtent();
-        setBbox(cleanBbox(extent, CRS.unit));
+        dispatch({
+          type: "drawBbox",
+          bbox: cleanBbox(extent, states.CRS.unit),
+        });
         e.feature.set("shape", shape);
         e.feature.setId(++featureId);
       });
@@ -223,8 +229,10 @@ export default function MapOL({
             return;
           }
           var extent = rectangleInteraction.getExtent();
-          setBbox(cleanBbox(extent, CRS.unit));
-          setAction("ModifyBbox");
+          dispatch({
+            type: "drawBbox",
+            bbox: cleanBbox(extent, states.CRS.unit),
+          });
           var poly = new Feature(polygonFromExtent(extent));
           b.getGeometry().setCoordinates(poly.getGeometry().getCoordinates());
           b.unset("coordinates");
@@ -247,107 +255,143 @@ export default function MapOL({
       };
       mapp.addInteraction(modify);
       setDraw(drawInt);
-    }/* else if (countr.length == 0 && mapp && !digitize) {
+    } /* else if (countr.length == 0 && mapp && !digitize) {
       clearLayers();
     }*/
   }, [mapp, features, digitize]);
 
   // The CRS gets updated. We need to reproject the map
   useEffect(() => {
-    const crsCode = `${CRS.authority}:${CRS.code}`
-    if (CRS && CRS?.code && mapp && get(crsCode)) {
-      const mapProjection = mapp.getView().getProjection().getCode();
-      if(CRS.def && mapProjection !== crsCode){
-        proj4.defs(crsCode, CRS.def);
-        register(proj4);
-        const newView = new View({
-          center: [0, 0],
-          zoom: 2,
-          projection: crsCode,
-        });
-        mapp.setView(newView);
+    if (states.actions.includes("changeMapCRS")) {
+      const crsCode = `${states.CRS.authority}:${states.CRS.code}`;
+      if (states.CRS && states.CRS?.code && mapp && get(crsCode)) {
+        const mapProjection = mapp.getView().getProjection().getCode();
+        if (states.CRS.def && mapProjection !== crsCode) {
+          proj4.defs(crsCode, states.CRS.def);
+          register(proj4);
+          const newView = new View({
+            center: [0, 0],
+            zoom: 2,
+            projection: crsCode,
+          });
+          mapp.setView(newView);
+        }
       }
     }
-  }, [CRS, mapp]);
+  }, [states.actions, mapp]);
 
   // The Country/Region Bounding box or CRS are updated, we need to update and reproject the bbox
+
   useEffect(() => {
-    if ((country.bboxLL.length > 0 || region.bboxLL.length > 0) && mapp && CRS.code && get(`${CRS.authority}:${CRS.code}`) && action !== "load") {
-      setDigitize(false);
-      const b = region.bboxLL.length > 0 ? region.bboxLL : country.bboxLL
-      setOldCRS(defaultCRS) 
-      setBbox(cleanBbox(b, "degree"));
-    } else if ((country.bboxLL.length == 0 && region.bboxLL.length == 0) && mapp) {
-      clearLayers();
+    if (states.actions.includes("updateBboxFromCountryRegion")) {
+      if (
+        (states.country.bboxLL.length > 0 || states.region.bboxLL.length > 0) &&
+        mapp &&
+        states.CRS.code &&
+        get(`${states.CRS.authority}:${states.CRS.code}`)
+      ) {
+        setDigitize(false);
+        const b =
+          states.region.bboxLL.length > 0
+            ? states.region.bboxLL
+            : states.country.bboxLL;
+        setOldCRS(defaultCRS);
+        dispatch({ bbox: cleanBbox(b, "degree"), type: "changeBbox" }); // Set update BBox in new CRS and re-run this block to set features
+      } else if (
+        states.country.bboxLL.length == 0 &&
+        states.region.bboxLL.length == 0 &&
+        mapp
+      ) {
+        clearLayers();
+      }
     }
-  }, [country.bboxLL, region.bboxLL, CRS]);
+  }, [states.actions]);
 
   //Reproject the BBox if necessary and set features
   useEffect(() => {
-    let ignore=false;
-    setDigitize(false);
-    if (bbox.length > 0 && CRS.code && get(`${CRS.authority}:${CRS.code}`) && !ignore) {
-      //Current map projection
-      const mapProjection = mapp.getView().getProjection().getCode();
-      const currentCRS = `${CRS.authority}:${CRS.code}`;
-      if (oldCRS && CRS && CRS.code === oldCRS.code) {
-        if (mapp && bbox && bbox.length > 0) {
-          setFeatures(new GeoJSON().readFeatures(turf.bboxPolygon(bbox)));
+    let ignore = false;
+    if (
+      states.actions.includes("changeBboxCRS") ||
+      states.actions.includes("updateBbox") ||
+      states.actions.includes("redrawBbox")
+    ) {
+      setDigitize(false);
+      if (
+        states.bbox.length > 0 &&
+        states.CRS.code &&
+        get(`${states.CRS.authority}:${states.CRS.code}`) &&
+        !ignore
+      ) {
+        //Current map projection
+        const mapProjection = mapp.getView().getProjection().getCode();
+        const currentCRS = `${states.CRS.authority}:${states.CRS.code}`;
+        if (oldCRS && states.CRS && states.CRS.code === oldCRS.code) {
+          if (mapp && states.bbox && states.bbox.length > 0) {
+            setFeatures(
+              new GeoJSON().readFeatures(turf.bboxPolygon(states.bbox))
+            );
+          }
+        } else if (
+          oldCRS &&
+          states.CRS &&
+          states.CRS.code !== oldCRS.code &&
+          currentCRS == mapProjection
+        ) {
+          //Just do this if the map projection has been set to the new CRS
+          let newpoly = turf.bboxPolygon(states.bbox);
+          if (CRS.code !== oldCRS.code) {
+            newpoly = transformPolyToBboxCRS(newpoly, oldCRS, states.CRS);
+          }
+          dispatch({ bbox: cleanBbox(newpoly, CRS.unit), type: "changeBbox" }); // Set update BBox in new CRS and re-run this block to set features
+          setOldCRS(states.CRS);
+        } else if (states.CRS) {
+          setOldCRS(states.CRS);
         }
-      } else if (
-        oldCRS &&
-        CRS &&
-        CRS.code !== oldCRS.code &&
-        currentCRS == mapProjection
-      ) { //Just do this if the map projection has been set to the new CRS
-        let newpoly = turf.bboxPolygon(bbox);
-        if (CRS.code !== oldCRS.code) {
-          newpoly = transformPolyToBboxCRS(newpoly, oldCRS, CRS);
-        }
-        setBbox(cleanBbox(newpoly, CRS.unit)); // Set update BBox in new CRS and re-run this block to set features
-        setOldCRS(CRS);
-      } else if (CRS) {
-        setOldCRS(CRS);
       }
     }
-    return (()=>ignore=true)
-  }, [bbox, CRS, oldCRS]);
+    return () => (ignore = true);
+  }, [states.actions, oldCRS]);
 
   useEffect(() => {
-    if(CRS.code && get(`${CRS.authority}:${CRS.code}`)){
-      const map = new Map({
-        target: "map",
-        layers: [
-          /*new TileLayer({
+    if (states.actions.includes("load")) {
+      if (
+        states.CRS.code &&
+        get(`${states.CRS.authority}:${states.CRS.code}`)
+      ) {
+        const map = new Map({
+          target: "map",
+          layers: [
+            /*new TileLayer({
             source: new OSM(),
             projection: `EPSG:3857`
           }),*/
-          /*new TileLayer({
+            /*new TileLayer({
               source: new OGCMapTile({
                 url: 'https://maps.gnosis.earth/ogcapi/collections/blueMarble/map/tiles/WebMercatorQuad',
                 projection: `EPSG:3857`
               }),
             }),*/
-          new Layer({
-            source: new Source({
-              attributions: ["Carto"],
-              url: "https://2.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+            new Layer({
+              source: new Source({
+                attributions: ["Carto"],
+                url: "https://2.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+              }),
+              projection: `EPSG:3857`,
             }),
-            projection: `EPSG:3857`,
+          ],
+          view: new View({
+            center: [0, 0],
+            zoom: 3,
+            projection: `${states.CRS.authority}:${states.CRS.code}`,
           }),
-        ],
-        view: new View({
-          center: [0, 0],
-          zoom: 3,
-          projection: `${CRS.authority}:${CRS.code}`,
-        }),
-      });
-      setMapp(map)
+        });
+        setMapp(map);
+      }
       return () => {
-        map.setTarget(null);
+        // mapp.setTarget(null);
       };
     }
-  }, [CRS]);
+  }, [states.actions]);
 
   return (
     <div

@@ -14,18 +14,11 @@ import {
 } from "./utils";
 
 export default function CountryRegionMenu({
-  setBbox = () => {},
-  country = defaultCountry,
-  setCountry = () => {},
-  region = defaultRegion,
-  setRegion = () => {},
-  action = "",
-  setAction = () => {},
-  showAcceptButton = true,
+  states,
+  dispatch,
   showRegion = true,
   dialog = false,
   updateValues = () => {},
-  onChange = () => {},
   value = null,
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
@@ -42,35 +35,38 @@ export default function CountryRegionMenu({
         .toLowerCase()
         .localeCompare(b.countryName.toLowerCase());
     });
-    countryOpts = countryOpts.map((country) => ({
-      label: country.countryName,
-      value: country.isoAlpha3,
+    countryOpts = countryOpts.map((countr) => ({
+      label: countr.countryName,
+      value: countr.isoAlpha3,
     }));
     setCountryOptions(countryOpts);
   }, []);
 
   // Set from controlled values coming in
   useEffect(() => {
-    if (["load"].includes(action)) {
+    if (states.actions.includes("updateCountryRegion")) {
       if (
-        country.ISO3 &&
-        country.ISO3 !== selectedCountry?.value &&
+        states.country.ISO3 &&
+        states.country.ISO3 !== selectedCountry?.value &&
         countryOptions.length > 1
       ) {
-        setSelectedCountry({ label: country.englishName, value: country.ISO3 });
+        setSelectedCountry({
+          label: states.country.englishName,
+          value: states.country.ISO3,
+        });
       }
       if (
-        region.regionName &&
-        region.regionName !== selectedRegion.value &&
+        states.region.regionName &&
+        states.region.regionName !== selectedRegion.value &&
         regionOptions.length > 1
       ) {
         setSelectedRegion({
-          label: region.regionName,
-          value: region.regionName,
+          label: states.region.regionName,
+          value: states.region.regionName,
         });
       }
     }
-  }, [region, country, countryOptions, regionOptions, action]);
+  }, [states.actions, countryOptions, regionOptions]);
 
   useEffect(() => {
     if (selectedCountry && selectedCountry.value) {
@@ -92,13 +88,11 @@ export default function CountryRegionMenu({
       });
     } else {
       setRegionOptions([]);
-      setBbox([]);
+      //dispatch({ bbox: [], actions: ["updateBbox"] });
     }
   }, [selectedCountry]);
 
-  const buttonClicked = (type, value) => {
-    setAction("CountryButton");
-    setBbox([]);
+  const selectionChanged = (type, value) => {
     let countryValue, regionValue;
     if (type === "both") {
       countryValue = selectedCountry.value;
@@ -113,6 +107,7 @@ export default function CountryRegionMenu({
     const countryObj = countryOptionsJSON.geonames.find(
       (c) => c.isoAlpha3 === countryValue
     );
+    let country = defaultCountry;
     if (countryValue) {
       let b = [
         countryObj.west,
@@ -121,15 +116,14 @@ export default function CountryRegionMenu({
         countryObj.north,
       ];
       b = b.map((c) => parseFloat(c.toFixed(6)));
-      let countr = {
+      country = {
         englishName: countryObj.countryName,
         ISO3: countryObj.isoAlpha3,
         code: countryObj.countryCode,
         bboxLL: b,
       };
-      setCountry(countr);
-      updateValues("country", countr);
     }
+    let region = defaultRegion;
     if (regionValue) {
       const regionObj = regionJSON.find((s) => s.geonameId === regionValue);
       let b = [
@@ -139,7 +133,7 @@ export default function CountryRegionMenu({
         regionObj.bbox.north,
       ];
       b = b.map((c) => parseFloat(c.toFixed(6)));
-      let reg = regionObj
+      region = regionObj
         ? {
             regionName: regionObj.name,
             ISO3166_2: regionObj.adminCodes1.ISO3166_2
@@ -149,15 +143,10 @@ export default function CountryRegionMenu({
             countryEnglishName: countryObj.countryName,
           }
         : defaultRegion;
-      setRegion(reg);
-      updateValues("region", reg);
     }
-    if (countryValue === "" && regionValue === "") {
-      setCountry(defaultCountry);
-      updateValues("country", defaultCountry);
-      setRegion(defaultRegion);
-      updateValues("region", defaultRegion);
-    }
+    dispatch({ type: "changeCountryRegion", country: country, region: region });
+    updateValues("country", country);
+    updateValues("region", region);
   };
 
   return (
@@ -183,14 +172,12 @@ export default function CountryRegionMenu({
         }}
         value={selectedCountry}
         renderInput={(params) => (
-          <TextField size="small "{...params} label="Select country" />
+          <TextField size="small " {...params} label="Select country" />
         )}
         onChange={(event, value) => {
-          onChange(event, { countryData: selectedCountry, regionData: selectedRegion });
-          setAction("ChangeCountry");
           setSelectedCountry(value);
           setSelectedRegion("");
-          buttonClicked("country", value.value);
+          selectionChanged("country", value?.value ? value.value : "");
         }}
       />
       {showRegion && (
@@ -213,11 +200,8 @@ export default function CountryRegionMenu({
             <TextField {...params} label="Select region" />
           )}
           onChange={(event, value) => {
-            onChange(event, { countryData: selectedCountry, regionData: selectedRegion });
-            setAction("ChangeRegion");
             setSelectedRegion(value);
-            buttonClicked("region", value.value);
-            updateValues();
+            selectionChanged("region", value?.value ? value.value : "");
           }}
           value={selectedRegion}
         />
