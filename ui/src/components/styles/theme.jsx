@@ -1,6 +1,5 @@
-import React from "react";
 import { createTheme } from "@mui/material/styles";
-import { Box, autocompleteClasses } from "@mui/material/";
+import { Box, autocompleteClasses } from "@mui/material";
 
 // A custom theme for this app
 const theme = {
