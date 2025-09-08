@@ -15,15 +15,18 @@ import java.io.File
 import kotlin.time.Duration.Companion.minutes
 
 
-class ScriptStep(
-    serverContext: ServerContext,
-    yamlFile: File,
-    stepId: StepId,
-    inputs: MutableMap<String, Pipe> = mutableMapOf()
-) :
-    YMLStep(serverContext, yamlFile, stepId, inputs) {
+class ScriptStep : YMLStep {
 
-    private val scriptFile = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
+    constructor(
+        serverContext: ServerContext,
+        yamlFile: File,
+        stepId: StepId,
+        inputs: MutableMap<String, Pipe> = mutableMapOf()
+    ) : super(serverContext, yamlFile, stepId, inputs) {
+        serverContext.hpc?.register(this)
+    }
+
+    private val scriptFile: File = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
 
     /**
      * Used for a lighter test syntax
@@ -111,6 +114,11 @@ class ScriptStep(
 
             return run.results
         } ?: throw RuntimeException("Context not defined.")
+    }
+
+    override fun cleanUp() {
+        super.cleanUp()
+        serverContext.hpc?.unregister(this)
     }
 
     companion object {

@@ -27,7 +27,7 @@ abstract class YMLStep(
     /**
      * Context becomes set in onInputsReceived(), once the invocation inputs are known.
      */
-    protected var context:RunContext? = null
+    var context:RunContext? = null
 
     val inputsDefinition = readInputs(yamlParsed, logger)
     override fun getDisplayBreadcrumbs(): String {
@@ -65,7 +65,7 @@ abstract class YMLStep(
                     else -> {
                         val description = readIODescription(INPUTS, inputKey)
                         val label = description?.get(IO__LABEL) as? String?
-                        var displayName = if (label != null) "\"$label\" ($inputKey)" else inputKey
+                        val displayName = if (label != null) "\"$label\" ($inputKey)" else inputKey
 
                         "Wrong type for input $displayName: expected \"$expectedType\" but \"${it.type}\" was received.\n"
                     }

@@ -22,3 +22,5 @@ outputs:
     description: bla bla
     type: int
     example: 4
+hpc:
+  memory: 1G

@@ -7,6 +7,13 @@ import org.geobon.hpc.HPCConnection
 import org.geobon.server.ServerContext
 
 val noHPCContext = ServerContext()
-val mockHPCContext = ServerContext(HPC(mockk<HPCConnection>().also {
-    every { it.ready }.answers { true }
-}))
+
+fun createMockHPCContext (): ServerContext {
+    return ServerContext(mockk<HPC>().also { hpc ->
+        val connection = mockk<HPCConnection>().also {
+            every { it.ready } returns true
+        }
+        every { hpc.connection } returns connection
+    })
+}
+

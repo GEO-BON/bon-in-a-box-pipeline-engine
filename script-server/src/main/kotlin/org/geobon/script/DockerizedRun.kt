@@ -208,22 +208,9 @@ class DockerizedRun ( // Constructor used in single script run
                 }
 
                 if (resultFile.exists()) {
-                    val type = object : TypeToken<Map<String, Any>>() {}.type
-                    val result = resultFile.readText()
-                    try {
-                        outputs = RunContext.gson.fromJson<Map<String, Any>>(result, type)
-                        logger.debug("Output: $result")
-                    } catch (e: Exception) {
-                        error = true
-                        log(
-                            logger::warn, """
-                        ${e.message}
-                        Error: Malformed JSON file.
-                        Make sure complex results are saved in a separate file (csv, geojson, etc.).
-                        Contents of output.json:
-                    """.trimIndent() + "\n$result"
-                        )
-                    }
+                    outputs = readOutputs()
+                    outputs ?: { error = true }
+
                 } else {
                     error = true
                     log(logger::warn, "Error: output.json file not found")
@@ -256,11 +243,6 @@ class DockerizedRun ( // Constructor used in single script run
 
         // Format log output
         return flagError(outputs ?: mapOf(), error)
-    }
-
-    private fun log(func: (String?) -> Unit, line: String) {
-        func(line) // realtime logging
-        logFile.appendText("$line\n") // record
     }
 
 }

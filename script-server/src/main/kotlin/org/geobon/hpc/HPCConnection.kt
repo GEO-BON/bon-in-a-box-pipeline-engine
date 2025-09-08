@@ -225,6 +225,10 @@ class HPCConnection(
         }
     }
 
+    fun sendJobs(tasksToSend: MutableList<String>) {
+        // TODO: Unimplemented
+    }
+
     companion object {
         private val logger: Logger = LoggerFactory.getLogger("HPCConnection")
     }

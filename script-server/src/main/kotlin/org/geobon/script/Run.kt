@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.hours
 
 abstract class Run(
     protected val scriptFile: File,
-    protected val context: RunContext
+    val context: RunContext
 ) {
 
     val resultFile get() = context.resultFile
@@ -151,6 +151,26 @@ abstract class Run(
         }
     }
 
+    protected fun readOutputs() : Map<String, Any>? {
+        val type = object : TypeToken<Map<String, Any>>() {}.type
+        val result = resultFile.readText()
+        try {
+            val outputs = RunContext.gson.fromJson<Map<String, Any>>(result, type)
+            logger.debug("Output: $result")
+            return outputs
+        } catch (e: Exception) {
+            log(
+                logger::warn, """
+                        ${e.message}
+                        Error: Malformed JSON file.
+                        Make sure complex results are saved in a separate file (csv, geojson, etc.).
+                        Contents of output.json:
+                    """.trimIndent() + "\n$result"
+            )
+        }
+        return null
+    }
+
     protected fun flagError(results: Map<String, Any>, error: Boolean): Map<String, Any> {
         if (error || results.isEmpty()) {
             if (!results.containsKey(ERROR_KEY)) {
@@ -171,6 +191,11 @@ abstract class Run(
             }
         }
         return results
+    }
+
+    protected fun log(func: (String?) -> Unit, line: String) {
+        func(line) // realtime logging
+        logFile.appendText("$line\n") // record
     }
 
     companion object {

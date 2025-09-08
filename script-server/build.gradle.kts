@@ -65,6 +65,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementation("org.yaml:snakeyaml:2.5")
 
+    // File watcher for HPC to detect when results are synced back
+    implementation("io.github.irgaly.kfswatch:kfswatch:1.3.1")
+
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
     testImplementation("io.mockk:mockk:1.14.5")
