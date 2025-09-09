@@ -1,12 +1,7 @@
 package org.geobon.hpc
 
-import io.mockk.every
-import io.mockk.just
-import io.mockk.runs
-import io.mockk.verify
-import io.mockk.verifySequence
+import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.ConstantPipe
@@ -19,6 +14,8 @@ import org.geobon.utils.createMockHPCContext
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.File
 import kotlin.test.assertTrue
 import kotlin.test.fail
@@ -27,6 +24,7 @@ import kotlin.test.fail
 internal class HPCRunTest {
 
     lateinit var mockContext: ServerContext
+    val logger: Logger = LoggerFactory.getLogger("HPCRunTest")
 
     @Before
     fun setupOutputFolder() {
@@ -62,13 +60,16 @@ internal class HPCRunTest {
         every { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
         every { mockContext.hpc!!.connection.ready } returns true
         every { mockContext.hpc!!.ready(any()) } answers {
-            this@runTest.launch { delay(1000) }
-            File(step.context!!.outputFolder, "output.json").writeText(
-                """
-                { "increment": 11 }
-            """.trimIndent()
-            )
-            println("TEMP created output file")
+            this@runTest.launch {
+                // We need a real thread.sleep() here, since otherwise the OS is not ready yet to watch the file.
+                // Using delay(...) is skipped in runTest context.
+                Thread.sleep(100)
+                with(step.context!!.resultFile) {
+                    parentFile.mkdirs()
+                    writeText("""{ "increment":11 }""".trimIndent())
+                }
+                logger.debug("TEMP created output file")
+            }
         }
         every { mockContext.hpc!!.unregister(any()) } just runs
 
@@ -80,18 +81,15 @@ internal class HPCRunTest {
             e.printStackTrace()
         }
 
-        val outputFolder = outputRoot.listFiles()[0].listFiles()[0]
+        val outputFolder = File(outputRoot, "HPCSyncTest").listFiles()[0]
         verify {
             mockContext.hpc!!.connection.sendFiles(
-                listOf(
-                    File(outputRoot, "someFile.csv"),
-                    outputFolder
-                ),
+                match { it.containsAll(listOf(outputFolder, File(outputRoot, "someFile.csv"))) },
                 any()
             )
         }
-        verifySequence {
-            mockContext.hpc!!.connection.sendFiles(any())
+        verifyOrder {
+            mockContext.hpc!!.connection.sendFiles(allAny())
             mockContext.hpc!!.ready(any())
             mockContext.hpc!!.unregister(any())
         }

@@ -23,6 +23,7 @@ application {
 repositories {
     mavenCentral()
     maven("https://s01.oss.sonatype.org/content/repositories/releases")
+    maven("https://jitpack.io")
 }
 
 tasks.test {
@@ -65,8 +66,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementation("org.yaml:snakeyaml:2.5")
 
-    // File watcher for HPC to detect when results are synced back
-    implementation("io.github.irgaly.kfswatch:kfswatch:1.3.1")
+    // https://github.com/vishna/watchservice-ktx?tab=readme-ov-file
+    implementation("com.github.vishna:watchservice-ktx:master-SNAPSHOT")
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")

@@ -1,19 +1,24 @@
 package org.geobon.hpc
 
-import com.google.gson.reflect.TypeToken
-import io.github.irgaly.kfswatch.KfsDirectoryWatcher
-import io.github.irgaly.kfswatch.KfsDirectoryWatcherEvent
-import kotlinx.coroutines.CoroutineScope
+import dev.vishna.watchservice.KWatchChannel
+import dev.vishna.watchservice.KWatchEvent
+import dev.vishna.watchservice.asWatchChannel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.RunContext
 import org.geobon.script.Run
 import java.io.File
-import kotlin.coroutines.coroutineContext
 
-class HPCRun(context: RunContext, scriptFile: File, inputs: Map<String, Pipe>, private val resolvedInputs: Map<String, Any?>)
-    : Run(scriptFile, context) {
+class HPCRun(
+    context: RunContext,
+    scriptFile: File,
+    inputs: Map<String, Pipe>,
+    private val resolvedInputs: Map<String, Any?>
+) : Run(scriptFile, context) {
 
     private val hpc = context.serverContext.hpc
         ?: throw RuntimeException("A valid HPC connection is necessary to run job on HPC for file ${scriptFile.absolutePath}")
@@ -22,8 +27,9 @@ class HPCRun(context: RunContext, scriptFile: File, inputs: Map<String, Pipe>, p
 
     private val fileInputs = inputs.filterValues { MIME_TYPE_REGEX.matches(it.type) }.keys
 
+
     override suspend fun runScript(): Map<String, Any> {
-        if(!hpcConnection.ready) {
+        if (!hpcConnection.ready) {
             throw RuntimeException("HPC connection is not ready to send jobs, aborting.")
         }
 
@@ -31,7 +37,7 @@ class HPCRun(context: RunContext, scriptFile: File, inputs: Map<String, Pipe>, p
         val filesToSend = mutableListOf(context.outputFolder)
         filesToSend.addAll(
             resolvedInputs.mapNotNull {
-                if(fileInputs.contains(it.key) && it.value is String)
+                if (fileInputs.contains(it.key) && it.value is String)
                     File(it.value as String)
                 else null
             }
@@ -39,31 +45,55 @@ class HPCRun(context: RunContext, scriptFile: File, inputs: Map<String, Pipe>, p
 
         hpcConnection.sendFiles(filesToSend, logFile)
 
-        // Install file watcher that will monitor result
-        coroutineScope {
-            val watcher = KfsDirectoryWatcher(this@coroutineScope)
-            watcher.add(context.outputFolder.absolutePath)
-            launch {
-                watcher.onEventFlow.collect { event: KfsDirectoryWatcherEvent ->
-                    logger.debug("TEMP Event received: $event")
-                    if(event.path.endsWith("/output.json")) {
-                        logger.debug("TEMP got ${event.event}")
-                        readOutputs()?.let {
-                            results = it // TODO: create or modify?
+        context.outputFolder.mkdirs()
+        val watchChannel = context.outputFolder.asWatchChannel()
+        watchChannel.autoCloseable().use {
+            coroutineScope {
+                val watchJob = launch {
+                    withContext(Dispatchers.IO) {
+                        logger.debug("TEMP setting up watchChannel")
+                        watchChannel.consumeEach { event ->
+                            // do something with event
+                            logger.debug("TEMP event $event")
+                            if (event.file == context.resultFile) {
+                                when (event.kind) {
+                                    KWatchEvent.Kind.Created -> {
+                                        logger.debug(
+                                            "TEMP file was created, contents: {}",
+                                            context.resultFile.readText()
+                                        )
+                                    }
+
+                                    KWatchEvent.Kind.Modified -> {
+                                        logger.debug("TEMP got result file update!")
+                                        readOutputs()?.let {
+                                            logger.debug("TEMP read $it")
+                                            results = it // TODO: create or modify?
+                                        }
+                                    }
+
+                                    else -> {}
+                                }
+
+                            }
                         }
+                        logger.debug("TEMP watchChannel exit")
                     }
+
                 }
-                logger.debug("TEMP onEventFlow set")
+                logger.debug("TEMP watcher job launched, ready to launch script")
+
+                // Signal job is ready to be sent
+                hpc.ready(this@HPCRun)
+
+                waitForResults()
+
+                // Cancel watch job to break free of coroutine scope and auto-close watcher
+                watchJob.cancel()
             }
-            logger.debug("TEMP watcher job launched, ready to launch script")
-
-            // Signal job is ready to be sent
-            hpc.ready(this@HPCRun)
-
-            waitForResults()
-            logger.debug("TEMP results=$results")
         }
-        logger.debug("TEMP scope closed")
+
+        logger.debug("TEMP scope closed results=$results")
 
         return flagError(results, false)
     }
@@ -75,4 +105,12 @@ class HPCRun(context: RunContext, scriptFile: File, inputs: Map<String, Pipe>, p
     companion object {
         private val MIME_TYPE_REGEX = Regex("""\w+/[-+.\w]+""")
     }
+
+    fun KWatchChannel.autoCloseable(): AutoCloseable {
+        return AutoCloseable {
+            logger.debug("TEMP Closing!!")
+            this.close()
+        }
+    }
 }
+
