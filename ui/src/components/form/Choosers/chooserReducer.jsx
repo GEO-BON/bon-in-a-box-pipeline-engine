@@ -7,7 +7,12 @@ export function chooserReducer(states, action) {
         bbox: action.bbox,
         country: action.country,
         region: action.region,
-        actions: ["updateBbox", "updateCRS", "updateCountry", "updateRegion"],
+        actions: [
+          "updateBbox",
+          "updateCRS",
+          "updateCRSInput",
+          "updateCountryRegion",
+        ],
       };
     case "changeCountryRegion":
       return {

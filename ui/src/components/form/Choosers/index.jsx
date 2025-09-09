@@ -27,7 +27,7 @@ export default function Choosers({
     label: "",
     type: "",
   },
-  updateInputFile = () => {},
+  updateInputFile,
   onChange = () => {},
   descriptionCell = true,
   leftLabel = true,
@@ -173,30 +173,39 @@ export function Chooser({
   }, []);
   // Update values in the input file content
   const updateValues = (what, value) => {
-    if (states.actions.includes["load"]) {
+    if (!states.actions.includes["load"]) {
+      let inp;
       if (type === "bboxCRS") {
-        let inp = {
+        inp = {
           bbox: states.bbox,
           CRS: states.CRS,
           country: states.country,
           region: states.region,
         };
-        inp[what] = value;
+        if (what === "countryRegion") {
+          inp["country"] = value.country;
+          inp["region"] = value.region;
+        } else {
+          inp[what] = value;
+        }
         updateInputFile(inputId, inp);
       } else if (type === "country" && what === "country") {
-        updateInputFile(inputId, { country: value });
+        inp = {
+          country: value,
+        };
+        updateInputFile(inputId, inp);
       } else if (
         type === "countryRegion" &&
         (what === "country" || what === "region")
       ) {
-        let inp = { country: states.country, region: states.region };
+        inp = { country: states.country, region: states.region };
         inp[what] = value;
         updateInputFile(inputId, inp);
       } else if (
         type === "countryRegionCRS" &&
         (what === "country" || what === "region" || what === "CRS")
       ) {
-        let inp = {
+        inp = {
           country: states.country,
           region: states.region,
           CRS: states.CRS,
@@ -204,7 +213,8 @@ export function Chooser({
         inp[what] = value;
         updateInputFile(inputId, inp);
       } else if (type === "CRS" && what === "CRS") {
-        updateInputFile(inputId, { CRS: value });
+        inp = { CRS: value };
+        updateInputFile(inputId, inp);
       }
     }
   };

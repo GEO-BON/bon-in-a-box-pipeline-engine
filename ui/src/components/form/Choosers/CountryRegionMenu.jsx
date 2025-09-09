@@ -24,8 +24,12 @@ export default function CountryRegionMenu({
   const [countryOptions, setCountryOptions] = useState([]);
   const [regionOptions, setRegionOptions] = useState([]);
   const [regionJSON, setRegionJSON] = useState([]);
-  const [selectedRegion, setSelectedRegion] = useState(value?.regionData);
-  const [selectedCountry, setSelectedCountry] = useState(value?.countryData);
+  const [selectedRegion, setSelectedRegion] = useState(
+    value?.regionData || null
+  );
+  const [selectedCountry, setSelectedCountry] = useState(
+    value?.countryData || null
+  );
 
   useEffect(() => {
     // Fetch country options from the JSON file
@@ -47,19 +51,14 @@ export default function CountryRegionMenu({
     if (states.actions.includes("updateCountryRegion")) {
       if (
         states.country.ISO3 &&
-        states.country.ISO3 !== selectedCountry?.value &&
-        countryOptions.length > 1
+        states.country.ISO3 !== selectedCountry?.value
       ) {
         setSelectedCountry({
           label: states.country.englishName,
           value: states.country.ISO3,
         });
       }
-      if (
-        states.region.regionName &&
-        states.region.regionName !== selectedRegion.value &&
-        regionOptions.length > 1
-      ) {
+      if (states.region.regionName) {
         setSelectedRegion({
           label: states.region.regionName,
           value: states.region.regionName,
@@ -96,7 +95,7 @@ export default function CountryRegionMenu({
     let countryValue, regionValue;
     if (type === "both") {
       countryValue = selectedCountry.value;
-      regionValue = selectedRegion.value;
+      regionValue = selectedRegion?.value;
     } else if (type === "region") {
       countryValue = selectedCountry.value;
       regionValue = value;
@@ -145,8 +144,7 @@ export default function CountryRegionMenu({
         : defaultRegion;
     }
     dispatch({ type: "changeCountryRegion", country: country, region: region });
-    updateValues("country", country);
-    updateValues("region", region);
+    updateValues("countryRegion", { country: country, region: region });
   };
 
   return (
@@ -176,8 +174,8 @@ export default function CountryRegionMenu({
         )}
         onChange={(event, value) => {
           setSelectedCountry(value);
-          setSelectedRegion("");
-          selectionChanged("country", value?.value ? value.value : "");
+          setSelectedRegion(null);
+          selectionChanged("country", value?.value ? value.value : null);
         }}
       />
       {showRegion && (
@@ -201,7 +199,7 @@ export default function CountryRegionMenu({
           )}
           onChange={(event, value) => {
             setSelectedRegion(value);
-            selectionChanged("region", value?.value ? value.value : "");
+            selectionChanged("region", value?.value ? value.value : null);
           }}
           value={selectedRegion}
         />

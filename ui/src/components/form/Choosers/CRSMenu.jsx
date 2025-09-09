@@ -17,6 +17,7 @@ import {
   transformBboxAPI,
   getCRSDef,
   defaultCRS,
+  defaultCRSList,
   getCRSListFromName,
   paperStyle,
 } from "./utils";
@@ -28,13 +29,8 @@ export default function CRSMenu({
   dialog = false,
   updateValues = () => {},
 }) {
-  const [CRSList, setCRSList] = useState([]);
-  const [selectedCRS, setSelectedCRS] = useState({
-    label: states.CRS.name
-      ? states.CRS.name
-      : `${states.CRS.authority}:${states.CRS.code}`,
-    value: `${states.CRS.authority}:${states.CRS.code}`,
-  });
+  const [CRSList, setCRSList] = useState(defaultCRSList);
+  const [selectedCRS, setSelectedCRS] = useState(defaultCRS[0]);
   const [inputValue, setInputValue] = useState("");
   const [searching, setSearching] = useState(false);
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
@@ -61,7 +57,7 @@ export default function CRSMenu({
             });
             setCRSList(suggestions);
           } else {
-            setCRSList([defaultCRS]);
+            setCRSList(defaultCRSList);
           }
           setSearching(false);
           //}
@@ -149,14 +145,14 @@ export default function CRSMenu({
             } else {
               dispatch({ type: "changeCRSFromInput", CRS: value.value });
               updateValues("CRS", {});
-              setSelectedCRS("");
+              setSelectedCRS(null);
             }
           }
         });
       }
     } else {
       setCRS(defaultCRS);
-      setSelectedCRS({ label: "", value: "" });
+      setSelectedCRS(null);
       updateValues("CRS", defaultCRS);
     }
   };

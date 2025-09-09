@@ -43,6 +43,7 @@ export default function MapOL({
   const [draw, setDraw] = useState(null);
   const [features, setFeatures] = useState([]);
   const [oldCRS, setOldCRS] = useState(null);
+  const [message, setMessage] = useState("");
   var featureId = 0;
 
   const styles = {
@@ -76,7 +77,7 @@ export default function MapOL({
   };
 
   const clearLayers = () => {
-    dispatch({ type: "changeBbox", bbox: [] });
+    //dispatch({ type: "changeBbox", bbox: [] });
     if (draw) {
       mapp.removeInteraction(draw);
       setDraw(null);
@@ -264,11 +265,17 @@ export default function MapOL({
   useEffect(() => {
     if (states.actions.includes("changeMapCRS")) {
       const crsCode = `${states.CRS.authority}:${states.CRS.code}`;
-      if (states.CRS && states.CRS?.code && mapp && get(crsCode)) {
-        const mapProjection = mapp.getView().getProjection().getCode();
-        if (states.CRS.def && mapProjection !== crsCode) {
-          proj4.defs(crsCode, states.CRS.def);
-          register(proj4);
+      const mapProjection = mapp.getView().getProjection().getCode();
+      if (states.CRS.def && mapProjection !== crsCode) {
+        proj4.defs(crsCode, states.CRS.def);
+        register(proj4);
+        if (!get(crsCode)) {
+          setMessage(
+            "This CRS cannot be show on the map. The bounding box can still be entered manually."
+          );
+          return;
+        } else {
+          setMessage("");
           const newView = new View({
             center: [0, 0],
             zoom: 2,
@@ -316,12 +323,20 @@ export default function MapOL({
       states.actions.includes("redrawBbox")
     ) {
       setDigitize(false);
-      if (
-        states.bbox.length > 0 &&
-        states.CRS.code &&
-        get(`${states.CRS.authority}:${states.CRS.code}`) &&
-        !ignore
-      ) {
+      // openLayers does not recognize this CRS, but try with mapTiler anyways
+      if (!get(`${states.CRS.authority}:${states.CRS.code}`)) {
+        let newpoly = turf.bboxPolygon(states.bbox);
+        if (states.CRS.code !== oldCRS.code) {
+          newpoly = transformPolyToBboxCRS(newpoly, oldCRS, states.CRS);
+          dispatch({
+            bbox: cleanBbox(newpoly, states.CRS.unit),
+            type: "changeBbox",
+          });
+          setOldCRS(states.CRS);
+        }
+        return;
+      }
+      if (states.bbox.length > 0 && states.CRS.code && !ignore) {
         //Current map projection
         const mapProjection = mapp.getView().getProjection().getCode();
         const currentCRS = `${states.CRS.authority}:${states.CRS.code}`;
@@ -339,10 +354,13 @@ export default function MapOL({
         ) {
           //Just do this if the map projection has been set to the new CRS
           let newpoly = turf.bboxPolygon(states.bbox);
-          if (CRS.code !== oldCRS.code) {
+          if (states.CRS.code !== oldCRS.code) {
             newpoly = transformPolyToBboxCRS(newpoly, oldCRS, states.CRS);
           }
-          dispatch({ bbox: cleanBbox(newpoly, CRS.unit), type: "changeBbox" }); // Set update BBox in new CRS and re-run this block to set features
+          dispatch({
+            bbox: cleanBbox(newpoly, states.CRS.unit),
+            type: "changeBbox",
+          }); // Set update BBox in new CRS and re-run this block to set features
           setOldCRS(states.CRS);
         } else if (states.CRS) {
           setOldCRS(states.CRS);
@@ -394,16 +412,41 @@ export default function MapOL({
   }, [states.actions]);
 
   return (
-    <div
-      id="map"
-      ref={mapContainer}
-      className="map"
-      style={{
-        width: "100%",
-        height: "100%",
-        zIndex: "88",
-        border: "0px",
-      }}
-    ></div>
+    <div style={{ width: "100%", height: "100%", position: "relative" }}>
+      <div
+        id="map"
+        ref={mapContainer}
+        className="map"
+        style={{
+          width: "100%",
+          height: "100%",
+          zIndex: "88",
+          border: "0px",
+          position: "absolute",
+          top: "0px",
+          left: "0px",
+        }}
+      ></div>
+      {message !== "" && (
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            position: "absolute",
+            zIndex: "89",
+            top: "0px",
+            left: "0px",
+            paddingTop: "30%",
+            paddingLeft: "30%",
+            backgroundColor: "#000000cc",
+            color: "white",
+            fontSize: "14px",
+            fontWeight: "bold",
+          }}
+        >
+          {message}
+        </div>
+      )}
+    </div>
   );
 }

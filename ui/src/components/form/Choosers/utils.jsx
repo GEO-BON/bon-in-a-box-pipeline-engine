@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { polygon, bbox } from "@turf/turf";
 import proj4 from "proj4";
 
-const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=")
+const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
 let defs = [
   [
     "EPSG:4326",
@@ -38,13 +38,33 @@ export const defaultCRS = {
   unit: "degree",
 };
 
+export const defaultCRSList = [
+  {
+    label: "WGS 84 / Latitude-Longitude",
+    value: "EPSG:4326",
+  },
+  {
+    label: "WGS 84 / Pseudo-Mercator",
+    value: "EPSG:3857",
+  },
+  {
+    label: "WGS 84 / Equal Earth",
+    value: "EPSG:8857",
+  },
+];
+
 export const defaultCountry = {
   englishName: "",
   ISO3: "",
   code: "",
   bboxLL: [],
 };
-export const defaultRegion = { name: "", ISO3166_2: "", bboxLL: [], countryEnglishName: "" };
+export const defaultRegion = {
+  name: "",
+  ISO3166_2: "",
+  bboxLL: [],
+  countryEnglishName: "",
+};
 
 export const paperStyle = (dialog) => {
   if (dialog) {
@@ -164,7 +184,7 @@ export const getCRSDef = async (epsg_number) => {
 
 export const getCRSListFromName = async (name) => {
   let result;
-  const base_url = `https://api.maptiler.com/coordinates/search/${name} deprecated:0.json`;
+  const base_url = `https://api.maptiler.com/coordinates/search/${name} kind:CRS-PROJCRS kind:CRS-GEOCRS deprecated:0.json`;
   try {
     result = await axios({
       method: "get",
@@ -201,7 +221,12 @@ export const getCRSListFromName = async (name) => {
 
 export const transformCoordCRS = (poly, source_crs_epsg, dest_crs_epsg) => {
   const coo = poly.geometry.coordinates[0].map((c) => {
-    const cc = proj4(source_crs_epsg, dest_crs_epsg).forward(c, true);
+    let cc = [0, 0];
+    try {
+      cc = proj4(source_crs_epsg, dest_crs_epsg).forward(c, true);
+    } catch (error) {
+      return [];
+    }
     return [parseFloat(cc[0].toFixed(6)), parseFloat(cc[1].toFixed(6))];
   });
   poly.geometry.coordinates[0] = coo;
@@ -246,7 +271,7 @@ export const validTerraPolygon = (feature) => {
 };
 
 export const cleanBbox = (bbox, units) => {
-  const dec = units.includes("degree") ? 5 : 0;
+  const dec = units?.includes("degree") ? 5 : 0;
   return bbox.map((b) => parseFloat(parseFloat(b).toFixed(dec)));
 };
 

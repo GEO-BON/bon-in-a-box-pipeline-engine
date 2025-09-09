@@ -31,7 +31,7 @@ export default function BBox({ states, dispatch, updateValues }) {
         newInput[index] = value;
       }
       dispatch({ type: "changeBbox", bbox: newInput });
-      updateValues("bbox", newInput);
+      updateValues("bboxCRS", newInput);
       return newInput;
     });
   };
