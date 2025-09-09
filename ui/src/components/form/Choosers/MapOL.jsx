@@ -271,7 +271,7 @@ export default function MapOL({
         register(proj4);
         if (!get(crsCode)) {
           setMessage(
-            "This CRS cannot be show on the map. The bounding box can still be entered manually."
+            "This CRS cannot be shown on the map. The bounding box can still be entered manually."
           );
           return;
         } else {
@@ -287,6 +287,12 @@ export default function MapOL({
     }
   }, [states.actions, mapp]);
 
+
+  useEffect(() =>{
+    if(states.actions.includes("clearLayers")){
+      clearLayers();
+    }
+  },[states.actions])
   // The Country/Region Bounding box or CRS are updated, we need to update and reproject the bbox
 
   useEffect(() => {
@@ -336,12 +342,12 @@ export default function MapOL({
         }
         return;
       }
-      if (states.bbox.length > 0 && states.CRS.code && !ignore) {
+      if (states.bbox.length > 0 && !states.bbox.includes("") && states.CRS.code && !ignore) {
         //Current map projection
         const mapProjection = mapp.getView().getProjection().getCode();
         const currentCRS = `${states.CRS.authority}:${states.CRS.code}`;
         if (oldCRS && states.CRS && states.CRS.code === oldCRS.code) {
-          if (mapp && states.bbox && states.bbox.length > 0) {
+          if (mapp && states.bbox) {
             setFeatures(
               new GeoJSON().readFeatures(turf.bboxPolygon(states.bbox))
             );

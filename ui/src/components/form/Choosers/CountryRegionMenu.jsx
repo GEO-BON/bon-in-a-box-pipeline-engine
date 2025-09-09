@@ -12,13 +12,14 @@ import {
   defaultRegion,
   paperStyle,
 } from "./utils";
+import { set } from "lodash";
 
 export default function CountryRegionMenu({
   states,
   dispatch,
   showRegion = true,
   dialog = false,
-  updateValues = () => {},
+  //updateValues = () => {},
   value = null,
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
@@ -48,7 +49,7 @@ export default function CountryRegionMenu({
 
   // Set from controlled values coming in
   useEffect(() => {
-    if (states.actions.includes("updateCountryRegion")) {
+    if (states.actions.includes("updateCountryRegion") && countryOptions.length > 0) {
       if (
         states.country.ISO3 &&
         states.country.ISO3 !== selectedCountry?.value
@@ -57,12 +58,16 @@ export default function CountryRegionMenu({
           label: states.country.englishName,
           value: states.country.ISO3,
         });
+      }else{
+        setSelectedCountry(null);
       }
       if (states.region.regionName) {
         setSelectedRegion({
           label: states.region.regionName,
           value: states.region.regionName,
         });
+      }else{
+        setSelectedRegion(null);
       }
     }
   }, [states.actions, countryOptions, regionOptions]);
@@ -144,7 +149,7 @@ export default function CountryRegionMenu({
         : defaultRegion;
     }
     dispatch({ type: "changeCountryRegion", country: country, region: region });
-    updateValues("countryRegion", { country: country, region: region });
+    //updateValues({ country: country, region: region }, states);
   };
 
   return (

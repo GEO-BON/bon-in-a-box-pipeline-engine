@@ -292,7 +292,7 @@ export const densifyPolygon = (poly, minDistDeg) => {
     const segLen = Math.sqrt(dx * dx + dy * dy);
 
     if (segLen > 0) {
-      const steps = Math.floor(segLen / minDistDeg);
+      const steps = Math.min(Math.floor(segLen / minDistDeg),100);
       for (let j = 1; j < steps; j++) {
         const frac = (j * minDistDeg) / segLen;
         const x = start[0] + frac * dx;

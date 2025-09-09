@@ -1,17 +1,21 @@
+import { defaultCRS, defaultCountry, defaultRegion } from "./utils";
+
 export function chooserReducer(states, action) {
   switch (action.type) {
     case "load":
       return {
         ...states,
-        crs: action.CRS,
+        CRS: action.CRS,
         bbox: action.bbox,
         country: action.country,
         region: action.region,
         actions: [
           "updateBbox",
           "updateCRS",
+          "updateCRSListFromNames",
           "updateCRSInput",
           "updateCountryRegion",
+          "saveInputs"
         ],
       };
     case "changeCountryRegion":
@@ -23,31 +27,47 @@ export function chooserReducer(states, action) {
           "updateCRSListFromNames",
           "updateBbox",
           "updateBboxFromCountryRegion",
+          "saveInputs"
         ],
       };
-    case "changeCRSFromDropdown":
+    case "changeCRS":
       return {
         ...states,
         CRS: action.CRS,
-        actions: ["changeMapCRS", "updateCRSInput", "changeBboxCRS"],
+        actions: ["changeMapCRS", "changeBboxCRS","saveInputs"],
       };
     case "changeCRSFromInput":
       return {
         ...states,
         CRS: action.CRS,
-        actions: ["updateCRSDropdown", "changeMapCRS", "changeBboxCRS"],
+        actions: ["updateCRSDropdown", "changeMapCRS", "changeBboxCRS","saveInputs"],
       };
     case "drawBbox":
       return {
         ...states,
         bbox: action.bbox,
-        actions: ["updateBbox"],
+        actions: ["updateBbox", "saveInputs"],
       };
     case "changeBbox":
       return {
         ...states,
         bbox: action.bbox,
-        actions: ["redrawBbox"],
+        actions: ["redrawBbox", "saveInputs"],
+      };
+    case "clear":
+      return {
+        bbox: ["", "", "", ""],
+        CRS: defaultCRS,
+        country: defaultCountry,
+        region: defaultRegion,
+        actions: [
+          "updateBbox",
+          "updateCRS",
+          "updateCRSInput",
+          "updateCountryRegion",
+          "clearLayers",
+          "saveInputs"
+        ],
       };
     default:
       return states;

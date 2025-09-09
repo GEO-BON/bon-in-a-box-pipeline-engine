@@ -28,9 +28,10 @@ export default function CRSMenu({
   bboxGeoJSONShrink,
   dialog = false,
   updateValues = () => {},
+  showBBox
 }) {
   const [CRSList, setCRSList] = useState(defaultCRSList);
-  const [selectedCRS, setSelectedCRS] = useState(defaultCRS[0]);
+  const [selectedCRS, setSelectedCRS] = useState(defaultCRSList[0]);
   const [inputValue, setInputValue] = useState("");
   const [searching, setSearching] = useState(false);
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
@@ -46,20 +47,20 @@ export default function CRSMenu({
           ? states.region.name
           : states.country.englishName;
         getCRSListFromName(searchName).then((result) => {
-          //if (!ignore) {
-          if (result) {
-            const suggestions = result.map((proj) => {
-              const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
-              return {
-                label: `${proj.name} (${p})`,
-                value: `${p}`,
-              };
-            });
-            setCRSList(suggestions);
-          } else {
-            setCRSList(defaultCRSList);
-          }
-          setSearching(false);
+         // if (!ignore) {
+            if (result) {
+              const suggestions = result.map((proj) => {
+                const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
+                return {
+                  label: `${proj.name} (${p})`,
+                  value: `${p}`,
+                };
+              });
+              setCRSList(defaultCRSList.concat(suggestions));
+            } else {
+              setCRSList(defaultCRSList);
+            }
+            setSearching(false);
           //}
         });
       }
@@ -88,7 +89,7 @@ export default function CRSMenu({
                 ")",
               value: `EPSG:${parseInt(proj.properties.coord_ref_sys_code)}`,
             }));
-            setCRSList(suggestions);
+            setCRSList(defaultCRSList.concat(suggestions));
           } else {
             setCRSList([]);
           }
@@ -106,7 +107,7 @@ export default function CRSMenu({
       const c = `${states.CRS.authority}:${states.CRS.code}`;
       if (c !== inputValue) {
         setInputValue(c);
-        updateCRS({ label: c, value: c }, ignore);
+        updateCRS({ label: c, value: c }, 'input', ignore);
       }
     }
     return () => {
@@ -114,7 +115,7 @@ export default function CRSMenu({
     };
   }, [states.actions]);
 
-  const updateCRS = (value, ignore = false) => {
+  const updateCRS = (value, from='dropdown', ignore = false) => {
     if (value && value?.value) {
       let code = "";
       code = value.value.split(":")[1];
@@ -130,21 +131,24 @@ export default function CRSMenu({
                 unit: def.unit,
                 bbox: def.bbox,
               };
-              dispatch({ type: "changeCRSFromDropdown", CRS: c });
-              updateValues("CRS", c);
-              if (value && value.value == value.label) {
-                const fl = CRSList.filter((fl) => fl.value === value.value);
-                if (fl.length > 0) {
-                  setSelectedCRS(fl[0]);
+              dispatch({ type: "changeCRS", CRS: c });
+              /*if(from==='dropdown'){
+                if (value && value.value == value.label) {
+                  const fl = CRSList.filter((fl) => fl.value === value.value);
+                  if (fl.length > 0) {
+                    setSelectedCRS(fl[0]);
+                  } else {
+                    setSelectedCRS({ value: value.label, label: def.name });
+                  }
                 } else {
-                  setSelectedCRS({ value: value.label, label: def.name });
+                  setSelectedCRS(value);
                 }
-              } else {
-                setSelectedCRS(value);
-              }
+              }else if(from==='input'){
+                let cr = { label: c.CRS.name + ` (${c.CRS.authority}:${c.CRS.code})`, value: `${c.CRS.authority}:${c.CRS.code}` }
+                setSelectedCRS(cr);
+              }*/
             } else {
-              dispatch({ type: "changeCRSFromInput", CRS: value.value });
-              updateValues("CRS", {});
+              dispatch({ type: "changeCRSFromInput", CRS: {name: value.value, authority: code[0], code: code[1]} });
               setSelectedCRS(null);
             }
           }
@@ -153,9 +157,25 @@ export default function CRSMenu({
     } else {
       setCRS(defaultCRS);
       setSelectedCRS(null);
-      updateValues("CRS", defaultCRS);
     }
   };
+
+  useEffect(() => {
+    if(states.actions.includes("updateCRSDropdown")){
+      updateCRS({ label: `${states.CRS.authority}:${states.CRS.code}`, value: `${states.CRS.authority}:${states.CRS.code}` },'input');
+    }
+  },[states.actions])
+
+  useEffect(() => {
+    let code = `${states.CRS.authority}:${states.CRS.code}`
+    const fl = CRSList.filter((fl) => fl.value === code);
+    if (fl.length > 0) {
+      setSelectedCRS(fl[0]);
+    } else {
+      setSelectedCRS({ value: code, label: code });
+    }
+    setInputValue(code)
+  },[CRSList, states.CRS.code])
 
   const debouncedSearch = useCallback(
     debounce((value) => {

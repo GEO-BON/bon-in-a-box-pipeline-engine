@@ -4,7 +4,7 @@ import TextField from "@mui/material/TextField";
 import { paperStyle } from "./utils";
 import _ from "lodash";
 
-export default function BBox({ states, dispatch, updateValues }) {
+export default function BBox({ states, dispatch }) {
   const [bbInput, setBboxInput] = useState(["", "", "", ""]);
 
   // BBox values coming in
@@ -31,7 +31,7 @@ export default function BBox({ states, dispatch, updateValues }) {
         newInput[index] = value;
       }
       dispatch({ type: "changeBbox", bbox: newInput });
-      updateValues("bboxCRS", newInput);
+      //updateValues({ bbox: newInput, CRS: states.CRS}, states);
       return newInput;
     });
   };

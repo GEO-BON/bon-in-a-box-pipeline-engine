@@ -171,10 +171,11 @@ export function Chooser({
       setOldValues(inputFileContent[inputId]);
     }
   }, []);
+
   // Update values in the input file content
-  const updateValues = (what, value) => {
-    if (!states.actions.includes["load"]) {
-      let inp;
+  useEffect(() => {    
+    if (states.actions.includes("saveInputs")) {
+      let inp={};
       if (type === "bboxCRS") {
         inp = {
           bbox: states.bbox,
@@ -182,42 +183,29 @@ export function Chooser({
           country: states.country,
           region: states.region,
         };
-        if (what === "countryRegion") {
-          inp["country"] = value.country;
-          inp["region"] = value.region;
-        } else {
-          inp[what] = value;
-        }
-        updateInputFile(inputId, inp);
-      } else if (type === "country" && what === "country") {
+      } else if (type === "country") {
         inp = {
-          country: value,
+          country: states.country,
         };
-        updateInputFile(inputId, inp);
-      } else if (
-        type === "countryRegion" &&
-        (what === "country" || what === "region")
-      ) {
+      } else if ( type === "countryRegion" ) {
         inp = { country: states.country, region: states.region };
-        inp[what] = value;
-        updateInputFile(inputId, inp);
       } else if (
-        type === "countryRegionCRS" &&
-        (what === "country" || what === "region" || what === "CRS")
+        type === "countryRegionCRS" 
       ) {
         inp = {
           country: states.country,
           region: states.region,
           CRS: states.CRS,
         };
-        inp[what] = value;
-        updateInputFile(inputId, inp);
-      } else if (type === "CRS" && what === "CRS") {
-        inp = { CRS: value };
+      } else if (type === "CRS") {
+        inp = { CRS: states.CRS };
+      }
+      if(inp){
         updateInputFile(inputId, inp);
       }
     }
-  };
+},[states.actions]);
+    
 
   useEffect(() => {
     if (states.bbox.length > 0 && states.actions.includes("updateBboxShrink")) {
@@ -298,7 +286,7 @@ export function Chooser({
                   ? false
                   : true,
                 dialog: showMap,
-                updateValues,
+                //updateValues,
                 onChange,
                 value,
               }}
@@ -311,7 +299,8 @@ export function Chooser({
                 dispatch,
                 bboxGeoJSONShrink,
                 dialog: showMap,
-                updateValues,
+                //updateValues,
+                showBBox,
               }}
             />
           )}
@@ -320,7 +309,7 @@ export function Chooser({
               {...{
                 states,
                 dispatch,
-                updateValues,
+                //updateValues,
               }}
             />
           )}
@@ -332,6 +321,13 @@ export function Chooser({
                 }}
               >
                 Accept
+              </CustomButtonGreen>
+              <CustomButtonGreen
+                onClick={() => {
+                  dispatch({ type: "clear" });
+                }}
+              >
+                Clear
               </CustomButtonGreen>
               <CustomButtonGreen
                 onClick={() => {
