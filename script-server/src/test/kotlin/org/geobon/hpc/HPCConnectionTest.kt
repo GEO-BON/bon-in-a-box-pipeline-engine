@@ -209,9 +209,9 @@ class HPCConnectionTest {
                 systemCall.run(
                     listOf(
                         "echo", """
-                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/outputs/someScript/hasdfdflgjkl/output.txt
-                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/scripts/1in1out.yml
-                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/scripts/1in1out.py
+                ${outputRoot.absolutePath}/someScript/hasdfdflgjkl/output.txt
+                ${scriptsRoot.absolutePath}/1in1out.yml
+                ${scriptsRoot.absolutePath}/1in1out.py
                 """.trimIndent(), "|", "rsync", "--files-from=-", ".", "HPC-name:~/bon-in-a-box/"
                     ), any(), any(), any(), any()
                 )
