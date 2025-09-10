@@ -34,8 +34,6 @@ export default function MapOL({
   dispatch,
   digitize,
   setDigitize,
-  setAction = () => {},
-  action,
 }) {
   const mapRef = useRef(null);
   const mapContainer = useRef(null);
@@ -77,7 +75,6 @@ export default function MapOL({
   };
 
   const clearLayers = () => {
-    //dispatch({ type: "changeBbox", bbox: [] });
     if (draw) {
       mapp.removeInteraction(draw);
       setDraw(null);
@@ -271,13 +268,6 @@ export default function MapOL({
         proj4.defs(crsCode, states.CRS.def);
         let projectMap = true;
         register(proj4);
-        /*unregister();
-        try {
-          register(proj4); //register the new CRS with openLayers;
-        } catch (error) {
-          projectMap = false;
-          unregister();
-        }*/
         if (!get(crsCode) || !projectMap) {
           setMessage(
             "This CRS cannot be shown on the map. The bounding box can still be entered manually."
@@ -302,8 +292,8 @@ export default function MapOL({
       clearLayers();
     }
   },[states.actions])
-  // The Country/Region Bounding box or CRS are updated, we need to update and reproject the bbox
 
+  // The Country/Region Bounding box or CRS are updated, we need to update and reproject the bbox
   useEffect(() => {
     if (states.actions.includes("updateBboxFromCountryRegion")) {
       if (
@@ -394,16 +384,6 @@ export default function MapOL({
         const map = new Map({
           target: "map",
           layers: [
-            /*new TileLayer({
-            source: new OSM(),
-            projection: `EPSG:3857`
-          }),*/
-            /*new TileLayer({
-              source: new OGCMapTile({
-                url: 'https://maps.gnosis.earth/ogcapi/collections/blueMarble/map/tiles/WebMercatorQuad',
-                projection: `EPSG:3857`
-              }),
-            }),*/
             new Layer({
               source: new Source({
                 attributions: ["Carto"],
@@ -420,9 +400,6 @@ export default function MapOL({
         });
         setMapp(map);
       }
-      return () => {
-        // mapp.setTarget(null);
-      };
     }
   }, [states.actions]);
 
