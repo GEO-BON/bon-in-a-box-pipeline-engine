@@ -46,24 +46,26 @@ export default function CountryRegionMenu({
   // Set from controlled values coming in
   useEffect(() => {
     if (states.actions.includes("updateCountryRegion") && countryOptions.length > 0) {
-      if (
-        states.country.ISO3 &&
-        states.country.ISO3 !== selectedCountry?.value
-      ) {
+      if (!states.country.ISO3){
+          setSelectedCountry(null);
+          setSelectedRegion(null);
+          return
+      }
+      if(states.country.ISO3 !== selectedCountry?.value) {
         setSelectedCountry({
           label: states.country.englishName,
           value: states.country.ISO3,
         });
-      }else{
-        setSelectedCountry(null);
       }
-      if (states.region.regionName) {
+      if (!states.region.regionName){
+        setSelectedRegion(null);
+        return
+      }
+      if (states.region.regionName !== selectedRegion?.value) {
         setSelectedRegion({
           label: states.region.regionName,
           value: states.region.regionName,
         });
-      }else{
-        setSelectedRegion(null);
       }
     }
   }, [states.actions, countryOptions, regionOptions]);
