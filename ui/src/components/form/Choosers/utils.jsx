@@ -2,32 +2,24 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { polygon, bbox } from "@turf/turf";
 import proj4 from "proj4";
+import { get } from "ol/proj";
+import NativeSelectInput from "@mui/material/NativeSelect/NativeSelectInput";
 
 const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
-let defs = [
-  [
-    "EPSG:4326",
-    "+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +units=degrees",
-  ],
-  ["EPSG:4269", "+proj=longlat +datum=NAD83 +no_defs"],
-  [
-    "EPSG:3857",
-    "+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs +type=crs",
-  ],
-  [
-    "EPSG:3116",
-    "+proj=tmerc +lat_0=4.59620041666667 +lon_0=-74.0775079166667 +k=1 +x_0=1000000 +y_0=1000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
-  ],
-  [
-    "EPSG:6623",
-    "+proj=aea +lat_0=44 +lon_0=-68.5 +lat_1=60 +lat_2=46 +x_0=0 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs",
-  ],
-  [
-    "EPSG:6622",
-    "+proj=lcc +lat_0=44 +lon_0=-68.5 +lat_1=60 +lat_2=46 +x_0=0 +y_0=0 +ellps=GRS80 +units=m +no_defs",
-  ],
+
+
+const supportedProjections = [
+  "longlat", "utm", "merc", "lcc", "tmerc", "aea", "stere", "somerc", "omerc",
+  "laea", "cass", "eqc", "poly", "gnom", "sinu", "moll", "eck4", "vandg", "aeqd",
+  "mill", "robin", "cea", "eqdc", "bonne", "loxim", "apian", "ortho", "bacon",
+  "hammer", "mt", "goode", "craster", "mod_airy", "nodc", "geocent", "nsper",
+  "labrd", "tpeqd", "qsc", "wink2", "wink3"
 ];
 
+function filterProj4String(proj4String) {
+  const match = proj4String.match(/\+proj=([a-z0-9_]+)/i);
+  return match && supportedProjections.includes(match[1]);
+}
 //proj4.defs = defs;
 
 export const defaultCRS = {
@@ -183,34 +175,54 @@ export const getCRSDef = async (epsg_number) => {
 };
 
 export const getCRSListFromName = async (name) => {
-  let result;
+  let allResults = [];
   const base_url = `https://api.maptiler.com/coordinates/search/${name} kind:CRS-PROJCRS kind:CRS-GEOCRS deprecated:0.json`;
-  try {
-    result = await axios({
-      method: "get",
-      baseURL: `${base_url}`,
-      params: {
-        limit: 50,
-        exports: true,
-        key: key,
-      },
-    });
-    // Check if the response is valid and contains the proj4 definition
-    if (
-      result.data &&
-      result.data.results &&
-      result.data.results.length > 0 &&
-      result.data.results[0].exports &&
-      result.data.results[0].exports.proj4
-    ) {
-      return result.data.results;
-    } else {
-      throw new Error("No CRS found for " + name);
+  let offset = 0;
+  let keepGoing = true;
+
+  while (keepGoing) {
+    try {
+      const result = await axios({
+        method: "get",
+        baseURL: `${base_url}`,
+        params: {
+          limit: 50,
+          offset: offset,
+          exports: true,
+          key: key,
+        },
+      });
+
+      if (
+        result.data &&
+        result.data.results &&
+        result.data.results.length > 0
+      ) {
+        // Filter and add results
+        const filtered = result.data.results.filter(r => {
+          if(!("exports" in r && r.exports !== null)){
+            return false
+          };
+          return filterProj4String(r.exports.proj4)
+        });
+        allResults = allResults.concat(filtered);
+
+        // If less than limit, we're done
+        if (result.data.results.length < 50) {
+          keepGoing = false;
+        } else {
+          offset += 50;
+        }
+      } else {
+        keepGoing = false;
+      }
+    } catch (error) {
+      console.error("getCRSListFromName error:", error);
+      keepGoing = false;
     }
-  } catch (error) {
-    console.error("getCRSDef error:", error);
-    return null;
   }
+
+  return allResults;
 };
 
 /*export const transformCoordCRS = (coords, source_crs_epsg, dest_crs_epsg) => {

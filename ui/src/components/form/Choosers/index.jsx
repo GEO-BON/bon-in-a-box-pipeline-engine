@@ -1,16 +1,12 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useRef, useReducer } from "react";
-import Paper from "@mui/material/Paper";
-import { styled } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import CropIcon from "@mui/icons-material/Crop";
 import MapOL from "./MapOL";
-import * as turf from "@turf/turf";
 import CountryRegionMenu from "./CountryRegionMenu";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
 import yaml from "js-yaml";
-import { v4 as uuidv4 } from "uuid";
 import { CustomButtonGreen } from "../../CustomMUI";
 import ReactMarkdown from "react-markdown";
 import Alert from "@mui/material/Alert";
@@ -141,7 +137,6 @@ export function Chooser({
   value,
 }) {
   const [clearFeatures, setClearFeatures] = useState(0);
-  const [bboxGeoJSONShrink, setBboxGeoJSONShrink] = useState(null);
   const [digitize, setDigitize] = useState(false);
   const [states, dispatch] = useReducer(chooserReducer, {
     bbox: [],
@@ -207,22 +202,6 @@ export function Chooser({
 },[states.actions]);
     
 
-  useEffect(() => {
-    if (states.bbox.length > 0 && states.actions.includes("updateBboxShrink")) {
-      //Shrink bbox for projestion which wont provide a crs suggestion if even a small part of the bbox is outside the area of coverage of the CRS
-      const b = states.bbox.map((c) => parseFloat(c));
-      const scale_width = Math.abs((b[2] - b[0]) / 3);
-      const scale_height = Math.abs((b[3] - b[1]) / 3);
-      const bbox_shrink = [
-        b[0] + scale_width,
-        b[1] + scale_height,
-        b[2] - scale_width,
-        b[3] - scale_height,
-      ];
-      setBboxGeoJSONShrink(turf.bboxPolygon(bbox_shrink));
-    }
-  }, [states.actions]);
-
   // Set from controlled values coming in
   useEffect(() => {
     const input = inputFileContent[inputId];
@@ -286,7 +265,6 @@ export function Chooser({
                   ? false
                   : true,
                 dialog: showMap,
-                //updateValues,
                 onChange,
                 value,
               }}
@@ -297,9 +275,7 @@ export function Chooser({
               {...{
                 states,
                 dispatch,
-                bboxGeoJSONShrink,
                 dialog: showMap,
-                //updateValues,
                 showBBox,
               }}
             />
@@ -309,7 +285,6 @@ export function Chooser({
               {...{
                 states,
                 dispatch,
-                //updateValues,
               }}
             />
           )}

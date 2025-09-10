@@ -12,6 +12,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import debounce from "lodash.debounce";
 import _, { update } from "lodash";
+import * as turf from "@turf/turf";
 import {
   getProjestAPI,
   transformBboxAPI,
@@ -20,15 +21,13 @@ import {
   defaultCRSList,
   getCRSListFromName,
   paperStyle,
+  transformCoordCRS
 } from "./utils";
 
 export default function CRSMenu({
   states,
   dispatch,
-  bboxGeoJSONShrink,
   dialog = false,
-  updateValues = () => {},
-  showBBox
 }) {
   const [CRSList, setCRSList] = useState(defaultCRSList);
   const [selectedCRS, setSelectedCRS] = useState(defaultCRSList[0]);
@@ -37,17 +36,12 @@ export default function CRSMenu({
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
 
   useEffect(() => {
-    let ignore = false;
-    if (!states.region.name && !states.country.englishName) return;
+    if (!states.country.englishName) return;
     if (states.actions.includes("updateCRSListFromNames")) {
       setSearching(true);
       // Suggest from names
-      if (states.region.name || states.country.englishName) {
-        const searchName = states.region.name
-          ? states.region.name
-          : states.country.englishName;
-        getCRSListFromName(searchName).then((result) => {
-         // if (!ignore) {
+      if (states.country.englishName) {
+        getCRSListFromName(states.country.englishName).then((result) => {
             if (result) {
               const suggestions = result.map((proj) => {
                 const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
@@ -61,20 +55,26 @@ export default function CRSMenu({
               setCRSList(defaultCRSList);
             }
             setSearching(false);
-          //}
         });
       }
     }
-    return () => {
-      ignore = true;
-    };
   }, [states.actions]);
 
   useEffect(() => {
-    let bbj = { type: "FeatureCollection", features: [bboxGeoJSONShrink] };
-    if (states.actions.includes("updateCRSListFromArea") && bboxGeoJSONShrink) {
+    if (states.actions.includes("updateCRSListFromArea") && !states.bbox.includes("")) {
+      // Shrink bbox to help projestion give better suggestions
+      const b = states.bbox.map((c) => parseFloat(c));
+      const scale_width = Math.abs((b[2] - b[0]) / 3);
+      const scale_height = Math.abs((b[3] - b[1]) / 3);
+      const bbox_shrink = [
+        b[0] + scale_width,
+        b[1] + scale_height,
+        b[2] - scale_width,
+        b[3] - scale_height,
+      ];
+      let code = `${states.CRS.authority}:${states.CRS.code}`;
+      let bbj = { type: "FeatureCollection", features: [transformCoordCRS(turf.bboxPolygon(bbox_shrink), code, 'EPSG:4326')] };
       getProjestAPI(bbj).then((result) => {
-        if (!ignore) {
           if (result && result.length > 0) {
             let suggestions = _.uniqBy(result, function (e) {
               return e.properties.coord_ref_sys_code;
@@ -91,13 +91,12 @@ export default function CRSMenu({
             }));
             setCRSList(defaultCRSList.concat(suggestions));
           } else {
-            setCRSList([]);
+            setCRSList(defaultCRSList);
           }
           setSearching(false);
-        }
       });
     }
-  }, [states.actions, bboxGeoJSONShrink]);
+  }, [states.actions]);
 
   // Update CRS from controlled values coming in
   useEffect(() => {
@@ -107,7 +106,7 @@ export default function CRSMenu({
       const c = `${states.CRS.authority}:${states.CRS.code}`;
       if (c !== inputValue) {
         setInputValue(c);
-        updateCRS({ label: c, value: c }, 'input', ignore);
+        updateCRS({ label: c, value: c }, ignore);
       }
     }
     return () => {
@@ -115,7 +114,34 @@ export default function CRSMenu({
     };
   }, [states.actions]);
 
-  const updateCRS = (value, from='dropdown', ignore = false) => {
+  // Update CRS from controlled values coming in
+  useEffect(() => {
+    if (states.actions.includes("resetCRS")) {
+      let code = `${defaultCRS.authority}:${defaultCRS.code}`
+      updateCRS({value: code, label: defaultCRS.name}, false);
+    }
+  }, [states.actions]);
+
+
+  useEffect(() => {
+    if(states.actions.includes("updateCRSDropdown")){
+      updateCRS({ label: `${states.CRS.authority}:${states.CRS.code}`, value: `${states.CRS.authority}:${states.CRS.code}` });
+    }
+  },[states.actions])
+
+  // Set selected CRS and input value CRS changes
+  useEffect(() => {
+    let code = `${states.CRS.authority}:${states.CRS.code}`
+    const fl = CRSList.filter((fl) => fl.value === code);
+    if (fl.length > 0) {
+      setSelectedCRS(fl[0]);
+    } else {
+      setSelectedCRS({ value: code, label: code });
+    }
+    setInputValue(code)
+  },[CRSList, states.CRS.code])
+
+  const updateCRS = (value, ignore = false) => {
     if (value && value?.value) {
       let code = "";
       code = value.value.split(":")[1];
@@ -132,21 +158,6 @@ export default function CRSMenu({
                 bbox: def.bbox,
               };
               dispatch({ type: "changeCRS", CRS: c });
-              /*if(from==='dropdown'){
-                if (value && value.value == value.label) {
-                  const fl = CRSList.filter((fl) => fl.value === value.value);
-                  if (fl.length > 0) {
-                    setSelectedCRS(fl[0]);
-                  } else {
-                    setSelectedCRS({ value: value.label, label: def.name });
-                  }
-                } else {
-                  setSelectedCRS(value);
-                }
-              }else if(from==='input'){
-                let cr = { label: c.CRS.name + ` (${c.CRS.authority}:${c.CRS.code})`, value: `${c.CRS.authority}:${c.CRS.code}` }
-                setSelectedCRS(cr);
-              }*/
             } else {
               dispatch({ type: "changeCRSFromInput", CRS: {name: value.value, authority: code[0], code: code[1]} });
               setSelectedCRS(null);
@@ -155,27 +166,11 @@ export default function CRSMenu({
         });
       }
     } else {
-      setCRS(defaultCRS);
       setSelectedCRS(null);
     }
   };
 
-  useEffect(() => {
-    if(states.actions.includes("updateCRSDropdown")){
-      updateCRS({ label: `${states.CRS.authority}:${states.CRS.code}`, value: `${states.CRS.authority}:${states.CRS.code}` },'input');
-    }
-  },[states.actions])
 
-  useEffect(() => {
-    let code = `${states.CRS.authority}:${states.CRS.code}`
-    const fl = CRSList.filter((fl) => fl.value === code);
-    if (fl.length > 0) {
-      setSelectedCRS(fl[0]);
-    } else {
-      setSelectedCRS({ value: code, label: code });
-    }
-    setInputValue(code)
-  },[CRSList, states.CRS.code])
 
   const debouncedSearch = useCallback(
     debounce((value) => {
@@ -258,6 +253,7 @@ export default function CRSMenu({
             color: "var(--biab-green-main)",
           }}
           variant="outlined"
+          size="small"
         >
           Enter code (e.g. EPSG:4326)
         </InputLabel>

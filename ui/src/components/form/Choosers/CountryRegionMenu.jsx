@@ -1,10 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useRef, useCallback } from "react";
-import { styled } from "@mui/material";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import CheckIcon from "@mui/icons-material/Check";
-import { CustomButtonGreen } from "../../CustomMUI";
 import countryOptionsJSON from "./countries.json"; // Assuming you have a JSON file with country data
 import {
   getStateAPI,
@@ -12,7 +9,6 @@ import {
   defaultRegion,
   paperStyle,
 } from "./utils";
-import { set } from "lodash";
 
 export default function CountryRegionMenu({
   states,
@@ -108,6 +104,11 @@ export default function CountryRegionMenu({
       countryValue = value;
       regionValue = "";
     }
+    if (!countryValue) {
+      setSelectedRegion(null);
+      dispatch({type: "clear"})
+      return;
+    }
     const countryObj = countryOptionsJSON.geonames.find(
       (c) => c.isoAlpha3 === countryValue
     );
@@ -149,7 +150,6 @@ export default function CountryRegionMenu({
         : defaultRegion;
     }
     dispatch({ type: "changeCountryRegion", country: country, region: region });
-    //updateValues({ country: country, region: region }, states);
   };
 
   return (

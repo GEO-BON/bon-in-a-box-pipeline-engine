@@ -25,6 +25,7 @@ export function chooserReducer(states, action) {
         region: action.region,
         actions: [
           "updateCRSListFromNames",
+          "resetCRS",
           "updateBbox",
           "updateBboxFromCountryRegion",
           "saveInputs"
@@ -46,7 +47,7 @@ export function chooserReducer(states, action) {
       return {
         ...states,
         bbox: action.bbox,
-        actions: ["updateBbox", "saveInputs"],
+        actions: ["updateBbox", "saveInputs", "updateCRSListFromArea"],
       };
     case "changeBbox":
       return {

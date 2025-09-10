@@ -15,7 +15,7 @@ import { get } from "ol/proj";
 import { boundingExtent } from "ol/extent";
 import Feature from "ol/Feature";
 import { fromExtent as polygonFromExtent } from "ol/geom/Polygon";
-import { register } from "ol/proj/proj4";
+import { register, unregister } from "ol/proj/proj4";
 import Draw, { createBox } from "ol/interaction/Draw.js";
 import Extent from "ol/interaction/Extent";
 import Modify from "ol/interaction/Modify.js";
@@ -88,6 +88,7 @@ export default function MapOL({
         mapp.removeLayer(l);
       }
     });
+    setMessage("")
   };
 
   // Adapted from https://sun-san-tech.com/javascript/285/
@@ -268,8 +269,16 @@ export default function MapOL({
       const mapProjection = mapp.getView().getProjection().getCode();
       if (states.CRS.def && mapProjection !== crsCode) {
         proj4.defs(crsCode, states.CRS.def);
+        let projectMap = true;
         register(proj4);
-        if (!get(crsCode)) {
+        /*unregister();
+        try {
+          register(proj4); //register the new CRS with openLayers;
+        } catch (error) {
+          projectMap = false;
+          unregister();
+        }*/
+        if (!get(crsCode) || !projectMap) {
           setMessage(
             "This CRS cannot be shown on the map. The bounding box can still be entered manually."
           );
