@@ -55,7 +55,10 @@ open class HPC (val connection: HPCConnection) {
             }
         }
 
-        connection.sendJobs(tasksToSend)
+        if(tasksToSend.isNotEmpty()) {
+            connection.sendJobs(tasksToSend)
+        }
+
     }
 
     companion object {
