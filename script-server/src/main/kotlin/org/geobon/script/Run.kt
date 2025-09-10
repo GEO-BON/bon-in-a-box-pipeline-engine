@@ -17,7 +17,7 @@ abstract class Run(
 
     val resultFile get() = context.resultFile
     lateinit var results: Map<String, Any>
-        protected set
+        private set
 
     protected var logBuffer: String = ""
     protected val logger: Logger = LoggerFactory.getLogger(scriptFile.name)
@@ -171,8 +171,8 @@ abstract class Run(
         return null
     }
 
-    protected fun flagError(results: Map<String, Any>, error: Boolean): Map<String, Any> {
-        if (error || results.isEmpty()) {
+    protected fun flagError(results: Map<String, Any>, genericError: Boolean): Map<String, Any> {
+        if (genericError || results.isEmpty()) {
             if (!results.containsKey(ERROR_KEY)) {
                 val outputs = results.toMutableMap()
                 outputs[ERROR_KEY] =

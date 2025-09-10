@@ -20,7 +20,7 @@ abstract class YMLStep(
     protected val yamlFile: File,
     stepId:StepId,
     inputs: MutableMap<String, Pipe> = mutableMapOf(),
-    private val logger: Logger = LoggerFactory.getLogger(yamlFile.name),
+    internal val logger: Logger = LoggerFactory.getLogger(yamlFile.name),
     protected val yamlParsed: Map<String, Any> = Yaml().load(yamlFile.readText())
 ) : Step(stepId, inputs, readOutputs(yamlParsed, logger)) {
 

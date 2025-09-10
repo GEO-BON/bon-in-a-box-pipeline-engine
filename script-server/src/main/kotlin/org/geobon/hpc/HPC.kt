@@ -16,6 +16,7 @@ open class HPC (val connection: HPCConnection) {
     }
 
     fun unregister(step: ScriptStep) {
+        // TODO: check if it has been sent, if yes, cancel remotely (if possible...)
         synchronized(registeredSteps) {
             registeredSteps.remove(step)
         }
