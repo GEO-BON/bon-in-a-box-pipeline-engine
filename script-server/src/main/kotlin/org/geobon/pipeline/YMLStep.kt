@@ -177,7 +177,7 @@ abstract class YMLStep(
                                     toExecute(key.toString(), type.toString())
                                 } ?: logger.error("Invalid type")
                             } else {
-                                logger.error("$section description is not a map")
+                                logger.error("description of $section is not a map")
                             }
                         } ?: logger.error("Invalid key")
                     }
