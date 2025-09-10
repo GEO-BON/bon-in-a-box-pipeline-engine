@@ -132,7 +132,7 @@ export function Chooser({
   inputId,
   inputDescription,
   inputFileContent,
-  updateInputFile,
+  updateInputFile = () => {},
   onChange,
   value,
 }) {
@@ -179,11 +179,13 @@ export function Chooser({
           region: states.region,
         };
       } else if (type === "country") {
+        onChange({ countryData: { label: states.country.englishName, value: states.country.ISO3 }, regionData: { label: states.region.regionName, value: states.region.regionName } })
         inp = {
           country: states.country,
         };
       } else if ( type === "countryRegion" ) {
         inp = { country: states.country, region: states.region };
+        onChange({ countryData: { label: states.country.englishName, value: states.country.ISO3 }, regionData: { label: states.region.regionName, value: states.region.regionName } })
       } else if (
         type === "countryRegionCRS" 
       ) {
