@@ -184,8 +184,6 @@ fun Application.configureRouting() {
         }
 
         post("/{type}/{descriptionPath}/run") {
-            logger.debug("BLOCK_RUNS: ${System.getenv("BLOCK_RUNS")}")
-
             if (System.getenv("BLOCK_RUNS") == "true") {
                 call.respond(
                     HttpStatusCode.ServiceUnavailable, "This server does not allow running pipelines and scripts.\n" +
