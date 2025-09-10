@@ -15,9 +15,11 @@ group = "org.geobon"
 version = "1.2.0"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
+}
 
-    val isDevelopment: Boolean = ("true" == System.getenv("DEV"))
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+ktor {
+    development = ("true" == System.getenv("DEV"))
+    println("ktor.development=${development.get()}")
 }
 
 repositories {
