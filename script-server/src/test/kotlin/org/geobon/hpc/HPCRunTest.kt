@@ -68,7 +68,7 @@ internal class HPCRunTest {
                     parentFile.mkdirs()
                     writeText("""{ "increment":11 }""".trimIndent())
                 }
-                logger.debug("TEMP created output file")
+                logger.debug("Created mock output file")
             }
         }
         every { mockContext.hpc!!.unregister(any()) } just runs

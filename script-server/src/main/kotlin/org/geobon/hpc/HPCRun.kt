@@ -51,24 +51,18 @@ class HPCRun(
             coroutineScope {
                 val watchJob = launch {
                     withContext(Dispatchers.IO) {
-                        logger.debug("TEMP setting up watchChannel")
+                        logger.trace("Watching for changes to {}", context.outputFolder)
                         watchChannel.consumeEach { event ->
-                            // do something with event
-                            logger.debug("TEMP event $event")
                             if (event.file == context.resultFile) {
                                 when (event.kind) {
                                     KWatchEvent.Kind.Created -> {
-                                        logger.debug(
-                                            "TEMP file was created, contents: {}",
-                                            context.resultFile.readText()
-                                        )
+                                        logger.trace("Watched file created: {}", context.resultFile)
                                     }
 
                                     KWatchEvent.Kind.Modified -> {
-                                        logger.debug("TEMP got result file update!")
+                                        logger.trace("Watched file modified: {}", context.resultFile)
                                         readOutputs()?.let {
-                                            logger.debug("TEMP read $it")
-                                            results = it // TODO: create or modify?
+                                            results = it
                                         }
                                     }
 
@@ -77,11 +71,9 @@ class HPCRun(
 
                             }
                         }
-                        logger.debug("TEMP watchChannel exit")
                     }
 
                 }
-                logger.debug("TEMP watcher job launched, ready to launch script")
 
                 // Signal job is ready to be sent
                 hpc.ready(this@HPCRun)
@@ -92,8 +84,6 @@ class HPCRun(
                 watchJob.cancel()
             }
         }
-
-        logger.debug("TEMP scope closed results=$results")
 
         return flagError(results, false)
     }
@@ -106,11 +96,11 @@ class HPCRun(
         private val MIME_TYPE_REGEX = Regex("""\w+/[-+.\w]+""")
     }
 
-    fun KWatchChannel.autoCloseable(): AutoCloseable {
-        return AutoCloseable {
-            logger.debug("TEMP Closing!!")
-            this.close()
-        }
+}
+
+fun KWatchChannel.autoCloseable(): AutoCloseable {
+    return AutoCloseable {
+        this.close()
     }
 }
 
