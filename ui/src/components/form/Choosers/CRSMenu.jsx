@@ -1,21 +1,18 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useRef, useCallback } from "react";
 import TextField from "@mui/material/TextField";
-import { CustomButtonGreen } from "../../CustomMUI";
 import CircularProgress from "@mui/material/CircularProgress";
 import Autocomplete from "@mui/material/Autocomplete";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import debounce from "lodash.debounce";
-import _, { update } from "lodash";
+import _ from "lodash";
 import * as turf from "@turf/turf";
 import {
   getProjestAPI,
-  transformBboxAPI,
   getCRSDef,
   defaultCRS,
   defaultCRSList,
@@ -34,9 +31,9 @@ export default function CRSMenu({
   const [inputValue, setInputValue] = useState("");
   const [searching, setSearching] = useState(false);
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
+  const [badCRS, setBadCRS] = useState(false);
 
   useEffect(() => {
-    if (!states.country.englishName) return;
     if (states.actions.includes("updateCRSListFromNames")) {
       setSearching(true);
       // Suggest from names
@@ -56,6 +53,9 @@ export default function CRSMenu({
             }
             setSearching(false);
         });
+      }else{
+        setCRSList(defaultCRSList);
+        setSearching(false);
       }
     }
   }, [states.actions]);
@@ -119,6 +119,7 @@ export default function CRSMenu({
     if (states.actions.includes("resetCRS")) {
       let code = `${defaultCRS.authority}:${defaultCRS.code}`
       updateCRS({value: code, label: defaultCRS.name}, false);
+      setBadCRS(false)
     }
   }, [states.actions]);
 
@@ -126,6 +127,7 @@ export default function CRSMenu({
   useEffect(() => {
     if(states.actions.includes("updateCRSDropdown")){
       updateCRS({ label: `${states.CRS.authority}:${states.CRS.code}`, value: `${states.CRS.authority}:${states.CRS.code}` });
+      setBadCRS(false)
     }
   },[states.actions])
 
@@ -142,10 +144,10 @@ export default function CRSMenu({
   },[CRSList, states.CRS.code])
 
   const updateCRS = (value, ignore = false) => {
-    if (value && value?.value) {
+    if (value && value?.value !== `${states.CRS.authority}:${states.CRS.code}`) {
       let code = "";
-      code = value.value.split(":")[1];
-      if (code && code.length > 3) {
+      code = value.value.split(":");
+      if (code[1].length > 3) {
         getCRSDef(value.value).then((def) => {
           if (!ignore) {
             if (def) {
@@ -158,19 +160,23 @@ export default function CRSMenu({
                 bbox: def.bbox,
               };
               dispatch({ type: "changeCRS", CRS: c });
+              setBadCRS(false)
             } else {
-              dispatch({ type: "changeCRSFromInput", CRS: {name: value.value, authority: code[0], code: code[1]} });
-              setSelectedCRS(null);
+              setBadCRS(true)
+              dispatch({ type: "changeCRSFromInput", CRS: {name: 'unrecognized CRS', authority: code[0], code: code[1]} });
+              setSelectedCRS({label: value.value, value: value.value});
             }
           }
         });
+      }else{
+        setBadCRS(true)
+        dispatch({ type: "changeCRSFromInput", CRS: {name: 'unrecognized CRS', authority: code[0], code: code[1]} });
+        setSelectedCRS({label: value.value, value: value.value});
       }
     } else {
       setSelectedCRS(null);
     }
   };
-
-
 
   const debouncedSearch = useCallback(
     debounce((value) => {
@@ -202,7 +208,7 @@ export default function CRSMenu({
           background: "#fff",
           borderRadius: "4px",
           marginTop: "10px",
-          marginBottom: "15px",
+          marginBottom: "10px",
           "& .MuiInputBase-input": {
             fontSize: 13,
           },
@@ -246,6 +252,17 @@ export default function CRSMenu({
         }}
         value={selectedCRS}
       />
+      {badCRS && (
+      <div
+        style={{
+          fontSize: "11px",
+          margin: "-5px 0px 10px 5px",
+          color: "red"
+        }}
+      >
+        CRS not recognized
+      </div>)
+      }
       <FormControl sx={{ width: "90%", backgroundColor: "white" }}>
         <InputLabel
           htmlFor="crs-code"

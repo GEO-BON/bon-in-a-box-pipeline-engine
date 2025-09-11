@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef, useReducer } from "react";
 import Grid from "@mui/material/Grid";
 import CropIcon from "@mui/icons-material/Crop";
-import MapOL from "./MapOL";
+import MapOpenLayers from "./MapOpenLayers";
 import CountryRegionMenu from "./CountryRegionMenu";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
@@ -172,12 +172,16 @@ export function Chooser({
     if (states.actions.includes("saveInputs")) {
       let inp={};
       if (type === "bboxCRS") {
-        inp = {
-          bbox: states.bbox,
-          CRS: states.CRS,
-          country: states.country,
-          region: states.region,
-        };
+        if(states.bbox.includes("") || states.bbox.length === 0){
+          inp = null;
+        } else {
+          inp = {
+            bbox: states.bbox,
+            CRS: states.CRS,
+            country: states.country,
+            region: states.region,
+          };
+        }
       } else if (type === "country") {
         onChange({ countryData: { label: states.country.englishName, value: states.country.ISO3 }, regionData: { label: states.region.regionName, value: states.region.regionName } })
         inp = {
@@ -197,9 +201,7 @@ export function Chooser({
       } else if (type === "CRS") {
         inp = { CRS: states.CRS };
       }
-      if(inp){
-        updateInputFile(inputId, inp);
-      }
+      updateInputFile(inputId, inp);
     }
 },[states.actions]);
     
@@ -291,7 +293,7 @@ export function Chooser({
             />
           )}
           {showMap && (
-            <>
+            <div>
               <CustomButtonGreen
                 onClick={() => {
                   setOpenModal(false);
@@ -314,7 +316,7 @@ export function Chooser({
               >
                 Cancel
               </CustomButtonGreen>
-            </>
+            </div>
           )}
         </Grid>
         {showMap && (
@@ -322,7 +324,7 @@ export function Chooser({
             xs={9}
             sx={{ padding: "0px", backgroundColor: "#", height: "100%" }}
           >
-            <MapOL
+            <MapOpenLayers
               {...{
                 states,
                 dispatch,

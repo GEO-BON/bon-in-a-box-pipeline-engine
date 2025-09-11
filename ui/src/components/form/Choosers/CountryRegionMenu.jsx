@@ -90,7 +90,6 @@ export default function CountryRegionMenu({
       });
     } else {
       setRegionOptions([]);
-      //dispatch({ bbox: [], actions: ["updateBbox"] });
     }
   }, [selectedCountry]);
 
@@ -114,7 +113,7 @@ export default function CountryRegionMenu({
     const countryObj = countryOptionsJSON.geonames.find(
       (c) => c.isoAlpha3 === countryValue
     );
-    let country = defaultCountry;
+    let country;
     if (countryValue) {
       let b = [
         countryObj.west,
@@ -151,7 +150,11 @@ export default function CountryRegionMenu({
           }
         : defaultRegion;
     }
-    dispatch({ type: "changeCountryRegion", country: country, region: region });
+    if(!country){
+      dispatch({ type: "clear"});
+    }else{
+      dispatch({ type: "changeCountryRegion", country: country, region: region });
+    }
   };
 
   return (
@@ -167,7 +170,6 @@ export default function CountryRegionMenu({
         size="small"
         sx={{
           width: "90%",
-          minWidth: "265px",
           background: "#fff",
           color: "#fff",
           borderRadius: "4px",
@@ -186,6 +188,7 @@ export default function CountryRegionMenu({
         }}
       />
       {showRegion && (
+        <>
         <Autocomplete
           disablePortal
           options={regionOptions}
@@ -210,6 +213,15 @@ export default function CountryRegionMenu({
           }}
           value={selectedRegion}
         />
+              <div
+        style={{
+          fontSize: "11px",
+          margin: "5px 0px 2px 5px",
+        }}
+      >
+        Reference for toponyms: <a target="_blank" href="https://geonames.org">GeoNames</a>
+      </div>
+      </>
       )}
     </div>
   );

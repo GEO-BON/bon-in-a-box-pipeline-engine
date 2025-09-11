@@ -53,7 +53,7 @@ export function chooserReducer(states, action) {
       return {
         ...states,
         bbox: action.bbox,
-        actions: ["redrawBbox", "saveInputs"],
+        actions: ["updateBbox", "saveInputs"],
       };
     case "clear":
       return {
@@ -64,6 +64,8 @@ export function chooserReducer(states, action) {
         actions: [
           "updateBbox",
           "updateCRS",
+          "updateCRSListFromNames",
+          "changeMapCRS",
           "updateCRSInput",
           "updateCountryRegion",
           "clearLayers",

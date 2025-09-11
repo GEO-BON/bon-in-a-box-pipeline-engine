@@ -159,7 +159,7 @@ inputs:
     example: null
 ```
 
-The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying 'country' as input type will create a dropdown menu with a standardized list of countries. Selecting 'bboxCRS' will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:
+The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying 'country' as input type will create a dropdown menu with a standardized list of countries from GeoNames. Selecting 'bboxCRS' will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:
 
 | Input name | Description |
 |------------------|----------------------------|--------------------------|

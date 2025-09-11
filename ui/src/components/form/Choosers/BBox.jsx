@@ -10,8 +10,7 @@ export default function BBox({ states, dispatch }) {
   // BBox values coming in
   useEffect(() => {
     if (
-      states.actions.includes("updateBbox") ||
-      states.actions.includes("redrawBbox")
+      states.actions.includes("updateBbox") 
     ) {
       let b = ["", "", "", ""];
       if (states.bbox && states.bbox.length === 4) {
@@ -31,7 +30,6 @@ export default function BBox({ states, dispatch }) {
         newInput[index] = value;
       }
       dispatch({ type: "changeBbox", bbox: newInput });
-      //updateValues({ bbox: newInput, CRS: states.CRS}, states);
       return newInput;
     });
   };
