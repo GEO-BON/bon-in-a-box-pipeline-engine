@@ -42,7 +42,6 @@ class HPCRun(
 
         hpcConnection.sendFiles(filesToSend, logFile)
 
-        context.outputFolder.mkdirs()
         var genericError = false
         var output: Map<String, Any>? = null;
         val watchChannel = context.outputFolder.asWatchChannel()

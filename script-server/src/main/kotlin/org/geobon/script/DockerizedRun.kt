@@ -1,6 +1,5 @@
 package org.geobon.script
 
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
 import org.geobon.pipeline.RunContext
 import org.geobon.server.ServerContext
@@ -13,9 +12,8 @@ import java.util.concurrent.TimeoutException
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
-import kotlin.time.measureTime
 
-class DockerizedRun ( // Constructor used in single script run
+class DockerizedRun( // Constructor used in single script run
     context: RunContext,
     scriptFile: File,
     private val timeout: Duration = DEFAULT_TIMEOUT,
@@ -43,126 +41,111 @@ class DockerizedRun ( // Constructor used in single script run
         var outputs: Map<String, Any>? = null
 
         var container: Containers = Containers.SCRIPT_SERVER
-        val elapsed = measureTime {
-            val pidFile = File(context.outputFolder.absolutePath, ".pid")
 
-            runCatching {
-                // TODO: Errors are using the log file. If this initial step fails, they might be appended to previous log.
-                withContext(Dispatchers.IO) {
-                    // If loading from cache didn't succeed, make sure we have a clean slate.
-                    if (context.outputFolder.exists()) {
-                        context.outputFolder.deleteRecursively()
+        val pidFile = File(context.outputFolder.absolutePath, ".pid")
 
-                        if (context.outputFolder.exists())
-                            throw RuntimeException("Failed to delete directory of previous run ${context.outputFolder.path}")
-                    }
-
-                    // Create the output folder for this invocation
-                    context.outputFolder.mkdirs()
-                    logBuffer += "Script run outputting to ${context.outputFolder}\n"
-                        .also { logger.debug(it) }
-
-                    // Script run pre-requisites
-                    logFile.writeText(logBuffer)
-                    context.inputs?.let {
-                        // Create input.json
-                        context.inputFile.writeText(it)
-                    }
-                }
-
-                val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
-                val command: List<String>
-                when (scriptFile.extension) {
-                    "jl", "JL" -> {
-                        container = Containers.JULIA
-                        command = container.dockerCommandList + listOf(
-                            "bash", "-c",
-                            """
+        runCatching {
+            val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
+            val command: List<String>
+            when (scriptFile.extension) {
+                "jl", "JL" -> {
+                    container = Containers.JULIA
+                    command = container.dockerCommandList + listOf(
+                        "bash", "-c",
+                        """
                                 source importEnvVars.sh
                                 julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
                             """
-                        )
-                    }
+                    )
+                }
 
-                    "r", "R" -> {
-                        container = Containers.CONDA
+                "r", "R" -> {
+                    container = Containers.CONDA
 
-                        command = container.dockerCommandList + listOf(
-                            "bash", "-c",
-                            """
+                    command = container.dockerCommandList + listOf(
+                        "bash", "-c",
+                        """
                                 source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
                                 Rscript $scriptStubsRoot/system/scriptWrapper.R ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
                             """.trimIndent()
-                        )
-                    }
+                    )
+                }
 
-                    "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
-                    "py", "PY" -> {
-                        val scriptPath = scriptFile.absolutePath
-                        val pythonWrapper = "$scriptStubsRoot/system/scriptWrapper.py"
+                "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
+                "py", "PY" -> {
+                    val scriptPath = scriptFile.absolutePath
+                    val pythonWrapper = "$scriptStubsRoot/system/scriptWrapper.py"
 
-                        if(USE_RUNNERS) {
-                            container = Containers.CONDA
-                            command = container.dockerCommandList + listOf(
-                                "bash", "-c",
-                                """
+                    if (USE_RUNNERS) {
+                        container = Containers.CONDA
+                        command = container.dockerCommandList + listOf(
+                            "bash", "-c",
+                            """
                                     source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
                                     python3 $pythonWrapper $escapedOutputFolder $scriptPath
                                 """.trimIndent()
-                            )
-                        } else {
-                            command = listOf("python3", pythonWrapper, context.outputFolder.absolutePath, scriptPath)
-                        }
-                    }
-
-                    else -> {
-                        return flagError(mapOf(ERROR_KEY to "Unsupported script extension ${scriptFile.extension}"), true)
+                        )
+                    } else {
+                        command = listOf("python3", pythonWrapper, context.outputFolder.absolutePath, scriptPath)
                     }
                 }
 
-                ProcessBuilder(command)
-                    .directory(ServerContext.scriptsRoot)
-                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                    .redirectErrorStream(true) // Merges stderr into stdout
-                    .start().also { process ->
-                        withContext(Dispatchers.IO) { // More info on this context switching : https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761
-                            // The watchdog will terminate the process in two cases :
-                            // if the user cancels or if timeout delay expires.
-                            val watchdog = launch {
-                                try {
-                                    delay(timeout.toLong(DurationUnit.MILLISECONDS))
-                                    throw TimeoutException("Timeout occurred after $timeout")
+                else -> {
+                    return flagError(mapOf(ERROR_KEY to "Unsupported script extension ${scriptFile.extension}"), true)
+                }
+            }
 
-                                } catch (ex: Exception) {
-                                    if (process.isAlive) {
-                                        val event = ex.message ?: ex.javaClass.name
+            ProcessBuilder(command)
+                .directory(ServerContext.scriptsRoot)
+                .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                .redirectErrorStream(true) // Merges stderr into stdout
+                .start().also { process ->
+                    withContext(Dispatchers.IO) { // More info on this context switching : https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761
+                        // The watchdog will terminate the process in two cases :
+                        // if the user cancels or if timeout delay expires.
+                        val watchdog = launch {
+                            try {
+                                delay(timeout.toLong(DurationUnit.MILLISECONDS))
+                                throw TimeoutException("Timeout occurred after $timeout")
 
-                                        if (pidFile.exists() && container.isExternal()) {
-                                            val pid = pidFile.readText().trim()
-                                            log(logger::debug, "$event: gracefully stopping runner process '$pid'")
+                            } catch (ex: Exception) {
+                                if (process.isAlive) {
+                                    val event = ex.message ?: ex.javaClass.name
 
-                                            ProcessBuilder(container.dockerCommandList + listOf(
-                                                    "kill", "-s", "TERM", pid
-                                            )).start()
+                                    if (pidFile.exists() && container.isExternal()) {
+                                        val pid = pidFile.readText().trim()
+                                        log(logger::debug, "$event: gracefully stopping runner process '$pid'")
 
-                                            if (!process.waitFor(30, TimeUnit.SECONDS)) {
-                                                log(logger::debug, "$event: forcefully stopping runner process '$pid' after 30 seconds")
-                                                ProcessBuilder(container.dockerCommandList + listOf(
-                                                        "kill", "-s", "KILL", pid
-                                                )).start()
-                                            }
-
-                                        } else {
-                                            log(logger::info, "$event: killing server process...")
-                                            process.destroy()
-                                        }
+                                        ProcessBuilder(
+                                            container.dockerCommandList + listOf(
+                                                "kill", "-s", "TERM", pid
+                                            )
+                                        ).start()
 
                                         if (!process.waitFor(30, TimeUnit.SECONDS)) {
-                                            log(logger::info, "$event: cancellation timeout elapsed.")
-                                            process.destroyForcibly()
+                                            log(
+                                                logger::debug,
+                                                "$event: forcefully stopping runner process '$pid' after 30 seconds"
+                                            )
+                                            ProcessBuilder(
+                                                container.dockerCommandList + listOf(
+                                                    "kill", "-s", "KILL", pid
+                                                )
+                                            ).start()
+                                        }
 
-                                            if(container == Containers.JULIA) {
-                                                log(logger::info, """
+                                    } else {
+                                        log(logger::info, "$event: killing server process...")
+                                        process.destroy()
+                                    }
+
+                                    if (!process.waitFor(30, TimeUnit.SECONDS)) {
+                                        log(logger::info, "$event: cancellation timeout elapsed.")
+                                        process.destroyForcibly()
+
+                                        if (container == Containers.JULIA) {
+                                            log(
+                                                logger::info, """
 
 
                                                     Julia processes may not terminate well and continue consuming resources in the background.
@@ -174,72 +157,71 @@ class DockerizedRun ( // Constructor used in single script run
                                                     Updates on this issue can be found at https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/issues/150
 
 
-                                                """.trimIndent())
-                                            }
+                                                """.trimIndent()
+                                            )
                                         }
-
-                                        throw ex
                                     }
+
+                                    throw ex
                                 }
                             }
-
-                            launch {
-                                process.inputStream.bufferedReader().run {
-                                    try {
-                                        while (true) { // Breaks when readLine returns null
-                                            readLine()?.let { log(logger::trace, it) }
-                                                ?: break
-                                        }
-                                    } catch (ex: IOException) {
-                                        if (ex.message != "Stream closed") // This is normal when cancelling the script
-                                            log(logger::trace, ex.message!!)
-                                    }
-                                }
-                            }
-
-                            process.waitFor()
-                            watchdog.cancel("Watched task normal completion")
                         }
-                    }
-            }.onSuccess { process -> // completed, with success or failure
-                if (process.exitValue() != 0) {
-                    error = true
-                    log(logger::warn, "Error: script returned non-zero value")
-                }
 
-                if (resultFile.exists()) {
-                    outputs = readOutputs()
-                    outputs ?: { error = true }
+                        launch {
+                            process.inputStream.bufferedReader().run {
+                                try {
+                                    while (true) { // Breaks when readLine returns null
+                                        readLine()?.let { log(logger::trace, it) }
+                                            ?: break
+                                    }
+                                } catch (ex: IOException) {
+                                    if (ex.message != "Stream closed") // This is normal when cancelling the script
+                                        log(logger::trace, ex.message!!)
+                                }
+                            }
+                        }
 
-                } else {
-                    error = true
-                    log(logger::warn, "Error: output.json file not found")
-                }
-
-            }.onFailure { ex ->
-                when (ex) {
-                    is TimeoutException,
-                    is CancellationException -> {
-                        val event = ex.message ?: ex.javaClass.name
-                        log(logger::info, "$event: done.")
-                        outputs = mapOf(ERROR_KEY to event)
-                        resultFile.writeText(RunContext.gson.toJson(outputs))
-                    }
-
-                    else -> {
-                        log(logger::warn, "An error occurred when running the script: ${ex.message}")
-                        logger.warn(ex.stackTraceToString())
-                        error = true
+                        process.waitFor()
+                        watchdog.cancel("Watched task normal completion")
                     }
                 }
+        }.onSuccess { process -> // completed, with success or failure
+            if (process.exitValue() != 0) {
+                error = true
+                log(logger::warn, "Error: script returned non-zero value")
             }
 
-            pidFile.delete()
-            context.createEnvironmentFile(container)
+            if (resultFile.exists()) {
+                outputs = readOutputs()
+                outputs ?: { error = true }
+
+            } else {
+                error = true
+                log(logger::warn, "Error: output.json file not found")
+            }
+
+        }.onFailure { ex ->
+            when (ex) {
+                is TimeoutException,
+                is CancellationException -> {
+                    val event = ex.message ?: ex.javaClass.name
+                    log(logger::info, "$event: done.")
+                    outputs = mapOf(ERROR_KEY to event)
+                    resultFile.writeText(RunContext.gson.toJson(outputs))
+                }
+
+                else -> {
+                    log(logger::warn, "An error occurred when running the script: ${ex.message}")
+                    logger.warn(ex.stackTraceToString())
+                    error = true
+                }
+            }
         }
 
+        pidFile.delete()
+        context.createEnvironmentFile(container)
+
         log(logger::debug, "Runner: ${container.containerName} version ${container.version}")
-        log(logger::info, "Elapsed: $elapsed")
 
         // Format log output
         return flagError(outputs ?: mapOf(), error)

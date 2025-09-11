@@ -1,14 +1,19 @@
 package org.geobon.script
 
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.geobon.pipeline.RunContext
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.TimeSource.Monotonic.markNow
 
 abstract class Run(
     protected val scriptFile: File,
@@ -40,12 +45,16 @@ abstract class Run(
 
         results = checkPreconditions()
             ?: loadFromCache()
-            ?: runScript()
+                    ?: run {
+                prepareRunFolder()
+                val mark = markNow()
+                val res = runScript()
+                log(logger::info, "Elapsed: ${mark.elapsedNow()}")
+                return@run res
+            }
     }
 
-    abstract suspend fun runScript() : Map<String, Any>
-
-    protected open fun checkPreconditions() : Map<String, Any>? {
+    protected open fun checkPreconditions(): Map<String, Any>? {
         if (!scriptFile.exists()) {
             val message = "Script $scriptFile not found"
             logger.warn(message)
@@ -104,6 +113,47 @@ abstract class Run(
         return null
     }
 
+    private suspend fun prepareRunFolder() {
+        try {
+            // Add this before and after withContext to debug
+            logger.debug("Before withContext: ${coroutineContext[Job]}")
+            withContext(Dispatchers.IO) {
+                logger.debug("Inside IO: ${coroutineContext[Job]}")
+                // your IO code
+            }
+            logger.debug("After withContext: ${coroutineContext[Job]}")
+
+            withContext(Dispatchers.IO) {
+                // If loading from cache didn't succeed, make sure we have a clean slate.
+                if (context.outputFolder.exists()) {
+                    context.outputFolder.deleteRecursively()
+
+                    if (context.outputFolder.exists())
+                        throw RuntimeException("Failed to delete directory of previous run ${context.outputFolder.path}")
+                }
+
+                // Create the output folder for this invocation
+                context.outputFolder.mkdirs()
+                logBuffer += "Script run outputting to ${context.outputFolder}\n"
+                    .also { logger.debug(it) }
+
+                // Script run pre-requisites
+                logFile.writeText(logBuffer)
+                context.inputs?.let {
+                    // Create input.json
+                    context.inputFile.writeText(it)
+                }
+
+                logger.debug("prepareRunFolder prepared")
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        logger.debug("prepareRunFolder end")
+    }
+
+    abstract suspend fun runScript(): Map<String, Any>
+
     /**
      * @return true if all inputs are older than cached result
      */
@@ -151,7 +201,7 @@ abstract class Run(
         }
     }
 
-    protected fun readOutputs() : Map<String, Any>? {
+    protected fun readOutputs(): Map<String, Any>? {
         val type = object : TypeToken<Map<String, Any>>() {}.type
         val result = resultFile.readText()
         try {

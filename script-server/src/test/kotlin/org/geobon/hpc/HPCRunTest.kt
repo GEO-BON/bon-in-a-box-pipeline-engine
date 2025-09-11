@@ -44,7 +44,7 @@ internal class HPCRunTest {
     }
 
     @Test
-    fun `given correct task_test registered sync and ready`() = runTest {
+    fun `given HPC task_when executing_then registered sync and ready`() = runTest {
         every { mockContext.hpc!!.register(any()) } just runs
         val inputFile = File(outputRoot, "someFile.csv")
         inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
@@ -100,7 +100,7 @@ internal class HPCRunTest {
     }
 
     @Test
-    fun `given task fails_when synced_then error thrown`() = runTest {
+    fun `given HPC task fails_when synced_then error thrown`() = runTest {
         every { mockContext.hpc!!.register(any()) } just runs
         val inputFile = File(outputRoot, "someFile.csv")
         inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
@@ -157,7 +157,7 @@ internal class HPCRunTest {
     }
 
     @Test
-    fun `given task running_when canceled_then unregisters and throws`() = runTest {
+    fun `given HPC task running_when canceled_then unregisters and throws`() = runTest {
         every { mockContext.hpc!!.register(any()) } just runs
         val inputFile = File(outputRoot, "someFile.csv")
         inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
