@@ -101,9 +101,12 @@ class ScriptStep : YMLStep {
             }
 
             if (runOwner) {
-                run.execute()
-                synchronized(currentRuns) {
-                    currentRuns.remove(context.runId)
+                try {
+                    run.execute()
+                } finally {
+                    synchronized(currentRuns) {
+                        currentRuns.remove(context.runId)
+                    }
                 }
             } else {
                 run.waitForResults()
