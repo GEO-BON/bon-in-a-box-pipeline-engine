@@ -81,7 +81,7 @@ open class Pipeline (
             }
         } catch (ex: RuntimeException) {
             error = ex.message ?: ex.stackTraceToString()
-            logger.debug(error)
+            logger.debug("Pipeline execution error: $error")
 
             cancelled = ex is CancellationException
             if (!cancelled) failure = true
@@ -116,6 +116,7 @@ open class Pipeline (
     }
 
     override suspend fun execute() {
+        logger.info("TEMP Starting pipeline $this")
         coroutineScope {
             finalSteps.forEach { launch { it.execute() } }
         } // exits when all final steps have their results
@@ -123,6 +124,7 @@ open class Pipeline (
 
     suspend fun stop() {
         job?.apply {
+            logger.info("Cancelling pipeline $this")
             cancel("Cancelled by user")
             join() // wait so the user receives response when really cancelled
         }

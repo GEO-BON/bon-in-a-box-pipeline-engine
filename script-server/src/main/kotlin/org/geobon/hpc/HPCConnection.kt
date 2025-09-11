@@ -213,9 +213,14 @@ class HPCConnection(
             "No valid files to sync.".let { logger.warn(it); logFile?.appendText(it) }
 
         } else {
+            logFile?.appendText("Syncing files to HPC:\n$filesString".also { logger.debug(it) })
             val result = systemCall.run(
-                listOf("echo", filesString.trim(), "|", "rsync", "--files-from=-", ".", "$sshConfig:~/bon-in-a-box/"),
-                timeoutAmount = 10, timeoutUnit = MINUTES)
+                listOf(
+                    "echo", filesString.trim(), "|",
+                    "rsync", "-e", "'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath'",
+                    "--mkpath", "--files-from=-", ".", "$sshConfig:~/bon-in-a-box/"
+                ),
+                timeoutAmount = 10, timeoutUnit = MINUTES, mergeErrors = false)
 
             logFile?.appendText(result.output)
 

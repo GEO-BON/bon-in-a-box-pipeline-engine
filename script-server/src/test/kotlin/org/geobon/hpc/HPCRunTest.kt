@@ -186,7 +186,7 @@ internal class HPCRunTest {
             }
         }
         delay(1000)
-        job.cancel()
+        job.cancel("Cancelled by test")
         job.join()
 
         verifyOrder {
