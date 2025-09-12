@@ -168,34 +168,53 @@ export function Chooser({
   }, []);
 
   // Update values in the input file content
-  useEffect(() => {    
+  useEffect(() => {
     if (states.actions.includes("saveInputs")) {
-      let inp={};
+      let inp = {};
       if (type === "bboxCRS") {
-        if(states.bbox.includes("") || states.bbox.length === 0){
+        if (states.bbox.includes("") || states.bbox.length === 0) {
           inp = null;
         } else {
           inp = {
             bbox: states.bbox,
             CRS: states.CRS,
-            country: states.country,
-            region: states.region,
+            country: states.country?.ISO3 ? states.country : null,
+            region: states.region?.englishName ? states.region : null,
           };
         }
       } else if (type === "country") {
-        onChange({ countryData: { label: states.country.englishName, value: states.country.ISO3 }, regionData: { label: states.region.regionName, value: states.region.regionName } })
+        onChange({
+          countryData: {
+            label: states.country.englishName,
+            value: states.country.ISO3,
+          },
+          regionData: {
+            label: states.region.regionName,
+            value: states.region.regionName,
+          },
+        });
         inp = {
           country: states.country,
         };
-      } else if ( type === "countryRegion" ) {
-        inp = { country: states.country, region: states.region };
-        onChange({ countryData: { label: states.country.englishName, value: states.country.ISO3 }, regionData: { label: states.region.regionName, value: states.region.regionName } })
-      } else if (
-        type === "countryRegionCRS" 
-      ) {
+      } else if (type === "countryRegion") {
         inp = {
           country: states.country,
-          region: states.region,
+          region: states.region?.englishName ? states.region : null,
+        };
+        onChange({
+          countryData: {
+            label: states.country.englishName,
+            value: states.country.ISO3,
+          },
+          regionData: {
+            label: states.region?.regionName,
+            value: states.region?.regionName,
+          },
+        });
+      } else if (type === "countryRegionCRS") {
+        inp = {
+          country: states.country,
+          region: states.region.englishName ? states.region : null,
           CRS: states.CRS,
         };
       } else if (type === "CRS") {
@@ -203,8 +222,7 @@ export function Chooser({
       }
       updateInputFile(inputId, inp);
     }
-},[states.actions]);
-    
+  }, [states.actions]);
 
   // Set from controlled values coming in
   useEffect(() => {

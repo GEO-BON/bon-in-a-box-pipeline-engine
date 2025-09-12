@@ -5,13 +5,48 @@ import proj4 from "proj4";
 
 const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
 
-
 const supportedProjections = [
-  "longlat", "utm", "merc", "lcc", "tmerc", "aea", "stere", "somerc", "omerc",
-  "laea", "cass", "eqc", "poly", "gnom", "sinu", "moll", "eck4", "vandg", "aeqd",
-  "mill", "robin", "cea", "eqdc", "bonne", "loxim", "apian", "ortho", "bacon",
-  "hammer", "mt", "goode", "craster", "mod_airy", "nodc", "geocent", "nsper",
-  "labrd", "tpeqd", "qsc", "wink2", "wink3"
+  "longlat",
+  "utm",
+  "merc",
+  "lcc",
+  "tmerc",
+  "aea",
+  "stere",
+  "somerc",
+  "omerc",
+  "laea",
+  "cass",
+  "eqc",
+  "poly",
+  "gnom",
+  "sinu",
+  "moll",
+  "eck4",
+  "vandg",
+  "aeqd",
+  "mill",
+  "robin",
+  "cea",
+  "eqdc",
+  "bonne",
+  "loxim",
+  "apian",
+  "ortho",
+  "bacon",
+  "hammer",
+  "mt",
+  "goode",
+  "craster",
+  "mod_airy",
+  "nodc",
+  "geocent",
+  "nsper",
+  "labrd",
+  "tpeqd",
+  "qsc",
+  "wink2",
+  "wink3",
 ];
 
 function filterProj4String(proj4String) {
@@ -19,12 +54,11 @@ function filterProj4String(proj4String) {
   return match && supportedProjections.includes(match[1]);
 }
 
-
 export const defaultCRS = {
   name: "WGS84 - Lat/long",
   authority: "EPSG",
-  code: "4326",
-  def: "+proj=longlat +datum=WGS84 +no_defs",
+  code: 4326,
+  proj4Def: "+proj=longlat +datum=WGS84 +no_defs",
   unit: "degree",
 };
 
@@ -47,12 +81,12 @@ export const defaultCountry = {
   englishName: "",
   ISO3: "",
   code: "",
-  bboxLL: [],
+  countryBboxWGS84: [],
 };
 export const defaultRegion = {
   name: "",
   ISO3166_2: "",
-  bboxLL: [],
+  regionBboxWGS84: [],
   countryEnglishName: "",
 };
 
@@ -197,11 +231,11 @@ export const getCRSListFromName = async (name) => {
         result.data.results.length > 0
       ) {
         // Filter and add results
-        const filtered = result.data.results.filter(r => {
-          if(!("exports" in r && r.exports !== null)){
-            return false
-          };
-          return filterProj4String(r.exports.proj4)
+        const filtered = result.data.results.filter((r) => {
+          if (!("exports" in r && r.exports !== null)) {
+            return false;
+          }
+          return filterProj4String(r.exports.proj4);
         });
         allResults = allResults.concat(filtered);
 
@@ -223,7 +257,6 @@ export const getCRSListFromName = async (name) => {
   return allResults;
 };
 
-
 export const transformCoordCRS = (poly, source_crs_epsg, dest_crs_epsg) => {
   const coo = poly.geometry.coordinates[0].map((c) => {
     let cc = [0, 0];
@@ -241,7 +274,7 @@ export const transformCoordCRS = (poly, source_crs_epsg, dest_crs_epsg) => {
 export const transformPolyToBboxCRS = (poly, src_crs, dest_crs) => {
   const dist = src_crs.unit == "degree" ? 0.25 : 500000;
   const d = densifyPolygon(poly, dist); //Densify vertices of polygon in Eucledian space before reprojection
-  poly = transformCoordCRS(d, src_crs.def, dest_crs.def);
+  poly = transformCoordCRS(d, src_crs.proj4Def, dest_crs.proj4Def);
   if (poly.geometry.coordinates.length > 0) {
     const feat = {
       crs: {
@@ -297,7 +330,7 @@ export const densifyPolygon = (poly, minDistDeg) => {
     const segLen = Math.sqrt(dx * dx + dy * dy);
 
     if (segLen > 0) {
-      const steps = Math.min(Math.floor(segLen / minDistDeg),100);
+      const steps = Math.min(Math.floor(segLen / minDistDeg), 100);
       for (let j = 1; j < steps; j++) {
         const frac = (j * minDistDeg) / segLen;
         const x = start[0] + frac * dx;
