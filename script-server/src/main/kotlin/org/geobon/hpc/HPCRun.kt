@@ -30,18 +30,6 @@ class HPCRun(
             throw RuntimeException("HPC connection is not ready to send jobs, aborting.")
         }
 
-        // Sync the output folder (has inputs.json) and any files the script depends on
-        val filesToSend = mutableListOf(context.outputFolder)
-        filesToSend.addAll(
-            resolvedInputs.mapNotNull {
-                if (fileInputs.contains(it.key) && it.value is String)
-                    File(it.value as String)
-                else null
-            }
-        )
-
-        hpcConnection.sendFiles(filesToSend, logFile)
-
         var genericError = false
         var output: Map<String, Any>? = null;
         val watchChannel = context.outputFolder.asWatchChannel()
@@ -49,6 +37,18 @@ class HPCRun(
             coroutineScope {
                 launch {
                     withContext(Dispatchers.IO) {
+                        // Sync the output folder (has inputs.json) and any files the script depends on
+                        val filesToSend = mutableListOf(context.outputFolder)
+                        filesToSend.addAll(
+                            resolvedInputs.mapNotNull {
+                                if (fileInputs.contains(it.key) && it.value is String)
+                                    File(it.value as String)
+                                else null
+                            }
+                        )
+
+                        hpcConnection.sendFiles(filesToSend, logFile)
+
                         logger.trace("Watching for changes to {}", context.outputFolder)
                         watchChannel.consumeEach { event ->
                             if (event.file == context.resultFile) {
@@ -102,7 +102,7 @@ class HPCRun(
     }
 
     fun getCommand(): String {
-        throw RuntimeException("unimplemented")
+        return """echo "getCommand() unimplemented" """
     }
 
     companion object {

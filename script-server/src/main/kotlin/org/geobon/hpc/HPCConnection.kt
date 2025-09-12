@@ -192,7 +192,7 @@ class HPCConnection(
                 logFile?.appendText("Ignoring non-existing file \"$file\"\n")
             }
         } else {
-            logFile?.appendText("Ignoring file from unexpected location \"$file\"")
+            logFile?.appendText("Ignoring file from unexpected location \"$file\"\n")
         }
         return false
     }
@@ -208,16 +208,17 @@ class HPCConnection(
                 if (validatePath(file, logFile)) file.absolutePath + "\n"
                 else ""
         }
+        filesString = filesString.trim()
 
-        if(filesString.isBlank()) {
-            "No valid files to sync.".let { logger.warn(it); logFile?.appendText(it) }
+        if(filesString.isEmpty()) {
+            "No files to sync.".let { logger.debug(it); logFile?.appendText(it) }
 
         } else {
-            logFile?.appendText("Syncing files to HPC:\n$filesString".also { logger.debug(it) })
+            logFile?.appendText("Syncing files to HPC:\n$filesString\n".also { logger.debug(it) })
 
 
             val result = systemCall.run(
-                listOf("bash", "-c", """echo "${filesString.trim()}" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- . $sshConfig:~/bon-in-a-box/"""),
+                listOf("bash", "-c", """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- / $sshConfig:~/bon-in-a-box/"""),
                 timeoutAmount = 10,
                 timeoutUnit = MINUTES,
                 mergeErrors = false
