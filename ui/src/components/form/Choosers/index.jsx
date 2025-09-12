@@ -214,7 +214,7 @@ export function Chooser({
       } else if (type === "countryRegionCRS") {
         inp = {
           country: states.country,
-          region: states.region.englishName ? states.region : null,
+          region: states.region.regionName ? states.region : null,
           CRS: states.CRS,
         };
       } else if (type === "CRS") {
