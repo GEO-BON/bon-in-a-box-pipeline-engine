@@ -84,7 +84,7 @@ export const defaultCountry = {
   countryBboxWGS84: [],
 };
 export const defaultRegion = {
-  name: "",
+  regionName: "",
   ISO3166_2: "",
   regionBboxWGS84: [],
   countryEnglishName: "",

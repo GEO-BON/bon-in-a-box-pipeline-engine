@@ -106,7 +106,7 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
   useEffect(() => {
     let ignore = false;
     if (states.actions.includes("updateCRSInput")) {
-      if (states.CRS.code === undefined) return;
+      if (!states.CRS.code) return;
       const c = `${states.CRS.authority}:${states.CRS.code}`;
       if (c !== inputValue) {
         setInputValue(c);
