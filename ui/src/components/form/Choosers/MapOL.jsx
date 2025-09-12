@@ -21,13 +21,7 @@ import Extent from "ol/interaction/Extent";
 import Modify from "ol/interaction/Modify.js";
 import * as turf from "@turf/turf";
 import proj4 from "proj4";
-import {
-  transformPolyToBboxCRS,
-  cleanBbox,
-  defaultCRS,
-  defaultCountry,
-  defaultRegion,
-} from "./utils";
+import { transformPolyToBboxCRS, cleanBbox, defaultCRS } from "./utils";
 
 export default function MapOL({
   states,
@@ -88,7 +82,7 @@ export default function MapOL({
         mapp.removeLayer(l);
       }
     });
-    setMessage("")
+    setMessage("");
   };
 
   // Adapted from https://sun-san-tech.com/javascript/285/
@@ -257,9 +251,7 @@ export default function MapOL({
       };
       mapp.addInteraction(modify);
       setDraw(drawInt);
-    } /* else if (countr.length == 0 && mapp && !digitize) {
-      clearLayers();
-    }*/
+    }
   }, [mapp, features, digitize]);
 
   // The CRS gets updated. We need to reproject the map
@@ -267,17 +259,10 @@ export default function MapOL({
     if (states.actions.includes("changeMapCRS")) {
       const crsCode = `${states.CRS.authority}:${states.CRS.code}`;
       const mapProjection = mapp.getView().getProjection().getCode();
-      if (states.CRS.def && mapProjection !== crsCode) {
-        proj4.defs(crsCode, states.CRS.def);
+      if (states.CRS.proj4Def && mapProjection !== crsCode) {
+        proj4.defs(crsCode, states.CRS.proj4Def);
         let projectMap = true;
         register(proj4);
-        /*unregister();
-        try {
-          register(proj4); //register the new CRS with openLayers;
-        } catch (error) {
-          projectMap = false;
-          unregister();
-        }*/
         if (!get(crsCode) || !projectMap) {
           setMessage(
             "This CRS cannot be shown on the map. The bounding box can still be entered manually."
@@ -296,32 +281,32 @@ export default function MapOL({
     }
   }, [states.actions, mapp]);
 
-
-  useEffect(() =>{
-    if(states.actions.includes("clearLayers")){
+  useEffect(() => {
+    if (states.actions.includes("clearLayers")) {
       clearLayers();
     }
-  },[states.actions])
+  }, [states.actions]);
   // The Country/Region Bounding box or CRS are updated, we need to update and reproject the bbox
 
   useEffect(() => {
     if (states.actions.includes("updateBboxFromCountryRegion")) {
       if (
-        (states.country.bboxLL.length > 0 || states.region.bboxLL.length > 0) &&
+        (states.country.countryBboxWGS84.length > 0 ||
+          states.region.regionBboxWGS84.length > 0) &&
         mapp &&
         states.CRS.code &&
         get(`${states.CRS.authority}:${states.CRS.code}`)
       ) {
         setDigitize(false);
         const b =
-          states.region.bboxLL.length > 0
-            ? states.region.bboxLL
-            : states.country.bboxLL;
+          states.region.regionBboxWGS84.length > 0
+            ? states.region.regionBboxWGS84
+            : states.country.countryBboxWGS84;
         setOldCRS(defaultCRS);
         dispatch({ bbox: cleanBbox(b, "degree"), type: "changeBbox" }); // Set update BBox in new CRS and re-run this block to set features
       } else if (
-        states.country.bboxLL.length == 0 &&
-        states.region.bboxLL.length == 0 &&
+        states.country.countryBboxWGS84.length == 0 &&
+        states.region.regionBboxWGS84.length == 0 &&
         mapp
       ) {
         clearLayers();
@@ -351,7 +336,12 @@ export default function MapOL({
         }
         return;
       }
-      if (states.bbox.length > 0 && !states.bbox.includes("") && states.CRS.code && !ignore) {
+      if (
+        states.bbox.length > 0 &&
+        !states.bbox.includes("") &&
+        states.CRS.code &&
+        !ignore
+      ) {
         //Current map projection
         const mapProjection = mapp.getView().getProjection().getCode();
         const currentCRS = `${states.CRS.authority}:${states.CRS.code}`;

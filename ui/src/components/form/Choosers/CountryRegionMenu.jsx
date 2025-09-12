@@ -45,7 +45,10 @@ export default function CountryRegionMenu({
 
   // Set from controlled values coming in
   useEffect(() => {
-    if (states.actions.includes("updateCountryRegion") && countryOptions.length > 0) {
+    if (
+      states.actions.includes("updateCountryRegion") &&
+      countryOptions.length > 0
+    ) {
       if (
         states.country.ISO3 &&
         states.country.ISO3 !== selectedCountry?.value
@@ -54,7 +57,7 @@ export default function CountryRegionMenu({
           label: states.country.englishName,
           value: states.country.ISO3,
         });
-      }else{
+      } else {
         setSelectedCountry(null);
       }
       if (states.region.regionName) {
@@ -62,7 +65,7 @@ export default function CountryRegionMenu({
           label: states.region.regionName,
           value: states.region.regionName,
         });
-      }else{
+      } else {
         setSelectedRegion(null);
       }
     }
@@ -106,7 +109,7 @@ export default function CountryRegionMenu({
     }
     if (!countryValue) {
       setSelectedRegion(null);
-      dispatch({type: "clear"})
+      dispatch({ type: "clear" });
       return;
     }
     const countryObj = countryOptionsJSON.geonames.find(
@@ -125,7 +128,7 @@ export default function CountryRegionMenu({
         englishName: countryObj.countryName,
         ISO3: countryObj.isoAlpha3,
         code: countryObj.countryCode,
-        bboxLL: b,
+        countryBboxWGS84: b,
       };
     }
     let region = defaultRegion;
@@ -144,7 +147,7 @@ export default function CountryRegionMenu({
             ISO3166_2: regionObj.adminCodes1.ISO3166_2
               ? regionObj.adminCodes1.ISO3166_2
               : "",
-            bboxLL: b,
+            regionBboxWGS84: b,
             countryEnglishName: countryObj.countryName,
           }
         : defaultRegion;

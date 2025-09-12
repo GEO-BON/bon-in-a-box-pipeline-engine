@@ -168,9 +168,9 @@ export function Chooser({
   }, []);
 
   // Update values in the input file content
-  useEffect(() => {    
+  useEffect(() => {
     if (states.actions.includes("saveInputs")) {
-      let inp={};
+      let inp = {};
       if (type === "bboxCRS") {
         inp = {
           bbox: states.bbox,
@@ -182,11 +182,9 @@ export function Chooser({
         inp = {
           country: states.country,
         };
-      } else if ( type === "countryRegion" ) {
+      } else if (type === "countryRegion") {
         inp = { country: states.country, region: states.region };
-      } else if (
-        type === "countryRegionCRS" 
-      ) {
+      } else if (type === "countryRegionCRS") {
         inp = {
           country: states.country,
           region: states.region,
@@ -195,12 +193,11 @@ export function Chooser({
       } else if (type === "CRS") {
         inp = { CRS: states.CRS };
       }
-      if(inp){
+      if (inp) {
         updateInputFile(inputId, inp);
       }
     }
-},[states.actions]);
-    
+  }, [states.actions]);
 
   // Set from controlled values coming in
   useEffect(() => {
