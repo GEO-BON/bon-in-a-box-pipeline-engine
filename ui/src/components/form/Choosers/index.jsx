@@ -179,7 +179,7 @@ export function Chooser({
             bbox: states.bbox,
             CRS: states.CRS,
             country: states.country?.ISO3 ? states.country : null,
-            region: states.region?.englishName ? states.region : null,
+            region: states.region?.regionName ? states.region : null,
           };
         }
       } else if (type === "country") {
