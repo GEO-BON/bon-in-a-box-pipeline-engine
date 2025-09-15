@@ -216,9 +216,11 @@ class HPCConnection(
         } else {
             logFile?.appendText("Syncing files to HPC:\n$filesString\n".also { logger.debug(it) })
 
-
             val result = systemCall.run(
-                listOf("bash", "-c", """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- / $sshConfig:~/bon-in-a-box/"""),
+                listOf(
+                    "bash", "-c",
+                    """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r / $sshConfig:~/bon-in-a-box/"""
+                ),
                 timeoutAmount = 10,
                 timeoutUnit = MINUTES,
                 mergeErrors = false
