@@ -234,7 +234,7 @@ class HPCConnection(
         }
     }
 
-    fun sendJobs(tasksToSend: MutableList<String>) {
+    fun sendJobs(tasksToSend: List<String>) {
         logger.warn("UNIMPLEMENTED: Sending tasks {}", tasksToSend)
         // TODO: Unimplemented
     }

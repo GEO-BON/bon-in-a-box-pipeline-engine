@@ -45,7 +45,7 @@ open class HPC (val connection: HPCConnection) {
 
         synchronized(registeredSteps){
             val readyTasks = registeredSteps.filterValues { it != null }
-            if(readyTasks.size > SEND_THRESHOLD
+            if(readyTasks.size >= SEND_THRESHOLD
                 || readyTasks.size == registeredSteps.size) {
 
                 readyTasks.forEach {
@@ -62,6 +62,6 @@ open class HPC (val connection: HPCConnection) {
     }
 
     companion object {
-        private const val SEND_THRESHOLD = 10
+        const val SEND_THRESHOLD = 10
     }
 }
