@@ -1,9 +1,7 @@
 package org.geobon.hpc
 
 import io.mockk.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.ConstantPipe
 import org.geobon.pipeline.ScriptStep

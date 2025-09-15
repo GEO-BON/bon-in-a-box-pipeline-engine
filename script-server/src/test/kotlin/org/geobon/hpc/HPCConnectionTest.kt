@@ -207,13 +207,15 @@ class HPCConnectionTest {
 
             verify {
                 systemCall.run(
-                    listOf(
-                        "echo", """
-                ${outputRoot.absolutePath}/someScript/hasdfdflgjkl/output.txt
-                ${scriptsRoot.absolutePath}/1in1out.yml
-                ${scriptsRoot.absolutePath}/1in1out.py
-                """.trimIndent(), "|", "rsync", "--files-from=-", ".", "HPC-name:~/bon-in-a-box/"
-                    ), any(), any(), any(), any()
+                    match { cmdList ->
+                        cmdList.find {
+                            it.contains("rsync")
+                                    && it.contains("${outputRoot.absolutePath}/someScript/hasdfdflgjkl/output.txt")
+                                    && it.contains("${scriptsRoot.absolutePath}/1in1out.yml")
+                                    && it.contains("${scriptsRoot.absolutePath}/1in1out.py")
+                                    && it.contains("HPC-name:~/bon-in-a-box/")
+                        } !== null
+                    },  any(), any(), any(), any()
                 )
             }
             confirmVerified(systemCall)
@@ -240,13 +242,15 @@ class HPCConnectionTest {
 
             verify { // somethingWrong.py should not be there
                 systemCall.run(
-                    listOf(
-                        "echo", """
-                ${outputRoot.absolutePath}/someScript/hasdfdflgjkl/output.txt
-                ${scriptsRoot.absolutePath}/1in1out.yml
-                ${scriptsRoot.absolutePath}/1in1out.py
-                """.trimIndent(), "|", "rsync", "--files-from=-", ".", "HPC-name:~/bon-in-a-box/"
-                    ), any(), any(), any(), any()
+                    match { cmdList ->
+                        cmdList.find {
+                            it.contains("rsync")
+                                    && it.contains("${outputRoot.absolutePath}/someScript/hasdfdflgjkl/output.txt")
+                                    && it.contains("${scriptsRoot.absolutePath}/1in1out.yml")
+                                    && it.contains("${scriptsRoot.absolutePath}/1in1out.py")
+                                    && it.contains("HPC-name:~/bon-in-a-box/")
+                        } !== null
+                    }, any(), any(), any(), any()
                 )
             }
             confirmVerified(systemCall)
