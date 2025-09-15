@@ -123,10 +123,7 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
     if (states.actions.includes("resetCRS")) {
       let code = `${defaultCRS.authority}:${defaultCRS.code}`;
       updateCRS({ value: code, label: defaultCRS.name }, false);
-<<<<<<< HEAD
-=======
       setBadCRS("");
->>>>>>> location_chooser
     }
   }, [states.actions]);
 
@@ -136,10 +133,7 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
         label: `${states.CRS.authority}:${states.CRS.code}`,
         value: `${states.CRS.authority}:${states.CRS.code}`,
       });
-<<<<<<< HEAD
-=======
       setBadCRS("");
->>>>>>> location_chooser
     }
   }, [states.actions]);
 
@@ -169,31 +163,15 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
               const c = {
                 name: def.name,
                 authority: def.id.authority,
-<<<<<<< HEAD
-                code: parseInt(def.id.code),
-                proj4Def: def.exports.proj4,
-=======
                 code: def.id.code,
                 proj4Def: def.exports.proj4,
                 wktDef: def.exports.wkt ? def.exports.wkt : null,
->>>>>>> location_chooser
                 unit: def.unit,
                 CRSBboxWGS84: def.bbox,
               };
               dispatch({ type: "changeCRS", CRS: c });
               setBadCRS("");
             } else {
-<<<<<<< HEAD
-              dispatch({
-                type: "changeCRSFromInput",
-                CRS: {
-                  name: value.value,
-                  authority: code[0],
-                  code: parseInt(code[1]),
-                },
-              });
-              setSelectedCRS(null);
-=======
               setBadCRS("CRS not recognized");
               dispatch({
                 type: "changeCRSFromInput",
@@ -204,7 +182,6 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
                 },
               });
               setSelectedCRS({ label: value.value, value: value.value });
->>>>>>> location_chooser
             }
           }
         });
