@@ -355,14 +355,39 @@ export default function MapOpenLayers({
           if (states.CRS.code !== oldCRS.code) {
             newpoly = transformPolyToBboxCRS(newpoly, oldCRS, states.CRS);
           }
-          dispatch({
-            bbox: cleanBbox(newpoly, states.CRS.unit),
-            type: "changeBbox",
-          }); // Set update BBox in new CRS and re-run this block to set features
-          setOldCRS(states.CRS);
+          if (newpoly.includes(Infinity)) {
+            setMessage("CRS not recognized");
+            dispatch({
+              bbox: ["", "", "", ""],
+              type: "changeBbox",
+            }); // Set update BBox in new CRS and re-run this block to set features
+            setOldCRS(states.CRS);
+          } else {
+            dispatch({
+              bbox: cleanBbox(newpoly, states.CRS.unit),
+              type: "changeBbox",
+            }); // Set update BBox in new CRS and re-run this block to set features
+            setOldCRS(states.CRS);
+          }
         } else if (states.CRS) {
           setOldCRS(states.CRS);
         }
+      }
+      if (
+        oldCRS &&
+        states.bbox.includes("") &&
+        (states.country.countryBboxWGS84 || states.region.regionBboxWGS84)
+      ) {
+        // The bounding box is gone, try to reuse the country one, if available
+        const b = states.region.regionBboxWGS4
+          ? states.region.regionBboxWGS4
+          : states.country.countryBboxWGS84;
+        dispatch({
+          bbox: b,
+          CRS: defaultCRS,
+          type: "changeBboxCRS",
+        });
+        setOldCRS(defaultCRS);
       }
     }
   }, [states.actions, oldCRS]);

@@ -27,7 +27,7 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
   const [inputValue, setInputValue] = useState("");
   const [searching, setSearching] = useState(false);
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
-  const [badCRS, setBadCRS] = useState(false);
+  const [badCRS, setBadCRS] = useState("");
 
   useEffect(() => {
     if (states.actions.includes("updateCRSListFromNames")) {
@@ -123,7 +123,7 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
     if (states.actions.includes("resetCRS")) {
       let code = `${defaultCRS.authority}:${defaultCRS.code}`;
       updateCRS({ value: code, label: defaultCRS.name }, false);
-      setBadCRS(false);
+      setBadCRS("");
     }
   }, [states.actions]);
 
@@ -133,7 +133,7 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
         label: `${states.CRS.authority}:${states.CRS.code}`,
         value: `${states.CRS.authority}:${states.CRS.code}`,
       });
-      setBadCRS(false);
+      setBadCRS("");
     }
   }, [states.actions]);
 
@@ -170,9 +170,9 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
                 CRSBboxWGS84: def.bbox,
               };
               dispatch({ type: "changeCRS", CRS: c });
-              setBadCRS(false);
+              setBadCRS("");
             } else {
-              setBadCRS(true);
+              setBadCRS("CRS not recognized");
               dispatch({
                 type: "changeCRSFromInput",
                 CRS: {
@@ -186,7 +186,7 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
           }
         });
       } else {
-        setBadCRS(true);
+        setBadCRS("CRS not recognized");
         dispatch({
           type: "changeCRSFromInput",
           CRS: { name: "unrecognized CRS", authority: code[0], code: code[1] },
@@ -272,7 +272,7 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
         }}
         value={selectedCRS}
       />
-      {badCRS && (
+      {badCRS !== "" && (
         <div
           style={{
             fontSize: "11px",
@@ -280,7 +280,7 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
             color: "red",
           }}
         >
-          CRS not recognized
+          {badCRS}
         </div>
       )}
       <FormControl sx={{ width: "90%", backgroundColor: "white" }}>
