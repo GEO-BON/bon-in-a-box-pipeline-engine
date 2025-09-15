@@ -4,7 +4,7 @@ title: "Description for selectors for specific input types."
 
 When specifying input types 'country', 'countryRegion', 'countryRegionCRS', 'CRS' or 'bboxCRS', selectors are automatically created that facilitate the selection of those inputs. After being selected, those inputs appear in the `input.json` of the script or pipeline as objects with various parameters that will be available when loading then in R, Python or Julia.
 
-For example, the bboxCRS selector allows specifying a country, region and coordinate reference system to define a bounding box. The bounding box can also be selected manually, without first selecting a country or region. Here is an example of an object created through the selection of the Putumayo department in Colombia, in the Bogota 1975 / Colombia West zone reference system:
+For example, the bboxCRS selector allows the user to specify a country, region and coordinate reference system to define a bounding box. The bounding box can also be selected manually, without first selecting a country or region. Here is an example of an object created through the selection of the Putumayo department in Colombia, in the Bogota 1975 / Colombia West zone reference system:
 
 ``` {#bboxCRS .yaml}
 bbox:
