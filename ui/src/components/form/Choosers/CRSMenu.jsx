@@ -27,13 +27,13 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
   const [inputValue, setInputValue] = useState("");
   const [searching, setSearching] = useState(false);
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
+  const [badCRS, setBadCRS] = useState("");
 
   useEffect(() => {
-    if (!states.country.englishName) return;
     if (states.actions.includes("updateCRSListFromNames")) {
       setSearching(true);
       // Suggest from names
-      if (states.country.englishName) {
+      if (states.country?.englishName) {
         getCRSListFromName(states.country.englishName).then((result) => {
           if (result) {
             const suggestions = result.map((proj) => {
@@ -49,6 +49,9 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
           }
           setSearching(false);
         });
+      } else {
+        setCRSList(defaultCRSList);
+        setSearching(false);
       }
     }
   }, [states.actions]);
@@ -120,6 +123,10 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
     if (states.actions.includes("resetCRS")) {
       let code = `${defaultCRS.authority}:${defaultCRS.code}`;
       updateCRS({ value: code, label: defaultCRS.name }, false);
+<<<<<<< HEAD
+=======
+      setBadCRS("");
+>>>>>>> location_chooser
     }
   }, [states.actions]);
 
@@ -129,6 +136,10 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
         label: `${states.CRS.authority}:${states.CRS.code}`,
         value: `${states.CRS.authority}:${states.CRS.code}`,
       });
+<<<<<<< HEAD
+=======
+      setBadCRS("");
+>>>>>>> location_chooser
     }
   }, [states.actions]);
 
@@ -145,23 +156,34 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
   }, [CRSList, states.CRS.code]);
 
   const updateCRS = (value, ignore = false) => {
-    if (value && value?.value) {
+    if (
+      value &&
+      value?.value !== `${states.CRS.authority}:${states.CRS.code}`
+    ) {
       let code = "";
-      code = value.value.split(":")[1];
-      if (code && code.length > 3) {
+      code = value.value.split(":");
+      if (code[1].length > 3) {
         getCRSDef(value.value).then((def) => {
           if (!ignore) {
             if (def) {
               const c = {
                 name: def.name,
                 authority: def.id.authority,
+<<<<<<< HEAD
                 code: parseInt(def.id.code),
                 proj4Def: def.exports.proj4,
+=======
+                code: def.id.code,
+                proj4Def: def.exports.proj4,
+                wktDef: def.exports.wkt ? def.exports.wkt : null,
+>>>>>>> location_chooser
                 unit: def.unit,
-                bbox: def.bbox,
+                CRSBboxWGS84: def.bbox,
               };
               dispatch({ type: "changeCRS", CRS: c });
+              setBadCRS("");
             } else {
+<<<<<<< HEAD
               dispatch({
                 type: "changeCRSFromInput",
                 CRS: {
@@ -171,9 +193,28 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
                 },
               });
               setSelectedCRS(null);
+=======
+              setBadCRS("CRS not recognized");
+              dispatch({
+                type: "changeCRSFromInput",
+                CRS: {
+                  name: "unrecognized CRS",
+                  authority: code[0],
+                  code: code[1],
+                },
+              });
+              setSelectedCRS({ label: value.value, value: value.value });
+>>>>>>> location_chooser
             }
           }
         });
+      } else {
+        setBadCRS("CRS not recognized");
+        dispatch({
+          type: "changeCRSFromInput",
+          CRS: { name: "unrecognized CRS", authority: code[0], code: code[1] },
+        });
+        setSelectedCRS({ label: value.value, value: value.value });
       }
     } else {
       setSelectedCRS(null);
@@ -210,7 +251,7 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
           background: "#fff",
           borderRadius: "4px",
           marginTop: "10px",
-          marginBottom: "15px",
+          marginBottom: "10px",
           "& .MuiInputBase-input": {
             fontSize: 13,
           },
@@ -254,6 +295,17 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
         }}
         value={selectedCRS}
       />
+      {badCRS !== "" && (
+        <div
+          style={{
+            fontSize: "11px",
+            margin: "-5px 0px 10px 5px",
+            color: "red",
+          }}
+        >
+          {badCRS}
+        </div>
+      )}
       <FormControl sx={{ width: "90%", backgroundColor: "white" }}>
         <InputLabel
           htmlFor="crs-code"

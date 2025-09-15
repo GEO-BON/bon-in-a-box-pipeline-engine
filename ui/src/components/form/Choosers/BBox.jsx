@@ -9,29 +9,25 @@ export default function BBox({ states, dispatch }) {
 
   // BBox values coming in
   useEffect(() => {
-    if (
-      states.actions.includes("updateBbox") ||
-      states.actions.includes("redrawBbox")
-    ) {
+    if (states.actions.includes("updateBbox")) {
       let b = ["", "", "", ""];
       if (states.bbox && states.bbox.length === 4) {
         b = states.bbox;
       }
       if (!_.isEqual(bbInput, b)) {
-        updateBBox(4, b);
+        updateBBox(null, b, true);
       }
     }
   }, [states.actions]);
 
-  const updateBBox = (index, value) => {
+  const updateBBox = (index, value, all = false) => {
     setBboxInput((prev) => {
       let newInput = value;
-      if (index !== 4) {
+      if (!all) {
         newInput = [...prev];
         newInput[index] = value;
       }
       dispatch({ type: "changeBbox", bbox: newInput });
-      //updateValues({ bbox: newInput, CRS: states.CRS}, states);
       return newInput;
     });
   };

@@ -2,8 +2,6 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { polygon, bbox } from "@turf/turf";
 import proj4 from "proj4";
-import { get } from "ol/proj";
-import NativeSelectInput from "@mui/material/NativeSelect/NativeSelectInput";
 
 const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
 
@@ -55,7 +53,6 @@ function filterProj4String(proj4String) {
   const match = proj4String.match(/\+proj=([a-z0-9_]+)/i);
   return match && supportedProjections.includes(match[1]);
 }
-//proj4.defs = defs;
 
 export const defaultCRS = {
   name: "WGS84 - Lat/long",
@@ -83,7 +80,7 @@ export const defaultCRSList = [
 export const defaultCountry = {
   englishName: "",
   ISO3: "",
-  code: null,
+  code: "",
   countryBboxWGS84: [],
 };
 export const defaultRegion = {
@@ -259,12 +256,6 @@ export const getCRSListFromName = async (name) => {
 
   return allResults;
 };
-
-/*export const transformCoordCRS = (coords, source_crs_epsg, dest_crs_epsg) => {
-  return coords.map((c) =>
-    proj4(source_crs_epsg, dest_crs_epsg).forward(c, true)
-  );
-};*/
 
 export const transformCoordCRS = (poly, source_crs_epsg, dest_crs_epsg) => {
   const coo = poly.geometry.coordinates[0].map((c) => {

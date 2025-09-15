@@ -49,24 +49,26 @@ export default function CountryRegionMenu({
       states.actions.includes("updateCountryRegion") &&
       countryOptions.length > 0
     ) {
-      if (
-        states.country.ISO3 &&
-        states.country.ISO3 !== selectedCountry?.value
-      ) {
+      if (!states.country?.ISO3) {
+        setSelectedCountry(null);
+        setSelectedRegion(null);
+        return;
+      }
+      if (states.country?.ISO3 !== selectedCountry?.value) {
         setSelectedCountry({
           label: states.country.englishName,
           value: states.country.ISO3,
         });
-      } else {
-        setSelectedCountry(null);
       }
-      if (states.region.regionName) {
+      if (!states.region?.regionName) {
+        setSelectedRegion(null);
+        return;
+      }
+      if (states.region?.regionName !== selectedRegion?.value) {
         setSelectedRegion({
           label: states.region.regionName,
           value: states.region.regionName,
         });
-      } else {
-        setSelectedRegion(null);
       }
     }
   }, [states.actions, countryOptions, regionOptions]);
@@ -91,7 +93,6 @@ export default function CountryRegionMenu({
       });
     } else {
       setRegionOptions([]);
-      //dispatch({ bbox: [], actions: ["updateBbox"] });
     }
   }, [selectedCountry]);
 
@@ -115,7 +116,7 @@ export default function CountryRegionMenu({
     const countryObj = countryOptionsJSON.geonames.find(
       (c) => c.isoAlpha3 === countryValue
     );
-    let country = defaultCountry;
+    let country;
     if (countryValue) {
       let b = [
         countryObj.west,
@@ -152,7 +153,15 @@ export default function CountryRegionMenu({
           }
         : defaultRegion;
     }
-    dispatch({ type: "changeCountryRegion", country: country, region: region });
+    if (!country) {
+      dispatch({ type: "clear" });
+    } else {
+      dispatch({
+        type: "changeCountryRegion",
+        country: country,
+        region: region,
+      });
+    }
   };
 
   return (
@@ -168,7 +177,6 @@ export default function CountryRegionMenu({
         size="small"
         sx={{
           width: "90%",
-          minWidth: "265px",
           background: "#fff",
           color: "#fff",
           borderRadius: "4px",
@@ -187,30 +195,43 @@ export default function CountryRegionMenu({
         }}
       />
       {showRegion && (
-        <Autocomplete
-          disablePortal
-          options={regionOptions}
-          size="small"
-          sx={{
-            marginTop: "20px",
-            width: "90%",
-            background: "#fff",
-            color: "#fff",
-            borderRadius: "4px",
-            marginBottom: "10px",
-          }}
-          getOptionLabel={(option) => {
-            return option.label || "";
-          }}
-          renderInput={(params) => (
-            <TextField {...params} label="Select region" />
-          )}
-          onChange={(event, value) => {
-            setSelectedRegion(value);
-            selectionChanged("region", value?.value ? value.value : null);
-          }}
-          value={selectedRegion}
-        />
+        <>
+          <Autocomplete
+            disablePortal
+            options={regionOptions}
+            size="small"
+            sx={{
+              marginTop: "20px",
+              width: "90%",
+              background: "#fff",
+              color: "#fff",
+              borderRadius: "4px",
+              marginBottom: "10px",
+            }}
+            getOptionLabel={(option) => {
+              return option.label || "";
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Select region" />
+            )}
+            onChange={(event, value) => {
+              setSelectedRegion(value);
+              selectionChanged("region", value?.value ? value.value : null);
+            }}
+            value={selectedRegion}
+          />
+          <div
+            style={{
+              fontSize: "11px",
+              margin: "5px 0px 2px 5px",
+            }}
+          >
+            Reference for toponyms:{" "}
+            <a target="_blank" href="https://geonames.org">
+              GeoNames
+            </a>
+          </div>
+        </>
       )}
     </div>
   );
