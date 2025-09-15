@@ -115,14 +115,6 @@ abstract class Run(
 
     private suspend fun prepareRunFolder() {
         try {
-            // Add this before and after withContext to debug
-            logger.debug("Before withContext: ${coroutineContext[Job]}")
-            withContext(Dispatchers.IO) {
-                logger.debug("Inside IO: ${coroutineContext[Job]}")
-                // your IO code
-            }
-            logger.debug("After withContext: ${coroutineContext[Job]}")
-
             withContext(Dispatchers.IO) {
                 // If loading from cache didn't succeed, make sure we have a clean slate.
                 if (context.outputFolder.exists()) {
@@ -144,12 +136,10 @@ abstract class Run(
                     context.inputFile.writeText(it)
                 }
 
-                logger.debug("prepareRunFolder prepared")
             }
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
-        logger.debug("prepareRunFolder end")
     }
 
     abstract suspend fun runScript(): Map<String, Any>

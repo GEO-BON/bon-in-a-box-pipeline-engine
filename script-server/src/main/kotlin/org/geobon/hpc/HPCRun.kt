@@ -35,7 +35,7 @@ class HPCRun(
         val watchChannel = context.outputFolder.asWatchChannel()
         try {
             coroutineScope {
-                launch {
+                val syncJob = launch {
                     withContext(Dispatchers.IO) {
                         // Sync the output folder (has inputs.json) and any files the script depends on
                         val filesToSend = mutableListOf(context.outputFolder)
@@ -48,7 +48,11 @@ class HPCRun(
                         )
 
                         hpcConnection.sendFiles(filesToSend, logFile)
+                    }
+                }
 
+                launch {
+                    withContext(Dispatchers.IO) {
                         logger.trace("Watching for changes to {}", context.outputFolder)
                         watchChannel.consumeEach { event ->
                             if (event.file == context.resultFile) {
@@ -73,6 +77,7 @@ class HPCRun(
                 }
 
                 // Signal job is ready to be sent
+                syncJob.join()
                 hpc.ready(this@HPCRun)
 
                 logger.debug("Waiting results to be synced back... {}", context.resultFile)
