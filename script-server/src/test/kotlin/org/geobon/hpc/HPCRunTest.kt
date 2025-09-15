@@ -168,23 +168,23 @@ internal class HPCRunTest {
         )
         verify(exactly = 1) { mockContext.hpc!!.register(any()) }
 
-
+        var job:Job? = null
         every { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
         every { mockContext.hpc!!.connection.ready } returns true
-        every { mockContext.hpc!!.ready(any()) } just runs // don't expect an answer, cancelled before result synced back
+        every { mockContext.hpc!!.ready(any()) } answers {
+            // Calling ready starts the job. So we cancel here "while the job is running"
+            job!!.cancel("Cancelled by test")
+        }
         every { mockContext.hpc!!.unregister(any()) } just runs
 
         var error: String? = null
-
-        val job = launch {
+         job = launch {
             try {
                 step.execute()
             } catch (e: Exception) {
                 error = e.message
             }
         }
-        delay(1000)
-        job.cancel("Cancelled by test")
         job.join()
 
         verifyOrder {
