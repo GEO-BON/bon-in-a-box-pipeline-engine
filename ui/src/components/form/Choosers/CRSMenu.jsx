@@ -165,8 +165,9 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
                 authority: def.id.authority,
                 code: def.id.code,
                 proj4Def: def.exports.proj4,
+                wktDef: def.exports.wkt ? def.exports.wkt : null,
                 unit: def.unit,
-                bbox: def.bbox,
+                CRSBboxWGS84: def.bbox,
               };
               dispatch({ type: "changeCRS", CRS: c });
               setBadCRS(false);
