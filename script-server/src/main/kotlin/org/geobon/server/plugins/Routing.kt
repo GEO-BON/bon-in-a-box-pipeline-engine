@@ -8,15 +8,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.geobon.hpc.HPC
 import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.pipelinesRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -296,19 +295,17 @@ fun Application.configureRouting() {
         }
 
         get("/hpc/prepare") {
-            if(!hpc.connection.configured) {
+            if (!hpc.connection.configured) {
                 call.respond(HttpStatusCode.ServiceUnavailable, "HPC not configured on this server")
                 return@get
             }
 
-            runBlocking {
-                launch {
-                    hpc.connection.prepare()
-                }
-
-                // We respond OK immediately when started, status API can be checked for progress.
-                call.respond(HttpStatusCode.OK)
+            launch {
+                hpc.connection.prepare()
             }
+
+            // We respond OK immediately when started, status API can be checked for progress.
+            call.respond(HttpStatusCode.OK)
         }
 
         get("/api/versions") {
