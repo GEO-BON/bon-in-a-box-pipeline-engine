@@ -74,103 +74,108 @@ class HPCConnection(
     suspend fun prepare() {
         coroutineScope {
             launch {
-                withContext(Dispatchers.IO) {
-                    // Checking if already preparing to avoid launching the process 2 times in parallel by accident
-                    if (rStatus.state != ApptainerImageState.NOT_CONFIGURED
-                        && rStatus.state != ApptainerImageState.PREPARING
-                        && rStatus.state != ApptainerImageState.READY) {
-                        prepareApptainer(rStatus)
-                    }
+                sendFiles(File(scriptStubsRoot, "system").listFiles().asList())
+            }
+
+            launch {
+                // Checking if already preparing to avoid launching the process 2 times in parallel by accident
+                if (rStatus.state != ApptainerImageState.NOT_CONFIGURED
+                    && rStatus.state != ApptainerImageState.PREPARING
+                    && rStatus.state != ApptainerImageState.READY
+                ) {
+                    prepareApptainer(rStatus)
                 }
             }
 
             launch {
-                withContext(Dispatchers.IO) {
-                    if (juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
-                        && juliaStatus.state != ApptainerImageState.PREPARING
-                        && juliaStatus.state != ApptainerImageState.READY) {
-                        prepareApptainer(juliaStatus)
-                    }
+                if (juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
+                    && juliaStatus.state != ApptainerImageState.PREPARING
+                    && juliaStatus.state != ApptainerImageState.READY
+                ) {
+                    prepareApptainer(juliaStatus)
                 }
             }
         }
     }
 
-    private fun prepareApptainer(apptainerImage: ApptainerImage) {
-        apptainerImage.state = ApptainerImageState.PREPARING
-        apptainerImage.message = null
-        apptainerImage.image = null
+    private suspend fun prepareApptainer(apptainerImage: ApptainerImage) {
+        withContext(Dispatchers.IO) {
+            apptainerImage.state = ApptainerImageState.PREPARING
+            apptainerImage.message = null
+            apptainerImage.image = null
 
-        try {
-            val container = apptainerImage.container
-            logger.debug("Preparing remote ${container.containerName}")
+            try {
+                val container = apptainerImage.container
+                logger.debug("Preparing remote ${container.containerName}")
 
-            val imageName = container.imageName
-            if (imageName.isEmpty()) {
-                throw RuntimeException("""Could not read image name for service "${container.containerName}". Is the service running?""")
-            }
+                val imageName = container.imageName
+                if (imageName.isEmpty()) {
+                    throw RuntimeException("""Could not read image name for service "${container.containerName}". Is the service running?""")
+                }
 
-            // imageDigestResult: [ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
-            val imageDigestResult = "docker image inspect --format '{{.RepoDigests}}' $imageName"
-                .run()
-                ?.trim()
+                // imageDigestResult: [ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
+                val imageDigestResult = "docker image inspect --format '{{.RepoDigests}}' $imageName"
+                    .run()
+                    ?.trim()
 
-            if (imageDigestResult.isNullOrBlank()
-                || !imageDigestResult.startsWith('[')
-                || !imageDigestResult.endsWith(']')
-            ) {
-                throw RuntimeException("""Could not read digest for image "$imageName".""")
-            }
-            // imageDigest: ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:62849e38bc9105a53c34828009b3632d23d2485ade7f0da285c888074313782e
-            val imageDigest = imageDigestResult.removePrefix("[").removeSuffix("]")
-            apptainerImage.image = imageDigest
+                if (imageDigestResult.isNullOrBlank()
+                    || !imageDigestResult.startsWith('[')
+                    || !imageDigestResult.endsWith(']')
+                ) {
+                    throw RuntimeException("""Could not read digest for image "$imageName".""")
+                }
+                // imageDigest: ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:62849e38bc9105a53c34828009b3632d23d2485ade7f0da285c888074313782e
+                val imageDigest = imageDigestResult.removePrefix("[").removeSuffix("]")
+                apptainerImage.image = imageDigest
 
-            // imageSha: 62849e38bc9105a53c34828009b3632d23d2485ade7f0da285c888074313782e
-            val imageSha = imageDigest.substringAfter(':')
-            if (imageSha.length != 64) throw RuntimeException("Unexpected sha length for runner image: $imageSha")
+                // imageSha: 62849e38bc9105a53c34828009b3632d23d2485ade7f0da285c888074313782e
+                val imageSha = imageDigest.substringAfter(':')
+                if (imageSha.length != 64) throw RuntimeException("Unexpected sha length for runner image: $imageSha")
 
-            // Launch the container creation for that digest (if not already existing)
-            val apptainerImageName = "${container.containerName}_$imageSha.sif"
-            val process = ProcessBuilder(
-                "ssh",
-                "-F", configPath,
-                "-i", sshKeyPath,
-                "-o", "UserKnownHostsFile=$knownHostsPath",
-                sshConfig,
-                """
-                    if [ -f $apptainerImageName ]; then
-                        echo "Image already exists: $apptainerImageName"
-                    else
-                        module load apptainer
-                        apptainer build $apptainerImageName docker://$imageDigest
-                        if [[ $? -eq 0 ]]; then
-                            echo "Image created: $apptainerImageName"
+                // Launch the container creation for that digest (if not already existing)
+                val apptainerImageName = "${container.containerName}_$imageSha.sif"
+                val process = ProcessBuilder(
+                    "ssh",
+                    "-F", configPath,
+                    "-i", sshKeyPath,
+                    "-o", "UserKnownHostsFile=$knownHostsPath",
+                    sshConfig,
+                    """
+                        if [ -f $apptainerImageName ]; then
+                            echo "Image already exists: $apptainerImageName"
                         else
-                            echo "Failed to create image: $apptainerImageName" >&2
-                            exit 1
+                            module load apptainer
+                            apptainer build $apptainerImageName docker://$imageDigest
+                            if [[ $? -eq 0 ]]; then
+                                echo "Image created: $apptainerImageName"
+                            else
+                                echo "Failed to create image: $apptainerImageName" >&2
+                                exit 1
+                            fi
                         fi
-                    fi
-                """.trimIndent())
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .redirectErrorStream(false)
-                .start()
+                    """.trimIndent()
+                )
+                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                    .redirectErrorStream(false)
+                    .start()
 
-            process.waitFor(10, MINUTES)
+                process.waitFor(10, MINUTES)
 
-            val sysOut = process.inputStream.bufferedReader().readText()
-            if (sysOut.isNotBlank()) logger.info(sysOut) // excludes error stream
+                val sysOut = process.inputStream.bufferedReader().readText()
+                if (sysOut.isNotBlank()) logger.info(sysOut) // excludes error stream
 
-            apptainerImage.state = if (process.exitValue() == 0) {
-                ApptainerImageState.READY
-            } else {
-                apptainerImage.message = process.errorStream.bufferedReader().readText()
-                ApptainerImageState.ERROR
+                apptainerImage.state = if (process.exitValue() == 0) {
+                    ApptainerImageState.READY
+                } else {
+                    apptainerImage.message = process.errorStream.bufferedReader().readText()
+                    ApptainerImageState.ERROR
+                }
+
+            } catch (ex: Throwable) {
+                ex.printStackTrace()
+                apptainerImage.message = ex.message
+                apptainerImage.state = ApptainerImageState.ERROR
             }
-
-        } catch (ex: Throwable) {
-            ex.printStackTrace()
-            apptainerImage.message = ex.message
-            apptainerImage.state = ApptainerImageState.ERROR
         }
     }
 
@@ -183,10 +188,11 @@ class HPCConnection(
     }
 
     private fun validatePath(file: File, logFile: File?): Boolean {
-        if(file.startsWith(outputRoot)
+        if (file.startsWith(outputRoot)
             || file.startsWith(scriptsRoot)
-            || file.startsWith(scriptStubsRoot)) {
-            if(file.exists()) {
+            || file.startsWith(scriptStubsRoot)
+        ) {
+            if (file.exists()) {
                 return true
             } else {
                 logFile?.appendText("Ignoring non-existing file \"$file\"\n")
@@ -201,35 +207,37 @@ class HPCConnection(
      * Syncs the files/folders towards the remote host via rsync
      * @return logging information
      */
-    fun sendFiles(files: List<File>, logFile: File? = null) {
-        var filesString = ""
-        files.forEach { file ->
-            filesString = filesString +
-                if (validatePath(file, logFile)) file.absolutePath + "\n"
-                else ""
-        }
-        filesString = filesString.trim()
+    suspend fun sendFiles(files: List<File>, logFile: File? = null) {
+        withContext(Dispatchers.IO) {
+            var filesString = ""
+            files.forEach { file ->
+                filesString = filesString +
+                        if (validatePath(file, logFile)) file.absolutePath + "\n"
+                        else ""
+            }
+            filesString = filesString.trim()
 
-        if(filesString.isEmpty()) {
-            "No files to sync.".let { logger.debug(it); logFile?.appendText(it) }
+            if (filesString.isEmpty()) {
+                "No files to sync.".let { logger.debug(it); logFile?.appendText(it) }
 
-        } else {
-            logFile?.appendText("Syncing files to HPC:\n$filesString\n".also { logger.debug(it) })
+            } else {
+                logFile?.appendText("Syncing files to HPC:\n$filesString\n".also { logger.debug(it) })
 
-            val result = systemCall.run(
-                listOf(
-                    "bash", "-c",
-                    """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r / $sshConfig:~/bon-in-a-box/"""
-                ),
-                timeoutAmount = 10,
-                timeoutUnit = MINUTES,
-                mergeErrors = false
-            )
+                val result = systemCall.run(
+                    listOf(
+                        "bash", "-c",
+                        """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r / $sshConfig:~/bon-in-a-box/"""
+                    ),
+                    timeoutAmount = 10,
+                    timeoutUnit = MINUTES,
+                    mergeErrors = false
+                )
 
-            logFile?.appendText(result.output)
+                logFile?.appendText(result.output)
 
-            if(!result.success) {
-                throw RuntimeException(result.error)
+                if (!result.success) {
+                    throw RuntimeException(result.error)
+                }
             }
         }
     }

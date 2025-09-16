@@ -36,22 +36,20 @@ class HPCRun(
         try {
             coroutineScope {
                 val syncJob = launch {
-                    withContext(Dispatchers.IO) {
-                        // Sync the output folder (has inputs.json) and any files the script depends on
-                        val filesToSend = mutableListOf(
-                            context.outputFolder,
-                            scriptFile
-                        )
-                        filesToSend.addAll(
-                            resolvedInputs.mapNotNull {
-                                if (fileInputs.contains(it.key) && it.value is String)
-                                    File(it.value as String)
-                                else null
-                            }
-                        )
+                    // Sync the output folder (has inputs.json) and any files the script depends on
+                    val filesToSend = mutableListOf(
+                        context.outputFolder,
+                        scriptFile
+                    )
+                    filesToSend.addAll(
+                        resolvedInputs.mapNotNull {
+                            if (fileInputs.contains(it.key) && it.value is String)
+                                File(it.value as String)
+                            else null
+                        }
+                    )
 
-                        hpcConnection.sendFiles(filesToSend, logFile)
-                    }
+                    hpcConnection.sendFiles(filesToSend, logFile)
                 }
 
                 launch {

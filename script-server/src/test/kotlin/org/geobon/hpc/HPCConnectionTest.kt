@@ -9,6 +9,7 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.scriptModule
@@ -189,7 +190,7 @@ class HPCConnectionTest {
 //    }
 
     @Test
-    fun givenAListOfValidFiles_whenSent_thenAllAreSent() {
+    fun givenAListOfValidFiles_whenSent_thenAllAreSent() = runTest {
         withEnvironment(testEnvironment) {
             val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/output.txt")
             someOutput.parentFile.mkdirs()
@@ -223,7 +224,7 @@ class HPCConnectionTest {
     }
 
     @Test
-    fun givenAListWithInvalidFiles_whenSent_thenInvalidAreNotSent() {
+    fun givenAListWithInvalidFiles_whenSent_thenInvalidAreNotSent() = runTest {
         withEnvironment(testEnvironment) {
             val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/output.txt")
             someOutput.parentFile.mkdirs()
@@ -258,7 +259,7 @@ class HPCConnectionTest {
     }
 
     @Test
-    fun givenNoValidFiles_whenSent_thenNothingHappens() {
+    fun givenNoValidFiles_whenSent_thenNothingHappens() = runTest {
         withEnvironment(testEnvironment) {
             val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/outputIsNotCreated.txt")
             someOutput.parentFile.mkdirs()

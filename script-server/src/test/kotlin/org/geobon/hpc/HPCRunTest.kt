@@ -56,7 +56,7 @@ internal class HPCRunTest {
         verify(exactly = 1) { mockContext.hpc!!.register(any()) }
 
 
-        every { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
+        coEvery { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
         every { mockContext.hpc!!.connection.ready } returns true
         every { mockContext.hpc!!.ready(any()) } answers {
             this@runTest.launch {
@@ -81,7 +81,7 @@ internal class HPCRunTest {
         }
 
         val outputFolder = File(outputRoot, "HPCSyncTest").listFiles()[0]
-        verify {
+        coVerify {
             mockContext.hpc!!.connection.sendFiles(
                 match {
                     it.containsAll(
@@ -95,7 +95,7 @@ internal class HPCRunTest {
                 any()
             )
         }
-        verifyOrder {
+        coVerifyOrder {
             mockContext.hpc!!.register(step)
             mockContext.hpc!!.connection.sendFiles(allAny())
             mockContext.hpc!!.ready(any())
@@ -120,7 +120,7 @@ internal class HPCRunTest {
         verify(exactly = 1) { mockContext.hpc!!.register(any()) }
 
 
-        every { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
+        coEvery { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
         every { mockContext.hpc!!.connection.ready } returns true
         every { mockContext.hpc!!.ready(any()) } answers {
             this@runTest.launch {
@@ -144,7 +144,7 @@ internal class HPCRunTest {
             e.printStackTrace()
         }
 
-        verifyOrder {
+        coVerifyOrder {
             mockContext.hpc!!.register(step)
             mockContext.hpc!!.connection.sendFiles(allAny())
             mockContext.hpc!!.ready(any())
@@ -170,7 +170,7 @@ internal class HPCRunTest {
         verify(exactly = 1) { mockContext.hpc!!.register(any()) }
 
         var job:Job? = null
-        every { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
+        coEvery { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
         every { mockContext.hpc!!.connection.ready } returns true
         every { mockContext.hpc!!.ready(any()) } answers {
             // Calling ready starts the job. So we cancel here "while the job is running"
@@ -188,7 +188,7 @@ internal class HPCRunTest {
         }
         job.join()
 
-        verifyOrder {
+        coVerifyOrder {
             mockContext.hpc!!.register(step)
             mockContext.hpc!!.connection.sendFiles(allAny())
             mockContext.hpc!!.ready(any())
