@@ -15,7 +15,7 @@ class ApplicationCallbackTest {
     var callbackCalled = false
     lateinit var server: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>
     val hostTest = "127.0.0.1"
-    val portTest = 8086
+    val portTest = 8087
     val callbackURL = "http://$hostTest:$portTest/callback"
 
     @BeforeTest
