@@ -240,7 +240,7 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
           <TextField
             {...params}
             multiline
-            label="Select CRS"
+            label="Search / Select CRS"
             InputProps={{
               ...params.InputProps,
               readOnly: true,
@@ -292,12 +292,12 @@ export default function CRSMenu({ states, dispatch, dialog = false }) {
           variant="outlined"
           size="small"
         >
-          Enter code (e.g. EPSG:4326)
+          Or enter code directly (e.g. EPSG:4326)
         </InputLabel>
         <OutlinedInput
           id="crs-code"
           value={inputValue}
-          label="Enter code (e.g. EPSG:4326)"
+          label="Or enter code directly (e.g. EPSG:4326)"
           variant="outlined"
           size="small"
           sx={{ width: "100%" }}
