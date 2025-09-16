@@ -261,7 +261,7 @@ export function Chooser({
             padding: "10px",
             backgroundColor: "#fff",
             height: showMap ? "100%" : "auto",
-            overflowY: "scroll",
+            overflowY: type==='bboxCRS'? "scroll": "hidden",
           }}
         >
           {showBBox && (
