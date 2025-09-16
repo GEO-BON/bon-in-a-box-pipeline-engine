@@ -83,7 +83,15 @@ internal class HPCRunTest {
         val outputFolder = File(outputRoot, "HPCSyncTest").listFiles()[0]
         verify {
             mockContext.hpc!!.connection.sendFiles(
-                match { it.containsAll(listOf(outputFolder, File(outputRoot, "someFile.csv"))) },
+                match {
+                    it.containsAll(
+                        listOf(
+                            outputFolder,
+                            File(outputRoot, "someFile.csv"),
+                            File(scriptsRoot, "HPCSyncTest.py"),
+                        )
+                    )
+                },
                 any()
             )
         }
@@ -136,13 +144,6 @@ internal class HPCRunTest {
             e.printStackTrace()
         }
 
-        val outputFolder = File(outputRoot, "HPCSyncTest").listFiles()[0]
-        verify {
-            mockContext.hpc!!.connection.sendFiles(
-                match { it.containsAll(listOf(outputFolder, File(outputRoot, "someFile.csv"))) },
-                any()
-            )
-        }
         verifyOrder {
             mockContext.hpc!!.register(step)
             mockContext.hpc!!.connection.sendFiles(allAny())

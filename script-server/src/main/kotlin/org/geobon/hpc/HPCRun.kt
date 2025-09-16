@@ -31,14 +31,17 @@ class HPCRun(
         }
 
         var genericError = false
-        var output: Map<String, Any>? = null;
+        var output: Map<String, Any>? = null
         val watchChannel = context.outputFolder.asWatchChannel()
         try {
             coroutineScope {
                 val syncJob = launch {
                     withContext(Dispatchers.IO) {
                         // Sync the output folder (has inputs.json) and any files the script depends on
-                        val filesToSend = mutableListOf(context.outputFolder)
+                        val filesToSend = mutableListOf(
+                            context.outputFolder,
+                            scriptFile
+                        )
                         filesToSend.addAll(
                             resolvedInputs.mapNotNull {
                                 if (fileInputs.contains(it.key) && it.value is String)
