@@ -53,9 +53,9 @@ class DockerizedRun( // Constructor used in single script run
                     command = container.dockerCommandList + listOf(
                         "bash", "-c",
                         """
-                                source importEnvVars.sh
-                                julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
-                            """
+                            source importEnvVars.sh
+                            julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
+                        """
                     )
                 }
 
@@ -65,9 +65,9 @@ class DockerizedRun( // Constructor used in single script run
                     command = container.dockerCommandList + listOf(
                         "bash", "-c",
                         """
-                                source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
-                                Rscript $scriptStubsRoot/system/scriptWrapper.R ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
-                            """.trimIndent()
+                            source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
+                            Rscript $scriptStubsRoot/system/scriptWrapper.R ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
+                        """.trimIndent()
                     )
                 }
 
@@ -81,9 +81,9 @@ class DockerizedRun( // Constructor used in single script run
                         command = container.dockerCommandList + listOf(
                             "bash", "-c",
                             """
-                                    source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
-                                    python3 $pythonWrapper $escapedOutputFolder $scriptPath
-                                """.trimIndent()
+                                source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
+                                python3 $pythonWrapper $escapedOutputFolder $scriptPath
+                            """.trimIndent()
                         )
                     } else {
                         command = listOf("python3", pythonWrapper, context.outputFolder.absolutePath, scriptPath)
