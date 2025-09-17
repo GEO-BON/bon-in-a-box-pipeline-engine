@@ -38,6 +38,7 @@ tasks.test {
         "SCRIPT_LOCATION" to "$projectDir/src/test/resources/scripts/",
         "SCRIPT_STUBS_LOCATION" to projectDir.parent + "/script-stubs/",
         "PIPELINES_LOCATION" to "$projectDir/src/test/resources/pipelines/",
+        "USERDATA_LOCATION" to "$projectDir/src/test/resources/userdata/",
         "OUTPUT_LOCATION" to "$projectDir/src/test/resources/outputs/",
         "SCRIPT_SERVER_CACHE_CLEANER" to "full"
     ))

@@ -113,7 +113,7 @@ class HPCRun(
     }
 
     fun getCommand(): String {
-        val escapedOutputFolder = hpcConnection.hpcOutputsRoot
+        val escapedOutputFolder = hpcConnection.hpcOutputRoot
             .replace(" ", "\\ ")
         val scriptPath = scriptFile.absolutePath
             .replace(scriptsRoot.absolutePath, hpcConnection.hpcScriptsRoot)

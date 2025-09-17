@@ -9,6 +9,7 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
@@ -30,7 +31,7 @@ class HPCConnectionTest {
         "HPC_SSH_CONFIG_FILE" to configFile.absolutePath,
         "HPC_SSH_KEY" to sshKeyFile.absolutePath,
         "HPC_KNOWN_HOSTS_FILE" to knownHostsFile.absolutePath,
-        "HPC_BIAB_ROOT" to biabRoot.absolutePath,
+        "HPC_BIAB_ROOT" to "${biabRoot.absolutePath}/hpc",
         "HPC_AUTO_CONNECT" to "false"
     )
 
@@ -126,8 +127,10 @@ class HPCConnectionTest {
 
             client.get("/hpc/prepare").apply {
                 assertEquals(HttpStatusCode.OK, status)
-                print(bodyAsText())
+                print("Body"+bodyAsText())
             }
+
+            delay(1000)
 
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
@@ -197,10 +200,14 @@ class HPCConnectionTest {
             val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/output.txt")
             someOutput.parentFile.mkdirs()
             someOutput.writeText("Some content.")
+            val someRun = File(outputRoot, "someScript/abcdefg/input.json")
+            someRun.parentFile.mkdirs()
+            someRun.writeText("""{"some_file":"${someOutput.absolutePath}","some_int":10}""")
             val toSync = listOf(
                 someOutput,
-                File(scriptsRoot, "1in1out.yml"),
-                File(scriptsRoot, "1in1out.py"),
+                someRun,
+                File(scriptsRoot, "HPCSyncTest.yml"),
+                File(scriptsRoot, "HPCSyncTest.py"),
             )
             val systemCall = mockk<SystemCall>()
             every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
@@ -213,15 +220,22 @@ class HPCConnectionTest {
                     match { cmdList ->
                         cmdList.find {
                             it.contains("rsync")
-                                    && it.contains("${outputRoot.absolutePath}/someScript/hasdfdflgjkl/output.txt")
-                                    && it.contains("${scriptsRoot.absolutePath}/1in1out.yml")
-                                    && it.contains("${scriptsRoot.absolutePath}/1in1out.py")
-                                    && it.contains("HPC-name:~/bon-in-a-box/")
+                                    && it.contains(someOutput.absolutePath)
+                                    && it.contains(someRun.absolutePath)
+                                    && it.contains("${scriptsRoot.absolutePath}/HPCSyncTest.yml")
+                                    && it.contains("${scriptsRoot.absolutePath}/HPCSyncTest.py")
+                                    && it.contains("HPC-name:${connection.hpcRoot}/")
                         } !== null
                     },  any(), any(), any(), any()
                 )
             }
             confirmVerified(systemCall)
+
+            // Input has been transformed for HPC
+            someRun.readText().apply {
+                assertTrue(contains(connection.hpcOutputRoot))
+                assertFalse(contains(outputRoot.absolutePath))
+            }
         }
     }
 
@@ -251,8 +265,8 @@ class HPCConnectionTest {
                                     && it.contains("${outputRoot.absolutePath}/someScript/hasdfdflgjkl/output.txt")
                                     && it.contains("${scriptsRoot.absolutePath}/1in1out.yml")
                                     && it.contains("${scriptsRoot.absolutePath}/1in1out.py")
-                                    && it.contains("HPC-name:~/bon-in-a-box/")
-                        } !== null
+                                    && it.contains("HPC-name:${connection.hpcRoot}")
+                        } != null
                     }, any(), any(), any(), any()
                 )
             }

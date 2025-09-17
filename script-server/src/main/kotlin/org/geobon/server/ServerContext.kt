@@ -14,5 +14,9 @@ class ServerContext(val hpc: HPC? = null) {
 
         val pipelinesRoot
             get() = File(System.getenv("PIPELINES_LOCATION"))
+
+        val userDataRoot
+            get() = File(System.getenv("USERDATA_LOCATION"))
+
     }
 }

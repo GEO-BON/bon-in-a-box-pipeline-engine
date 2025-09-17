@@ -5,6 +5,7 @@ import org.geobon.hpc.ApptainerImage.Companion.ApptainerImageState
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.geobon.server.ServerContext.Companion.userDataRoot
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.SystemCall
 import org.geobon.utils.run
@@ -46,8 +47,11 @@ class HPCConnection(
     val hpcScriptStubsRoot: String
         get() = "$hpcRoot/script-stubs"
 
-    val hpcOutputsRoot: String
+    val hpcOutputRoot: String
         get() = "$hpcRoot/output"
+
+    val hpcUserDataRoot: String
+        get() = "$hpcRoot/userdata"
 
     init {
         if (configPath == null || !File(configPath).exists()) {
@@ -85,29 +89,35 @@ class HPCConnection(
     }
 
     suspend fun prepare() {
-        coroutineScope {
-            launch {
+        try {
+            coroutineScope {
                 sendFiles(File(scriptStubsRoot, "system").listFiles().asList())
-            }
 
-            launch {
-                // Checking if already preparing to avoid launching the process 2 times in parallel by accident
-                if (rStatus.state != ApptainerImageState.NOT_CONFIGURED
-                    && rStatus.state != ApptainerImageState.PREPARING
-                    && rStatus.state != ApptainerImageState.READY
-                ) {
-                    prepareApptainer(rStatus)
+                launch {
+                    // Checking if already preparing to avoid launching the process 2 times in parallel by accident
+                    if (rStatus.state != ApptainerImageState.NOT_CONFIGURED
+                        && rStatus.state != ApptainerImageState.PREPARING
+                        && rStatus.state != ApptainerImageState.READY
+                    ) {
+                        prepareApptainer(rStatus)
+                    }
+                }
+
+                launch {
+                    if (juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
+                        && juliaStatus.state != ApptainerImageState.PREPARING
+                        && juliaStatus.state != ApptainerImageState.READY
+                    ) {
+                        prepareApptainer(juliaStatus)
+                    }
                 }
             }
-
-            launch {
-                if (juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
-                    && juliaStatus.state != ApptainerImageState.PREPARING
-                    && juliaStatus.state != ApptainerImageState.READY
-                ) {
-                    prepareApptainer(juliaStatus)
-                }
-            }
+        } catch (ex: Throwable) {
+            logger.warn("Exception preparing HPC connection: ${ex.message}")
+            juliaStatus.state = ApptainerImageState.ERROR
+            juliaStatus.message = ex.message
+            rStatus.state = ApptainerImageState.ERROR
+            rStatus.message = ex.message
         }
     }
 
@@ -232,6 +242,18 @@ class HPCConnection(
      */
     suspend fun sendFiles(files: List<File>, logFile: File? = null) {
         withContext(Dispatchers.IO) {
+            logFile?.appendText("Transforming inputs for HPC:\n")
+            files
+                .filter { it.name == "input.json" }
+                .forEach {
+                    logFile?.appendText("    ${it.absolutePath}\n")
+                    it.writeText(
+                    it.readText()
+                        .replace("\"${scriptsRoot.absolutePath}", "\"$hpcScriptsRoot")
+                        .replace("\"${outputRoot.absolutePath}", "\"$hpcOutputRoot")
+                        .replace("\"${userDataRoot.absolutePath}", "\"$hpcUserDataRoot")
+                )}
+
             var filesString = ""
             files.forEach { file ->
                 filesString = filesString +
@@ -259,8 +281,6 @@ class HPCConnection(
                 if (!result.success) {
                     throw RuntimeException(result.error)
                 }
-
-
             }
         }
     }
