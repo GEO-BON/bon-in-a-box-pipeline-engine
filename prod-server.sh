@@ -109,7 +109,7 @@ function prepareCommands {
     if ! [[ -z "$macCPU" ]]; then
         # This is a Mac, check chip type
         if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
-            if [ $log -eq 0 ]; then echo "Apple M* chip detected" ; fi
+            echo "Apple M* chip detected"
             composeFiles+=" -f .server/compose.apple.yml"
         fi
     fi

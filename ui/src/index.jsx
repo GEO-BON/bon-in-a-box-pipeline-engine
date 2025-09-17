@@ -28,12 +28,6 @@ import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { Alert } from "@mui/material";
 export const api = new BonInABoxScriptService.DefaultApi();
 
-if (import.meta.hot) {
-  import.meta.hot.on("vite:beforeFullReload", () => {
-    throw "(skipping full reload)";
-  });
-}
-
 function NotFound() {
   const location = useLocation();
   return (
