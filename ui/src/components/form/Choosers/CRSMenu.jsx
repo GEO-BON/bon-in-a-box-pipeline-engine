@@ -1,27 +1,24 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, useRef, useCallback } from "react";
 import TextField from "@mui/material/TextField";
-import { CustomButtonGreen } from "../../CustomMUI";
 import CircularProgress from "@mui/material/CircularProgress";
 import Autocomplete from "@mui/material/Autocomplete";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import debounce from "lodash.debounce";
-import _, { update } from "lodash";
+import _ from "lodash";
 import * as turf from "@turf/turf";
 import {
   getProjestAPI,
-  transformBboxAPI,
   getCRSDef,
   defaultCRS,
   defaultCRSList,
   getCRSListFromName,
   paperStyle,
-  transformCoordCRS
+  transformCoordCRS,
 } from "./utils";
 
 export default function CRSMenu({
@@ -35,34 +32,40 @@ export default function CRSMenu({
   const [inputValue, setInputValue] = useState("");
   const [searching, setSearching] = useState(false);
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
+  const [badCRS, setBadCRS] = useState("");
 
   useEffect(() => {
-    if (!states.country.englishName) return;
     if (states.actions.includes("updateCRSListFromNames")) {
       setSearching(true);
       // Suggest from names
-      if (states.country.englishName) {
+      if (states.country?.englishName) {
         getCRSListFromName(states.country.englishName).then((result) => {
-            if (result) {
-              const suggestions = result.map((proj) => {
-                const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
-                return {
-                  label: `${proj.name} (${p})`,
-                  value: `${p}`,
-                };
-              });
-              setCRSList(defaultCRSList.concat(suggestions));
-            } else {
-              setCRSList(defaultCRSList);
-            }
-            setSearching(false);
+          if (result) {
+            const suggestions = result.map((proj) => {
+              const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
+              return {
+                label: `${proj.name} (${p})`,
+                value: `${p}`,
+              };
+            });
+            setCRSList(defaultCRSList.concat(suggestions));
+          } else {
+            setCRSList(defaultCRSList);
+          }
+          setSearching(false);
         });
+      } else {
+        setCRSList(defaultCRSList);
+        setSearching(false);
       }
     }
   }, [states.actions]);
 
   useEffect(() => {
-    if (states.actions.includes("updateCRSListFromArea") && !states.bbox.includes("")) {
+    if (
+      states.actions.includes("updateCRSListFromArea") &&
+      !states.bbox.includes("")
+    ) {
       // Shrink bbox to help projestion give better suggestions
       const b = states.bbox.map((c) => parseFloat(c));
       const scale_width = Math.abs((b[2] - b[0]) / 3);
@@ -74,27 +77,32 @@ export default function CRSMenu({
         b[3] - scale_height,
       ];
       let code = `${states.CRS.authority}:${states.CRS.code}`;
-      let bbj = { type: "FeatureCollection", features: [transformCoordCRS(turf.bboxPolygon(bbox_shrink), code, 'EPSG:4326')] };
+      let bbj = {
+        type: "FeatureCollection",
+        features: [
+          transformCoordCRS(turf.bboxPolygon(bbox_shrink), code, "EPSG:4326"),
+        ],
+      };
       getProjestAPI(bbj).then((result) => {
-          if (result && result.length > 0) {
-            let suggestions = _.uniqBy(result, function (e) {
-              return e.properties.coord_ref_sys_code;
-            });
-            suggestions = suggestions.map((proj) => ({
-              label:
-                proj.properties.area_name +
-                " " +
-                proj.properties.coord_ref_sys_name +
-                " (EPSG:" +
-                proj.properties.coord_ref_sys_code +
-                ")",
-              value: `EPSG:${parseInt(proj.properties.coord_ref_sys_code)}`,
-            }));
-            setCRSList(defaultCRSList.concat(suggestions));
-          } else {
-            setCRSList(defaultCRSList);
-          }
-          setSearching(false);
+        if (result && result.length > 0) {
+          let suggestions = _.uniqBy(result, function (e) {
+            return e.properties.coord_ref_sys_code;
+          });
+          suggestions = suggestions.map((proj) => ({
+            label:
+              proj.properties.area_name +
+              " " +
+              proj.properties.coord_ref_sys_name +
+              " (EPSG:" +
+              proj.properties.coord_ref_sys_code +
+              ")",
+            value: `EPSG:${parseInt(proj.properties.coord_ref_sys_code)}`,
+          }));
+          setCRSList(defaultCRSList.concat(suggestions));
+        } else {
+          setCRSList(defaultCRSList);
+        }
+        setSearching(false);
       });
     }
   }, [states.actions]);
@@ -103,7 +111,7 @@ export default function CRSMenu({
   useEffect(() => {
     let ignore = false;
     if (states.actions.includes("updateCRSInput")) {
-      if (states.CRS.code === undefined) return;
+      if (!states.CRS.code) return;
       const c = `${states.CRS.authority}:${states.CRS.code}`;
       if (c !== inputValue) {
         setInputValue(c);
@@ -118,35 +126,42 @@ export default function CRSMenu({
   // Update CRS from controlled values coming in
   useEffect(() => {
     if (states.actions.includes("resetCRS")) {
-      let code = `${defaultCRS.authority}:${defaultCRS.code}`
-      updateCRS({value: code, label: defaultCRS.name}, false);
+      let code = `${defaultCRS.authority}:${defaultCRS.code}`;
+      updateCRS({ value: code, label: defaultCRS.name }, false);
+      setBadCRS("");
     }
   }, [states.actions]);
 
-
   useEffect(() => {
-    if(states.actions.includes("updateCRSDropdown")){
-      updateCRS({ label: `${states.CRS.authority}:${states.CRS.code}`, value: `${states.CRS.authority}:${states.CRS.code}` });
+    if (states.actions.includes("updateCRSDropdown")) {
+      updateCRS({
+        label: `${states.CRS.authority}:${states.CRS.code}`,
+        value: `${states.CRS.authority}:${states.CRS.code}`,
+      });
+      setBadCRS("");
     }
-  },[states.actions])
+  }, [states.actions]);
 
   // Set selected CRS and input value CRS changes
   useEffect(() => {
-    let code = `${states.CRS.authority}:${states.CRS.code}`
+    let code = `${states.CRS.authority}:${states.CRS.code}`;
     const fl = CRSList.filter((fl) => fl.value === code);
     if (fl.length > 0) {
       setSelectedCRS(fl[0]);
     } else {
       setSelectedCRS({ value: code, label: code });
     }
-    setInputValue(code)
-  },[CRSList, states.CRS.code])
+    setInputValue(code);
+  }, [CRSList, states.CRS.code]);
 
   const updateCRS = (value, ignore = false) => {
-    if (value && value?.value) {
+    if (
+      value &&
+      value?.value !== `${states.CRS.authority}:${states.CRS.code}`
+    ) {
       let code = "";
-      code = value.value.split(":")[1];
-      if (code && code.length > 3) {
+      code = value.value.split(":");
+      if (code[1].length > 3) {
         getCRSDef(value.value).then((def) => {
           if (!ignore) {
             if (def) {
@@ -154,24 +169,39 @@ export default function CRSMenu({
                 name: def.name,
                 authority: def.id.authority,
                 code: def.id.code,
-                def: def.exports.proj4,
+                proj4Def: def.exports.proj4,
+                wktDef: def.exports.wkt ? def.exports.wkt : null,
                 unit: def.unit,
-                bbox: def.bbox,
+                CRSBboxWGS84: def.bbox,
               };
               dispatch({ type: "changeCRS", CRS: c });
+              setBadCRS("");
             } else {
-              dispatch({ type: "changeCRSFromInput", CRS: {name: value.value, authority: code[0], code: code[1]} });
-              setSelectedCRS(null);
+              setBadCRS("CRS not recognized");
+              dispatch({
+                type: "changeCRSFromInput",
+                CRS: {
+                  name: "unrecognized CRS",
+                  authority: code[0],
+                  code: code[1],
+                },
+              });
+              setSelectedCRS({ label: value.value, value: value.value });
             }
           }
         });
+      } else {
+        setBadCRS("CRS not recognized");
+        dispatch({
+          type: "changeCRSFromInput",
+          CRS: { name: "unrecognized CRS", authority: code[0], code: code[1] },
+        });
+        setSelectedCRS({ label: value.value, value: value.value });
       }
     } else {
       setSelectedCRS(null);
     }
   };
-
-
 
   const debouncedSearch = useCallback(
     debounce((value) => {
@@ -203,7 +233,7 @@ export default function CRSMenu({
           background: "#fff",
           borderRadius: "4px",
           marginTop: "10px",
-          marginBottom: "15px",
+          marginBottom: "10px",
           "& .MuiInputBase-input": {
             fontSize: 13,
           },
@@ -215,7 +245,7 @@ export default function CRSMenu({
           <TextField
             {...params}
             multiline
-            label="Select CRS"
+            label="Search / Select CRS"
             InputProps={{
               ...params.InputProps,
               readOnly: true,
@@ -247,6 +277,17 @@ export default function CRSMenu({
         }}
         value={selectedCRS}
       />
+      {badCRS !== "" && (
+        <div
+          style={{
+            fontSize: "11px",
+            margin: "-5px 0px 10px 5px",
+            color: "red",
+          }}
+        >
+          {badCRS}
+        </div>
+      )}
       <FormControl sx={{ width: "90%", backgroundColor: "white" }}>
         <InputLabel
           htmlFor="crs-code"
@@ -256,12 +297,12 @@ export default function CRSMenu({
           variant="outlined"
           size="small"
         >
-          Enter code (e.g. EPSG:4326)
+          Or enter code directly (e.g. EPSG:4326)
         </InputLabel>
         <OutlinedInput
           id="crs-code"
           value={inputValue}
-          label="Enter code (e.g. EPSG:4326)"
+          label="Or enter code directly (e.g. EPSG:4326)"
           variant="outlined"
           size="small"
           sx={{ width: "100%" }}

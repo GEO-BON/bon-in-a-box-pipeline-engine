@@ -9,13 +9,14 @@ export function chooserReducer(states, action) {
         bbox: action.bbox,
         country: action.country,
         region: action.region,
+        previousCRS: null,
         actions: [
           "updateBbox",
           "updateCRS",
           "updateCRSListFromNames",
           "updateCRSInput",
           "updateCountryRegion",
-          "saveInputs"
+          "saveInputs",
         ],
       };
     case "changeCountryRegion":
@@ -28,20 +29,32 @@ export function chooserReducer(states, action) {
           "resetCRS",
           "updateBbox",
           "updateBboxFromCountryRegion",
-          "saveInputs"
+          "saveInputs",
         ],
       };
     case "changeCRS":
       return {
         ...states,
         CRS: action.CRS,
-        actions: ["changeMapCRS", "changeBboxCRS","saveInputs"],
+        actions: ["changeMapCRS", "changeBboxCRS", "saveInputs"],
       };
     case "changeCRSFromInput":
       return {
         ...states,
         CRS: action.CRS,
-        actions: ["updateCRSDropdown", "changeMapCRS", "changeBboxCRS","saveInputs"],
+        CRSMessage: "",
+        actions: [
+          "updateCRSDropdown",
+          "changeMapCRS",
+          "changeBboxCRS",
+          "saveInputs",
+        ],
+      };
+    case "changeBboxCRS":
+      return {
+        ...states,
+        CRS: action.CRS,
+        bbox: action.bbox,
       };
     case "drawBbox":
       return {
@@ -53,7 +66,7 @@ export function chooserReducer(states, action) {
       return {
         ...states,
         bbox: action.bbox,
-        actions: ["redrawBbox", "saveInputs"],
+        actions: ["updateBbox", "saveInputs"],
       };
     case "clear":
       return {
@@ -64,10 +77,12 @@ export function chooserReducer(states, action) {
         actions: [
           "updateBbox",
           "updateCRS",
+          "updateCRSListFromNames",
+          "changeMapCRS",
           "updateCRSInput",
           "updateCountryRegion",
           "clearLayers",
-          "saveInputs"
+          "saveInputs",
         ],
       };
     default:

@@ -263,7 +263,6 @@ const RunCard = (props) => {
                   {Object.entries(run.inputs).map((i) => {
                     const inputId = i[0]
                     const value = i[1]
-                    console.log(i);
                     return (
                       <TableRow key={inputId}>
                         <TableCell

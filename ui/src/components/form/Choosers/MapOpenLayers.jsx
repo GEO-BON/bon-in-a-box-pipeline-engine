@@ -4,7 +4,7 @@ import "ol/ol.css";
 import Map from "ol/Map";
 import View from "ol/View";
 import GeoJSON from "ol/format/GeoJSON";
-import { OSM, Vector as VectorSource } from "ol/source";
+import { Vector as VectorSource } from "ol/source";
 import VectorLayer from "ol/layer/Vector";
 import Layer from "ol/layer/WebGLTile.js";
 import Source from "ol/source/ImageTile.js";
@@ -15,27 +15,20 @@ import { get } from "ol/proj";
 import { boundingExtent } from "ol/extent";
 import Feature from "ol/Feature";
 import { fromExtent as polygonFromExtent } from "ol/geom/Polygon";
-import { register, unregister } from "ol/proj/proj4";
+import { register } from "ol/proj/proj4";
 import Draw, { createBox } from "ol/interaction/Draw.js";
 import Extent from "ol/interaction/Extent";
 import Modify from "ol/interaction/Modify.js";
 import * as turf from "@turf/turf";
 import proj4 from "proj4";
-import {
-  transformPolyToBboxCRS,
-  cleanBbox,
-  defaultCRS,
-  defaultCountry,
-  defaultRegion,
-} from "./utils";
+import { transformPolyToBboxCRS, cleanBbox, defaultCRS } from "./utils";
 
-export default function MapOL({
+export default function MapOpenLayers({
   states,
   dispatch,
   digitize,
   setDigitize,
 }) {
-  const mapRef = useRef(null);
   const mapContainer = useRef(null);
   const [mapp, setMapp] = useState(null);
   const [draw, setDraw] = useState(null);
@@ -85,7 +78,7 @@ export default function MapOL({
         mapp.removeLayer(l);
       }
     });
-    setMessage("")
+    setMessage("");
   };
 
   // Adapted from https://sun-san-tech.com/javascript/285/
@@ -149,7 +142,7 @@ export default function MapOL({
 
   // New map features are coming in or the digitize button was clicked
   useEffect(() => {
-    if (mapp && (digitize || features.length > 0)) {
+    if (mapp && (digitize || features.length > 0) && states.CRS.proj4Def) {
       clearLayers();
       const feats = features.map((f) => {
         f.set("shape", "Rectangle");
@@ -254,9 +247,7 @@ export default function MapOL({
       };
       mapp.addInteraction(modify);
       setDraw(drawInt);
-    } /* else if (countr.length == 0 && mapp && !digitize) {
-      clearLayers();
-    }*/
+    }
   }, [mapp, features, digitize]);
 
   // The CRS gets updated. We need to reproject the map
@@ -264,8 +255,8 @@ export default function MapOL({
     if (states.actions.includes("changeMapCRS")) {
       const crsCode = `${states.CRS.authority}:${states.CRS.code}`;
       const mapProjection = mapp.getView().getProjection().getCode();
-      if (states.CRS.def && mapProjection !== crsCode) {
-        proj4.defs(crsCode, states.CRS.def);
+      if (states.CRS.proj4Def && mapProjection !== crsCode) {
+        proj4.defs(crsCode, states.CRS.proj4Def);
         let projectMap = true;
         register(proj4);
         if (!get(crsCode) || !projectMap) {
@@ -286,32 +277,33 @@ export default function MapOL({
     }
   }, [states.actions, mapp]);
 
-
-  useEffect(() =>{
-    if(states.actions.includes("clearLayers")){
+  useEffect(() => {
+    if (states.actions.includes("clearLayers")) {
       clearLayers();
+      setFeatures([]);
     }
-  },[states.actions])
+  }, [states.actions]);
 
   // The Country/Region Bounding box or CRS are updated, we need to update and reproject the bbox
   useEffect(() => {
     if (states.actions.includes("updateBboxFromCountryRegion")) {
       if (
-        (states.country.bboxLL.length > 0 || states.region.bboxLL.length > 0) &&
+        (states.country.countryBboxWGS84.length > 0 ||
+          states.region.regionBboxWGS84.length > 0) &&
         mapp &&
         states.CRS.code &&
         get(`${states.CRS.authority}:${states.CRS.code}`)
       ) {
         setDigitize(false);
         const b =
-          states.region.bboxLL.length > 0
-            ? states.region.bboxLL
-            : states.country.bboxLL;
+          states.region.regionBboxWGS84.length > 0
+            ? states.region.regionBboxWGS84
+            : states.country.countryBboxWGS84;
         setOldCRS(defaultCRS);
         dispatch({ bbox: cleanBbox(b, "degree"), type: "changeBbox" }); // Set update BBox in new CRS and re-run this block to set features
       } else if (
-        states.country.bboxLL.length == 0 &&
-        states.region.bboxLL.length == 0 &&
+        states.country.countryBboxWGS84.length == 0 &&
+        states.region.regionBboxWGS84.length == 0 &&
         mapp
       ) {
         clearLayers();
@@ -321,11 +313,9 @@ export default function MapOL({
 
   //Reproject the BBox if necessary and set features
   useEffect(() => {
-    let ignore = false;
     if (
       states.actions.includes("changeBboxCRS") ||
-      states.actions.includes("updateBbox") ||
-      states.actions.includes("redrawBbox")
+      states.actions.includes("updateBbox")
     ) {
       setDigitize(false);
       // openLayers does not recognize this CRS, but try with mapTiler anyways
@@ -341,38 +331,65 @@ export default function MapOL({
         }
         return;
       }
-      if (states.bbox.length > 0 && !states.bbox.includes("") && states.CRS.code && !ignore) {
+      if (
+        states.bbox.length > 0 &&
+        !states.bbox.includes("") &&
+        states.CRS.code &&
+        states.CRS.proj4Def
+      ) {
         //Current map projection
         const mapProjection = mapp.getView().getProjection().getCode();
         const currentCRS = `${states.CRS.authority}:${states.CRS.code}`;
         if (oldCRS && states.CRS && states.CRS.code === oldCRS.code) {
-          if (mapp && states.bbox) {
-            setFeatures(
-              new GeoJSON().readFeatures(turf.bboxPolygon(states.bbox))
-            );
-          }
+          setFeatures(
+            new GeoJSON().readFeatures(turf.bboxPolygon(states.bbox))
+          );
         } else if (
           oldCRS &&
           states.CRS &&
           states.CRS.code !== oldCRS.code &&
           currentCRS == mapProjection
         ) {
-          //Just do this if the map projection has been set to the new CRS
+          //Just reproject the bbox if the map projection has been set to the new CRS
           let newpoly = turf.bboxPolygon(states.bbox);
           if (states.CRS.code !== oldCRS.code) {
             newpoly = transformPolyToBboxCRS(newpoly, oldCRS, states.CRS);
           }
-          dispatch({
-            bbox: cleanBbox(newpoly, states.CRS.unit),
-            type: "changeBbox",
-          }); // Set update BBox in new CRS and re-run this block to set features
-          setOldCRS(states.CRS);
+          if (newpoly.includes(Infinity)) {
+            setMessage("CRS not recognized");
+            dispatch({
+              bbox: ["", "", "", ""],
+              type: "changeBbox",
+            }); // Set update BBox in new CRS and re-run this block to set features
+            setOldCRS(states.CRS);
+          } else {
+            dispatch({
+              bbox: cleanBbox(newpoly, states.CRS.unit),
+              type: "changeBbox",
+            }); // Set update BBox in new CRS and re-run this block to set features
+            setOldCRS(states.CRS);
+          }
         } else if (states.CRS) {
           setOldCRS(states.CRS);
         }
       }
+      if (
+        oldCRS &&
+        states.bbox.includes("") &&
+        (states.country.countryBboxWGS84 || states.region.regionBboxWGS84)
+      ) {
+        // The bounding box is gone, try to reuse the country one, if available
+        const b = states.region.regionBboxWGS4
+          ? states.region.regionBboxWGS4
+          : states.country.countryBboxWGS84;
+        dispatch({
+          bbox: b,
+          CRS: defaultCRS,
+          type: "changeBboxCRS",
+        });
+        setOldCRS(defaultCRS);
+      }
     }
-    return () => (ignore = true);
   }, [states.actions, oldCRS]);
 
   useEffect(() => {

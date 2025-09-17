@@ -70,7 +70,7 @@ YAML files should begin with a name, description, and the authors of the script.
 
 Example:
 
-```
+```         
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -87,7 +87,7 @@ All input and output ids should follow the snake case naming conventions. Names 
 
 Here is an example where the inputs are a coordinate reference system and a distance, specified by the user:
 
-```
+```         
 inputs:
   crs:
     label: coordinate reference system for output
@@ -105,21 +105,21 @@ Specifying an example will auto-fill that input with the example unless changed 
 
 There are several different types of user inputs that can be specified in the YAML file:
 
-| "Type" attribute in the yaml | UI rendering | Description |
+| "Type" attribute in the yaml     | UI rendering               | Description                                                                       |
 |------------------------|------------------------|------------------------|
-| boolean | Plain text | true/false |
-| float or float\[\] (float array) | Plain text | positive or negative numbers with a decimal point, accepts int and a valid input. |
-| int or int\[\] (int array) | Plain text | integer |
-| options^1^ | Dropdown menu | Select one from predefined options |
-| options\[\]^1^ | Multi-select dropdown menu | Select several from predefined options |
-| text or text\[\] (text array) | Plain text | text input (words) |
-| (any unknown type) | Plain text |  |
+| boolean                          | Plain text                 | true/false                                                                        |
+| float or float\[\] (float array) | Plain text                 | positive or negative numbers with a decimal point, accepts int and a valid input. |
+| int or int\[\] (int array)       | Plain text                 | integer                                                                           |
+| options^1^                       | Dropdown menu              | Select one from predefined options                                                |
+| options\[\]^1^                   | Multi-select dropdown menu | Select several from predefined options                                            |
+| text or text\[\] (text array)    | Plain text                 | text input (words)                                                                |
+| (any unknown type)               | Plain text                 |                                                                                   |
 
 -   Note that the square brackets specify an array, where the user can input multiple values separated by a comma. This is useful if you want the analysis to run with several different parameters (e.g. for multiple species or with multiple raster bands).
 
 ^1^options type requires an additional options attribute to be added with the available options.
 
-```
+```         
 options_example:
   label: Options example
   description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
@@ -133,19 +133,19 @@ options_example:
 
 The user inputs can also be file types if you want to upload a file or connect the script to a previous one that outputs a specific file type. There are several file types that you can specify:
 
-| File Type | MIME type to use in the yaml | Description |
+| File Type  | MIME type to use in the yaml   | Description                                                               |
 |------------------|----------------------------|--------------------------|
-| CSV | text/csv | Comma separated values file format (.csv) |
-| GeoJSON | application/geo+json | GeoJSON file format (.geojson) |
-| GeoPackage | application/geopackage+sqlite3 | GeoPackage file format (.gpkg) |
-| GeoTIFF^2^ | image/tiff;application=geotiff | GeoTIFF file format (.tif) |
-| Shapefile | application/dbf | Shapefile format (.shp) |
-| Text | text/plain | Plain text output (no need to save as a format just output in the script) |
-| TSV | text/tab-separated-values | Tab separated values format (.tsv) |
+| CSV        | text/csv                       | Comma separated values file format (.csv)                                 |
+| GeoJSON    | application/geo+json           | GeoJSON file format (.geojson)                                            |
+| GeoPackage | application/geopackage+sqlite3 | GeoPackage file format (.gpkg)                                            |
+| GeoTIFF^2^ | image/tiff;application=geotiff | GeoTIFF file format (.tif)                                                |
+| Shapefile  | application/dbf                | Shapefile format (.shp)                                                   |
+| Text       | text/plain                     | Plain text output (no need to save as a format just output in the script) |
+| TSV        | text/tab-separated-values      | Tab separated values format (.tsv)                                        |
 
 For example:
 
-```
+```         
 inputs:
   landcover_raster:
     label: Raster of landcover
@@ -159,17 +159,17 @@ inputs:
     example: null
 ```
 
-The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying 'country' as input type will create a dropdown menu with a standardized list of countries. Selecting 'bboxCRS' will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:
+The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying 'country' as input type will create a dropdown menu with a standardized list of countries from GeoNames. Selecting 'bboxCRS' will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:
 
-| Input name | Description |
+| Input name       | Description                                                                                                                                                                                                                                                       |     |
 |------------------|----------------------------|--------------------------|
-| country | Creates a selector (dropdown menu) with a standardized list of countries. GeoNames is used as the reference for the country list.  |
-| countryRegion | Creates a selector (dropdown menu) with a standardized list of regions (provinces, states, etc) within a selected country. GeoNames is used as the reference for the list of regions.|
-| countryRegionCRS | Creates a selector (dropdown menu) for choosing a coordinate reference system adapted for a specific country and/or region. |
-| CRS | Creates a selector for specifying a coordinate reference system.|
-| bboxCRS | Creates a button to open an interface that allows to specify a bounding box (geographical minima and maxima) based on an optional selection of country/region and on a CRS, or by clicking on the map to set the bounds of the area of interest for the analysis.|
+| country          | Creates a selector (drop down menu) with a standardized list of countries. GeoNames is used as the reference for the country list.                                                                                                                                |     |
+| countryRegion    | Creates a selector (drop down menu) with a standardized list of regions (provinces, states, etc) within a selected country. GeoNames is used as the reference for the list of regions.                                                                            |     |
+| countryRegionCRS | Creates a selector (drop down menu) for choosing a coordinate reference system adapted for a specific country and/or region.                                                                                                                                      |     |
+| CRS              | Creates a selector for specifying a coordinate reference system.                                                                                                                                                                                                  |     |
+| bboxCRS          | Creates a button to open an interface that allows the user to specify a bounding box (geographical minima and maxima) based on an optional selection of country/region and on a CRS, or by clicking on the map to set the bounds of the area of interest for the analysis. |     |
 
-Note that the use of these selectors will create objects that contain multiple elements. For example, the country selector will create an input object that contains the country name in English, the ISO3 code of the country, the ISO2 code, as well as the bounding box of that country, in longitude, latitude coordinates. 
+Note that the use of these selectors will create objects that contain multiple elements. For example, the country selector will create an input object that contains the country name in English, the ISO3 code of the country, the ISO2 code, as well as the bounding box of that country, in longitude, latitude coordinates. [See the full list of those keys for each selector here](selectors.qmd).
 
 ### Outputs
 
@@ -194,7 +194,7 @@ There are also several types of outputs that can be created
 
 ^3^ When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
 
-```
+```         
 map:
   label: My map
   description: Some map that shows something
@@ -205,7 +205,7 @@ map:
 
 Here is an example output:
 
-```
+```         
 outputs:
   result:
     label: Analysis result
@@ -242,7 +242,7 @@ Search for your package names on [anaconda](https://anaconda.org/). Packages tha
 
 Example of conda sub-environment for an R script:
 
-```
+```         
 conda: # Optional: if you script requires specific versions of packages.
   channels:
     - conda-forge # make sure to put conda forge first
@@ -258,7 +258,7 @@ conda: # Optional: if you script requires specific versions of packages.
 
 Example of conda sub-environment for a python script. You do not need to put anything after conda-forge or before the package names when specifying a conda environment for python.
 
-```
+```         
 conda:
   channels:
     - conda-forge
@@ -282,7 +282,7 @@ For more information, refer to the [conda documentation](https://docs.conda.io/p
 
 #### Full example of a YAML file:
 
-```
+```         
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -343,7 +343,7 @@ If inputs are outputs from a previous step in the pipeline, make sure to give th
 
 #### Empty commented template to fill in:
 
-```
+```         
 script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targeted to those who will interpret pipeline results and edit pipelines.
@@ -467,6 +467,21 @@ And to project it using the CRS that the user specified:
 landcover_projected <- project(landcover, input$crs)
 ```
 
+When the inputs were entered through [preset selectors](selectors.qmd), the values associated with the selected options are available as a list with values [described here](selectors.qmd). For example, to access the bounding box of an selector with name study_area_bbox of type `BboxCRS`. The bounding box can be accessed through:
+
+``` r
+bbox <- input$study_area_bbox$bbox
+```
+
+and the ID of the coordinate reference system of the bounding box, made of the authority and code:
+
+``` r
+crs_id <- paste0(input$study_area_bbox$CRS$authority,input$study_area_bbox$CRS$code) 
+```
+:::
+
+::: panel-tabset
+
 ## Python
 
 A convenience function `biab_inputs` is loaded in Python by default to load the file into a list. Here is an example of how to read the input file in the script and use it's value:
@@ -475,6 +490,14 @@ A convenience function `biab_inputs` is loaded in Python by default to load the 
 data = biab_inputs()
 my_int = data['some_int_input']
 # do something with my_int
+```
+
+To access selector values in Python, the approach is similar to R. For example, to create the CRS ID from the authority and code:
+:::
+
+::: panel-tabset
+``` python
+crs_id = data['study_area_bbox']['CRS']['authority']+':'+str(data['study_area_bbox']['CRS']['code'])
 ```
 
 ## Julia
@@ -491,6 +514,14 @@ end
 
 number = input_data["number"]
 # do something with number
+```
+
+::: panel-tabset
+To access selector values in Julia, the approach is similar to R or Python. For example, to create the CRS ID from the authority and code:
+:::
+
+``` julia
+crs_id = string(input_data["study_area_bbox"]["CRS"]["authority"],":",input_data["study_area_bbox"]["CRS"]["code"])
 ```
 :::
 
