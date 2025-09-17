@@ -249,18 +249,18 @@ class HPCConnection(
                 val result = systemCall.run(
                     listOf(
                         "bash", "-c",
-                        """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r / $sshConfig:~/bon-in-a-box/"""
+                        """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r / $sshConfig:$hpcRoot/"""
                     ),
                     timeoutAmount = 10,
                     timeoutUnit = MINUTES,
                     mergeErrors = false
                 )
-
                 logFile?.appendText(result.output)
-
                 if (!result.success) {
                     throw RuntimeException(result.error)
                 }
+
+
             }
         }
     }
