@@ -261,7 +261,6 @@ export function PipelinePage({ runType }) {
   const toggleAccord  = useCallback(() => {
     setExpandInputs(prev => !prev);
   }, [setExpandInputs])
-  console.log(inputFileContent);
 
 
   return (
