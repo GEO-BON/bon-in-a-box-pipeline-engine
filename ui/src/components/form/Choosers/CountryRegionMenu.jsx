@@ -21,12 +21,8 @@ export default function CountryRegionMenu({
   const [countryOptions, setCountryOptions] = useState([]);
   const [regionOptions, setRegionOptions] = useState([]);
   const [regionJSON, setRegionJSON] = useState([]);
-  const [selectedRegion, setSelectedRegion] = useState(
-    value?.regionData || null
-  );
-  const [selectedCountry, setSelectedCountry] = useState(
-    value?.countryData || null
-  );
+  const [selectedRegion, setSelectedRegion] = useState(null);
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   useEffect(() => {
     // Fetch country options from the JSON file

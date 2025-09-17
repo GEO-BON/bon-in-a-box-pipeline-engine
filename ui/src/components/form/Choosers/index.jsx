@@ -27,7 +27,6 @@ export default function Choosers({
   onChange = () => {},
   descriptionCell = true,
   leftLabel = true,
-  value = null,
 }) {
   const [openModal, setOpenModal] = useState(false);
 
@@ -82,7 +81,6 @@ export default function Choosers({
                       inputFileContent,
                       updateInputFile,
                       onChange,
-                      value,
                     }}
                   />
                 )}
@@ -103,7 +101,6 @@ export default function Choosers({
                 inputFileContent,
                 updateInputFile,
                 onChange,
-                value,
               }}
             />
           </td>
@@ -134,7 +131,6 @@ export function Chooser({
   inputFileContent,
   updateInputFile = () => {},
   onChange,
-  value,
 }) {
   const [clearFeatures, setClearFeatures] = useState(0);
   const [digitize, setDigitize] = useState(false);
@@ -261,7 +257,7 @@ export function Chooser({
             padding: "10px",
             backgroundColor: "#fff",
             height: showMap ? "100%" : "auto",
-            overflowY: type==='bboxCRS'? "scroll": "hidden",
+            overflowY: type === "bboxCRS" ? "scroll" : "hidden",
           }}
         >
           {showBBox && (
@@ -287,8 +283,6 @@ export function Chooser({
                   ? false
                   : true,
                 dialog: showMap,
-                onChange,
-                value,
               }}
             />
           )}
@@ -298,7 +292,6 @@ export function Chooser({
                 states,
                 dispatch,
                 dialog: showMap,
-                value,
                 showBBox,
               }}
             />
