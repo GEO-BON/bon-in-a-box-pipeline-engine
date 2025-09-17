@@ -278,6 +278,7 @@ export function Chooser({
                 states,
                 dispatch,
                 dialog: showMap,
+                value,
                 showBBox,
               }}
             />

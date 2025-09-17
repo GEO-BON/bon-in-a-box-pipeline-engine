@@ -27,10 +27,11 @@ import {
 export default function CRSMenu({
   states,
   dispatch,
+  value,
   dialog = false,
 }) {
   const [CRSList, setCRSList] = useState(defaultCRSList);
-  const [selectedCRS, setSelectedCRS] = useState(defaultCRSList[0]);
+  const [selectedCRS, setSelectedCRS] = useState(value || defaultCRSList[0]);
   const [inputValue, setInputValue] = useState("");
   const [searching, setSearching] = useState(false);
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
