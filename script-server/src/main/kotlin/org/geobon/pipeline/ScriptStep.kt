@@ -83,10 +83,10 @@ class ScriptStep : YMLStep {
                             context,
                             scriptFile,
                             inputs,
-                            resolvedInputs
-//                        specificTimeout ?: Run.DEFAULT_TIMEOUT,
-//                        condaEnvName,
-//                        condaEnvYml
+                            resolvedInputs,
+                            specificTimeout ?: Run.DEFAULT_TIMEOUT,
+                            condaEnvName,
+                            condaEnvYml
                         )
                     } else {
                         DockerizedRun(

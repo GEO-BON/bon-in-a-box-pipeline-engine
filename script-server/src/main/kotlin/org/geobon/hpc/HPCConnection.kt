@@ -23,6 +23,7 @@ class HPCConnection(
     val configPath: String? = System.getenv("HPC_SSH_CONFIG_FILE")
     val sshKeyPath: String? = System.getenv("HPC_SSH_KEY")
     val knownHostsPath: String? = System.getenv("HPC_KNOWN_HOSTS_FILE")
+    val hpcRoot: String? = System.getenv("HPC_BIAB_ROOT")
 
     val autoConnect = System.getenv("HPC_AUTO_CONNECT") == "true"
 
@@ -39,6 +40,15 @@ class HPCConnection(
         get() = rStatus.state == ApptainerImageState.READY
                 && juliaStatus.state == ApptainerImageState.READY
 
+    val hpcScriptsRoot: String
+        get() = "$hpcRoot/scripts"
+
+    val hpcScriptStubsRoot: String
+        get() = "$hpcRoot/script-stubs"
+
+    val hpcOutputsRoot: String
+        get() = "$hpcRoot/output"
+
     init {
         if (configPath == null || !File(configPath).exists()) {
             logger.info("HPC not configured: missing HPC_SSH_CONFIG_FILE ($configPath)")
@@ -51,6 +61,9 @@ class HPCConnection(
 
         } else if (knownHostsPath == null || !File(knownHostsPath).exists()) {
             logger.info("HPC not configured: missing HPC_KNOWN_HOSTS_FILE ($knownHostsPath).")
+
+        } else if (hpcRoot.isNullOrBlank()) {
+            logger.info("HPC not configured: missing HPC_BIAB_ROOT ($knownHostsPath).")
 
         } else {
             juliaStatus.state = ApptainerImageState.CONFIGURED
@@ -134,6 +147,7 @@ class HPCConnection(
 
                 // Launch the container creation for that digest (if not already existing)
                 val apptainerImageName = "${container.containerName}_$imageSha.sif"
+                val apptainerImagePath = "$hpcRoot/$apptainerImageName"
                 val process = ProcessBuilder(
                     "ssh",
                     "-F", configPath,
@@ -141,11 +155,20 @@ class HPCConnection(
                     "-o", "UserKnownHostsFile=$knownHostsPath",
                     sshConfig,
                     """
-                        if [ -f $apptainerImageName ]; then
+                        if [ -f $apptainerImagePath ]; then
                             echo "Image already exists: $apptainerImageName"
                         else
+                            if [ ! -d "$hpcRoot" ]; then
+                                mkdir -p "$hpcRoot"
+                            fi
+
+                            if [ ! -w "$hpcRoot" ]; then
+                                echo "No write permission to $hpcRoot" >&2
+                                exit 1
+                            fi
+
                             module load apptainer
-                            apptainer build $apptainerImageName docker://$imageDigest
+                            apptainer build $apptainerImagePath docker://$imageDigest
                             if [[ $? -eq 0 ]]; then
                                 echo "Image created: $apptainerImageName"
                             else

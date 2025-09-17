@@ -24,11 +24,13 @@ class HPCConnectionTest {
     private val configFile = File(tmpDir, "config")
     private val sshKeyFile = File(tmpDir, "key")
     private val knownHostsFile = File(tmpDir, "hosts")
+    private val biabRoot = File(tmpDir, "bon-in-a-box")
     private val testEnvironment = mutableMapOf(
         "HPC_SSH_CONFIG_NAME" to "HPC-name",
         "HPC_SSH_CONFIG_FILE" to configFile.absolutePath,
         "HPC_SSH_KEY" to sshKeyFile.absolutePath,
         "HPC_KNOWN_HOSTS_FILE" to knownHostsFile.absolutePath,
+        "HPC_BIAB_ROOT" to biabRoot.absolutePath,
         "HPC_AUTO_CONNECT" to "false"
     )
 

@@ -7,14 +7,19 @@ import kotlinx.coroutines.channels.consumeEach
 import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.RunContext
 import org.geobon.script.Run
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import java.io.File
 import java.util.concurrent.TimeoutException
+import kotlin.time.Duration
 
 class HPCRun(
     context: RunContext,
     scriptFile: File,
     inputs: Map<String, Pipe>,
-    private val resolvedInputs: Map<String, Any?>
+    private val resolvedInputs: Map<String, Any?>,
+    private val timeout: Duration = DEFAULT_TIMEOUT, // TODO Timeout implementation
+    private val condaEnvName: String? = null,
+    private val condaEnvYml: String? = null
 ) : Run(scriptFile, context) {
 
     private val hpc = context.serverContext.hpc
@@ -84,7 +89,7 @@ class HPCRun(
                 logger.debug("Waiting results to be synced back... {}", context.resultFile)
                 // this will stop when watchChannel.close() called above, is cancelled, or script times out.
             }
-        } catch ( ex: Exception ) {
+        } catch (ex: Exception) {
             when (ex) {
                 is TimeoutException,
                 is CancellationException -> {
@@ -108,7 +113,34 @@ class HPCRun(
     }
 
     fun getCommand(): String {
-        return """echo "getCommand() unimplemented" """
+        val escapedOutputFolder = hpcConnection.hpcOutputsRoot
+            .replace(" ", "\\ ")
+        val scriptPath = scriptFile.absolutePath
+            .replace(scriptsRoot.absolutePath, hpcConnection.hpcScriptsRoot)
+            .replace(" ", "\\ ")
+        val scriptStubsPath = hpcConnection.hpcScriptStubsRoot
+            .replace(" ", "\\ ")
+        val condaEnvWrapper = "$scriptStubsPath/system/condaEnvironment.sh"
+
+        return when (scriptFile.extension) {
+            "jl", "JL" ->
+                """julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsPath/system/scriptWrapper.jl $escapedOutputFolder $scriptPath"""
+
+            "r", "R" ->
+                """
+                    source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
+                    Rscript $scriptStubsPath/system/scriptWrapper.R $escapedOutputFolder $scriptPath
+                """.trimIndent()
+
+            "sh" -> "$scriptPath $escapedOutputFolder"
+            "py", "PY" ->
+                """
+                    source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
+                    python3 $scriptStubsPath/system/scriptWrapper.py $escapedOutputFolder $scriptPath
+                """.trimIndent()
+
+            else -> throw RuntimeException("Unsupported script extension $scriptPath")
+        }
     }
 
     companion object {
