@@ -167,6 +167,7 @@ class HPCConnectionTest {
                 val body = response.bodyAsText()
                 if (body.contains(""""R":{"state":"ERROR"""")
                     && body.contains(""""Julia":{"state":"ERROR"""")
+                    && body.contains(""""Launch scripts":{"state":"ERROR"""")
                 ) {
                     println("Request completed in ${i * 10}ms")
                     break@waiting
@@ -180,9 +181,6 @@ class HPCConnectionTest {
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 val body = bodyAsText()
-                assertContains(body, """"R":{"state":"ERROR"""")
-                assertContains(body, """"Julia":{"state":"ERROR"""")
-                assertContains(body, """"Launch scripts":{"state":"ERROR"""")
                 assertTrue(
                     // error message from rsyc
                     body.contains("ssh: Could not resolve hostname hpc-name: Temporary failure in name resolution")
