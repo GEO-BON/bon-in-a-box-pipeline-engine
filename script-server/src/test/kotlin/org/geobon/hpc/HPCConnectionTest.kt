@@ -71,7 +71,7 @@ class HPCConnectionTest {
         client.get("/hpc/status").apply {
             assertEquals(HttpStatusCode.OK, status)
             assertEquals(
-                """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"}}""",
+                """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"},"Launch scripts":{"state":"NOT_CONFIGURED"}}""",
                 bodyAsText()
             )
         }
@@ -87,7 +87,7 @@ class HPCConnectionTest {
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 assertEquals(
-                    """{"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"}}""",
+                    """{"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"},"Launch scripts":{"state":"CONFIGURED"}}""",
                     bodyAsText()
                 )
             }
@@ -103,7 +103,7 @@ class HPCConnectionTest {
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 assertEquals(
-                    """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"}}""",
+                    """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"},"Launch scripts":{"state":"NOT_CONFIGURED"}}""",
                     bodyAsText()
                 )
             }
@@ -120,7 +120,7 @@ class HPCConnectionTest {
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 assertEquals(
-                    """{"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"}}""",
+                    """{"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"},"Launch scripts":{"state":"CONFIGURED"}}""",
                     bodyAsText()
                 )
             }
@@ -137,9 +137,12 @@ class HPCConnectionTest {
                 val body = bodyAsText()
                 assertContains(body, """"R":{"state":"ERROR"""")
                 assertContains(body, """"Julia":{"state":"ERROR"""")
+                assertContains(body, """"Launch scripts":{"state":"ERROR"""")
                 assertTrue(
-                    // if biab not running
-                    body.contains("""Could not read image name for service \"biab-runner-conda\". Is the service running?""")
+                    // error message from rsyc
+                    body.contains("ssh: Could not resolve hostname hpc-name: Temporary failure in name resolution")
+                            // if biab not running
+                            || body.contains("""Could not read image name for service \"biab-runner-conda\". Is the service running?""")
                             // if biab is separately running on the testing PC
                             || body.contains("""ssh: Could not resolve hostname hpc-name: Name or service not known"""),
                     "Unexpected message: $body"
@@ -165,6 +168,7 @@ class HPCConnectionTest {
                 if (body.contains(""""R":{"state":"ERROR"""")
                     && body.contains(""""Julia":{"state":"ERROR"""")
                 ) {
+                    println("Request completed in ${i * 10}ms")
                     break@waiting
                 }
 
@@ -178,9 +182,12 @@ class HPCConnectionTest {
                 val body = bodyAsText()
                 assertContains(body, """"R":{"state":"ERROR"""")
                 assertContains(body, """"Julia":{"state":"ERROR"""")
+                assertContains(body, """"Launch scripts":{"state":"ERROR"""")
                 assertTrue(
-                    // if biab not running
-                    body.contains(""""message":"Could not read image name for service \"biab-runner-conda\". Is the service running?"""")
+                    // error message from rsyc
+                    body.contains("ssh: Could not resolve hostname hpc-name: Temporary failure in name resolution")
+                            // if biab not running
+                            || body.contains(""""message":"Could not read image name for service \"biab-runner-conda\". Is the service running?"""")
                             // if biab is separately running on the testing PC
                             || body.contains("""ssh: Could not resolve hostname hpc-name: Name or service not known"""),
                     "Unexpected message: $body"

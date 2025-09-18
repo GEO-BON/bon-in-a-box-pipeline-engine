@@ -1,7 +1,6 @@
 package org.geobon.hpc
 
 import kotlinx.coroutines.*
-import org.geobon.hpc.ApptainerImage.Companion.ApptainerImageState
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
@@ -28,18 +27,21 @@ class HPCConnection(
 
     val autoConnect = System.getenv("HPC_AUTO_CONNECT") == "true"
 
+    var scriptsStatus = RemoteSetup()
     var juliaStatus = ApptainerImage(juliaContainer)
     var rStatus = ApptainerImage(condaContainer)
     val pythonStatus: ApptainerImage
         get() = rStatus
 
     val configured: Boolean
-        get() = rStatus.state != ApptainerImageState.NOT_CONFIGURED
-                && juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
+        get() = rStatus.state != RemoteSetupState.NOT_CONFIGURED
+                && juliaStatus.state != RemoteSetupState.NOT_CONFIGURED
+                && scriptsStatus.state != RemoteSetupState.NOT_CONFIGURED
 
     val ready: Boolean
-        get() = rStatus.state == ApptainerImageState.READY
-                && juliaStatus.state == ApptainerImageState.READY
+        get() = rStatus.state == RemoteSetupState.READY
+                && juliaStatus.state == RemoteSetupState.READY
+                && scriptsStatus.state == RemoteSetupState.READY
 
     val hpcScriptsRoot: String
         get() = "$hpcRoot/scripts"
@@ -70,8 +72,9 @@ class HPCConnection(
             logger.info("HPC not configured: missing HPC_BIAB_ROOT ($knownHostsPath).")
 
         } else {
-            juliaStatus.state = ApptainerImageState.CONFIGURED
-            rStatus.state = ApptainerImageState.CONFIGURED
+            juliaStatus.state = RemoteSetupState.CONFIGURED
+            rStatus.state = RemoteSetupState.CONFIGURED
+            scriptsStatus.state = RemoteSetupState.CONFIGURED
 
             if (autoConnect) {
                 // We are launching preparation non-blocking, and not interested immediately in the result,
@@ -89,41 +92,50 @@ class HPCConnection(
     }
 
     suspend fun prepare() {
-        try {
-            coroutineScope {
-                sendFiles(File(scriptStubsRoot, "system").listFiles().asList())
 
-                launch {
+        coroutineScope {
+            launch {
+                try {
                     // Checking if already preparing to avoid launching the process 2 times in parallel by accident
-                    if (rStatus.state != ApptainerImageState.NOT_CONFIGURED
-                        && rStatus.state != ApptainerImageState.PREPARING
-                        && rStatus.state != ApptainerImageState.READY
+                    if (scriptsStatus.state != RemoteSetupState.NOT_CONFIGURED
+                        && scriptsStatus.state != RemoteSetupState.PREPARING
+                        && scriptsStatus.state != RemoteSetupState.READY
                     ) {
-                        prepareApptainer(rStatus)
+                        scriptsStatus.state = RemoteSetupState.PREPARING
+                        sendFiles(File(scriptStubsRoot, "system").listFiles().asList())
+                        scriptsStatus.state = RemoteSetupState.READY
                     }
-                }
-
-                launch {
-                    if (juliaStatus.state != ApptainerImageState.NOT_CONFIGURED
-                        && juliaStatus.state != ApptainerImageState.PREPARING
-                        && juliaStatus.state != ApptainerImageState.READY
-                    ) {
-                        prepareApptainer(juliaStatus)
-                    }
+                } catch (ex: Throwable) {
+                    logger.warn("Exception preparing HPC connection: ${ex.message}")
+                    scriptsStatus.state = RemoteSetupState.ERROR
+                    scriptsStatus.message = ex.message
                 }
             }
-        } catch (ex: Throwable) {
-            logger.warn("Exception preparing HPC connection: ${ex.message}")
-            juliaStatus.state = ApptainerImageState.ERROR
-            juliaStatus.message = ex.message
-            rStatus.state = ApptainerImageState.ERROR
-            rStatus.message = ex.message
+
+            launch {
+                // Checking if already preparing to avoid launching the process 2 times in parallel by accident
+                if (rStatus.state != RemoteSetupState.NOT_CONFIGURED
+                    && rStatus.state != RemoteSetupState.PREPARING
+                    && rStatus.state != RemoteSetupState.READY
+                ) {
+                    prepareApptainer(rStatus)
+                }
+            }
+
+            launch {
+                if (juliaStatus.state != RemoteSetupState.NOT_CONFIGURED
+                    && juliaStatus.state != RemoteSetupState.PREPARING
+                    && juliaStatus.state != RemoteSetupState.READY
+                ) {
+                    prepareApptainer(juliaStatus)
+                }
+            }
         }
     }
 
     private suspend fun prepareApptainer(apptainerImage: ApptainerImage) {
         withContext(Dispatchers.IO) {
-            apptainerImage.state = ApptainerImageState.PREPARING
+            apptainerImage.state = RemoteSetupState.PREPARING
             apptainerImage.message = null
             apptainerImage.image = null
 
@@ -198,16 +210,16 @@ class HPCConnection(
                 if (sysOut.isNotBlank()) logger.info(sysOut) // excludes error stream
 
                 apptainerImage.state = if (process.exitValue() == 0) {
-                    ApptainerImageState.READY
+                    RemoteSetupState.READY
                 } else {
                     apptainerImage.message = process.errorStream.bufferedReader().readText()
-                    ApptainerImageState.ERROR
+                    RemoteSetupState.ERROR
                 }
 
             } catch (ex: Throwable) {
                 ex.printStackTrace()
                 apptainerImage.message = ex.message
-                apptainerImage.state = ApptainerImageState.ERROR
+                apptainerImage.state = RemoteSetupState.ERROR
             }
         }
     }
@@ -216,7 +228,8 @@ class HPCConnection(
         return mapOf(
             "R" to rStatus.statusMap(),
             "Python" to pythonStatus.statusMap(),
-            "Julia" to juliaStatus.statusMap()
+            "Julia" to juliaStatus.statusMap(),
+            "Launch scripts" to scriptsStatus.statusMap()
         )
     }
 
