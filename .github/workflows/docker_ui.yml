@@ -70,6 +70,8 @@ jobs:
         with:
           context: .
           file: Dockerfile.gateway.prod
+          build-args: |
+            "BIAB_VERSION=${{ env.TAG_VERSION }}"
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
