@@ -4,7 +4,6 @@ import kotlinx.coroutines.*
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
-import org.geobon.server.ServerContext.Companion.userDataRoot
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.SystemCall
 import org.geobon.utils.run
@@ -169,7 +168,7 @@ class HPCConnection(
 
                 // Launch the container creation for that digest (if not already existing)
                 val apptainerImageName = "${container.containerName}_$imageSha.sif"
-                val apptainerImagePath = "$hpcRoot/$apptainerImageName"
+                apptainerImage.imagePath = "$hpcRoot/$apptainerImageName"
                 val callResult = systemCall.run(
                     listOf(
                         "ssh",
@@ -178,7 +177,7 @@ class HPCConnection(
                         "-o", "UserKnownHostsFile=$knownHostsPath",
                         sshConfig!!,
                         """
-                        if [ -f $apptainerImagePath ]; then
+                        if [ -f ${apptainerImage.imagePath} ]; then
                             echo "Image already exists: $apptainerImageName"
                         else
                             if [ ! -d "$hpcRoot" ]; then
@@ -191,7 +190,7 @@ class HPCConnection(
                             fi
 
                             module load apptainer
-                            apptainer build $apptainerImagePath docker://$imageDigest
+                            apptainer build ${apptainerImage.imagePath} docker://$imageDigest
                             if [[ $? -eq 0 ]]; then
                                 echo "Image created: $apptainerImageName"
                             else
@@ -253,18 +252,6 @@ class HPCConnection(
      */
     suspend fun sendFiles(files: List<File>, logFile: File? = null) {
         withContext(Dispatchers.IO) {
-            logFile?.appendText("Transforming inputs for HPC:\n")
-            files
-                .filter { it.name == "input.json" }
-                .forEach {
-                    logFile?.appendText("    ${it.absolutePath}\n")
-                    it.writeText(
-                    it.readText()
-                        .replace("\"${scriptsRoot.absolutePath}", "\"$hpcScriptsRoot")
-                        .replace("\"${outputRoot.absolutePath}", "\"$hpcOutputRoot")
-                        .replace("\"${userDataRoot.absolutePath}", "\"$hpcUserDataRoot")
-                )}
-
             var filesString = ""
             files.forEach { file ->
                 filesString = filesString +
@@ -296,8 +283,59 @@ class HPCConnection(
     }
 
     fun sendJobs(tasksToSend: List<String>) {
-        logger.warn("UNIMPLEMENTED: Sending tasks {}", tasksToSend)
-        // TODO: Unimplemented
+        if(!ready) {
+            logger.warn("Cannot send jobs to HPC while not ready")
+            return
+        }
+
+        val sBatchFile = File(outputRoot, "boninabox_${System.currentTimeMillis()}")
+        sBatchFile.writeText("""
+            #!/bin/bash
+            #SBATCH --account=$(whoami)
+            #SBATCH --time=01:00:00
+            #SBATCH --job-name=boninabox_${System.currentTimeMillis()}
+            #SBATCH --nodes=1
+            #SBATCH --ntasks-per-node=64
+            #SBATCH --mem=0
+            module load apptainer
+            
+            ${tasksToSend.joinToString("\n\n")}
+        """.trimIndent())
+
+        var callResult = systemCall.run(
+            listOf(
+                "scp",
+                "-F", configPath!!, // these variables cannot be null when HPC configured
+                "-i", sshKeyPath!!,
+                "-o", "UserKnownHostsFile=$knownHostsPath",
+                sBatchFile.absolutePath,
+                "$sshConfig:$hpcRoot/${sBatchFile.name}"
+            ),
+            timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
+        )
+
+
+        if (!callResult.success) {
+            throw RuntimeException(callResult.error)
+        }
+
+        callResult = systemCall.run(
+            listOf(
+                "ssh",
+                "-F", configPath, // these variables cannot be null when HPC configured
+                "-i", sshKeyPath,
+                "-o", "UserKnownHostsFile=$knownHostsPath",
+                sshConfig!!,
+                "sbatch",
+                sBatchFile.absolutePath
+            ),
+            timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
+        )
+
+
+        if (!callResult.success) {
+            throw RuntimeException(callResult.error)
+        }
     }
 
     companion object {

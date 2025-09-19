@@ -6,8 +6,11 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.consumeEach
 import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.RunContext
+import org.geobon.pipeline.outputRoot
 import org.geobon.script.Run
+import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.geobon.server.ServerContext.Companion.userDataRoot
 import java.io.File
 import java.util.concurrent.TimeoutException
 import kotlin.time.Duration
@@ -112,31 +115,49 @@ class HPCRun(
         return flagError(output ?: mapOf(), genericError)
     }
 
+    private fun getApptainerBaseCommand(image: ApptainerImage): String {
+        return """
+            apptainer run \
+                -B ${hpcConnection.hpcScriptsRoot}:$scriptsRoot\
+                -B ${hpcConnection.hpcScriptStubsRoot}:$scriptStubsRoot\
+                -B ${hpcConnection.hpcOutputRoot}:$outputRoot\
+                -B ${hpcConnection.hpcUserDataRoot}:$userDataRoot\
+                ${image.imagePath}\
+                bash -c
+        """.trimIndent()
+    }
+
     fun getCommand(): String {
-        val escapedOutputFolder = hpcConnection.hpcOutputRoot
+        val escapedOutputFolder = context.outputFolder.absolutePath
             .replace(" ", "\\ ")
         val scriptPath = scriptFile.absolutePath
-            .replace(scriptsRoot.absolutePath, hpcConnection.hpcScriptsRoot)
             .replace(" ", "\\ ")
-        val scriptStubsPath = hpcConnection.hpcScriptStubsRoot
-            .replace(" ", "\\ ")
-        val condaEnvWrapper = "$scriptStubsPath/system/condaEnvironment.sh"
+        val condaEnvWrapper = "$scriptStubsRoot/system/condaEnvironment.sh"
 
         return when (scriptFile.extension) {
             "jl", "JL" ->
-                """julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsPath/system/scriptWrapper.jl $escapedOutputFolder $scriptPath"""
+                """
+                    ${getApptainerBaseCommand(hpcConnection.juliaStatus)} "
+                        julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath
+                    "
+                """.trimIndent()
 
             "r", "R" ->
                 """
-                    source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
-                    Rscript $scriptStubsPath/system/scriptWrapper.R $escapedOutputFolder $scriptPath
+                    ${getApptainerBaseCommand(hpcConnection.rStatus)} "
+                        source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
+                        Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath
+                    "
                 """.trimIndent()
 
             "sh" -> "$scriptPath $escapedOutputFolder"
+
             "py", "PY" ->
                 """
-                    source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
-                    python3 $scriptStubsPath/system/scriptWrapper.py $escapedOutputFolder $scriptPath
+                    ${getApptainerBaseCommand(hpcConnection.pythonStatus)} "
+                        source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
+                        python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath
+                    "
                 """.trimIndent()
 
             else -> throw RuntimeException("Unsupported script extension $scriptPath")

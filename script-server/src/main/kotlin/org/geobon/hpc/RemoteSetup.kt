@@ -25,5 +25,6 @@ class ApptainerImage (
     val container: Containers,
     state: RemoteSetupState = RemoteSetupState.NOT_CONFIGURED,
     image: String? = null,
-    message: String? = null
+    message: String? = null,
+    var imagePath: String? = null
 ): RemoteSetup(state, image, message)

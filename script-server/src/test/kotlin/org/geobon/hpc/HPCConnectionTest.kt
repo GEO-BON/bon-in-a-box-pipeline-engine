@@ -235,12 +235,6 @@ class HPCConnectionTest {
                 )
             }
             confirmVerified(systemCall)
-
-            // Input has been transformed for HPC
-            someRun.readText().apply {
-                assertTrue(contains(connection.hpcOutputRoot))
-                assertFalse(contains(outputRoot.absolutePath))
-            }
         }
     }
 
