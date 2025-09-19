@@ -298,24 +298,21 @@ class HPCConnection(
             #SBATCH --ntasks-per-node=64
             #SBATCH --mem=0
             module load apptainer
-            
+
             ${tasksToSend.joinToString("\n\n")}
         """.trimIndent())
 
         var callResult = systemCall.run(
             listOf(
-                "scp",
-                "-F", configPath!!, // these variables cannot be null when HPC configured
-                "-i", sshKeyPath!!,
-                "-o", "UserKnownHostsFile=$knownHostsPath",
-                sBatchFile.absolutePath,
-                "$sshConfig:$hpcRoot/${sBatchFile.name}"
+                "bash", "-c",
+                """echo "${sBatchFile.absolutePath}" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- / $sshConfig:$hpcRoot/"""
             ),
             timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
         )
 
 
         if (!callResult.success) {
+            println(callResult.output)
             throw RuntimeException(callResult.error)
         }
 
