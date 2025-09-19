@@ -10,7 +10,7 @@ open class SystemCall {
         workingDir: File = File("."),
         timeoutAmount: Long = 1,
         timeoutUnit: TimeUnit = TimeUnit.SECONDS,
-        mergeErrors: Boolean = true,
+        mergeErrors: Boolean = false,
         logger: Logger? = null
     ): CallResult {
         try {

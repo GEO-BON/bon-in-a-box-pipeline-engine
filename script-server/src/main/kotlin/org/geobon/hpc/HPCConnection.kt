@@ -201,7 +201,7 @@ class HPCConnection(
                         fi
                     """.trimIndent()
                     ),
-                    timeoutAmount = 10, timeoutUnit = MINUTES, mergeErrors = false, logger = logger
+                    timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
                 )
 
                 if (callResult.output.isNotBlank())
@@ -285,8 +285,7 @@ class HPCConnection(
                         """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r / $sshConfig:$hpcRoot/"""
                     ),
                     timeoutAmount = 10,
-                    timeoutUnit = MINUTES,
-                    mergeErrors = false
+                    timeoutUnit = MINUTES
                 )
                 logFile?.appendText(result.output)
                 if (!result.success) {
