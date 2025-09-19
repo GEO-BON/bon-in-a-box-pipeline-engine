@@ -55,6 +55,7 @@ class ScriptStep : YMLStep {
     }
 
     override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
+        @Suppress("KotlinUnreachableCode") // the code is reachable. There is an error with the linting...
         context?.let { context ->
             val specificTimeout = (yamlParsed[TIMEOUT] as? Int)?.minutes
 

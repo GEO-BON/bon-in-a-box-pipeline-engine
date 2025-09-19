@@ -319,8 +319,8 @@ class HPCConnection(
         callResult = systemCall.run(
             listOf(
                 "ssh",
-                "-F", configPath, // these variables cannot be null when HPC configured
-                "-i", sshKeyPath,
+                "-F", configPath!!, // these variables cannot be null when HPC configured
+                "-i", sshKeyPath!!,
                 "-o", "UserKnownHostsFile=$knownHostsPath",
                 sshConfig!!,
                 "sbatch",
@@ -331,6 +331,7 @@ class HPCConnection(
 
 
         if (!callResult.success) {
+            println(callResult.output)
             throw RuntimeException(callResult.error)
         }
     }
