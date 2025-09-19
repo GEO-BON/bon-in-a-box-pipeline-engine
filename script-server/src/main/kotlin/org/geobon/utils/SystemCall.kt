@@ -2,6 +2,7 @@ package org.geobon.utils
 
 import java.io.File
 import java.util.concurrent.TimeUnit
+import org.slf4j.Logger
 
 open class SystemCall {
     open fun run(
@@ -9,7 +10,8 @@ open class SystemCall {
         workingDir: File = File("."),
         timeoutAmount: Long = 1,
         timeoutUnit: TimeUnit = TimeUnit.SECONDS,
-        mergeErrors: Boolean = true
+        mergeErrors: Boolean = true,
+        logger: Logger? = null
     ): CallResult {
         try {
             val process = ProcessBuilder(call)
@@ -19,6 +21,16 @@ open class SystemCall {
                 .start()
 
             process.waitFor(timeoutAmount, timeoutUnit)
+            if (process.isAlive) {
+                logger?.warn("Timeout reached, stopping process.")
+                process.destroy()
+                process.waitFor(30, TimeUnit.SECONDS)
+                if (process.isAlive) {
+                    logger?.warn("Destroy timeout reached, killing process.")
+                    process.destroyForcibly()
+                }
+            }
+
             return CallResult(process)
 
         } catch (ex: Exception) {

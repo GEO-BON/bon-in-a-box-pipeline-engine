@@ -170,13 +170,14 @@ class HPCConnection(
                 // Launch the container creation for that digest (if not already existing)
                 val apptainerImageName = "${container.containerName}_$imageSha.sif"
                 val apptainerImagePath = "$hpcRoot/$apptainerImageName"
-                val process = ProcessBuilder(
-                    "ssh",
-                    "-F", configPath,
-                    "-i", sshKeyPath,
-                    "-o", "UserKnownHostsFile=$knownHostsPath",
-                    sshConfig,
-                    """
+                val callResult = systemCall.run(
+                    listOf(
+                        "ssh",
+                        "-F", configPath!!, // these variables cannot be null when HPC configured
+                        "-i", sshKeyPath!!,
+                        "-o", "UserKnownHostsFile=$knownHostsPath",
+                        sshConfig!!,
+                        """
                         if [ -f $apptainerImagePath ]; then
                             echo "Image already exists: $apptainerImageName"
                         else
@@ -199,20 +200,17 @@ class HPCConnection(
                             fi
                         fi
                     """.trimIndent()
+                    ),
+                    timeoutAmount = 10, timeoutUnit = MINUTES, mergeErrors = false, logger = logger
                 )
-                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                    .redirectErrorStream(false)
-                    .start()
 
-                process.waitFor(10, MINUTES)
+                if (callResult.output.isNotBlank())
+                    logger.info(callResult.output) // excludes error stream
 
-                val sysOut = process.inputStream.bufferedReader().readText()
-                if (sysOut.isNotBlank()) logger.info(sysOut) // excludes error stream
-
-                apptainerImage.state = if (process.exitValue() == 0) {
+                apptainerImage.state = if (callResult.exitCode == 0) {
                     RemoteSetupState.READY
                 } else {
-                    apptainerImage.message = process.errorStream.bufferedReader().readText()
+                    apptainerImage.message = callResult.error
                     RemoteSetupState.ERROR
                 }
 
