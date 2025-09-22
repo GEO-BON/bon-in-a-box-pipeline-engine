@@ -105,7 +105,8 @@ class HPCRun(
                 else -> {
                     log(logger::warn, "An error occurred when running the script: ${ex.message}")
                     logger.warn(ex.stackTraceToString())
-                    genericError = true
+                    output = mapOf(ERROR_KEY to (ex.message as Any))
+//                    genericError = true
                 }
             }
         } finally {
