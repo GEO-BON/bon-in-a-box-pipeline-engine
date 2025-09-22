@@ -89,7 +89,7 @@ class HPCRun(
                 syncJob.join()
                 hpc.ready(this@HPCRun)
 
-                logger.debug("Waiting results to be synced back... {}", context.resultFile)
+                logger.debug("Waiting for results to be synced back... {}", context.resultFile)
                 // this will stop when watchChannel.close() called above, is cancelled, or script times out.
             }
         } catch (ex: Exception) {
@@ -104,9 +104,8 @@ class HPCRun(
 
                 else -> {
                     log(logger::warn, "An error occurred when running the script: ${ex.message}")
-                    logger.warn(ex.stackTraceToString())
-                    output = mapOf(ERROR_KEY to (ex.message as Any))
-//                    genericError = true
+                    ex.printStackTrace()
+                    genericError = true
                 }
             }
         } finally {
