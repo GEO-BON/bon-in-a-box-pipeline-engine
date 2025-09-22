@@ -336,6 +336,37 @@ class HPCConnection(
         }
     }
 
+    /**
+     * Syncs the files/folders towards the remote host via rsync
+     * @return logging information
+     */
+    suspend fun retrieveFiles(files: List<File>, logFile: File? = null) {
+        if (files.isEmpty()) {
+            "No files to sync.".let { logger.debug(it); logFile?.appendText(it) }
+        }
+
+        withContext(Dispatchers.IO) {
+            var filesString = ""
+            files.forEach { filesString = filesString + it.absolutePath + "\n" }
+            filesString = filesString.trim()
+
+            logger.debug("Syncing from HPC:\n$filesString\n")
+
+            val result = systemCall.run(
+                listOf(
+                    "bash", "-c",
+                    """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r $sshConfig:$hpcRoot/ / """
+                ),
+                timeoutAmount = 10,
+                timeoutUnit = MINUTES
+            )
+            logFile?.appendText(result.output)
+            if (!result.success) {
+                throw RuntimeException(result.error)
+            }
+        }
+    }
+
     companion object {
         private val logger: Logger = LoggerFactory.getLogger("HPCConnection")
     }
