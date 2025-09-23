@@ -32,6 +32,7 @@ class HPCConnectionTest {
         "HPC_SSH_KEY" to sshKeyFile.absolutePath,
         "HPC_KNOWN_HOSTS_FILE" to knownHostsFile.absolutePath,
         "HPC_BIAB_ROOT" to "${biabRoot.absolutePath}/hpc",
+        "HPC_SBATCH_ACCOUNT" to "account-name",
         "HPC_AUTO_CONNECT" to "false"
     )
 

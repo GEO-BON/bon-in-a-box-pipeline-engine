@@ -23,6 +23,7 @@ class HPCConnection(
     val sshKeyPath: String? = System.getenv("HPC_SSH_KEY")
     val knownHostsPath: String? = System.getenv("HPC_KNOWN_HOSTS_FILE")
     val hpcRoot: String? = System.getenv("HPC_BIAB_ROOT")
+    val account: String? = System.getenv("HPC_SBATCH_ACCOUNT")
 
     val autoConnect = System.getenv("HPC_AUTO_CONNECT") == "true"
 
@@ -59,7 +60,7 @@ class HPCConnection(
             logger.info("HPC not configured: missing HPC_SSH_CONFIG_FILE ($configPath)")
 
         } else if (sshConfig.isNullOrBlank()) {
-            logger.info("HPC not configured: missing HPC_SSH_CONFIG_NAME ($sshConfig).")
+            logger.info("HPC not configured: missing HPC_SSH_CONFIG_NAME.")
 
         } else if (sshKeyPath == null || !File(sshKeyPath).exists()) {
             logger.info("HPC not configured: missing HPC_SSH_KEY ($sshKeyPath).")
@@ -68,7 +69,7 @@ class HPCConnection(
             logger.info("HPC not configured: missing HPC_KNOWN_HOSTS_FILE ($knownHostsPath).")
 
         } else if (hpcRoot.isNullOrBlank()) {
-            logger.info("HPC not configured: missing HPC_BIAB_ROOT ($knownHostsPath).")
+            logger.info("HPC not configured: missing HPC_BIAB_ROOT.")
 
         } else {
             juliaStatus.state = RemoteSetupState.CONFIGURED
@@ -291,7 +292,7 @@ class HPCConnection(
         val sBatchFile = File(outputRoot, "boninabox_${System.currentTimeMillis()}")
         sBatchFile.writeText("""
             #!/bin/bash
-            #SBATCH --account=$(whoami)
+            ${account?.isNotBlank().let { "#SBATCH --account=$account" }}
             #SBATCH --time=01:00:00
             #SBATCH --job-name=boninabox_${System.currentTimeMillis()}
             #SBATCH --nodes=1
