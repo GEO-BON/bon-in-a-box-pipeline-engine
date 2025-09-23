@@ -8,12 +8,13 @@ import java.util.*
 
 open class HPC (
     val connection: HPCConnection,
-    val retrieveSyncInterval: Long = 1000 * 60 // 1 minute
+    val retrieveSyncInterval: Long = 1000 * 60, // 1 minute
+    val syncScope:CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 ) {
     val registeredSteps = WeakHashMap<ScriptStep, HPCRun?>()
     val runningSteps = WeakHashMap<ScriptStep, HPCRun>()
 
-    val syncScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
     var syncJob: Job? = null
 
     constructor() : this(HPCConnection())

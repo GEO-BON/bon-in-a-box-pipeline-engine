@@ -1,6 +1,7 @@
 package org.geobon.hpc
 
 import io.mockk.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.RunContext
 import org.geobon.pipeline.ScriptStep
@@ -10,11 +11,13 @@ import org.geobon.utils.createMockHPCContext
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertContains
 import kotlin.test.assertTrue
 
 class HPCTest {
     lateinit var hpc: HPC
     lateinit var serverContext: ServerContext
+    val retrieveSyncInterval = 10000L
 
     @Before
     fun setup() {
@@ -24,8 +27,9 @@ class HPCTest {
             assertTrue(exists())
         }
 
-        hpc = HPC(createMockHPCContext().hpc!!.connection)
+        hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval)
         every { hpc.connection.sendJobs(any()) } just runs
+        coEvery { hpc.connection.retrieveFiles(allAny()) } just runs
 
         serverContext = ServerContext(hpc)
     }
@@ -36,7 +40,7 @@ class HPCTest {
     }
 
     private fun mockHPCStep(id: Int = 0): ScriptStep {
-        val context = RunContext("testRun#$id", """{"some":"inputs"}""", serverContext)
+        val context = RunContext("testRun-$id", """{"some":"inputs"}""", serverContext)
         val step = mockk<ScriptStep>()
         every { step.context } returns context
         hpc.register(step)
@@ -47,6 +51,8 @@ class HPCTest {
         val run = mockk<HPCRun>()
         every { run.getCommand() } returns mockCommand
         every { run.context } returns step.context!!
+        every { run.resultFile } returns step.context!!.resultFile
+        step.context!!.resultFile.parentFile.mkdirs()
         return run
     }
 
@@ -153,5 +159,59 @@ class HPCTest {
         }
     }
 
-    // TODO test files retrieval
+    @Test
+    fun `given waiting for results_when unregisters_then stop waiting`() = runTest {
+        // Building an HPC instance that uses the runTest context.
+        hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
+        every { hpc.connection.sendJobs(any()) } just runs
+        coEvery { hpc.connection.retrieveFiles(allAny()) } just runs
+        serverContext = ServerContext(hpc)
+
+        val step = mockHPCStep()
+        val mockCommand = """echo "test job command" """
+        val run = mockRun(step, mockCommand)
+
+        hpc.ready(run)
+
+        verify { hpc.connection.sendJobs(listOf(mockCommand)) }
+
+        delay(retrieveSyncInterval + retrieveSyncInterval / 2)
+        coVerify(exactly=1) { hpc.connection.retrieveFiles(allAny()) }
+
+        delay(retrieveSyncInterval)
+        coVerify(exactly=2) { hpc.connection.retrieveFiles(allAny()) }
+
+        hpc.unregister(step)
+        delay(retrieveSyncInterval)
+        // After unregister, count has not increased
+        coVerify(exactly=2) { hpc.connection.retrieveFiles(allAny()) }
+    }
+
+    @Test
+    fun `given waiting for results_when fails to sync 10 times_then stops and outputs an error`() = runTest {
+        // Building an HPC instance that uses the runTest context.
+        hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
+        every { hpc.connection.sendJobs(any()) } just runs
+        coEvery { hpc.connection.retrieveFiles(allAny()) } throws RuntimeException("Sync problem")
+        serverContext = ServerContext(hpc)
+
+        val step = mockHPCStep()
+        val mockCommand = """echo "test job command" """
+        val run = mockRun(step, mockCommand)
+
+        hpc.ready(run)
+        verify { hpc.connection.sendJobs(listOf(mockCommand)) }
+
+        delay(retrieveSyncInterval * 20)
+        // After 10 failures it should have stopped
+        coVerify(exactly=10) { hpc.connection.retrieveFiles(allAny()) }
+
+        val resultFile = step.context!!.resultFile
+        assertTrue(resultFile.exists())
+        val resultFileContent = resultFile.readText()
+        assertContains(resultFileContent, "error")
+        assertContains(resultFileContent, "Sync problem")
+
+        hpc.unregister(step)
+    }
 }
