@@ -102,7 +102,10 @@ class HPCConnection(
                         && scriptsStatus.state != RemoteSetupState.READY
                     ) {
                         scriptsStatus.state = RemoteSetupState.PREPARING
+                        apptainerImage.message = null
+
                         sendFiles(File(scriptStubsRoot, "system").listFiles().asList())
+
                         // Create other mount endpoints
                         val callResult = systemCall.run(
                             listOf(
