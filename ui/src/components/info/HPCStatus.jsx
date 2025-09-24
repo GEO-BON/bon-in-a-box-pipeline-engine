@@ -32,8 +32,8 @@ export default function HPCStatus() {
         if (data) {
           if ((data['R'] && data['R']['state'] === "PREPARING")
             || (data['Python'] && data['Python']['state'] === "PREPARING")
-            || (data['Julia'] && data['Julia']['state'] === "PREPARING")) {
-
+            || (data['Julia'] && data['Julia']['state'] === "PREPARING")
+            || (data['Launch scripts'] && data['Launch scripts']['state'] === "PREPARING")) {
             timeout = setTimeout(refreshStatus, 1000);
           }
         }
