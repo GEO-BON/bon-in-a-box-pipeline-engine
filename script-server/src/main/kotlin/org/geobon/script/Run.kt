@@ -211,7 +211,7 @@ abstract class Run(
         return null
     }
 
-    protected fun flagError(results: Map<String, Any>, genericError: Boolean): Map<String, Any> {
+    protected fun flagError(results: Map<String, Any>, genericError: Boolean = false): Map<String, Any> {
         if (genericError || results.isEmpty()) {
             if (!results.containsKey(ERROR_KEY)) {
                 val outputs = results.toMutableMap()

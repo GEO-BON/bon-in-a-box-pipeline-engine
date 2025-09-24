@@ -104,15 +104,15 @@ class HPCRun(
 
                 else -> {
                     log(logger::warn, "An error occurred when running the script: ${ex.message}")
+                    output = mapOf<String, Any>(ERROR_KEY to (ex.message ?: "check logs for details."))
                     ex.printStackTrace()
-                    genericError = true
                 }
             }
         } finally {
             watchChannel.close()
         }
 
-        return flagError(output ?: mapOf(), genericError)
+        return flagError(output ?: mapOf())
     }
 
     private fun getApptainerBaseCommand(image: ApptainerImage): String {
