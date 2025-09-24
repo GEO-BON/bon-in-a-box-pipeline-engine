@@ -48,6 +48,9 @@ data class RunContext(val runId: String, val inputs: String?, val serverContext:
     val resultFile: File
         get() = File(outputFolder, "output.json")
 
+    val logFile: File
+        get() = File(outputFolder, "logs.txt")
+
     fun getEnvironment(container: Containers): Map<String, Any?> {
         val environment = mapOf(
             "server" to Containers.toVersionsMap(),

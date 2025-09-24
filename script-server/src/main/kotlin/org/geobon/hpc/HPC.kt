@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import org.geobon.pipeline.ScriptStep
 import org.geobon.script.Run.Companion.ERROR_KEY
 import org.json.JSONObject
+import java.io.File
 import java.util.*
 
 open class HPC (
@@ -53,6 +54,7 @@ open class HPC (
      */
     private fun verifySend() {
         val tasksToSend = mutableListOf<String>()
+        val logFiles = mutableListOf<File>()
 
         synchronized(registeredSteps) {
             val readyTasks = mutableMapOf<ScriptStep, HPCRun>()
@@ -64,6 +66,7 @@ open class HPC (
             ) {
                 readyTasks.forEach {
                     tasksToSend.add(it.value.getCommand())
+                    logFiles.add(it.value.context.logFile)
                     runningSteps.putAll(readyTasks)
                     registeredSteps.remove(it.key)
                 }
@@ -71,7 +74,7 @@ open class HPC (
         }
 
         if(tasksToSend.isNotEmpty()) {
-            connection.sendJobs(tasksToSend)
+            connection.sendJobs(tasksToSend, logFiles)
         }
 
         updateRetrieveJob()

@@ -26,7 +26,7 @@ abstract class Run(
 
     protected var logBuffer: String = ""
     protected val logger: Logger = LoggerFactory.getLogger(scriptFile.name)
-    protected val logFile = File(context.outputFolder, "logs.txt")
+    protected val logFile get() = context.logFile
 
     /**
      * It is possible that two scripts are executed with the same parameters at the same time.

@@ -265,7 +265,8 @@ class HPCConnection(
                 "No files to sync.".let { logger.debug(it); logFile?.appendText(it) }
 
             } else {
-                logFile?.appendText("Syncing files to HPC:\n$filesString\n".also { logger.debug(it) })
+                logFile?.appendText("Syncing files to HPC:\n$filesString\nPlease be patient, the next logs will appear only when the job starts on the HPC.\n"
+                    .also { logger.debug(it) })
 
                 val result = systemCall.run(
                     listOf(
@@ -283,7 +284,7 @@ class HPCConnection(
         }
     }
 
-    fun sendJobs(tasksToSend: List<String>) {
+    fun sendJobs(tasksToSend: List<String>, logFiles: List<File> = listOf()) {
         if(!ready) {
             logger.warn("Cannot send jobs to HPC while not ready")
             return
@@ -326,8 +327,7 @@ class HPCConnection(
                 "-i", sshKeyPath!!,
                 "-o", "UserKnownHostsFile=$knownHostsPath",
                 sshConfig!!,
-                "sbatch",
-                sBatchFileRemote.absolutePath
+                """bash -c "sbatch ${sBatchFileRemote.absolutePath} | tee ${logFiles.joinToString(" ")}" """
             ),
             timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
         )

@@ -99,15 +99,16 @@ class HPCRun(
                     val event = ex.message ?: ex.javaClass.name
                     log(logger::info, "$event: done.")
                     output = mapOf(ERROR_KEY to event)
-                    resultFile.writeText(RunContext.gson.toJson(output))
                 }
 
                 else -> {
                     log(logger::warn, "An error occurred when running the script: ${ex.message}")
-                    output = mapOf<String, Any>(ERROR_KEY to (ex.message ?: "check logs for details."))
                     ex.printStackTrace()
+                    output = mapOf<String, Any>(ERROR_KEY to (ex.message ?: "check logs for details."))
                 }
             }
+
+            resultFile.writeText(RunContext.gson.toJson(output))
         } finally {
             watchChannel.close()
         }
