@@ -102,7 +102,7 @@ class HPCConnection(
                         && scriptsStatus.state != RemoteSetupState.READY
                     ) {
                         scriptsStatus.state = RemoteSetupState.PREPARING
-                        apptainerImage.message = null
+                        scriptsStatus.message = null
 
                         sendFiles(File(scriptStubsRoot, "system").listFiles().asList())
 
