@@ -140,11 +140,11 @@ internal class ScriptStepTest {
             fail("Exception should have been thrown")
         } catch (_:Exception) {}
 
-        /*val files = outputRoot.listFiles()!![0].listFiles()!![0].listFiles()!!
+        val files = outputRoot.listFiles()!![0].listFiles()!![0].listFiles()!!
         files.filter { it.name == "output.json" }.let {
             assertEquals(1, it.size)
-            assertTrue(it[0]!!.readText().contains("\"error\""))
-        }*/
+            assertTrue(it[0]!!.readText().contains("\"error\""), "output.json does not contain an error")
+        }
     }
 
     @Test
