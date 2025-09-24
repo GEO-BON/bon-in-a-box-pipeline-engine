@@ -289,8 +289,8 @@ class HPCConnection(
             return
         }
 
-        val sBatchFile = File(outputRoot, "boninabox_${System.currentTimeMillis()}")
-        sBatchFile.writeText("""
+        val sBatchFileLocal = File(outputRoot, "boninabox_${System.currentTimeMillis()}.sbatch")
+        sBatchFileLocal.writeText("""
             #!/bin/bash
             ${account?.isNotBlank().let { "#SBATCH --account=$account" }}
             #SBATCH --time=01:00:00
@@ -301,12 +301,13 @@ class HPCConnection(
             module load apptainer
 
             ${tasksToSend.joinToString("\n\n")}
+
         """.trimIndent())
 
         var callResult = systemCall.run(
             listOf(
                 "bash", "-c",
-                """echo "${sBatchFile.absolutePath}" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- / $sshConfig:$hpcRoot/"""
+                """echo "${sBatchFileLocal.absolutePath}" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- / $sshConfig:$hpcRoot/"""
             ),
             timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
         )
@@ -317,6 +318,7 @@ class HPCConnection(
             throw RuntimeException(callResult.error)
         }
 
+        val sBatchFileRemote = File(hpcOutputRoot, sBatchFileLocal.name)
         callResult = systemCall.run(
             listOf(
                 "ssh",
@@ -325,12 +327,13 @@ class HPCConnection(
                 "-o", "UserKnownHostsFile=$knownHostsPath",
                 sshConfig!!,
                 "sbatch",
-                sBatchFile.absolutePath
+                sBatchFileRemote.absolutePath
             ),
             timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
         )
 
 
+        logger.debug(callResult.output)
         if (!callResult.success) {
             println(callResult.output)
             throw RuntimeException(callResult.error)

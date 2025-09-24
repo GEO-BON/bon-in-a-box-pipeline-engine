@@ -118,11 +118,11 @@ class HPCRun(
     private fun getApptainerBaseCommand(image: ApptainerImage): String {
         return """
             apptainer run \
-                -B ${hpcConnection.hpcScriptsRoot}:$scriptsRoot\
-                -B ${hpcConnection.hpcScriptStubsRoot}:$scriptStubsRoot\
-                -B ${hpcConnection.hpcOutputRoot}:$outputRoot\
-                -B ${hpcConnection.hpcUserDataRoot}:$userDataRoot\
-                ${image.imagePath}\
+                -B ${hpcConnection.hpcScriptsRoot}:$scriptsRoot \
+                -B ${hpcConnection.hpcScriptStubsRoot}:$scriptStubsRoot \
+                -B ${hpcConnection.hpcOutputRoot}:$outputRoot \
+                -B ${hpcConnection.hpcUserDataRoot}:$userDataRoot \
+                ${image.imagePath} \
                 bash -c
         """.trimIndent()
     }
@@ -137,27 +137,27 @@ class HPCRun(
         return when (scriptFile.extension) {
             "jl", "JL" ->
                 """
-                    ${getApptainerBaseCommand(hpcConnection.juliaStatus)} "
+                    ${getApptainerBaseCommand(hpcConnection.juliaStatus)} '
                         julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath >> ${logFile.absolutePath}
-                    "
+                    '
                 """.trimIndent()
 
             "r", "R" ->
                 """
-                    ${getApptainerBaseCommand(hpcConnection.rStatus)} "
+                    ${getApptainerBaseCommand(hpcConnection.rStatus)} '
                         source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
                         Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath >> ${logFile.absolutePath}
-                    "
+                    '
                 """.trimIndent()
 
             "sh" -> "$scriptPath $escapedOutputFolder >> ${logFile.absolutePath}"
 
             "py", "PY" ->
                 """
-                    ${getApptainerBaseCommand(hpcConnection.pythonStatus)} "
+                    ${getApptainerBaseCommand(hpcConnection.pythonStatus)} '
                         source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
                         python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath >> ${logFile.absolutePath}
-                    "
+                    '
                 """.trimIndent()
 
             else -> throw RuntimeException("Unsupported script extension $scriptPath")
