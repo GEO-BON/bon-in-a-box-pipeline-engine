@@ -103,7 +103,23 @@ class HPCConnection(
                     ) {
                         scriptsStatus.state = RemoteSetupState.PREPARING
                         sendFiles(File(scriptStubsRoot, "system").listFiles().asList())
-                        scriptsStatus.state = RemoteSetupState.READY
+                        // Create other mount endpoints
+                        val callResult = systemCall.run(
+                            listOf(
+                                "ssh",
+                                "-F", configPath!!, // these variables cannot be null when HPC configured
+                                "-i", sshKeyPath!!,
+                                "-o", "UserKnownHostsFile=$knownHostsPath",
+                                sshConfig!!,
+                                "mkdir -p $hpcScriptsRoot && mkdir -p $hpcOutputRoot && mkdir -p $hpcUserDataRoot"
+                            ),
+                            timeoutAmount = 1, timeoutUnit = MINUTES, logger = logger, mergeErrors = true
+                        )
+
+                        logger.trace(callResult.output)
+
+                        scriptsStatus.state =
+                            if (callResult.exitCode == 0) RemoteSetupState.READY else RemoteSetupState.ERROR
                     }
                 } catch (ex: Throwable) {
                     logger.warn("Exception preparing HPC connection: ${ex.message}")
