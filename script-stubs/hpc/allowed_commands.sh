@@ -32,6 +32,7 @@ function is_safe_command() {
 		"^cp "
 		"^rm "
 		"^mkdir "
+		"^tee "
 		## git
 		"^git "
 		## archiving commands
@@ -102,8 +103,16 @@ function validate_complex_command() {
 	local in_conditional=false
 	local conditional_allowed=false
 
+	# Remove leading 'bash -c' and surrounding quotes if present
+	if [[ "$fullCommand" =~ ^bash\ -c\ (\"|\')(.*)(\"|\')$ ]]; then
+		fullCommand="${BASH_REMATCH[2]}"
+	elif [[ "$fullCommand" =~ ^bash\ -c\ (.*)$ ]]; then
+		fullCommand="${BASH_REMATCH[1]}"
+	fi
+
 	while IFS= read -r line; do
-		line="${line//&&/;}" # Replace '&&' by ';', in our case we just want them to be split.
+		line="${line//&&/;}" # Replace '&&' by ';', we are just checking if commands are valid
+		line="${line//|/;}"  # Replace '|' by ';', same reason
 		IFS=';' read -ra cmds <<<"$line"
 		for cmd in "${cmds[@]}"; do
 			# Trim whitespace using xargs
@@ -151,19 +160,24 @@ function test_command_filter() {
 		fi=PASS'
 		"exit=PASS"
 		"exit 1=PASS"
+		"echo yes | tee file.txt=PASS"
+		"sbatch /folder/file.sbatch | tee logs.txt=PASS"
+		'bash -c "sbatch /folder/file.sbatch | tee logs.txt"=PASS'
 
 		## Supposed to FAIL
-		"module load python; forbiddenCommand=FAIL"   # this test is failing
-		"module load python && forbiddenCommand=FAIL" # this test is failing
+		"module load python; forbiddenCommand=FAIL"
+		"module load python && forbiddenCommand=FAIL"
 		"forbiddenCommand=FAIL"
 		"lspasswd=FAIL" # this one starts with ls (allowed) but has a non-allowed ending.
 		"if [ -f /nonexistent ]; then forbiddenCommand; fi=FAIL"
 		"if [ -f /nonexistent && forbiddenCommand ]; then ls; fi=FAIL"
 		"if [ -f /nonexistent ];
             forbiddenCommand
-        fi=FAIL" # this test is failing
+        fi=FAIL"
 		"sudo su=FAIL"
 		"python3 script.py=FAIL"
+		'bash -c "python3 script.py"=FAIL'
+		"echo yes | forbiddenCommand=FAIL"
 	)
 
 	echo "Starting Command Filter Test Suite"
