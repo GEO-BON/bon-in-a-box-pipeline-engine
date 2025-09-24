@@ -124,7 +124,7 @@ open class Pipeline (
 
     suspend fun stop() {
         job?.apply {
-            logger.info("Cancelling pipeline $this")
+            logger.info("Cancelling pipeline $debugName")
             cancel("Cancelled by user")
             join() // wait so the user receives response when really cancelled
         }
