@@ -163,6 +163,7 @@ function test_command_filter() {
 		"echo yes | tee file.txt=PASS"
 		"sbatch /folder/file.sbatch | tee logs.txt=PASS"
 		'bash -c "sbatch /folder/file.sbatch | tee logs.txt"=PASS'
+		"bash -c 'sbatch /folder/file.sbatch | tee logs1.txt logs2.txt'=PASS"
 
 		## Supposed to FAIL
 		"module load python; forbiddenCommand=FAIL"
