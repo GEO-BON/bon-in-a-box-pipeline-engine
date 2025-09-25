@@ -28,7 +28,7 @@ class HPCTest {
         }
 
         hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval)
-        every { hpc.connection.sendJobs(any()) } just runs
+        every { hpc.connection.sendJobs(allAny()) } just runs
         coEvery { hpc.connection.retrieveFiles(allAny()) } just runs
 
         serverContext = ServerContext(hpc)
@@ -65,7 +65,7 @@ class HPCTest {
 
         hpc.ready(run)
 
-        verify { hpc.connection.sendJobs(listOf(mockCommand)) }
+        verify { hpc.connection.sendJobs(listOf(mockCommand), any()) }
     }
 
 
@@ -80,11 +80,11 @@ class HPCTest {
         val run2 = mockRun(step2, mockCommand2)
 
         hpc.ready(run1)
-        verify(exactly = 0) { hpc.connection.sendJobs(any()) }
+        verify(exactly = 0) { hpc.connection.sendJobs(allAny()) }
 
         hpc.ready(run2)
         verify(exactly = 1) {
-            hpc.connection.sendJobs(match { it.containsAll(listOf(mockCommand1, mockCommand2)) })
+            hpc.connection.sendJobs(match { it.containsAll(listOf(mockCommand1, mockCommand2)) }, any())
         }
     }
 
@@ -117,7 +117,7 @@ class HPCTest {
                     }
                 }
                 return@match true
-            })
+            }, any())
         }
     }
 
@@ -139,7 +139,7 @@ class HPCTest {
                 hpc.ready(runs[i - 1])
             }
         }
-        verify(exactly = 0) { hpc.connection.sendJobs(any()) }
+        verify(exactly = 0) { hpc.connection.sendJobs(allAny()) }
 
         hpc.unregister(steps[skip -1])
 
@@ -155,7 +155,7 @@ class HPCTest {
                     }
                 }
                 return@match true
-            })
+            }, any())
         }
     }
 
@@ -163,7 +163,7 @@ class HPCTest {
     fun `given waiting for results_when unregisters_then stop waiting`() = runTest {
         // Building an HPC instance that uses the runTest context.
         hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
-        every { hpc.connection.sendJobs(any()) } just runs
+        every { hpc.connection.sendJobs(allAny()) } just runs
         coEvery { hpc.connection.retrieveFiles(allAny()) } just runs
         serverContext = ServerContext(hpc)
 
@@ -173,7 +173,7 @@ class HPCTest {
 
         hpc.ready(run)
 
-        verify { hpc.connection.sendJobs(listOf(mockCommand)) }
+        verify { hpc.connection.sendJobs(listOf(mockCommand), any()) }
 
         delay(retrieveSyncInterval + retrieveSyncInterval / 2)
         coVerify(exactly=1) { hpc.connection.retrieveFiles(allAny()) }
@@ -191,7 +191,7 @@ class HPCTest {
     fun `given waiting for results_when fails to sync 10 times_then stops and outputs an error`() = runTest {
         // Building an HPC instance that uses the runTest context.
         hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
-        every { hpc.connection.sendJobs(any()) } just runs
+        every { hpc.connection.sendJobs(allAny()) } just runs
         coEvery { hpc.connection.retrieveFiles(allAny()) } throws RuntimeException("Sync problem")
         serverContext = ServerContext(hpc)
 
@@ -200,7 +200,7 @@ class HPCTest {
         val run = mockRun(step, mockCommand)
 
         hpc.ready(run)
-        verify { hpc.connection.sendJobs(listOf(mockCommand)) }
+        verify { hpc.connection.sendJobs(listOf(mockCommand), any()) }
 
         delay(retrieveSyncInterval * 20)
         // After 10 failures it should have stopped
