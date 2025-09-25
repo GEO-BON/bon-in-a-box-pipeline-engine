@@ -349,7 +349,7 @@ class HPCConnection(
                 "-i", sshKeyPath!!,
                 "-o", "UserKnownHostsFile=$knownHostsPath",
                 sshConfig!!,
-                """bash -c "sbatch ${sBatchFileRemote.absolutePath} | tee ${hpcLogFiles.joinToString(" ")}""""
+                """bash -c "sbatch ${sBatchFileRemote.absolutePath} | tee -a ${hpcLogFiles.joinToString(" ")}""""
             ),
             timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
         )
