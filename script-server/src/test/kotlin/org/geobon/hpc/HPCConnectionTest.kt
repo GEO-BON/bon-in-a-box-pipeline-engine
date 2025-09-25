@@ -131,7 +131,16 @@ class HPCConnectionTest {
                 print("Body"+bodyAsText())
             }
 
-            delay(1000)
+            val time = System.currentTimeMillis()
+            while(System.currentTimeMillis() - time < 10 * 1000) {
+                client.get("/hpc/status").apply {
+                    val body = bodyAsText()
+                    if(!body.contains("\"PREPARING\""))
+                        break
+                }
+
+                delay(100)
+            }
 
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
