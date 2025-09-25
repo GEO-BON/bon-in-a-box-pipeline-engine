@@ -104,6 +104,7 @@ function validate_complex_command() {
 	local conditional_allowed=false
 
 	# Remove leading 'bash -c' and surrounding quotes if present
+	fullCommand=$(echo "$fullCommand" | xargs) # A trailing whitespace would fail the regex
 	if [[ "$fullCommand" =~ ^bash\ -c\ (\"|\')(.*)(\"|\')$ ]]; then
 		fullCommand="${BASH_REMATCH[2]}"
 	elif [[ "$fullCommand" =~ ^bash\ -c\ (.*)$ ]]; then
@@ -163,7 +164,7 @@ function test_command_filter() {
 		"echo yes | tee file.txt=PASS"
 		"sbatch /folder/file.sbatch | tee logs.txt=PASS"
 		'bash -c "sbatch /folder/file.sbatch | tee logs.txt"=PASS'
-		"bash -c 'sbatch /folder/file.sbatch | tee logs1.txt logs2.txt'=PASS"
+		"bash -c 'sbatch /folder/file.sbatch | tee logs1.txt logs2.txt' =PASS" # notice the trailing whitespace
 
 		## Supposed to FAIL
 		"module load python; forbiddenCommand=FAIL"
