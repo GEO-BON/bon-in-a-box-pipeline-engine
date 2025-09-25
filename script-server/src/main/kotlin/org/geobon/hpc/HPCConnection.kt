@@ -381,7 +381,7 @@ class HPCConnection(
             val result = systemCall.run(
                 listOf(
                     "bash", "-c",
-                    """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r $sshConfig:$hpcRoot/ / """
+                    """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' -p --chmod=Da+rx,Fa+r --mkpath --files-from=- -r $sshConfig:$hpcRoot/ / """
                 ),
                 timeoutAmount = 10,
                 timeoutUnit = MINUTES
