@@ -34,7 +34,6 @@ class HPCRun(
             throw RuntimeException("HPC connection is not ready to send jobs, aborting.")
         }
 
-        var genericError = false
         var output: Map<String, Any>? = null
         val watchChannel = context.outputFolder.asWatchChannel()
         try {
