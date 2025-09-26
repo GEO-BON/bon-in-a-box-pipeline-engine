@@ -1,0 +1,45 @@
+script: HPCSyncArrayTest.py
+name: HPC sync test
+description: The file input should be synced along with the output folder.
+lifecycle:
+  status: example
+author:
+  - name: Jean-Michel Lord
+inputs:
+  some_int:
+    label: Some int
+    description: A number, which should be ignored
+    type: int
+    example: 3
+  some_file:
+    label: Some file
+    description: A file, which will be synced
+    type: text/csv
+    example: myFile0.csv
+  some_files:
+    label: Some files
+    description: A file array, which will be synced
+    type: text/csv[]
+    example: ["myFile1.csv", "myFile2.csv"]
+  deep_array:
+      label: Deep array
+      description: A deep file array, which will all be synced
+      type: text/csv[][][]
+      example: [
+        [
+          ["myFileAA1.csv", "myFileAA2.csv"],
+          ["myFileAB1.csv", "myFileAB2.csv"]
+        ],
+        [
+          [ "myFileBA1.csv", "myFileBA2.csv" ],
+          [ "myFileBB1.csv", "myFileBB2.csv" ]
+        ]
+      ]
+outputs:
+  increment:
+    label: A number (input++)
+    description: bla bla
+    type: int
+    example: 4
+hpc:
+  memory: 1G

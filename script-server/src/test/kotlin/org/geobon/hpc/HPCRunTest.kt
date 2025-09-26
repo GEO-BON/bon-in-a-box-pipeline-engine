@@ -3,6 +3,7 @@ package org.geobon.hpc
 import io.mockk.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
+import org.geobon.pipeline.AggregatePipe
 import org.geobon.pipeline.ConstantPipe
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
@@ -16,6 +17,7 @@ import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import kotlin.test.assertContains
 import kotlin.test.assertTrue
 import kotlin.test.fail
 
@@ -169,7 +171,7 @@ internal class HPCRunTest {
         )
         verify(exactly = 1) { mockContext.hpc!!.register(any()) }
 
-        var job:Job? = null
+        var job: Job? = null
         coEvery { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
         every { mockContext.hpc!!.connection.ready } returns true
         every { mockContext.hpc!!.ready(any()) } answers {
@@ -179,7 +181,7 @@ internal class HPCRunTest {
         every { mockContext.hpc!!.unregister(any()) } just runs
 
         var error: String? = null
-         job = launch {
+        job = launch {
             try {
                 step.execute()
             } catch (e: Exception) {
@@ -197,5 +199,90 @@ internal class HPCRunTest {
 
         if (error == null) fail("We were expecting an error to be detected")
         println("Got expected error: $error")
+    }
+
+    @Test
+    fun `given script has files and array of files inputs_when execute_then all files are sent`() = runTest {
+        every { mockContext.hpc!!.register(any()) } just runs
+        every { mockContext.hpc!!.unregister(any()) } just runs
+        every { mockContext.hpc!!.ready(any()) } answers {
+            this@runTest.launch {
+                Thread.sleep(100)
+                val run = firstArg<HPCRun>()
+                with(run.context.resultFile) {
+                    parentFile.mkdirs()
+                    writeText("""{ "increment":11 }""")
+                    logger.debug("Created mock output file {}", absolutePath)
+                }
+            }
+        }
+        every { mockContext.hpc!!.connection.ready } returns true
+        val inputFiles = (0..10).map { i ->
+            File(outputRoot, "someFile$i.csv").apply {
+                writeText("a,b,c,d,e\n${(i..i + 4).joinToString(",")}")
+            }
+        }
+        val step = ScriptStep(
+            mockContext, File(scriptsRoot, "HPCSyncArrayTest.yml"), StepId("HPCSyncTest.yml", "1"),
+            mutableMapOf(
+                "someInt" to ConstantPipe("int", 10),
+                "someFile" to ConstantPipe("text/csv", inputFiles[0].absolutePath),
+                "someFiles" to AggregatePipe(
+                    listOf(
+                        ConstantPipe("text/csv", inputFiles[1].absolutePath),
+                        ConstantPipe("text/csv", inputFiles[2].absolutePath),
+                    )
+                ),
+                "deep_array" to AggregatePipe(
+                    listOf(
+                        AggregatePipe(
+                            listOf(
+                                AggregatePipe(
+                                    listOf(
+                                        ConstantPipe("text/csv", inputFiles[3].absolutePath),
+                                        ConstantPipe("text/csv", inputFiles[4].absolutePath),
+                                    )
+                                ),
+                                AggregatePipe(
+                                    listOf(
+                                        ConstantPipe("text/csv", inputFiles[5].absolutePath),
+                                        ConstantPipe("text/csv", inputFiles[6].absolutePath),
+                                    )
+                                )
+                            )
+                        ),
+                        AggregatePipe(
+                            listOf(
+                                AggregatePipe(
+                                    listOf(
+                                        ConstantPipe("text/csv", inputFiles[7].absolutePath),
+                                        ConstantPipe("text/csv", inputFiles[8].absolutePath),
+                                    )
+                                ),
+                                AggregatePipe(
+                                    listOf(
+                                        ConstantPipe("text/csv", inputFiles[9].absolutePath),
+                                        ConstantPipe("text/csv", inputFiles[10].absolutePath),
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+        verify(exactly = 1) { mockContext.hpc!!.register(any()) }
+
+        val filesSlot = slot<List<File>>()
+        coEvery {mockContext.hpc!!.connection.sendFiles(capture(filesSlot), any())} just runs
+        step.execute()
+
+        assertTrue(filesSlot.isCaptured)
+        val captured = filesSlot.captured
+        for (i in 0..10) {
+            assertContains(captured, inputFiles[i])
+        }
+        assertContains(captured, File(scriptsRoot, "HPCSyncArrayTest.py"))
+        assertContains(captured, step.context!!.outputFolder)
     }
 }

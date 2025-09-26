@@ -18,8 +18,7 @@ import kotlin.time.Duration
 class HPCRun(
     context: RunContext,
     scriptFile: File,
-    inputs: Map<String, Pipe>,
-    private val resolvedInputs: Map<String, Any?>,
+    private val inputPipes: Map<String, Pipe>,
     private val timeout: Duration = DEFAULT_TIMEOUT, // TODO Timeout implementation
     private val condaEnvName: String? = null,
     private val condaEnvYml: String? = null
@@ -29,9 +28,6 @@ class HPCRun(
         ?: throw RuntimeException("A valid HPC connection is necessary to run job on HPC for file ${scriptFile.absolutePath}")
 
     private val hpcConnection = hpc.connection
-
-    private val fileInputs = inputs.filterValues { MIME_TYPE_REGEX.matches(it.type) }.keys
-
 
     override suspend fun runScript(): Map<String, Any> {
         if (!hpcConnection.ready) {
@@ -50,11 +46,7 @@ class HPCRun(
                         scriptFile
                     )
                     filesToSend.addAll(
-                        resolvedInputs.mapNotNull {
-                            if (fileInputs.contains(it.key) && it.value is String)
-                                File(it.value as String)
-                            else null
-                        }
+                        inputPipes.mapNotNull { it.value.asFiles() }.flatten()
                     )
 
                     hpcConnection.sendFiles(filesToSend, logFile)
@@ -163,10 +155,6 @@ class HPCRun(
 
             else -> throw RuntimeException("Unsupported script extension $scriptPath")
         }
-    }
-
-    companion object {
-        private val MIME_TYPE_REGEX = Regex("""\w+/[-+.\w]+""")
     }
 
 }

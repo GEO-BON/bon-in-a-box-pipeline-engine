@@ -1,5 +1,7 @@
 package org.geobon.pipeline
 
+import java.io.File
+
 class Output(override val type:String) : Pipe {
     private var isInit = false
     var step: Step? = null
@@ -36,6 +38,12 @@ class Output(override val type:String) : Pipe {
             if(condition(it)) pull()
             else null
         }
+    }
+
+    override fun asFiles(): Collection<File>? {
+        return if (Pipe.Companion.MIME_TYPE_REGEX.matches(type) && value != null)
+            listOf(File(value as String))
+        else null
     }
 
     override fun dumpOutputFolders(allOutputs: MutableMap<String, String>) {
