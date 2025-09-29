@@ -285,6 +285,7 @@ export function Chooser({
               {...{
                 states,
                 dispatch,
+                value,
               }}
             />
           )}

@@ -4,8 +4,9 @@ import TextField from "@mui/material/TextField";
 import { paperStyle } from "./utils";
 import _ from "lodash";
 
-export default function BBox({ states, dispatch }) {
-  const [bbInput, setBboxInput] = useState(["", "", "", ""]);
+export default function BBox({ states, dispatch, value = null }) {
+  const bboxSavedValue = Array.isArray(value?.bbox) && value?.bbox.length == 4 ? value?.bbox : null;
+  const [bbInput, setBboxInput] = useState(bboxSavedValue || ["", "", "", ""]);
 
   // BBox values coming in
   useEffect(() => {
