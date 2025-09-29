@@ -234,11 +234,11 @@ export default function ScriptInput({
       );
     case "country":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} onChange={(value) => { onValueUpdated(value) }}/>
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
       );
     case "countryRegionCRS":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} onChange={(value) => { onValueUpdated(value) }}/>
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
       );
 
     case "bboxCRS":
@@ -252,7 +252,7 @@ export default function ScriptInput({
       );
     case "countryRegion":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} onChange={(value) => { onValueUpdated(value) }}/>
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
       );
 
     default:

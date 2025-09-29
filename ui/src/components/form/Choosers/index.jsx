@@ -27,6 +27,8 @@ export default function Choosers({
   onChange = () => {},
   descriptionCell = true,
   leftLabel = true,
+  updateValue,
+  value = null,
 }) {
   const [openModal, setOpenModal] = useState(false);
 
@@ -42,8 +44,8 @@ export default function Choosers({
                 {": "}
               </>
             )}
-            {inputFileContent[inputId] && (
-              <pre>{yaml.dump(inputFileContent[inputId])}</pre>
+            { value && (
+              <pre>{yaml.dump(value)}</pre>
             )}
             <br />
           </td>
@@ -78,8 +80,8 @@ export default function Choosers({
                       setOpenModal,
                       inputId,
                       inputDescription,
-                      inputFileContent,
-                      updateInputFile,
+                      value,
+                      updateValue,
                       onChange,
                     }}
                   />
@@ -98,8 +100,8 @@ export default function Choosers({
                 setOpenModal,
                 inputId,
                 inputDescription,
-                inputFileContent,
-                updateInputFile,
+                value,
+                updateValue,
                 onChange,
               }}
             />
@@ -128,8 +130,8 @@ export function Chooser({
   setOpenModal,
   inputId,
   inputDescription,
-  inputFileContent,
-  updateInputFile = () => {},
+  value,
+  updateValue = () => {},
   onChange,
 }) {
   const [clearFeatures, setClearFeatures] = useState(0);
@@ -158,8 +160,8 @@ export function Chooser({
   const [oldValues, setOldValues] = useState({});
 
   useEffect(() => {
-    if (inputFileContent && inputFileContent[inputId]) {
-      setOldValues(inputFileContent[inputId]);
+    if (value) {
+      setOldValues(value);
     }
   }, []);
 
@@ -179,50 +181,30 @@ export function Chooser({
           };
         }
       } else if (type === "country") {
-        onChange({
-          countryData: {
-            label: states.country.englishName,
-            value: states.country.ISO3,
-          },
-          regionData: {
-            label: states.region.regionName,
-            value: states.region.regionName,
-          },
-        });
         inp = {
           country: states.country,
         };
       } else if (type === "countryRegion") {
         inp = {
           country: states.country,
-          region: states.region?.englishName ? states.region : null,
+          region: states.region?.regionName ? states.region : null,
         };
-        onChange({
-          countryData: {
-            label: states.country.englishName,
-            value: states.country.ISO3,
-          },
-          regionData: {
-            label: states.region?.regionName,
-            value: states.region?.regionName,
-          },
-        });
       } else if (type === "countryRegionCRS") {
         inp = {
           country: states.country,
-          region: states.region.regionName ? states.region : null,
+          region: states.region?.regionName ? states.region : null,
           CRS: states.CRS,
         };
       } else if (type === "CRS") {
         inp = { CRS: states.CRS };
       }
-      updateInputFile(inputId, inp);
+      updateValue(inp);
     }
   }, [states.actions]);
 
   // Set from controlled values coming in
   useEffect(() => {
-    const input = inputFileContent[inputId];
+    const input = value;
     if (input && states.actions.includes("load")) {
       dispatch({
         type: "load",
@@ -232,7 +214,7 @@ export function Chooser({
         region: "region" in input ? input["region"] : defaultRegion,
       });
     }
-  }, [inputId, inputFileContent, states.actions]);
+  }, [value, states.actions]);
 
   return (
     <div
@@ -283,6 +265,7 @@ export function Chooser({
                   ? false
                   : true,
                 dialog: showMap,
+                value,
               }}
             />
           )}
@@ -293,6 +276,7 @@ export function Chooser({
                 dispatch,
                 dialog: showMap,
                 showBBox,
+                value,
               }}
             />
           )}
@@ -323,7 +307,7 @@ export function Chooser({
               <CustomButtonGreen
                 onClick={() => {
                   setOpenModal(false);
-                  updateInputFile(inputId, oldValues);
+                  updateValue(oldValues);
                 }}
               >
                 Cancel

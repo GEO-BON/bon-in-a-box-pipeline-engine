@@ -28,7 +28,9 @@ export default function CRSMenu({
   dialog = false,
 }) {
   const [CRSList, setCRSList] = useState(defaultCRSList);
-  const [selectedCRS, setSelectedCRS] = useState(value || defaultCRSList[0]);
+  const p = `${value?.CRS?.authority}:${parseInt(value?.CRS?.code)}`;
+  const savedCRSValue = value?.CRS ? { label: `${value?.CRS?.name} (${p})`, value: `${p}` } : null
+  const [selectedCRS, setSelectedCRS] = useState(savedCRSValue || defaultCRSList[0]);
   const [inputValue, setInputValue] = useState("");
   const [searching, setSearching] = useState(false);
   const [openCRSMenu, setOpenCRSMenu] = useState(false);

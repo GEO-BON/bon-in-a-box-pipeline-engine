@@ -118,10 +118,9 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
           return (
             <Choosers
               key={inputId}
-              inputId={inputId}
               inputDescription={inputDescription}
-              inputFileContent={inputFileContent}
-              updateInputFile={updateInputFile}
+              value={inputFileContent[inputId] || null}
+              updateValue={(value) => updateInputFile(inputId, value)}
             />
           );
         } else {
