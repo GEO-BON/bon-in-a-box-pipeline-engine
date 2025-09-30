@@ -130,7 +130,7 @@ class HPCRun(
             "jl", "JL" ->
                 """
                     ${getApptainerBaseCommand(hpcConnection.juliaStatus)} '
-                        julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath >> ${logFile.absolutePath}
+                        julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
                     '
                 """.trimIndent()
 
@@ -138,17 +138,17 @@ class HPCRun(
                 """
                     ${getApptainerBaseCommand(hpcConnection.rStatus)} '
                         source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
-                        Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath >> ${logFile.absolutePath}
+                        Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
                     '
                 """.trimIndent()
 
-            "sh" -> "$scriptPath $escapedOutputFolder >> ${logFile.absolutePath}"
+            "sh" -> "$scriptPath $escapedOutputFolder >> ${logFile.absolutePath} 2>&1"
 
             "py", "PY" ->
                 """
                     ${getApptainerBaseCommand(hpcConnection.pythonStatus)} '
                         source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
-                        python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath >> ${logFile.absolutePath}
+                        python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
                     '
                 """.trimIndent()
 
