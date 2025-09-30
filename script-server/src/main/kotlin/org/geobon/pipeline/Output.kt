@@ -41,9 +41,27 @@ class Output(override val type:String) : Pipe {
     }
 
     override fun asFiles(): Collection<File>? {
-        return if (Pipe.Companion.MIME_TYPE_REGEX.matches(type) && value != null)
-            listOf(File(value as String))
-        else null
+        value?.let { value ->
+            if (Pipe.Companion.MIME_TYPE_REGEX.matches(type)) {
+                // This incomprehensible boilerplate code flattens unknown types of multidimensional arrays to a single array
+                var flattenedValue = listOf(value)
+                while(flattenedValue.isNotEmpty() && flattenedValue[0] is Collection<*>) {
+                    val new = mutableListOf<Any>()
+                    flattenedValue.forEach {
+                        (it as? Collection<*>)?.let {
+                            collection -> collection.forEach { elem -> elem?.let { new.add(elem) } }
+                        }
+                    }
+                    flattenedValue = new
+                }
+
+                if(flattenedValue.isNotEmpty()) {
+                    return flattenedValue.map { File(it as String) }
+                }
+            }
+        }
+
+        return null
     }
 
     override fun dumpOutputFolders(allOutputs: MutableMap<String, String>) {
