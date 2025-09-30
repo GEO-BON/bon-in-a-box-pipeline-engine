@@ -41,6 +41,7 @@ class DockerizedRun( // Constructor used in single script run
         var outputs: MutableMap<String, Any>? = null
 
         var container: Containers = Containers.SCRIPT_SERVER
+        var stopSignal = "TERM"
 
         val pidFile = File(context.outputFolder.absolutePath, ".pid")
 
@@ -61,6 +62,7 @@ class DockerizedRun( // Constructor used in single script run
 
                 "r", "R" -> {
                     container = Containers.CONDA
+                    stopSignal = "INT" // Using SIGINT since R does not allow to handle cleanup on SIGTERM.
 
                     command = container.dockerCommandList + listOf(
                         "bash", "-c",
@@ -118,7 +120,7 @@ class DockerizedRun( // Constructor used in single script run
 
                                         ProcessBuilder(
                                             container.dockerCommandList + listOf(
-                                                "kill", "-s", "TERM", pid
+                                                "kill", "-s", stopSignal, pid
                                             )
                                         ).start()
 
