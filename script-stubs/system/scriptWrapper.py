@@ -1,5 +1,5 @@
 #!/bin/python3
-import os, sys, json
+import os, sys, json, signal
 
 biab_output_list = {}
 
@@ -25,6 +25,25 @@ def biab_error_stop(errorMessage):
 	biab_output_list[ "error" ] = errorMessage
 	sys.exit(errorMessage)
 
+# Signal handler to write whatever outputs we have on exit.
+def signal_handler(sig, frame):
+    print('Handling SIGTERM', flush=True)
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, signal_handler)
+
+# Outputs the saved outputs and environment
+def on_exit():
+	if biab_output_list:
+		print("Writing outputs to BON in a Box...", flush=True)
+		with open(output_folder + "/output.json", "w") as outfile:
+			outfile.write(json.dumps(biab_output_list, indent = 2))
+
+	# Capture dependencies for this run
+	print("Writing dependencies to file...", flush=True)
+	os.system("/opt/conda/bin/pip freeze > " + output_folder + "/dependencies.txt")
+	print(" done.", flush=True)
+
 
 if __name__ == "__main__":
 	# Receive args
@@ -41,13 +60,5 @@ if __name__ == "__main__":
 	except:
 		raise
 	finally: # Write the output.json file
-		if biab_output_list:
-			print("Writing outputs to BON in a Box...", flush=True)
-			with open(output_folder + "/output.json", "w") as outfile:
-				outfile.write(json.dumps(biab_output_list, indent = 2))
-
-		# Capture dependencies for this run
-		print("Writing dependencies to file...", flush=True)
-		os.system("/opt/conda/bin/pip freeze > " + output_folder + "/dependencies.txt")
-		print(" done.", flush=True)
+		on_exit()
 
