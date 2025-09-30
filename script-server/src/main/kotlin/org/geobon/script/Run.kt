@@ -191,11 +191,14 @@ abstract class Run(
         }
     }
 
-    protected fun readOutputs(): Map<String, Any>? {
-        val type = object : TypeToken<Map<String, Any>>() {}.type
+    protected fun readOutputs(): MutableMap<String, Any>? {
+        if(!resultFile.exists())
+            return null
+
         val result = resultFile.readText()
+        val type = object : TypeToken<MutableMap<String, Any>>() {}.type
         try {
-            val outputs = RunContext.gson.fromJson<Map<String, Any>>(result, type)
+            val outputs = RunContext.gson.fromJson<MutableMap<String, Any>>(result, type)
             logger.debug("Output: $result")
             return outputs
         } catch (e: Exception) {

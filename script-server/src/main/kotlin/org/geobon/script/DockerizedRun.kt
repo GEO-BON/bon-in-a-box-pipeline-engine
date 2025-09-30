@@ -38,7 +38,7 @@ class DockerizedRun( // Constructor used in single script run
     @OptIn(ExperimentalTime::class)
     override suspend fun runScript(): Map<String, Any> {
         var error = false
-        var outputs: Map<String, Any>? = null
+        var outputs: MutableMap<String, Any>? = null
 
         var container: Containers = Containers.SCRIPT_SERVER
 
@@ -201,21 +201,26 @@ class DockerizedRun( // Constructor used in single script run
             }
 
         }.onFailure { ex ->
+            error = true
+            outputs = readOutputs() ?: mutableMapOf()
+
             when (ex) {
                 is TimeoutException,
                 is CancellationException -> {
                     val event = ex.message ?: ex.javaClass.name
                     log(logger::info, "$event: done.")
-                    outputs = mapOf(ERROR_KEY to event)
-                    resultFile.writeText(RunContext.gson.toJson(outputs))
+                    outputs[ERROR_KEY] = event
                 }
 
                 else -> {
-                    log(logger::warn, "An error occurred when running the script: ${ex.message}")
+                    outputs[ERROR_KEY] = "An error occurred when running the script: ${ex.message}"
+                        .also { log(logger::warn, it) }
+
                     logger.warn(ex.stackTraceToString())
-                    error = true
                 }
             }
+
+            resultFile.writeText(RunContext.gson.toJson(outputs))
         }
 
         pidFile.delete()
