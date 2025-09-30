@@ -34,7 +34,7 @@ class HPCRun(
             throw RuntimeException("HPC connection is not ready to send jobs, aborting.")
         }
 
-        var output: Map<String, Any>? = null
+        var output: MutableMap<String, Any>? = null
         val watchChannel = context.outputFolder.asWatchChannel()
         try {
             coroutineScope {
@@ -84,18 +84,20 @@ class HPCRun(
                 // this will stop when watchChannel.close() called above, is cancelled, or script times out.
             }
         } catch (ex: Exception) {
+            output = readOutputs() ?: mutableMapOf()
+
             when (ex) {
                 is TimeoutException,
                 is CancellationException -> {
                     val event = ex.message ?: ex.javaClass.name
                     log(logger::info, "$event: done.")
-                    output = mapOf(ERROR_KEY to event)
+                    output[ERROR_KEY] = event
                 }
 
                 else -> {
                     log(logger::warn, "An error occurred when running the script: ${ex.message}")
                     ex.printStackTrace()
-                    output = mapOf<String, Any>(ERROR_KEY to (ex.message ?: "check logs for details."))
+                    output[ERROR_KEY] = ex.message ?: "check logs for details."
                 }
             }
 
