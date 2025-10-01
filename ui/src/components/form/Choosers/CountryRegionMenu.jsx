@@ -170,7 +170,6 @@ export default function CountryRegionMenu({
         </h4>
       )}
       <Autocomplete
-        disablePortal
         options={countryOptions}
         size="small"
         sx={{
@@ -195,7 +194,6 @@ export default function CountryRegionMenu({
       {showRegion && (
         <>
           <Autocomplete
-            disablePortal
             options={regionOptions}
             size="small"
             sx={{
