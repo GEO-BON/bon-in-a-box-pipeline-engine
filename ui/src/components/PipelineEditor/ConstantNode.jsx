@@ -10,7 +10,7 @@ export default function ConstantNode({ id, data, type }) {
         <tbody>
           <tr>
             <td className='dragHandle'><p>{data.type}</p></td>
-            <td>
+            <td className='dragHandle'>
               <ScriptInput id={id} type={data.type} value={data.value} options={data.options}
               onValueUpdated={v => data.onConstantValueChange(id, v)} size="small" keepWidth={false}/>
             </td>

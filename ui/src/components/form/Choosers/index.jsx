@@ -29,6 +29,7 @@ export default function Choosers({
   leftLabel = true,
   updateValue,
   value = null,
+  isCompact = false,
 }) {
   const [openModal, setOpenModal] = useState(false);
 
@@ -44,7 +45,7 @@ export default function Choosers({
                 {": "}
               </>
             )}
-            { value && (
+            { value && !isCompact && (
               <pre>{yaml.dump(value)}</pre>
             )}
             <br />
