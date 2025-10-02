@@ -315,6 +315,7 @@ class HPCConnection(
         val sBatchFileLocal = File(outputRoot, "boninabox_${System.currentTimeMillis()}.sbatch")
         sBatchFileLocal.writeText("""
             #!/bin/bash
+            #SBATCH --signal=B:SIGINT
             ${account?.isNotBlank().let { "#SBATCH --account=$account" }}
             #SBATCH --time=01:00:00
             #SBATCH --job-name=boninabox_${System.currentTimeMillis()}
