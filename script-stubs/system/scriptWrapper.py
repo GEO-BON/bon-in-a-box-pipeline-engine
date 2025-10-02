@@ -27,7 +27,7 @@ def biab_error_stop(errorMessage):
 
 # Signal handler will allow to write whatever outputs we have (in the finally clause below)
 def signal_handler(sig, frame):
-    print('Handling SIGTERM', flush=True)
+    print('Handling termination signal', flush=True)
     sys.exit(0)
 
 signal.signal(signal.SIGTERM, signal_handler)

@@ -284,8 +284,11 @@ class HPCConnection(
                 "No files to sync.".let { logger.debug(it); logFile?.appendText(it) }
 
             } else {
-                logFile?.appendText("Syncing files to HPC:\n$filesString\nPlease be patient, the next logs will appear only when the job starts on the HPC.\n"
-                    .also { logger.debug(it) })
+                logFile?.apply {
+                    appendText("Syncing files to HPC:\n$filesString\n".also { logger.debug(it) })
+                    appendText("Please be patient, the next logs will appear only when the job starts on the HPC.\nLogs are updated every minute.\n")
+                }
+
 
                 val result = systemCall.run(
                     listOf(
