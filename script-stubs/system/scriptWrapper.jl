@@ -35,17 +35,13 @@ end
 pid_file_path = joinpath(output_folder, ".pid")
 open(pid_file_path, "w") do file write(file, string(getpid())) end;
 
-try
-    include(script_file_path)
-catch e
-    msg = sprint(showerror, e)
-    biab_output_dict["error"] = msg
-    println("\n$msg")
-    Base.show_backtrace(stdout, catch_backtrace())
-    println("\n\n")
-finally
+# Internal use: Outputs the saved outputs and environment
+function on_exit()
+    global biab_output_dict
+    global pid_file_path
+
     if !isempty(biab_output_dict)
-        println("Writing outputs to BON in a Box...")
+        try print("Writing outputs to BON in a Box...\n") catch; end # this throws when called after an interrupt (but the log still goes through)
         jsonData = JSON.json(biab_output_dict, 2)
         open(joinpath(output_folder, "output.json"), "w") do f
             write(f, jsonData)
@@ -53,16 +49,28 @@ finally
 
     end
 
-    println("Writing dependencies to file...")
+    try print("Writing dependencies to file...\n") catch; end
     deps = Pkg.dependencies()
     direct_deps = filter(x -> x[2].is_direct_dep, deps)
     open(joinpath(output_folder, "dependencies.txt"), "w") do file
         for (uuid, pkg) in direct_deps
-            println(file, "$(pkg.name) $(pkg.version)")
+            write(file, "$(pkg.name) $(pkg.version)")
         end
     end
-    println(" done.")
+    try print(" done.\n") catch; end
     flush(stdout)
 
     rm(pid_file_path)
+end
+
+atexit(on_exit)
+
+try
+    include(script_file_path)
+catch e
+    msg = sprint(showerror, e)
+    biab_output_dict["error"] = msg
+    println("\n$msg\n")
+    Base.show_backtrace(stdout, catch_backtrace())
+    println("\n\n")
 end

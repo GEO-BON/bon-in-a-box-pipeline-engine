@@ -51,6 +51,7 @@ class DockerizedRun( // Constructor used in single script run
             when (scriptFile.extension) {
                 "jl", "JL" -> {
                     container = Containers.JULIA
+                    stopSignal = "INT" // Using SIGINT since Julia does not allow to handle cleanup on SIGTERM.
                     command = container.dockerCommandList + listOf(
                         "bash", "-c",
                         """
@@ -120,7 +121,7 @@ class DockerizedRun( // Constructor used in single script run
 
                                         ProcessBuilder(
                                             container.dockerCommandList + listOf(
-                                                "kill", "-s", stopSignal, pid
+                                                "bash", "-c", "kill -s $stopSignal $pid"
                                             )
                                         ).start()
 
