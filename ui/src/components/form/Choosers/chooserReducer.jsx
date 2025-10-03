@@ -15,6 +15,7 @@ export function chooserReducer(states, action) {
           "updateCRS",
           "updateCRSListFromNames",
           "updateCRSInput",
+          "updateCRS",
           "updateCountryRegion",
           "saveInputs",
         ],
@@ -36,7 +37,7 @@ export function chooserReducer(states, action) {
       return {
         ...states,
         CRS: action.CRS,
-        actions: ["changeMapCRS", "changeBboxCRS", "saveInputs"],
+        actions: ["changeMapCRS", "changeBboxCRS", "saveInputs", "updateCRSInput"],
       };
     case "changeCRSFromInput":
       return {
@@ -47,7 +48,16 @@ export function chooserReducer(states, action) {
           "updateCRSDropdown",
           "changeMapCRS",
           "changeBboxCRS",
+          "updateCRS",
           "saveInputs",
+        ],
+      };
+    case "searchCRSFromAutocomplete":
+      return {
+        ...states,
+        CRSMessage: "",
+        actions: [
+          "updateCRSListFromNames",
         ],
       };
     case "changeBboxCRS":

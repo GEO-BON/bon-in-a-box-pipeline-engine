@@ -20,6 +20,7 @@ import {
   paperStyle,
   transformCoordCRS,
 } from "./utils";
+import { CRS } from "leaflet";
 
 export default function CRSMenu({
   states,
@@ -32,6 +33,7 @@ export default function CRSMenu({
   const savedCRSValue = value?.CRS ? { label: `${value?.CRS?.name} (${p})`, value: `${p}` } : null
   const [selectedCRS, setSelectedCRS] = useState(savedCRSValue || defaultCRSList[0]);
   const [inputValue, setInputValue] = useState("");
+  const [searchValue, setSearchValue] = useState(null);
   const [searching, setSearching] = useState(false);
   const [openCRSMenu, setOpenCRSMenu] = useState(false);
   const [badCRS, setBadCRS] = useState("");
@@ -40,8 +42,9 @@ export default function CRSMenu({
     if (states.actions.includes("updateCRSListFromNames")) {
       setSearching(true);
       // Suggest from names
-      if (states.country?.englishName) {
-        getCRSListFromName(states.country.englishName).then((result) => {
+      const searchTerm = searchValue ? searchValue : states.country.englishName;
+      if (searchTerm && searchTerm !== "" && searchTerm !== states.CRS?.name ) {
+        getCRSListFromName(searchTerm).then((result) => {
           if (result) {
             const suggestions = result.map((proj) => {
               const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
@@ -57,7 +60,7 @@ export default function CRSMenu({
           setSearching(false);
         });
       } else {
-        setCRSList(defaultCRSList);
+        //setCRSList(defaultCRSList);
         setSearching(false);
       }
     }
@@ -109,33 +112,18 @@ export default function CRSMenu({
     }
   }, [states.actions]);
 
-  // Update CRS from controlled values coming in
-  useEffect(() => {
-    let ignore = false;
-    if (states.actions.includes("updateCRSInput")) {
-      if (!states.CRS.code) return;
-      const c = `${states.CRS.authority}:${states.CRS.code}`;
-      if (c !== inputValue) {
-        setInputValue(c);
-        updateCRS({ label: c, value: c }, ignore);
-      }
-    }
-    return () => {
-      ignore = true;
-    };
-  }, [states.actions]);
 
-  // Update CRS from controlled values coming in
   useEffect(() => {
     if (states.actions.includes("resetCRS")) {
       let code = `${defaultCRS.authority}:${defaultCRS.code}`;
       updateCRS({ value: code, label: defaultCRS.name }, false);
+      setSearchValue("")
       setBadCRS("");
     }
   }, [states.actions]);
 
   useEffect(() => {
-    if (states.actions.includes("updateCRSDropdown")) {
+    if (states.actions.includes("updateCRS")) {
       updateCRS({
         label: `${states.CRS.authority}:${states.CRS.code}`,
         value: `${states.CRS.authority}:${states.CRS.code}`,
@@ -144,22 +132,31 @@ export default function CRSMenu({
     }
   }, [states.actions]);
 
-  // Set selected CRS and input value CRS changes
-  useEffect(() => {
-    let code = `${states.CRS.authority}:${states.CRS.code}`;
-    const fl = CRSList.filter((fl) => fl.value === code);
-    if (fl.length > 0) {
-      setSelectedCRS(fl[0]);
-    } else {
-      setSelectedCRS({ value: code, label: code });
-    }
-    setInputValue(code);
-  }, [CRSList, states.CRS.code]);
 
+  useEffect(() => {
+    if( states.actions.includes("updateSelectedCRS") ){
+      let code = `${states.CRS.authority}:${states.CRS.code}`;
+      const fl = CRSList.filter((fl) => fl.value === code);
+      if (fl.length > 0) {
+        setSelectedCRS(fl[0]);
+      }else{
+        setSelectedCRS({ label: code, value: states.CRS.name });
+      }
+    }
+  },[states.actions])
+  
+
+  useEffect(() => {
+    if( states.actions.includes("updateCRSInput") ){
+      let code = `${states.CRS.authority}:${states.CRS.code}`;
+      setInputValue(code);
+    }
+  },[states.actions])
+  
   const updateCRS = (value, ignore = false) => {
+    let code = `${states.CRS.authority}:${states.CRS.code}`
     if (
-      value &&
-      value?.value !== `${states.CRS.authority}:${states.CRS.code}`
+      value 
     ) {
       let code = "";
       code = value.value.split(":");
@@ -177,17 +174,10 @@ export default function CRSMenu({
                 CRSBboxWGS84: def.bbox,
               };
               dispatch({ type: "changeCRS", CRS: c });
+              setSelectedCRS({ label: def.name, value: value.value });
               setBadCRS("");
             } else {
               setBadCRS("CRS not recognized");
-              dispatch({
-                type: "changeCRSFromInput",
-                CRS: {
-                  name: "unrecognized CRS",
-                  authority: code[0],
-                  code: code[1],
-                },
-              });
               setSelectedCRS({ label: value.value, value: value.value });
             }
           }
@@ -205,12 +195,29 @@ export default function CRSMenu({
     }
   };
 
-  const debouncedSearch = useCallback(
+  const debouncedSearchInput = useCallback(
     debounce((value) => {
-      updateCRS({ label: value, value: value });
+      let code = value.split(":")
+      if(code.length === 2 && code[1]?.length > 3){
+        dispatch({
+          type: "changeCRSFromInput",
+          CRS: { name: value, authority: code[0], code: code[1] },
+        })
+      }
     }, 1000),
+  []);
+
+
+  const debouncedSearchAutocomplete = useCallback(
+    debounce((value) => {
+      setSearchValue(value.target.value);
+      dispatch({
+        type: "searchCRSFromAutocomplete",
+      })
+    }, 500),
     []
   );
+
 
   return (
     <div style={paperStyle(dialog)}>
@@ -274,8 +281,11 @@ export default function CRSMenu({
             }}
           />
         )}
-        onChange={(event, value) => {
-          updateCRS(value);
+        onInputChange={(event, value) => {
+          debouncedSearchAutocomplete(event);
+        }}
+        onChange={(event, newValue) => {
+          updateCRS(newValue);
         }}
         value={selectedCRS}
       />
@@ -310,7 +320,7 @@ export default function CRSMenu({
           sx={{ width: "100%" }}
           onChange={(event) => {
             setInputValue(event.target.value);
-            debouncedSearch(event.target.value);
+            debouncedSearchInput(event.target.value);
           }}
         />
       </FormControl>
