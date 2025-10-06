@@ -45,8 +45,10 @@ export default function Choosers({
                 {": "}
               </>
             )}
-            { value && !isCompact && (
-              <pre>{yaml.dump(value)}</pre>
+            {value && !isCompact && (
+              <pre style={{ maxWidth: "500px", overflowX: "scroll" }}>
+                {yaml.dump(value)}
+              </pre>
             )}
             <br />
           </td>

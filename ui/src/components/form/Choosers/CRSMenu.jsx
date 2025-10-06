@@ -22,16 +22,15 @@ import {
 } from "./utils";
 import { CRS } from "leaflet";
 
-export default function CRSMenu({
-  states,
-  dispatch,
-  value,
-  dialog = false,
-}) {
+export default function CRSMenu({ states, dispatch, value, dialog = false }) {
   const [CRSList, setCRSList] = useState(defaultCRSList);
   const p = `${value?.CRS?.authority}:${parseInt(value?.CRS?.code)}`;
-  const savedCRSValue = value?.CRS ? { label: `${value?.CRS?.name} (${p})`, value: `${p}` } : null
-  const [selectedCRS, setSelectedCRS] = useState(savedCRSValue || defaultCRSList[0]);
+  const savedCRSValue = value?.CRS
+    ? { label: `${value?.CRS?.name} (${p})`, value: `${p}` }
+    : null;
+  const [selectedCRS, setSelectedCRS] = useState(
+    savedCRSValue || defaultCRSList[0]
+  );
   const [inputValue, setInputValue] = useState("");
   const [searchValue, setSearchValue] = useState(null);
   const [searching, setSearching] = useState(false);
@@ -43,7 +42,7 @@ export default function CRSMenu({
       setSearching(true);
       // Suggest from names
       const searchTerm = searchValue ? searchValue : states.country.englishName;
-      if (searchTerm && searchTerm !== "" && searchTerm !== states.CRS?.name ) {
+      if (searchTerm && searchTerm !== "" && searchTerm !== states.CRS?.name) {
         getCRSListFromName(searchTerm).then((result) => {
           if (result) {
             const suggestions = result.map((proj) => {
@@ -112,12 +111,11 @@ export default function CRSMenu({
     }
   }, [states.actions]);
 
-
   useEffect(() => {
     if (states.actions.includes("resetCRS")) {
       let code = `${defaultCRS.authority}:${defaultCRS.code}`;
       updateCRS({ value: code, label: defaultCRS.name }, false);
-      setSearchValue("")
+      setSearchValue("");
       setBadCRS("");
     }
   }, [states.actions]);
@@ -132,32 +130,28 @@ export default function CRSMenu({
     }
   }, [states.actions]);
 
-
   useEffect(() => {
-    if( states.actions.includes("updateSelectedCRS") ){
+    if (states.actions.includes("updateSelectedCRS")) {
       let code = `${states.CRS.authority}:${states.CRS.code}`;
       const fl = CRSList.filter((fl) => fl.value === code);
       if (fl.length > 0) {
         setSelectedCRS(fl[0]);
-      }else{
+      } else {
         setSelectedCRS({ label: code, value: states.CRS.name });
       }
     }
-  },[states.actions])
-  
+  }, [states.actions]);
 
   useEffect(() => {
-    if( states.actions.includes("updateCRSInput") ){
+    if (states.actions.includes("updateCRSInput")) {
       let code = `${states.CRS.authority}:${states.CRS.code}`;
       setInputValue(code);
     }
-  },[states.actions])
-  
+  }, [states.actions]);
+
   const updateCRS = (value, ignore = false) => {
-    let code = `${states.CRS.authority}:${states.CRS.code}`
-    if (
-      value 
-    ) {
+    let code = `${states.CRS.authority}:${states.CRS.code}`;
+    if (value) {
       let code = "";
       code = value.value.split(":");
       if (code[1].length > 3) {
@@ -197,27 +191,26 @@ export default function CRSMenu({
 
   const debouncedSearchInput = useCallback(
     debounce((value) => {
-      let code = value.split(":")
-      if(code.length === 2 && code[1]?.length > 3){
+      let code = value.split(":");
+      if (code.length === 2 && code[1]?.length > 3) {
         dispatch({
           type: "changeCRSFromInput",
           CRS: { name: value, authority: code[0], code: code[1] },
-        })
+        });
       }
     }, 1000),
-  []);
-
+    []
+  );
 
   const debouncedSearchAutocomplete = useCallback(
     debounce((value) => {
       setSearchValue(value.target.value);
       dispatch({
         type: "searchCRSFromAutocomplete",
-      })
+      });
     }, 500),
     []
   );
-
 
   return (
     <div style={paperStyle(dialog)}>

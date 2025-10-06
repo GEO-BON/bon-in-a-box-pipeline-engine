@@ -83,7 +83,7 @@
   flex-grow: 1;
   height: 95%;
   background-color: #8f94a0;
-  border-radius:15px;
+  border-radius: 15px;
   border: 4px solid rgba(255, 255, 255, 0.432);
 }
 
@@ -157,15 +157,16 @@
   max-width: 400px;
 }
 
-.ioNode .ioNode-folder, .ioNode .ioNode-script{
+.ioNode .ioNode-folder,
+.ioNode .ioNode-script {
   display: block;
 }
-.ioNode .ioNode-folder{
-    font-size: 0.6em;
+.ioNode .ioNode-folder {
+  font-size: 0.6em;
 }
-.ioNode .ioNode-script{
-    font-weight: 700;
-    color: var(--biab-green-main)
+.ioNode .ioNode-script {
+  font-weight: 700;
+  color: var(--biab-green-main);
 }
 
 .inputs,
@@ -221,7 +222,6 @@
 .outputs div:hover {
   text-shadow: 0px 0px 1px black;
 }
-
 
 .ioWarning {
   color: hsl(0, 100%, 27%);
@@ -325,17 +325,17 @@
 
 .ioList textarea.label:focus,
 .ioList textarea.description:focus,
-.ioList textarea.autoResizeHeight:focus  {
+.ioList textarea.autoResizeHeight:focus {
   outline: 1px solid var(--biab-green-trans-main);
   border: 1px solid var(--biab-green-trans-main);
 }
 
 .ioList textarea.label:hover:focus,
-.ioList textarea.description:hover:focus  {
+.ioList textarea.description:hover:focus {
   background: none;
 }
 
-.ioList textarea.autoResizeHeight.example  {
+.ioList textarea.autoResizeHeight.example {
   outline: 1px solid #bbb;
   display: block;
 }
@@ -346,12 +346,14 @@
 
 .ioList .draggable {
   /* https://stackoverflow.com/a/34685980/3519951 */
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" style="font-size: 25px;"><text x="-5" y="20">⇳</text></svg>'), auto;
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" style="font-size: 25px;"><text x="-5" y="20">⇳</text></svg>'),
+    auto;
 }
 
 .ioList .dragging * {
   /* https://stackoverflow.com/a/34685980/3519951 */
-  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" style="font-size: 25px;"><text x="-5" y="20">⬍</text></svg>'), auto;
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="25" style="font-size: 25px;"><text x="-5" y="20">⬍</text></svg>'),
+    auto;
 }
 
 .ioList .ioListItem {
@@ -363,8 +365,7 @@
   width: 100%;
 }
 .ioList .ioListItem tr,
-.ioList .ioListItem td
- {
+.ioList .ioListItem td {
   border: none;
   padding: 0;
   margin: 0;
@@ -382,17 +383,17 @@
   background-color: lightgreen;
 }
 
-.ioListItem .MuiInputBase-input{
+.ioListItem .MuiInputBase-input {
   font-size: 0.7em;
   padding: 2px;
 }
 
-.ioListItem .MuiInputBase-root{
+.ioListItem .MuiInputBase-root {
   padding: 5px;
 }
 
-.ioListItem .MuiInputBase-input{
-  font-size:0.7em;
+.ioListItem .MuiInputBase-input {
+  font-size: 0.7em;
   padding: 2px;
 }
 

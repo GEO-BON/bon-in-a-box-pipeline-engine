@@ -93,7 +93,6 @@ export const defaultRegion = {
 export const paperStyle = (dialog) => {
   if (dialog) {
     return {
-      width: "90%",
       borderRadius: "10px",
       border: "1px solid #aaa",
       padding: "10px",
@@ -102,7 +101,6 @@ export const paperStyle = (dialog) => {
     };
   } else {
     return {
-      width: "90%",
       border: "0px",
       padding: "2px",
       margin: "0px",
