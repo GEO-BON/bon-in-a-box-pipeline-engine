@@ -517,3 +517,17 @@ ul#popupMenu {
   background-color: #aaa;
   cursor: pointer;
 }
+
+.constant-countryRegionCRS .constant-name,
+.constant-countryRegion .constant-name,
+.constant-CRS .constant-name {
+  font-size: 0;
+}
+
+.constant-countryRegionCRS .MuiAutocomplete-root,
+.constant-countryRegion .MuiAutocomplete-root,
+.constant-CRS .MuiAutocomplete-root,
+.constant-countryRegionCRS .MuiFormControl-root,
+.constant-CRS .MuiFormControl-root {
+  width: 100% !important;
+}
