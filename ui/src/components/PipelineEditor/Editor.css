@@ -518,16 +518,25 @@ ul#popupMenu {
   cursor: pointer;
 }
 
+.constant-country .constant-name,
 .constant-countryRegionCRS .constant-name,
 .constant-countryRegion .constant-name,
 .constant-CRS .constant-name {
   font-size: 0;
 }
 
+.constant-country .MuiAutocomplete-root,
 .constant-countryRegionCRS .MuiAutocomplete-root,
 .constant-countryRegion .MuiAutocomplete-root,
 .constant-CRS .MuiAutocomplete-root,
 .constant-countryRegionCRS .MuiFormControl-root,
 .constant-CRS .MuiFormControl-root {
   width: 100% !important;
+}
+
+.constant-country .location-chooser-modal {
+  min-width: 250px;
+}
+.ioListItem .location-chooser-modal {
+  min-width: 350px;
 }
