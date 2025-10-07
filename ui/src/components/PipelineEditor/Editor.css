@@ -515,6 +515,14 @@ ul#popupMenu {
   cursor: pointer;
 }
 
+.constant .location-chooser-modal .MuiGrid-container {
+  padding: 0;
+}
+
+.constant .location-chooser-modal .MuiGrid-container .inputGrid {
+  padding: 0;
+}
+
 .constant-boolean .MuiFormControlLabel-root {
   margin: 0;
 }
