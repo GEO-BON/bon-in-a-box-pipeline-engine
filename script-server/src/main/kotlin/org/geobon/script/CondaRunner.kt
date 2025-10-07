@@ -11,6 +11,7 @@ class CondaRunner(
     condaEnvYml: String?
 ) {
     private var activateEnvironment = ""
+    private val condaEnvFile = "/conda-env-yml/$condaEnvName"
 
     init {
         if (condaEnvName?.isNotEmpty() == true && condaEnvYml?.isNotEmpty() == true) {
@@ -35,7 +36,6 @@ class CondaRunner(
     }
 
     private fun useSubEnvironment(condaEnvName: String, condaEnvYml: String) {
-        val condaEnvFile = "/conda-env-yml/$condaEnvName"
         activateEnvironment = """
             set -o pipefail
 

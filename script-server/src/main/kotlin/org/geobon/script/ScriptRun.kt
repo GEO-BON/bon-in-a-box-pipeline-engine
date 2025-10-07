@@ -342,6 +342,7 @@ class ScriptRun( // Constructor used in single script run
                         if(useRunners) {
                             val runner = CondaRunner(logFile, pidFile, "python", condaEnvName, condaEnvYml)
                             container = CondaRunner.container
+
                             val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
                             command = container.dockerCommandList + listOf(
                                 "bash", "-c",
@@ -370,7 +371,7 @@ class ScriptRun( // Constructor used in single script run
                     .start().also { process ->
                         withContext(Dispatchers.IO) { // More info on this context switching : https://elizarov.medium.com/blocking-threads-suspending-coroutines-d33e11bf4761
                             // The watchdog will terminate the process in two cases :
-                            // if the user cancels or if 60 minutes delay expires.
+                            // if the user cancels or if timeout delay expires.
                             val watchdog = launch {
                                 try {
                                     delay(timeout.toLong(DurationUnit.MILLISECONDS))
