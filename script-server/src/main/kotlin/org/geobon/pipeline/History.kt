@@ -97,8 +97,9 @@ private fun getHistoryFromFolder(runFolder: File, isRunning: Boolean): JSONObjec
     run.put(
         "type",
 
-        // single script runs have both output and pipelineOutput in the same folder
-        if (File(runFolder,"output.json").exists()) "script" else "pipeline"
+        // single script runs have log file in the same folder as soon as they start
+        // TODO: we should have explicit run metadata to find what was ran.
+        if (File(runFolder, "logs.txt").exists()) "script" else "pipeline"
     )
 
     return run

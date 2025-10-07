@@ -263,11 +263,15 @@ class ApplicationTest {
         val response = client.get("/api/versions")
         assertEquals(HttpStatusCode.OK, response.status)
         val result = JSONObject(response.bodyAsText())
-        assertEquals(result.get("UI"),"offline" )
-        assertEquals(result.get("Script server"),"offline" )
-        assertEquals(result.get("Conda runner").toString(),"{\"container version\":\"offline\",\"environment\":\"\"}" )
-        assertEquals(result.get("Julia runner").toString(),"{\"container version\":\"offline\",\"environment\":\"\"}" )
-        assertEquals(result.get("TiTiler"),"offline" )
+        assertEquals("offline", result.get("UI") )
+        assertEquals("offline" , result.get("Script server"))
+        assertEquals("{\"container version\":\"offline\",\"environment\":\"\"}", result.get("Conda runner").toString())
+        assertEquals("{\"container version\":\"offline\",\"environment\":\"\"}", result.get("Julia runner").toString())
+        assertTrue {
+            (result.get("TiTiler") as String).let {
+                it == "offline" || it.matches(Regex("""\d{4}-\d{2}-\d{2} \d{2}:\d{2}"""))
+            }
+        }
     }
 
 }

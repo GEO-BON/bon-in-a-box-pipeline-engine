@@ -18,7 +18,7 @@ Contributors will follow the [GitHub flow](https://docs.github.com/en/get-starte
 
 3.  Create a branch from the main branch for your pipeline, with a descriptive branch name (e.g. ProtConn_pipeline).
 
-4.  Create your pipeline on this branch. Make sure it adheres to the [pipeline standards](pipeline_standards.wmd).
+4.  Create your pipeline on this branch. Make sure it adheres to the [pipeline standards](pipeline_standards.qmd).
 
 5.  When it is complete, create a pull request ([instructions here](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)) to the main branch on the bon-in-a-box-pipelines GitHub and fill out the peer review template that will autofill in the pull request, suggesting at least two potential peer reviewers.
 
