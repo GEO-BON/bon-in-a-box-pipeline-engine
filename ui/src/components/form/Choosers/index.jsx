@@ -229,7 +229,7 @@ export function Chooser({
         top: showMap ? "50%" : "auto",
         left: showMap ? "50%" : "auto",
         transform: showMap ? "translate(-50%, -50%)" : "",
-        backgroundColor: showMap ? "#666" : "none",
+        backgroundColor: showMap ? "#fff" : "none",
         padding: showMap ? "20px" : "0px",
         borderRadius: "8px",
         margin: showMap ? "0px auto" : "0px",
@@ -240,7 +240,6 @@ export function Chooser({
           xs={showMap ? 3 : 12}
           sx={{
             padding: "10px",
-            backgroundColor: "#fff",
             height: showMap ? "100%" : "auto",
             overflowY: type === "bboxCRS" ? "scroll" : "visible",
           }}
