@@ -515,6 +515,14 @@ ul#popupMenu {
   cursor: pointer;
 }
 
+.constant-boolean .MuiFormControlLabel-root {
+  margin: 0;
+}
+
+.constant-boolean .MuiCheckbox-root {
+  padding: 0;
+}
+
 .constant-country .constant-name,
 .constant-countryRegionCRS .constant-name,
 .constant-countryRegion .constant-name,
