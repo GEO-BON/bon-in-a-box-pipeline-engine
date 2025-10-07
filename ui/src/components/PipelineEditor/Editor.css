@@ -125,19 +125,16 @@
 }
 
 .MuiGrid-root {
-  background-color: whitesmoke;
+  background: none;
 }
 
 .ioNode:hover,
 .constant:hover,
-.constant:hover .MuiGrid-root,
 .userInput:hover,
 .react-flow__node-output:hover {
   background-color: white;
 }
 
-.selected .MuiGrid-root,
-.selected:hover .MuiGrid-root,
 .selected .ioNode,
 .selected .constant,
 .selected .userInput,
