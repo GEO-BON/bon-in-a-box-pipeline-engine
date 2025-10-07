@@ -5,10 +5,11 @@ import ScriptInput from "../form/ScriptInput";
 export default function ConstantNode({ id, data, type }) {
   return (
     <div className={`constant constant-${data.type}`}>
+      <div className="dragHandle behindInput"></div>
       <table>
         <tbody>
           <tr>
-            <td className="dragHandle constant-name">
+            <td className="left-gutter">
               <p>{data.type}</p>
             </td>
             <td>
@@ -22,7 +23,7 @@ export default function ConstantNode({ id, data, type }) {
                 keepWidth={false}
               />
             </td>
-            <td className="dragHandle">
+            <td className="right-gutter">
               <button
                 className="arrowDownButton"
                 title="options"

@@ -59,13 +59,29 @@
   vertical-align: top;
 }
 
-.constant table td.dragHandle {
+.constant table td.left-gutter,
+.constant table td.right-gutter {
   padding: 3px 2px;
 }
 
 .constant p {
   margin: 0px 10px 0 10px;
 }
+
+.constant .behindInput{
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0; /* .constant .behindInput */
+}
+
+.constant .arrowDownButton {
+  position: relative;
+  z-index: 1; /* .arrowDownButton */
+}
+
 
 .dragHandle {
   cursor: grab;
@@ -531,10 +547,10 @@ ul#popupMenu {
   padding: 0;
 }
 
-.constant-country .constant-name,
-.constant-countryRegionCRS .constant-name,
-.constant-countryRegion .constant-name,
-.constant-CRS .constant-name {
+.constant-country .left-gutter,
+.constant-countryRegionCRS .left-gutter,
+.constant-countryRegion .left-gutter,
+.constant-CRS .left-gutter {
   font-size: 0;
 }
 
