@@ -236,7 +236,7 @@ export function Chooser({
       }}
     >
       <Grid container spacing={0} sx={{ height: "100%" }}>
-        <Grid
+        <Grid className="inputGrid"
           xs={showMap ? 3 : 12}
           sx={{
             padding: "10px",
