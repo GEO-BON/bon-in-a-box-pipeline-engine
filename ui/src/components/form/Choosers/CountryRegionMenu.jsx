@@ -225,17 +225,17 @@ export default function CountryRegionMenu({
             }}
             value={selectedRegion}
           />
-          <div
+          <p
             style={{
               fontSize: "11px",
-              margin: "5px 0px 2px 5px",
+              margin: "0px 0px 2px 5px",
             }}
           >
             Reference for toponyms:{" "}
             <a target="_blank" href="https://geonames.org">
               GeoNames
             </a>
-          </div>
+          </p>
         </>
       )}
     </div>
