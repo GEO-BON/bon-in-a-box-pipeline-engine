@@ -1,8 +1,7 @@
 import sys, json, os.path;
 
 # Reading input.json
-inputFile = open(sys.argv[1] + '/input.json')
-data = json.load(inputFile)
+data = biab_inputs()
 pathIn = data['file']
 
 # Checking if this is a file...
