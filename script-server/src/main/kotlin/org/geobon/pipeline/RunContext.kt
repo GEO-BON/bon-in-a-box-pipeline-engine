@@ -35,7 +35,7 @@ data class RunContext(val runId: String, val inputs: String?, val serverContext:
 
     constructor(descriptionFile: File, inputMap: Map<String, Any?>, serverContext: ServerContext) : this(
         descriptionFile,
-        if (inputMap.isEmpty()) null else gson.toJson(inputMap),
+        if (inputMap.isEmpty()) null else JSONObject(preserveNulls(inputMap)).toString(),
         serverContext
     )
 
@@ -70,6 +70,10 @@ data class RunContext(val runId: String, val inputs: String?, val serverContext:
         File("${outputFolder.absolutePath}/environment.json").writeText(JSONObject(environment).toString(2))
     }
     companion object {
+
+        private fun preserveNulls(inputMap: Map<String, Any?>) : Map<String, Any> {
+            return inputMap.mapValues { it.value ?: JSONObject.NULL }
+        }
 
         val gson: Gson = GsonBuilder()
             .serializeNulls()

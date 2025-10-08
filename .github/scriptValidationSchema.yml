@@ -124,8 +124,6 @@ inputs:
         - type: boolean
         - type: list
         - type: dict
-          dependencies:
-            type: [object]
 
 outputs:
   required: true

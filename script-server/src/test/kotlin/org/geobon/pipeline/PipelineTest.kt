@@ -380,4 +380,36 @@ internal class PipelineTest {
             )
         }
     }
+
+    @Test
+    fun `given a mini pipeline_when ran with object_then outputs generated`() = runTest {
+        val pipeline = createMiniPipelineFromScript(
+            File(RunContext.scriptRoot, "assertObject.yml"),
+            "assertObject.yml",
+            """{ "some_object" : { "some_data" : "bla bla" } }""".trimMargin()
+        )
+
+        val outputs = pipeline.pullFinalOutputs()
+        val scriptOutputDir = File(outputRoot, outputs["assertObject.yml@1"]!!)
+        val scriptOutputFile = File(scriptOutputDir, "output.json")
+        assertTrue(scriptOutputFile.exists())
+
+        // The results are there
+        assertContains(scriptOutputFile.readText(), """\{\s+"some_data": "bla bla"\s+}""".toRegex())
+    }
+
+    @Test
+    fun `given a mini pipeline and assert Object_when ran with string_then exception occurs`() = runTest {
+        val pipeline = createMiniPipelineFromScript(
+            File(RunContext.scriptRoot, "assertObject.yml"),
+            "assertObject.yml",
+            """{ "some_object" : 'bla bla' }""".trimMargin()
+        )
+
+        val outputs = pipeline.pullFinalOutputs()
+        val scriptOutputDir = File(outputRoot, outputs["assertObject.yml@1"]!!)
+        val scriptOutputFile = File(scriptOutputDir, "output.json")
+        assertTrue(scriptOutputFile.exists())
+        assertFalse(scriptOutputFile.readText().contains( "bla bla"))
+    }
 }

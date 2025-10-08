@@ -21,4 +21,8 @@ open class ConstantPipe(override val type: String, private val value: Any?) : Pi
     override fun validateGraph(): String {
         return ""
     }
+
+    override fun toString(): String {
+        return "ConstantPipe(type='$type', value=$value, value.javaClass.name=${value?.javaClass?.name})"
+    }
 }
