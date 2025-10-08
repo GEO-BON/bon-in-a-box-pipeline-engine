@@ -240,17 +240,12 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
             fontSize: 13,
           },
         }}
-        InputProps={{
-          readOnly: true,
-        }}
         renderInput={(params) => (
           <TextField
             {...params}
-            multiline
             label="Search / Select CRS"
             InputProps={{
               ...params.InputProps,
-              readOnly: true,
               endAdornment: (
                 <>
                   {CRSList.length > 0 && (
