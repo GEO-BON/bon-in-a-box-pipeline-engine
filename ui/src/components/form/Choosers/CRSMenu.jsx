@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -20,7 +20,6 @@ import {
   paperStyle,
   transformCoordCRS,
 } from "./utils";
-import { CRS } from "leaflet";
 
 export default function CRSMenu({ states, dispatch, value, dialog = false }) {
   const [CRSList, setCRSList] = useState(defaultCRSList);
@@ -204,10 +203,12 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
 
   const debouncedSearchAutocomplete = useCallback(
     debounce((value) => {
-      setSearchValue(value.target.value);
-      dispatch({
-        type: "searchCRSFromAutocomplete",
-      });
+      if(value) {
+        setSearchValue(value.target.value);
+        dispatch({
+          type: "searchCRSFromAutocomplete",
+        });
+      }
     }, 500),
     []
   );
