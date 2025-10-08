@@ -175,7 +175,7 @@ const PreviousNext = (props) => {
       sx={{ marginTop: "20px", paddingBottom: "100px" }}
     >
       {start > 0 && (
-        <Grid item xs={12} md={6}>
+        <Grid size={{xs:12, md:6}}>
           <CustomButtonGrey
             onClick={() => {
               setStart((prev) => Math.max(prev - limit, 0));
@@ -186,7 +186,7 @@ const PreviousNext = (props) => {
         </Grid>
       )}
       {showNext && runsLength === limit && (
-        <Grid xs={12} md={6}>
+        <Grid size={{xs:12, md:6}}>
           <CustomButtonGrey
             onClick={() => {
               setStart((prev) => prev + limit);
@@ -237,7 +237,7 @@ const RunCard = (props) => {
     });
   }, [pipeline, run, setExpanded]);
   return (
-    <Grid item size={{ md: 10, lg: 5 }}>
+    <Grid size={{ md: 10, lg: 5 }}>
       <Card
         sx={{
           width: "100%",
