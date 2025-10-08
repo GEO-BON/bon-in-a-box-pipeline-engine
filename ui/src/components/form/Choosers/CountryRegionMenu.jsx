@@ -1,11 +1,10 @@
 /* eslint-disable prettier/prettier */
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import countryOptionsJSON from "./countries.json"; // Assuming you have a JSON file with country data
 import {
   getStateAPI,
-  defaultCountry,
   defaultRegion,
   paperStyle,
 } from "./utils";
