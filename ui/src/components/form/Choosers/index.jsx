@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
-import { useEffect, useState, useRef, useReducer } from "react";
+import { useEffect, useState, lazy, useReducer, Suspense } from "react";
 import Grid from "@mui/material/Grid";
 import CropIcon from "@mui/icons-material/Crop";
-import MapOpenLayers from "./MapOpenLayers";
+const MapOpenLayers = lazy(() => import('./MapOpenLayers'));
 import CountryRegionMenu from "./CountryRegionMenu";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
@@ -14,16 +14,15 @@ import { defaultCRS, defaultCountry, defaultRegion } from "./utils";
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import Modal from "@mui/material/Modal";
 import { chooserReducer } from "./chooserReducer";
+import { Spinner } from "../../Spinner";
 
 export default function Choosers({
-  inputFileContent = {},
   inputId,
   inputDescription = {
     description: "",
     label: "",
     type: "",
   },
-  updateInputFile,
   onChange = () => {},
   descriptionCell = true,
   leftLabel = true,
@@ -323,15 +322,17 @@ export function Chooser({
             size={{ xs: 9 }}
             sx={{ padding: "0px", backgroundColor: "#", height: "100%" }}
           >
-            <MapOpenLayers
-              {...{
-                states,
-                dispatch,
-                clearFeatures,
-                digitize,
-                setDigitize,
-              }}
-            />
+            <Suspense fallback={<Spinner />}>
+              <MapOpenLayers
+                {...{
+                  states,
+                  dispatch,
+                  clearFeatures,
+                  digitize,
+                  setDigitize,
+                }}
+              />
+            </Suspense>
           </Grid>
         )}
       </Grid>
