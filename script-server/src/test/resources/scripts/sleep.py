@@ -1,8 +1,7 @@
 import sys, json, time;
 
 # Reading json
-inputFile = open(sys.argv[1] + '/input.json')
-data = json.load(inputFile)
+data = biab_inputs()
 delay = data['delay']
 
 time.sleep(delay)

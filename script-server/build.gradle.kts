@@ -4,15 +4,15 @@ val ktorVersion: String by project
 val kotlinVersion: String by project
 
 plugins {
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm") version "2.2.10"
     id("io.ktor.plugin")
 
     // Better behavior of trimIndent() when it includes variables
-    id("com.bennyhuo.kotlin.trimindent") version "2.1.20-1.1.0"
+    id("com.bennyhuo.kotlin.trimindent") version "2.2.0-1.1.0"
 }
 
 group = "org.geobon"
-version = "1.0.0"
+version = "1.1.3"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 
@@ -63,11 +63,11 @@ dependencies {
     implementation("org.json:json:20250107")
 
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
-    implementation("org.yaml:snakeyaml:2.4")
+    implementation("org.yaml:snakeyaml:2.5")
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
-    testImplementation("io.mockk:mockk:1.13.17")
+    testImplementation("io.mockk:mockk:1.14.5")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
-    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
+    testImplementation("io.kotest:kotest-runner-junit5:6.0.3")
 }

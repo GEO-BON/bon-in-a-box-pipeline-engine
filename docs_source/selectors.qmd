@@ -1,0 +1,70 @@
+---
+title: "Description for selectors for specific input types."
+---
+
+When specifying input types 'country', 'countryRegion', 'countryRegionCRS', 'CRS' or 'bboxCRS', selectors are automatically created that facilitate the selection of those inputs. After being selected, those inputs appear in the `input.json` of the script or pipeline as objects with various parameters that will be available when loading then in R, Python or Julia.
+
+For example, the bboxCRS selector allows the user to specify a country, region and coordinate reference system to define a bounding box. The bounding box can also be selected manually, without first selecting a country or region. Here is an example of an object created through the selection of the Putumayo department in Colombia, in the Bogota 1975 / Colombia West zone reference system:
+
+``` {#bboxCRS .yaml}
+bbox:
+  - 983337
+  - 428305
+  - 1360903
+  - 659616
+CRS:
+  name: Bogota 1975 / Colombia West zone
+  authority: EPSG
+  code: 21896
+  proj4Def: >-
+    +proj=tmerc +lat_0=4.59904722222222 +lon_0=-77.0809166666667 +k=1
+    +x_0=1000000 +y_0=1000000 +ellps=intl +towgs84=307,304,-318,0,0,0,0 +units=m
+    +no_defs +type=crs
+  unit: metre
+  bbox:
+    - -79.1
+    - 0.03
+    - -75.58
+    - 10.21
+country:
+  englishName: Colombia
+  ISO3: COL
+  code: CO
+  countryBboxWGS84:
+    - -81.735776
+    - -4.228392
+    - -66.847215
+    - 13.386003
+region:
+  regionName: Putumayo Department
+  ISO3166_2: PUT
+  regionBboxWGS84:
+    - -77.227302
+    - -0.572994
+    - -73.837335
+    - 1.515533
+  countryEnglishName: Colombia
+```
+
+Here is the meaning of each key.
+
+| Key name           | Section | Description                                                                                                                                    |
+|--------------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| bbox               | bbox    | Array containing the minimum x, minimum y, maximum x, maximum y coordinates (in that order) of the bounding box, in units of the selected CRS. |
+| name               | CRS     | Plain text name of the coordinate reference system selected.                                                                                   |
+| authority          | CRS     | Authority associated with the code of the reference system. Usually EPSG or ESRI. For example `EPSG`\` for 'EPSG:4326'.                        |
+| code               | CRS     | Code associated with the authority of the reference system. Usually a 4 or 5 digit integer. For example `4326`\`for EPSG:4326                  |
+| proj4Def           | CRS     | Proj4 string definition of the CRS.                                                                                                            |
+| wktDef             | CRS     | Well Known text definition of the CRS, when available.                                                                                         |
+| unit               | CRS     | units associated with CRS. Usually `meter`, `degree`, or `feet`                                                                                |
+| CRSBboxWGS84       | CRS     | The bounding box covered by this coordinate reference system, in latitude, longitude, WGS84 (EPSG:4326)                                        |
+| englishName        | country | English name of the selected country, according to GeoNames.org.                                                                               |
+| ISO3               | country | 3 letter ISO code for this country.                                                                                                            |
+| code               | country | 2 letter code for this country                                                                                                                 |
+| countryBboxWGS84   | country | The bounding box covered by this country, in WGS84 (EPSG:4326), according to GeoNames.org                                                      |
+| regionName         | region  | Name of the region, according to GeoNames.org                                                                                                  |
+| ISO3166_2          | region  | ISO code associated with this region, where available.                                                                                         |
+| regionBboxWGS84    | region  | The bounding box covered by this region, in latitude, longitude, WGS84 (EPSG:4326), according to GeoNames.org                                  |
+| countryEnglishName | region  | English name of the country within which this region is.                                                                                       |
+
+When using other selectors, the object create contains a subset of the bboxCRS selector. For example, the countryRegion selector will only contain the country and region sections, and countryRegionCRS will contain all but the bbox section.

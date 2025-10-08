@@ -6,6 +6,7 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 import AutoResizeTextArea from "./AutoResizeTextArea";
+import Choosers from "./Choosers";
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
 export const CONSTANT_PLACEHOLDER = "Constant";
 
@@ -230,6 +231,28 @@ export default function ScriptInput({
           }}
           sx={{ width: small ? 220 : 328 }}
         />
+      );
+    case "country":
+      return (
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
+      );
+    case "countryRegionCRS":
+      return (
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
+      );
+
+    case "bboxCRS":
+      return (
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={true} descriptionCell={false}/>
+      );
+
+    case "CRS":
+      return (
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
+      );
+    case "countryRegion":
+      return (
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
       );
 
     default:
