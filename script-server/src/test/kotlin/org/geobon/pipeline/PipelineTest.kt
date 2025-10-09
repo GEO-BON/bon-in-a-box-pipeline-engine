@@ -384,7 +384,8 @@ internal class PipelineTest {
     @Test
     fun `given a mini pipeline_when ran with object_then outputs generated`() = runTest {
         val pipeline = createMiniPipelineFromScript(
-            File(RunContext.scriptRoot, "assertObject.yml"),
+            noHPCContext,
+            File(ServerContext.scriptsRoot, "assertObject.yml"),
             "assertObject.yml",
             """{ "some_object" : { "some_data" : "bla bla" } }""".trimMargin()
         )
@@ -401,7 +402,8 @@ internal class PipelineTest {
     @Test
     fun `given a mini pipeline and assert Object_when ran with string_then exception occurs`() = runTest {
         val pipeline = createMiniPipelineFromScript(
-            File(RunContext.scriptRoot, "assertObject.yml"),
+            noHPCContext,
+            File(ServerContext.scriptsRoot, "assertObject.yml"),
             "assertObject.yml",
             """{ "some_object" : 'bla bla' }""".trimMargin()
         )
