@@ -56,7 +56,8 @@ class DockerizedRun( // Constructor used in single script run
                         "bash", "-c",
                         """
                             source importEnvVars.sh
-                            julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
+                            /usr/bin/time -f "Memory used: %M kb" \
+                                julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
                         """
                     )
                 }
@@ -85,7 +86,8 @@ class DockerizedRun( // Constructor used in single script run
                             "bash", "-c",
                             """
                                 source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
-                                python3 $pythonWrapper $escapedOutputFolder $scriptPath
+                                /usr/bin/time -f "Memory used: %M kb" \
+                                    python3 $pythonWrapper $escapedOutputFolder $scriptPath
                             """.trimIndent()
                         )
                     } else {
