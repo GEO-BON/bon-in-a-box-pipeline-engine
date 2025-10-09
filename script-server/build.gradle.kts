@@ -12,17 +12,20 @@ plugins {
 }
 
 group = "org.geobon"
-version = "1.1.3"
+version = "1.2.0"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
+}
 
-    val isDevelopment: Boolean = ("true" == System.getenv("DEV"))
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+ktor {
+    development = ("true" == System.getenv("DEV"))
+    println("ktor.development=${development.get()}")
 }
 
 repositories {
     mavenCentral()
     maven("https://s01.oss.sonatype.org/content/repositories/releases")
+    maven("https://jitpack.io")
 }
 
 tasks.test {
@@ -35,6 +38,7 @@ tasks.test {
         "SCRIPT_LOCATION" to "$projectDir/src/test/resources/scripts/",
         "SCRIPT_STUBS_LOCATION" to projectDir.parent + "/script-stubs/",
         "PIPELINES_LOCATION" to "$projectDir/src/test/resources/pipelines/",
+        "USERDATA_LOCATION" to "$projectDir/src/test/resources/userdata/",
         "OUTPUT_LOCATION" to "$projectDir/src/test/resources/outputs/",
         "SCRIPT_SERVER_CACHE_CLEANER" to "full"
     ))
@@ -64,6 +68,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementation("org.yaml:snakeyaml:2.5")
+
+    // https://github.com/vishna/watchservice-ktx?tab=readme-ov-file
+    implementation("com.github.vishna:watchservice-ktx:master-SNAPSHOT")
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")

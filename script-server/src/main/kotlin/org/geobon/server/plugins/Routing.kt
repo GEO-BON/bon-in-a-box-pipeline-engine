@@ -8,12 +8,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.geobon.hpc.HPC
 import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
+import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.pipelinesRoot
+import org.geobon.server.ServerContext.Companion.scriptStubsRoot
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -32,8 +34,6 @@ import java.net.http.HttpResponse
  */
 const val FILE_SEPARATOR = '>'
 private val gson = Gson()
-private val pipelinesRoot = File(System.getenv("PIPELINES_LOCATION"))
-private val scriptStubsRoot = File(System.getenv("SCRIPT_STUBS_LOCATION"))
 
 private val runningPipelines = mutableMapOf<String, Pipeline>()
 private val logger: Logger = LoggerFactory.getLogger("Server")
@@ -42,6 +42,7 @@ private val logger: Logger = LoggerFactory.getLogger("Server")
 fun Application.configureRouting() {
 
     val hpc = HPC()
+    val serverContext = ServerContext(hpc)
 
     routing {
         get("/api/systemStatus") {
@@ -70,7 +71,7 @@ fun Application.configureRouting() {
                 }
 
                 "script" -> {
-                    roots = listOf(scriptRoot, scriptStubsRoot)
+                    roots = listOf(scriptsRoot, scriptStubsRoot)
                     extension = "yml"
                 }
 
@@ -125,7 +126,7 @@ fun Application.configureRouting() {
                     replace(FILE_SEPARATOR, '/').replace(Regex("""\.\w+$"""), ".yml")
                 }
 
-                var scriptFile = File(scriptRoot, ymlPath)
+                var scriptFile = File(scriptsRoot, ymlPath)
 
                 if (scriptFile.exists()) {
                     call.respond(Yaml().load(scriptFile.readText()) as Map<String, Any>)
@@ -182,8 +183,6 @@ fun Application.configureRouting() {
         }
 
         post("/{type}/{descriptionPath}/run") {
-            logger.debug("BLOCK_RUNS: ${System.getenv("BLOCK_RUNS")}")
-
             if (System.getenv("BLOCK_RUNS") == "true") {
                 call.respond(
                     HttpStatusCode.ServiceUnavailable, "This server does not allow running pipelines and scripts.\n" +
@@ -208,7 +207,7 @@ fun Application.configureRouting() {
 
             // Validate the existence of the file
             val descriptionFile = File(
-                if (singleScript) scriptRoot else pipelinesRoot,
+                if (singleScript) scriptsRoot else pipelinesRoot,
                 descriptionPath.replace(FILE_SEPARATOR, '/')
             )
             if (!descriptionFile.exists()) {
@@ -221,9 +220,9 @@ fun Application.configureRouting() {
 
             runCatching {
                 if (singleScript) {
-                    createMiniPipelineFromScript(descriptionFile, descriptionPath, inputFileContent)
+                    createMiniPipelineFromScript(serverContext, descriptionFile, descriptionPath, inputFileContent)
                 } else {
-                    createRootPipeline(descriptionFile, inputFileContent)
+                    createRootPipeline(serverContext, descriptionFile, inputFileContent)
                 }
             }.onSuccess { pipeline ->
                 runningPipelines[runId] = pipeline
@@ -296,19 +295,17 @@ fun Application.configureRouting() {
         }
 
         get("/hpc/prepare") {
-            if(!hpc.connection.configured) {
+            if (!hpc.connection.configured) {
                 call.respond(HttpStatusCode.ServiceUnavailable, "HPC not configured on this server")
                 return@get
             }
 
-            runBlocking {
-                launch {
-                    hpc.connection.prepare()
-                }
-
-                // We respond OK immediately when started, status API can be checked for progress.
-                call.respond(HttpStatusCode.OK)
+            launch {
+                hpc.connection.prepare()
             }
+
+            // We respond OK immediately when started, status API can be checked for progress.
+            call.respond(HttpStatusCode.OK)
         }
 
         get("/api/versions") {
@@ -353,7 +350,7 @@ fun Application.configureRouting() {
             val fakeInputs = Validator.generateInputFromExamples(pipelineJSON)
             var message = ""
             try {
-                createRootPipeline(filename, pipelineJSON, fakeInputs)
+                createRootPipeline(serverContext, filename, pipelineJSON, fakeInputs)
             } catch (e: Exception) {
                 message = "${e.message}"
             }

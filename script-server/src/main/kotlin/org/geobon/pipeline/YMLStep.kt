@@ -2,31 +2,32 @@ package org.geobon.pipeline
 
 import org.geobon.script.Description.INPUTS
 import org.geobon.script.Description.IO__LABEL
-import org.geobon.script.Description.NAME
-import org.geobon.script.Description.OUTPUTS
 import org.geobon.script.Description.IO__TYPE
 import org.geobon.script.Description.IO__TYPE_OPTIONS
-import org.geobon.script.ScriptRun
+import org.geobon.script.Description.NAME
+import org.geobon.script.Description.OUTPUTS
+import org.geobon.script.Run
+import org.geobon.server.ServerContext
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
-import kotlin.collections.get
 
 
 abstract class YMLStep(
+    protected val serverContext: ServerContext,
     protected val yamlFile: File,
     stepId:StepId,
     inputs: MutableMap<String, Pipe> = mutableMapOf(),
-    private val logger: Logger = LoggerFactory.getLogger(yamlFile.name),
+    internal val logger: Logger = LoggerFactory.getLogger(yamlFile.name),
     protected val yamlParsed: Map<String, Any> = Yaml().load(yamlFile.readText())
 ) : Step(stepId, inputs, readOutputs(yamlParsed, logger)) {
 
     /**
-     * Context becomes set in validateInputsReceived(), once the invocation inputs are known.
+     * Context becomes set in onInputsReceived(), once the invocation inputs are known.
      */
-    protected var context:RunContext? = null
+    var context:RunContext? = null
 
     val inputsDefinition = readInputs(yamlParsed, logger)
     override fun getDisplayBreadcrumbs(): String {
@@ -64,7 +65,7 @@ abstract class YMLStep(
                     else -> {
                         val description = readIODescription(INPUTS, inputKey)
                         val label = description?.get(IO__LABEL) as? String?
-                        var displayName = if (label != null) "\"$label\" ($inputKey)" else inputKey
+                        val displayName = if (label != null) "\"$label\" ($inputKey)" else inputKey
 
                         "Wrong type for input $displayName: expected \"$expectedType\" but \"${it.type}\" was received.\n"
                     }
@@ -77,7 +78,7 @@ abstract class YMLStep(
 
     override fun onInputsReceived(resolvedInputs: Map<String, Any?>) {
         // Now that we know the inputs are valid, record the id
-        context = RunContext(yamlFile, resolvedInputs)
+        context = RunContext(yamlFile, resolvedInputs, serverContext)
 
         try { // Validation
             inputs.filter { (_, pipe) -> pipe.type == IO__TYPE_OPTIONS }.forEach { (key, _) ->
@@ -89,7 +90,7 @@ abstract class YMLStep(
                 }
             }
         } catch (e:RuntimeException) {
-            record(mapOf(ScriptRun.ERROR_KEY to (e.message ?: e.toString())))
+            record(mapOf(Run.ERROR_KEY to (e.message ?: e.toString())))
             throw e
         }
     }
@@ -131,7 +132,7 @@ abstract class YMLStep(
     }
 
     override fun toString(): String {
-        return "${javaClass.simpleName} (id=$id, name=\"${yamlParsed[NAME]}\", file=${yamlFile.relativeTo(RunContext.scriptRoot)})"
+        return "${javaClass.simpleName} (id=$id, name=\"${yamlParsed[NAME]}\", file=${yamlFile.relativeTo(ServerContext.scriptsRoot)})"
     }
 
     companion object {
@@ -176,7 +177,7 @@ abstract class YMLStep(
                                     toExecute(key.toString(), type.toString())
                                 } ?: logger.error("Invalid type")
                             } else {
-                                logger.error("$section description is not a map")
+                                logger.error("description of $section is not a map")
                             }
                         } ?: logger.error("Invalid key")
                     }

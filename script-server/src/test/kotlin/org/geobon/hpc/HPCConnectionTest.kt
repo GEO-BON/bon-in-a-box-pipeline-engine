@@ -9,9 +9,10 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import io.mockk.verifyCount
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.outputRoot
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.scriptModule
 import org.geobon.utils.CallResult
 import org.geobon.utils.SystemCall
@@ -24,11 +25,14 @@ class HPCConnectionTest {
     private val configFile = File(tmpDir, "config")
     private val sshKeyFile = File(tmpDir, "key")
     private val knownHostsFile = File(tmpDir, "hosts")
+    private val biabRoot = File(tmpDir, "bon-in-a-box")
     private val testEnvironment = mutableMapOf(
         "HPC_SSH_CONFIG_NAME" to "HPC-name",
         "HPC_SSH_CONFIG_FILE" to configFile.absolutePath,
         "HPC_SSH_KEY" to sshKeyFile.absolutePath,
         "HPC_KNOWN_HOSTS_FILE" to knownHostsFile.absolutePath,
+        "HPC_BIAB_ROOT" to "${biabRoot.absolutePath}/hpc",
+        "HPC_SBATCH_ACCOUNT" to "account-name",
         "HPC_AUTO_CONNECT" to "false"
     )
 
@@ -68,7 +72,7 @@ class HPCConnectionTest {
         client.get("/hpc/status").apply {
             assertEquals(HttpStatusCode.OK, status)
             assertEquals(
-                """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"}}""",
+                """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"},"Launch scripts":{"state":"NOT_CONFIGURED"}}""",
                 bodyAsText()
             )
         }
@@ -84,7 +88,7 @@ class HPCConnectionTest {
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 assertEquals(
-                    """{"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"}}""",
+                    """{"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"},"Launch scripts":{"state":"CONFIGURED"}}""",
                     bodyAsText()
                 )
             }
@@ -100,7 +104,7 @@ class HPCConnectionTest {
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 assertEquals(
-                    """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"}}""",
+                    """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"},"Launch scripts":{"state":"NOT_CONFIGURED"}}""",
                     bodyAsText()
                 )
             }
@@ -117,14 +121,25 @@ class HPCConnectionTest {
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 assertEquals(
-                    """{"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"}}""",
+                    """{"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"},"Launch scripts":{"state":"CONFIGURED"}}""",
                     bodyAsText()
                 )
             }
 
             client.get("/hpc/prepare").apply {
                 assertEquals(HttpStatusCode.OK, status)
-                print(bodyAsText())
+                print("Body"+bodyAsText())
+            }
+
+            val time = System.currentTimeMillis()
+            while(System.currentTimeMillis() - time < 10 * 1000) {
+                client.get("/hpc/status").apply {
+                    val body = bodyAsText()
+                    if(!body.contains("\"PREPARING\""))
+                        break
+                }
+
+                delay(100)
             }
 
             client.get("/hpc/status").apply {
@@ -132,9 +147,12 @@ class HPCConnectionTest {
                 val body = bodyAsText()
                 assertContains(body, """"R":{"state":"ERROR"""")
                 assertContains(body, """"Julia":{"state":"ERROR"""")
+                assertContains(body, """"Launch scripts":{"state":"ERROR"""")
                 assertTrue(
-                    // if biab not running
-                    body.contains("""Could not read image name for service \"biab-runner-conda\". Is the service running?""")
+                    // error message from rsyc
+                    body.contains("ssh: Could not resolve hostname hpc-name: Temporary failure in name resolution")
+                            // if biab not running
+                            || body.contains("""Could not read image name for service \"biab-runner-conda\". Is the service running?""")
                             // if biab is separately running on the testing PC
                             || body.contains("""ssh: Could not resolve hostname hpc-name: Name or service not known"""),
                     "Unexpected message: $body"
@@ -159,7 +177,9 @@ class HPCConnectionTest {
                 val body = response.bodyAsText()
                 if (body.contains(""""R":{"state":"ERROR"""")
                     && body.contains(""""Julia":{"state":"ERROR"""")
+                    && body.contains(""""Launch scripts":{"state":"ERROR"""")
                 ) {
+                    println("Request completed in ${i * 10}ms")
                     break@waiting
                 }
 
@@ -171,11 +191,11 @@ class HPCConnectionTest {
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 val body = bodyAsText()
-                assertContains(body, """"R":{"state":"ERROR"""")
-                assertContains(body, """"Julia":{"state":"ERROR"""")
                 assertTrue(
-                    // if biab not running
-                    body.contains(""""message":"Could not read image name for service \"biab-runner-conda\". Is the service running?"""")
+                    // error message from rsyc
+                    body.contains("ssh: Could not resolve hostname hpc-name: Temporary failure in name resolution")
+                            // if biab not running
+                            || body.contains(""""message":"Could not read image name for service \"biab-runner-conda\". Is the service running?"""")
                             // if biab is separately running on the testing PC
                             || body.contains("""ssh: Could not resolve hostname hpc-name: Name or service not known"""),
                     "Unexpected message: $body"
@@ -190,15 +210,19 @@ class HPCConnectionTest {
 //    }
 
     @Test
-    fun givenAListOfValidFiles_whenSent_thenAllAreSent() {
+    fun givenAListOfValidFiles_whenSent_thenAllAreSent() = runTest {
         withEnvironment(testEnvironment) {
             val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/output.txt")
             someOutput.parentFile.mkdirs()
             someOutput.writeText("Some content.")
+            val someRun = File(outputRoot, "someScript/abcdefg/input.json")
+            someRun.parentFile.mkdirs()
+            someRun.writeText("""{"some_file":"${someOutput.absolutePath}","some_int":10}""")
             val toSync = listOf(
                 someOutput,
-                File(scriptRoot, "1in1out.yml"),
-                File(scriptRoot, "1in1out.py"),
+                someRun,
+                File(scriptsRoot, "HPCSyncTest.yml"),
+                File(scriptsRoot, "HPCSyncTest.py"),
             )
             val systemCall = mockk<SystemCall>()
             every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
@@ -208,13 +232,16 @@ class HPCConnectionTest {
 
             verify {
                 systemCall.run(
-                    listOf(
-                        "echo", """
-                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/outputs/someScript/hasdfdflgjkl/output.txt
-                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/scripts/1in1out.yml
-                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/scripts/1in1out.py
-                """.trimIndent(), "|", "rsync", "--files-from=-", ".", "HPC-name:~/bon-in-a-box/"
-                    ), any(), any(), any(), any()
+                    match { cmdList ->
+                        cmdList.find {
+                            it.contains("rsync")
+                                    && it.contains(someOutput.absolutePath)
+                                    && it.contains(someRun.absolutePath)
+                                    && it.contains("${scriptsRoot.absolutePath}/HPCSyncTest.yml")
+                                    && it.contains("${scriptsRoot.absolutePath}/HPCSyncTest.py")
+                                    && it.contains("HPC-name:${connection.hpcRoot}/")
+                        } !== null
+                    },  any(), any(), any(), any()
                 )
             }
             confirmVerified(systemCall)
@@ -222,16 +249,16 @@ class HPCConnectionTest {
     }
 
     @Test
-    fun givenAListWithInvalidFiles_whenSent_thenInvalidAreNotSent() {
+    fun givenAListWithInvalidFiles_whenSent_thenInvalidAreNotSent() = runTest {
         withEnvironment(testEnvironment) {
             val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/output.txt")
             someOutput.parentFile.mkdirs()
             someOutput.writeText("Some content.")
             val toSync = listOf(
                 someOutput,
-                File(scriptRoot, "1in1out.yml"),
-                File(scriptRoot, "1in1out.py"),
-                File(scriptRoot, "somethingWrong.py"),
+                File(scriptsRoot, "1in1out.yml"),
+                File(scriptsRoot, "1in1out.py"),
+                File(scriptsRoot, "somethingWrong.py"),
             )
             val systemCall = mockk<SystemCall>()
             every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
@@ -241,13 +268,15 @@ class HPCConnectionTest {
 
             verify { // somethingWrong.py should not be there
                 systemCall.run(
-                    listOf(
-                        "echo", """
-                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/outputs/someScript/hasdfdflgjkl/output.txt
-                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/scripts/1in1out.yml
-                /home/jean-michel/code/pipeline-engine/script-server/src/test/resources/scripts/1in1out.py
-                """.trimIndent(), "|", "rsync", "--files-from=-", ".", "HPC-name:~/bon-in-a-box/"
-                    ), any(), any(), any(), any()
+                    match { cmdList ->
+                        cmdList.find {
+                            it.contains("rsync")
+                                    && it.contains("${outputRoot.absolutePath}/someScript/hasdfdflgjkl/output.txt")
+                                    && it.contains("${scriptsRoot.absolutePath}/1in1out.yml")
+                                    && it.contains("${scriptsRoot.absolutePath}/1in1out.py")
+                                    && it.contains("HPC-name:${connection.hpcRoot}")
+                        } != null
+                    }, any(), any(), any(), any()
                 )
             }
             confirmVerified(systemCall)
@@ -255,15 +284,15 @@ class HPCConnectionTest {
     }
 
     @Test
-    fun givenNoValidFiles_whenSent_thenNothingHappens() {
+    fun givenNoValidFiles_whenSent_thenNothingHappens() = runTest {
         withEnvironment(testEnvironment) {
             val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/outputIsNotCreated.txt")
             someOutput.parentFile.mkdirs()
             // output folder is there but not the file!
             val toSync = listOf(
                 someOutput,
-                File(scriptRoot, "somethingWrong.py"),
-                File(scriptRoot, "imLost.yml"),
+                File(scriptsRoot, "somethingWrong.py"),
+                File(scriptsRoot, "imLost.yml"),
             )
             val systemCall = mockk<SystemCall>()
             every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }

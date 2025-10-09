@@ -1,5 +1,4 @@
-#TODO: Deprecated. Switch to  ?
-FROM eclipse-temurin:17 AS base-image
+FROM ubuntu/jre:21-24.04_stable AS base-image
 
 #INSTALL DOCKER CLI
 ENV DOCKER_VERSION=20.10.9
@@ -13,8 +12,13 @@ RUN curl -L "https://github.com/docker/compose/releases/download/v2.3.3/docker-c
 RUN chmod 755 /usr/local/bin/docker-compose
 RUN chmod 755 /usr/local/bin/docker
 
+RUN set -ex; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends rsync; \
+    apt-get clean all;
+
 ## This image builds the server code
-FROM gradle:8.13-jdk17 AS builder
+FROM gradle:9.0-jdk21 AS builder
 COPY . /home/gradle/project
 WORKDIR /home/gradle/project
 RUN gradle assemble

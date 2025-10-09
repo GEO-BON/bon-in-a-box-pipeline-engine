@@ -1,5 +1,5 @@
 #!/bin/python3
-import os, sys, json
+import os, sys, json, signal
 
 biab_output_list = {}
 
@@ -24,6 +24,15 @@ def biab_warning(message):
 def biab_error_stop(errorMessage):
 	biab_output_list[ "error" ] = errorMessage
 	sys.exit(errorMessage)
+
+# Signal handler will allow to write whatever outputs we have (in the finally clause below)
+def signal_handler(sig, frame):
+    print('Handling termination signal', flush=True)
+    biab_output_list[ "error" ] = "Script run has received a stop signal before completion.\nThis is usually due to a timeout or cancellation."
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, signal_handler)
+signal.signal(signal.SIGINT, signal_handler)
 
 
 if __name__ == "__main__":
