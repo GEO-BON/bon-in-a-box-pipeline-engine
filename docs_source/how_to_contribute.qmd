@@ -476,7 +476,7 @@ bbox <- input$study_area_bbox$bbox
 and the ID of the coordinate reference system of the bounding box, made of the authority and code:
 
 ``` r
-crs_id <- paste0(input$study_area_bbox$CRS$authority,input$study_area_bbox$CRS$code) 
+crs_id <- paste0(input$study_area_bbox$CRS$authority, ":", input$study_area_bbox$CRS$code)
 ```
 :::
 
