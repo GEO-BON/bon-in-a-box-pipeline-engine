@@ -5,6 +5,8 @@ import Typography from "@mui/material/Typography";
 import LinkedinLogo from "../img/LinkedIn_icon.svg";
 import ResearchGateLogo from "../img/ResearchGate_icon.svg";
 import OrcIDLogo from "../img/ORCID_ID_green.svg";
+import { isEmptyObject } from '../utils/isEmptyObject';
+import { Alert } from '@mui/material';
 
 export function StepDescription({ descriptionFile, metadata }) {
     return <>
@@ -85,6 +87,13 @@ function generatePersonList(list) {
 export function GeneralDescription({ ymlPath, metadata }) {
     if (!metadata)
         return null
+
+    console.log("GeneralDescription metadata:", metadata)
+    if (isEmptyObject(metadata)) {
+        return <div className='stepDescription'>
+            <Alert severity='warning'>Script was not found on this server. Raw results will be displayed.</Alert>
+        </div>
+    }
 
     const codeLink = getCodeUrl(ymlPath, metadata.script)
 
