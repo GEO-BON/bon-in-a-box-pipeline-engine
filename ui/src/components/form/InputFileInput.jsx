@@ -183,8 +183,11 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   }, [inputs, inputFileContent]);
 
   function updateInputFile(inputId, value) {
-    setInputFileContent((content) => {
-      const newContent = { ...content };
+    setInputFileContent((oldContent) => {
+      if(_lang.isEqual(oldContent[inputId], value))
+        return oldContent
+
+      const newContent = { ...oldContent };
       newContent[inputId] = value;
       return newContent;
     });
