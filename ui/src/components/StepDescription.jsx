@@ -88,7 +88,6 @@ export function GeneralDescription({ ymlPath, metadata }) {
     if (!metadata)
         return null
 
-    console.log("GeneralDescription metadata:", metadata)
     if (isEmptyObject(metadata)) {
         return <div className='stepDescription'>
             <Alert severity='warning'>Script was not found on this server. Raw results will be displayed.</Alert>
