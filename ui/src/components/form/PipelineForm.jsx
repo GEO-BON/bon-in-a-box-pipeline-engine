@@ -94,9 +94,6 @@ export function PipelineForm({
         acceptCharset="utf-8"
         className="inputForm"
       >
-        <label htmlFor="pipelineChoice">
-          {runType === "pipeline" ? "Pipeline:" : "Script:"}
-        </label>
         <Select
           id="pipelineChoice"
           name="pipelineChoice"
