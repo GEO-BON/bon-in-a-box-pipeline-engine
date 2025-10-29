@@ -8,6 +8,7 @@ services:
     container_name: biab-script-server
     volumes:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
+      - ${PIPELINE_REPO_PATH}/.git:/.git:ro
       - ./script-stubs:/script-stubs:ro
       - ${PIPELINE_REPO_PATH}/pipelines:/pipelines:rw
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
@@ -24,6 +25,7 @@ services:
       USERDATA_LOCATION: /userdata
       PIPELINES_LOCATION: /pipelines
       OUTPUT_LOCATION: /output
+      GIT_LOCATION: /.git
       PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
       USE_RUNNERS: true
 

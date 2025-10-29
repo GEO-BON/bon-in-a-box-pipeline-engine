@@ -2,8 +2,10 @@ package org.geobon.script
 
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import org.geobon.pipeline.RunContext
 import org.geobon.server.plugins.Containers
+import org.geobon.utils.runToText
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -12,12 +14,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import java.io.InputStreamReader
+import java.io.BufferedReader
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
-
 
 class ScriptRun( // Constructor used in single script run
     private val scriptFile: File,
@@ -139,11 +142,8 @@ class ScriptRun( // Constructor used in single script run
                             with(File(stringValue)) {
                                 // check if missing or newer than cache
                                 if (!exists()) {
-                                    logBuffer += "Cannot reuse cache: input file $this does not exist.\n".also {
-                                        logger.warn(
-                                            it
-                                        )
-                                    }
+                                    logBuffer += "Cannot reuse cache: input file $this does not exist.\n"
+                                        .also { logger.warn(it) }
                                     return false
                                 }
 
@@ -218,6 +218,14 @@ class ScriptRun( // Constructor used in single script run
                             """
                                 source importEnvVars.sh
                                 julia --project=${"$"}JULIA_DEPOT_PATH -e '
+                                    using Pkg
+                                    deps = Pkg.dependencies()
+                                    direct_deps = filter(x -> x[2].is_direct_dep, deps)
+                                    open("${context.outputFolder.absolutePath}/dependencies.txt", "w") do file
+                                        for (uuid, pkg) in direct_deps
+                                            println(file, "$(pkg.name) $(pkg.version)")
+                                        end
+                                    end
                                     open("${pidFile.absolutePath}", "w") do file write(file, string(getpid())) end;
                                     output_folder="${context.outputFolder.absolutePath}"
                                     ARGS=[output_folder];
@@ -299,7 +307,8 @@ class ScriptRun( // Constructor used in single script run
                                     cat(" done.\n")
                                 }
                                 unlink("${pidFile.absolutePath}")
-                                gc()'
+                                gc()
+                                capture.output(sessionInfo(), file = paste0(outputFolder, "/dependencies.txt"))'
                             """.trimIndent()
                         )
                     }
@@ -326,6 +335,8 @@ class ScriptRun( // Constructor used in single script run
                                 if biab_output_list:
                                     with open(output_folder + "/output.json", "w") as outfile:
                                         outfile.write(json.dumps(biab_output_list, indent = 2))
+
+                                os.system("/opt/conda/bin/pip freeze > " + output_folder + "/dependencies.txt")
                         """.trimIndent()
 
                         if(useRunners) {
@@ -481,6 +492,7 @@ class ScriptRun( // Constructor used in single script run
             }
 
             pidFile.delete()
+            context.createEnvironmentFile(container)
         }
 
         log(logger::debug, "Runner: ${container.containerName} version ${container.version}")
@@ -500,8 +512,13 @@ class ScriptRun( // Constructor used in single script run
             if (!results.containsKey(ERROR_KEY)) {
                 val outputs = results.toMutableMap()
                 outputs[ERROR_KEY] =
-                    if (results.isEmpty()) "Script produced no results. Check log for errors and make sure that the script calls biab_output."
-                    else "An error occurred. Check log for details."
+                    if (results.isEmpty())
+                        "Script produced no results. Check log for errors and make sure that the script calls biab_output. " +
+                                "Also, monitor the memory usage on next run, as this error can be caused by insufficient " +
+                                "memory for the script's usage. See " +
+                                "[troubleshooting documentation](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#troubleshooting)."
+                    else
+                        "An error occurred. Check log for details."
 
                 // Rewrite output file with error
                 resultFile.writeText(RunContext.gson.toJson(outputs))

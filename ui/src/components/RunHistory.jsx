@@ -7,7 +7,7 @@ import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import Collapse from "@mui/material/Collapse";
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
@@ -24,25 +24,32 @@ import ReactMarkdown from "react-markdown";
 import { CustomButtonGreen, CustomButtonGrey } from "./CustomMUI";
 import { Alert } from "@mui/material";
 import Warning from "@mui/icons-material/Warning";
+import yaml from "js-yaml";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export default function RunHistory() {
   let [runHistory, setRunHistory] = useState(null);
   let [start, setStart] = useState(0);
-  let limit=30;
+  let limit = 30;
   useEffect(() => {
-    api.getHistory({start, limit},(error, _, response) => {
-      document.getElementById('pageTop')?.scrollIntoView({ behavior: 'smooth' });
+    api.getHistory({ start, limit }, (error, _, response) => {
+      document
+        .getElementById("pageTop")
+        ?.scrollIntoView({ behavior: "smooth" });
       if (error) {
         setRunHistory(
-          <Box sx={{ padding: '50px' }}>
-            <HttpError httpError={error} response={response} context={"getting run history"} />
+          <Box sx={{ padding: "50px" }}>
+            <HttpError
+              httpError={error}
+              response={response}
+              context={"getting run history"}
+            />
           </Box>
         );
       } else if (response && response.body.length === 0) {
         setRunHistory(
-          <Box sx={{ padding: '50px' }}>
+          <Box sx={{ padding: "50px" }}>
             <h1>Previous runs</h1>
             <Alert severity="info">There are no runs in history.</Alert>
           </Box>
@@ -54,44 +61,69 @@ export default function RunHistory() {
           return bb - aa;
         });
         setRunHistory(
-          <div id='pageTop' style={{padding:"20px"}}>
+          <div id="pageTop" style={{ padding: "20px" }}>
             <h1>Previous runs</h1>
-              <Grid container spacing={2}>
-                {runs.map((res, i) => (
-                  <RunCard key={i} run={res} />
-                ))}
-              </Grid>
-              <PreviousNext start={start} limit={limit} runsLength={runs.length} showNext={response.status===206} setStart={setStart}/>
+            <Grid container spacing={2}>
+              {runs.map((res, i) => (
+                <RunCard key={i} run={res} />
+              ))}
+            </Grid>
+            <PreviousNext
+              start={start}
+              limit={limit}
+              runsLength={runs.length}
+              showNext={response.status === 206}
+              setStart={setStart}
+            />
           </div>
         );
       } else {
-        setRunHistory(<Alert severity="warning">Could not retrieve history: empty response.</Alert>);
+        setRunHistory(
+          <Alert severity="warning">
+            Could not retrieve history: empty response.
+          </Alert>
+        );
       }
     });
   }, [start, limit]);
 
-  return runHistory ? runHistory : <Spinner variant='light' />;
+  return runHistory ? runHistory : <Spinner variant="light" />;
 }
 
 export const LastNRuns = (n) => {
-    const [lastRuns, setLastRuns] = useState(null);
-    useEffect(() => {
-        api.getHistory({start:0, limit:4}, (error, _, response) => {
-          let resp=null
-          if (error) {
-          } else if (response && response.body?.length > 0) {
-            resp =
-              <Grid container spacing={3}>
-                {response.body.map((res, i) => (
-                  <RunCard key={i} run={res} />
-                ))}
-              </Grid>
-          }
-          setLastRuns(resp);
-        });
-    }, []);
-    return <>{lastRuns && (<div><div className="home-page-subtitle" style={{marginTop: '30px', marginBottom:'20px'}}>LATEST RUNS</div>{lastRuns}</div>)}</>;
-  }
+  const [lastRuns, setLastRuns] = useState(null);
+  useEffect(() => {
+    api.getHistory({ start: 0, limit: 4 }, (error, _, response) => {
+      let resp = null;
+      if (error) {
+      } else if (response && response.body?.length > 0) {
+        resp = (
+          <Grid container spacing={3}>
+            {response.body.map((res, i) => (
+              <RunCard key={i} run={res} />
+            ))}
+          </Grid>
+        );
+      }
+      setLastRuns(resp);
+    });
+  }, []);
+  return (
+    <>
+      {lastRuns && (
+        <div>
+          <div
+            className="home-page-subtitle"
+            style={{ marginTop: "30px", marginBottom: "20px" }}
+          >
+            LATEST RUNS
+          </div>
+          {lastRuns}
+        </div>
+      )}
+    </>
+  );
+};
 
 const color = (status) => {
   switch (status) {
@@ -133,25 +165,40 @@ const ExpandMore = styled((props) => {
   ],
 }));
 
-const PreviousNext = (props)=> {
+const PreviousNext = (props) => {
   const { start, limit, runsLength, showNext, setStart } = props;
-  return(
-  <Grid container spacing={2} justifyContent="flex-center" sx={{ marginTop: "20px", paddingBottom: "100px" }}>
+  return (
+    <Grid
+      container
+      spacing={2}
+      justifyContent="flex-center"
+      sx={{ marginTop: "20px", paddingBottom: "100px" }}
+    >
       {start > 0 && (
-        <Grid item xs={12} md={6}>
-          <CustomButtonGrey onClick={() => { setStart((prev) => (Math.max(prev - limit, 0))) }}>
+        <Grid size={{xs:12, md:6}}>
+          <CustomButtonGrey
+            onClick={() => {
+              setStart((prev) => Math.max(prev - limit, 0));
+            }}
+          >
             {"<< Previous page"}
           </CustomButtonGrey>
         </Grid>
       )}
       {showNext && runsLength === limit && (
-        <Grid xs={12} md={6}>
-        <CustomButtonGrey onClick={()=>{setStart((prev)=>(prev+limit))}}>{"Next page >>"}</CustomButtonGrey>
+        <Grid size={{xs:12, md:6}}>
+          <CustomButtonGrey
+            onClick={() => {
+              setStart((prev) => prev + limit);
+            }}
+          >
+            {"Next page >>"}
+          </CustomButtonGrey>
         </Grid>
       )}
-  </Grid>
-  )
-}
+    </Grid>
+  );
+};
 
 const RunCard = (props) => {
   const { run } = props;
@@ -172,8 +219,10 @@ const RunCard = (props) => {
   const runHash = run.runId.substring(index + 1);
   const debug_url = `/${run.type}-form/${pipeline}/${runHash}`;
   useEffect(() => {
-    setExpanded(false) // close card if card reused for another history item
-    const descriptionPath = `${pipeline}.${run.type === "script" ? "yaml" : "json"}`
+    setExpanded(false); // close card if card reused for another history item
+    const descriptionPath = `${pipeline}.${
+      run.type === "script" ? "yaml" : "json"
+    }`;
     api.getInfo(run.type, descriptionPath, (error, _, response) => {
       if (response.status !== 404) {
         const res = JSON.parse(response.text);
@@ -188,7 +237,7 @@ const RunCard = (props) => {
     });
   }, [pipeline, run, setExpanded]);
   return (
-    <Grid item size={{ md: 10, lg: 5 }}>
+    <Grid size={{ md: 10, lg: 5 }}>
       <Card
         sx={{
           width: "100%",
@@ -226,15 +275,11 @@ const RunCard = (props) => {
           </Typography>
         </CardContent>
         <CardActions disableSpacing>
-          {run.type === "pipeline"
-            && status !== "error"
-            && status !== "unavailable"
-            && status !== "running"
-            && (
-              <a href={`/viewer/${run.runId}`} target="_blank">
-                <CustomButtonGreen>See in viewer</CustomButtonGreen>
-              </a>
-            )}
+          {run.type === "pipeline" && status === "completed" && (
+            <a href={`/viewer/${run.runId}`} target="_blank">
+              <CustomButtonGreen>See in viewer</CustomButtonGreen>
+            </a>
+          )}
           {status !== "unavailable" && (
             <a href={debug_url} target="_blank">
               <CustomButtonGreen>See in run UI</CustomButtonGreen>
@@ -254,39 +299,68 @@ const RunCard = (props) => {
         </CardActions>
         {run.inputs && Object.entries(run.inputs).length > 0 && (
           <Collapse in={expanded} timeout="auto" unmountOnExit>
-            {expanded && <CardContent>
-              <ReactMarkdown className="historyDescription">
-                {desc}
-              </ReactMarkdown>
-              <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>
-              <Table size="small">
-                <TableBody>
-                  {Object.entries(run.inputs).map((i) => {
-                    const inputId = i[0]
-                    const value = i[1]
-                    return (
-                      <TableRow key={inputId}>
-                        <TableCell
-                          sx={{
-                            maxWidth: "300px",
-                            wordWrap: "break-word",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {inputId in inputs && !!inputs[inputId]
-                            ? <Tooltip title={inputId}><>{inputs[inputId].label}</></Tooltip>
-                            : <UnknownInputId id={inputId} />
-                          }
-                        </TableCell>
-                        <TableCell style={{whiteSpace: "pre-wrap"}}>
-                          <>{Array.isArray(value) ? value.join(", ") : value}</>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </CardContent>}
+            {expanded && (
+              <CardContent>
+                <ReactMarkdown className="historyDescription">
+                  {desc}
+                </ReactMarkdown>
+                <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>
+                <Table size="small">
+                  <TableBody>
+                    {Object.entries(run.inputs).map((i) => {
+                      const inputId = i[0];
+                      const value = i[1];
+                      return (
+                        <TableRow key={inputId}>
+                          <TableCell
+                            sx={{
+                              maxWidth: "300px",
+                              wordWrap: "break-word",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {inputId in inputs && !!inputs[inputId] ? (
+                              <Tooltip title={inputId}>
+                                <>{inputs[inputId].label}</>
+                              </Tooltip>
+                            ) : (
+                              <UnknownInputId id={inputId} />
+                            )}
+                          </TableCell>
+                          <TableCell style={{ whiteSpace: "pre-wrap" }}>
+                            <>
+                              {(() => {
+                                // Format the value for the table, handle types
+                                if (Array.isArray(value)) {
+                                  return value.join(", ");
+                                } else if (
+                                  typeof value === "object" &&
+                                  value !== null
+                                ) {
+                                  return (
+                                    <pre
+                                      style={{
+                                        fontSize: "0.8em",
+                                        maxWidth: "400px",
+                                        overflowX: "scroll",
+                                      }}
+                                    >
+                                      {yaml.dump(value, { lineWidth: 50 })}
+                                    </pre>
+                                  );
+                                } else {
+                                  return value;
+                                }
+                              })()}
+                            </>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            )}
           </Collapse>
         )}
       </Card>
@@ -298,23 +372,33 @@ const RunCard = (props) => {
 // Either the whole script / pipeline is missing,
 // or the input does not exist anymore.
 const UnknownInputId = ({ id }) => {
-  const warningIcon =
+  const warningIcon = (
     <Tooltip title="Input description not found">
-      <Warning color="warning" style={{height: "1rem", transform: "translate(0, 0.15rem)"}} />
+      <Warning
+        color="warning"
+        style={{ height: "1rem", transform: "translate(0, 0.15rem)" }}
+      />
     </Tooltip>
+  );
 
-  const pipeIx = id.lastIndexOf('|')
+  const pipeIx = id.lastIndexOf("|");
   if (pipeIx > 0) {
-    return <>
-      {id.substring(pipeIx + 1)}
-      {warningIcon}
-      <br />
-      <small style={{fontWeight: "normal"}}>{id.substring(0, pipeIx)}</small>
-    </>
+    return (
+      <>
+        {id.substring(pipeIx + 1)}
+        {warningIcon}
+        <br />
+        <small style={{ fontWeight: "normal" }}>
+          {id.substring(0, pipeIx)}
+        </small>
+      </>
+    );
   } else {
-    return <>
-      {id}
-      {warningIcon}
-    </>
+    return (
+      <>
+        {id}
+        {warningIcon}
+      </>
+    );
   }
-}
+};

@@ -1,0 +1,22 @@
+script: assertObject.py
+name: Assert Object
+description: "Test python script if it receives an object."
+lifecycle:
+  status: in_development
+  message: bla bla
+author:
+  - name: Jean-Michel Lord
+inputs:
+  some_object:
+    label: Some object
+    description: The object body to check.
+    type: object
+    properties: [some_data]
+    example: { 'some_data': 'bla bla' }
+outputs:
+  the_same:
+    label: Same value
+    description: The same object as in the inputs.
+    type: object
+    properties: [some_data]
+    example: { 'some_data': 'bla bla' }

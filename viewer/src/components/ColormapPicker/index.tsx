@@ -1,8 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
-import Control from "react-leaflet";
-import L from "leaflet";
-import Grid from "@mui/material/Grid";
-import ReactDOMServer from "react-dom/server";
+import React, { useState, useEffect } from "react";
 import { cmap } from "../../helpers/colormaps";
 
 export function ColorPicker(props: any) {

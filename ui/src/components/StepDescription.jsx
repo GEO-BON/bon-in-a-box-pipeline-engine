@@ -5,6 +5,8 @@ import Typography from "@mui/material/Typography";
 import LinkedinLogo from "../img/LinkedIn_icon.svg";
 import ResearchGateLogo from "../img/ResearchGate_icon.svg";
 import OrcIDLogo from "../img/ORCID_ID_green.svg";
+import { isEmptyObject } from '../utils/isEmptyObject';
+import { Alert } from '@mui/material';
 
 export function StepDescription({ descriptionFile, metadata }) {
     return <>
@@ -41,6 +43,7 @@ function findLogoImageFromURL(url) {
     }
 }
 
+
 function IdentifierLogo({ src, href }) {
     return <a href={href} target="_blank">
         <img src={src} alt="Identifier logo" title="Go to profile" width="20px"></img>
@@ -51,7 +54,7 @@ function generatePersonList(list) {
     return list.map((person, i, array) => {
         let email = person.email && <a href={'mailto:' + person.email}>{person.email}</a>
         let role = person.role && <span>{person.role}</span>
-        let comma = (i !== array.length - 1) && ',' // Comma will be inside link but the space outside the link.
+        let comma = (i !== array.length - 1) && ', '
         let isAuthorProperties = person.email || person.role || person.identifier;
         let identifierLogo = person.identifier && findLogoImageFromURL(person.identifier);
 
@@ -72,7 +75,6 @@ function generatePersonList(list) {
             {comma}
         </span>
 
-
     })
 }
 
@@ -85,6 +87,12 @@ function generatePersonList(list) {
 export function GeneralDescription({ ymlPath, metadata }) {
     if (!metadata)
         return null
+
+    if (isEmptyObject(metadata)) {
+        return <div className='stepDescription'>
+            <Alert severity='warning'>Script was not found on this server. Raw results will be displayed.</Alert>
+        </div>
+    }
 
     const codeLink = getCodeUrl(ymlPath, metadata.script)
 

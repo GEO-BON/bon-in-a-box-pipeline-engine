@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useState } from "react";
-const Editor = React.lazy(() => import('@monaco-editor/react'));
+import { useRef, useEffect, useState, lazy } from "react";
+const Editor = lazy(() => import('@monaco-editor/react'));
 
 // TODO: See https://github.com/suren-atoyan/monaco-react for configuration
 // TODO: Try this for code validation: https://github.com/suren-atoyan/monaco-react/issues/228#issuecomment-1159365104
@@ -56,14 +56,18 @@ export const MetadataPane = ({
       if (model) {
         if (metadataError) {
           if (!isTyping) {
-            monaco.editor.setModelMarkers(model, "owner", [
-              {
-                startLineNumber: metadataError.line,
-                endColumn: model.getLineLength(metadataError.line) + 1,
-                message: metadataError.message,
-                severity: monaco.MarkerSeverity.Error
-              }
-            ]);
+            try {
+              monaco.editor.setModelMarkers(model, "owner", [
+                {
+                  startLineNumber: metadataError.line,
+                  endColumn: model.getLineLength(metadataError.line) + 1,
+                  message: metadataError.message,
+                  severity: monaco.MarkerSeverity.Error
+                }
+              ]);
+            } catch (ex) {
+              console.error("Error setting model markers:", ex);
+            }
           }
         } else {
           monaco.editor.setModelMarkers(model, "owner", []);

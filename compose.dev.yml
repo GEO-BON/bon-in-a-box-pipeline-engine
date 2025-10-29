@@ -17,7 +17,6 @@ services:
     expose:
       - "3000"
     environment:
-      VITE_APP_SAVE_PIPELINE_TO_SERVER: ${SAVE_PIPELINE_TO_SERVER}
       CHOKIDAR_USEPOLLING: true
       # https://github.com/facebook/create-react-app/issues/11779
       WDS_SOCKET_PORT: 0
