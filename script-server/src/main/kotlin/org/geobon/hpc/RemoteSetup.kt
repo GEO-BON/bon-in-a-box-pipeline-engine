@@ -26,5 +26,6 @@ class ApptainerImage (
     state: RemoteSetupState = RemoteSetupState.NOT_CONFIGURED,
     image: String? = null,
     message: String? = null,
-    var imagePath: String? = null
+    var imagePath: String? = null,
+    var overlayPath: String? = null
 ): RemoteSetup(state, image, message)

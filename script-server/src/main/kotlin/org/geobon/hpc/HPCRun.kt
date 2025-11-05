@@ -112,6 +112,7 @@ class HPCRun(
     private fun getApptainerBaseCommand(image: ApptainerImage): String {
         return """
             apptainer run \
+                --fakeroot --overlay ${image.overlayPath}
                 -B ${hpcConnection.hpcScriptsRoot}:$scriptsRoot \
                 -B ${hpcConnection.hpcScriptStubsRoot}:$scriptStubsRoot \
                 -B ${hpcConnection.hpcOutputRoot}:$outputRoot \

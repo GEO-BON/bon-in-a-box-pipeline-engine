@@ -137,7 +137,7 @@ class HPCConnection(
                     && rStatus.state != RemoteSetupState.PREPARING
                     && rStatus.state != RemoteSetupState.READY
                 ) {
-                    prepareApptainer(rStatus)
+                    prepareApptainer(rStatus, 20)
                 }
             }
 
@@ -146,13 +146,13 @@ class HPCConnection(
                     && juliaStatus.state != RemoteSetupState.PREPARING
                     && juliaStatus.state != RemoteSetupState.READY
                 ) {
-                    prepareApptainer(juliaStatus)
+                    prepareApptainer(juliaStatus, 10)
                 }
             }
         }
     }
 
-    private suspend fun prepareApptainer(apptainerImage: ApptainerImage) {
+    private suspend fun prepareApptainer(apptainerImage: ApptainerImage, overlaySizeGB:Int) {
         withContext(Dispatchers.IO) {
             apptainerImage.state = RemoteSetupState.PREPARING
             apptainerImage.message = null
@@ -189,6 +189,8 @@ class HPCConnection(
                 // Launch the container creation for that digest (if not already existing)
                 val apptainerImageName = "${container.containerName}_$imageSha.sif"
                 apptainerImage.imagePath = "$hpcRoot/$apptainerImageName"
+                val overlayName = "${container.containerName}_overlay-${overlaySizeGB}GB"
+                apptainerImage.overlayPath = "$hpcRoot/$overlayName"
                 val callResult = systemCall.run(
                     listOf(
                         "ssh",
@@ -210,6 +212,14 @@ class HPCConnection(
                             fi
 
                             module load apptainer
+                            rm ${apptainerImage.overlayPath}
+                            apptainer overlay create --fakeroot --size ${overlaySizeGB * 1024} ${apptainerImage.overlayPath}
+                            if [[ $? -eq 0 ]]; then
+                                echo "Overlay created: $overlayName"
+                            else
+                                echo "Failed to create overlay: $overlayName" >&2
+                                exit 1
+                            fi
                             apptainer build ${apptainerImage.imagePath} docker://$imageDigest
                             if [[ $? -eq 0 ]]; then
                                 echo "Image created: $apptainerImageName"
