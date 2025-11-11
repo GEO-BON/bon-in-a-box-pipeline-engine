@@ -83,3 +83,9 @@ services:
       TITILER_API_CORS_ORIGINS: "*"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+  
+  biab-python-api:
+    container_name: biab-python-api
+    build: python-api/
+    volumes:
+      - ./python-api/app:/app:rw

@@ -16,3 +16,6 @@ pipeline-repo
 **/._*
 
 /.quarto/
+
+**/__pycache__/
+
