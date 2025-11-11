@@ -2,8 +2,9 @@
 import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import countryOptionsJSON from "./countries.json"; // Assuming you have a JSON file with country data
+
 import {
+  getCountriesAPI,
   getStateAPI,
   defaultRegion,
   paperStyle,
@@ -36,17 +37,18 @@ export default function CountryRegionMenu({
 
   useEffect(() => {
     // Fetch country options from the JSON file
-    let countryOpts = countryOptionsJSON.geonames;
-    countryOpts.sort((a, b) => {
-      return a.countryName
-        .toLowerCase()
-        .localeCompare(b.countryName.toLowerCase());
-    });
-    countryOpts = countryOpts.map((countr) => ({
-      label: countr.countryName,
-      value: countr.isoAlpha3,
-    }));
-    setCountryOptions(countryOpts);
+    getCountriesAPI().then((response) => {
+      let countryOpts = response.data.map((country) => ({
+        label: country.NAME_0,
+        value: country.GID_O,
+      }))
+      countryOpts.sort((a, b) => {
+        return a.label
+          .toLowerCase()
+          .localeCompare(b.label.toLowerCase());
+      });
+      setCountryOptions(countryOpts);
+    })
   }, []);
 
   // Set from controlled values coming in
@@ -60,10 +62,10 @@ export default function CountryRegionMenu({
         setSelectedRegion(null);
         return;
       }
-      if (states.country?.ISO3 !== selectedCountry?.value) {
+      if (states.country?.GID !== selectedCountry?.value) {
         setSelectedCountry({
           label: states.country.englishName,
-          value: states.country.ISO3,
+          value: states.country.GID,
         });
       }
       if (!states.region?.regionName) {
@@ -82,17 +84,14 @@ export default function CountryRegionMenu({
   useEffect(() => {
     if (selectedCountry && selectedCountry.value) {
       // Fetch states or provinces based on the selected country
-      const countryObj = countryOptionsJSON.geonames.find(
-        (c) => c.isoAlpha3 === selectedCountry.value
-      );
-      getStateAPI(countryObj.geonameId).then((response) => {
-        if (response.data && response.data.geonames) {
-          const regionOpts = response.data.geonames.map((state) => ({
-            label: state.name,
-            value: state.geonameId,
+      getStateAPI(selectedCountry.value).then((response) => {
+        if (response.data && response.data) {
+          const regionOpts = response.data.map((state) => ({
+            label: state.NAME_1,
+            value: state.GID_1,
           }));
           setRegionOptions(regionOpts);
-          setRegionJSON(response.data.geonames);
+          setRegionJSON(response.data);
         } else {
           setRegionOptions([]);
         }

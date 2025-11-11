@@ -108,14 +108,28 @@ export const paperStyle = (dialog) => {
   }
 };
 
-export const getStateAPI = async (geonameId) => {
+export const getCountriesAPI = async () => {
   let result;
-  const base_url = "http://api.geonames.org/childrenJSON";
+  const base_url = "/python-api/country_list/";
   try {
     result = await axios({
       method: "get",
       baseURL: `${base_url}`,
-      params: { geonameId: geonameId, inclBbox: true, username: "geobon" },
+    });
+  } catch (error) {
+    result = { data: null };
+  }
+  return result;
+};
+
+export const getStateAPI = async (country_gid) => {
+  let result;
+  const base_url = "/python-api/regions_list/";
+  try {
+    result = await axios({
+      method: "get",
+      baseURL: `${base_url}`,
+      params: { country_gid: country_gid },
     });
   } catch (error) {
     result = { data: null };
