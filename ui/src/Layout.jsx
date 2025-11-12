@@ -3,6 +3,7 @@ import React, { useEffect, createContext, useState } from "react";
 import BiaBLogo from "./img/boninabox_logo.jpg";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./components/styles/theme";
+import SpamField from "./components/SpamField";
 import useWindowDimensions from "./utils/WindowDimensions";
 import TopMenu from "./TopMenu";
 
@@ -22,6 +23,7 @@ export function Layout(props) {
   return (
     <PopupContentContext.Provider value={{popupContent, setPopupContent}}>
       <ThemeProvider theme={theme}>
+        <SpamField />
         <div className="left-pane">
           <div>
             <img id="logo" src={BiaBLogo} alt="BON in a Box logo" />

@@ -1,0 +1,15 @@
+
+export default function SpamField(props) {
+  const handleChange = () => {
+    // do captcha
+    window.location.href = "";
+  };
+
+  const hideStyle = {display: "none"};
+
+  const getRandomInt = (n) => Math.floor(Math.random() * n);
+
+  return (<><label for="input" style={hideStyle}>pipeline input {getRandomInt(100)}</label>
+      <input type="text" name="input" id={"input-"+getRandomInt(100)} onChange={handleChange} style={hideStyle}></input></>);
+
+}
