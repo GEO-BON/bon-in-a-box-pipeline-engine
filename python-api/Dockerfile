@@ -11,7 +11,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR /app/
 
-RUN uv pip install fastapi "uvicorn[standard]" requests duckdb pandas geopandas pandas_geojson shapely pygadm
+RUN uv pip install fastapi "uvicorn[standard]" requests duckdb pandas geopandas pandas_geojson shapely pygadm fiona
 
 COPY . .
 
@@ -26,4 +26,4 @@ COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
 COPY --from=builder /app /app
 WORKDIR /app
 
-CMD uvicorn main:app --proxy-headers --port 8001 --host 0.0.0.0
+CMD uvicorn main:app --proxy-headers --port 8001 --host 0.0.0.0 --reload

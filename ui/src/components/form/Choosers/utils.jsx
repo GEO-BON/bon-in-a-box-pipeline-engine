@@ -80,14 +80,10 @@ export const defaultCRSList = [
 export const defaultCountry = {
   englishName: "",
   ISO3: "",
-  code: "",
-  countryBboxWGS84: [],
 };
 export const defaultRegion = {
   regionName: "",
-  ISO3166_2: "",
-  regionBboxWGS84: [],
-  countryEnglishName: "",
+  regionGID: "",
 };
 
 export const paperStyle = (dialog) => {

@@ -26,7 +26,7 @@ export default function CountryRegionMenu({
       ? { label: states.country.englishName, value: states.country.ISO3 }
       : null;
   const savedRegionValue = value?.region?.regionName
-    ? { label: states.region.regionName, value: states.region.regionName }
+    ? { label: states.region.regionName, value: states.region.regionGID }
     : null;
   const [selectedCountry, setSelectedCountry] = useState(
     savedCountryValue || null
@@ -38,9 +38,12 @@ export default function CountryRegionMenu({
   useEffect(() => {
     // Fetch country options from the JSON file
     getCountriesAPI().then((response) => {
-      let countryOpts = response.data.map((country) => ({
+      const unresp = response.data.filter((obj, index, self) =>
+        index === self.findIndex((o) => o.NAME_0 === obj.NAME_0)
+      );
+      let countryOpts = unresp.map((country) => ({
         label: country.NAME_0,
-        value: country.GID_O,
+        value: country.GID_0,
       }))
       countryOpts.sort((a, b) => {
         return a.label
@@ -62,10 +65,10 @@ export default function CountryRegionMenu({
         setSelectedRegion(null);
         return;
       }
-      if (states.country?.GID !== selectedCountry?.value) {
+      if (states.country?.ISO3 !== selectedCountry?.value) {
         setSelectedCountry({
           label: states.country.englishName,
-          value: states.country.GID,
+          value: states.country.ISO3,
         });
       }
       if (!states.region?.regionName) {
@@ -75,7 +78,7 @@ export default function CountryRegionMenu({
       if (states.region?.regionName !== selectedRegion?.value) {
         setSelectedRegion({
           label: states.region.regionName,
-          value: states.region.regionName,
+          value: states.region.regionGID,
         });
       }
     }
@@ -118,45 +121,21 @@ export default function CountryRegionMenu({
       dispatch({ type: "clear" });
       return;
     }
-    const countryObj = countryOptionsJSON.geonames.find(
-      (c) => c.isoAlpha3 === countryValue
-    );
     let country;
     if (countryValue) {
-      let b = [
-        countryObj.west,
-        countryObj.south,
-        countryObj.east,
-        countryObj.north,
-      ];
-      b = b.map((c) => parseFloat(c.toFixed(6)));
       country = {
-        englishName: countryObj.countryName,
-        ISO3: countryObj.isoAlpha3,
-        code: countryObj.countryCode,
-        countryBboxWGS84: b,
+        englishName: selectedCountry?.label,
+        ISO3: selectedCountry?.value,
       };
     }
     let region = defaultRegion;
     if (regionValue) {
-      const regionObj = regionJSON.find((s) => s.geonameId === regionValue);
-      let b = [
-        regionObj.bbox.west,
-        regionObj.bbox.south,
-        regionObj.bbox.east,
-        regionObj.bbox.north,
-      ];
-      b = b.map((c) => parseFloat(c.toFixed(6)));
-      region = regionObj
-        ? {
-            regionName: regionObj.name,
-            ISO3166_2: regionObj.adminCodes1.ISO3166_2
-              ? regionObj.adminCodes1.ISO3166_2
-              : "",
-            regionBboxWGS84: b,
-            countryEnglishName: countryObj.countryName,
+      region = 
+          {
+            regionName: selectedRegion?.label,
+            regionGID: selectedRegion?.value,
+            countryEnglishName: selectedCountry?.label,
           }
-        : defaultRegion;
     }
     if (!country) {
       dispatch({ type: "clear" });
@@ -230,8 +209,8 @@ export default function CountryRegionMenu({
             }}
           >
             Reference for toponyms:{" "}
-            <a target="_blank" href="https://geonames.org">
-              GeoNames
+            <a target="_blank" href="https://gadm.org/">
+              GADM
             </a>
           </p>
         </>
