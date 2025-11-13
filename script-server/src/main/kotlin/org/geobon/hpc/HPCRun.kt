@@ -143,7 +143,7 @@ class HPCRun(
         return when (scriptFile.extension) {
             "jl", "JL" ->
                 """
-                    ${getApptainerBaseCommand(hpcConnection.juliaImage)} '
+                    /usr/bin/time -f "Memory used: %M kb" ${getApptainerBaseCommand(hpcConnection.juliaImage)} '
                         julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
                     '
                 """.trimIndent()
@@ -156,11 +156,11 @@ class HPCRun(
                     '
                 """.trimIndent()
 
-            "sh" -> "$scriptPath $escapedOutputFolder >> ${logFile.absolutePath} 2>&1"
+            "sh" -> "/usr/bin/time -f 'Memory used: %M kb' $scriptPath $escapedOutputFolder >> ${logFile.absolutePath} 2>&1"
 
             "py", "PY" ->
                 """
-                    ${getApptainerBaseCommand(hpcConnection.pythonImage)} '
+                    /usr/bin/time -f "Memory used: %M kb" ${getApptainerBaseCommand(hpcConnection.pythonImage)} '
                         mamba activate ${condaEnvName ?: "pythonbase"};
                         python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
                     '

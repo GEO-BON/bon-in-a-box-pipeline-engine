@@ -75,7 +75,7 @@ class DockerizedRun( // Constructor used in single script run
                     )
                 }
 
-                "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
+                "sh" -> command = listOf("/usr/bin/time", "-f", "Memory used: %M kb", "sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
                 "py", "PY" -> {
                     val scriptPath = scriptFile.absolutePath
                     val pythonWrapper = "$scriptStubsRoot/system/scriptWrapper.py"
