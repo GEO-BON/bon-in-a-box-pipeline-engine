@@ -106,7 +106,7 @@ export const paperStyle = (dialog) => {
 
 export const getCountriesAPI = async () => {
   let result;
-  const base_url = "/python-api/country_list/";
+  const base_url = "/region/countries_list";
   try {
     result = await axios({
       method: "get",
@@ -120,7 +120,7 @@ export const getCountriesAPI = async () => {
 
 export const getStateAPI = async (country_gid) => {
   let result;
-  const base_url = "/python-api/regions_list/";
+  const base_url = "/region/regions_list";
   try {
     result = await axios({
       method: "get",
@@ -135,7 +135,7 @@ export const getStateAPI = async (country_gid) => {
 
 export const getBBox = async (gid) => {
   let result;
-  const base_url = "/python-api/region_bbox/";
+  const base_url = "/region/bbox";
   try {
     result = await axios({
       method: "get",

@@ -33,17 +33,19 @@ def read_root():
     return {"Title": "BON in a Box Python API"}
 
 
-@app.get("/country_list",response_model=List[Dict[str, str]])
+@app.get("/countries_list")
 def gadm_country_names():
     names = pg.AdmNames(complete=False, content_level=-1)
     return names.to_dict(orient='records')
 
-@app.get("/regions_list/")
+@app.get("/regions_list")
 def gadm_region_names(country_gid:str, level:int=1):
     names = pg.AdmNames(complete=True, admin=country_gid, content_level=level)
+    if names.empty:
+        return {"error": "Country GID not found"}
     return names.to_dict(orient='records')
 
-@app.get("/region_geometry/")
+@app.get("/geometry")
 def gadm_region_geometry(gid:str):
     adm = pg.Items(admin=gid).set_crs(epsg=4326)
     if adm.empty:
@@ -59,7 +61,7 @@ def gadm_region_geometry(gid:str):
     adm.to_file(file_path, driver='GPKG', layer='country_region', overwrite=True)
     return FileResponse(file_path, media_type="application/geopackage+sqlite3", filename=fname)
 
-@app.get("/region_bbox/")
+@app.get("/bbox")
 def gadm_region_geometry(gid:str):
     adm = pg.Items(admin=gid).set_crs(epsg=4326)
     if adm.empty:

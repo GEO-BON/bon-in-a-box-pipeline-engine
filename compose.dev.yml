@@ -56,12 +56,13 @@ services:
 
   ## Server to use when making changes to the OpenAPI specification.
   openapi_swagger:
-    container_name: swagger_editor
-    image: swaggerapi/swagger-editor
+    container_name: swagger_ui
+    image: swaggerapi/swagger-ui:v5.17.14
+    volumes:
+      - ./script-server/api/openapi.yaml:/openapi.yaml:ro
     expose:
       - "8080"
     environment:
-      SWAGGER_FILE: openapi.yaml
+      SWAGGER_JSON: /openapi.yaml
       BASE_URL: /swagger
-    volumes:
-      - ./script-server/api/:/app
+

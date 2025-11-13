@@ -375,7 +375,98 @@ paths:
                     "Julia": "julia version 1.8.1",
                     "TiTiler": "2023-08-30 15:44"
                   }
-
+  /region/countries_list:
+    get:
+      summary: Returns the list of countries from GADM with their ISO3/GID and English names
+      operationId: getCountriesList
+      responses:
+        "200":
+          description: Array with list of countries.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example: 
+                    {
+                      "NAME_0": "Canada",
+                      "GID_0": "CAN",
+                    }
+  /region/regions_list:
+    get:
+      summary: Returns the list of countries from GADM with their ISO3/GID and English names
+      operationId: getRegionsList
+      parameters:
+        - name: country_gid
+          in: query
+          description: GID of the country to get the regions for (ISO3 code, e.g. "CAN" for Canada)
+          required: true
+          schema:
+            type: string
+        - name: level
+          in: query
+          description: Administrative level to get (1 for states/provinces, 2 for counties/districts, etc.)
+          required: false
+          schema:
+            type: integer
+            default: 1
+      responses:
+        "200":
+          description: Array with list of regions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example: 
+                    {
+                      "NAME_1": "Québec",
+                      "GID_1": "CAN.10_1",
+                    }
+  /region/bbox:
+    get:
+      summary: Returns the bounding box of the specified region from GADM
+      operationId: getRegionBBox
+      parameters:
+        - name: gid
+          in: query
+          description: GID of the region to get the bounding box for (e.g. "CAN.11_1" for Québec, Canada)
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Bounding box of the region in [min_lon, min_lat, max_lon, max_lat] format.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: number
+                minItems: 4
+                maxItems: 4
+                example: [-79.7624, 44.9966, -57.1057, 62.5933]
+  /region/geometry:
+    get:
+      summary: Returns the geometry of the specified region from GADM in GeoJSON format
+      operationId: getRegionGeometry
+      parameters:
+        - name: gid
+          in: query
+          description: GID of the region to get the geometry for (e.g. "CAN.11_1" for Québec, Canada)
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Geometry of the region in GeoJSON format.
+          content:
+            application/geopackage+sqlite3:
+              schema:
+                type: binary
+                format: binary
 components:
   parameters:
     stepType:
