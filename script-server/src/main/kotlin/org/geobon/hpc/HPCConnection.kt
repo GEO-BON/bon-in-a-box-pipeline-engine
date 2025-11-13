@@ -28,19 +28,21 @@ class HPCConnection(
     val autoConnect = System.getenv("HPC_AUTO_CONNECT") == "true"
 
     var scriptsStatus = RemoteSetup()
-    var juliaStatus = ApptainerImage(juliaContainer)
-    var rStatus = ApptainerImage(condaContainer)
-    val pythonStatus: ApptainerImage
-        get() = rStatus
+    var juliaImage = ApptainerImage(juliaContainer)
+    var condaImage = ApptainerImage(condaContainer)
+    val rImage : ApptainerImage
+        get() = condaImage
+    val pythonImage: ApptainerImage
+        get() = condaImage
 
     val configured: Boolean
-        get() = rStatus.state != RemoteSetupState.NOT_CONFIGURED
-                && juliaStatus.state != RemoteSetupState.NOT_CONFIGURED
+        get() = rImage.state != RemoteSetupState.NOT_CONFIGURED
+                && juliaImage.state != RemoteSetupState.NOT_CONFIGURED
                 && scriptsStatus.state != RemoteSetupState.NOT_CONFIGURED
 
     val ready: Boolean
-        get() = rStatus.state == RemoteSetupState.READY
-                && juliaStatus.state == RemoteSetupState.READY
+        get() = rImage.state == RemoteSetupState.READY
+                && juliaImage.state == RemoteSetupState.READY
                 && scriptsStatus.state == RemoteSetupState.READY
 
     val hpcScriptsRoot: String
@@ -72,8 +74,8 @@ class HPCConnection(
             logger.info("HPC not configured: missing HPC_BIAB_ROOT.")
 
         } else {
-            juliaStatus.state = RemoteSetupState.CONFIGURED
-            rStatus.state = RemoteSetupState.CONFIGURED
+            juliaImage.state = RemoteSetupState.CONFIGURED
+            rImage.state = RemoteSetupState.CONFIGURED
             scriptsStatus.state = RemoteSetupState.CONFIGURED
 
             if (autoConnect) {
@@ -133,20 +135,20 @@ class HPCConnection(
 
             launch {
                 // Checking if already preparing to avoid launching the process 2 times in parallel by accident
-                if (rStatus.state != RemoteSetupState.NOT_CONFIGURED
-                    && rStatus.state != RemoteSetupState.PREPARING
-                    && rStatus.state != RemoteSetupState.READY
+                if (rImage.state != RemoteSetupState.NOT_CONFIGURED
+                    && rImage.state != RemoteSetupState.PREPARING
+                    && rImage.state != RemoteSetupState.READY
                 ) {
-                    prepareApptainer(rStatus, 20)
+                    prepareApptainer(rImage, 20)
                 }
             }
 
             launch {
-                if (juliaStatus.state != RemoteSetupState.NOT_CONFIGURED
-                    && juliaStatus.state != RemoteSetupState.PREPARING
-                    && juliaStatus.state != RemoteSetupState.READY
+                if (juliaImage.state != RemoteSetupState.NOT_CONFIGURED
+                    && juliaImage.state != RemoteSetupState.PREPARING
+                    && juliaImage.state != RemoteSetupState.READY
                 ) {
-                    prepareApptainer(juliaStatus, 10)
+                    prepareApptainer(juliaImage, 10)
                 }
             }
         }
@@ -253,9 +255,9 @@ class HPCConnection(
 
     fun statusMap(): Map<String, Map<String, String?>> {
         return mapOf(
-            "R" to rStatus.statusMap(),
-            "Python" to pythonStatus.statusMap(),
-            "Julia" to juliaStatus.statusMap(),
+            "R" to rImage.statusMap(),
+            "Python" to pythonImage.statusMap(),
+            "Julia" to juliaImage.statusMap(),
             "Launch scripts" to scriptsStatus.statusMap()
         )
     }

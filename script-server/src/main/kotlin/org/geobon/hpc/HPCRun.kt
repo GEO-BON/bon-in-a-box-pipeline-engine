@@ -132,14 +132,14 @@ class HPCRun(
         return when (scriptFile.extension) {
             "jl", "JL" ->
                 """
-                    ${getApptainerBaseCommand(hpcConnection.juliaStatus)} '
+                    ${getApptainerBaseCommand(hpcConnection.juliaImage)} '
                         julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
                     '
                 """.trimIndent()
 
             "r", "R" ->
                 """
-                    ${getApptainerBaseCommand(hpcConnection.rStatus)} '
+                    ${getApptainerBaseCommand(hpcConnection.rImage)} '
                         source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
                         Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
                     '
@@ -149,7 +149,7 @@ class HPCRun(
 
             "py", "PY" ->
                 """
-                    ${getApptainerBaseCommand(hpcConnection.pythonStatus)} '
+                    ${getApptainerBaseCommand(hpcConnection.pythonImage)} '
                         source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
                         python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
                     '
