@@ -13,6 +13,7 @@ import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.ServerContext.Companion.userDataRoot
 import java.io.File
 import java.util.concurrent.TimeoutException
+import kotlin.io.appendText
 import kotlin.time.Duration
 
 class HPCRun(
@@ -28,6 +29,7 @@ class HPCRun(
         ?: throw RuntimeException("A valid HPC connection is necessary to run job on HPC for file ${scriptFile.absolutePath}")
 
     private val hpcConnection = hpc.connection
+    val condaEnvWrapper = "$scriptStubsRoot/system/condaEnvironment.sh"
 
     override suspend fun runScript(): Map<String, Any> {
         if (!hpcConnection.ready) {
@@ -38,7 +40,7 @@ class HPCRun(
         val watchChannel = context.outputFolder.asWatchChannel()
         try {
             coroutineScope {
-                val syncJob = launch {
+                val fileSyncJob = launch {
                     // Sync the output folder (has inputs.json) and any files the script depends on
                     val filesToSend = mutableListOf(
                         context.outputFolder,
@@ -49,6 +51,17 @@ class HPCRun(
                     )
 
                     hpcConnection.sendFiles(filesToSend, logFile)
+                }
+                fileSyncJob.join() // We want the log file to be present while conda sync is happening.
+
+                val condaSyncJob = launch {
+                    if(condaEnvYml != null && condaEnvName != null) {
+                        hpcConnection.runCommand("""
+                             ${getApptainerBaseCommand(hpcConnection.condaImage)} '
+                                source $condaEnvWrapper ${context.outputFolderEscaped} $condaEnvName "$condaEnvYml" ;
+                             '
+                        """.trimIndent())
+                    }
                 }
 
                 launch {
@@ -77,9 +90,10 @@ class HPCRun(
                 }
 
                 // Signal job is ready to be sent
-                syncJob.join()
+                fileSyncJob.join()
+                condaSyncJob.join()
                 hpc.ready(this@HPCRun)
-
+                logFile.appendText("Please be patient, the next logs will appear only when the job starts on the HPC.\nLogs are updated every minute.\n")
                 logger.debug("Waiting for results to be synced back... {}", context.resultFile)
                 // this will stop when watchChannel.close() called above, is cancelled, or script times out.
             }
@@ -123,11 +137,8 @@ class HPCRun(
     }
 
     fun getCommand(): String {
-        val escapedOutputFolder = context.outputFolder.absolutePath
-            .replace(" ", "\\ ")
-        val scriptPath = scriptFile.absolutePath
-            .replace(" ", "\\ ")
-        val condaEnvWrapper = "$scriptStubsRoot/system/condaEnvironment.sh"
+        val escapedOutputFolder = context.outputFolderEscaped
+        val scriptPath = scriptFile.absolutePath.replace(" ", "\\ ")
 
         return when (scriptFile.extension) {
             "jl", "JL" ->
@@ -140,7 +151,7 @@ class HPCRun(
             "r", "R" ->
                 """
                     ${getApptainerBaseCommand(hpcConnection.rImage)} '
-                        source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
+                        mamba activate ${condaEnvName ?: "rbase"};
                         Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
                     '
                 """.trimIndent()
@@ -150,7 +161,7 @@ class HPCRun(
             "py", "PY" ->
                 """
                     ${getApptainerBaseCommand(hpcConnection.pythonImage)} '
-                        source $condaEnvWrapper $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
+                        mamba activate ${condaEnvName ?: "pythonbase"};
                         python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
                     '
                 """.trimIndent()

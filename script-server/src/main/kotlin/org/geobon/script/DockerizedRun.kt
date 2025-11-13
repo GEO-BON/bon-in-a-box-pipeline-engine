@@ -46,7 +46,7 @@ class DockerizedRun( // Constructor used in single script run
         val pidFile = File(context.outputFolder.absolutePath, ".pid")
 
         runCatching {
-            val escapedOutputFolder = context.outputFolder.absolutePath.replace(" ", "\\ ")
+            val escapedOutputFolder = context.outputFolderEscaped
             val command: List<String>
             when (scriptFile.extension) {
                 "jl", "JL" -> {

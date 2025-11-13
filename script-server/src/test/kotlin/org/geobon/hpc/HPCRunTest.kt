@@ -10,6 +10,7 @@ import org.geobon.pipeline.StepId
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.geobon.server.plugins.Containers
 import org.geobon.utils.createMockHPCContext
 import org.junit.After
 import org.junit.Before
@@ -25,6 +26,8 @@ import kotlin.test.fail
 internal class HPCRunTest {
 
     lateinit var mockContext: ServerContext
+    lateinit var hpc: HPC
+    lateinit var connection: HPCConnection
     val logger: Logger = LoggerFactory.getLogger("HPCRunTest")
 
     @Before
@@ -35,7 +38,10 @@ internal class HPCRunTest {
             assertTrue(exists())
         }
 
-        mockContext = createMockHPCContext()
+        mockContext = createMockHPCContext().also {
+            hpc = it.hpc!!
+            connection = hpc.connection
+        }
     }
 
     @After
@@ -45,7 +51,7 @@ internal class HPCRunTest {
 
     @Test
     fun `given HPC task_when executing_then registered sync and ready`() = runTest {
-        every { mockContext.hpc!!.register(any()) } just runs
+        every { hpc.register(any()) } just runs
         val inputFile = File(outputRoot, "someFile.csv")
         inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
         val step = ScriptStep(
@@ -55,12 +61,12 @@ internal class HPCRunTest {
                 "someInt" to ConstantPipe("int", 10)
             )
         )
-        verify(exactly = 1) { mockContext.hpc!!.register(any()) }
+        verify(exactly = 1) { hpc.register(any()) }
 
 
-        coEvery { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
-        every { mockContext.hpc!!.connection.ready } returns true
-        every { mockContext.hpc!!.ready(any()) } answers {
+        coEvery { connection.sendFiles(allAny()) } just runs
+        every { connection.ready } returns true
+        every { hpc.ready(any()) } answers {
             this@runTest.launch {
                 // We need a real thread.sleep() here, since otherwise the OS is not ready yet to watch the file.
                 // Using delay(...) is skipped in runTest context.
@@ -72,7 +78,7 @@ internal class HPCRunTest {
                 logger.debug("Created mock output file")
             }
         }
-        every { mockContext.hpc!!.unregister(any()) } just runs
+        every { hpc.unregister(any()) } just runs
 
         var error: String? = null
         try {
@@ -84,7 +90,7 @@ internal class HPCRunTest {
 
         val outputFolder = File(outputRoot, "HPCSyncTest").listFiles()[0]
         coVerify {
-            mockContext.hpc!!.connection.sendFiles(
+            connection.sendFiles(
                 match {
                     it.containsAll(
                         listOf(
@@ -98,10 +104,10 @@ internal class HPCRunTest {
             )
         }
         coVerifyOrder {
-            mockContext.hpc!!.register(step)
-            mockContext.hpc!!.connection.sendFiles(allAny())
-            mockContext.hpc!!.ready(any())
-            mockContext.hpc!!.unregister(step)
+            hpc.register(step)
+            connection.sendFiles(allAny())
+            hpc.ready(any())
+            hpc.unregister(step)
         }
 
         error?.let { fail(error) }
@@ -109,7 +115,7 @@ internal class HPCRunTest {
 
     @Test
     fun `given HPC task fails_when synced_then error thrown`() = runTest {
-        every { mockContext.hpc!!.register(any()) } just runs
+        every { hpc.register(any()) } just runs
         val inputFile = File(outputRoot, "someFile.csv")
         inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
         val step = ScriptStep(
@@ -119,12 +125,12 @@ internal class HPCRunTest {
                 "someInt" to ConstantPipe("int", 10)
             )
         )
-        verify(exactly = 1) { mockContext.hpc!!.register(any()) }
+        verify(exactly = 1) { hpc.register(any()) }
 
 
-        coEvery { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
-        every { mockContext.hpc!!.connection.ready } returns true
-        every { mockContext.hpc!!.ready(any()) } answers {
+        coEvery { connection.sendFiles(allAny()) } just runs
+        every { connection.ready } returns true
+        every { hpc.ready(any()) } answers {
             this@runTest.launch {
                 // We need a real thread.sleep() here, since otherwise the OS is not ready yet to watch the file.
                 // Using delay(...) is skipped in runTest context.
@@ -136,7 +142,7 @@ internal class HPCRunTest {
                 logger.debug("Created mock failing output file")
             }
         }
-        every { mockContext.hpc!!.unregister(any()) } just runs
+        every { hpc.unregister(any()) } just runs
 
         var error: String? = null
         try {
@@ -147,10 +153,10 @@ internal class HPCRunTest {
         }
 
         coVerifyOrder {
-            mockContext.hpc!!.register(step)
-            mockContext.hpc!!.connection.sendFiles(allAny())
-            mockContext.hpc!!.ready(any())
-            mockContext.hpc!!.unregister(step)
+            hpc.register(step)
+            connection.sendFiles(allAny())
+            hpc.ready(any())
+            hpc.unregister(step)
         }
 
         if (error == null) fail("We were expecting an error to be detected")
@@ -159,7 +165,7 @@ internal class HPCRunTest {
 
     @Test
     fun `given HPC task running_when canceled_then unregisters and throws`() = runTest {
-        every { mockContext.hpc!!.register(any()) } just runs
+        every { hpc.register(any()) } just runs
         val inputFile = File(outputRoot, "someFile.csv")
         inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
         val step = ScriptStep(
@@ -169,16 +175,16 @@ internal class HPCRunTest {
                 "someInt" to ConstantPipe("int", 10)
             )
         )
-        verify(exactly = 1) { mockContext.hpc!!.register(any()) }
+        verify(exactly = 1) { hpc.register(any()) }
 
         var job: Job? = null
-        coEvery { mockContext.hpc!!.connection.sendFiles(allAny()) } just runs
-        every { mockContext.hpc!!.connection.ready } returns true
-        every { mockContext.hpc!!.ready(any()) } answers {
+        coEvery { connection.sendFiles(allAny()) } just runs
+        every { connection.ready } returns true
+        every { hpc.ready(any()) } answers {
             // Calling ready starts the job. So we cancel here "while the job is running"
             job!!.cancel("Cancelled by test")
         }
-        every { mockContext.hpc!!.unregister(any()) } just runs
+        every { hpc.unregister(any()) } just runs
 
         var error: String? = null
         job = launch {
@@ -191,10 +197,10 @@ internal class HPCRunTest {
         job.join()
 
         coVerifyOrder {
-            mockContext.hpc!!.register(step)
-            mockContext.hpc!!.connection.sendFiles(allAny())
-            mockContext.hpc!!.ready(any())
-            mockContext.hpc!!.unregister(step)
+            hpc.register(step)
+            connection.sendFiles(allAny())
+            hpc.ready(any())
+            hpc.unregister(step)
         }
 
         if (error == null) fail("We were expecting an error to be detected")
@@ -203,9 +209,9 @@ internal class HPCRunTest {
 
     @Test
     fun `given script has files and array of files inputs_when execute_then all files are sent`() = runTest {
-        every { mockContext.hpc!!.register(any()) } just runs
-        every { mockContext.hpc!!.unregister(any()) } just runs
-        every { mockContext.hpc!!.ready(any()) } answers {
+        every { hpc.register(any()) } just runs
+        every { hpc.unregister(any()) } just runs
+        every { hpc.ready(any()) } answers {
             this@runTest.launch {
                 Thread.sleep(100)
                 val run = firstArg<HPCRun>()
@@ -216,7 +222,7 @@ internal class HPCRunTest {
                 }
             }
         }
-        every { mockContext.hpc!!.connection.ready } returns true
+        every { connection.ready } returns true
         val inputFiles = (0..10).map { i ->
             File(outputRoot, "someFile$i.csv").apply {
                 writeText("a,b,c,d,e\n${(i..i + 4).joinToString(",")}")
@@ -271,10 +277,10 @@ internal class HPCRunTest {
                 )
             )
         )
-        verify(exactly = 1) { mockContext.hpc!!.register(any()) }
+        verify(exactly = 1) { hpc.register(any()) }
 
         val filesSlot = slot<List<File>>()
-        coEvery {mockContext.hpc!!.connection.sendFiles(capture(filesSlot), any())} just runs
+        coEvery {connection.sendFiles(capture(filesSlot), any())} just runs
         step.execute()
 
         assertTrue(filesSlot.isCaptured)
@@ -284,5 +290,71 @@ internal class HPCRunTest {
         }
         assertContains(captured, File(scriptsRoot, "HPCSyncArrayTest.py"))
         assertContains(captured, step.context!!.outputFolder)
+    }
+
+    @Test
+    fun givenScriptHasCondaEnv_whenExecute_thenEnvironmentPrepared() = runTest {
+        every { hpc.register(any()) } just runs
+        val inputFile = File(outputRoot, "someFile.csv")
+        inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
+        val step = ScriptStep(
+            mockContext, File(scriptsRoot, "HPCCondaTest.yml"), StepId("HPCCondaTest.yml", "1"),
+            mutableMapOf(
+                "someFile" to ConstantPipe("text/csv", inputFile.absolutePath),
+                "someInt" to ConstantPipe("int", 10)
+            )
+        )
+        verify(exactly = 1) { hpc.register(any()) }
+
+        every { connection.condaImage } returns ApptainerImage (Containers.CONDA,
+            RemoteSetupState.READY, "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:62849e38bc9105etcetc", null,
+            "someImage.sif", "overlayPath.img"
+        )
+
+        connection.apply {
+            coEvery { runCommand(any()) } just runs
+            coEvery { sendFiles(allAny()) } just runs
+            every { ready } returns true
+            every { hpcRoot } returns "hpcRoot"
+            every { hpcScriptsRoot } returns "$hpcRoot/scripts"
+            every { hpcScriptStubsRoot } returns "$hpcRoot/script-stubs"
+            every { hpcOutputRoot } returns "$hpcRoot/output"
+            every { hpcUserDataRoot } returns "$hpcRoot/userdata"
+        }
+
+        every { hpc.ready(any()) } answers {
+            this@runTest.launch {
+                // We need a real thread.sleep() here, since otherwise the OS is not ready yet to watch the file.
+                // Using delay(...) is skipped in runTest context.
+                Thread.sleep(100)
+                with(step.context!!.resultFile) {
+                    parentFile.mkdirs()
+                    writeText("""{ "increment":11 }""".trimIndent())
+                }
+                logger.debug("Created mock output file")
+            }
+        }
+        every { hpc.unregister(any()) } just runs
+
+        var error: String? = null
+        try {
+            step.execute()
+        } catch (e: Exception) {
+            error = e.message
+            e.printStackTrace()
+        }
+
+        coVerify {
+            connection.runCommand(match { it.contains("somePackage=0.0.0") })
+        }
+        coVerifyOrder {
+            hpc.register(step)
+            connection.sendFiles(allAny())
+            connection.runCommand(any())
+            hpc.ready(any())
+            hpc.unregister(step)
+        }
+
+        error?.let { fail(error) }
     }
 }

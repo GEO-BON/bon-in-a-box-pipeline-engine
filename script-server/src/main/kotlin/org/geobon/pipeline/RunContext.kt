@@ -13,6 +13,7 @@ import org.geobon.utils.toMD5
 import org.json.JSONObject
 import java.io.File
 import kotlin.math.floor
+import kotlin.text.replace
 
 val outputRoot = File(System.getenv("OUTPUT_LOCATION"))
 
@@ -41,6 +42,9 @@ data class RunContext(val runId: String, val inputs: String?, val serverContext:
 
     val outputFolder
         get() = File(outputRoot, runId)
+
+    val outputFolderEscaped
+        get() = outputFolder.absolutePath.replace(" ", "\\ ")
 
     val inputFile: File
         get() = File(outputFolder, "input.json")

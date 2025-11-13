@@ -11,6 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.TimeUnit.MINUTES
+import kotlin.collections.listOf
 
 @OptIn(DelicateCoroutinesApi::class)
 class HPCConnection(
@@ -24,6 +25,8 @@ class HPCConnection(
     val knownHostsPath: String? = System.getenv("HPC_KNOWN_HOSTS_FILE")
     val hpcRoot: String? = System.getenv("HPC_BIAB_ROOT")
     val account: String? = System.getenv("HPC_SBATCH_ACCOUNT")
+
+    val sshCommand: List<String>?
 
     val autoConnect = System.getenv("HPC_AUTO_CONNECT") == "true"
 
@@ -60,23 +63,35 @@ class HPCConnection(
     init {
         if (configPath == null || !File(configPath).exists()) {
             logger.info("HPC not configured: missing HPC_SSH_CONFIG_FILE ($configPath)")
+            sshCommand = null
 
         } else if (sshConfig.isNullOrBlank()) {
             logger.info("HPC not configured: missing HPC_SSH_CONFIG_NAME.")
+            sshCommand = null
 
         } else if (sshKeyPath == null || !File(sshKeyPath).exists()) {
             logger.info("HPC not configured: missing HPC_SSH_KEY ($sshKeyPath).")
+            sshCommand = null
 
         } else if (knownHostsPath == null || !File(knownHostsPath).exists()) {
             logger.info("HPC not configured: missing HPC_KNOWN_HOSTS_FILE ($knownHostsPath).")
+            sshCommand = null
 
         } else if (hpcRoot.isNullOrBlank()) {
             logger.info("HPC not configured: missing HPC_BIAB_ROOT.")
+            sshCommand = null
 
         } else {
             juliaImage.state = RemoteSetupState.CONFIGURED
             rImage.state = RemoteSetupState.CONFIGURED
             scriptsStatus.state = RemoteSetupState.CONFIGURED
+
+            sshCommand = listOf(
+                "ssh",
+                "-F", configPath, // these variables cannot be null when HPC configured
+                "-i", sshKeyPath,
+                "-o", "UserKnownHostsFile=$knownHostsPath",
+                sshConfig)
 
             if (autoConnect) {
                 // We are launching preparation non-blocking, and not interested immediately in the result,
@@ -94,6 +109,10 @@ class HPCConnection(
     }
 
     suspend fun prepare() {
+        if(sshCommand == null) {
+            logger.warn("Cannot prepare HPC, incomplete configuration.")
+            return
+        }
 
         coroutineScope {
             launch {
@@ -110,14 +129,7 @@ class HPCConnection(
 
                         // Create other mount endpoints
                         val callResult = systemCall.run(
-                            listOf(
-                                "ssh",
-                                "-F", configPath!!, // these variables cannot be null when HPC configured
-                                "-i", sshKeyPath!!,
-                                "-o", "UserKnownHostsFile=$knownHostsPath",
-                                sshConfig!!,
-                                "mkdir -p $hpcScriptsRoot && mkdir -p $hpcOutputRoot && mkdir -p $hpcUserDataRoot"
-                            ),
+                            sshCommand + "mkdir -p $hpcScriptsRoot && mkdir -p $hpcOutputRoot && mkdir -p $hpcUserDataRoot",
                             timeoutAmount = 1, timeoutUnit = MINUTES, logger = logger, mergeErrors = true
                         )
 
@@ -134,73 +146,63 @@ class HPCConnection(
             }
 
             launch {
-                // Checking if already preparing to avoid launching the process 2 times in parallel by accident
-                if (rImage.state != RemoteSetupState.NOT_CONFIGURED
-                    && rImage.state != RemoteSetupState.PREPARING
-                    && rImage.state != RemoteSetupState.READY
-                ) {
-                    prepareApptainer(rImage, 20)
-                }
+                prepareApptainer(rImage, 20)
             }
 
             launch {
-                if (juliaImage.state != RemoteSetupState.NOT_CONFIGURED
-                    && juliaImage.state != RemoteSetupState.PREPARING
-                    && juliaImage.state != RemoteSetupState.READY
-                ) {
-                    prepareApptainer(juliaImage, 10)
-                }
+                prepareApptainer(juliaImage, 10)
             }
         }
     }
 
     private suspend fun prepareApptainer(apptainerImage: ApptainerImage, overlaySizeGB:Int) {
-        withContext(Dispatchers.IO) {
-            apptainerImage.state = RemoteSetupState.PREPARING
-            apptainerImage.message = null
-            apptainerImage.image = null
+        // Checking if already preparing to avoid launching the process 2 times in parallel by accident
+        if (apptainerImage.state != RemoteSetupState.NOT_CONFIGURED
+            && apptainerImage.state != RemoteSetupState.PREPARING
+            && apptainerImage.state != RemoteSetupState.READY
+            && sshCommand != null
+        ) {
+            withContext(Dispatchers.IO) {
+                apptainerImage.state = RemoteSetupState.PREPARING
+                apptainerImage.message = null
+                apptainerImage.image = null
 
-            try {
-                val container = apptainerImage.container
-                logger.debug("Preparing remote ${container.containerName}")
+                try {
+                    val container = apptainerImage.container
+                    logger.debug("Preparing remote ${container.containerName}")
 
-                val imageName = container.imageName
-                if (imageName.isEmpty()) {
-                    throw RuntimeException("""Could not read image name for service "${container.containerName}". Is the service running?""")
-                }
+                    val imageName = container.imageName
+                    if (imageName.isEmpty()) {
+                        throw RuntimeException("""Could not read image name for service "${container.containerName}". Is the service running?""")
+                    }
 
-                // imageDigestResult: [ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
-                val imageDigestResult = "docker image inspect --format '{{.RepoDigests}}' $imageName"
-                    .run()
-                    ?.trim()
+                    // imageDigestResult: [ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
+                    val imageDigestResult = "docker image inspect --format '{{.RepoDigests}}' $imageName"
+                        .run()
+                        ?.trim()
 
-                if (imageDigestResult.isNullOrBlank()
-                    || !imageDigestResult.startsWith('[')
-                    || !imageDigestResult.endsWith(']')
-                ) {
-                    throw RuntimeException("""Could not read digest for image "$imageName".""")
-                }
-                // imageDigest: ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:62849e38bc9105a53c34828009b3632d23d2485ade7f0da285c888074313782e
-                val imageDigest = imageDigestResult.removePrefix("[").removeSuffix("]")
-                apptainerImage.image = imageDigest
+                    if (imageDigestResult.isNullOrBlank()
+                        || !imageDigestResult.startsWith('[')
+                        || !imageDigestResult.endsWith(']')
+                    ) {
+                        throw RuntimeException("""Could not read digest for image "$imageName".""")
+                    }
+                    // imageDigest: ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:62849e38bc9105a53c34828009b3632d23d2485ade7f0da285c888074313782e
+                    val imageDigest = imageDigestResult.removePrefix("[").removeSuffix("]")
+                    apptainerImage.image = imageDigest
 
-                // imageSha: 62849e38bc9105a53c34828009b3632d23d2485ade7f0da285c888074313782e
-                val imageSha = imageDigest.substringAfter(':')
-                if (imageSha.length != 64) throw RuntimeException("Unexpected sha length for runner image: $imageSha")
+                    // imageSha: 62849e38bc9105a53c34828009b3632d23d2485ade7f0da285c888074313782e
+                    val imageSha = imageDigest.substringAfter(':')
+                    if (imageSha.length != 64) throw RuntimeException("Unexpected sha length for runner image: $imageSha")
 
-                // Launch the container creation for that digest (if not already existing)
-                val apptainerImageName = "${container.containerName}_$imageSha.sif"
-                apptainerImage.imagePath = "$hpcRoot/$apptainerImageName"
-                val overlayName = "${container.containerName}_overlay-${overlaySizeGB}GB"
-                apptainerImage.overlayPath = "$hpcRoot/$overlayName"
-                val callResult = systemCall.run(
-                    listOf(
-                        "ssh",
-                        "-F", configPath!!, // these variables cannot be null when HPC configured
-                        "-i", sshKeyPath!!,
-                        "-o", "UserKnownHostsFile=$knownHostsPath",
-                        sshConfig!!,
-                        """
+                    // Launch the container creation for that digest (if not already existing)
+                    val apptainerImageName = "${container.containerName}_$imageSha.sif"
+                    apptainerImage.imagePath = "$hpcRoot/$apptainerImageName"
+                    val overlayName = "${container.containerName}_overlay-${overlaySizeGB}GB.img"
+                    apptainerImage.overlayPath = "$hpcRoot/$overlayName"
+                    val callResult = systemCall.run(
+                        sshCommand +
+                                """
                         if [ -f ${apptainerImage.imagePath} ]; then
                             echo "Image already exists: $apptainerImageName"
                         else
@@ -230,25 +232,25 @@ class HPCConnection(
                                 exit 1
                             fi
                         fi
-                    """.trimIndent()
-                    ),
-                    timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
-                )
+                    """.trimIndent(),
+                        timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
+                    )
 
-                if (callResult.output.isNotBlank())
-                    logger.info(callResult.output) // excludes error stream
+                    if (callResult.output.isNotBlank())
+                        logger.info(callResult.output) // excludes error stream
 
-                apptainerImage.state = if (callResult.exitCode == 0) {
-                    RemoteSetupState.READY
-                } else {
-                    apptainerImage.message = callResult.error
-                    RemoteSetupState.ERROR
+                    apptainerImage.state = if (callResult.exitCode == 0) {
+                        RemoteSetupState.READY
+                    } else {
+                        apptainerImage.message = callResult.error
+                        RemoteSetupState.ERROR
+                    }
+
+                } catch (ex: Throwable) {
+                    ex.printStackTrace()
+                    apptainerImage.message = ex.message
+                    apptainerImage.state = RemoteSetupState.ERROR
                 }
-
-            } catch (ex: Throwable) {
-                ex.printStackTrace()
-                apptainerImage.message = ex.message
-                apptainerImage.state = RemoteSetupState.ERROR
             }
         }
     }
@@ -296,11 +298,7 @@ class HPCConnection(
                 "No files to sync.".let { logger.debug(it); logFile?.appendText(it) }
 
             } else {
-                logFile?.apply {
-                    appendText("Syncing files to HPC:\n$filesString\n".also { logger.debug(it) })
-                    appendText("Please be patient, the next logs will appear only when the job starts on the HPC.\nLogs are updated every minute.\n")
-                }
-
+                logFile?.appendText("Syncing files to HPC:\n$filesString\n".also { logger.debug(it) })
 
                 val result = systemCall.run(
                     listOf(
@@ -319,7 +317,7 @@ class HPCConnection(
     }
 
     fun sendJobs(tasksToSend: List<String>, logFiles: List<File> = listOf()) {
-        if(!ready) {
+        if(!ready || sshCommand == null) {
             logger.warn("Cannot send jobs to HPC while not ready")
             return
         }
@@ -350,7 +348,7 @@ class HPCConnection(
 
 
         if (!callResult.success) {
-            println(callResult.output)
+            logger.debug(callResult.output)
             throw RuntimeException(callResult.error)
         }
 
@@ -359,21 +357,13 @@ class HPCConnection(
 
         val sBatchFileRemote = File(hpcOutputRoot, sBatchFileLocal.name)
         callResult = systemCall.run(
-            listOf(
-                "ssh",
-                "-F", configPath!!, // these variables cannot be null when HPC configured
-                "-i", sshKeyPath!!,
-                "-o", "UserKnownHostsFile=$knownHostsPath",
-                sshConfig!!,
-                """bash -c "sbatch ${sBatchFileRemote.absolutePath} 2>&1 | tee -a ${hpcLogFiles.joinToString(" ")}""""
-            ),
+            sshCommand + """bash -c "sbatch ${sBatchFileRemote.absolutePath} 2>&1 | tee -a ${hpcLogFiles.joinToString(" ")}"""",
             timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
         )
 
 
         logger.debug(callResult.output)
         if (!callResult.success) {
-            println(callResult.output)
             throw RuntimeException(callResult.error)
         }
     }
@@ -405,6 +395,28 @@ class HPCConnection(
             logFile?.appendText(result.output)
             if (!result.success) {
                 throw RuntimeException(result.error)
+            }
+        }
+    }
+
+    /**
+     * Run an immediate command on the automation node.
+     */
+    suspend fun runCommand(command: String) {
+        if(!ready || sshCommand == null) {
+            logger.warn("Cannot run commands on HPC while not ready")
+            return
+        }
+
+        withContext(Dispatchers.IO) {
+            var callResult = systemCall.run(
+                sshCommand + command,
+                timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
+            )
+
+            logger.debug(callResult.output)
+            if (!callResult.success) {
+                throw RuntimeException(callResult.error)
             }
         }
     }
