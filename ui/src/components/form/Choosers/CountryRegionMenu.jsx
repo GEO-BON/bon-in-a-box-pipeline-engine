@@ -107,10 +107,10 @@ export default function CountryRegionMenu({
   const selectionChanged = (type, value) => {
     let countryValue, regionValue;
     if (type === "both") {
-      countryValue = selectedCountry.value;
-      regionValue = selectedRegion?.value;
+      countryValue = selectedCountry;
+      regionValue = selectedRegion;
     } else if (type === "region") {
-      countryValue = selectedCountry.value;
+      countryValue = selectedCountry;
       regionValue = value;
     } else if (type === "country") {
       countryValue = value;
@@ -124,16 +124,16 @@ export default function CountryRegionMenu({
     let country;
     if (countryValue) {
       country = {
-        englishName: selectedCountry?.label,
-        ISO3: selectedCountry?.value,
+        englishName: countryValue?.label,
+        ISO3: countryValue?.value,
       };
     }
     let region = defaultRegion;
     if (regionValue) {
       region = 
           {
-            regionName: selectedRegion?.label,
-            regionGID: selectedRegion?.value,
+            regionName: regionValue?.label,
+            regionGID: regionValue?.value,
             countryEnglishName: selectedCountry?.label,
           }
     }
@@ -174,7 +174,7 @@ export default function CountryRegionMenu({
         onChange={(event, value) => {
           setSelectedCountry(value);
           setSelectedRegion(null);
-          selectionChanged("country", value?.value ? value.value : null);
+          selectionChanged("country", value?.value ? value : null);
         }}
       />
       {showRegion && (
@@ -198,7 +198,7 @@ export default function CountryRegionMenu({
             )}
             onChange={(event, value) => {
               setSelectedRegion(value);
-              selectionChanged("region", value?.value ? value.value : null);
+              selectionChanged("region", value?.value ? value : null);
             }}
             value={selectedRegion}
           />
