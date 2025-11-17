@@ -27,6 +27,7 @@ function is_safe_command() {
 		"^uname( |$)"
 		"^id( |$)"
 		"^groups( |$)"
+		"^source "
 		## file commands
 		"^mv "
 		"^cp "
@@ -104,7 +105,7 @@ function validate_complex_command() {
 	local conditional_allowed=false
 
 	# Remove leading 'bash -c' and surrounding quotes if present
-	fullCommand=$(echo "$fullCommand" | xargs) # A trailing whitespace would fail the regex
+	fullCommand=$(echo "$fullCommand" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//') # A trailing whitespace would fail the regex
 	if [[ "$fullCommand" =~ ^bash\ -c\ (\"|\')(.*)(\"|\')$ ]]; then
 		fullCommand="${BASH_REMATCH[2]}"
 	elif [[ "$fullCommand" =~ ^bash\ -c\ (.*)$ ]]; then
@@ -116,9 +117,8 @@ function validate_complex_command() {
 		line="${line//|/;}"  # Replace '|' by ';', same reason
 		IFS=';' read -ra cmds <<<"$line"
 		for cmd in "${cmds[@]}"; do
-			# Trim whitespace using xargs
-			# xargs removes leading/trailing whitespace and condenses multiple spaces
-			cmd=$(echo "$cmd" | xargs)
+			# Trim whitespace
+			cmd=$(echo "$cmd" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
 			# In case we are inside an if, ignore the "then" keyword
 			cmd=$(echo "$cmd" | sed 's/^then\( \|$\)//')
@@ -165,6 +165,8 @@ function test_command_filter() {
 		"sbatch /folder/file.sbatch | tee logs.txt=PASS"
 		'bash -c "sbatch /folder/file.sbatch | tee logs.txt"=PASS'
 		"bash -c 'sbatch /folder/file.sbatch | tee logs1.txt logs2.txt' =PASS" # notice the trailing whitespace
+		"module load apptainer;
+			apptainer run      --fakeroot --overlay /folder/biab-runner-conda_overlay-20GB.ext3      -B /folder/scripts:/scripts      -B /folder/script-stubs:/script-stubs      -B /folder/output:/output      -B /folder/userdata:/userdata      /folder/biab-runner-conda_593a8b940b287b9d2692e4d764ca1676c72ed78c743452bbc746623430d4c0df.sif      bash -c 'source /script-stubs/system/condaEnvironment.sh /output/helloWorld/helloHPC/6ba389c8e50ddf5002e0b00b05b5b51b helloWorld__helloHPC channels'=PASS"
 
 		## Supposed to FAIL
 		"module load python; forbiddenCommand=FAIL"
