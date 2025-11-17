@@ -146,7 +146,7 @@ class HPCConnection(
             }
 
             launch {
-                prepareApptainer(rImage, 20)
+                prepareApptainer(condaImage, 20)
             }
 
             launch {
