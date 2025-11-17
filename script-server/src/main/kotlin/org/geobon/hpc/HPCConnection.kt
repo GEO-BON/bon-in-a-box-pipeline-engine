@@ -198,42 +198,46 @@ class HPCConnection(
                     // Launch the container creation for that digest (if not already existing)
                     val apptainerImageName = "${container.containerName}_$imageSha.sif"
                     apptainerImage.imagePath = "$hpcRoot/$apptainerImageName"
-                    val overlayName = "${container.containerName}_overlay-${overlaySizeGB}GB.img"
+                    val overlayName = "${container.containerName}_overlay-${overlaySizeGB}GB.ext3"
                     apptainerImage.overlayPath = "$hpcRoot/$overlayName"
                     val callResult = systemCall.run(
                         sshCommand +
-                                """
-                        if [ -f ${apptainerImage.imagePath} ]; then
-                            echo "Image already exists: $apptainerImageName"
-                        else
-                            if [ ! -d "$hpcRoot" ]; then
-                                mkdir -p "$hpcRoot"
-                            fi
+                            """
+                                if [ -f ${apptainerImage.imagePath} ]; then
+                                    echo "Image already exists: $apptainerImageName"
+                                else
+                                    if [ ! -d "$hpcRoot" ]; then
+                                        mkdir -p "$hpcRoot"
+                                    fi
 
-                            if [ ! -w "$hpcRoot" ]; then
-                                echo "No write permission to $hpcRoot" >&2
-                                exit 1
-                            fi
+                                    if [ ! -w "$hpcRoot" ]; then
+                                        echo "No write permission to $hpcRoot" >&2
+                                        exit 1
+                                    fi
 
-                            module load apptainer
-                            rm ${apptainerImage.overlayPath}
-                            apptainer overlay create --fakeroot --size ${overlaySizeGB * 1024} ${apptainerImage.overlayPath}
-                            if [[ $? -eq 0 ]]; then
-                                echo "Overlay created: $overlayName"
-                            else
-                                echo "Failed to create overlay: $overlayName" >&2
-                                exit 1
-                            fi
-                            apptainer build ${apptainerImage.imagePath} docker://$imageDigest
-                            if [[ $? -eq 0 ]]; then
-                                echo "Image created: $apptainerImageName"
-                            else
-                                echo "Failed to create image: $apptainerImageName" >&2
-                                exit 1
-                            fi
-                        fi
-                    """.trimIndent(),
-                        timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
+                                    module load apptainer
+                                    if [ $? -ne 0 ]; then exit 1; fi
+                                    echo "apptainer version:" $(apptainer version)
+
+                                    rm -f ${apptainerImage.overlayPath}
+                                    apptainer overlay create --fakeroot --size ${overlaySizeGB * 1024} ${apptainerImage.overlayPath}
+                                    if [ $? -eq 0 ] && [ -f "${apptainerImage.overlayPath}" ]; then
+                                        echo "Overlay created: $overlayName"
+                                    else
+                                        echo "Failed to create overlay: $overlayName" >&2
+                                        exit 1
+                                    fi
+
+                                    apptainer build ${apptainerImage.imagePath} docker://$imageDigest
+                                    if [[ $? -eq 0 ]]; then
+                                        echo "Image created: $apptainerImageName"
+                                    else
+                                        echo "Failed to create image: $apptainerImageName" >&2
+                                        exit 1
+                                    fi
+                                fi
+                            """.trimIndent(),
+                        timeoutAmount = 20, timeoutUnit = MINUTES, logger = logger
                     )
 
                     if (callResult.output.isNotBlank())
@@ -243,6 +247,7 @@ class HPCConnection(
                         RemoteSetupState.READY
                     } else {
                         apptainerImage.message = callResult.error
+                        logger.error(callResult.error)
                         RemoteSetupState.ERROR
                     }
 
