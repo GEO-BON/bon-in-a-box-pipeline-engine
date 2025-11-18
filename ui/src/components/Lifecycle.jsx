@@ -36,6 +36,8 @@ function ChipFromStatus({ status }) {
       chipStyle.backgroundColor = '#c7a9ff';
       displayText = "Example";
       break;
+    case 'none': // used when script not found on server
+      return null;
     default:
       console.warn(`Unknown lifecycle status: ${status}`);
   }

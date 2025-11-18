@@ -5,6 +5,8 @@ import Typography from "@mui/material/Typography";
 import LinkedinLogo from "../img/LinkedIn_icon.svg";
 import ResearchGateLogo from "../img/ResearchGate_icon.svg";
 import OrcIDLogo from "../img/ORCID_ID_green.svg";
+import { isEmptyObject } from '../utils/isEmptyObject';
+import { Alert } from '@mui/material';
 
 export function StepDescription({ descriptionFile, metadata }) {
     return <>
@@ -86,6 +88,12 @@ export function GeneralDescription({ ymlPath, metadata }) {
     if (!metadata)
         return null
 
+    if (isEmptyObject(metadata)) {
+        return <div className='stepDescription'>
+            <Alert severity='warning'>Script was not found on this server. Raw results will be displayed.</Alert>
+        </div>
+    }
+
     const codeLink = getCodeUrl(ymlPath, metadata.script)
 
     return <div className='stepDescription'>
@@ -133,26 +141,31 @@ function printLicense(license) {
             </a>
 
         case "CC BY":
+        case "CC-BY":
             return <a href="https://creativecommons.org/licenses/by/4.0/">
                 <img alt={license} src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by.png" width="88" height="31" />
             </a>
 
         case "CC BY-SA":
+        case "CC-BY-SA":
             return <a href="https://creativecommons.org/licenses/by-sa/4.0/">
                 <img alt={license} src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-sa.png" width="88" height="31" />
             </a>
 
         case "CC BY-NC-SA":
+        case "CC-BY-NC-SA":
             return <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">
                 <img alt={license} src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-sa.png" width="88" height="31" />
             </a>
 
         case "CC BY-ND":
+        case "CC-BY-ND":
             return <a href="https://creativecommons.org/licenses/by-nd/4.0/">
                 <img alt={license} src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nd.png" width="88" height="31" />
             </a>
 
         case "CC BY-NC-ND":
+        case "CC-BY-NC-ND":
             return <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">
                 <img alt={license} src="https://mirrors.creativecommons.org/presskit/buttons/88x31/png/by-nc-nd.png" width="88" height="31" />
             </a>
