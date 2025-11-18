@@ -409,16 +409,17 @@ class HPCConnection(
     /**
      * Run an immediate command on the automation node.
      */
-    suspend fun runCommand(command: String) {
+    suspend fun runCommand(command: String, timeoutMinutes: Long = 10, logFile: File? = null) {
         if(!ready || sshCommand == null) {
-            logger.warn("Cannot run commands on HPC while not ready")
+            logger.warn("Cannot run commands on HPC while not ready.")
             return
         }
 
         withContext(Dispatchers.IO) {
             var callResult = systemCall.run(
                 sshCommand + command,
-                timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
+                timeoutAmount = timeoutMinutes, timeoutUnit = MINUTES, logger = logger,
+                logFile = logFile
             )
 
             if (!callResult.success) {

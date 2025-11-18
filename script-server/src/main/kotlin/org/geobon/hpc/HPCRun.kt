@@ -29,7 +29,6 @@ class HPCRun(
         ?: throw RuntimeException("A valid HPC connection is necessary to run job on HPC for file ${scriptFile.absolutePath}")
 
     private val hpcConnection = hpc.connection
-    val condaEnvWrapper = "$scriptStubsRoot/system/condaEnvironment.sh"
 
     override suspend fun runScript(): Map<String, Any> {
         if (!hpcConnection.ready) {
@@ -58,17 +57,23 @@ class HPCRun(
 
                     hpcConnection.sendFiles(filesToSend, logFile)
                 }
-                fileSyncJob.join() // We want the log file to be present while conda sync is happening.
+                fileSyncJob.join() // We want the conda file to be present while conda sync is happening.
 
                 val condaSyncJob = launch {
                     if(condaEnvYml != null && condaEnvName != null) {
+                        logFile.appendText("Syncing conda environment towards HPC...\n")
+                        val condaEnvWrapper = "$scriptStubsRoot/system/condaEnvironmentHPC.sh"
                         val condaEnvFileOnHPC = File(context.outputFolder, condaEnvName)
+
                         hpcConnection.runCommand("""
                             module load apptainer;
-                            ${getApptainerBaseCommand(hpcConnection.condaImage)} ' \
+                            ${getApptainerBaseCommand(hpcConnection.condaImage, true)} ' \
                                 source $condaEnvWrapper ${context.outputFolderEscaped} $condaEnvName "${"$"}(cat $condaEnvFile)" \
                             '
-                        """.replace(Regex("""\s*\\\n\s*"""), " "))
+                        """.replace(Regex("""\s*\\\n\s*"""), " "), 30, logFile)
+
+                        // Send edited log file to HPC
+                        hpcConnection.sendFiles(listOf(context.logFile), logFile)
                     }
                 }
 
@@ -131,10 +136,10 @@ class HPCRun(
         return flagError(output ?: mapOf())
     }
 
-    private fun getApptainerBaseCommand(image: ApptainerImage): String {
+    private fun getApptainerBaseCommand(image: ApptainerImage, edit:Boolean = false): String {
         return """
             apptainer run
-                --fakeroot --overlay ${image.overlayPath}
+                ${if(edit) "--fakeroot " else ""}--overlay ${image.overlayPath}${if(edit) "" else ":ro"}
                 -B ${hpcConnection.hpcScriptsRoot}:$scriptsRoot
                 -B ${hpcConnection.hpcScriptStubsRoot}:$scriptStubsRoot
                 -B ${hpcConnection.hpcOutputRoot}:$outputRoot
