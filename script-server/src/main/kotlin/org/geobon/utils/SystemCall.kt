@@ -3,6 +3,8 @@ package org.geobon.utils
 import java.io.File
 import java.util.concurrent.TimeUnit
 import org.slf4j.Logger
+import kotlinx.coroutines.*
+import java.io.IOException
 
 open class SystemCall {
     open fun run(
@@ -11,42 +13,72 @@ open class SystemCall {
         timeoutAmount: Long = 1,
         timeoutUnit: TimeUnit = TimeUnit.SECONDS,
         mergeErrors: Boolean = false,
-        logger: Logger? = null
+        logger: Logger? = null,
+        logFile: File? = null
     ): CallResult {
-        try {
-            val process = ProcessBuilder(call)
-                .directory(workingDir)
-                .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                .redirectErrorStream(mergeErrors) // Merges stderr into stdout
-                .start()
+        var inputString = ""
+        var errorString = ""
+        return runBlocking(Dispatchers.IO) {
+            try {
+                val process = ProcessBuilder(call)
+                    .directory(workingDir)
+                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                    .redirectErrorStream(mergeErrors) // Merges stderr into stdout
+                    .start()
 
-            process.waitFor(timeoutAmount, timeoutUnit)
-            if (process.isAlive) {
-                logger?.warn("Timeout reached, stopping process.")
-                process.destroy()
-                process.waitFor(30, TimeUnit.SECONDS)
-                if (process.isAlive) {
-                    logger?.warn("Destroy timeout reached, killing process.")
-                    process.destroyForcibly()
+                val fileOutputJob = logFile?.let {
+                    launch {
+                        try {
+                            while (true) { // Breaks when input's readLine returns null
+                                delay(1)
+                                process.inputReader().readLine()?.let {
+                                     logFile.appendText("$it\n")
+                                     inputString += "$it\n"
+                                } ?: break
+                                process.errorReader().readLine()?.let {
+                                    logFile.appendText("$it\n")
+                                    errorString += "$it\n"
+                                }
+                            }
+                        } catch (ex: IOException) {
+                            if (ex.message != "Stream closed") // This is normal when cancelling the script
+                                logger?.trace(ex.message)
+                        }
+                    }
                 }
+
+                process.waitFor(timeoutAmount, timeoutUnit)
+                if (process.isAlive) {
+                    logger?.warn("Timeout reached, stopping process.")
+                    process.destroy()
+                    process.waitFor(30, TimeUnit.SECONDS)
+                    if (process.isAlive) {
+                        logger?.warn("Destroy timeout reached, killing process.")
+                        process.destroyForcibly()
+                    }
+                }
+                fileOutputJob?.join()
+
+                if(logFile == null) {
+                    inputString = process.inputReader().readText()
+                    errorString = process.errorReader().readText()
+                }
+
+                CallResult(process.exitValue(), inputString, errorString)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                if(errorString.isNotBlank()) errorString += "\n"
+
+                CallResult(
+                    1,
+                    inputString,
+                    errorString + ex.message ?: ex.javaClass.name)
             }
-
-            return CallResult(process)
-
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            return CallResult(1, "", ex.message ?: ex.javaClass.name)
         }
     }
 }
 
 data class CallResult(val exitCode: Int, val output: String, val error:String = "") {
-    constructor(process:Process) : this(
-        process.exitValue(),
-        process.inputReader().readText(),
-        process.errorReader().readText()
-    )
-
     val success: Boolean
         get() = exitCode == 0
 }

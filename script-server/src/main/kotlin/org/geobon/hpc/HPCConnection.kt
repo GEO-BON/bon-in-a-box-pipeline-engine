@@ -313,8 +313,9 @@ class HPCConnection(
                     timeoutAmount = 10,
                     timeoutUnit = MINUTES
                 )
-                logFile?.appendText(result.output)
+                // Log file was already sent, should not append to local log file now unless there is a problem.
                 if (!result.success) {
+                    logFile?.appendText(result.output)
                     throw RuntimeException(result.error)
                 }
             }
@@ -397,8 +398,9 @@ class HPCConnection(
                 timeoutAmount = 10,
                 timeoutUnit = MINUTES
             )
-            logFile?.appendText(result.output)
+
             if (!result.success) {
+                logFile?.appendText(result.output)
                 throw RuntimeException(result.error)
             }
         }
@@ -419,8 +421,8 @@ class HPCConnection(
                 timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
             )
 
-            logger.debug(callResult.output)
             if (!callResult.success) {
+                logger.debug(callResult.output)
                 throw RuntimeException(callResult.error)
             }
         }
