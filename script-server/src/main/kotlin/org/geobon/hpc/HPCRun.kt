@@ -40,6 +40,7 @@ class HPCRun(
         val watchChannel = context.outputFolder.asWatchChannel()
         try {
             coroutineScope {
+                val condaEnvFile = File(context.outputFolder, "$condaEnvName.yml")
                 val fileSyncJob = launch {
                     // Sync the output folder (has inputs.json) and any files the script depends on
                     val filesToSend = mutableListOf(
@@ -50,17 +51,24 @@ class HPCRun(
                         inputPipes.mapNotNull { it.value.asFiles() }.flatten()
                     )
 
+                    if(condaEnvYml != null && condaEnvName != null) {
+                        condaEnvFile.writeText(condaEnvYml)
+                        filesToSend.add(condaEnvFile)
+                    }
+
                     hpcConnection.sendFiles(filesToSend, logFile)
                 }
                 fileSyncJob.join() // We want the log file to be present while conda sync is happening.
 
                 val condaSyncJob = launch {
                     if(condaEnvYml != null && condaEnvName != null) {
+                        val condaEnvFileOnHPC = File(context.outputFolder, condaEnvName)
                         hpcConnection.runCommand("""
-                             ${getApptainerBaseCommand(hpcConnection.condaImage)} '
-                                source $condaEnvWrapper ${context.outputFolderEscaped} $condaEnvName "$condaEnvYml" ;
-                             '
-                        """.trimIndent())
+                            module load apptainer;
+                            ${getApptainerBaseCommand(hpcConnection.condaImage)} ' \
+                                source $condaEnvWrapper ${context.outputFolderEscaped} $condaEnvName "${"$"}(cat $condaEnvFile)" \
+                            '
+                        """.replace(Regex("""\s*\\\n\s*"""), " "))
                     }
                 }
 
@@ -125,15 +133,15 @@ class HPCRun(
 
     private fun getApptainerBaseCommand(image: ApptainerImage): String {
         return """
-            apptainer run \
+            apptainer run
                 --fakeroot --overlay ${image.overlayPath}
-                -B ${hpcConnection.hpcScriptsRoot}:$scriptsRoot \
-                -B ${hpcConnection.hpcScriptStubsRoot}:$scriptStubsRoot \
-                -B ${hpcConnection.hpcOutputRoot}:$outputRoot \
-                -B ${hpcConnection.hpcUserDataRoot}:$userDataRoot \
-                ${image.imagePath} \
+                -B ${hpcConnection.hpcScriptsRoot}:$scriptsRoot
+                -B ${hpcConnection.hpcScriptStubsRoot}:$scriptStubsRoot
+                -B ${hpcConnection.hpcOutputRoot}:$outputRoot
+                -B ${hpcConnection.hpcUserDataRoot}:$userDataRoot
+                ${image.imagePath}
                 bash -c
-        """.trimIndent()
+        """.replace(Regex("""\s*\n\s*"""), " ")
     }
 
     fun getCommand(): String {
