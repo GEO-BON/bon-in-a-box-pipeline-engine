@@ -20,6 +20,7 @@ import InfoPage from "./components/InfoPage";
 import RunHistory from "./components/RunHistory";
 import { Spinner } from "./components/Spinner";
 import { HttpError } from "./components/HttpErrors";
+import CaptchaGate from "./components/CaptchaGate";
 const PipelineEditor = lazy(() =>
   import("./components/PipelineEditor/PipelineEditor")
 );
@@ -144,7 +145,11 @@ function App() {
     );
   }
 
-  return <RouterProvider router={router} />;
+  return (
+    <CaptchaGate>
+      <RouterProvider router={router} />
+    </CaptchaGate>
+  );
 }
 
 const root = createRoot(document.getElementById("root"));

@@ -5,7 +5,7 @@ export default function SpamField(props) {
     window.location.href = "about:blank";
   };
 
-  const hideStyle = {display: "block"};
+  const hideStyle = {display: "none"};
 
   const getRandomInt = (n) => Math.floor(Math.random() * n);
 
