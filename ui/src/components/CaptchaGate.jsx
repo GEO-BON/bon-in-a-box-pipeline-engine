@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const RECAPTCHA_SITE_KEY = "6LdzGRIsAAAAADsYxXjmBi4m5r8bPnqaIlsKkFDL";
 
 export default function CaptchaGate({ children }) {
-  const [verified, setVerified] = useState(
-    localStorage.getItem("human") === "true"
+
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const States = Object.freeze({
+    LOADING: "loading",
+    ERROR: "error",
+    VERIFIED: "verified"
+  });
+  const [state, setState] = useState(
+    localStorage.getItem("human") === "true" ? States.VERIFIED : States.LOADING
   );
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     // Skip if already verified
-    if (verified) {
-      setLoading(false);
+    if (state === States.VERIFIED) {
       return;
     }
 
@@ -38,24 +43,21 @@ export default function CaptchaGate({ children }) {
               const data = await res.json();
               if (data.success) {
                 localStorage.setItem("human", "true");
-                setVerified(true);
+                setState(States.VERIFIED);
+                return;
+
               } else {
-                setError("Verification failed. Please try again.");
+                setErrorMessage("Verification failed. Are you a robot? Please try again.");
               }
             } else {
-              // This is a security risk in production - tokens should always be verified server-side
-              console.log(
-                "reCAPTCHA verification endpoint not available. Trusting client token."
-              );
-              localStorage.setItem("human", "true");
-              setVerified(true);
+              setErrorMessage("Verification failed: reCAPTCHA verification endpoint not available.");
             }
           } catch (err) {
             console.error("reCAPTCHA error:", err);
-            setError("Verification error. Please refresh the page.");
-          } finally {
-            setLoading(false);
+            setErrorMessage("Verification error. Please refresh the page.");
           }
+
+          setState(States.ERROR)
         });
       } else {
         setTimeout(checkRecaptcha, 100);
@@ -63,73 +65,53 @@ export default function CaptchaGate({ children }) {
     };
 
     checkRecaptcha();
-  }, [verified]);
+  }, [state, setState, setErrorMessage]);
 
-  // Show loading state while verifying
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          flexDirection: "column",
-        }}
-      >
-        <h1>Verifying access...</h1>
-        <p>This process is automatic. Please wait.</p>
-      </div>
-    );
-  }
 
-  // Show error state if verification failed
-  if (error) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          flexDirection: "column",
-        }}
-      >
-        <h1>Verification Error</h1>
-        <p>{error}</p>
-        <button
-          onClick={() => {
-            localStorage.removeItem("human");
-            setVerified(false);
-            setError("");
-            setLoading(true);
-            window.location.reload();
+  switch (state) {
+    case States.LOADING:
+      return (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+            flexDirection: "column",
           }}
         >
-          Retry
-        </button>
-      </div>
-    );
-  }
+          <h1>Verifying access...</h1>
+          <p>This process is automatic. Please wait.</p>
+        </div>
+      );
 
-  // Show children only after successful verification
-  if (verified) {
-    return children;
-  }
+    case States.VERIFIED:
+      return children; // Show children only after successful verification
 
-  // Fallback 
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        flexDirection: "column",
-      }}
-    >
-      <h1>Loading...</h1>
-    </div>
-  );
+    case States.ERROR:
+      return (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh",
+            flexDirection: "column",
+          }}
+        >
+          <h1>Verification Error</h1>
+          <p>{errorMessage}</p>
+          <button
+            onClick={() => {
+              setState(States.LOADING)
+              setErrorMessage("");
+              window.location.reload();
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      );
+  }
 }
 
