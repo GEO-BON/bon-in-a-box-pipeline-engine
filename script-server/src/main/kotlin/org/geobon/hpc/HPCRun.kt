@@ -138,7 +138,7 @@ class HPCRun(
 
     private fun getApptainerBaseCommand(image: ApptainerImage, edit:Boolean = false): String {
         return """
-            apptainer run
+            apptainer run --pid --env "TINI_SUBREAPER=true"
                 ${if(edit) "--fakeroot " else ""}--overlay ${image.overlayPath}${if(edit) "" else ":ro"}
                 -B ${hpcConnection.hpcScriptsRoot}:$scriptsRoot
                 -B ${hpcConnection.hpcScriptStubsRoot}:$scriptStubsRoot
