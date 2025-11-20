@@ -1,7 +1,7 @@
 #!/bin/bash
 outputFolder=$1
 condaEnvName=$2
-condaEnvYml=$3
+condaEnvFileSrc=$3
 
 pidFile="$outputFolder/.pid"
 
@@ -19,40 +19,37 @@ function activateSubEnvironment {
     set -o pipefail
 
     n=$RANDOM
-    condaEnvFile="/conda-env-yml/$condaEnvName"
-    echo "$condaEnvYml" > $condaEnvFile.$n.yml ; assertSuccess
+    condaEnvFile="/conda-env-yml/$condaEnvName.yml"
 
-    if [ ! -f "$condaEnvFile.yml" ]; then
-        echo "Creating new conda environment $condaEnvName..."
-        logfile=$(mktemp)
-        mamba env create -y -f "$condaEnvFile.$n.yml" 2>&1 | tee "$logfile"
-        retCode=$?
-        createLogs=$(<"$logfile")
-        rm "$logfile"
-
+    if [ ! -f "$condaEnvFile" ]; then
+        mamba env list | grep " $condaEnvName "
         if [[ $retCode -eq 0 ]] ; then
-            mv $condaEnvFile.$n.yml $condaEnvFile.yml ; assertSuccess
-            echo "Created successfully."
-        elif [[ $createLogs == *"prefix already exists:"* ]]; then
-            echo "YML files out of sync, will attempt updating..."
+            echo "Conda environment listed, will attempt updating..."
         else
-            echo "Cleaning up after failure..."
-            mamba remove -y -n $condaEnvName --all > /dev/null 2>&1
-            rm $condaEnvFile.$n.yml 2> /dev/null
-            rm $pidFile
-            echo -e "FAILED" ; exit 1
+            echo "Creating new conda environment $condaEnvName..."
+            mamba env create -y -f "$condaEnvFileSrc" 2>&1 | tee "$tmpLog"
+
+            if [[ $retCode -eq $? ]] ; then
+                mv $condaEnvFileSrc $condaEnvFile ; assertSuccess
+                echo "Created successfully."
+            else
+                echo "Cleaning up after failure..."
+                mamba remove -y -n $condaEnvName --all > /dev/null 2>&1
+                #rm $pidFile
+                echo -e "FAILED" ; exit 1
+            fi
         fi
     fi
 
-    if [ -f "$condaEnvFile.$n.yml" ]; then
-        if cmp -s $condaEnvFile.yml $condaEnvFile.$n.yml; then
+    if [ -f "$condaEnvFileSrc" ]; then
+        if cmp -s $condaEnvFile $condaEnvFileSrc; then
             echo "Activating existing conda environment $condaEnvName"
         else
             echo "Updating existing conda environment $condaEnvName"
-            mamba env update -y -f $condaEnvFile.$n.yml ; assertSuccess
+            mamba env update -y -f $condaEnvFileSrc ; assertSuccess
         fi
 
-        cp $condaEnvFile.$n.yml $condaEnvFile.yml ; assertSuccess
+        mv $condaEnvFileSrc $condaEnvFile ; assertSuccess
     fi
 
     mamba activate $condaEnvName
@@ -60,12 +57,12 @@ function activateSubEnvironment {
         echo "$condaEnvName activated"
     else
         echo "Activation failed, will attempt creating..."
-        mamba env create -y -f $condaEnvFile.yml
+        mamba env create -y -f $condaEnvFile
         mamba activate $condaEnvName
     fi
 }
 
-echo $$ > $pidFile
+# echo $$ > $pidFile If we need it on HPC, we'll use https://apptainer.org/docs/user/latest/running_services.html#system-integration-pid-files
 source /.bashrc
 if [[ "$condaEnvName" == "pythonbase" || "$condaEnvName" == "rbase" ]]; then
     activateBaseEnvironment
@@ -73,4 +70,4 @@ else
     activateSubEnvironment
 fi
 echo "Conda environment ready."
-rm $pidFile
+#rm $pidFile
