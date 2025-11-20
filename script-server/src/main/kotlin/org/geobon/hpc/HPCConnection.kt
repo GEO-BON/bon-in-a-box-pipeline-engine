@@ -338,7 +338,7 @@ class HPCConnection(
         val sBatchFileLocal = File(outputRoot, "boninabox_$timestamp.sbatch")
         sBatchFileLocal.writeText("""
             #!/bin/bash
-            #SBATCH --mem=1.0G
+            #SBATCH --mem=1G
             #SBATCH --cpus-per-task=1
             #SBATCH --time=00:03:00
             #SBATCH --nodes=1
