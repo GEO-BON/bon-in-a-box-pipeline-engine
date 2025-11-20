@@ -7,6 +7,7 @@ import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { CustomButtonGreen } from "../CustomMUI";
 import { formatError } from "../HttpErrors";
 import { Alert } from "@mui/material";
+import SpamField from "../SpamField";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -124,6 +125,7 @@ export function PipelineForm({
           Error parsing YAML input.<br />
           {validationError}
         </Alert>}
+        <SpamField />
         <CustomButtonGreen type="submit" disabled={validationError != null} variant="contained">
           {runType === "pipeline" ? "Run pipeline" : "Run script"}
         </CustomButtonGreen>
