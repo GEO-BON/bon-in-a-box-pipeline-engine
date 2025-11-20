@@ -106,10 +106,8 @@ function validate_complex_command() {
 
 	# Remove leading 'bash -c' and surrounding quotes if present
 	fullCommand=$(echo "$fullCommand" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//') # A trailing whitespace would fail the regex
-	if [[ "$fullCommand" =~ ^bash\ -c\ (\"|\')(.*)(\"|\')$ ]]; then
-		fullCommand="${BASH_REMATCH[2]}"
-	elif [[ "$fullCommand" =~ ^bash\ -c\ (.*)$ ]]; then
-		fullCommand="${BASH_REMATCH[1]}"
+	if [[ "$fullCommand" =~ ^bash\ (-o\ [a-z]+\ )*-c\ (\"|\')(.*)(\"|\')$ ]]; then
+		fullCommand="${BASH_REMATCH[3]}"
 	fi
 
 	while IFS= read -r line; do
