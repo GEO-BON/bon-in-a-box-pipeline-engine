@@ -40,6 +40,10 @@ class HPCRun(
         try {
             coroutineScope {
                 val condaEnvFile = File(context.outputFolder, "$condaEnvName.yml")
+                if(condaEnvYml != null && condaEnvName != null) {
+                    condaEnvFile.writeText(condaEnvYml)
+                }
+
                 val fileSyncJob = launch {
                     // Sync the output folder (has inputs.json) and any files the script depends on
                     val filesToSend = mutableListOf(
@@ -49,11 +53,6 @@ class HPCRun(
                     filesToSend.addAll(
                         inputPipes.mapNotNull { it.value.asFiles() }.flatten()
                     )
-
-                    if(condaEnvYml != null && condaEnvName != null) {
-                        condaEnvFile.writeText(condaEnvYml)
-                        filesToSend.add(condaEnvFile)
-                    }
 
                     hpcConnection.sendFiles(filesToSend, logFile)
                 }
