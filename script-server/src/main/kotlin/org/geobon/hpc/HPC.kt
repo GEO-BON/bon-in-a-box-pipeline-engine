@@ -104,7 +104,7 @@ open class HPC (
                         try {
                             connection.retrieveFiles(files)
                         } catch (e: Exception) {
-                            println("Cannot retrieve file ${e.message}")
+                            println("Cannot retrieve files: ${e.message}")
                             failCount++
                             if (failCount >= 10) {
                                 val failedOutput = JSONObject()

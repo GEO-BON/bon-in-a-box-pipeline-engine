@@ -303,7 +303,13 @@ class HPCConnection(
                 "No files to sync.".let { logger.debug(it); logFile?.appendText(it) }
 
             } else {
-                logFile?.appendText("Syncing files to HPC:\n$filesString\n".also { logger.debug(it) })
+                logFile?.appendText("""
+                        Syncing files to HPC:
+                        ${filesString.lines().joinToString("\n") { " - $it" }}
+
+                    """
+                    .trimIndent()
+                    .also { logger.debug(it) })
 
                 val result = systemCall.run(
                     listOf(
