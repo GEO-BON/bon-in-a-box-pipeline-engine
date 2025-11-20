@@ -53,11 +53,8 @@ open class HPC (
      * Send tasks if they are all ready, or if the defined threshold is met.
      */
     private fun verifySend() {
-        val tasksToSend = mutableListOf<String>()
-        val logFiles = mutableListOf<File>()
-
+        val readyTasks = mutableMapOf<ScriptStep, HPCRun>()
         synchronized(registeredSteps) {
-            val readyTasks = mutableMapOf<ScriptStep, HPCRun>()
             // filter non null values
             registeredSteps.forEach { it.value?.let { value -> readyTasks[it.key] = value } }
 
@@ -65,16 +62,22 @@ open class HPC (
                 || readyTasks.size == registeredSteps.size
             ) {
                 readyTasks.forEach {
-                    tasksToSend.add(it.value.getCommand())
-                    logFiles.add(it.value.context.logFile)
-                    runningSteps.putAll(readyTasks)
                     registeredSteps.remove(it.key)
                 }
+                runningSteps.putAll(readyTasks)
             }
         }
 
-        if(tasksToSend.isNotEmpty()) {
-            connection.sendJobs(tasksToSend, logFiles)
+        if(readyTasks.isNotEmpty()) {
+            try {
+                val jobsToSend = readyTasks.map { it.value.getCommand() }
+                connection.sendJobs(
+                    jobsToSend,
+                    readyTasks.map { it.value.context.logFile }
+                )
+            } catch (e:Exception) {
+                readyTasks.values.forEach { it.fail("Failed to send job to HPC. Cancelling.") }
+            }
         }
 
         updateRetrieveJob()

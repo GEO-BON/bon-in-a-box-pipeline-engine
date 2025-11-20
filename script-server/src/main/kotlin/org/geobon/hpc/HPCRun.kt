@@ -182,5 +182,11 @@ class HPCRun(
         }
     }
 
+    fun fail(message:String) {
+        context.resultFile.writeText(RunContext.gson.toJson(
+            mapOf<String, Any>(ERROR_KEY to message)
+        ))
+    }
+
 }
 
