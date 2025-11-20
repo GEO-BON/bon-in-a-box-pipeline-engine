@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 
 import { createRoot } from "react-dom/client";
 import "./index.css";
@@ -20,7 +20,6 @@ import InfoPage from "./components/InfoPage";
 import RunHistory from "./components/RunHistory";
 import { Spinner } from "./components/Spinner";
 import { HttpError } from "./components/HttpErrors";
-import CaptchaGate from "./components/CaptchaGate";
 const PipelineEditor = lazy(() =>
   import("./components/PipelineEditor/PipelineEditor")
 );
@@ -145,11 +144,7 @@ function App() {
     );
   }
 
-  return (
-    <CaptchaGate>
-      <RouterProvider router={router} />
-    </CaptchaGate>
-  );
+  return <RouterProvider router={router} />;
 }
 
 const root = createRoot(document.getElementById("root"));

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { CustomButtonGreen } from "./CustomMUI";
 
 const RECAPTCHA_SITE_KEY = "6LdzGRIsAAAAADsYxXjmBi4m5r8bPnqaIlsKkFDL";
 
@@ -78,6 +79,7 @@ export default function CaptchaGate({ children }) {
             alignItems: "center",
             height: "100vh",
             flexDirection: "column",
+            color: "whitesmoke"
           }}
         >
           <h1>Verifying access...</h1>
@@ -97,11 +99,12 @@ export default function CaptchaGate({ children }) {
             alignItems: "center",
             height: "100vh",
             flexDirection: "column",
+            color: "whitesmoke"
           }}
         >
           <h1>Verification Error</h1>
           <p>{errorMessage}</p>
-          <button
+          <CustomButtonGreen
             onClick={() => {
               setState(States.LOADING)
               setErrorMessage("");
@@ -109,7 +112,7 @@ export default function CaptchaGate({ children }) {
             }}
           >
             Retry
-          </button>
+          </CustomButtonGreen>
         </div>
       );
   }
