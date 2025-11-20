@@ -328,16 +328,18 @@ class HPCConnection(
             return
         }
 
-        val sBatchFileLocal = File(outputRoot, "boninabox_${System.currentTimeMillis()}.sbatch")
+        val timestamp = System.currentTimeMillis()
+        val sBatchFileLocal = File(outputRoot, "boninabox_$timestamp.sbatch")
         sBatchFileLocal.writeText("""
             #!/bin/bash
+            #SBATCH --mem=1.0G
+            #SBATCH --cpus-per-task=1
+            #SBATCH --time=00:03:00
+            #SBATCH --nodes=1
             #SBATCH --signal=B:SIGINT
             ${account?.isNotBlank().let { "#SBATCH --account=$account" }}
-            #SBATCH --time=01:00:00
-            #SBATCH --job-name=boninabox_${System.currentTimeMillis()}
-            #SBATCH --nodes=1
-            #SBATCH --ntasks-per-node=64
-            #SBATCH --mem=0
+            #SBATCH --job-name=boninabox_$timestamp
+
             module load apptainer
 
             ${tasksToSend.joinToString("\n\n")}
