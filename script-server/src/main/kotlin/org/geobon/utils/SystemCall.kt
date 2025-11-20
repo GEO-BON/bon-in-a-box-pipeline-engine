@@ -30,15 +30,24 @@ open class SystemCall {
                     launch {
                         try {
                             while (true) { // Breaks when input's readLine returns null
-                                delay(1)
                                 process.inputReader().readLine()?.let {
                                      logFile.appendText("$it\n")
                                      inputString += "$it\n"
                                 } ?: break
+                            }
+                        } catch (ex: IOException) {
+                            if (ex.message != "Stream closed") // This is normal when cancelling the script
+                                logger?.trace(ex.message)
+                        }
+                    }
+
+                    launch {
+                        try {
+                            while (true) { // Breaks when error's readLine returns null
                                 process.errorReader().readLine()?.let {
-                                    logFile.appendText("$it\n")
-                                    errorString += "$it\n"
-                                }
+                                     logFile.appendText("$it\n")
+                                     errorString += "$it\n"
+                                } ?: break
                             }
                         } catch (ex: IOException) {
                             if (ex.message != "Stream closed") // This is normal when cancelling the script
