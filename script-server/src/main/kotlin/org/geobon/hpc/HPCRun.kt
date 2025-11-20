@@ -65,9 +65,9 @@ class HPCRun(
                         val condaEnvFileOnHPC = File(context.outputFolder, condaEnvName)
 
                         hpcConnection.runCommand("""
-                            module load apptainer;
+                            module load apptainer
                             ${getApptainerBaseCommand(hpcConnection.condaImage, true)} ' \
-                                source $condaEnvWrapper ${context.outputFolderEscaped} $condaEnvName "${"$"}(cat $condaEnvFile)" \
+                                source $condaEnvWrapper ${context.outputFolderEscaped} "$condaEnvName" "$condaEnvFile" \
                             '
                         """.replace(Regex("""\s*\\\n\s*"""), " "), 30, logFile)
 
