@@ -360,9 +360,8 @@ class HPCConnection(
             timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
         )
 
-
         if (!callResult.success) {
-            logger.debug(callResult.output)
+            multiLog(logFiles, callResult.error)
             throw RuntimeException(callResult.error)
         }
 
@@ -371,14 +370,13 @@ class HPCConnection(
 
         val sBatchFileRemote = File(hpcOutputRoot, sBatchFileLocal.name)
         callResult = systemCall.run(
-            sshCommand + """bash -c "sbatch ${sBatchFileRemote.absolutePath} 2>&1 | tee -a ${hpcLogFiles.joinToString(" ")}"""",
-            timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
+            sshCommand + """bash -o pipefail -c "sbatch ${sBatchFileRemote.absolutePath} 2>&1 | tee -a ${hpcLogFiles.joinToString(" ")}"""",
+            timeoutAmount = 10, timeoutUnit = MINUTES, mergeErrors = true, logger = logger
         )
 
-
-        logger.debug(callResult.output)
+        multiLog(logFiles, callResult.output)
         if (!callResult.success) {
-            throw RuntimeException(callResult.error)
+            throw RuntimeException("An error occured launching job on HPC. Check logs for details.")
         }
     }
 
@@ -435,6 +433,11 @@ class HPCConnection(
                 throw RuntimeException(callResult.error)
             }
         }
+    }
+
+    private fun multiLog(files:List<File>, log:String) {
+        if(log.isNotEmpty())
+            files.forEach { file -> file.appendText(log) }
     }
 
     companion object {
