@@ -43,22 +43,13 @@ function activateSubEnvironment {
 
     if [ -f "$condaEnvFileSrc" ]; then
         if cmp -s $condaEnvFile $condaEnvFileSrc; then
-            echo "Activating existing conda environment $condaEnvName"
+            echo "Conda environment $condaEnvName exists with the same dependencies."
         else
             echo "Updating existing conda environment $condaEnvName"
             mamba env update -y -f $condaEnvFileSrc ; assertSuccess
         fi
 
         mv $condaEnvFileSrc $condaEnvFile ; assertSuccess
-    fi
-
-    mamba activate $condaEnvName
-    if [[ $CONDA_DEFAULT_ENV == $condaEnvName ]]; then
-        echo "$condaEnvName activated"
-    else
-        echo "Activation failed, will attempt creating..."
-        mamba env create -y -f $condaEnvFile
-        mamba activate $condaEnvName
     fi
 }
 
