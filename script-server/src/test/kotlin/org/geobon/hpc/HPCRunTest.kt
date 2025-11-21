@@ -64,7 +64,7 @@ internal class HPCRunTest {
         verify(exactly = 1) { hpc.register(any()) }
 
 
-        coEvery { connection.sendFiles(allAny()) } just runs
+        coEvery { connection.syncFiles(allAny()) } just runs
         every { connection.ready } returns true
         every { hpc.ready(any()) } answers {
             this@runTest.launch {
@@ -90,7 +90,7 @@ internal class HPCRunTest {
 
         val outputFolder = File(outputRoot, "HPCSyncTest").listFiles()[0]
         coVerify {
-            connection.sendFiles(
+            connection.syncFiles(
                 match {
                     it.containsAll(
                         listOf(
@@ -105,7 +105,7 @@ internal class HPCRunTest {
         }
         coVerifyOrder {
             hpc.register(step)
-            connection.sendFiles(allAny())
+            connection.syncFiles(allAny())
             hpc.ready(any())
             hpc.unregister(step)
         }
@@ -128,7 +128,7 @@ internal class HPCRunTest {
         verify(exactly = 1) { hpc.register(any()) }
 
 
-        coEvery { connection.sendFiles(allAny()) } just runs
+        coEvery { connection.syncFiles(allAny()) } just runs
         every { connection.ready } returns true
         every { hpc.ready(any()) } answers {
             this@runTest.launch {
@@ -154,7 +154,7 @@ internal class HPCRunTest {
 
         coVerifyOrder {
             hpc.register(step)
-            connection.sendFiles(allAny())
+            connection.syncFiles(allAny())
             hpc.ready(any())
             hpc.unregister(step)
         }
@@ -178,7 +178,7 @@ internal class HPCRunTest {
         verify(exactly = 1) { hpc.register(any()) }
 
         var job: Job? = null
-        coEvery { connection.sendFiles(allAny()) } just runs
+        coEvery { connection.syncFiles(allAny()) } just runs
         every { connection.ready } returns true
         every { hpc.ready(any()) } answers {
             // Calling ready starts the job. So we cancel here "while the job is running"
@@ -198,7 +198,7 @@ internal class HPCRunTest {
 
         coVerifyOrder {
             hpc.register(step)
-            connection.sendFiles(allAny())
+            connection.syncFiles(allAny())
             hpc.ready(any())
             hpc.unregister(step)
         }
@@ -280,7 +280,7 @@ internal class HPCRunTest {
         verify(exactly = 1) { hpc.register(any()) }
 
         val filesSlot = slot<List<File>>()
-        coEvery {connection.sendFiles(capture(filesSlot), any())} just runs
+        coEvery {connection.syncFiles(capture(filesSlot), any())} just runs
         step.execute()
 
         assertTrue(filesSlot.isCaptured)
@@ -313,7 +313,7 @@ internal class HPCRunTest {
 
         connection.apply {
             coEvery { runCommand(any()) } just runs
-            coEvery { sendFiles(allAny()) } just runs
+            coEvery { syncFiles(allAny()) } just runs
             every { ready } returns true
             every { hpcRoot } returns "hpcRoot"
             every { hpcScriptsRoot } returns "$hpcRoot/scripts"
@@ -349,7 +349,7 @@ internal class HPCRunTest {
         }
         coVerifyOrder {
             hpc.register(step)
-            connection.sendFiles(allAny())
+            connection.syncFiles(allAny())
             connection.runCommand(any())
             hpc.ready(any())
             hpc.unregister(step)

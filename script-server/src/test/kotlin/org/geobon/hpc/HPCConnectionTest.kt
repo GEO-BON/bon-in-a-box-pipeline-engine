@@ -228,7 +228,7 @@ class HPCConnectionTest {
             every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
 
-            connection.sendFiles(toSync)
+            connection.syncFiles(toSync)
 
             verify {
                 systemCall.run(
@@ -264,7 +264,7 @@ class HPCConnectionTest {
             every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
 
-            connection.sendFiles(toSync)
+            connection.syncFiles(toSync)
 
             verify { // somethingWrong.py should not be there
                 systemCall.run(
@@ -298,7 +298,7 @@ class HPCConnectionTest {
             every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
 
-            connection.sendFiles(toSync)
+            connection.syncFiles(toSync)
 
             verify(exactly = 0) { // somethingWrong.py should not be there
                 systemCall.run(any(), any(), any(), any(), any()

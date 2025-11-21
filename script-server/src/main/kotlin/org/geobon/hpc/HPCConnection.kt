@@ -125,7 +125,7 @@ class HPCConnection(
                         scriptsStatus.state = RemoteSetupState.PREPARING
                         scriptsStatus.message = null
 
-                        sendFiles(File(scriptStubsRoot, "system").listFiles().asList())
+                        syncFiles(File(scriptStubsRoot, "system").listFiles().asList())
 
                         // Create other mount endpoints
                         val callResult = systemCall.run(
@@ -289,7 +289,12 @@ class HPCConnection(
      * Syncs the files/folders towards the remote host via rsync
      * @return logging information
      */
-    suspend fun sendFiles(files: List<File>, logFile: File? = null) {
+    suspend fun syncFiles(files: List<File>, toDelete: List<File>? = null, logFile: File? = null) {
+        if(sshCommand == null) {
+            logger.warn("HPC SSH config missing, cannot sync files to HPC.")
+            return
+        }
+
         withContext(Dispatchers.IO) {
             var filesString = ""
             files.forEach { file ->
@@ -303,6 +308,21 @@ class HPCConnection(
                 "No files to sync.".let { logger.debug(it); logFile?.appendText(it) }
 
             } else {
+                toDelete?.let {
+                    // files are relative to our root:
+                    val toDeleteAbsolute = toDelete.map { file -> File(hpcRoot, file.absolutePath.removePrefix("/")).absolutePath }
+
+                    logFile?.appendText("""
+                        Removing files from HPC (if exists):
+                        ${toDeleteAbsolute.joinToString("\n") { " - $it" }}
+
+                    """
+                    .trimIndent()
+                    .also { logger.debug(it) })
+
+                    systemCall.run(sshCommand +  "rm -rf ${toDeleteAbsolute.joinToString(" ")};", logFile = logFile)
+                }
+
                 logFile?.appendText("""
                         Syncing files to HPC:
                         ${filesString.lines().joinToString("\n") { " - $it" }}

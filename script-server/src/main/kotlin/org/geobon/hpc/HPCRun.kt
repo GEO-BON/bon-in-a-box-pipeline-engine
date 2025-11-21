@@ -54,7 +54,7 @@ class HPCRun(
                         inputPipes.mapNotNull { it.value.asFiles() }.flatten()
                     )
 
-                    hpcConnection.sendFiles(filesToSend, logFile)
+                    hpcConnection.syncFiles(filesToSend, listOf(context.outputFolder), logFile)
                 }
                 fileSyncJob.join() // We want the conda file to be present while conda sync is happening.
 
@@ -72,7 +72,7 @@ class HPCRun(
                         """.replace(Regex("""\s*\\\n\s*"""), " "), 30, logFile)
 
                         // Send edited log file to HPC
-                        hpcConnection.sendFiles(listOf(context.logFile), logFile)
+                        hpcConnection.syncFiles(listOf(context.logFile), null, logFile)
                     }
                 }
 
