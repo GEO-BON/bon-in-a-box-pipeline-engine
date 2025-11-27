@@ -152,30 +152,32 @@ class HPCRun(
         val escapedOutputFolder = context.outputFolderEscaped
         val scriptPath = scriptFile.absolutePath.replace(" ", "\\ ")
 
+        val logFileAbsolute = File(hpcConnection.hpcRoot, logFile.absolutePath.removePrefix("/")).absolutePath
+
         return when (scriptFile.extension) {
             "jl", "JL" ->
                 """
-                    /usr/bin/time -f "Memory used: %M kb" ${getApptainerBaseCommand(hpcConnection.juliaImage)} '
-                        julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
-                    '
+                    /usr/bin/time -f "Memory used: %M kb\nElapsed: %E" ${getApptainerBaseCommand(hpcConnection.juliaImage)} '
+                        julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath
+                    ' >> ${logFileAbsolute} 2>&1
                 """.trimIndent()
 
             "r", "R" ->
                 """
                     ${getApptainerBaseCommand(hpcConnection.rImage)} '
-                        mamba activate ${condaEnvName ?: "rbase"};
-                        Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
-                    '
+                        source /.bashrc; mamba activate ${condaEnvName ?: "rbase"};
+                        Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath
+                    ' >> ${logFileAbsolute} 2>&1
                 """.trimIndent()
 
-            "sh" -> "/usr/bin/time -f 'Memory used: %M kb' $scriptPath $escapedOutputFolder >> ${logFile.absolutePath} 2>&1"
+            "sh" -> "/usr/bin/time -f 'Memory used: %M kb\nElapsed: %E' $scriptPath $escapedOutputFolder >> ${logFile.absolutePath} 2>&1"
 
             "py", "PY" ->
                 """
-                    /usr/bin/time -f "Memory used: %M kb" ${getApptainerBaseCommand(hpcConnection.pythonImage)} '
-                        mamba activate ${condaEnvName ?: "pythonbase"};
-                        python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath >> ${logFile.absolutePath} 2>&1
-                    '
+                    /usr/bin/time -f "Memory used: %M kb\nElapsed: %E" ${getApptainerBaseCommand(hpcConnection.pythonImage)} '
+                        source /.bashrc; mamba activate ${condaEnvName ?: "pythonbase"};
+                        python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath
+                    ' >> ${logFileAbsolute} 2>&1
                 """.trimIndent()
 
             else -> throw RuntimeException("Unsupported script extension $scriptPath")
