@@ -136,8 +136,14 @@ class HPCRun(
     }
 
     private fun getApptainerBaseCommand(image: ApptainerImage, edit:Boolean = false): String {
+        // Apptainer options selected:
+        // -q for --quiet: remove INFO logs that appeared for every apptainer command.
+        // -p for --pid: separate PID namespace from the host machine.
+        // --env "TINI_SUBREAPER=true": Allow Tini to collect zombie processes, even if not running as PID 1.
+        // --overlay <...>: The overlay is the equivalent of the docker container. It allows local modifications to the image.
+        // --fakeroot: give the container the impression that it's root. Necessary with the overlay.
         return """
-            apptainer run --pid --env "TINI_SUBREAPER=true"
+            apptainer -q run -p --env "TINI_SUBREAPER=true"
                 --fakeroot --overlay ${image.overlayPath}${if(edit) "" else ":ro"}
                 -B ${hpcConnection.hpcScriptsRoot}:$scriptsRoot
                 -B ${hpcConnection.hpcScriptStubsRoot}:$scriptStubsRoot
