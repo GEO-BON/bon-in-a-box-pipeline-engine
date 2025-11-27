@@ -309,17 +309,16 @@ class HPCConnection(
 
             } else {
                 toDelete?.let {
+                    logFile?.appendText("""
+                            Removing files from HPC (if exists):
+                            ${toDelete.joinToString("\n") { " - $it" }}
+
+                        """
+                        .trimIndent()
+                        .also { logger.debug(it) })
+
                     // files are relative to our root:
                     val toDeleteAbsolute = toDelete.map { file -> File(hpcRoot, file.absolutePath.removePrefix("/")).absolutePath }
-
-                    logFile?.appendText("""
-                        Removing files from HPC (if exists):
-                        ${toDeleteAbsolute.joinToString("\n") { " - $it" }}
-
-                    """
-                    .trimIndent()
-                    .also { logger.debug(it) })
-
                     systemCall.run(sshCommand +  "rm -rf ${toDeleteAbsolute.joinToString(" ")};", logFile = logFile)
                 }
 
