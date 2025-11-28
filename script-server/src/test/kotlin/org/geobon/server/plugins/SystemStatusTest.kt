@@ -1,6 +1,7 @@
 package org.geobon.server.plugins
 
 import org.geobon.pipeline.outputRoot
+import java.io.File
 import kotlin.test.*
 
 

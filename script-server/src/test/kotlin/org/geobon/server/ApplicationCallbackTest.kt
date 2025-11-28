@@ -1,7 +1,7 @@
 package org.geobon.server
 
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*

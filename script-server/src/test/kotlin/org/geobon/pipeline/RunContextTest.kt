@@ -1,10 +1,13 @@
 package org.geobon.pipeline
 
-import io.kotest.extensions.system.withEnvironment
 import org.geobon.server.plugins.Containers
-import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
+import io.kotest.extensions.system.withEnvironment
+import org.json.JSONObject
 
 internal class RunContextTest {
     @BeforeTest

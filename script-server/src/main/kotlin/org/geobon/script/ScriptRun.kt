@@ -2,8 +2,10 @@ package org.geobon.script
 
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import org.geobon.pipeline.RunContext
 import org.geobon.server.plugins.Containers
+import org.geobon.utils.runToText
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -12,6 +14,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import java.io.InputStreamReader
+import java.io.BufferedReader
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.DurationUnit

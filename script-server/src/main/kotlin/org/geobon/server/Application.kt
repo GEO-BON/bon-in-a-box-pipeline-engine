@@ -2,9 +2,7 @@ package org.geobon.server
 
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import org.geobon.server.plugins.checkCacheVersion
-import org.geobon.server.plugins.configureRouting
-import org.geobon.server.plugins.configureSerialization
+import org.geobon.server.plugins.*
 
 fun main(args: Array<String>): Unit =
     io.ktor.server.netty.EngineMain.main(args)
