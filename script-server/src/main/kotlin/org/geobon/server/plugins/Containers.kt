@@ -1,7 +1,6 @@
 package org.geobon.server.plugins
 
 import org.geobon.utils.runToText
-import org.json.JSONObject
 
 enum class Containers(
     val containerName: String,
