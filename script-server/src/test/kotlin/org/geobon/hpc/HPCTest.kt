@@ -11,7 +11,6 @@ import org.geobon.utils.createMockHPCContext
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import kotlin.test.assertContains
 import kotlin.test.assertTrue
 
 class HPCTest {
@@ -198,6 +197,7 @@ class HPCTest {
         val step = mockHPCStep()
         val mockCommand = """echo "test job command" """
         val run = mockRun(step, mockCommand)
+        every { run.fail(any()) } just runs
 
         hpc.ready(run)
         verify { hpc.connection.sendJobs(listOf(mockCommand), any()) }
@@ -205,13 +205,7 @@ class HPCTest {
         delay(retrieveSyncInterval * 20)
         // After 10 failures it should have stopped
         coVerify(exactly=10) { hpc.connection.retrieveFiles(allAny()) }
-
-        val resultFile = step.context!!.resultFile
-        assertTrue(resultFile.exists())
-        val resultFileContent = resultFile.readText()
-        assertContains(resultFileContent, "error")
-        assertContains(resultFileContent, "Sync problem")
-
+        verify { run.fail( match { it.contains("Sync problem") }) }
         hpc.unregister(step)
     }
 }

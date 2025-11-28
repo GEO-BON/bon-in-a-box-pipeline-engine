@@ -1,13 +1,12 @@
 package org.geobon.hpc
 
 import io.mockk.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import org.geobon.pipeline.AggregatePipe
-import org.geobon.pipeline.ConstantPipe
-import org.geobon.pipeline.ScriptStep
-import org.geobon.pipeline.StepId
-import org.geobon.pipeline.outputRoot
+import org.geobon.pipeline.*
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
@@ -100,6 +99,7 @@ internal class HPCRunTest {
                         )
                     )
                 },
+                match { it.contains(outputFolder) },
                 any()
             )
         }
@@ -211,6 +211,7 @@ internal class HPCRunTest {
     fun `given script has files and array of files inputs_when execute_then all files are sent`() = runTest {
         every { hpc.register(any()) } just runs
         every { hpc.unregister(any()) } just runs
+        coEvery { connection.syncFiles(allAny()) } just runs
         every { hpc.ready(any()) } answers {
             this@runTest.launch {
                 Thread.sleep(100)
@@ -280,7 +281,7 @@ internal class HPCRunTest {
         verify(exactly = 1) { hpc.register(any()) }
 
         val filesSlot = slot<List<File>>()
-        coEvery {connection.syncFiles(capture(filesSlot), any())} just runs
+        coEvery {connection.syncFiles(capture(filesSlot), any(), any())} just runs
         step.execute()
 
         assertTrue(filesSlot.isCaptured)
@@ -312,7 +313,7 @@ internal class HPCRunTest {
         )
 
         connection.apply {
-            coEvery { runCommand(any()) } just runs
+            coEvery { runCommand(allAny()) } just runs
             coEvery { syncFiles(allAny()) } just runs
             every { ready } returns true
             every { hpcRoot } returns "hpcRoot"
@@ -344,13 +345,11 @@ internal class HPCRunTest {
             e.printStackTrace()
         }
 
-        coVerify {
-            connection.runCommand(match { it.contains("somePackage=0.0.0") })
-        }
+        // If this file is there, it has been synced with the rest.
+        assertTrue(File(step.context!!.outputFolder, "HPCCondaTest.conda.yml").exists())
         coVerifyOrder {
             hpc.register(step)
             connection.syncFiles(allAny())
-            connection.runCommand(any())
             hpc.ready(any())
             hpc.unregister(step)
         }

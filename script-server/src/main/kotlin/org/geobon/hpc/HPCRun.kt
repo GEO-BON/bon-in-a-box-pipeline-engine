@@ -13,7 +13,6 @@ import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.ServerContext.Companion.userDataRoot
 import java.io.File
 import java.util.concurrent.TimeoutException
-import kotlin.io.appendText
 import kotlin.time.Duration
 
 class HPCRun(
@@ -39,7 +38,7 @@ class HPCRun(
         val watchChannel = context.outputFolder.asWatchChannel()
         try {
             coroutineScope {
-                val condaEnvFile = File(context.outputFolder, "$condaEnvName.yml")
+                val condaEnvFile = File(context.outputFolder, "$condaEnvName.conda.yml")
                 if(condaEnvYml != null && condaEnvName != null) {
                     condaEnvFile.writeText(condaEnvYml)
                 }
@@ -62,7 +61,6 @@ class HPCRun(
                     if(condaEnvYml != null && condaEnvName != null) {
                         logFile.appendText("Syncing conda environment towards HPC...\n")
                         val condaEnvWrapper = "$scriptStubsRoot/system/condaEnvironmentHPC.sh"
-                        val condaEnvFileOnHPC = File(context.outputFolder, condaEnvName)
 
                         hpcConnection.runCommand("""
                             module load apptainer
@@ -165,7 +163,7 @@ class HPCRun(
                 """
                     /usr/bin/time -f "Memory used: %M kb\nElapsed: %E" ${getApptainerBaseCommand(hpcConnection.juliaImage)} '
                         julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath
-                    ' >> ${logFileAbsolute} 2>&1
+                    ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
 
             "r", "R" ->
@@ -173,7 +171,7 @@ class HPCRun(
                     ${getApptainerBaseCommand(hpcConnection.rImage)} '
                         source /.bashrc; mamba activate ${condaEnvName ?: "rbase"};
                         Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath
-                    ' >> ${logFileAbsolute} 2>&1
+                    ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
 
             "sh" -> "/usr/bin/time -f 'Memory used: %M kb\nElapsed: %E' $scriptPath $escapedOutputFolder >> ${logFile.absolutePath} 2>&1"
@@ -183,7 +181,7 @@ class HPCRun(
                     /usr/bin/time -f "Memory used: %M kb\nElapsed: %E" ${getApptainerBaseCommand(hpcConnection.pythonImage)} '
                         source /.bashrc; mamba activate ${condaEnvName ?: "pythonbase"};
                         python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath
-                    ' >> ${logFileAbsolute} 2>&1
+                    ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
 
             else -> throw RuntimeException("Unsupported script extension $scriptPath")

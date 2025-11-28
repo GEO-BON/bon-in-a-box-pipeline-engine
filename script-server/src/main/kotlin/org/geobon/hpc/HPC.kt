@@ -2,9 +2,6 @@ package org.geobon.hpc
 
 import kotlinx.coroutines.*
 import org.geobon.pipeline.ScriptStep
-import org.geobon.script.Run.Companion.ERROR_KEY
-import org.json.JSONObject
-import java.io.File
 import java.util.*
 
 open class HPC (
@@ -53,8 +50,10 @@ open class HPC (
      * Send tasks if they are all ready, or if the defined threshold is met.
      */
     private fun verifySend() {
-        val readyTasks = mutableMapOf<ScriptStep, HPCRun>()
+        val tasksToSend = mutableMapOf<ScriptStep, HPCRun>()
+
         synchronized(registeredSteps) {
+            val readyTasks = mutableMapOf<ScriptStep, HPCRun>()
             // filter non null values
             registeredSteps.forEach { it.value?.let { value -> readyTasks[it.key] = value } }
 
@@ -64,19 +63,24 @@ open class HPC (
                 readyTasks.forEach {
                     registeredSteps.remove(it.key)
                 }
-                runningSteps.putAll(readyTasks)
+                tasksToSend.putAll(readyTasks)
+                runningSteps.putAll(tasksToSend)
             }
         }
 
-        if(readyTasks.isNotEmpty()) {
+        if(tasksToSend.isNotEmpty()) {
             try {
-                val jobsToSend = readyTasks.map { it.value.getCommand() }
+                val jobsToSend = tasksToSend.map { it.value.getCommand() }
                 connection.sendJobs(
                     jobsToSend,
-                    readyTasks.map { it.value.context.logFile }
+                    tasksToSend.map { it.value.context.logFile }
                 )
+
             } catch (e:Exception) {
-                readyTasks.values.forEach { it.fail("Failed to send job to HPC. Cancelling.") }
+                tasksToSend.forEach {
+                    it.value.fail("Failed to send job to HPC: ${e.message}\nCancelling.")
+                    runningSteps.remove(it.key)
+                }
             }
         }
 
@@ -100,19 +104,15 @@ open class HPC (
                     // + use of coroutines and delay makes sure that no thread is reserved.
                     while (isActive) {
                         delay(retrieveSyncInterval)
-                        val files = runningSteps.values.map { it.context.outputFolder }
+                        val runs = runningSteps.values.filterNotNull()
+                        val files = runs.map { it.context.outputFolder }
                         try {
                             connection.retrieveFiles(files)
                         } catch (e: Exception) {
                             println("Cannot retrieve files: ${e.message}")
                             failCount++
                             if (failCount >= 10) {
-                                val failedOutput = JSONObject()
-                                failedOutput.put(
-                                    ERROR_KEY,
-                                    "Syncing files back from HPC failed multiple times. \n${e.message}"
-                                )
-                                runningSteps.forEach { it.value.resultFile.writeText(failedOutput.toString()) }
+                                runs.forEach { it.fail("Syncing files back from HPC failed multiple times. \n${e.message}") }
                                 cancel() // stops the recurrent retrieve job
                             }
                         }

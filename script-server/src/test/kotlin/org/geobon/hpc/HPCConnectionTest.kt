@@ -211,6 +211,7 @@ class HPCConnectionTest {
 
     @Test
     fun givenAListOfValidFiles_whenSent_thenAllAreSent() = runTest {
+        createSshFiles()
         withEnvironment(testEnvironment) {
             val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/output.txt")
             someOutput.parentFile.mkdirs()
@@ -250,6 +251,7 @@ class HPCConnectionTest {
 
     @Test
     fun givenAListWithInvalidFiles_whenSent_thenInvalidAreNotSent() = runTest {
+        createSshFiles()
         withEnvironment(testEnvironment) {
             val someOutput = File(outputRoot, "someScript/hasdfdflgjkl/output.txt")
             someOutput.parentFile.mkdirs()
