@@ -2,7 +2,6 @@ package org.geobon.pipeline
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import java.io.File
 import kotlin.test.*
 

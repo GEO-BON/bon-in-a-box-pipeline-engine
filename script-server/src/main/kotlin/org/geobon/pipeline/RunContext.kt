@@ -13,7 +13,6 @@ import org.geobon.utils.toMD5
 import org.json.JSONObject
 import java.io.File
 import kotlin.math.floor
-import kotlin.text.replace
 
 val outputRoot = File(System.getenv("OUTPUT_LOCATION"))
 

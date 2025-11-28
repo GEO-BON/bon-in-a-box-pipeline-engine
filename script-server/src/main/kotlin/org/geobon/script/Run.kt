@@ -2,7 +2,6 @@ package org.geobon.script
 
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.geobon.pipeline.RunContext
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.TimeSource.Monotonic.markNow
 
