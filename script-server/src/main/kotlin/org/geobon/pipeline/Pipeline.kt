@@ -1,6 +1,8 @@
 package org.geobon.pipeline
 
 import kotlinx.coroutines.*
+import org.geobon.script.Description.IO__LABEL
+import org.geobon.script.Description.IO__TYPE
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
@@ -272,7 +274,7 @@ open class Pipeline (
                                 type,
                                 pipelineJSON.optJSONObject(INPUTS)
                                     ?.optJSONObject(userInputId.toString())
-                                    ?.optString(INPUTS__LABEL, null)
+                                    ?.optString(IO__LABEL, null)
                             )
                         }
 
@@ -338,7 +340,7 @@ open class Pipeline (
                 inputsJSON.keySet().forEach { key ->
                     val inputSpec = inputsSpec.optJSONObject(key)
                         ?: throw RuntimeException("Input received \"$key\" is not listed in pipeline inputs. Listed inputs are ${inputsSpec.keySet()}")
-                    val type = inputSpec.getString(INPUTS__TYPE)
+                    val type = inputSpec.getString(IO__TYPE)
 
                     constants[key] = createConstant(key, inputsJSON, type, key)
                 }

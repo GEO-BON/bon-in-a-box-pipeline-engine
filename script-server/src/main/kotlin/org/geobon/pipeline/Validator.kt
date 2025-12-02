@@ -1,6 +1,7 @@
 package org.geobon.pipeline
 
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
+import org.geobon.script.Description.IO__EXAMPLE
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.json.JSONObject
@@ -30,7 +31,7 @@ object Validator {
                 inputsSpec.optJSONObject(key)?.let { inputSpec ->
                     fakeInputs.put(
                         key,
-                        inputSpec.opt(INPUTS__EXAMPLE) ?: JSONObject.NULL
+                        inputSpec.opt(IO__EXAMPLE) ?: JSONObject.NULL
                     )
                 }
             }
