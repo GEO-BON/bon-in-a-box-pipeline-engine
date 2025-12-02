@@ -29,4 +29,6 @@ conda:
     - somePackage=0.0.0
 
 hpc:
-  memory: 1G
+  mem: 1G
+  cpus-per-task: 1
+  time: 3

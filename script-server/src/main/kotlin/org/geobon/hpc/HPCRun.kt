@@ -13,14 +13,12 @@ import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.ServerContext.Companion.userDataRoot
 import java.io.File
 import java.util.concurrent.TimeoutException
-import kotlin.time.Duration
 
 class HPCRun(
     context: RunContext,
     scriptFile: File,
     private val inputPipes: Map<String, Pipe>,
     val requirements: HPCRequirements,
-    private val timeout: Duration = DEFAULT_TIMEOUT, // TODO Timeout implementation
     private val condaEnvName: String? = null,
     private val condaEnvYml: String? = null
 ) : Run(scriptFile, context) {

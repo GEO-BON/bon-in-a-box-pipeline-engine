@@ -86,15 +86,15 @@ class ScriptStep : YMLStep {
                     val hpcSection = yamlParsed[HPC]
                     if (hpcSection is Map<*, *> && context.serverContext.hpc?.connection?.ready == true) {
                         val memory = (hpcSection[Description.HPC__MEMORY] as? String)?.let {
-                            Regex("""(\d+)G""").find(it)?.groups?.first()?.value?.toInt() // Get rid of the G
+                            Regex("""(\d+)G""").find(it)?.groups?.get(1)?.value?.toInt() // Get rid of the G
                         } ?: throw RuntimeException("HPC ${Description.HPC__MEMORY} parameter is not formatted as gigabytes. \nExample: 30G \nGot: ${hpcSection[Description.HPC__MEMORY]}")
 
-                        val cpus = (hpcSection[Description.HPC__CPUS] as? String)?.toInt()
+                        val cpus = hpcSection[Description.HPC__CPUS] as? Int
                             ?: throw RuntimeException("HPC ${Description.HPC__CPUS} parameter should be an int. Got: ${hpcSection[Description.HPC__CPUS]}")
 
                         // See https://slurm.schedmd.com/sbatch.html#OPT_time
                         val duration = Duration.fromSlurm(
-                            (hpcSection[Description.HPC__CPUS] as? String)
+                            hpcSection[Description.HPC__CPUS]?.toString() // can be considered an int if only minutes provided
                                 ?: throw RuntimeException("HPC ${Description.HPC__DURATION} parameter missing.")
                         )
 
@@ -107,7 +107,6 @@ class ScriptStep : YMLStep {
                                 cpus,
                                 duration
                             ),
-                            specificTimeout ?: Run.DEFAULT_TIMEOUT,
                             condaEnvName,
                             condaEnvYml
                         )
