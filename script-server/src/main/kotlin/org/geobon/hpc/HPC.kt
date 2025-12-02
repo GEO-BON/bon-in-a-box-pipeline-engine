@@ -3,6 +3,7 @@ package org.geobon.hpc
 import kotlinx.coroutines.*
 import org.geobon.pipeline.ScriptStep
 import java.util.*
+import kotlin.time.Duration.Companion.seconds
 
 open class HPC (
     val connection: HPCConnection,
@@ -73,6 +74,11 @@ open class HPC (
                 val jobsToSend = tasksToSend.map { it.value.getCommand() }
                 connection.sendJobs(
                     jobsToSend,
+                    HPCRequirements(
+                        tasksToSend.values.maxOf { it.requirements.memoryG },
+                        tasksToSend.values.maxOf { it.requirements.cpus },
+                        tasksToSend.values.sumOf { it.requirements.duration.inWholeSeconds }.seconds
+                    ),
                     tasksToSend.map { it.value.context.logFile }
                 )
 

@@ -7,6 +7,7 @@ import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.SystemCall
 import org.geobon.utils.run
+import org.geobon.utils.toSlurmDuration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -346,7 +347,7 @@ class HPCConnection(
         }
     }
 
-    fun sendJobs(tasksToSend: List<String>, logFiles: List<File> = listOf()) {
+    fun sendJobs(tasksToSend: List<String>, requirements: HPCRequirements, logFiles: List<File> = listOf()) {
         if(!ready || sshCommand == null) {
             logger.warn("Cannot send jobs to HPC while not ready")
             return
@@ -356,9 +357,9 @@ class HPCConnection(
         val sBatchFileLocal = File(outputRoot, "boninabox_$timestamp.sbatch")
         sBatchFileLocal.writeText("""
             #!/bin/bash
-            #SBATCH --mem=1G
-            #SBATCH --cpus-per-task=1
-            #SBATCH --time=00:03:00
+            #SBATCH --mem=${requirements.memoryG}G
+            #SBATCH --cpus-per-task=${requirements.cpus}
+            #SBATCH --time=${requirements.duration.toSlurmDuration()}
             #SBATCH --nodes=1
             #SBATCH --signal=B:SIGINT
             ${account?.isNotBlank().let { "#SBATCH --account=$account" }}

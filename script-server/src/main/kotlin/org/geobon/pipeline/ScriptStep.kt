@@ -1,6 +1,8 @@
 package org.geobon.pipeline
 
+import org.geobon.hpc.HPCRequirements
 import org.geobon.hpc.HPCRun
+import org.geobon.script.Description
 import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
 import org.geobon.script.Description.HPC
@@ -10,8 +12,10 @@ import org.geobon.script.DockerizedRun
 import org.geobon.script.Run
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.geobon.utils.fromSlurm
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 
@@ -79,11 +83,30 @@ class ScriptStep : YMLStep {
                         }
                     }
 
-                    if (context.serverContext.hpc?.connection?.ready == true && yamlParsed[HPC] != null) {
+                    val hpcSection = yamlParsed[HPC]
+                    if (hpcSection is Map<*, *> && context.serverContext.hpc?.connection?.ready == true) {
+                        val memory = (hpcSection[Description.HPC__MEMORY] as? String)?.let {
+                            Regex("""(\d+)G""").find(it)?.groups?.first()?.value?.toInt() // Get rid of the G
+                        } ?: throw RuntimeException("HPC ${Description.HPC__MEMORY} parameter is not formatted as gigabytes. \nExample: 30G \nGot: ${hpcSection[Description.HPC__MEMORY]}")
+
+                        val cpus = (hpcSection[Description.HPC__CPUS] as? String)?.toInt()
+                            ?: throw RuntimeException("HPC ${Description.HPC__CPUS} parameter should be an int. Got: ${hpcSection[Description.HPC__CPUS]}")
+
+                        // See https://slurm.schedmd.com/sbatch.html#OPT_time
+                        val duration = Duration.fromSlurm(
+                            (hpcSection[Description.HPC__CPUS] as? String)
+                                ?: throw RuntimeException("HPC ${Description.HPC__DURATION} parameter missing.")
+                        )
+
                         HPCRun(
                             context,
                             scriptFile,
                             inputs,
+                            HPCRequirements(
+                                memory,
+                                cpus,
+                                duration
+                            ),
                             specificTimeout ?: Run.DEFAULT_TIMEOUT,
                             condaEnvName,
                             condaEnvYml

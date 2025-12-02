@@ -48,3 +48,9 @@ fun Duration.Companion.fromSlurm(value: String): Duration {
     )
 
 }
+
+/**
+ * Expresses as a valid slurm string.
+ * In this case, we just display it as a large number of minutes.
+ */
+fun Duration.toSlurmDuration(): Long = this.inWholeMinutes

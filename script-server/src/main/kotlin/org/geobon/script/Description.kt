@@ -21,4 +21,7 @@ object Description {
     const val CONDA__NAME = "name"
 
     const val HPC = "hpc"
+    const val HPC__MEMORY = "mem"
+    const val HPC__CPUS = "cpus-per-task"
+    const val HPC__DURATION = "time"
 }

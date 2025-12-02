@@ -19,6 +19,7 @@ class HPCRun(
     context: RunContext,
     scriptFile: File,
     private val inputPipes: Map<String, Pipe>,
+    val requirements: HPCRequirements,
     private val timeout: Duration = DEFAULT_TIMEOUT, // TODO Timeout implementation
     private val condaEnvName: String? = null,
     private val condaEnvYml: String? = null
