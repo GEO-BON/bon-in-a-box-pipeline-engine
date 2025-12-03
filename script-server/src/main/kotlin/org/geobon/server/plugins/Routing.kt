@@ -315,7 +315,7 @@ fun Application.configureRouting() {
                     return@post
                 }
 
-                val secretKey = "6LdzGRIsAAAAAO34nuh3-WDyjQnJNAUFKgr86mwX"
+                val secretKey = System.getenv("RECAPTCHA_SERVER_KEY")
                 if (secretKey.isNullOrEmpty()) {
                     logger.warn("RECAPTCHA_SECRET_KEY environment variable is not set")
                     call.respond(
@@ -341,7 +341,7 @@ fun Application.configureRouting() {
                 if (verifyResponse.statusCode() == 200) {
                     val responseJSON = JSONObject(verifyResponse.body())
                     val success = responseJSON.optBoolean("success", false)
-                    
+
                     if (success) {
                         call.respond(gson.toJson(mapOf("success" to true)))
                     } else {

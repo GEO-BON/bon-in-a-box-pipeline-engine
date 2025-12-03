@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { CustomButtonGreen } from "./CustomMUI";
 
-const RECAPTCHA_SITE_KEY = "6LdzGRIsAAAAADsYxXjmBi4m5r8bPnqaIlsKkFDL";
+const RECAPTCHA_SITE_KEY = "6LffRSAsAAAAAEpm931BdxnEUqTTCU6aYQUQt5aJ";
 
 export default function CaptchaGate({ children }) {
 
