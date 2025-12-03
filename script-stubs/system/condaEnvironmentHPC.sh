@@ -18,18 +18,17 @@ function activateBaseEnvironment {
 function activateSubEnvironment {
     set -o pipefail
 
-    n=$RANDOM
     condaEnvFile="/conda-env-yml/$condaEnvName.yml"
 
     if [ ! -f "$condaEnvFile" ]; then
         mamba env list | grep " $condaEnvName "
-        if [[ $retCode -eq 0 ]] ; then
+        if [[ $? -eq 0 ]] ; then
             echo "Conda environment listed, will attempt updating..."
         else
             echo "Creating new conda environment $condaEnvName..."
             mamba env create -y -f "$condaEnvFileSrc" 2>&1 | tee "$tmpLog"
 
-            if [[ $retCode -eq $? ]] ; then
+            if [[ $? -eq 0 ]] ; then
                 mv $condaEnvFileSrc $condaEnvFile ; assertSuccess
                 echo "Created successfully."
             else
