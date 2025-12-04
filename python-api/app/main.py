@@ -28,6 +28,12 @@ LOAD spatial;
 LOAD httpfs;
 """)
 
+countries_parquet = "https://data.fieldmaps.io/adm0/osm/intl/adm0_polygons.parquet"
+regions_parquet = "https://data.fieldmaps.io/edge-matched/humanitarian/intl/adm1_polygons.parquet"
+
+ddb.sql("CREATE TABLE countries AS SELECT adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % countries_parquet)
+ddb.sql("CREATE TABLE regions AS SELECT adm1_src, adm1_name, adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % regions_parquet)
+
 @app.get("/")
 def read_root():
     return {"Title": "BON in a Box Python API"}
@@ -35,14 +41,14 @@ def read_root():
 
 @app.get("/countries_list")
 def gadm_country_names():
-    names = pg.AdmNames(complete=False, content_level=-1)
+    names=ddb.sql("SELECT * FROM countries")
     return names.to_dict(orient='records')
 
 @app.get("/regions_list")
-def gadm_region_names(country_gid:str, level:int=1):
-    names = pg.AdmNames(complete=True, admin=country_gid, content_level=level)
+def region_names(country_iso:str, level:int=1):
+    names=ddb.sql("SELECT * FROM regions WHERE adm0_src = '%s'" % country_iso)
     if names.empty:
-        return {"error": "Country GID not found"}
+        return {"error": "Country ISO not found"}
     return names.to_dict(orient='records')
 
 @app.get("/geometry")
