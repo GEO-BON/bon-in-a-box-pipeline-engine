@@ -50,4 +50,15 @@ class SlurmDurationTest {
 
         shouldThrow<IllegalArgumentException> { Duration.fromSlurm("whatever") }
     }
+
+    @Test
+    fun givenDuration_whenOutput_thenValueInMinutes() {
+        assertEquals(1440, 1.days.toSlurmDuration())
+        assertEquals(120, 2.hours.toSlurmDuration())
+        assertEquals(3, 3.minutes.toSlurmDuration())
+        assertEquals(0, 4.seconds.toSlurmDuration())
+
+        // Full cycle
+        assertEquals(62, Duration.fromSlurm("1:02:03").toSlurmDuration())
+    }
 }
