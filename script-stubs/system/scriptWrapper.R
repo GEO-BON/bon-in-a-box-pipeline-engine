@@ -56,12 +56,12 @@ withCallingHandlers(source(scriptFile),
 )
 
 if(length(biab_output_list) > 0) {
-    cat("Writing outputs to BON in a Box...")
+    cat("Writing outputs to BON in a Box...\n")
     jsonData <- toJSON(biab_output_list, indent=2)
     write(jsonData, file.path(outputFolder,"output.json"))
 }
 
-cat("Writing dependencies to file...")
+cat("Writing dependencies to file...\n")
 capture.output(sessionInfo(), file = paste0(outputFolder, "/dependencies.txt"))
 cat(" done.\n")
 
