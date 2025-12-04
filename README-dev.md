@@ -263,10 +263,10 @@ To connect to the DRAC automation node, you will need
 3. Create an ssh config file dedicated to BON in a Box, with the details for your HPC's automation node as such:
     ```
     host yourHPC
-     hostname robot.yourHPC.domain.edu
-     user yourUser
-     identitiesonly yes
-     requesttty no
+      hostname robot.yourHPC.domain.edu
+      user yourUser
+      identitiesonly yes
+      requesttty no
     ```
 3. Configure all the HPC_ environment variables in runner.env. (Make sure your runner.env contains all the HPC_ variables in the up-to-date runner-sample.env)
 4. Start the BON in a Box server normally.
@@ -281,3 +281,10 @@ stateDiagram-v2
     PREPARING --> READY
     PREPARING --> ERROR
 ```
+
+### Limitations
+The current implementation is basic, and has the following limitations:
+- Batches must be started via API call (for ex. a script sending curl calls)
+- Conda is supported, but: it is not possible for two HPC-enabled tasks to verify or edit the conda environment withing the apptainer image at the same time. Only one writeable access can be granted to the overlay.
+- Max 1 HPC-enabled script per pipeline.
+- Steps are grouped together by batches of max 10 to create a SLURM job. The max memory and CPU are used, and the sum of times.
