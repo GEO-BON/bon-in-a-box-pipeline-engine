@@ -20,7 +20,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ddb = duckdb.connect()
+ddb = duckdb.connect("/app/duckdb.db")
+
 ddb.sql("""
 INSTALL spatial;
 INSTALL httpfs;
@@ -31,13 +32,12 @@ LOAD httpfs;
 countries_parquet = "https://data.fieldmaps.io/adm0/osm/intl/adm0_polygons.parquet"
 regions_parquet = "https://data.fieldmaps.io/edge-matched/humanitarian/intl/adm1_polygons.parquet"
 
-ddb.sql("CREATE TABLE countries AS SELECT adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % countries_parquet)
-ddb.sql("CREATE TABLE regions AS SELECT adm1_src, adm1_name, adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % regions_parquet)
+ddb.sql("CREATE TABLE IF NOT EXISTS countries AS SELECT adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % countries_parquet)
+ddb.sql("CREATE TABLE IF NOT EXISTS regions AS SELECT adm1_src, adm1_name, adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % regions_parquet)
 
 @app.get("/")
 def read_root():
     return {"Title": "BON in a Box Python API"}
-
 
 @app.get("/countries_list")
 def gadm_country_names():
@@ -45,7 +45,7 @@ def gadm_country_names():
     return names.to_dict(orient='records')
 
 @app.get("/regions_list")
-def region_names(country_iso:str, level:int=1):
+def region_names(country_iso:str):
     names=ddb.sql("SELECT * FROM regions WHERE adm0_src = '%s'" % country_iso)
     if names.empty:
         return {"error": "Country ISO not found"}
