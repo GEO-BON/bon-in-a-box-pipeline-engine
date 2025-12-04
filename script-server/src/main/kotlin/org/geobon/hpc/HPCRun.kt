@@ -62,11 +62,12 @@ class HPCRun(
                         val condaEnvWrapper = "$scriptStubsRoot/system/condaEnvironmentHPC.sh"
 
                         hpcConnection.runCommand("""
-                            module load apptainer
-                            ${getApptainerBaseCommand(hpcConnection.condaImage, true)} ' \
-                                source $condaEnvWrapper ${context.outputFolderEscaped} "$condaEnvName" "$condaEnvFile" \
-                            '
-                        """.replace(Regex("""\s*\\\n\s*"""), " "), 30, logFile)
+                                module load apptainer && ${getApptainerBaseCommand(hpcConnection.condaImage, true)} '
+                                    source $condaEnvWrapper ${context.outputFolderEscaped} "$condaEnvName" "$condaEnvFile"
+                                '
+                            """.replace(Regex("""\s*\n\s*"""), " "),
+                            30,
+                            logFile)
 
                         // Send edited log file to HPC
                         hpcConnection.syncFiles(listOf(context.logFile), null, logFile)
