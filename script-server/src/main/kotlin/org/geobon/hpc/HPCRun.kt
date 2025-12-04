@@ -168,7 +168,7 @@ class HPCRun(
 
             "r", "R" ->
                 """
-                    ${getApptainerBaseCommand(hpcConnection.rImage)} '
+                    /usr/bin/time -f "Memory used: %M kb\nElapsed: %E" ${getApptainerBaseCommand(hpcConnection.rImage)} '
                         source /.bashrc; mamba activate ${condaEnvName ?: "rbase"};
                         Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath
                     ' >> $logFileAbsolute 2>&1
