@@ -133,21 +133,6 @@ export const getStateAPI = async (country_iso) => {
   return result;
 };
 
-export const getBBox = async (gid) => {
-  let result;
-  const base_url = "/region/bbox";
-  try {
-    result = await axios({
-      method: "get",
-      baseURL: `${base_url}`,
-      params: { gid: gid },
-    });
-  } catch (error) {
-    result = { data: null };
-  }
-  return result;
-};
-
 export const getProjestAPI = async (geojson) => {
   let result;
   const base_url = "https://projest.io/ns/api/";

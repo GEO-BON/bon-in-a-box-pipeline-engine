@@ -22,12 +22,7 @@ import Extent from "ol/interaction/Extent";
 import Modify from "ol/interaction/Modify.js";
 import * as turf from "@turf/turf";
 import proj4 from "proj4";
-import {
-  transformPolyToBboxCRS,
-  cleanBbox,
-  getBBox,
-  defaultCRS,
-} from "./utils";
+import { transformPolyToBboxCRS, cleanBbox, defaultCRS } from "./utils";
 
 export default function MapOpenLayers({
   states,
@@ -385,18 +380,12 @@ export default function MapOpenLayers({
         (states.country.ISO3 || states.region.regionGID)
       ) {
         // The bounding box is gone, try to reuse the country one, if available
-        getBBox(
-          states.region.regionGID
-            ? states.region.regionGID
-            : states.country.ISO3
-        ).then((b) => {
-          dispatch({
-            bbox: b,
-            CRS: defaultCRS,
-            type: "changeBboxCRS",
-          });
-          setOldCRS(defaultCRS);
+        dispatch({
+          bbox: states.country.bboxWGS84,
+          CRS: defaultCRS,
+          type: "changeBboxCRS",
         });
+        setOldCRS(defaultCRS);
       }
     }
   }, [states.actions, oldCRS]);
