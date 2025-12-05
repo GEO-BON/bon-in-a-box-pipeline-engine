@@ -43,12 +43,12 @@ export default function CountryRegionMenu({
         setCountryOptions([]);
         return;
       }
-      const unresp = response.data.filter(
+      const resp = response.data.filter(
         (obj, index, self) =>
           index === self.findIndex((o) => o.adm0_name === obj.adm0_name) &&
           obj.adm0_name !== null
       );
-      let countryOpts = unresp.map((country) => ({
+      let countryOpts = resp.map((country) => ({
         label: country.adm0_name,
         value: country.adm0_src,
         bbox: Object.values(country.geometry_bbox),
