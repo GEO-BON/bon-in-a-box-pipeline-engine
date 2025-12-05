@@ -118,14 +118,14 @@ export const getCountriesAPI = async () => {
   return result;
 };
 
-export const getStateAPI = async (country_gid) => {
+export const getStateAPI = async (country_iso) => {
   let result;
   const base_url = "/region/regions_list";
   try {
     result = await axios({
       method: "get",
       baseURL: `${base_url}`,
-      params: { country_gid: country_gid },
+      params: { country_iso: country_iso },
     });
   } catch (error) {
     result = { data: null };
@@ -146,7 +146,7 @@ export const getBBox = async (gid) => {
     result = { data: null };
   }
   return result;
-}
+};
 
 export const getProjestAPI = async (geojson) => {
   let result;

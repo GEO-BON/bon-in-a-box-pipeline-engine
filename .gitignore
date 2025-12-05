@@ -19,3 +19,4 @@ pipeline-repo
 
 **/__pycache__/
 
+/python-api/app/*duckdb*

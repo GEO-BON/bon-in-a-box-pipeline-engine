@@ -2,7 +2,6 @@
 # Contains all that is common between production and development configurations.
 
 services:
-
   # This can be accessed within the docker network with http://biab-script-server:8080/script/...
   script-server:
     container_name: biab-script-server
@@ -70,22 +69,20 @@ services:
     depends_on:
       - script-server
 
-  tiler:
-    container_name: biab-tiler
-    image: ghcr.io/developmentseed/titiler:0.18.9
+  biab-python-api:
+    container_name: biab-python-api
+    build: python-api/
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
+      - ./python-api/app:/app:rw
     user: ${MY_UID}:${DOCKER_GID}
     environment:
       PORT: 8000
       WORKERS_PER_CORE: 1
       TITILER_API_CORS_ORIGINS: "*"
+    expose:
+      - "8000"
+      - "8001"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-  
-  biab-python-api:
-    container_name: biab-python-api
-    build: python-api/
-    volumes:
-      - ./python-api/app:/app:rw

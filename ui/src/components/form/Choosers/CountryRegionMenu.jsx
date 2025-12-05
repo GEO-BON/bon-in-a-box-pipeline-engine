@@ -9,6 +9,7 @@ import {
   defaultRegion,
   paperStyle,
 } from "./utils";
+import { bbox } from "@turf/turf";
 
 export default function CountryRegionMenu({
   states,
@@ -38,20 +39,25 @@ export default function CountryRegionMenu({
   useEffect(() => {
     // Fetch country options from the JSON file
     getCountriesAPI().then((response) => {
-      const unresp = response.data.filter((obj, index, self) =>
-        index === self.findIndex((o) => o.NAME_0 === obj.NAME_0)
+      if (response.data === null) {
+        setCountryOptions([]);
+        return;
+      }
+      const unresp = response.data.filter(
+        (obj, index, self) =>
+          index === self.findIndex((o) => o.adm0_name === obj.adm0_name) &&
+          obj.adm0_name !== null
       );
       let countryOpts = unresp.map((country) => ({
-        label: country.NAME_0,
-        value: country.GID_0,
-      }))
+        label: country.adm0_name,
+        value: country.adm0_src,
+        bbox: Object.values(country.geometry_bbox),
+      }));
       countryOpts.sort((a, b) => {
-        return a.label
-          .toLowerCase()
-          .localeCompare(b.label.toLowerCase());
+        return a.label.toLowerCase().localeCompare(b.label.toLowerCase());
       });
       setCountryOptions(countryOpts);
-    })
+    });
   }, []);
 
   // Set from controlled values coming in
@@ -69,6 +75,7 @@ export default function CountryRegionMenu({
         setSelectedCountry({
           label: states.country.englishName,
           value: states.country.ISO3,
+          bbox: states.country.bboxWGS84,
         });
       }
       if (!states.region?.regionName) {
@@ -78,7 +85,8 @@ export default function CountryRegionMenu({
       if (states.region?.regionName !== selectedRegion?.value) {
         setSelectedRegion({
           label: states.region.regionName,
-          value: states.region.regionGID,
+          value: states.region.adm1_src,
+          bbox: states.region.bboxWGS84,
         });
       }
     }
@@ -89,9 +97,10 @@ export default function CountryRegionMenu({
       // Fetch states or provinces based on the selected country
       getStateAPI(selectedCountry.value).then((response) => {
         if (response.data && response.data) {
-          const regionOpts = response.data.map((state) => ({
-            label: state.NAME_1,
-            value: state.GID_1,
+          const regionOpts = response.data.map((reg) => ({
+            label: reg.adm1_name,
+            value: reg.adm1_src,
+            bbox: Object.values(reg.geometry_bbox),
           }));
           setRegionOptions(regionOpts);
           setRegionJSON(response.data);
@@ -126,16 +135,17 @@ export default function CountryRegionMenu({
       country = {
         englishName: countryValue?.label,
         ISO3: countryValue?.value,
+        bboxWGS84: countryValue?.bbox,
       };
     }
     let region = defaultRegion;
     if (regionValue) {
-      region = 
-          {
-            regionName: regionValue?.label,
-            regionGID: regionValue?.value,
-            countryEnglishName: selectedCountry?.label,
-          }
+      region = {
+        regionName: regionValue?.label,
+        regionID: regionValue?.value,
+        countryEnglishName: selectedCountry?.label,
+        bboxWGS84: regionValue?.bbox,
+      };
     }
     if (!country) {
       dispatch({ type: "clear" });

@@ -22,7 +22,12 @@ import Extent from "ol/interaction/Extent";
 import Modify from "ol/interaction/Modify.js";
 import * as turf from "@turf/turf";
 import proj4 from "proj4";
-import { transformPolyToBboxCRS, cleanBbox, getBBox, defaultCRS } from "./utils";
+import {
+  transformPolyToBboxCRS,
+  cleanBbox,
+  getBBox,
+  defaultCRS,
+} from "./utils";
 
 export default function MapOpenLayers({
   states,
@@ -290,22 +295,21 @@ export default function MapOpenLayers({
   useEffect(() => {
     if (states.actions.includes("updateBboxFromCountryRegion")) {
       if (
-        (states.country.ISO3 !=='' ||
-          states.region.regionGID !=='') &&
+        (states.country.ISO3 !== "" || states.region.regionID !== "") &&
         mapp &&
         states.CRS.code &&
         get(`${states.CRS.authority}:${states.CRS.code}`)
       ) {
-        setShowSpinner(true);
-        getBBox(states.region.regionGID ? states.region.regionGID : states.country.ISO3).then((b) => {
-          setDigitize(false);
-          setOldCRS(defaultCRS);
-          dispatch({ bbox: cleanBbox(b.data, "degree"), type: "changeBbox" });
-          setShowSpinner(false);
-        });
+        const bbox = states.region.bboxWGS84
+          ? states.region.bboxWGS84
+          : states.country.bboxWGS84;
+        setDigitize(false);
+        setOldCRS(defaultCRS);
+        dispatch({ bbox: cleanBbox(bbox, "degree"), type: "changeBbox" });
+        setShowSpinner(false);
       } else if (
         states.country.ISO3 == "" &&
-        states.region.regionGID == "" &&
+        states.region.regionID == "" &&
         mapp
       ) {
         clearLayers();
@@ -381,7 +385,11 @@ export default function MapOpenLayers({
         (states.country.ISO3 || states.region.regionGID)
       ) {
         // The bounding box is gone, try to reuse the country one, if available
-        getBBox(states.region.regionGID ? states.region.regionGID : states.country.ISO3).then((b) => {
+        getBBox(
+          states.region.regionGID
+            ? states.region.regionGID
+            : states.country.ISO3
+        ).then((b) => {
           dispatch({
             bbox: b,
             CRS: defaultCRS,
@@ -436,19 +444,25 @@ export default function MapOpenLayers({
           top: "0px",
           left: "0px",
         }}
-      >      {showSpinner && (
-        <div style = {{
-          width: "100%",
-          height: "100%",
-          position: "absolute",
-          zIndex: "90",
-          top: "50%",
-          left: "0px",
-          display: "flex",
-          justifyContent: "center"}}>
+      >
+        {" "}
+        {showSpinner && (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              position: "absolute",
+              zIndex: "90",
+              top: "50%",
+              left: "0px",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <CircularProgress size={60} />
-        </div>
-      )}</div>
+          </div>
+        )}
+      </div>
       {message !== "" && (
         <div
           style={{
