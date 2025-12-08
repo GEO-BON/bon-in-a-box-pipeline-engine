@@ -293,6 +293,18 @@ fun Application.configureRouting() {
             call.respond(Containers.toVersionsMap() + gitInfo)
         }
 
+        get("/api/captcha-config") {
+            val siteKey = System.getenv("RECAPTCHA_SITE_KEY")
+            val serverKey = System.getenv("RECAPTCHA_SERVER_KEY")
+            val enabled = !siteKey.isNullOrEmpty() && !serverKey.isNullOrEmpty()
+            
+            val config = mapOf(
+                "enabled" to enabled,
+                "siteKey" to (if (enabled) siteKey else null)
+            )
+            call.respond(gson.toJson(config))
+        }
+
         post("/api/verify-captcha") {
             try {
                 val requestBody = call.receive<String>()
@@ -317,10 +329,10 @@ fun Application.configureRouting() {
 
                 val secretKey = System.getenv("RECAPTCHA_SERVER_KEY")
                 if (secretKey.isNullOrEmpty()) {
-                    logger.warn("RECAPTCHA_SECRET_KEY environment variable is not set")
+                    logger.warn("RECAPTCHA_SERVER_KEY environment variable is not set - captcha verification disabled")
                     call.respond(
-                        HttpStatusCode.InternalServerError,
-                        gson.toJson(mapOf("success" to false, "error" to "Server configuration error"))
+                        HttpStatusCode.BadRequest,
+                        gson.toJson(mapOf("success" to false, "error" to "reCAPTCHA is not configured on this server"))
                     )
                     return@post
                 }
