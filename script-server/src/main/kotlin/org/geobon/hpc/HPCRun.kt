@@ -43,6 +43,8 @@ class HPCRun(
                 }
 
                 val fileSyncJob = launch {
+                    logFile.appendText("Please be patient, after submission logs will only appear when the job starts on the HPC.\nLogs are updated every minute.\n")
+
                     // Sync the output folder (has inputs.json) and any files the script depends on
                     val filesToSend = mutableListOf(
                         context.outputFolder,
@@ -103,7 +105,6 @@ class HPCRun(
                 fileSyncJob.join()
                 condaSyncJob.join()
                 hpc.ready(this@HPCRun)
-                logFile.appendText("Please be patient, the next logs will appear only when the job starts on the HPC.\nLogs are updated every minute.\n")
                 logger.debug("Waiting for results to be synced back... {}", context.resultFile)
                 // this will stop when watchChannel.close() called above, is cancelled, or script times out.
             }
