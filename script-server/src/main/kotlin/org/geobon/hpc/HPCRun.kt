@@ -158,7 +158,10 @@ class HPCRun(
         val scriptPath = scriptFile.absolutePath.replace(" ", "\\ ")
 
         val logFileAbsolute = File(hpcConnection.hpcRoot, logFile.absolutePath.removePrefix("/")).absolutePath
-        val timeCmd = "/usr/bin/time -f 'Memory used: %M kb\\nElapsed: %E'"
+        // Time is a reserved keyword in bash, so we use \time to call the command normally installed in /usr/bin/time
+        // which happens to be somewhere else inside a HPC's compute node.
+        // See https://askubuntu.com/questions/1054456/what-is-the-difference-between-time-and-usr-bin-time/1054460#1054460
+        val timeCmd = "\\time -f 'Memory used: %M kb\\nElapsed: %E'"
 
         return when (scriptFile.extension) {
             "jl", "JL" ->
