@@ -20,36 +20,35 @@ function activateSubEnvironment {
 
     condaEnvFile="/conda-env-yml/$condaEnvName.yml"
 
-    if [ ! -f "$condaEnvFile" ]; then
-        mamba env list | grep " $condaEnvName "
-        if [[ $? -eq 0 ]] ; then
-            echo "Conda environment listed, will attempt updating..."
+    mamba env list | grep " $condaEnvName "
+    if [[ $? -eq 0 ]] ; then
+        if cmp -s "$condaEnvFile" "$condaEnvFileSrc"; then
+            echo "Conda environment $condaEnvName exists with the same dependencies."
+            rm "$condaEnvFileSrc" ; assertSuccess
         else
-            echo "Creating new conda environment $condaEnvName..."
-            mamba env create -y -f "$condaEnvFileSrc" 2>&1 | tee "$tmpLog"
-
+            echo "Updating existing conda environment $condaEnvName..."
+            mamba env update -y -f "$condaEnvFileSrc"
             if [[ $? -eq 0 ]] ; then
-                mv $condaEnvFileSrc $condaEnvFile ; assertSuccess
-                echo "Created successfully."
-            else
-                echo "Cleaning up after failure..."
-                mamba remove -y -n $condaEnvName --all > /dev/null 2>&1
-                #rm $pidFile
-                echo -e "FAILED" ; exit 1
+                mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
+                echo "Updated successfully."
             fi
+        fi
+    else
+        echo "Creating new conda environment $condaEnvName..."
+        mamba env create -y -f "$condaEnvFileSrc" 2>&1
+
+        if [[ $? -eq 0 ]] ; then
+            mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
+            echo "Created successfully."
         fi
     fi
 
     if [ -f "$condaEnvFileSrc" ]; then
-        if cmp -s $condaEnvFile $condaEnvFileSrc; then
-            echo "Conda environment $condaEnvName exists with the same dependencies."
-        else
-            echo "Updating existing conda environment $condaEnvName"
-            mamba env update -y -f $condaEnvFileSrc ; assertSuccess
-        fi
-
-        mv $condaEnvFileSrc $condaEnvFile ; assertSuccess
+        echo "Cleaning up after failure..."
+        mamba remove -qy -n $condaEnvName --all > /dev/null 2>&1
+        echo -e "FAILED" ; exit 1
     fi
+
 }
 
 # echo $$ > $pidFile If we need it on HPC, we'll use https://apptainer.org/docs/user/latest/running_services.html#system-integration-pid-files
@@ -60,4 +59,3 @@ else
     activateSubEnvironment
 fi
 echo "Conda environment ready."
-#rm $pidFile
