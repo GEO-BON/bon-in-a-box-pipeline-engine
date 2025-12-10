@@ -393,9 +393,9 @@ class HPCConnection(
             timeoutAmount = 10, timeoutUnit = MINUTES, mergeErrors = true, logger = logger
         )
 
-        multiLog(logFiles, callResult.output)
         if (!callResult.success) {
-            throw RuntimeException("An error occured launching job on HPC. Check logs for details.")
+            multiLog(logFiles, callResult.output)
+            throw RuntimeException("An error occurred launching job on HPC. Check logs for details.")
         }
     }
 
