@@ -2,6 +2,12 @@ package org.geobon.utils
 
 import kotlin.time.Duration
 
+/**
+ * Transforms a string in slurm syntax to a Duration.
+ * See https://slurm.schedmd.com/sbatch.html#OPT_time
+ * @param value slurm duration string
+ * @return the same time value expressed as kotlin.time.Duration
+ */
 fun Duration.Companion.fromSlurm(value: String): Duration {
     val slurmString = value.trim()
 
@@ -50,7 +56,7 @@ fun Duration.Companion.fromSlurm(value: String): Duration {
 }
 
 /**
- * Expresses as a valid slurm string.
+ * Expresses kotlin.time.Duration as a valid slurm string.
  * In this case, we just display it as a large number of minutes.
  */
 fun Duration.toSlurmDuration(): Long = this.inWholeMinutes

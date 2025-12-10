@@ -38,6 +38,7 @@ class SlurmDurationTest {
         assertEquals(1.hours + 2.minutes, Duration.fromSlurm("1:02:00"))
         assertEquals(1.hours + 2.minutes + 3.seconds, Duration.fromSlurm("1:02:03"))
         assertEquals(1.hours + 2.minutes + 30.seconds, Duration.fromSlurm("1:02:30"))
+        assertEquals(1.hours + 2.minutes + 30.seconds, Duration.fromSlurm("01:02:30"))
     }
 
     @Test

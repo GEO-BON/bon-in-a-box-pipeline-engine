@@ -18,13 +18,14 @@ import org.geobon.utils.CallResult
 import org.geobon.utils.SystemCall
 import java.io.File
 import kotlin.test.*
+import kotlin.time.Duration.Companion.hours
 
 class HPCConnectionTest {
 
     private val tmpDir = File(outputRoot.parentFile, "tmp")
     private val configFile = File(tmpDir, "config")
-    private val sshKeyFile = File(tmpDir, "key")
-    private val knownHostsFile = File(tmpDir, "hosts")
+    private val sshKeyFile = File(tmpDir, "id_key")
+    private val knownHostsFile = File(tmpDir, "known_hosts")
     private val biabRoot = File(tmpDir, "bon-in-a-box")
     private val testEnvironment = mutableMapOf(
         "HPC_SSH_CONFIG_NAME" to "HPC-name",
@@ -303,10 +304,37 @@ class HPCConnectionTest {
             connection.syncFiles(toSync)
 
             verify(exactly = 0) { // somethingWrong.py should not be there
-                systemCall.run(any(), any(), any(), any(), any()
-                )
+                systemCall.run(any(), any(), any(), any(), any())
             }
             confirmVerified(systemCall)
+        }
+    }
+
+    @Test
+    fun givenJobsToSend_whenSending_thenSBatchFileCreated() = runTest {
+        withEnvironment(testEnvironment) {
+            createSshFiles()
+            val systemCall = mockk<SystemCall>()
+            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            val connection = HPCConnection(systemCall = systemCall)
+            connection.condaImage.state = RemoteSetupState.READY
+            connection.juliaImage.state = RemoteSetupState.READY
+            connection.prepare()
+
+            connection.sendJobs(
+                listOf("command1.sh", "command2.sh"),
+                HPCRequirements(8, 4, 1.hours)
+            )
+
+            val sBatchList = outputRoot.listFiles { _, name -> name.endsWith(".sbatch") }
+            assertEquals(1, sBatchList.size)
+            val sBatchFile = sBatchList.first()
+            val sBatchContent = sBatchFile.readText()
+            assertContains(sBatchContent, "#SBATCH --mem=8G")
+            assertContains(sBatchContent, "#SBATCH --cpus-per-task=4")
+            assertContains(sBatchContent, "#SBATCH --time=60")
+            assertContains(sBatchContent, "command1.sh")
+            assertContains(sBatchContent, "command2.sh")
         }
     }
 }
