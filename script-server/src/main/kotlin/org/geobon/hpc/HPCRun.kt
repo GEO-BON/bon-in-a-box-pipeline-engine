@@ -4,6 +4,8 @@ import dev.vishna.watchservice.KWatchEvent
 import dev.vishna.watchservice.asWatchChannel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.RunContext
 import org.geobon.pipeline.outputRoot
@@ -60,16 +62,19 @@ class HPCRun(
 
                 val condaSyncJob = launch {
                     if(condaEnvYml != null && condaEnvName != null) {
-                        logFile.appendText("Syncing conda environment towards HPC...\n")
+                        logFile.appendText("Acquiring lock to check conda environment on HPC...\n")
                         val condaEnvWrapper = "$scriptStubsRoot/system/condaEnvironmentHPC.sh"
 
-                        hpcConnection.runCommand("""
+                        condaSyncMutex.withLock {
+                            logFile.appendText("Lock acquired. Syncing conda environment towards HPC...\n")
+                            hpcConnection.runCommand("""
                                 module load apptainer && ${getApptainerBaseCommand(hpcConnection.condaImage, true)} '
                                     source $condaEnvWrapper ${context.outputFolderEscaped} "$condaEnvName" "$condaEnvFile"
                                 '
                             """.replace(Regex("""\s*\n\s*"""), " "),
-                            30,
-                            logFile)
+                                30,
+                                logFile)
+                        }
 
                         // Send edited log file to HPC
                         hpcConnection.syncFiles(listOf(context.logFile), null, logFile)
@@ -197,6 +202,10 @@ class HPCRun(
         context.resultFile.writeText(RunContext.gson.toJson(
             mapOf<String, Any>(ERROR_KEY to message)
         ))
+    }
+
+    companion object {
+        val condaSyncMutex = Mutex()
     }
 
 }
