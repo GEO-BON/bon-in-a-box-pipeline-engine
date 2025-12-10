@@ -78,7 +78,7 @@ external_link:
 
 timeout:
   required: false
-  type: number
+  type: integer
 
 inputs:
   required: false
@@ -227,7 +227,7 @@ hpc:
       regex: "^[0-9]+[GM]$"
     cpus-per-task:
       required: true
-      type: number
+      type: integer
     time:
       required: true
       type: string
