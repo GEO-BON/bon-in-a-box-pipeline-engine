@@ -92,10 +92,18 @@ class ScriptStep : YMLStep {
                         val cpus = hpcSection[Description.HPC__CPUS] as? Int
                             ?: throw RuntimeException("HPC ${Description.HPC__CPUS} parameter should be an int. Got: ${hpcSection[Description.HPC__CPUS]}")
 
-                        val duration = Duration.fromSlurm(
-                            hpcSection[Description.HPC__CPUS]?.toString() // can be considered an int if only minutes provided
-                                ?: throw RuntimeException("HPC ${Description.HPC__DURATION} parameter missing.")
-                        )
+                        val durationString = hpcSection[Description.HPC__DURATION]
+                            ?: throw RuntimeException("HPC ${Description.HPC__DURATION} parameter missing.")
+
+                        if (durationString !is String) {
+                            throw RuntimeException(
+                                """
+                                    HPC parameter ${Description.HPC__DURATION} must be expressed as a string, for example "1:30:00".
+                                    See [SLURM documentation](https://slurm.schedmd.com/sbatch.html#OPT_time) for accepted formats.
+                                """.trimIndent()
+                            )
+                        }
+                        val duration = Duration.fromSlurm(durationString)
 
                         HPCRun(
                             context,

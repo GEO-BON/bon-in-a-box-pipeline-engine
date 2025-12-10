@@ -14,12 +14,15 @@ import org.geobon.utils.createMockHPCContext
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.jupiter.api.assertThrows
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import kotlin.test.assertContains
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
+import kotlin.time.Duration.Companion.hours
 
 @ExperimentalCoroutinesApi
 internal class HPCStepTest {
@@ -281,7 +284,7 @@ internal class HPCStepTest {
         verify(exactly = 1) { hpc.register(any()) }
 
         val filesSlot = slot<List<File>>()
-        coEvery {connection.syncFiles(capture(filesSlot), any(), any())} just runs
+        coEvery { connection.syncFiles(capture(filesSlot), any(), any()) } just runs
         step.execute()
 
         assertTrue(filesSlot.isCaptured)
@@ -355,5 +358,85 @@ internal class HPCStepTest {
         }
 
         error?.let { fail(error) }
+    }
+
+    @Test
+    fun givenScriptIsHPCEnabled_whenRunReady_thenRequirementsExact() = runTest {
+        every { hpc.register(any()) } just runs
+        val inputFile = File(outputRoot, "someFile.csv")
+        inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
+        val step = ScriptStep(
+            mockContext, File(scriptsRoot, "HPCSyncTest.yml"), StepId("HPCSyncTest.yml", "1"),
+            mutableMapOf(
+                "someFile" to ConstantPipe("text/csv", inputFile.absolutePath),
+                "someInt" to ConstantPipe("int", 10)
+            )
+        )
+        verify(exactly = 1) { hpc.register(any()) }
+
+        every { connection.condaImage } returns ApptainerImage(
+            Containers.CONDA,
+            RemoteSetupState.READY,
+            "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:62849e38bc9105etcetc",
+            null,
+            "someImage.sif",
+            "overlayPath.img"
+        )
+
+        connection.apply {
+            coEvery { runCommand(allAny()) } just runs
+            coEvery { syncFiles(allAny()) } just runs
+            every { ready } returns true
+            every { hpcRoot } returns "hpcRoot"
+            every { hpcScriptsRoot } returns "$hpcRoot/scripts"
+            every { hpcScriptStubsRoot } returns "$hpcRoot/script-stubs"
+            every { hpcOutputRoot } returns "$hpcRoot/output"
+            every { hpcUserDataRoot } returns "$hpcRoot/userdata"
+        }
+
+        val runSlot = slot<HPCRun>()
+        every { hpc.ready(capture(runSlot)) } answers {
+            this@runTest.launch {
+                // We need a real thread.sleep() here, since otherwise the OS is not ready yet to watch the file.
+                // Using delay(...) is skipped in runTest context.
+                Thread.sleep(100)
+                with(step.context!!.resultFile) {
+                    parentFile.mkdirs()
+                    writeText("""{ "increment":11 }""".trimIndent())
+                }
+                logger.debug("Created mock output file")
+            }
+        }
+        every { hpc.unregister(any()) } just runs
+
+        step.execute()
+
+        assertTrue(runSlot.isCaptured)
+        val run = runSlot.captured
+        assertEquals(1, run.requirements.memoryG)
+        assertEquals(2, run.requirements.cpus)
+        assertEquals(1.hours, run.requirements.duration)
+    }
+
+    @Test
+    fun givenScriptIsHPCEnabled_whenTimeAsInt_thenErrorThrown() = runTest {
+        every { hpc.register(any()) } just runs
+        val inputFile = File(outputRoot, "someFile.csv")
+        inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
+        val step = ScriptStep(
+            mockContext, File(scriptsRoot, "HPCBadTimeTest.yml"), StepId("HPCBadTimeTest.yml", "1"),
+            mutableMapOf(
+                "someFile" to ConstantPipe("text/csv", inputFile.absolutePath),
+                "someInt" to ConstantPipe("int", 10)
+            )
+        )
+        every { hpc.unregister(any()) } just runs
+
+        val ex = assertThrows<RuntimeException> {
+            step.execute()
+        }
+
+        // The error message should redirect to the SLURM documentation on time formats
+        assertContains(ex.message.toString(), "https://slurm.schedmd.com/sbatch.html#OPT_time")
     }
 }

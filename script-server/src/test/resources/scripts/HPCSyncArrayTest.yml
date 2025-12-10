@@ -44,4 +44,4 @@ outputs:
 hpc:
   mem: 1G
   cpus-per-task: 1
-  time: 3
+  time: "3:00"
