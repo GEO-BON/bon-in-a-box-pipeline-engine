@@ -22,7 +22,7 @@ import kotlin.test.assertTrue
 import kotlin.test.fail
 
 @ExperimentalCoroutinesApi
-internal class HPCRunTest {
+internal class HPCStepTest {
 
     lateinit var mockContext: ServerContext
     lateinit var hpc: HPC
