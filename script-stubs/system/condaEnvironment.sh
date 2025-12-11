@@ -31,7 +31,7 @@ function activateSubEnvironment {
             rm "$condaEnvFileSrc" ; assertSuccess
         else
             echo "Updating existing conda environment $condaEnvName..."
-            mamba env update -y -f "$condaEnvFileSrc"
+            flock /conda-env-yml/ mamba env update -y -f "$condaEnvFileSrc"
             if [[ $? -eq 0 ]] ; then
                 mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
                 echo "Updated successfully."
@@ -39,7 +39,7 @@ function activateSubEnvironment {
         fi
     else
         echo "Creating new conda environment $condaEnvName..."
-        mamba env create -y -f "$condaEnvFileSrc" 2>&1 | tee -a "$logFile"
+        flock /conda-env-yml/ mamba env create -y -f "$condaEnvFileSrc" 2>&1 | tee -a "$logFile"
         if [[ $? -eq 0 ]] ; then
             mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
             echo "Created successfully."
@@ -58,8 +58,8 @@ function activateSubEnvironment {
         echo "$condaEnvName activated"
     else
         echo "Activation failed, will attempt creating..."
-        mamba env create -y -f $condaEnvFile
-        mamba activate $condaEnvName
+        flock /conda-env-yml/ mamba env create -y -f $condaEnvFile
+        mamba activate $condaEnvName ; assertSuccess
     fi
 }
 
@@ -68,6 +68,19 @@ source /.bashrc
 if [[ "$condaEnvName" == "pythonbase" || "$condaEnvName" == "rbase" ]]; then
     activateBaseEnvironment
 else
+    # A first lock on the sub-environment
+    # Case: if another environment is updating, we want to wait to
+    # find the environment ready, hence avoid entering the update
+    # condition and updating twice.
+    #
+    # A second lock on the whole folder happens inside the activateSubEnvironment
+    # function to prevent two different sub-environments from doing transactions
+    # at the same time.
+    lockFile="/conda-env-yml/$condaEnvName.lock"
+    exec {lockfd}>"$lockFile"
+    trap 'exec {lockfd}>&-; rm -f "$lockFile"' EXIT
+    flock -x "$lockfd"
+
     activateSubEnvironment
 fi
 echo "Conda environment ready."
