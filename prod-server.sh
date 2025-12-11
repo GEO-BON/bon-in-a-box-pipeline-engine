@@ -151,13 +151,21 @@ function validate {
     flagErrors
 
     echo "Validating pipeline metadata"
-    docker run --rm  \
-        -v /$(pwd)/pipelines://toValidate \
-        -v /$(pwd)/.server/.github/validateCerberusSchema.py://validator/validateCerberusSchema.py:ro \
-        -v /$(pwd)/.server/.github/pipelineValidationSchema.yml://validator/pipelineValidationSchema.yml:ro \
-        -w //toValidate/ \
-        ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/script-server \
-        python3 //validator/validateCerberusSchema.py //validator/pipelineValidationSchema.yml
+    which python3 > /dev/null
+    if [[ $? -ne 0 ]] ; then
+        echo -e "${RED}Python is required to validate the pipeline metadata.${ENDCOLOR}" ; exit 1
+    fi
+    which pip > /dev/null
+    if [[ $? -ne 0 ]] ; then
+        echo -e "${RED}pip is required to validate the pipeline metadata.${ENDCOLOR}" ; exit 1
+    fi
+    pip install pyyaml cerberus
+    schema=$(pwd)/.server/.github/validateCerberusSchema.py
+    validationScript=$(pwd)/.server/.github/pipelineValidationSchema.yml
+    echo "Using schema: $schema"
+    echo "Using validation script: $validationScript"
+    cd $(pwd)/pipelines
+    python3 $schema $validationScript
     flagErrors
 
     # Final assessment

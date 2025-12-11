@@ -1,13 +1,4 @@
-FROM openjdk:11-jre-bullseye AS base-image
-
-# Installing python for pipeline validation with cerberus schema
-# TODO: This should be moved out to the conda-runner
-RUN set -ex; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends python3 pip; \
-    apt-get clean all;
-
-RUN pip3 install pyyaml cerberus;
+FROM eclipse-temurin:21-jre AS base-image
 
 #INSTALL DOCKER CLI
 ENV DOCKER_VERSION=29.1.2
@@ -22,7 +13,7 @@ RUN chmod 755 /usr/local/bin/docker-compose
 RUN chmod 755 /usr/local/bin/docker
 
 ## This image builds the server code
-FROM gradle:8.13-jdk11 AS builder
+FROM gradle:9.0-jdk21 AS builder
 COPY . /home/gradle/project
 WORKDIR /home/gradle/project
 RUN gradle assemble
