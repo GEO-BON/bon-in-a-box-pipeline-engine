@@ -87,12 +87,8 @@ class HPCRun(
                         watchChannel.consumeEach { event ->
                             if (event.file == context.resultFile) {
                                 when (event.kind) {
-                                    KWatchEvent.Kind.Created -> {
-                                        logger.trace("Watched file created: {}", context.resultFile)
-                                    }
-
-                                    KWatchEvent.Kind.Modified -> {
-                                        logger.trace("Watched file modified: {}", context.resultFile)
+                                    KWatchEvent.Kind.Created, KWatchEvent.Kind.Modified -> {
+                                        logger.debug("Watched file ${event.kind}: {}", context.resultFile)
                                         readOutputs()?.let {
                                             output = it
                                             watchChannel.close()

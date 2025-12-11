@@ -194,6 +194,9 @@ abstract class Run(
             return null
 
         val result = resultFile.readText()
+        if(result.isBlank())
+            return null
+
         val type = object : TypeToken<MutableMap<String, Any>>() {}.type
         try {
             val outputs = RunContext.gson.fromJson<MutableMap<String, Any>>(result, type)
@@ -208,8 +211,8 @@ abstract class Run(
                         Contents of output.json:
                     """.trimIndent() + "\n$result"
             )
+            return null
         }
-        return null
     }
 
     protected fun flagError(results: Map<String, Any>, genericError: Boolean = false): Map<String, Any> {
