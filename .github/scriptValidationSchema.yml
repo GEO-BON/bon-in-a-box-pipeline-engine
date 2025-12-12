@@ -231,4 +231,4 @@ hpc:
     time:
       required: true
       type: string
-      regex: '^(\d-)?(\d\d:){0,2}\d\d$'
+      regex: '^(\d-)?(\d?\d:){0,2}\d?\d$'
