@@ -51,7 +51,7 @@ jobs:
         document_path: script-server/src/test/resources/scripts/
         validate_file_extension: no
         filter_extensions: .yml
-    - name: YML test files syntax validation (stubs)
+    - name: YML syntax validation (stubs)
       uses: navikt/yaml-validator@v4
       with:
         schema_path: .github/scriptValidationSchema.yml
