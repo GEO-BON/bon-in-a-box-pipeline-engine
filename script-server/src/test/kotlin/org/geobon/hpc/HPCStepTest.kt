@@ -23,6 +23,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.hours
+import java.io.File.createTempFile
 
 @ExperimentalCoroutinesApi
 internal class HPCStepTest {
@@ -420,11 +421,16 @@ internal class HPCStepTest {
 
     @Test
     fun givenScriptIsHPCEnabled_whenTimeAsInt_thenErrorThrown() = runTest {
+        // We can't leave the bad file in the repo or github actions fail. So we forge it here.
+        val goodFile = File(scriptsRoot, "HPCSyncTest.yml")
+        val badFile = createTempFile("HPCBadTimeTest", "yml")
+        badFile.writeText(goodFile.readText().replace("time: \"1:00:00\"", "time: 1:00:00"))
+
         every { hpc.register(any()) } just runs
         val inputFile = File(outputRoot, "someFile.csv")
         inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
         val step = ScriptStep(
-            mockContext, File(scriptsRoot, "HPCBadTimeTest.yml"), StepId("HPCBadTimeTest.yml", "1"),
+            mockContext, badFile, StepId("HPCBadTimeTest.yml", "1"),
             mutableMapOf(
                 "someFile" to ConstantPipe("text/csv", inputFile.absolutePath),
                 "someInt" to ConstantPipe("int", 10)
