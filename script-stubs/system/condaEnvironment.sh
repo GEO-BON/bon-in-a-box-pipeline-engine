@@ -31,7 +31,7 @@ function activateSubEnvironment {
             rm "$condaEnvFileSrc" ; assertSuccess
         else
             echo "Updating existing conda environment $condaEnvName..."
-            flock /conda-env-yml/ mamba env update -y -f "$condaEnvFileSrc"
+            flock --verbose /conda-env-yml/ mamba env update -y -f "$condaEnvFileSrc"
             if [[ $? -eq 0 ]] ; then
                 mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
                 echo "Updated successfully."
@@ -39,7 +39,7 @@ function activateSubEnvironment {
         fi
     else
         echo "Creating new conda environment $condaEnvName..."
-        flock /conda-env-yml/ mamba env create -y -f "$condaEnvFileSrc" 2>&1 | tee -a "$logFile"
+        flock --verbose /conda-env-yml/ mamba env create -y -f "$condaEnvFileSrc" 2>&1 | tee -a "$logFile"
         if [[ $? -eq 0 ]] ; then
             mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
             echo "Created successfully."
@@ -58,7 +58,7 @@ function activateSubEnvironment {
         echo "$condaEnvName activated"
     else
         echo "Activation failed, will attempt creating..."
-        flock /conda-env-yml/ mamba env create -y -f $condaEnvFile
+        flock --verbose /conda-env-yml/ mamba env create -y -f $condaEnvFile
         mamba activate $condaEnvName ; assertSuccess
     fi
 }
@@ -79,7 +79,7 @@ else
     lockFile="/conda-env-yml/$condaEnvName.lock"
     exec {lockfd}>"$lockFile"
     trap 'exec {lockfd}>&-; rm -f "$lockFile"' EXIT
-    flock -x "$lockfd"
+    flock --verbose -x "$lockfd"
 
     activateSubEnvironment
 fi
