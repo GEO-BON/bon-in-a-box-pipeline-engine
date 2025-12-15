@@ -56,8 +56,7 @@ class DockerizedRun( // Constructor used in single script run
                         "bash", "-c",
                         """
                             source importEnvVars.sh
-                            /usr/bin/time -f "Memory used: %M kb" \
-                                julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
+                            julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
                         """
                     )
                 }
@@ -75,7 +74,7 @@ class DockerizedRun( // Constructor used in single script run
                     )
                 }
 
-                "sh" -> command = listOf("/usr/bin/time", "-f", "Memory used: %M kb", "sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
+                "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
                 "py", "PY" -> {
                     val scriptPath = scriptFile.absolutePath
                     val pythonWrapper = "$scriptStubsRoot/system/scriptWrapper.py"
@@ -86,8 +85,7 @@ class DockerizedRun( // Constructor used in single script run
                             "bash", "-c",
                             """
                                 source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
-                                /usr/bin/time -f "Memory used: %M kb" \
-                                    python3 $pythonWrapper $escapedOutputFolder $scriptPath
+                                python3 $pythonWrapper $escapedOutputFolder $scriptPath
                             """.trimIndent()
                         )
                     } else {
