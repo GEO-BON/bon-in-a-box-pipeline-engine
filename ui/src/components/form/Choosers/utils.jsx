@@ -83,7 +83,7 @@ export const defaultCountry = {
 };
 export const defaultRegion = {
   regionName: "",
-  regionGID: "",
+  regionID: "",
 };
 
 export const paperStyle = (dialog) => {
