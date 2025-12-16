@@ -40,16 +40,16 @@ if os.path.exists("/app/regions.json") == False:
     with open('/app/regions.json', 'w') as f:
         json.dump(regions.to_dict(orient='records'), f)    
 
-@app.get("/")
+@app.get("/region")
 def read_root():
-    return {"Title": "BON in a Box Python API"}
+    return {"Title": "BON in a Box Python API", "Version": "1.0.0", "Description": "API for countries and subnational region names and geometries. Based on fieldmaps.io UN parquet files."}
 
-@app.get("/countries_list")
+@app.get("/region/countries_list")
 def countries_list():
     df = pd.read_json('/app/countries.json', orient='records')
     return df.to_dict(orient='records')
 
-@app.get("/regions_list")
+@app.get("/region/regions_list")
 def regions_list(country_iso:str):
     df = pd.read_json('/app/regions.json', orient='records')
     names = df[df['adm0_src'] == country_iso]
@@ -57,7 +57,7 @@ def regions_list(country_iso:str):
         raise HTTPException(status_code=404, detail="Country ISO code not valid")
     return names.to_dict(orient='records')
 
-@app.get("/geometry")
+@app.get("/region/geometry")
 def region_geometry(type: str = 'country', id: str = ""):
     if type == 'country':
         reg = ddb.sql("SELECT *, ST_AsText(geometry) AS geom FROM read_parquet('%s') WHERE adm0_src='%s'" % (countries_parquet, id)).df()
@@ -69,7 +69,6 @@ def region_geometry(type: str = 'country', id: str = ""):
         if( reg.empty ):
             raise HTTPException(status_code=404, detail="Region ID not found")
         fname = reg['adm1_name'].iloc[0].replace(' ','_')
-    print("name:", fname)
     gs = gpd.GeoSeries.from_wkt(reg["geom"])
     del reg["geom"]
     del reg["geometry"]

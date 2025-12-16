@@ -33,4 +33,3 @@ ENV PORT=8000
 ENV WEB_CONCURRENCY=1
 
 CMD sh ./startup.sh
-#CMD uvicorn main:app --proxy-headers --port 8001 --host 0.0.0.0 --reload ; gunicorn -k uvicorn.workers.UvicornWorker ${MODULE_NAME}:${VARIABLE_NAME} --bind 0.0.0.0:${PORT} --workers ${WEB_CONCURRENCY}

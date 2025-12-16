@@ -69,7 +69,7 @@ services:
     depends_on:
       - script-server
 
-  biab-python-api:
+  biab-python-api: # Serves Titiler and a FastAPI app to serve country and region names and geometries
     container_name: biab-python-api
     build: python-api/
     volumes:

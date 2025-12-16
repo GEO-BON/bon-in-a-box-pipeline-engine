@@ -92,7 +92,10 @@ paths:
                       runId: "path>to>script>hash",
                       type: "script",
                       startTime: "2024-01-01 00:00",
-                      inputs: { input1: "value", input2: "value" },
+                      inputs: { 
+                        input1: "value", 
+                        input2: "value" 
+                      },
                       status: "completed",
                     },
                   ]
