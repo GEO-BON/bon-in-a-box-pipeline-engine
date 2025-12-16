@@ -12,6 +12,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.TimeUnit.MINUTES
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @OptIn(DelicateCoroutinesApi::class)
 class HPCConnection(
@@ -319,7 +321,7 @@ class HPCConnection(
 
                     // files are relative to our root:
                     val toDeleteAbsolute = toDelete.map { file -> File(hpcRoot, file.absolutePath.removePrefix("/")).absolutePath }
-                    systemCall.run(sshCommand +  "rm -rf ${toDeleteAbsolute.joinToString(" ")};", logFile = logFile)
+                    systemCall.run(sshCommand +  "rm -rf ${toDeleteAbsolute.joinToString(" ")}", logFile = logFile)
                 }
 
                 logFile?.appendText("""
@@ -353,7 +355,8 @@ class HPCConnection(
             return
         }
 
-        val timestamp = System.currentTimeMillis()
+        val sdf = SimpleDateFormat("yyyy-M-dd_hh-mm-ss-SSS")
+        val timestamp = sdf.format(Date())
         val sBatchFileLocal = File(outputRoot, "boninabox_$timestamp.sbatch")
         sBatchFileLocal.writeText("""
             #!/bin/bash
