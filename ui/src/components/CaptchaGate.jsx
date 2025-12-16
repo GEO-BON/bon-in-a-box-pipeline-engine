@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { CustomButtonGreen } from "./CustomMUI";
 
 export default function CaptchaGate({ children }) {
+  const humanVarName = "h"
+
   const [errorMessage, setErrorMessage] = useState("");
   const [captchaConfig, setCaptchaConfig] = useState(null); // null = loading, {enabled: false} = disabled, {enabled: true, siteKey: "..."} = enabled
 
@@ -11,7 +13,7 @@ export default function CaptchaGate({ children }) {
     VERIFIED: "verified"
   });
   const [state, setState] = useState(
-    localStorage.getItem("human") === "true" ? States.VERIFIED : States.LOADING
+    localStorage.getItem(humanVarName) === "true" ? States.VERIFIED : States.LOADING
   );
 
   useEffect(() => {
@@ -26,12 +28,12 @@ export default function CaptchaGate({ children }) {
         if (res.ok) {
           const config = await res.json();
           setCaptchaConfig(config);
-          
+
           if (!config.enabled) {
             setState(States.VERIFIED);
             return;
           }
-          
+
           loadRecaptchaScript(config.siteKey);
         } else {
           console.warn("Failed to fetch captcha config, assuming captcha is disabled");
@@ -78,7 +80,7 @@ export default function CaptchaGate({ children }) {
 
     window.grecaptcha.ready(async () => {
       try {
-        // Execute recaptcha v3 
+        // Execute recaptcha v3
         const token = await window.grecaptcha.execute(siteKey, {
           action: "homepage",
         });
@@ -93,7 +95,7 @@ export default function CaptchaGate({ children }) {
         if (res.ok) {
           const data = await res.json();
           if (data.success) {
-            localStorage.setItem("human", "true");
+            localStorage.setItem(humanVarName, "true");
             setState(States.VERIFIED);
             return;
           } else {
