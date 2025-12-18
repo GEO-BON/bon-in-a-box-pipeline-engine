@@ -16,3 +16,7 @@ pipeline-repo
 **/._*
 
 /.quarto/
+
+**/__pycache__/
+
+/python-api/app/*duckdb*
