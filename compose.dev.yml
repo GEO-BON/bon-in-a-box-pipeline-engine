@@ -22,7 +22,7 @@ services:
       WDS_SOCKET_PORT: 0
     depends_on:
       - script-server
-      - biab-python-api
+      - python-api
 
   viewer:
     container_name: biab-viewer
