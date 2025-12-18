@@ -195,6 +195,9 @@ function checkout {
 
     git checkout $branch -- http-proxy/conf.d-prod/ngnix.conf ; assertSuccess
 
+## TODO TEMP while the image is not on GitHub Packages
+    git checkout $branch -- python-api ; assertSuccess
+
     git checkout $branch -- script-stubs ; assertSuccess
 
     echo -e "${GREEN}Server configuration updated.${ENDCOLOR}"
