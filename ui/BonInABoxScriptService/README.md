@@ -103,10 +103,6 @@ var BonInABoxScriptService = require('bon_in_a_box_script_service');
 
 
 var api = new BonInABoxScriptService.DefaultApi()
-var opts = {
-  'start': 56, // {Number} Start index for pagination
-  'limit': 56 // {Number} Limit the number of results
-};
 var callback = function(error, data, response) {
   if (error) {
     console.error(error);
@@ -114,7 +110,7 @@ var callback = function(error, data, response) {
     console.log('API called successfully. Returned data: ' + data);
   }
 };
-api.getHistory(opts, callback);
+api.getHPCStatus(callback);
 
 ```
 
@@ -124,6 +120,7 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*BonInABoxScriptService.DefaultApi* | [**getHPCStatus**](docs/DefaultApi.md#getHPCStatus) | **GET** /hpc/status | Get status of HPC connection.
 *BonInABoxScriptService.DefaultApi* | [**getHistory**](docs/DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 *BonInABoxScriptService.DefaultApi* | [**getInfo**](docs/DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
 *BonInABoxScriptService.DefaultApi* | [**getListOf**](docs/DefaultApi.md#getListOf) | **GET** /{type}/list | Get a list of available steps of given type and their names.
@@ -131,6 +128,7 @@ Class | Method | HTTP request | Description
 *BonInABoxScriptService.DefaultApi* | [**getPipeline**](docs/DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
 *BonInABoxScriptService.DefaultApi* | [**getSystemStatus**](docs/DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 *BonInABoxScriptService.DefaultApi* | [**getVersions**](docs/DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
+*BonInABoxScriptService.DefaultApi* | [**hpcPrepareGet**](docs/DefaultApi.md#hpcPrepareGet) | **GET** /hpc/prepare | Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.
 *BonInABoxScriptService.DefaultApi* | [**run**](docs/DefaultApi.md#run) | **POST** /{type}/{descriptionPath}/run | Runs the script or pipeline matching &#x60;descriptionPath&#x60;.
 *BonInABoxScriptService.DefaultApi* | [**savePipeline**](docs/DefaultApi.md#savePipeline) | **POST** /pipeline/save/{filename} | Save a json file to the pipeline folder.
 *BonInABoxScriptService.DefaultApi* | [**stop**](docs/DefaultApi.md#stop) | **GET** /{type}/{id}/stop | Stop the specified pipeline run.
@@ -138,6 +136,7 @@ Class | Method | HTTP request | Description
 
 ## Documentation for Models
 
+ - [BonInABoxScriptService.GetHPCStatus200ResponseValue](docs/GetHPCStatus200ResponseValue.md)
  - [BonInABoxScriptService.GetHistory200ResponseInner](docs/GetHistory200ResponseInner.md)
  - [BonInABoxScriptService.Info](docs/Info.md)
  - [BonInABoxScriptService.InfoAuthorInner](docs/InfoAuthorInner.md)

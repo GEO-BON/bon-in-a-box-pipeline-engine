@@ -1,6 +1,6 @@
 ktor:
     application:
         modules:
-            - org.geobon.server.ApplicationKt.module
+            - org.geobon.server.ApplicationKt.scriptModule
     deployment:
         port: 8080

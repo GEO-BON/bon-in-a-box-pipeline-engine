@@ -2,6 +2,7 @@
 .travis.yml
 README.md
 docs/DefaultApi.md
+docs/GetHPCStatus200ResponseValue.md
 docs/GetHistory200ResponseInner.md
 docs/Info.md
 docs/InfoAuthorInner.md
@@ -18,6 +19,7 @@ mocha.opts
 package.json
 src/api/DefaultApi.js
 src/index.js
+src/model/GetHPCStatus200ResponseValue.js
 src/model/GetHistory200ResponseInner.js
 src/model/Info.js
 src/model/InfoAuthorInner.js

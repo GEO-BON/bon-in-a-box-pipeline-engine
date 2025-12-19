@@ -1,5 +1,7 @@
 package org.geobon.pipeline
 
+import java.io.File
+
 class Output(override val type:String) : Pipe {
     private var isInit = false
     var step: Step? = null
@@ -36,6 +38,30 @@ class Output(override val type:String) : Pipe {
             if(condition(it)) pull()
             else null
         }
+    }
+
+    override fun asFiles(): Collection<File>? {
+        value?.let { value ->
+            if (Pipe.Companion.MIME_TYPE_REGEX.matches(type)) {
+                // This incomprehensible boilerplate code flattens unknown types of multidimensional arrays to a single array
+                var flattenedValue = listOf(value)
+                while(flattenedValue.isNotEmpty() && flattenedValue[0] is Collection<*>) {
+                    val new = mutableListOf<Any>()
+                    flattenedValue.forEach {
+                        (it as? Collection<*>)?.let {
+                            collection -> collection.forEach { elem -> elem?.let { new.add(elem) } }
+                        }
+                    }
+                    flattenedValue = new
+                }
+
+                if(flattenedValue.isNotEmpty()) {
+                    return flattenedValue.map { File(it as String) }
+                }
+            }
+        }
+
+        return null
     }
 
     override fun dumpOutputFolders(allOutputs: MutableMap<String, String>) {
