@@ -15,6 +15,52 @@ export default function CaptchaGate({ children }) {
   const [state, setState] = useState(
     localStorage.getItem(humanVarName) === "true" ? States.VERIFIED : States.LOADING
   );
+  const showRecaptchaBadge = () => {
+    const badge = document.querySelector(".grecaptcha-badge");
+    if (badge) badge.style.visibility = "visible";
+  };
+  
+  const hideRecaptchaBadge = () => {
+    const badge = document.querySelector(".grecaptcha-badge");
+    if (badge) badge.style.visibility = "hidden";
+  };
+  useEffect(() => {
+  
+    const checkCaptchaConfig = async () => {
+      try {
+        const res = await fetch("/api/captcha-config");
+        if (res.ok) {
+          const config = await res.json();
+          setCaptchaConfig(config);
+  
+          if (!config.enabled) {
+            setState(States.VERIFIED);
+            hideRecaptchaBadge();
+            return;
+          }
+  
+          showRecaptchaBadge();
+          loadRecaptchaScript(config.siteKey);
+        } else {
+          setCaptchaConfig({ enabled: false });
+          setState(States.VERIFIED);
+  
+          hideRecaptchaBadge();
+        }
+      } catch (err) {
+        console.error("Error checking captcha config:", err);
+        setCaptchaConfig({ enabled: false });
+        setState(States.VERIFIED);
+        hideRecaptchaBadge();
+      }
+    };
+  
+    checkCaptchaConfig();
+  
+    return () => {
+      hideRecaptchaBadge();
+    };
+  }, []);
 
   useEffect(() => {
     if (state === States.VERIFIED) {

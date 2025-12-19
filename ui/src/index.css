@@ -20,10 +20,3 @@ code {
   --biab-yellow-main: #b7872e;
   --biab-yellow-light: #fdd58c;
 }
-
-/* Hide reCAPTCHA badge */
-.grecaptcha-badge {
-  visibility: hidden !important;
-  opacity: 0 !important;
-  display: none !important;
-}

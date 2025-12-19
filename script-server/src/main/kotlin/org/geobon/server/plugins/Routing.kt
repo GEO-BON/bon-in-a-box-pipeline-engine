@@ -331,7 +331,7 @@ fun Application.configureRouting() {
                 if (secretKey.isNullOrEmpty()) {
                     logger.warn("RECAPTCHA_SERVER_KEY environment variable is not set - captcha verification disabled")
                     call.respond(
-                        HttpStatusCode.OK,
+                        HttpStatusCode.BadRequest,
                         gson.toJson(mapOf("success" to false, "error" to "reCAPTCHA is not configured on this server"))
                     )
                     return@post
@@ -358,7 +358,7 @@ fun Application.configureRouting() {
                         call.respond(gson.toJson(mapOf("success" to true)))
                     } else {
                         val errorCodes = responseJSON.optJSONArray("error-codes")
-                        logger.error("reCAPTCHA verification failed: ${errorCodes?.toString()}")
+                        logger.debug("reCAPTCHA verification failed: ${errorCodes?.toString()}")
                         call.respond(gson.toJson(mapOf("success" to false)))
                     }
                 } else {
