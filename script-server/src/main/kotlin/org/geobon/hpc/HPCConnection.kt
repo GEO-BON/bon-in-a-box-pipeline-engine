@@ -355,22 +355,32 @@ class HPCConnection(
             return
         }
 
+        val hpcLogFiles = logFiles.map { it.absolutePath.replace(outputRoot.absolutePath, hpcOutputRoot) }
+
         val sdf = SimpleDateFormat("yyyy-M-dd_hh-mm-ss-SSS")
         val timestamp = sdf.format(Date())
         val sBatchFileLocal = File(outputRoot, "boninabox_$timestamp.sbatch")
+        // --signal PARAM: two signals are needed.
+        // One to the task, so that it quits cleany,
+        // and one to the batch script to make sure it doesn't start the other tasks in the small buffer time that is left.
         sBatchFileLocal.writeText("""
             #!/bin/bash
             #SBATCH --mem=${requirements.memoryG}G
             #SBATCH --cpus-per-task=${requirements.cpus}
             #SBATCH --time=${requirements.duration.toSlurmDuration()}
             #SBATCH --nodes=1
-            #SBATCH --signal=B:SIGINT
+            #SBATCH --signal=B:SIGTERM@40
+            #SBATCH --signal=SIGTERM@30
             ${account?.isNotBlank().let { "#SBATCH --account=$account" }}
             #SBATCH --job-name=boninabox_$timestamp
+            #SBATCH --output=%x_%j.out
+
+            echo "Batch job started, contains ${tasksToSend.size} tasks" | tee -a ${hpcLogFiles.joinToString(" ")}
+            trap "echo 'Received termination signal from SLURM.' | tee -a ${hpcLogFiles.joinToString(" ")} && exit" TERM
 
             module load apptainer
 
-            ${tasksToSend.joinToString("\n\n")}
+            srun ${tasksToSend.joinToString("\n\nsrun ")}
 
         """.trimIndent())
 
@@ -388,7 +398,7 @@ class HPCConnection(
         }
 
 
-        val hpcLogFiles = logFiles.map { it.absolutePath.replace(outputRoot.absolutePath, hpcOutputRoot) }
+
 
         val sBatchFileRemote = File(hpcOutputRoot, sBatchFileLocal.name)
         callResult = systemCall.run(
