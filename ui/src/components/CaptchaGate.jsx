@@ -36,7 +36,7 @@ export default function CaptchaGate({ children }) {
 
           loadRecaptchaScript(config.siteKey);
         } else {
-          console.warn("Failed to fetch captcha config, assuming captcha is disabled");
+          // Failed to fetch captcha config, assuming captcha is disabled
           setCaptchaConfig({ enabled: false });
           setState(States.VERIFIED);
         }
@@ -82,7 +82,7 @@ export default function CaptchaGate({ children }) {
       try {
         // Execute recaptcha v3
         const token = await window.grecaptcha.execute(siteKey, {
-          action: "homepage",
+          action: "run",
         });
 
         // Verify token with backend
