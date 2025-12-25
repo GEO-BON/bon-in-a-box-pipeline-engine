@@ -1,0 +1,18 @@
+/* Hide reCAPTCHA badge by default - it should only appear when captcha is enabled */
+.grecaptcha-badge {
+  display: none !important;
+}
+
+/* Show reCAPTCHA badge only when captcha is enabled */
+/* The badge is automatically positioned by Google at bottom-right corner */
+body.recaptcha-enabled .grecaptcha-badge {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Allow inline styles to override when badge is explicitly shown */
+body.recaptcha-enabled .grecaptcha-badge[style*="display: block"] {
+  display: block !important;
+}
+
