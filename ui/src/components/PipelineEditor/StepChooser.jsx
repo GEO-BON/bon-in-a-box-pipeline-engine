@@ -19,6 +19,7 @@ const onDragStart = (event, nodeType, descriptionFile) => {
   event.dataTransfer.effectAllowed = "move";
 };
 
+// I hope jean micheal enjoys this code review :D, comments galore!
 // Helper function to highlight text with search keywords
 function highlightText(text, searchQuery) {
   if (!text || !searchQuery || searchQuery.trim() === "") {
@@ -258,6 +259,7 @@ export default function StepChooser(props) {
   const [selectedStep, setSelectedStep] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loadedDescriptions, setLoadedDescriptions] = useState({});
+  const [collapsedDirs, setCollapsedDirs] = useState(new Set());
   const {popupContent, setPopupContent} = useContext(PopupContentContext);
 
   // Applied only once when first loaded
@@ -350,6 +352,19 @@ export default function StepChooser(props) {
       setSelectedStep(null);
     }
   }, [popupContent, selectedStep, setSelectedStep]);
+
+  // Toggle directory collapse state
+  const toggleDir = useCallback((dirKey) => {
+    setCollapsedDirs((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(dirKey)) {
+        newSet.delete(dirKey);
+      } else {
+        newSet.add(dirKey);
+      }
+      return newSet;
+    });
+  }, []);
 
   // Helper function to extract all searchable text from metadata
   const extractSearchableText = useCallback((metadata) => {
@@ -523,22 +538,43 @@ export default function StepChooser(props) {
           // leaf
           return groupedFiles.get(key).map(([fileName, stepName]) => {
             let descriptionFile = [...splitPathBefore, fileName].join(">");
-            return <PipelineStep descriptionFile={descriptionFile} fileName={fileName} selectedStep={selectedStep} stepName={stepName} onStepClick={onStepClick} />
+            return <PipelineStep key={descriptionFile} descriptionFile={descriptionFile} fileName={fileName} selectedStep={selectedStep} stepName={stepName} onStepClick={onStepClick} />
           });
         }
 
-        // branch
+        // branch compute unique directory key
+        const dirKey = [...splitPathBefore, key].join(">");
+        const isCollapsed = collapsedDirs.has(dirKey);
+
         return (
-          <div key={key}>
-            <p className="dnd-head"><SubdirectoryArrowRightIcon sx={{fontSize: "0.85em"}} />{key}</p>
-            <div className="inFolder">
-              {renderTree([...splitPathBefore, key], groupedFiles.get(key))}
-            </div>
+          <div key={dirKey}>
+            <p 
+              className="dnd-head folder-header"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleDir(dirKey);
+              }}
+            >
+              <SubdirectoryArrowRightIcon 
+                sx={{
+                  fontSize: "0.85em",
+                  transform: isCollapsed ? "rotate(0deg)" : "rotate(90deg)",
+                  transition: "transform 0.2s ease-in-out",
+                  display: "inline-block"
+                }} 
+              />
+              {key}
+            </p>
+            {!isCollapsed && (
+              <div className="inFolder">
+                {renderTree([...splitPathBefore, key], groupedFiles.get(key))}
+              </div>
+            )}
           </div>
         );
       });
     },
-    [onStepClick, selectedStep]
+    [onStepClick, selectedStep, collapsedDirs, toggleDir]
   );
 
   return (

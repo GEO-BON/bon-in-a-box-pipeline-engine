@@ -44,6 +44,24 @@ aside.stepChooser .description {
     font-weight: 600;
 }
 
+.dnd-head.folder-header {
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 0;
+    margin: 4px 0;
+    transition: background-color 0.2s ease;
+    border-radius: 3px;
+    padding-left: 4px;
+    padding-right: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dnd-head.folder-header:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
 
 .inFolder {
     padding-left: 1em;
