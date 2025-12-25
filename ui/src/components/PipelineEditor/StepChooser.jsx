@@ -1,14 +1,15 @@
 import "./StepChooser.css";
 
-import { React, isValidElement, useContext, useState, useEffect, useCallback } from "react";
+import { React, isValidElement, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { PopupContentContext } from "../../Layout.jsx";
 
 import { HttpError } from "../HttpErrors";
-import { fetchStepDescription, fetchStepDescriptionAsync } from "./StepDescriptionStore";
+import { fetchStepDescription, fetchStepDescriptionAsync, getStepDescription } from "./StepDescriptionStore";
 import { StepDescription } from "../StepDescription";
 import { Spinner } from "../Spinner";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
+import { Alert } from '@mui/material';
 
 const api = new BonInABoxScriptService.DefaultApi();
 
@@ -59,6 +60,8 @@ export default function StepChooser(props) {
   const [scriptFiles, setScriptFiles] = useState([]);
   const [pipelineFiles, setPipelineFiles] = useState([]);
   const [selectedStep, setSelectedStep] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loadedDescriptions, setLoadedDescriptions] = useState({});
   const {popupContent, setPopupContent} = useContext(PopupContentContext);
 
   // Applied only once when first loaded
@@ -84,6 +87,36 @@ export default function StepChooser(props) {
       }
     });
   }, [setPipelineFiles, setScriptFiles]);
+
+  // Preload all step descriptions in the background for search
+  useEffect(() => {
+    if (!pipelineFiles || !scriptFiles || isValidElement(pipelineFiles) || isValidElement(scriptFiles)) {
+      return;
+    }
+
+    const allDescriptionFiles = [
+      ...Object.keys(pipelineFiles),
+      ...Object.keys(scriptFiles)
+    ];
+
+    const batchSize = 5;
+    const delay = 100; // ms between batches
+
+    allDescriptionFiles.forEach((descriptionFile, index) => {
+      setTimeout(() => {
+        fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
+          if (metadata) {
+            setLoadedDescriptions((prev) => ({
+              ...prev,
+              [descriptionFile]: metadata
+            }));
+          }
+        }).catch((error) => {
+          console.error("Error preloading description for", descriptionFile, error);
+        });
+      }, Math.floor(index / batchSize) * delay);
+    });
+  }, [pipelineFiles, scriptFiles]);
 
   const onStepClick = useCallback(
     (descriptionFile) => {
@@ -121,6 +154,143 @@ export default function StepChooser(props) {
       setSelectedStep(null);
     }
   }, [popupContent, selectedStep, setSelectedStep]);
+
+  // Helper function to extract all searchable text from metadata
+  const extractSearchableText = useCallback((metadata) => {
+    if (!metadata) return "";
+    
+    const textParts = [];
+    
+    // Add name
+    if (metadata.name) textParts.push(metadata.name);
+    
+    // Add description
+    if (metadata.description) textParts.push(metadata.description);
+    
+    // Add author names and emails
+    if (metadata.author && Array.isArray(metadata.author)) {
+      metadata.author.forEach((person) => {
+        if (person.name) textParts.push(person.name);
+        if (person.email) textParts.push(person.email);
+        if (person.role) textParts.push(person.role);
+        if (person.identifier) textParts.push(person.identifier);
+      });
+    }
+    
+    // Add reviewer names and emails
+    if (metadata.reviewer && Array.isArray(metadata.reviewer)) {
+      metadata.reviewer.forEach((person) => {
+        if (person.name) textParts.push(person.name);
+        if (person.email) textParts.push(person.email);
+        if (person.role) textParts.push(person.role);
+        if (person.identifier) textParts.push(person.identifier);
+      });
+    }
+    
+    // Add references text and DOIs
+    if (metadata.references && Array.isArray(metadata.references)) {
+      metadata.references.forEach((ref) => {
+        if (ref.text) textParts.push(ref.text);
+        if (ref.doi) textParts.push(ref.doi);
+      });
+    }
+    
+    // Add external link
+    if (metadata.external_link) textParts.push(metadata.external_link);
+    
+    // Add license
+    if (metadata.license) textParts.push(metadata.license);
+    
+    return textParts.join(" ").toLowerCase();
+  }, []);
+
+  // Filter and rank search results
+  const filterAndRankResults = useCallback((query, pipelineFiles, scriptFiles, descriptions) => {
+    if (!query || query.trim() === "") {
+      return { pipelines: [], scripts: [] };
+    }
+
+    const searchTerm = query.toLowerCase().trim();
+    const results = { pipelines: [], scripts: [] };
+
+    const scoreResult = (descriptionFile, stepName, metadata) => {
+      const nameLower = (stepName || "").toLowerCase();
+      const metadataText = extractSearchableText(metadata);
+      
+      let score = 0;
+      /* For match type:
+          0 = no match
+          1 = other fields
+          2 = name contains
+          3 = exact name */
+      let matchType = 0; 
+      
+      // Exact name match 
+      if (nameLower === searchTerm) {
+        score = 1000;
+        matchType = 3;
+      }
+      // Name contains search term
+      else if (nameLower.includes(searchTerm)) {
+        score = 500 + (nameLower.indexOf(searchTerm) === 0 ? 100 : 0); // Bonus for starts with
+        matchType = 2;
+      }
+
+      // Other fields contain search term
+      else if (metadataText.includes(searchTerm)) {
+        score = 100;
+        matchType = 1;
+      }
+      
+      return { score, matchType, descriptionFile, stepName, metadata };
+    };
+
+    // Process pipelines
+    if (pipelineFiles && !isValidElement(pipelineFiles)) {
+      Object.entries(pipelineFiles).forEach(([descriptionFile, stepName]) => {
+        // Check both loadedDescriptions and StepDescriptionStore cache
+        const metadata = descriptions[descriptionFile] || getStepDescription(descriptionFile);
+        const result = scoreResult(descriptionFile, stepName, metadata);
+        if (result.score > 0) {
+          results.pipelines.push(result);
+        }
+      });
+    }
+
+    // Process scripts
+    if (scriptFiles && !isValidElement(scriptFiles)) {
+      Object.entries(scriptFiles).forEach(([descriptionFile, stepName]) => {
+        // Check both loadedDescriptions and StepDescriptionStore cache
+        const metadata = descriptions[descriptionFile] || getStepDescription(descriptionFile);
+        const result = scoreResult(descriptionFile, stepName, metadata);
+        if (result.score > 0) {
+          results.scripts.push(result);
+        }
+      });
+    }
+
+    // Sort by score (descending), then by matchType (descending), then by name
+    const sortResults = (arr) => {
+      return arr.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        if (b.matchType !== a.matchType) return b.matchType - a.matchType;
+        return (a.stepName || "").localeCompare(b.stepName || "", "en", { sensitivity: "base" });
+      });
+    };
+
+    results.pipelines = sortResults(results.pipelines);
+    results.scripts = sortResults(results.scripts);
+
+    return results;
+  }, [extractSearchableText]);
+
+  // Memoized filtered results
+  const filteredResults = useMemo(() => {
+    if (!searchQuery || searchQuery.trim() === "") {
+      return null;
+    }
+    return filterAndRankResults(searchQuery, pipelineFiles, scriptFiles, loadedDescriptions);
+  }, [searchQuery, pipelineFiles, scriptFiles, loadedDescriptions, filterAndRankResults]);
 
   /**
    *
@@ -184,29 +354,92 @@ export default function StepChooser(props) {
       >
         Pipeline output
       </div>
-      {pipelineFiles && (
-        <div key="Pipelines">
-          <h3>Pipelines</h3>
-          <div>
-            {isValidElement(pipelineFiles) && pipelineFiles.type === HttpError ? pipelineFiles : renderTree(
-              [],
-              Object.entries(pipelineFiles).map((entry) => [ entry[0].split(">"), entry[1] ])
-            )}
-          </div>
-        </div>
-      )}
+      
+      <div className="search-container">
+        <input
+          type="search"
+          className="step-search-input"
+          placeholder="Search pipelines and scripts..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
 
-      {scriptFiles && (
-        <div key="Scripts">
-          <h3>Scripts</h3>
-          {isValidElement(scriptFiles) && scriptFiles.type === HttpError ? scriptFiles : renderTree(
-            [],
-            Object.entries(scriptFiles).map((entry) => [
-              entry[0].split(">"),
-              entry[1],
-            ])
+      {searchQuery && searchQuery.trim() !== "" && filteredResults ? (
+        // Show filtered search results
+        <>
+          {filteredResults.pipelines.length > 0 && (
+            <div key="Pipelines">
+              <h3>Pipelines</h3>
+              <div>
+                {filteredResults.pipelines.map((result) => {
+                  const fileName = result.descriptionFile.split(">").pop();
+                  return (
+                    <PipelineStep
+                      key={result.descriptionFile}
+                      descriptionFile={result.descriptionFile}
+                      fileName={fileName}
+                      selectedStep={selectedStep}
+                      stepName={result.stepName}
+                      onStepClick={onStepClick}
+                    />
+                  );
+                })}
+              </div>
+            </div>
           )}
-        </div>
+          {filteredResults.scripts.length > 0 && (
+            <div key="Scripts">
+              <h3>Scripts</h3>
+              <div>
+                {filteredResults.scripts.map((result) => {
+                  const fileName = result.descriptionFile.split(">").pop();
+                  return (
+                    <PipelineStep
+                      key={result.descriptionFile}
+                      descriptionFile={result.descriptionFile}
+                      fileName={fileName}
+                      selectedStep={selectedStep}
+                      stepName={result.stepName}
+                      onStepClick={onStepClick}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          {filteredResults.pipelines.length === 0 && filteredResults.scripts.length === 0 && (
+            <div className="no-results">No results found</div>
+          )}
+        </>
+      ) : (
+        // Show default tree view
+        <>
+          {pipelineFiles && (
+            <div key="Pipelines">
+              <h3>Pipelines</h3>
+              <div>
+                {isValidElement(pipelineFiles) && pipelineFiles.type === HttpError ? pipelineFiles : renderTree(
+                  [],
+                  Object.entries(pipelineFiles).map((entry) => [ entry[0].split(">"), entry[1] ])
+                )}
+              </div>
+            </div>
+          )}
+
+          {scriptFiles && (
+            <div key="Scripts">
+              <h3>Scripts</h3>
+              {isValidElement(scriptFiles) && scriptFiles.type === HttpError ? scriptFiles : renderTree(
+                [],
+                Object.entries(scriptFiles).map((entry) => [
+                  entry[0].split(">"),
+                  entry[1],
+                ])
+              )}
+            </div>
+          )}
+        </>
       )}
     </aside>
   );

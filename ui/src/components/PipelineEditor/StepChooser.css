@@ -60,3 +60,31 @@ aside.stepChooser .description {
 .stepChooser h3 {
     border-bottom: 1px solid #1a192b;
 }
+
+.search-container {
+    margin-bottom: 15px;
+    margin-right: 20px;
+}
+
+.step-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #83829b;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #fcfcfc;
+    box-sizing: border-box;
+}
+
+.step-search-input:focus {
+    outline: none;
+    border-color: var(--biab-green-main, #4caf50);
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.no-results {
+    padding: 10px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
