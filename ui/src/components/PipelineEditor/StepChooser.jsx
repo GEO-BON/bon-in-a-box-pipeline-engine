@@ -19,6 +19,160 @@ const onDragStart = (event, nodeType, descriptionFile) => {
   event.dataTransfer.effectAllowed = "move";
 };
 
+// Helper function to highlight text with search keywords
+function highlightText(text, searchQuery) {
+  if (!text || !searchQuery || searchQuery.trim() === "") {
+    return text;
+  }
+
+  const keywords = searchQuery.trim().split(/\s+/).filter(k => k.length > 0);
+  if (keywords.length === 0) {
+    return text;
+  }
+
+  // a case-insensitive regex that matches all keywords
+  const regexPattern = keywords
+    .map(keyword => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|');
+  
+  const regex = new RegExp(`(${regexPattern})`, 'gi');
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+  let keyCounter = 0;
+
+  // Find all matches and build JSX with highlights
+  const matches = Array.from(text.matchAll(regex));
+  
+  for (const match of matches) {
+    // Add text before match
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    // Add highlighted match
+    parts.push(<mark key={`highlight-${keyCounter++}`} className="search-highlight">{match[0]}</mark>);
+    lastIndex = match.index + match[0].length;
+  }
+  
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+}
+
+// Helper function to get metadata excerpt with highlighted keywords
+function getMetadataExcerpt(metadata, searchQuery, stepName) {
+  if (!metadata || !searchQuery || searchQuery.trim() === "") {
+    return null;
+  }
+
+  const keywords = searchQuery.trim().split(/\s+/).filter(k => k.length > 0);
+  if (keywords.length === 0) {
+    return null;
+  }
+
+  // Extract searchable text 
+  const textParts = [];
+  
+  if (metadata.description) textParts.push(metadata.description);
+  
+  if (metadata.author && Array.isArray(metadata.author)) {
+    metadata.author.forEach((person) => {
+      if (person.name) textParts.push(person.name);
+      if (person.email) textParts.push(person.email);
+      if (person.role) textParts.push(person.role);
+    });
+  }
+  
+  if (metadata.reviewer && Array.isArray(metadata.reviewer)) {
+    metadata.reviewer.forEach((person) => {
+      if (person.name) textParts.push(person.name);
+      if (person.email) textParts.push(person.email);
+    });
+  }
+  
+  if (metadata.references && Array.isArray(metadata.references)) {
+    metadata.references.forEach((ref) => {
+      if (ref.text) textParts.push(ref.text);
+      if (ref.doi) textParts.push(ref.doi);
+    });
+  }
+  
+  if (metadata.external_link) textParts.push(metadata.external_link);
+  if (metadata.license) textParts.push(metadata.license);
+
+  const fullText = textParts.join(" ");
+  if (!fullText) {
+    return null;
+  }
+
+  // Check if any keyword matches in metadata except name
+  const fullTextLower = fullText.toLowerCase();
+  const hasMetadataMatch = keywords.some(keyword => {
+    const keywordLower = keyword.toLowerCase();
+    return fullTextLower.includes(keywordLower);
+  });
+
+  // If no match in metadata fields, don't show excerpt
+  if (!hasMetadataMatch) {
+    return null;
+  }
+
+  // Find first match position to center excerpt around
+  let firstMatchIndex = -1;
+  for (const keyword of keywords) {
+    const keywordLower = keyword.toLowerCase();
+    const index = fullTextLower.indexOf(keywordLower);
+    if (index !== -1 && (firstMatchIndex === -1 || index < firstMatchIndex)) {
+      firstMatchIndex = index;
+    }
+  }
+
+  if (firstMatchIndex === -1) {
+    return null;
+  }
+
+  // Extract excerpt centered around first match 
+  const excerptLength = 120;
+  const start = Math.max(0, firstMatchIndex - (excerptLength / 2));
+  const end = Math.min(fullText.length, start + excerptLength);
+  let excerpt = fullText.substring(start, end);
+  
+  // Adjust to word boundaries if possible
+  let prefixEllipsis = false;
+  if (start > 0 && excerpt.length > 0) {
+    const firstSpace = excerpt.indexOf(" ");
+    if (firstSpace > 0 && firstSpace < 20) {
+      excerpt = excerpt.substring(firstSpace + 1);
+    } else {
+      prefixEllipsis = true;
+    }
+  }
+  
+  let suffixEllipsis = false;
+  if (end < fullText.length && excerpt.length > 0) {
+    const lastSpace = excerpt.lastIndexOf(" ");
+    if (lastSpace > excerpt.length - 20 && lastSpace > 0) {
+      excerpt = excerpt.substring(0, lastSpace);
+    } else {
+      suffixEllipsis = true;
+    }
+  }
+
+  // Use highlightText to highlight all keywords in the excerpt
+  const highlightedExcerpt = highlightText(excerpt, searchQuery);
+
+  return (
+    <div className="metadata-excerpt">
+      {prefixEllipsis && "..."}
+      {highlightedExcerpt}
+      {suffixEllipsis && "..."}
+    </div>
+  );
+}
+
 function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick }) {
   let [isDeprecated, setIsDeprecated] = useState(false);
   // async loading of metadata
@@ -52,6 +206,48 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
       onClick={() => {onStepClick(descriptionFile)} }
     >
       {stepName}
+    </div>
+  );
+}
+
+function SearchResultStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick, searchQuery, metadata }) {
+  let [isDeprecated, setIsDeprecated] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    // use setTimeout so that our other async tasks are prioritized and this is loaded after
+    setTimeout(() => {
+      fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
+        if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+          setIsDeprecated(true);
+        } 
+      });
+    }, 1000);
+
+    return () => { cancelled = true; };
+  }, []);
+
+  const highlightedName = highlightText(stepName || "", searchQuery || "");
+  const metadataExcerpt = getMetadataExcerpt(metadata, searchQuery, stepName);
+
+  return (
+    <div
+      key={fileName}
+      onDragStart={(event) =>
+        onDragStart(event, "io", descriptionFile)
+      }
+      draggable
+      title="Click for info, drag and drop to add to pipeline."
+      className={
+        "dndnode search-result" +
+        (descriptionFile === selectedStep ? " selected" : "") + (isDeprecated ? " deprecated" : "")
+      }
+      onClick={() => {onStepClick(descriptionFile)} }
+    >
+      <div className="search-result-content">
+        <div className="search-result-name">{highlightedName}</div>
+        {metadataExcerpt}
+      </div>
     </div>
   );
 }
@@ -375,13 +571,15 @@ export default function StepChooser(props) {
                 {filteredResults.pipelines.map((result) => {
                   const fileName = result.descriptionFile.split(">").pop();
                   return (
-                    <PipelineStep
+                    <SearchResultStep
                       key={result.descriptionFile}
                       descriptionFile={result.descriptionFile}
                       fileName={fileName}
                       selectedStep={selectedStep}
                       stepName={result.stepName}
                       onStepClick={onStepClick}
+                      searchQuery={searchQuery}
+                      metadata={result.metadata}
                     />
                   );
                 })}
@@ -395,13 +593,15 @@ export default function StepChooser(props) {
                 {filteredResults.scripts.map((result) => {
                   const fileName = result.descriptionFile.split(">").pop();
                   return (
-                    <PipelineStep
+                    <SearchResultStep
                       key={result.descriptionFile}
                       descriptionFile={result.descriptionFile}
                       fileName={fileName}
                       selectedStep={selectedStep}
                       stepName={result.stepName}
                       onStepClick={onStepClick}
+                      searchQuery={searchQuery}
+                      metadata={result.metadata}
                     />
                   );
                 })}
