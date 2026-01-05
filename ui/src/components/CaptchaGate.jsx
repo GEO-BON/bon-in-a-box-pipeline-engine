@@ -5,9 +5,12 @@ function recaptchaReady() {
   return window.grecaptcha && window.grecaptcha.ready
 }
 
+const humanVarName = "h"
+const clientKeyVarName = "ck"
+const expiryVarName = "exp"
+const expiryDelay = 12 * 60 * 60 * 1000 // 12 hours
+
 export default function CaptchaGate({ children }) {
-  const humanVarName = "h"
-  const clientKeyVarName = "ck"
 
   const [errorMessage, setErrorMessage] = useState("");
   const [clientKey, setClientKey] = useState(
@@ -20,7 +23,8 @@ export default function CaptchaGate({ children }) {
     SHOW_CONTENT: "verifiedOrDisabled"
   });
   const [state, setState] = useState(
-    localStorage.getItem(humanVarName) === "true" ? States.SHOW_CONTENT : States.LOADING
+    localStorage.getItem(humanVarName) === "true" && Date.now() < JSON.parse(localStorage.getItem(expiryVarName)) ?
+      States.SHOW_CONTENT : States.LOADING
   );
 
   const showRecaptchaBadge = () => {
@@ -121,6 +125,8 @@ export default function CaptchaGate({ children }) {
           const data = await res.json();
           if (data.success) {
             localStorage.setItem(humanVarName, "true");
+            localStorage.setItem(expiryVarName, Date.now() + expiryDelay);
+
             setState(States.SHOW_CONTENT);
             return;
 
