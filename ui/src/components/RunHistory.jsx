@@ -90,39 +90,43 @@ export default function RunHistory() {
   return runHistory ? runHistory : <Spinner variant="light" />;
 }
 
-export const LastNRuns = (n) => {
+export const LastNRuns = ({n}) => {
   const [lastRuns, setLastRuns] = useState(null);
+
   useEffect(() => {
-    api.getHistory({ start: 0, limit: 4 }, (error, _, response) => {
+    api.getHistory({ start: 0, limit: n }, (error, _, response) => {
       let resp = null;
-      if (error) {
-      } else if (response && response.body?.length > 0) {
-        resp = (
-          <Grid container spacing={3}>
-            {response.body.map((res, i) => (
-              <RunCard key={i} run={res} />
-            ))}
-          </Grid>
-        );
+      if (!error && response && response.body) {
+        if (response.body.length > 0) {
+          resp = (
+            <Grid container spacing={3}>
+              {response.body.map((res, i) => (
+                <RunCard key={i} run={res} />
+              ))}
+            </Grid>
+          );
+        } else {
+          resp = <p>There are currently no runs to display.</p>
+        }
+
+      } else {
+        resp = <p>Failed to retrieve latest runs.</p>
       }
       setLastRuns(resp);
     });
-  }, []);
-  return (
-    <>
-      {lastRuns && (
-        <div>
-          <div
-            className="home-page-subtitle"
-            style={{ marginTop: "30px", marginBottom: "20px" }}
-          >
-            LATEST RUNS
-          </div>
-          {lastRuns}
-        </div>
-      )}
-    </>
-  );
+  }, [n]);
+
+  return lastRuns && (
+    <div>
+      <div
+        className="home-page-subtitle"
+        style={{ marginTop: "30px", marginBottom: "20px" }}
+      >
+        LATEST RUNS
+      </div>
+      {lastRuns}
+    </div>
+  )
 };
 
 const color = (status) => {

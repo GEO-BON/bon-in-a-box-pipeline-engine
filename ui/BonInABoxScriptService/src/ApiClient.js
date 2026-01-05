@@ -206,13 +206,14 @@ class ApiClient {
     isFileParam(param) {
         // fs.ReadStream in Node.js and Electron (but not in runtime like browserify)
         if (typeof require === 'function') {
-            let fs;
-            try {
-                fs = require('fs');
-            } catch (err) {}
-            if (fs && fs.ReadStream && param instanceof fs.ReadStream) {
-                return true;
-            }
+            // JM Lord: Using fs does not work in client code, and prints a warning.
+            // let fs;
+            // try {
+            //     fs = require('fs');
+            // } catch (err) {}
+            // if (fs && fs.ReadStream && param instanceof fs.ReadStream) {
+            //     return true;
+            // }
         }
 
         // Buffer in Node.js
