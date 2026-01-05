@@ -152,7 +152,7 @@ export default function CaptchaGate({ children }) {
         <div
           style={{
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "start",
             alignItems: "center",
             height: "100vh",
             flexDirection: "column",
@@ -172,7 +172,7 @@ export default function CaptchaGate({ children }) {
         <div
           style={{
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "start",
             alignItems: "center",
             height: "100vh",
             flexDirection: "column",
