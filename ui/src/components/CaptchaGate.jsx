@@ -1,14 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CustomButtonGreen } from "./CustomMUI";
-
-function recaptchaReady() {
-  return window.grecaptcha && window.grecaptcha.ready
-}
 
 const humanVarName = "h"
 const clientKeyVarName = "ck"
 const expiryVarName = "exp"
 const expiryDelay = 12 * 60 * 60 * 1000 // 12 hours
+
+function recaptchaReady() {
+  return window.grecaptcha && window.grecaptcha.ready
+}
+
+function showRecaptchaBadge() {
+  const badge = document.querySelector(".grecaptcha-badge");
+  if (badge) badge.style.visibility = "visible";
+};
+
+function hideRecaptchaBadge() {
+  const badge = document.querySelector(".grecaptcha-badge");
+  if (badge) badge.style.visibility = "hidden";
+};
 
 export default function CaptchaGate({ children }) {
 
@@ -26,16 +36,6 @@ export default function CaptchaGate({ children }) {
     localStorage.getItem(humanVarName) === "true" && Date.now() < JSON.parse(localStorage.getItem(expiryVarName)) ?
       States.SHOW_CONTENT : States.LOADING
   );
-
-  const showRecaptchaBadge = () => {
-    const badge = document.querySelector(".grecaptcha-badge");
-    if (badge) badge.style.visibility = "visible";
-  };
-
-  const hideRecaptchaBadge = () => {
-    const badge = document.querySelector(".grecaptcha-badge");
-    if (badge) badge.style.visibility = "hidden";
-  };
 
   useEffect(() => {
     return () => {
@@ -96,7 +96,7 @@ export default function CaptchaGate({ children }) {
   }, [clientKey]);
 
   // Execute reCAPTCHA verification
-  const executeRecaptcha = (siteKey) => {
+  const executeRecaptcha = useCallback((siteKey) => {
     showRecaptchaBadge();
     if (state === States.SHOW_CONTENT) {
       return;
@@ -144,7 +144,7 @@ export default function CaptchaGate({ children }) {
 
       setState(States.ERROR);
     });
-  };
+  }, [setState, setErrorMessage]);
 
   switch (state) {
     case States.LOADING:
