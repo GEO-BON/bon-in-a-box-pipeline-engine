@@ -294,10 +294,10 @@ fun Application.configureRouting() {
         }
 
         get("/api/captcha-config") {
-            val siteKey = System.getenv("RECAPTCHA_SITE_KEY")
+            val siteKey = System.getenv("RECAPTCHA_CLIENT_KEY")
             val serverKey = System.getenv("RECAPTCHA_SERVER_KEY")
             val enabled = !siteKey.isNullOrEmpty() && !serverKey.isNullOrEmpty()
-            
+
             val config = mapOf(
                 "enabled" to enabled,
                 "siteKey" to (if (enabled) siteKey else null)
