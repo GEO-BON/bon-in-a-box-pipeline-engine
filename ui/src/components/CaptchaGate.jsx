@@ -1,19 +1,26 @@
 import { useState, useEffect } from "react";
 import { CustomButtonGreen } from "./CustomMUI";
 
+function recaptchaReady() {
+  return window.grecaptcha && window.grecaptcha.ready
+}
+
 export default function CaptchaGate({ children }) {
   const humanVarName = "h"
+  const clientKeyVarName = "ck"
 
   const [errorMessage, setErrorMessage] = useState("");
-  const [captchaConfig, setCaptchaConfig] = useState(null); // null = loading, {enabled: false} = disabled, {enabled: true, siteKey: "..."} = enabled
+  const [clientKey, setClientKey] = useState(
+    localStorage.getItem(clientKeyVarName)
+  );
 
   const States = Object.freeze({
     LOADING: "loading",
     ERROR: "error",
-    VERIFIED: "verified"
+    SHOW_CONTENT: "verifiedOrDisabled"
   });
   const [state, setState] = useState(
-    localStorage.getItem(humanVarName) === "true" ? States.VERIFIED : States.LOADING
+    localStorage.getItem(humanVarName) === "true" ? States.SHOW_CONTENT : States.LOADING
   );
 
   const showRecaptchaBadge = () => {
@@ -27,8 +34,14 @@ export default function CaptchaGate({ children }) {
   };
 
   useEffect(() => {
-    if (state === States.VERIFIED) {
-      setCaptchaConfig({ enabled: false });
+    return () => {
+      hideRecaptchaBadge() // when leaving the page (the captcha protects only this page)
+    }
+  }, [])
+
+  // Load captcha config from server
+  useEffect(() => {
+    if (state === States.SHOW_CONTENT) {
       return;
     }
 
@@ -37,61 +50,55 @@ export default function CaptchaGate({ children }) {
         const res = await fetch("/api/captcha-config");
         if (res.ok) {
           const config = await res.json();
-          setCaptchaConfig(config);
-
-          if (!config.enabled) {
-            setState(States.VERIFIED);
-            hideRecaptchaBadge();
+          if (config.enabled) {
+            localStorage.setItem(clientKeyVarName, config.siteKey);
+            setClientKey(config.siteKey)
             return;
           }
-
-          showRecaptchaBadge();
-          loadRecaptchaScript(config.siteKey);
-        } else {
-          setCaptchaConfig({ enabled: false });
-          setState(States.VERIFIED);
-
-          hideRecaptchaBadge();
         }
       } catch (err) {
         console.error("Error checking captcha config:", err);
-        setCaptchaConfig({ enabled: false });
-        setState(States.VERIFIED);
-        hideRecaptchaBadge();
       }
+
+      // Captcha disabled, or something went wrong, show contents
+      setState(States.SHOW_CONTENT);
     };
 
     checkCaptchaConfig();
-
-    return () => {
-      hideRecaptchaBadge();
-    };
   }, []);
 
-  const loadRecaptchaScript = (siteKey) => {
-    if (window.grecaptcha) {
-      executeRecaptcha(siteKey);
-      return;
+  // Create and inject script tag, once client key obtrained.
+  useEffect(() => {
+    if(!clientKey)
+      return
+
+    if(recaptchaReady()) {
+      executeRecaptcha(clientKey);
+      return
     }
 
-    // Create and inject script tag
     const script = document.createElement("script");
-    script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
+    script.src = `https://www.google.com/recaptcha/api.js?render=${clientKey}`;
     script.async = true;
     script.defer = true;
     script.onload = () => {
-      executeRecaptcha(siteKey);
+      executeRecaptcha(clientKey);
     };
     script.onerror = () => {
       setErrorMessage("Failed to load reCAPTCHA script. Please refresh the page.");
       setState(States.ERROR);
     };
     document.head.appendChild(script);
-  };
+  }, [clientKey]);
 
   // Execute reCAPTCHA verification
   const executeRecaptcha = (siteKey) => {
-    if (!window.grecaptcha || !window.grecaptcha.ready) {
+    showRecaptchaBadge();
+    if (state === States.SHOW_CONTENT) {
+      return;
+    }
+
+    if (!recaptchaReady()) {
       setTimeout(() => executeRecaptcha(siteKey), 100);
       return;
     }
@@ -114,8 +121,9 @@ export default function CaptchaGate({ children }) {
           const data = await res.json();
           if (data.success) {
             localStorage.setItem(humanVarName, "true");
-            setState(States.VERIFIED);
+            setState(States.SHOW_CONTENT);
             return;
+
           } else {
             setErrorMessage("Verification failed. Are you a robot? Please try again.");
           }
@@ -131,11 +139,6 @@ export default function CaptchaGate({ children }) {
       setState(States.ERROR);
     });
   };
-
-  // If captcha is disabled, render children immediately
-  if (captchaConfig && !captchaConfig.enabled) {
-    return children;
-  }
 
   switch (state) {
     case States.LOADING:
@@ -155,7 +158,7 @@ export default function CaptchaGate({ children }) {
         </div>
       );
 
-    case States.VERIFIED:
+    case States.SHOW_CONTENT:
       return children; // Show children only after successful verification
 
     case States.ERROR:
