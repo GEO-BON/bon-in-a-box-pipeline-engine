@@ -19,7 +19,6 @@ const onDragStart = (event, nodeType, descriptionFile) => {
   event.dataTransfer.effectAllowed = "move";
 };
 
-// I hope jean micheal enjoys this code review :D, comments galore!
 // Helper function to highlight text with search keywords
 function highlightText(text, searchQuery) {
   if (!text || !searchQuery || searchQuery.trim() === "") {
@@ -35,16 +34,15 @@ function highlightText(text, searchQuery) {
   const regexPattern = keywords
     .map(keyword => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
     .join('|');
-  
+
   const regex = new RegExp(`(${regexPattern})`, 'gi');
   const parts = [];
   let lastIndex = 0;
-  let match;
   let keyCounter = 0;
 
   // Find all matches and build JSX with highlights
   const matches = Array.from(text.matchAll(regex));
-  
+
   for (const match of matches) {
     // Add text before match
     if (match.index > lastIndex) {
@@ -54,17 +52,17 @@ function highlightText(text, searchQuery) {
     parts.push(<mark key={`highlight-${keyCounter++}`} className="search-highlight">{match[0]}</mark>);
     lastIndex = match.index + match[0].length;
   }
-  
+
   // Add remaining text
   if (lastIndex < text.length) {
     parts.push(text.substring(lastIndex));
   }
 
-  return parts.length > 0 ? parts : text;
+  return parts;
 }
 
 // Helper function to get metadata excerpt with highlighted keywords
-function getMetadataExcerpt(metadata, searchQuery, stepName) {
+function getMetadataExcerpt(metadata, searchQuery) {
   if (!metadata || !searchQuery || searchQuery.trim() === "") {
     return null;
   }
@@ -74,11 +72,11 @@ function getMetadataExcerpt(metadata, searchQuery, stepName) {
     return null;
   }
 
-  // Extract searchable text 
+  // Extract searchable text
   const textParts = [];
-  
+
   if (metadata.description) textParts.push(metadata.description);
-  
+
   if (metadata.author && Array.isArray(metadata.author)) {
     metadata.author.forEach((person) => {
       if (person.name) textParts.push(person.name);
@@ -86,21 +84,21 @@ function getMetadataExcerpt(metadata, searchQuery, stepName) {
       if (person.role) textParts.push(person.role);
     });
   }
-  
+
   if (metadata.reviewer && Array.isArray(metadata.reviewer)) {
     metadata.reviewer.forEach((person) => {
       if (person.name) textParts.push(person.name);
       if (person.email) textParts.push(person.email);
     });
   }
-  
+
   if (metadata.references && Array.isArray(metadata.references)) {
     metadata.references.forEach((ref) => {
       if (ref.text) textParts.push(ref.text);
       if (ref.doi) textParts.push(ref.doi);
     });
   }
-  
+
   if (metadata.external_link) textParts.push(metadata.external_link);
   if (metadata.license) textParts.push(metadata.license);
 
@@ -135,12 +133,12 @@ function getMetadataExcerpt(metadata, searchQuery, stepName) {
     return null;
   }
 
-  // Extract excerpt centered around first match 
+  // Extract excerpt centered around first match
   const excerptLength = 120;
   const start = Math.max(0, firstMatchIndex - (excerptLength / 2));
   const end = Math.min(fullText.length, start + excerptLength);
   let excerpt = fullText.substring(start, end);
-  
+
   // Adjust to word boundaries if possible
   let prefixEllipsis = false;
   if (start > 0 && excerpt.length > 0) {
@@ -151,7 +149,7 @@ function getMetadataExcerpt(metadata, searchQuery, stepName) {
       prefixEllipsis = true;
     }
   }
-  
+
   let suffixEllipsis = false;
   if (end < fullText.length && excerpt.length > 0) {
     const lastSpace = excerpt.lastIndexOf(" ");
@@ -185,7 +183,7 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
       fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
         if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
           setIsDeprecated(true);
-        } 
+        }
       });
     }, 1000);
 
@@ -221,7 +219,7 @@ function SearchResultStep({ descriptionFile, fileName, selectedStep, stepName, o
       fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
         if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
           setIsDeprecated(true);
-        } 
+        }
       });
     }, 1000);
 
@@ -229,7 +227,7 @@ function SearchResultStep({ descriptionFile, fileName, selectedStep, stepName, o
   }, []);
 
   const highlightedName = highlightText(stepName || "", searchQuery || "");
-  const metadataExcerpt = getMetadataExcerpt(metadata, searchQuery, stepName);
+  const metadataExcerpt = getMetadataExcerpt(metadata, searchQuery);
 
   return (
     <div
@@ -253,7 +251,7 @@ function SearchResultStep({ descriptionFile, fileName, selectedStep, stepName, o
   );
 }
 
-export default function StepChooser(props) { 
+export default function StepChooser(_) {
   const [scriptFiles, setScriptFiles] = useState([]);
   const [pipelineFiles, setPipelineFiles] = useState([]);
   const [selectedStep, setSelectedStep] = useState([]);
@@ -369,15 +367,15 @@ export default function StepChooser(props) {
   // Helper function to extract all searchable text from metadata
   const extractSearchableText = useCallback((metadata) => {
     if (!metadata) return "";
-    
+
     const textParts = [];
-    
+
     // Add name
     if (metadata.name) textParts.push(metadata.name);
-    
+
     // Add description
     if (metadata.description) textParts.push(metadata.description);
-    
+
     // Add author names and emails
     if (metadata.author && Array.isArray(metadata.author)) {
       metadata.author.forEach((person) => {
@@ -387,7 +385,7 @@ export default function StepChooser(props) {
         if (person.identifier) textParts.push(person.identifier);
       });
     }
-    
+
     // Add reviewer names and emails
     if (metadata.reviewer && Array.isArray(metadata.reviewer)) {
       metadata.reviewer.forEach((person) => {
@@ -397,7 +395,7 @@ export default function StepChooser(props) {
         if (person.identifier) textParts.push(person.identifier);
       });
     }
-    
+
     // Add references text and DOIs
     if (metadata.references && Array.isArray(metadata.references)) {
       metadata.references.forEach((ref) => {
@@ -405,13 +403,13 @@ export default function StepChooser(props) {
         if (ref.doi) textParts.push(ref.doi);
       });
     }
-    
+
     // Add external link
     if (metadata.external_link) textParts.push(metadata.external_link);
-    
+
     // Add license
     if (metadata.license) textParts.push(metadata.license);
-    
+
     return textParts.join(" ").toLowerCase();
   }, []);
 
@@ -427,16 +425,16 @@ export default function StepChooser(props) {
     const scoreResult = (descriptionFile, stepName, metadata) => {
       const nameLower = (stepName || "").toLowerCase();
       const metadataText = extractSearchableText(metadata);
-      
+
       let score = 0;
       /* For match type:
           0 = no match
           1 = other fields
           2 = name contains
           3 = exact name */
-      let matchType = 0; 
-      
-      // Exact name match 
+      let matchType = 0;
+
+      // Exact name match
       if (nameLower === searchTerm) {
         score = 1000;
         matchType = 3;
@@ -452,7 +450,7 @@ export default function StepChooser(props) {
         score = 100;
         matchType = 1;
       }
-      
+
       return { score, matchType, descriptionFile, stepName, metadata };
     };
 
@@ -548,20 +546,20 @@ export default function StepChooser(props) {
 
         return (
           <div key={dirKey}>
-            <p 
+            <p
               className="dnd-head folder-header"
               onClick={(e) => {
                 e.stopPropagation();
                 toggleDir(dirKey);
               }}
             >
-              <SubdirectoryArrowRightIcon 
+              <SubdirectoryArrowRightIcon
                 sx={{
                   fontSize: "0.85em",
                   transform: isCollapsed ? "rotate(0deg)" : "rotate(90deg)",
                   transition: "transform 0.2s ease-in-out",
                   display: "inline-block"
-                }} 
+                }}
               />
               {key}
             </p>
@@ -586,7 +584,7 @@ export default function StepChooser(props) {
       >
         Pipeline output
       </div>
-      
+
       <div className="search-container">
         <input
           type="search"
