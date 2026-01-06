@@ -78,7 +78,15 @@ export const filterAndRankResults = (searchKeywords, pipelineFiles, scriptFiles)
     // Metadata match
     let metadataExcerpt = getMetadataExcerpt(metadata, searchKeywords);
     if (metadataExcerpt) {
-      score += 1;
+      // Using stringify here is inaccurate since we can match on the keys
+      // (label, description, etc) but it only affects the scoring since
+      // we already know we have a true match from excerpt above
+      let metadataLower = JSON.stringify(metadata).toLowerCase();
+      searchKeywords.forEach((keyword) => {
+        if (metadataLower.includes(keyword)) {
+          score += 1;
+        }
+      });
     }
 
     // Title match
