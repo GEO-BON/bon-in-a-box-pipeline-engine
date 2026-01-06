@@ -1,11 +1,6 @@
 // Helper function to highlight text with search keywords
-export function highlightText(text, searchQuery) {
-    if (!text || !searchQuery?.trim()) {
-        return text;
-    }
-
-    const keywords = searchQuery.trim().split(/\s+/).filter(k => k.length > 0);
-    if (keywords.length === 0) {
+export function highlightText(text, keywords) {
+    if (!text || keywords.length === 0) {
         return text;
     }
 
@@ -57,4 +52,62 @@ export function highlightText(text, searchQuery) {
     }
 
     return parts;
+}
+
+// Extract exceprt matching search keywords and highlight them
+export function extractExcerpt(fullText, keywords) {
+  // Check if any keyword matches in metadata except name
+  const fullTextLower = fullText.toLowerCase();
+
+  // Find first match position to center excerpt around
+  let firstMatchIndex = -1;
+  for (const keyword of keywords) {
+    const keywordLower = keyword.toLowerCase();
+    const index = fullTextLower.indexOf(keywordLower);
+    if (index !== -1 && (firstMatchIndex === -1 || index < firstMatchIndex)) {
+      firstMatchIndex = index;
+    }
+  }
+
+  if (firstMatchIndex === -1) {
+    return null; // No matches found
+  }
+
+  // Extract excerpt centered around first match
+  const excerptLength = 120;
+  const start = Math.max(0, firstMatchIndex - (excerptLength / 2));
+  const end = Math.min(fullText.length, start + excerptLength);
+  let excerpt = fullText.substring(start, end);
+
+  // Adjust to word boundaries if possible
+  let prefixEllipsis = false;
+  if (start > 0 && excerpt.length > 0) {
+    prefixEllipsis = true;
+
+    const firstSpace = excerpt.indexOf(" ");
+    if (0 < firstSpace && firstSpace < 20) {
+      excerpt = excerpt.substring(firstSpace + 1);
+    }
+  }
+
+  let suffixEllipsis = false;
+  if (end < fullText.length && excerpt.length > 0) {
+    suffixEllipsis = true;
+
+    const lastSpace = excerpt.lastIndexOf(" ");
+    if (excerpt.length - 20 < lastSpace && lastSpace !== -1) {
+      excerpt = excerpt.substring(0, lastSpace);
+    }
+  }
+
+  // Use highlightText to highlight all keywords in the excerpt
+  const highlightedExcerpt = highlightText(excerpt, keywords);
+
+  return (
+    <div className="metadata-excerpt">
+      {prefixEllipsis && "... "}
+      {highlightedExcerpt}
+      {suffixEllipsis && "..."}
+    </div>
+  );
 }

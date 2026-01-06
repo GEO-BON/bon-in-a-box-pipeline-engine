@@ -10,7 +10,7 @@ import { Spinner } from "../Spinner";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import { Alert } from '@mui/material';
-import { highlightText } from "../../utils/HighlightText.jsx";
+import { extractExcerpt, highlightText } from "../../utils/HighlightText.jsx";
 
 const api = new BonInABoxScriptService.DefaultApi();
 
@@ -21,105 +21,66 @@ const onDragStart = (event, nodeType, descriptionFile) => {
 };
 
 // Helper function to get metadata excerpt with highlighted keywords
-function getMetadataExcerpt(metadata, searchQuery) {
-  if (!metadata || !searchQuery || searchQuery.trim() === "") {
+function getMetadataExcerpt(metadata, keywords) {
+  console.log(metadata)
+  if (!metadata || keywords.length === 0) {
     return null;
   }
 
-  const keywords = searchQuery.trim().split(/\s+/).filter(k => k.length > 0);
-  if (keywords.length === 0) {
-    return null;
+  let found;
+  if (metadata.description) {
+    found = extractExcerpt(metadata.description, keywords);
+    if (found) return found;
   }
-
-  // Extract searchable text
-  const textParts = [];
-
-  if (metadata.description) textParts.push(metadata.description);
 
   if (metadata.author && Array.isArray(metadata.author)) {
-    metadata.author.forEach((person) => {
-      if (person.name) textParts.push(person.name);
-      if (person.email) textParts.push(person.email);
-      if (person.role) textParts.push(person.role);
-    });
+    for(let i = 0; i < metadata.author.length; i++) {
+      let person = metadata.author[i];
+      let personStr = "In authors: "
+      if (person.name) personStr += person.name + " ";
+      if (person.email) personStr += person.email + " ";
+      if (person.role) personStr += person.role;
+
+      found = extractExcerpt(personStr, keywords);
+      if (found) return found;
+    };
   }
 
   if (metadata.reviewer && Array.isArray(metadata.reviewer)) {
-    metadata.reviewer.forEach((person) => {
-      if (person.name) textParts.push(person.name);
-      if (person.email) textParts.push(person.email);
-    });
+    for(let i = 0; i < metadata.reviewer.length; i++) {
+      let person = metadata.reviewer[i];
+      let personStr = "In reviewers: "
+      if (person.name) personStr += person.name + " ";
+      if (person.email) personStr += person.email;
+
+      found = extractExcerpt(personStr, keywords);
+      if (found) return found;
+    };
   }
 
   if (metadata.references && Array.isArray(metadata.references)) {
-    metadata.references.forEach((ref) => {
-      if (ref.text) textParts.push(ref.text);
-      if (ref.doi) textParts.push(ref.doi);
-    });
+    for(let i = 0; i < metadata.references.length; i++) {
+      let ref = metadata.references[i];
+      let refStr = "In references: ";
+      if (ref.text) refStr += ref.text + " ";
+      if (ref.doi) refStr += ref.doi;
+
+      found = extractExcerpt(refStr, keywords);
+      if (found) return found;
+    };
   }
 
-  if (metadata.external_link) textParts.push(metadata.external_link);
-  if (metadata.license) textParts.push(metadata.license);
-
-  const fullText = textParts.join(" ");
-  if (!fullText) {
-    return null;
+  if (metadata.external_link) {
+    found = extractExcerpt(metadata.external_link, keywords);
+    if (found) return found;
   }
 
-  // Check if any keyword matches in metadata except name
-  const fullTextLower = fullText.toLowerCase();
-
-  // Find first match position to center excerpt around
-  let firstMatchIndex = -1;
-  for (const keyword of keywords) {
-    const keywordLower = keyword.toLowerCase();
-    const index = fullTextLower.indexOf(keywordLower);
-    if (index !== -1 && (firstMatchIndex === -1 || index < firstMatchIndex)) {
-      firstMatchIndex = index;
-    }
+  if (metadata.license) {
+    found = extractExcerpt(metadata.license, keywords);
+    if (found) return found;
   }
 
-  if (firstMatchIndex === -1) {
-    return null; // No matches found
-  }
-
-  // Extract excerpt centered around first match
-  const excerptLength = 120;
-  const start = Math.max(0, firstMatchIndex - (excerptLength / 2));
-  const end = Math.min(fullText.length, start + excerptLength);
-  let excerpt = fullText.substring(start, end);
-
-  // Adjust to word boundaries if possible
-  let prefixEllipsis = false;
-  if (start > 0 && excerpt.length > 0) {
-    const firstSpace = excerpt.indexOf(" ");
-    if (firstSpace > 0 && firstSpace < 20) {
-      excerpt = excerpt.substring(firstSpace + 1);
-    } else {
-      prefixEllipsis = true;
-    }
-  }
-
-  let suffixEllipsis = false;
-  if (end < fullText.length && excerpt.length > 0) {
-    const lastSpace = excerpt.lastIndexOf(" ");
-    if (lastSpace > excerpt.length - 20 && lastSpace > 0) {
-      excerpt = excerpt.substring(0, lastSpace);
-    } else {
-      suffixEllipsis = true;
-    }
-  }
-
-  // Use highlightText to highlight all keywords in the excerpt
-  const highlightedExcerpt = highlightText(excerpt, searchQuery);
-
-  return (
-    <div className="metadata-excerpt">
-      {prefixEllipsis && "..."}
-      {highlightedExcerpt}
-      {suffixEllipsis && "..."}
-    </div>
-  );
+  return null;
 }
 
 function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick }) {
@@ -176,8 +137,12 @@ function SearchResultStep({ descriptionFile, fileName, selectedStep, stepName, o
     return () => { cancelled = true; };
   }, []);
 
-  const highlightedName = highlightText(stepName || "", searchQuery || "");
-  const metadataExcerpt = getMetadataExcerpt(metadata, searchQuery);
+  const keywords = searchQuery.trim().split(/\s+/).filter(k => k.length > 0);
+  if (keywords.length === 0) {
+    return null;
+  }
+  const highlightedName = highlightText(stepName || "", keywords);
+  const metadataExcerpt = getMetadataExcerpt(metadata, keywords);
 
   return (
     <div
