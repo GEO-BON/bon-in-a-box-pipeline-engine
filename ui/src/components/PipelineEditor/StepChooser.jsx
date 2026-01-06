@@ -1,6 +1,6 @@
 import "./StepChooser.css";
 
-import { React, isValidElement, useContext, useState, useEffect, useCallback, useMemo } from "react";
+import { isValidElement, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { PopupContentContext } from "../../Layout.jsx";
 
 import { HttpError } from "../HttpErrors";
@@ -10,7 +10,8 @@ import { Spinner } from "../Spinner";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import { Alert } from '@mui/material';
-import { extractExcerpt, highlightText } from "../../utils/HighlightText.jsx";
+import { highlightText } from "../../utils/HighlightText.jsx";
+import { filterAndRankResults, getMetadataExcerpt } from "./MetadataSearchFunctions.jsx";
 
 const api = new BonInABoxScriptService.DefaultApi();
 
@@ -19,68 +20,6 @@ const onDragStart = (event, nodeType, descriptionFile) => {
   event.dataTransfer.setData("descriptionFile", descriptionFile);
   event.dataTransfer.effectAllowed = "move";
 };
-
-// Helper function to get metadata excerpt with highlighted keywords
-function getMetadataExcerpt(metadata, keywords) {
-  if (!metadata || keywords.length === 0) {
-    return null;
-  }
-
-  let found;
-  if (metadata.description) {
-    found = extractExcerpt(metadata.description, keywords);
-    if (found) return found;
-  }
-
-  if (metadata.author && Array.isArray(metadata.author)) {
-    for(let i = 0; i < metadata.author.length; i++) {
-      let person = metadata.author[i];
-      let personStr = "In authors: "
-      if (person.name) personStr += person.name + " ";
-      if (person.email) personStr += person.email + " ";
-      if (person.role) personStr += person.role;
-
-      found = extractExcerpt(personStr, keywords);
-      if (found) return found;
-    };
-  }
-
-  if (metadata.reviewer && Array.isArray(metadata.reviewer)) {
-    for(let i = 0; i < metadata.reviewer.length; i++) {
-      let person = metadata.reviewer[i];
-      let personStr = "In reviewers: "
-      if (person.name) personStr += person.name + " ";
-      if (person.email) personStr += person.email;
-
-      found = extractExcerpt(personStr, keywords);
-      if (found) return found;
-    };
-  }
-
-  if (metadata.references && Array.isArray(metadata.references)) {
-    for(let i = 0; i < metadata.references.length; i++) {
-      let ref = metadata.references[i];
-      let refStr = "In references: ";
-      if (ref.text) refStr += ref.text + " ";
-      if (ref.doi) refStr += ref.doi;
-
-      found = extractExcerpt(refStr, keywords);
-      if (found) return found;
-    };
-  }
-
-  if (metadata.external_link) {
-    found = extractExcerpt(metadata.external_link, keywords);
-    if (found) return found;
-  }
-
-  if (metadata.license) {
-    found = extractExcerpt(metadata.license, keywords);
-    if (found) return found;
-  }
-
-  return null;
-}
 
 function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick }) {
   let [isDeprecated, setIsDeprecated] = useState(false);
@@ -138,7 +77,7 @@ function SearchResultStep({ descriptionFile, selectedStep, stepName, onStepClick
   }, [metadata]);
 
   useEffect(() => {
-    setHighlightedName(highlightText(stepName || "", searchKeywords));
+    setHighlightedName(highlightText(stepName, searchKeywords));
   }, [stepName, searchKeywords, setHighlightedName]);
 
   useEffect(() => {
@@ -253,140 +192,12 @@ export default function StepChooser(_) {
     setSearchKeywords(searchQuery.trim().split(/\s+/).filter(k => k.length > 0));
   }, [searchQuery, setSearchKeywords]);
 
-  // Helper function to extract all searchable text from metadata
-  const extractSearchableText = useCallback((metadata) => {
-    if (!metadata) return "";
-
-    const textParts = [];
-
-    // Add name
-    if (metadata.name) textParts.push(metadata.name);
-
-    // Add description
-    if (metadata.description) textParts.push(metadata.description);
-
-    // Add author names and emails
-    if (metadata.author && Array.isArray(metadata.author)) {
-      metadata.author.forEach((person) => {
-        if (person.name) textParts.push(person.name);
-        if (person.email) textParts.push(person.email);
-        if (person.role) textParts.push(person.role);
-        if (person.identifier) textParts.push(person.identifier);
-      });
-    }
-
-    // Add reviewer names and emails
-    if (metadata.reviewer && Array.isArray(metadata.reviewer)) {
-      metadata.reviewer.forEach((person) => {
-        if (person.name) textParts.push(person.name);
-        if (person.email) textParts.push(person.email);
-        if (person.role) textParts.push(person.role);
-        if (person.identifier) textParts.push(person.identifier);
-      });
-    }
-
-    // Add references text and DOIs
-    if (metadata.references && Array.isArray(metadata.references)) {
-      metadata.references.forEach((ref) => {
-        if (ref.text) textParts.push(ref.text);
-        if (ref.doi) textParts.push(ref.doi);
-      });
-    }
-
-    // Add external link
-    if (metadata.external_link) textParts.push(metadata.external_link);
-
-    // Add license
-    if (metadata.license) textParts.push(metadata.license);
-
-    return textParts.join(" ").toLowerCase();
-  }, []);
-
-  // Filter and rank search results
-  const filterAndRankResults = useCallback((query, pipelineFiles, scriptFiles) => {
-    if (!query || query.trim() === "") {
-      return { pipelines: [], scripts: [] };
-    }
-
-    const searchTerm = query.toLowerCase().trim();
-    const results = { pipelines: [], scripts: [] };
-
-    const scoreResult = (descriptionFile, stepName, metadata) => {
-      const nameLower = (stepName || "").toLowerCase();
-      const metadataText = extractSearchableText(metadata);
-
-      let score = 0;
-      /* For match type:
-          0 = no match
-          1 = other fields
-          2 = name contains
-          3 = exact name */
-      let matchType = 0;
-
-      // Exact name match
-      if (nameLower === searchTerm) {
-        score = 1000;
-        matchType = 3;
-      }
-      // Name contains search term
-      else if (nameLower.includes(searchTerm)) {
-        score = 500 + (nameLower.indexOf(searchTerm) === 0 ? 100 : 0); // Bonus for starts with
-        matchType = 2;
-      }
-
-      // Other fields contain search term
-      else if (metadataText.includes(searchTerm)) {
-        score = 100;
-        matchType = 1;
-      }
-
-      return { score, matchType, descriptionFile, stepName, metadata };
-    };
-
-    // Process pipelines
-    if (pipelineFiles && !isValidElement(pipelineFiles)) {
-      Object.entries(pipelineFiles).forEach(([descriptionFile, stepName]) => {
-        const metadata = getStepDescription(descriptionFile);
-        const result = scoreResult(descriptionFile, stepName, metadata);
-        if (result.score > 0) {
-          results.pipelines.push(result);
-        }
-      });
-    }
-
-    // Process scripts
-    if (scriptFiles && !isValidElement(scriptFiles)) {
-      Object.entries(scriptFiles).forEach(([descriptionFile, stepName]) => {
-        const metadata = getStepDescription(descriptionFile);
-        const result = scoreResult(descriptionFile, stepName, metadata);
-        if (result.score > 0) {
-          results.scripts.push(result);
-        }
-      });
-    }
-
-    // Sort by score (descending), then by matchType (descending), then by name
-    const sortResults = (arr) => {
-      return arr.sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
-        if (b.matchType !== a.matchType) return b.matchType - a.matchType;
-        return (a.stepName || "").localeCompare(b.stepName || "", "en", { sensitivity: "base" });
-      });
-    };
-
-    results.pipelines = sortResults(results.pipelines);
-    results.scripts = sortResults(results.scripts);
-
-    return results;
-  }, [extractSearchableText]);
-
   // Memoized filtered results
   const filteredResults = useMemo(() => {
-    if (!searchQuery || searchQuery.trim() === "") {
-      return null;
+    if (searchKeywords.length > 0) {
+      return filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles);
     }
-    return filterAndRankResults(searchQuery, pipelineFiles, scriptFiles);
-  }, [searchQuery, pipelineFiles, scriptFiles, filterAndRankResults]);
+  }, [searchKeywords, pipelineFiles, scriptFiles, filterAndRankResults]);
 
   /**
    *

@@ -1,4 +1,6 @@
 // Helper function to highlight text with search keywords
+// Returns an array of JSX elements with <mark> tags around keywords
+// If no match, returns original text string
 export function highlightText(text, keywords) {
     if (!text || keywords.length === 0) {
         return text;
@@ -46,6 +48,11 @@ export function highlightText(text, keywords) {
         );
     }
 
+    if(lastIndex === 0) {
+        // No matches found, return original text without JSX
+        return text;
+    }
+
     // Add remaining text
     if (lastIndex < text.length) {
         parts.push(text.substring(lastIndex));
@@ -54,7 +61,8 @@ export function highlightText(text, keywords) {
     return parts;
 }
 
-// Extract exceprt matching search keywords and highlight them
+// Extract exceprt matching search keywords (lowercase assumed) and highlight them
+// Returns JSX element with excerpt and highlights, or null if no match
 export function extractExcerpt(fullText, keywords) {
   // Check if any keyword matches in metadata except name
   const fullTextLower = fullText.toLowerCase();
