@@ -84,10 +84,12 @@ export const filterAndRankResults = (searchKeywords, pipelineFiles, scriptFiles)
     // Title match
     let titleHighlighted = highlightText(stepName, searchKeywords);
     if(titleHighlighted !== stepName) {
-      score = 10;
-
-      // TODO Bonus when starts with
-      // if (nameLower.indexOf(searchTerm) === 0) score += 5;
+      let stepNameLower = stepName.toLowerCase()
+      searchKeywords.forEach((keyword) => {
+        if (stepNameLower.includes(keyword)) {
+          score += 10;
+        }
+      });
     }
 
     return {score, descriptionFile, stepName, metadata, titleHighlighted, metadataExcerpt};
