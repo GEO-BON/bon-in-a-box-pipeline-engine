@@ -1,6 +1,6 @@
 // Helper function to highlight text with search keywords
 export function highlightText(text, searchQuery) {
-    if (!text || !searchQuery || searchQuery.trim() === "") {
+    if (!text || !searchQuery?.trim()) {
         return text;
     }
 
@@ -9,7 +9,7 @@ export function highlightText(text, searchQuery) {
         return text;
     }
 
-    // a case-insensitive regex that matches all keywords
+    // A case-insensitive regex that matches all keywords
     const regexPattern = keywords
         .map(keyword => keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
         .join('|');
@@ -27,9 +27,28 @@ export function highlightText(text, searchQuery) {
         if (match.index > lastIndex) {
             parts.push(text.substring(lastIndex, match.index));
         }
-        // Add highlighted match
-        parts.push(<mark key={`highlight-${keyCounter++}`} className="search-highlight">{match[0]}</mark>);
+
+        // Determine if we add padding to word boundaries
+        let styles = {}
+        const charBefore = text[match.index - 1];
+        if(!charBefore?.trim()) {
+            styles.paddingLeft = '2px'
+            styles.marginLeft = '-2px'
+        }
+
         lastIndex = match.index + match[0].length;
+        const charAfter = text[lastIndex];
+        if(!charAfter?.trim()) {
+            styles.paddingRight = '2px'
+            styles.marginRight = '-2px'
+        }
+
+        // Add highlighted match
+        parts.push(
+            <mark key={`highlight-${keyCounter++}`} className="search-highlight" style={styles}>
+                {match[0]}
+            </mark>
+        );
     }
 
     // Add remaining text
