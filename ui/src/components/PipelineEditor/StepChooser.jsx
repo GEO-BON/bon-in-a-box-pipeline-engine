@@ -85,18 +85,24 @@ function getMetadataExcerpt(metadata, keywords) {
 
 function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick }) {
   let [isDeprecated, setIsDeprecated] = useState(false);
-  // async loading of metadata
 
+  // Check deprecation status on mount
   useEffect(() => {
     let cancelled = false;
-    // use setTimeout so that our other async tasks are prioritized and this is loaded after
-    setTimeout(() => {
-      fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
-        if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
-          setIsDeprecated(true);
-        }
-      });
-    }, 1000);
+    let metadata = getStepDescription(descriptionFile);
+    if(metadata) {
+      if (metadata.lifecycle && metadata.lifecycle.status === "deprecated") {
+        setIsDeprecated(true);
+      }
+    } else { // We need to query. Use setTimeout so that our other async tasks are prioritized and this is loaded after
+      setTimeout(() => {
+        fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
+          if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+            setIsDeprecated(true);
+          }
+        });
+      }, 1000);
+    }
 
     return () => { cancelled = true; };
   }, []);
@@ -124,18 +130,10 @@ function SearchResultStep({ descriptionFile, fileName, selectedStep, stepName, o
   let [isDeprecated, setIsDeprecated] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
-    // use setTimeout so that our other async tasks are prioritized and this is loaded after
-    setTimeout(() => {
-      fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
-        if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
-          setIsDeprecated(true);
-        }
-      });
-    }, 1000);
-
-    return () => { cancelled = true; };
-  }, []);
+    if (metadata.lifecycle && metadata.lifecycle.status === "deprecated") {
+      setIsDeprecated(true);
+    }
+  }, [metadata]);
 
   const keywords = searchQuery.trim().split(/\s+/).filter(k => k.length > 0);
   if (keywords.length === 0) {
