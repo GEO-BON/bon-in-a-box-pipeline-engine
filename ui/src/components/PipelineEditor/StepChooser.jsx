@@ -126,7 +126,7 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
   );
 }
 
-function SearchResultStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick, searchQuery, metadata }) {
+function SearchResultStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick, searchKeywords, metadata }) {
   let [isDeprecated, setIsDeprecated] = useState(false);
 
   useEffect(() => {
@@ -135,12 +135,8 @@ function SearchResultStep({ descriptionFile, fileName, selectedStep, stepName, o
     }
   }, [metadata]);
 
-  const keywords = searchQuery.trim().split(/\s+/).filter(k => k.length > 0);
-  if (keywords.length === 0) {
-    return null;
-  }
-  const highlightedName = highlightText(stepName || "", keywords);
-  const metadataExcerpt = getMetadataExcerpt(metadata, keywords);
+  const highlightedName = highlightText(stepName || "", searchKeywords);
+  const metadataExcerpt = getMetadataExcerpt(metadata, searchKeywords);
 
   return (
     <div
@@ -169,6 +165,7 @@ export default function StepChooser(_) {
   const [pipelineFiles, setPipelineFiles] = useState([]);
   const [selectedStep, setSelectedStep] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchKeywords, setSearchKeywords] = useState([]);
   const [loadedDescriptions, setLoadedDescriptions] = useState({});
   const [collapsedDirs, setCollapsedDirs] = useState(new Set());
   const {popupContent, setPopupContent} = useContext(PopupContentContext);
@@ -276,6 +273,10 @@ export default function StepChooser(_) {
       return newSet;
     });
   }, []);
+
+  useEffect(() => {
+    setSearchKeywords(searchQuery.trim().split(/\s+/).filter(k => k.length > 0));
+  }, [searchQuery, setSearchKeywords]);
 
   // Helper function to extract all searchable text from metadata
   const extractSearchableText = useCallback((metadata) => {
@@ -508,7 +509,7 @@ export default function StepChooser(_) {
         />
       </div>
 
-      {searchQuery && searchQuery.trim() !== "" && filteredResults ? (
+      {searchKeywords.length > 0 && filteredResults ? (
         // Show filtered search results
         <>
           {filteredResults.pipelines.length > 0 && (
@@ -525,7 +526,7 @@ export default function StepChooser(_) {
                       selectedStep={selectedStep}
                       stepName={result.stepName}
                       onStepClick={onStepClick}
-                      searchQuery={searchQuery}
+                      searchKeywords={searchKeywords}
                       metadata={result.metadata}
                     />
                   );
@@ -547,7 +548,7 @@ export default function StepChooser(_) {
                       selectedStep={selectedStep}
                       stepName={result.stepName}
                       onStepClick={onStepClick}
-                      searchQuery={searchQuery}
+                      searchKeywords={searchKeywords}
                       metadata={result.metadata}
                     />
                   );
