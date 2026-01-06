@@ -189,7 +189,7 @@ export default function StepChooser(_) {
   }, []);
 
   useEffect(() => {
-    setSearchKeywords(searchQuery.trim().split(/\s+/).filter(k => k.length > 0));
+    setSearchKeywords(searchQuery.trim().split(/\s+/).filter(k => k.length > 0).map(k => k.toLowerCase()));
   }, [searchQuery, setSearchKeywords]);
 
   // Memoized filtered results

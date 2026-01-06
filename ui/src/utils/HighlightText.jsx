@@ -70,8 +70,7 @@ export function extractExcerpt(fullText, keywords) {
   // Find first match position to center excerpt around
   let firstMatchIndex = -1;
   for (const keyword of keywords) {
-    const keywordLower = keyword.toLowerCase();
-    const index = fullTextLower.indexOf(keywordLower);
+    const index = fullTextLower.indexOf(keyword);
     if (index !== -1 && (firstMatchIndex === -1 || index < firstMatchIndex)) {
       firstMatchIndex = index;
     }
