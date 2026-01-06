@@ -86,6 +86,7 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
   let [isDeprecated, setIsDeprecated] = useState(false);
 
   // Check deprecation status on mount
+  // Also supports search in metadata (it will load the ScriptDescriptionStore cache with all steps)
   useEffect(() => {
     let cancelled = false;
     let metadata = getStepDescription(descriptionFile);
@@ -171,7 +172,6 @@ export default function StepChooser(_) {
   const [selectedStep, setSelectedStep] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchKeywords, setSearchKeywords] = useState([]);
-  const [loadedDescriptions, setLoadedDescriptions] = useState({});
   const [collapsedDirs, setCollapsedDirs] = useState(new Set());
   const {popupContent, setPopupContent} = useContext(PopupContentContext);
 
@@ -198,36 +198,6 @@ export default function StepChooser(_) {
       }
     });
   }, [setPipelineFiles, setScriptFiles]);
-
-  // Preload all step descriptions in the background for search
-  useEffect(() => {
-    if (!pipelineFiles || !scriptFiles || isValidElement(pipelineFiles) || isValidElement(scriptFiles)) {
-      return;
-    }
-
-    const allDescriptionFiles = [
-      ...Object.keys(pipelineFiles),
-      ...Object.keys(scriptFiles)
-    ];
-
-    const batchSize = 5;
-    const delay = 100; // ms between batches
-
-    allDescriptionFiles.forEach((descriptionFile, index) => {
-      setTimeout(() => {
-        fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
-          if (metadata) {
-            setLoadedDescriptions((prev) => ({
-              ...prev,
-              [descriptionFile]: metadata
-            }));
-          }
-        }).catch((error) => {
-          console.error("Error preloading description for", descriptionFile, error);
-        });
-      }, Math.floor(index / batchSize) * delay);
-    });
-  }, [pipelineFiles, scriptFiles]);
 
   const onStepClick = useCallback(
     (descriptionFile) => {
@@ -333,7 +303,7 @@ export default function StepChooser(_) {
   }, []);
 
   // Filter and rank search results
-  const filterAndRankResults = useCallback((query, pipelineFiles, scriptFiles, descriptions) => {
+  const filterAndRankResults = useCallback((query, pipelineFiles, scriptFiles) => {
     if (!query || query.trim() === "") {
       return { pipelines: [], scripts: [] };
     }
@@ -376,8 +346,7 @@ export default function StepChooser(_) {
     // Process pipelines
     if (pipelineFiles && !isValidElement(pipelineFiles)) {
       Object.entries(pipelineFiles).forEach(([descriptionFile, stepName]) => {
-        // Check both loadedDescriptions and StepDescriptionStore cache
-        const metadata = descriptions[descriptionFile] || getStepDescription(descriptionFile);
+        const metadata = getStepDescription(descriptionFile);
         const result = scoreResult(descriptionFile, stepName, metadata);
         if (result.score > 0) {
           results.pipelines.push(result);
@@ -388,8 +357,7 @@ export default function StepChooser(_) {
     // Process scripts
     if (scriptFiles && !isValidElement(scriptFiles)) {
       Object.entries(scriptFiles).forEach(([descriptionFile, stepName]) => {
-        // Check both loadedDescriptions and StepDescriptionStore cache
-        const metadata = descriptions[descriptionFile] || getStepDescription(descriptionFile);
+        const metadata = getStepDescription(descriptionFile);
         const result = scoreResult(descriptionFile, stepName, metadata);
         if (result.score > 0) {
           results.scripts.push(result);
@@ -417,8 +385,8 @@ export default function StepChooser(_) {
     if (!searchQuery || searchQuery.trim() === "") {
       return null;
     }
-    return filterAndRankResults(searchQuery, pipelineFiles, scriptFiles, loadedDescriptions);
-  }, [searchQuery, pipelineFiles, scriptFiles, loadedDescriptions, filterAndRankResults]);
+    return filterAndRankResults(searchQuery, pipelineFiles, scriptFiles);
+  }, [searchQuery, pipelineFiles, scriptFiles, filterAndRankResults]);
 
   /**
    *
