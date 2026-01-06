@@ -68,15 +68,6 @@ function getMetadataExcerpt(metadata, searchQuery) {
 
   // Check if any keyword matches in metadata except name
   const fullTextLower = fullText.toLowerCase();
-  const hasMetadataMatch = keywords.some(keyword => {
-    const keywordLower = keyword.toLowerCase();
-    return fullTextLower.includes(keywordLower);
-  });
-
-  // If no match in metadata fields, don't show excerpt
-  if (!hasMetadataMatch) {
-    return null;
-  }
 
   // Find first match position to center excerpt around
   let firstMatchIndex = -1;
@@ -89,7 +80,7 @@ function getMetadataExcerpt(metadata, searchQuery) {
   }
 
   if (firstMatchIndex === -1) {
-    return null;
+    return null; // No matches found
   }
 
   // Extract excerpt centered around first match
