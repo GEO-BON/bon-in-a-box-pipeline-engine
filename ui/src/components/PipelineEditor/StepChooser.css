@@ -112,7 +112,7 @@ aside.stepChooser .description {
     color: #000;
     padding: 0 2px;
     border-radius: 2px;
-    font-weight: 500;
+    font-weight: 600;
 }
 
 .dndnode.search-result {
@@ -146,6 +146,6 @@ aside.stepChooser .description {
 }
 
 .metadata-excerpt .search-highlight {
-    background-color: #fff9c4;
-    font-style: normal;
+    background-color: #fff598;
+    font-weight: 500;
 }
