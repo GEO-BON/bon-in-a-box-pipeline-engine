@@ -22,7 +22,6 @@ const onDragStart = (event, nodeType, descriptionFile) => {
 
 // Helper function to get metadata excerpt with highlighted keywords
 function getMetadataExcerpt(metadata, keywords) {
-  console.log(metadata)
   if (!metadata || keywords.length === 0) {
     return null;
   }
@@ -126,8 +125,10 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
   );
 }
 
-function SearchResultStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick, searchKeywords, metadata }) {
-  let [isDeprecated, setIsDeprecated] = useState(false);
+function SearchResultStep({ descriptionFile, selectedStep, stepName, onStepClick, searchKeywords, metadata }) {
+  const [isDeprecated, setIsDeprecated] = useState(false);
+  const [highlightedName, setHighlightedName] = useState();
+  const [metadataExcerpt, setMetadataExcerpt] = useState();
 
   useEffect(() => {
     if (metadata.lifecycle && metadata.lifecycle.status === "deprecated") {
@@ -135,12 +136,16 @@ function SearchResultStep({ descriptionFile, fileName, selectedStep, stepName, o
     }
   }, [metadata]);
 
-  const highlightedName = highlightText(stepName || "", searchKeywords);
-  const metadataExcerpt = getMetadataExcerpt(metadata, searchKeywords);
+  useEffect(() => {
+    setHighlightedName(highlightText(stepName || "", searchKeywords));
+  }, [stepName, searchKeywords, setHighlightedName]);
+
+  useEffect(() => {
+    setMetadataExcerpt(getMetadataExcerpt(metadata, searchKeywords));
+  }, [metadata, searchKeywords, setMetadataExcerpt]);
 
   return (
     <div
-      key={fileName}
       onDragStart={(event) =>
         onDragStart(event, "io", descriptionFile)
       }
@@ -517,12 +522,10 @@ export default function StepChooser(_) {
               <h3>Pipelines</h3>
               <div>
                 {filteredResults.pipelines.map((result) => {
-                  const fileName = result.descriptionFile.split(">").pop();
                   return (
                     <SearchResultStep
                       key={result.descriptionFile}
                       descriptionFile={result.descriptionFile}
-                      fileName={fileName}
                       selectedStep={selectedStep}
                       stepName={result.stepName}
                       onStepClick={onStepClick}
@@ -539,12 +542,10 @@ export default function StepChooser(_) {
               <h3>Scripts</h3>
               <div>
                 {filteredResults.scripts.map((result) => {
-                  const fileName = result.descriptionFile.split(">").pop();
                   return (
                     <SearchResultStep
                       key={result.descriptionFile}
                       descriptionFile={result.descriptionFile}
-                      fileName={fileName}
                       selectedStep={selectedStep}
                       stepName={result.stepName}
                       onStepClick={onStepClick}
