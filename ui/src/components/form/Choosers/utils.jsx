@@ -80,14 +80,10 @@ export const defaultCRSList = [
 export const defaultCountry = {
   englishName: "",
   ISO3: "",
-  code: "",
-  countryBboxWGS84: [],
 };
 export const defaultRegion = {
   regionName: "",
-  ISO3166_2: "",
-  regionBboxWGS84: [],
-  countryEnglishName: "",
+  regionID: "",
 };
 
 export const paperStyle = (dialog) => {
@@ -108,14 +104,28 @@ export const paperStyle = (dialog) => {
   }
 };
 
-export const getStateAPI = async (geonameId) => {
+export const getCountriesAPI = async () => {
   let result;
-  const base_url = "http://api.geonames.org/childrenJSON";
+  const base_url = "/region/countries_list";
   try {
     result = await axios({
       method: "get",
       baseURL: `${base_url}`,
-      params: { geonameId: geonameId, inclBbox: true, username: "geobon" },
+    });
+  } catch (error) {
+    result = { data: null };
+  }
+  return result;
+};
+
+export const getStateAPI = async (country_iso) => {
+  let result;
+  const base_url = "/region/regions_list";
+  try {
+    result = await axios({
+      method: "get",
+      baseURL: `${base_url}`,
+      params: { country_iso: country_iso },
     });
   } catch (error) {
     result = { data: null };

@@ -40,23 +40,25 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
     if (states.actions.includes("updateCRSListFromNames")) {
       setSearching(true);
       // Suggest from names
-      const searchTerm = searchValue ? searchValue : states.country.englishName;
-      if (searchTerm && searchTerm !== "" && searchTerm !== states.CRS?.name) {
-        getCRSListFromName(searchTerm).then((result) => {
-          if (result) {
-            const suggestions = result.map((proj) => {
-              const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
-              return {
-                label: `${proj.name} (${p})`,
-                value: `${p}`,
-              };
-            });
-            setCRSList(defaultCRSList.concat(suggestions));
-          } else {
-            setCRSList(defaultCRSList);
-          }
-          setSearching(false);
-        });
+      if(states.country && states.country?.englishName){
+        const searchTerm = searchValue ? searchValue : states.country.englishName;
+        if (searchTerm && searchTerm !== "" && searchTerm !== states.CRS?.name) {
+          getCRSListFromName(searchTerm).then((result) => {
+            if (result) {
+              const suggestions = result.map((proj) => {
+                const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
+                return {
+                  label: `${proj.name} (${p})`,
+                  value: `${p}`,
+                };
+              });
+              setCRSList(defaultCRSList.concat(suggestions));
+            } else {
+              setCRSList(defaultCRSList);
+            }
+            setSearching(false);
+          });
+        }
       } else {
         //setCRSList(defaultCRSList);
         setSearching(false);

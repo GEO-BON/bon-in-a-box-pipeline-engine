@@ -29,20 +29,9 @@ CRS:
 country:
   englishName: Colombia
   ISO3: COL
-  code: CO
-  countryBboxWGS84:
-    - -81.735776
-    - -4.228392
-    - -66.847215
-    - 13.386003
 region:
   regionName: Putumayo Department
-  ISO3166_2: PUT
-  regionBboxWGS84:
-    - -77.227302
-    - -0.572994
-    - -73.837335
-    - 1.515533
+  regionGID: COL.24_2
   countryEnglishName: Colombia
 ```
 
@@ -58,13 +47,9 @@ Here is the meaning of each key.
 | wktDef             | CRS     | Well Known text definition of the CRS, when available.                                                                                         |
 | unit               | CRS     | units associated with CRS. Usually `meter`, `degree`, or `feet`                                                                                |
 | CRSBboxWGS84       | CRS     | The bounding box covered by this coordinate reference system, in latitude, longitude, WGS84 (EPSG:4326)                                        |
-| englishName        | country | English name of the selected country, according to GeoNames.org.                                                                               |
-| ISO3               | country | 3 letter ISO code for this country.                                                                                                            |
-| code               | country | 2 letter code for this country                                                                                                                 |
-| countryBboxWGS84   | country | The bounding box covered by this country, in WGS84 (EPSG:4326), according to GeoNames.org                                                      |
-| regionName         | region  | Name of the region, according to GeoNames.org                                                                                                  |
-| ISO3166_2          | region  | ISO code associated with this region, where available.                                                                                         |
-| regionBboxWGS84    | region  | The bounding box covered by this region, in latitude, longitude, WGS84 (EPSG:4326), according to GeoNames.org                                  |
+| englishName        | country | English name of the selected country, according to GADM.org.                                                                               |
+| ISO3               | country | 3 letter ISO code for this | regionName         | region  | Name of the region, according to GADM                                                                                                 |
+| regionGID          | region  | Identifier of the region in GADM                                                                 |
 | countryEnglishName | region  | English name of the country within which this region is.                                                                                       |
 
 When using other selectors, the object create contains a subset of the bboxCRS selector. For example, the countryRegion selector will only contain the country and region sections, and countryRegionCRS will contain all but the bbox section.
