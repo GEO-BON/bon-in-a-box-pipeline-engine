@@ -65,14 +65,15 @@ export function getMetadataExcerpt(metadata, keywords) {
   return null;
 }
 
-// Filter and rank search results
-export const filterAndRankResults = (searchKeywords, pipelineFiles, scriptFiles) => {
-  const results = { pipelines: [], scripts: [] };
-  if (searchKeywords.length === 0) {
-    return results;
-  }
+// Sort by score (descending), then by name
+function sortResults(arr) {
+  return arr.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return (a.stepName || "").localeCompare(b.stepName || "", "en", { sensitivity: "base" });
+  });
+};
 
-  const scoreResult = (descriptionFile, stepName, metadata) => {
+function scoreResult(descriptionFile, stepName, metadata) {
     let score = 0;
 
     // Metadata match
@@ -103,6 +104,13 @@ export const filterAndRankResults = (searchKeywords, pipelineFiles, scriptFiles)
     return {score, descriptionFile, stepName, metadata, titleHighlighted, metadataExcerpt};
   };
 
+// Filter and rank search results
+export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles) {
+  const results = { pipelines: [], scripts: [] };
+  if (searchKeywords.length === 0) {
+    return results;
+  }
+
   // Process pipelines
   if (pipelineFiles && !isValidElement(pipelineFiles)) {
     Object.entries(pipelineFiles).forEach(([descriptionFile, stepName]) => {
@@ -124,14 +132,6 @@ export const filterAndRankResults = (searchKeywords, pipelineFiles, scriptFiles)
       }
     });
   }
-
-  // Sort by score (descending), then by name
-  const sortResults = (arr) => {
-    return arr.sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score;
-      return (a.stepName || "").localeCompare(b.stepName || "", "en", { sensitivity: "base" });
-    });
-  };
 
   results.pipelines = sortResults(results.pipelines);
   results.scripts = sortResults(results.scripts);
