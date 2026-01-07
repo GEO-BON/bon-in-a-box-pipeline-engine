@@ -90,8 +90,9 @@ aside.stepChooser .description {
     border: 1px solid #83829b;
     border-radius: 4px;
     font-size: 14px;
-    background: #fcfcfc;
     box-sizing: border-box;
+    background: #fcfcfc url('../../img/magnifying-glass.svg') no-repeat right 12px center;
+    background-size: 20px;
 }
 
 .step-search-input:focus {
