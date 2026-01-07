@@ -105,6 +105,16 @@ function scoreResult(searchKeywords, descriptionFile, stepName, metadata) {
   };
 
 // Filter and rank search results
+// Return array of results with score > 0, sorted by score and name
+// Structure of each result:
+// {
+//   descriptionFile: string,
+//   stepName: string,
+//   metadata: object,
+//   titleHighlighted: JSX element,
+//   metadataExcerpt: JSX element,
+//   type: "pipeline" | "script"
+// }
 export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles) {
   const results = [];
   if (searchKeywords.length === 0) {
@@ -135,5 +145,7 @@ export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles)
     });
   }
 
-  return sortResults(results);
+  results = sortResults(results)
+  results.forEach(result => delete result.score);
+  return results;
 };
