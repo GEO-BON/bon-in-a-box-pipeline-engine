@@ -1,14 +1,16 @@
 import "./StepChooser.css";
 
-import { React, isValidElement, useContext, useState, useEffect, useCallback } from "react";
+import { isValidElement, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { PopupContentContext } from "../../Layout.jsx";
 
 import { HttpError } from "../HttpErrors";
-import { fetchStepDescription, fetchStepDescriptionAsync } from "./StepDescriptionStore";
+import { fetchStepDescription, fetchStepDescriptionAsync, getStepDescription } from "./StepDescriptionStore";
 import { StepDescription } from "../StepDescription";
 import { Spinner } from "../Spinner";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
+import { Alert } from '@mui/material';
+import { filterAndRankResults, SearchResultStep } from "./StepSearch.jsx";
 
 const api = new BonInABoxScriptService.DefaultApi();
 
@@ -20,18 +22,25 @@ const onDragStart = (event, nodeType, descriptionFile) => {
 
 function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick }) {
   let [isDeprecated, setIsDeprecated] = useState(false);
-  // async loading of metadata
 
+  // Check deprecation status on mount
+  // Also supports search in metadata (it will load the ScriptDescriptionStore cache with all steps)
   useEffect(() => {
     let cancelled = false;
-    // use setTimeout so that our other async tasks are prioritized and this is loaded after
-    setTimeout(() => {
-      fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
-        if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
-          setIsDeprecated(true);
-        } 
-      });
-    }, 1000);
+    let metadata = getStepDescription(descriptionFile);
+    if(metadata) {
+      if (metadata.lifecycle && metadata.lifecycle.status === "deprecated") {
+        setIsDeprecated(true);
+      }
+    } else { // We need to query. Use setTimeout so that our other async tasks are prioritized and this is loaded after
+      setTimeout(() => {
+        fetchStepDescriptionAsync(descriptionFile).then((metadata) => {
+          if (!cancelled && metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
+            setIsDeprecated(true);
+          }
+        });
+      }, 1000);
+    }
 
     return () => { cancelled = true; };
   }, []);
@@ -55,10 +64,13 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
   );
 }
 
-export default function StepChooser(props) { 
+export default function StepChooser(_) {
   const [scriptFiles, setScriptFiles] = useState([]);
   const [pipelineFiles, setPipelineFiles] = useState([]);
   const [selectedStep, setSelectedStep] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchKeywords, setSearchKeywords] = useState([]);
+  const [collapsedDirs, setCollapsedDirs] = useState(new Set());
   const {popupContent, setPopupContent} = useContext(PopupContentContext);
 
   // Applied only once when first loaded
@@ -122,6 +134,30 @@ export default function StepChooser(props) {
     }
   }, [popupContent, selectedStep, setSelectedStep]);
 
+  // Toggle directory collapse state
+  const toggleDir = useCallback((dirKey) => {
+    setCollapsedDirs((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(dirKey)) {
+        newSet.delete(dirKey);
+      } else {
+        newSet.add(dirKey);
+      }
+      return newSet;
+    });
+  }, []);
+
+  useEffect(() => {
+    setSearchKeywords(searchQuery.trim().split(/\s+/).filter(k => k.length > 0).map(k => k.toLowerCase()));
+  }, [searchQuery, setSearchKeywords]);
+
+  // Memoized filtered results
+  const filteredResults = useMemo(() => {
+    if (searchKeywords.length > 0) {
+      return filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles);
+    }
+  }, [searchKeywords, pipelineFiles, scriptFiles, filterAndRankResults]);
+
   /**
    *
    * @param {Array[String]} splitPathBefore Parent path, as a list of strings
@@ -157,22 +193,43 @@ export default function StepChooser(props) {
           // leaf
           return groupedFiles.get(key).map(([fileName, stepName]) => {
             let descriptionFile = [...splitPathBefore, fileName].join(">");
-            return <PipelineStep descriptionFile={descriptionFile} fileName={fileName} selectedStep={selectedStep} stepName={stepName} onStepClick={onStepClick} />
+            return <PipelineStep key={descriptionFile} descriptionFile={descriptionFile} fileName={fileName} selectedStep={selectedStep} stepName={stepName} onStepClick={onStepClick} />
           });
         }
 
-        // branch
+        // branch compute unique directory key
+        const dirKey = [...splitPathBefore, key].join(">");
+        const isCollapsed = collapsedDirs.has(dirKey);
+
         return (
-          <div key={key}>
-            <p className="dnd-head"><SubdirectoryArrowRightIcon sx={{fontSize: "0.85em"}} />{key}</p>
-            <div className="inFolder">
-              {renderTree([...splitPathBefore, key], groupedFiles.get(key))}
-            </div>
+          <div key={dirKey}>
+            <p
+              className="dnd-head folder-header"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleDir(dirKey);
+              }}
+            >
+              <SubdirectoryArrowRightIcon
+                sx={{
+                  fontSize: "0.85em",
+                  transform: isCollapsed ? "rotate(0deg)" : "rotate(90deg)",
+                  transition: "transform 0.2s ease-in-out",
+                  display: "inline-block"
+                }}
+              />
+              {key}
+            </p>
+            {!isCollapsed && (
+              <div className="inFolder">
+                {renderTree([...splitPathBefore, key], groupedFiles.get(key))}
+              </div>
+            )}
           </div>
         );
       });
     },
-    [onStepClick, selectedStep]
+    [onStepClick, selectedStep, collapsedDirs, toggleDir]
   );
 
   return (
@@ -184,30 +241,66 @@ export default function StepChooser(props) {
       >
         Pipeline output
       </div>
-      {pipelineFiles && (
-        <div key="Pipelines">
-          <h3>Pipelines</h3>
-          <div>
-            {isValidElement(pipelineFiles) && pipelineFiles.type === HttpError ? pipelineFiles : renderTree(
-              [],
-              Object.entries(pipelineFiles).map((entry) => [ entry[0].split(">"), entry[1] ])
-            )}
-          </div>
-        </div>
-      )}
 
-      {scriptFiles && (
-        <div key="Scripts">
-          <h3>Scripts</h3>
-          {isValidElement(scriptFiles) && scriptFiles.type === HttpError ? scriptFiles : renderTree(
-            [],
-            Object.entries(scriptFiles).map((entry) => [
-              entry[0].split(">"),
-              entry[1],
-            ])
-          )}
-        </div>
-      )}
+      <div className="search-container">
+        <input
+          type="search"
+          className="step-search-input"
+          placeholder="Search pipelines and scripts..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          autoFocus
+        />
+      </div>
+
+      {searchKeywords.length > 0 && filteredResults
+        ? ( // Show filtered search results
+          filteredResults.length === 0
+            ? <div className="no-results">No results found</div>
+            : <div>
+              {filteredResults.map((result) => {
+                return (
+                  <SearchResultStep
+                    key={result.descriptionFile}
+                    result={result}
+                    selectedStep={selectedStep}
+                    onStepClick={onStepClick}
+                    draggable
+                    onDragStart={e => onDragStart(e, "io", result.descriptionFile) }
+                    onClick={() => { onStepClick(result.descriptionFile) }}
+                  />
+                );
+              })}
+            </div>
+
+        ) : ( // Show default tree view
+          <>
+            {pipelineFiles && (
+              <div key="Pipelines">
+                <h3>Pipelines</h3>
+                <div>
+                  {isValidElement(pipelineFiles) && pipelineFiles.type === HttpError ? pipelineFiles : renderTree(
+                    [],
+                    Object.entries(pipelineFiles).map((entry) => [entry[0].split(">"), entry[1]])
+                  )}
+                </div>
+              </div>
+            )}
+
+            {scriptFiles && (
+              <div key="Scripts">
+                <h3>Scripts</h3>
+                {isValidElement(scriptFiles) && scriptFiles.type === HttpError ? scriptFiles : renderTree(
+                  [],
+                  Object.entries(scriptFiles).map((entry) => [
+                    entry[0].split(">"),
+                    entry[1],
+                  ])
+                )}
+              </div>
+            )}
+          </>
+        )}
     </aside>
   );
 }
