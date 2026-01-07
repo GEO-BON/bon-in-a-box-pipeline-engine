@@ -73,7 +73,7 @@ function sortResults(arr) {
   });
 };
 
-function scoreResult(descriptionFile, stepName, metadata) {
+function scoreResult(searchKeywords, descriptionFile, stepName, metadata) {
     let score = 0;
 
     // Metadata match
@@ -106,7 +106,7 @@ function scoreResult(descriptionFile, stepName, metadata) {
 
 // Filter and rank search results
 export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles) {
-  const results = { pipelines: [], scripts: [] };
+  const results = [];
   if (searchKeywords.length === 0) {
     return results;
   }
@@ -115,9 +115,10 @@ export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles)
   if (pipelineFiles && !isValidElement(pipelineFiles)) {
     Object.entries(pipelineFiles).forEach(([descriptionFile, stepName]) => {
       const metadata = getStepDescription(descriptionFile);
-      const result = scoreResult(descriptionFile, stepName, metadata);
+      const result = scoreResult(searchKeywords, descriptionFile, stepName, metadata);
       if (result.score > 0) {
-        results.pipelines.push(result);
+        result.type = "pipeline";
+        results.push(result);
       }
     });
   }
@@ -126,15 +127,13 @@ export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles)
   if (scriptFiles && !isValidElement(scriptFiles)) {
     Object.entries(scriptFiles).forEach(([descriptionFile, stepName]) => {
       const metadata = getStepDescription(descriptionFile);
-      const result = scoreResult(descriptionFile, stepName, metadata);
+      const result = scoreResult(searchKeywords, descriptionFile, stepName, metadata);
       if (result.score > 0) {
-        results.scripts.push(result);
+        result.type = "script";
+        results.push(result);
       }
     });
   }
 
-  results.pipelines = sortResults(results.pipelines);
-  results.scripts = sortResults(results.scripts);
-
-  return results;
+  return sortResults(results);
 };

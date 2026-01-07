@@ -122,6 +122,11 @@ aside.stepChooser .description {
     text-align: left;
 }
 
+.dndnode.search-result.pipeline-step {
+    border-width: medium;
+    border-style: double;
+}
+
 .search-result-content {
     width: 100%;
     display: flex;

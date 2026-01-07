@@ -65,7 +65,9 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
   );
 }
 
-function SearchResultStep({ descriptionFile, selectedStep, stepName, onStepClick, searchKeywords, metadata }) {
+function SearchResultStep({ result, selectedStep, onStepClick, searchKeywords }) {
+  const { descriptionFile, stepName, metadata, type } = result;
+
   const [isDeprecated, setIsDeprecated] = useState(false);
   const [highlightedName, setHighlightedName] = useState();
   const [metadataExcerpt, setMetadataExcerpt] = useState();
@@ -92,8 +94,10 @@ function SearchResultStep({ descriptionFile, selectedStep, stepName, onStepClick
       draggable
       title="Click for info, drag and drop to add to pipeline."
       className={
-        "dndnode search-result" +
-        (descriptionFile === selectedStep ? " selected" : "") + (isDeprecated ? " deprecated" : "")
+        "dndnode search-result"
+         + (descriptionFile === selectedStep ? " selected" : "")
+         + (isDeprecated ? " deprecated" : "")
+         + (type === "pipeline" ? " pipeline-step" : " script-step")
       }
       onClick={() => {onStepClick(descriptionFile)} }
     >
@@ -293,82 +297,52 @@ export default function StepChooser(_) {
         />
       </div>
 
-      {searchKeywords.length > 0 && filteredResults ? (
-        // Show filtered search results
-        <>
-          {filteredResults.pipelines.length > 0 && (
-            <div key="Pipelines">
-              <h3>Pipelines</h3>
-              <div>
-                {filteredResults.pipelines.map((result) => {
-                  return (
-                    <SearchResultStep
-                      key={result.descriptionFile}
-                      descriptionFile={result.descriptionFile}
-                      selectedStep={selectedStep}
-                      stepName={result.stepName}
-                      onStepClick={onStepClick}
-                      searchKeywords={searchKeywords}
-                      metadata={result.metadata}
-                    />
-                  );
-                })}
-              </div>
+      {searchKeywords.length > 0 && filteredResults
+        ? ( // Show filtered search results
+          filteredResults.length === 0
+            ? <div className="no-results">No results found</div>
+            : <div>
+              {filteredResults.map((result) => {
+                return (
+                  <SearchResultStep
+                    key={result.descriptionFile}
+                    result={result}
+                    selectedStep={selectedStep}
+                    onStepClick={onStepClick}
+                    searchKeywords={searchKeywords}
+                  />
+                );
+              })}
             </div>
-          )}
-          {filteredResults.scripts.length > 0 && (
-            <div key="Scripts">
-              <h3>Scripts</h3>
-              <div>
-                {filteredResults.scripts.map((result) => {
-                  return (
-                    <SearchResultStep
-                      key={result.descriptionFile}
-                      descriptionFile={result.descriptionFile}
-                      selectedStep={selectedStep}
-                      stepName={result.stepName}
-                      onStepClick={onStepClick}
-                      searchKeywords={searchKeywords}
-                      metadata={result.metadata}
-                    />
-                  );
-                })}
+
+        ) : ( // Show default tree view
+          <>
+            {pipelineFiles && (
+              <div key="Pipelines">
+                <h3>Pipelines</h3>
+                <div>
+                  {isValidElement(pipelineFiles) && pipelineFiles.type === HttpError ? pipelineFiles : renderTree(
+                    [],
+                    Object.entries(pipelineFiles).map((entry) => [entry[0].split(">"), entry[1]])
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-          {filteredResults.pipelines.length === 0 && filteredResults.scripts.length === 0 && (
-            <div className="no-results">No results found</div>
-          )}
-        </>
-      ) : (
-        // Show default tree view
-        <>
-          {pipelineFiles && (
-            <div key="Pipelines">
-              <h3>Pipelines</h3>
-              <div>
-                {isValidElement(pipelineFiles) && pipelineFiles.type === HttpError ? pipelineFiles : renderTree(
+            )}
+
+            {scriptFiles && (
+              <div key="Scripts">
+                <h3>Scripts</h3>
+                {isValidElement(scriptFiles) && scriptFiles.type === HttpError ? scriptFiles : renderTree(
                   [],
-                  Object.entries(pipelineFiles).map((entry) => [ entry[0].split(">"), entry[1] ])
+                  Object.entries(scriptFiles).map((entry) => [
+                    entry[0].split(">"),
+                    entry[1],
+                  ])
                 )}
               </div>
-            </div>
-          )}
-
-          {scriptFiles && (
-            <div key="Scripts">
-              <h3>Scripts</h3>
-              {isValidElement(scriptFiles) && scriptFiles.type === HttpError ? scriptFiles : renderTree(
-                [],
-                Object.entries(scriptFiles).map((entry) => [
-                  entry[0].split(">"),
-                  entry[1],
-                ])
-              )}
-            </div>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )}
     </aside>
   );
 }
