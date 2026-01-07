@@ -249,6 +249,7 @@ export default function StepChooser(_) {
           placeholder="Search pipelines and scripts..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          autoFocus
         />
       </div>
 
