@@ -64,7 +64,7 @@ def region_geometry(type: str = 'country', id: str = ""):
         if( reg.empty ):
             raise HTTPException(status_code=404, detail="Country ID not found")
         fname = reg['adm0_name'].iloc[0].replace(' ','_')
-    if type == 'region':
+    elif type == 'region':
         reg = ddb.sql("SELECT *, ST_AsWKB(geometry) AS geom FROM read_parquet('%s') WHERE adm1_src='%s'" % (regions_parquet, id)).df()
         if( reg.empty ):
             raise HTTPException(status_code=404, detail="Region ID not found")

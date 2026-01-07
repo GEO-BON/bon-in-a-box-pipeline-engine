@@ -397,7 +397,7 @@ paths:
                     }
   /region/regions_list:
     get:
-      summary: Returns the list of countries from GADM with their ISO3/GID and English names
+      summary: Returns the list of regions with their ID, Country, English names and bounding box
       operationId: getRegionsList
       parameters:
         - name: country_iso
