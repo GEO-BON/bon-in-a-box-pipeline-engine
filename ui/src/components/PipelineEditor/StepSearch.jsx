@@ -1,6 +1,38 @@
-import { isValidElement } from "react";
+import { isValidElement, useEffect, useState } from "react";
 import { extractExcerpt, highlightText } from "../../utils/HighlightText.jsx";
 import { getStepDescription } from "./StepDescriptionStore.jsx";
+
+
+export function SearchResultStep({ result, selectedStep, onStepClick, ...props }) {
+  const { descriptionFile, metadata, type, titleHighlighted, metadataExcerpt } = result;
+
+  const [isDeprecated, setIsDeprecated] = useState(false);
+
+  useEffect(() => {
+    if (metadata.lifecycle && metadata.lifecycle.status === "deprecated") {
+      setIsDeprecated(true);
+    }
+  }, [metadata]);
+
+  return (
+    <div
+      title="Click for info, drag and drop to add to pipeline."
+      className={
+        "dndnode search-result"
+         + (descriptionFile === selectedStep ? " selected" : "")
+         + (isDeprecated ? " deprecated" : "")
+         + (type === "pipeline" ? " pipeline-step" : " script-step")
+      }
+      onClick={() => {onStepClick(descriptionFile)} }
+      {...props}
+    >
+      <div className="search-result-content">
+        <div className="search-result-name">{titleHighlighted}</div>
+        {metadataExcerpt}
+      </div>
+    </div>
+  );
+}
 
 // Helper function to get metadata excerpt with highlighted keywords
 // Returns JSX element with chosen excerpt and highlights, or null if no match
@@ -65,6 +97,37 @@ export function getMetadataExcerpt(metadata, keywords) {
   return null;
 }
 
+function scoreResult(searchKeywords, descriptionFile, stepName, metadata) {
+  let score = 0;
+
+  // Metadata match
+  let metadataExcerpt = getMetadataExcerpt(metadata, searchKeywords);
+  if (metadataExcerpt) {
+    // Using stringify here is inaccurate since we can match on the keys
+    // (label, description, etc) but it only affects the scoring since
+    // we already know we have a true match from excerpt above
+    let metadataLower = JSON.stringify(metadata).toLowerCase();
+    searchKeywords.forEach((keyword) => {
+      if (metadataLower.includes(keyword)) {
+        score += 1;
+      }
+    });
+  }
+
+  // Title match
+  let titleHighlighted = highlightText(stepName, searchKeywords);
+  if (titleHighlighted !== stepName) {
+    let stepNameLower = stepName.toLowerCase()
+    searchKeywords.forEach((keyword) => {
+      if (stepNameLower.includes(keyword)) {
+        score += 10;
+      }
+    });
+  }
+
+  return { score, descriptionFile, stepName, metadata, titleHighlighted, metadataExcerpt };
+};
+
 // Sort by score (descending), then by name
 function sortResults(arr) {
   return arr.sort((a, b) => {
@@ -73,50 +136,18 @@ function sortResults(arr) {
   });
 };
 
-function scoreResult(searchKeywords, descriptionFile, stepName, metadata) {
-    let score = 0;
-
-    // Metadata match
-    let metadataExcerpt = getMetadataExcerpt(metadata, searchKeywords);
-    if (metadataExcerpt) {
-      // Using stringify here is inaccurate since we can match on the keys
-      // (label, description, etc) but it only affects the scoring since
-      // we already know we have a true match from excerpt above
-      let metadataLower = JSON.stringify(metadata).toLowerCase();
-      searchKeywords.forEach((keyword) => {
-        if (metadataLower.includes(keyword)) {
-          score += 1;
-        }
-      });
-    }
-
-    // Title match
-    let titleHighlighted = highlightText(stepName, searchKeywords);
-    if(titleHighlighted !== stepName) {
-      let stepNameLower = stepName.toLowerCase()
-      searchKeywords.forEach((keyword) => {
-        if (stepNameLower.includes(keyword)) {
-          score += 10;
-        }
-      });
-    }
-
-    return {score, descriptionFile, stepName, metadata, titleHighlighted, metadataExcerpt};
-  };
-
 // Filter and rank search results
 // Return array of results with score > 0, sorted by score and name
 // Structure of each result:
 // {
 //   descriptionFile: string,
-//   stepName: string,
 //   metadata: object,
 //   titleHighlighted: JSX element,
 //   metadataExcerpt: JSX element,
 //   type: "pipeline" | "script"
 // }
 export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles) {
-  const results = [];
+  let results = [];
   if (searchKeywords.length === 0) {
     return results;
   }
@@ -145,7 +176,11 @@ export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles)
     });
   }
 
+  // Sort, then remove sorting properties
   results = sortResults(results)
-  results.forEach(result => delete result.score);
+  results.forEach(result => {
+    delete result.score
+    delete result.stepName
+  });
   return results;
 };

@@ -10,8 +10,7 @@ import { Spinner } from "../Spinner";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import { Alert } from '@mui/material';
-import { highlightText } from "../../utils/HighlightText.jsx";
-import { filterAndRankResults, getMetadataExcerpt } from "./MetadataSearchFunctions.jsx";
+import { filterAndRankResults, SearchResultStep } from "./StepSearch.jsx";
 
 const api = new BonInABoxScriptService.DefaultApi();
 
@@ -61,50 +60,6 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
       onClick={() => {onStepClick(descriptionFile)} }
     >
       {stepName}
-    </div>
-  );
-}
-
-function SearchResultStep({ result, selectedStep, onStepClick, searchKeywords }) {
-  const { descriptionFile, stepName, metadata, type } = result;
-
-  const [isDeprecated, setIsDeprecated] = useState(false);
-  const [highlightedName, setHighlightedName] = useState();
-  const [metadataExcerpt, setMetadataExcerpt] = useState();
-
-  useEffect(() => {
-    if (metadata.lifecycle && metadata.lifecycle.status === "deprecated") {
-      setIsDeprecated(true);
-    }
-  }, [metadata]);
-
-  useEffect(() => {
-    setHighlightedName(highlightText(stepName, searchKeywords));
-  }, [stepName, searchKeywords, setHighlightedName]);
-
-  useEffect(() => {
-    setMetadataExcerpt(getMetadataExcerpt(metadata, searchKeywords));
-  }, [metadata, searchKeywords, setMetadataExcerpt]);
-
-  return (
-    <div
-      onDragStart={(event) =>
-        onDragStart(event, "io", descriptionFile)
-      }
-      draggable
-      title="Click for info, drag and drop to add to pipeline."
-      className={
-        "dndnode search-result"
-         + (descriptionFile === selectedStep ? " selected" : "")
-         + (isDeprecated ? " deprecated" : "")
-         + (type === "pipeline" ? " pipeline-step" : " script-step")
-      }
-      onClick={() => {onStepClick(descriptionFile)} }
-    >
-      <div className="search-result-content">
-        <div className="search-result-name">{highlightedName}</div>
-        {metadataExcerpt}
-      </div>
     </div>
   );
 }
@@ -309,7 +264,8 @@ export default function StepChooser(_) {
                     result={result}
                     selectedStep={selectedStep}
                     onStepClick={onStepClick}
-                    searchKeywords={searchKeywords}
+                    draggable
+                    onDragStart={e => onDragStart(e, "io", result.descriptionFile) }
                   />
                 );
               })}

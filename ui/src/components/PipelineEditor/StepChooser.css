@@ -124,7 +124,7 @@ aside.stepChooser .description {
 }
 
 .dndnode.search-result.pipeline-step {
-    border-width: medium;
+    border-width: 4px;
     border-style: double;
 }
 
