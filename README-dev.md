@@ -98,13 +98,14 @@ gitGraph
 5. Send the above command to a few beta users.
 
 ### Public release
-1. Merge to main
+1. Regenerate documentation by running `quarto render` in the docs_source folder.
+2. Merge to main
 
     The changes are live as soon as they are merged to main branch: the dockers are built, pushed to the GitHub package registry ([server](https://github.com/orgs/GEO-BON/packages?repo_name=bon-in-a-box-pipeline-engine) and [runners](https://github.com/orgs/GEO-BON/packages?repo_name=bon-in-a-box-pipelines)), and next time someone starts the server, the new docker images will be pulled.
 
     Old packages can be found on [GEO BON's Docker Hub](https://hub.docker.com/r/geobon/bon-in-a-box)
 
-2. Manually tag the version and create a release via GitHub. See [releases](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/releases).
+3. Manually tag the version and create a release via GitHub. See [releases](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/releases).
 
 
 ### Debugging prod servers
