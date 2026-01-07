@@ -3,7 +3,7 @@ import { extractExcerpt, highlightText } from "../../utils/HighlightText.jsx";
 import { getStepDescription } from "./StepDescriptionStore.jsx";
 
 
-export function SearchResultStep({ result, selectedStep, onStepClick, ...props }) {
+export function SearchResultStep({ result, selectedStep, ...props }) {
   const { descriptionFile, metadata, type, titleHighlighted, metadataExcerpt } = result;
 
   const [isDeprecated, setIsDeprecated] = useState(false);
@@ -23,7 +23,6 @@ export function SearchResultStep({ result, selectedStep, onStepClick, ...props }
          + (isDeprecated ? " deprecated" : "")
          + (type === "pipeline" ? " pipeline-step" : " script-step")
       }
-      onClick={() => {onStepClick(descriptionFile)} }
       {...props}
     >
       <div className="search-result-content">

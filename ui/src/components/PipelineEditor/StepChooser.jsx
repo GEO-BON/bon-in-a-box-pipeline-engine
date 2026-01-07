@@ -266,6 +266,7 @@ export default function StepChooser(_) {
                     onStepClick={onStepClick}
                     draggable
                     onDragStart={e => onDragStart(e, "io", result.descriptionFile) }
+                    onClick={() => { onStepClick(result.descriptionFile) }}
                   />
                 );
               })}
