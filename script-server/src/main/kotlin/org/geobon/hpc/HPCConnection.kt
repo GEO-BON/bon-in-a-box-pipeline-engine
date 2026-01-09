@@ -205,8 +205,8 @@ class HPCConnection(
                     val callResult = systemCall.run(
                         sshCommand +
                             """
-                                if [ -f ${apptainerImage.imagePath} ]; then
-                                    echo "Image already exists: $apptainerImageName"
+                                if [ -f ${apptainerImage.imagePath} ] && [ -f ${apptainerImage.overlayPath} ]; then
+                                    echo "Image and overlay already exist for $apptainerImageName"
                                 else
                                     if [ ! -d "$hpcRoot" ]; then
                                         mkdir -p "$hpcRoot"
@@ -230,12 +230,16 @@ class HPCConnection(
                                         exit 1
                                     fi
 
-                                    apptainer build ${apptainerImage.imagePath} docker://$imageDigest
-                                    if [[ $? -eq 0 ]]; then
-                                        echo "Image created: $apptainerImageName"
+                                    if [ -f ${apptainerImage.imagePath} ]; then
+                                        echo "Image already exists for $apptainerImageName"
                                     else
-                                        echo "Failed to create image: $apptainerImageName" >&2
-                                        exit 1
+                                        apptainer build ${apptainerImage.imagePath} docker://$imageDigest
+                                        if [[ $? -eq 0 ]]; then
+                                            echo "Image created: $apptainerImageName"
+                                        else
+                                            echo "Failed to create image: $apptainerImageName" >&2
+                                            exit 1
+                                        fi
                                     fi
                                 fi
                             """.trimIndent(),
