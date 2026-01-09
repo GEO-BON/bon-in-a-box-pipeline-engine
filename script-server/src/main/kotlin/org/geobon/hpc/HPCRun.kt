@@ -157,34 +157,30 @@ class HPCRun(
         val scriptPath = scriptFile.absolutePath.replace(" ", "\\ ")
 
         val logFileAbsolute = File(hpcConnection.hpcRoot, logFile.absolutePath.removePrefix("/")).absolutePath
-        // Time is a reserved keyword in bash, so we use \time to call the command normally installed in /usr/bin/time
-        // which happens to be somewhere else inside a HPC's compute node.
-        // See https://askubuntu.com/questions/1054456/what-is-the-difference-between-time-and-usr-bin-time/1054460#1054460
-        val timeCmd = "\\time -f 'Memory used: %M kb\\nElapsed: %E'"
 
         return when (scriptFile.extension) {
             "jl", "JL" ->
                 """
-                    $timeCmd ${getApptainerBaseCommand(hpcConnection.juliaImage)} '
+                    ${getApptainerBaseCommand(hpcConnection.juliaImage)} '
                         julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath
                     ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
 
             "r", "R" ->
                 """
-                    $timeCmd ${getApptainerBaseCommand(hpcConnection.rImage)} '
+                    ${getApptainerBaseCommand(hpcConnection.rImage)} '
                         source /.bashrc; mamba activate ${condaEnvName ?: "rbase"};
                         Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath
                     ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
 
-            "sh" -> "$timeCmd $scriptPath $escapedOutputFolder >> ${logFile.absolutePath} 2>&1"
+            "sh" -> "$scriptPath $escapedOutputFolder >> ${logFile.absolutePath} 2>&1"
 
-            "py", "PY" ->
+            "py", "PY" -> // exec call to replace shell by python, python receives signal directly.
                 """
-                    $timeCmd ${getApptainerBaseCommand(hpcConnection.pythonImage)} '
+                    ${getApptainerBaseCommand(hpcConnection.pythonImage)} '
                         source /.bashrc; mamba activate ${condaEnvName ?: "pythonbase"};
-                        python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath
+                        exec python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath
                     ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
 
