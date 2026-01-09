@@ -69,21 +69,6 @@ export default function HPCStatus() {
     <div>
       {Object.keys(status).sort().map(key => {
         const digest = [status[key]['image']]
-        let imageName
-        if (digest) {
-          switch (key) {
-            case 'R':
-            case 'Python':
-              imageName = 'runner-conda'
-              break;
-            case 'Julia':
-              imageName = 'runner-julia'
-              break
-            default:
-              console.error("Unknown runner " + key)
-          }
-        }
-        console.log(imageName, status)
 
         return <span key={key}>
           <p>
