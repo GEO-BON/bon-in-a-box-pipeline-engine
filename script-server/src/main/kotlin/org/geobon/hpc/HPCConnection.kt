@@ -222,7 +222,7 @@ class HPCConnection(
                                     echo "apptainer version:" $(apptainer version)
 
                                     rm -f ${apptainerImage.overlayPath}
-                                    apptainer overlay create --fakeroot --size ${overlaySizeGB * 1024} ${apptainerImage.overlayPath}
+                                    apptainer overlay create --size ${overlaySizeGB * 1024} ${apptainerImage.overlayPath}
                                     if [ $? -eq 0 ] && [ -f "${apptainerImage.overlayPath}" ]; then
                                         echo "Overlay created: $overlayName"
                                     else
