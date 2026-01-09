@@ -153,7 +153,7 @@ function test_command_filter() {
 		'if [ -f apptainerImageName ]; then
 			echo "Image already exists: apptainerImageName"
 		else
-			module load apptainer
+			module load apptainer/1.4.5
 			apptainer build apptainerImageName docker://imageDigest
 			echo "Image created: apptainerImageName"
 		fi=PASS'
@@ -164,8 +164,8 @@ function test_command_filter() {
 		'bash -c "sbatch /folder/file.sbatch | tee logs.txt"=PASS'
 		"bash -c 'sbatch /folder/file.sbatch | tee logs1.txt logs2.txt' =PASS" # notice the trailing whitespace
 		'bash -o pipefail -c "sbatch /folder/file.sbatch | tee logs.txt"=PASS'
-		"module load apptainer;
-			apptainer run      --fakeroot --overlay /folder/biab-runner-conda_overlay-20GB.ext3      -B /folder/scripts:/scripts      -B /folder/script-stubs:/script-stubs      -B /folder/output:/output      -B /folder/userdata:/userdata      /folder/biab-runner-conda_593a8b940b287b9d2692e4d764ca1676c72ed78c743452bbc746623430d4c0df.sif      bash -c 'source /script-stubs/system/condaEnvironment.sh /output/helloWorld/helloHPC/6ba389c8e50ddf5002e0b00b05b5b51b helloWorld__helloHPC channels'=PASS"
+		"module load apptainer/1.4.5;
+			apptainer exec --overlay /folder/biab-runner-conda_overlay-20GB.ext3      -B /folder/scripts:/scripts      -B /folder/script-stubs:/script-stubs      -B /folder/output:/output      -B /folder/userdata:/userdata      /folder/biab-runner-conda_593a8b940b287b9d2692e4d764ca1676c72ed78c743452bbc746623430d4c0df.sif      bash -c 'source /script-stubs/system/condaEnvironment.sh /output/helloWorld/helloHPC/6ba389c8e50ddf5002e0b00b05b5b51b helloWorld__helloHPC channels'=PASS"
 
 		## Supposed to FAIL
 		"module load python; forbiddenCommand=FAIL"
