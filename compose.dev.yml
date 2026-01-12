@@ -47,6 +47,9 @@ services:
     environment:
       DEV: true
 
+  python-api:
+    build: python-api/
+
   gateway:
     image: nginxinc/nginx-unprivileged
     depends_on:

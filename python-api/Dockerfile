@@ -1,5 +1,7 @@
 
-FROM ghcr.io/developmentseed/titiler:0.18.9 AS builder
+ARG TITILER_VERSION=0.18.9
+
+FROM ghcr.io/developmentseed/titiler:${TITILER_VERSION} AS builder
 
 RUN apt update
 RUN apt install -y libgdal-dev
@@ -15,7 +17,7 @@ RUN uv pip install fastapi "uvicorn[standard]" requests duckdb pandas geopandas 
 
 COPY . .
 
-FROM ghcr.io/developmentseed/titiler:0.18.9 AS runtime
+FROM ghcr.io/developmentseed/titiler:${TITILER_VERSION} AS runtime
 
 # Set up virtual environment path
 ENV VIRTUAL_ENV=/opt/venv
