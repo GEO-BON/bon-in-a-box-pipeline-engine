@@ -28,6 +28,23 @@ services:
       PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
       USE_RUNNERS: true
 
+  python-api: # Serves Titiler and a FastAPI app to serve country and region names and geometries
+    container_name: biab-python-api
+    volumes:
+      - ${PIPELINE_REPO_PATH}/output:/output:ro
+      - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
+      - ./python-api/app:/app:rw
+    user: ${MY_UID}:${DOCKER_GID}
+    environment:
+      PORT: 8000
+      WORKERS_PER_CORE: 1
+      TITILER_API_CORS_ORIGINS: "*"
+    expose:
+      - "8000"
+      - "8001"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   runner-conda:
     container_name: biab-runner-conda
     volumes:
@@ -68,20 +85,5 @@ services:
       - ${PIPELINE_REPO_PATH}/userdata:/static/userdata:ro
     depends_on:
       - script-server
+      - python-api
 
-  python-api: # Serves Titiler and a FastAPI app to serve country and region names and geometries
-    container_name: biab-python-api
-    volumes:
-      - ${PIPELINE_REPO_PATH}/output:/output:ro
-      - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
-      - ./python-api/app:/app:rw
-    user: ${MY_UID}:${DOCKER_GID}
-    environment:
-      PORT: 8000
-      WORKERS_PER_CORE: 1
-      TITILER_API_CORS_ORIGINS: "*"
-    expose:
-      - "8000"
-      - "8001"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
