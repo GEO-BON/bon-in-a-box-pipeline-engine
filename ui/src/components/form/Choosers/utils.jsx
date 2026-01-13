@@ -2,6 +2,8 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { polygon, bbox } from "@turf/turf";
 import proj4 from "proj4";
+import { DefaultApi } from "bon_in_a_box_script_service";
+export const api = new DefaultApi();
 
 const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
 
@@ -80,14 +82,10 @@ export const defaultCRSList = [
 export const defaultCountry = {
   englishName: "",
   ISO3: "",
-  code: "",
-  countryBboxWGS84: [],
 };
 export const defaultRegion = {
   regionName: "",
-  ISO3166_2: "",
-  regionBboxWGS84: [],
-  countryEnglishName: "",
+  regionID: "",
 };
 
 export const paperStyle = (dialog) => {
@@ -106,21 +104,6 @@ export const paperStyle = (dialog) => {
       margin: "0px",
     };
   }
-};
-
-export const getStateAPI = async (geonameId) => {
-  let result;
-  const base_url = "http://api.geonames.org/childrenJSON";
-  try {
-    result = await axios({
-      method: "get",
-      baseURL: `${base_url}`,
-      params: { geonameId: geonameId, inclBbox: true, username: "geobon" },
-    });
-  } catch (error) {
-    result = { data: null };
-  }
-  return result;
 };
 
 export const getProjestAPI = async (geojson) => {

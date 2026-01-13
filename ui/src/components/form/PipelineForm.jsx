@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import Select from "react-select";
 import InputFileInput from "./InputFileInput";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,8 @@ import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { CustomButtonGreen } from "../CustomMUI";
 import { formatError } from "../HttpErrors";
 import { Alert } from "@mui/material";
+import SpamField from "../SpamField";
+import CaptchaGate from "../CaptchaGate";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -86,32 +88,32 @@ export function PipelineForm({
     });
   }, [runType, setPipelineOptions]);
 
-  return (
-    pipelineOptions.length > 0 && (
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit}
-        acceptCharset="utf-8"
-        className="inputForm"
-      >
-        <Select
-          id="pipelineChoice"
-          name="pipelineChoice"
-          className="blackText"
-          options={pipelineOptions}
-          value={pipelineOptions.find(
-            (o) => o.value === pipStates.descriptionFile
-          )}
-          menuPortalTarget={document.body}
-          onChange={(v) => handlePipelineChange(v.label, v.value)}
-        />
-        <br />
-        {pipelineMetadata && (
-          <GeneralDescription
-            ymlPath={pipStates.descriptionFile}
-            metadata={pipelineMetadata}
-          />
+  return pipelineOptions.length > 0 &&
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit}
+      acceptCharset="utf-8"
+      className="inputForm"
+    >
+      <Select
+        id="pipelineChoice"
+        name="pipelineChoice"
+        className="blackText"
+        options={pipelineOptions}
+        value={pipelineOptions.find(
+          (o) => o.value === pipStates.descriptionFile
         )}
+        menuPortalTarget={document.body}
+        onChange={(v) => handlePipelineChange(v.label, v.value)}
+      />
+      <br />
+      {pipelineMetadata && (
+        <GeneralDescription
+          ymlPath={pipStates.descriptionFile}
+          metadata={pipelineMetadata}
+        />
+      )}
+      <CaptchaGate>
         <InputFileInput
           metadata={pipelineMetadata}
           inputFileContent={inputFileContent}
@@ -124,10 +126,10 @@ export function PipelineForm({
           Error parsing YAML input.<br />
           {validationError}
         </Alert>}
+        <SpamField />
         <CustomButtonGreen type="submit" disabled={validationError != null} variant="contained">
           {runType === "pipeline" ? "Run pipeline" : "Run script"}
         </CustomButtonGreen>
-      </form>
-    )
-  );
+      </CaptchaGate>
+    </form>
 }

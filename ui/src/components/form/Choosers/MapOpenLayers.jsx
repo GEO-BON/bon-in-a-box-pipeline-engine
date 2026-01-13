@@ -17,6 +17,7 @@ import Feature from "ol/Feature";
 import { fromExtent as polygonFromExtent } from "ol/geom/Polygon";
 import { register } from "ol/proj/proj4";
 import Draw, { createBox } from "ol/interaction/Draw.js";
+import CircularProgress from "@mui/material/CircularProgress";
 import Extent from "ol/interaction/Extent";
 import Modify from "ol/interaction/Modify.js";
 import * as turf from "@turf/turf";
@@ -35,6 +36,7 @@ export default function MapOpenLayers({
   const [features, setFeatures] = useState([]);
   const [oldCRS, setOldCRS] = useState(null);
   const [message, setMessage] = useState("");
+  const [showSpinner, setShowSpinner] = useState(false);
   var featureId = 0;
 
   const styles = {
@@ -288,22 +290,21 @@ export default function MapOpenLayers({
   useEffect(() => {
     if (states.actions.includes("updateBboxFromCountryRegion")) {
       if (
-        (states.country.countryBboxWGS84.length > 0 ||
-          states.region.regionBboxWGS84.length > 0) &&
+        (states.country.ISO3 !== "" || states.region.regionID !== "") &&
         mapp &&
         states.CRS.code &&
         get(`${states.CRS.authority}:${states.CRS.code}`)
       ) {
+        const bbox = states.region.bboxWGS84
+          ? states.region.bboxWGS84
+          : states.country.bboxWGS84;
         setDigitize(false);
-        const b =
-          states.region.regionBboxWGS84.length > 0
-            ? states.region.regionBboxWGS84
-            : states.country.countryBboxWGS84;
         setOldCRS(defaultCRS);
-        dispatch({ bbox: cleanBbox(b, "degree"), type: "changeBbox" }); // Set update BBox in new CRS and re-run this block to set features
+        dispatch({ bbox: cleanBbox(bbox, "degree"), type: "changeBbox" });
+        setShowSpinner(false);
       } else if (
-        states.country.countryBboxWGS84.length == 0 &&
-        states.region.regionBboxWGS84.length == 0 &&
+        states.country.ISO3 == "" &&
+        states.region.regionID == "" &&
         mapp
       ) {
         clearLayers();
@@ -376,14 +377,11 @@ export default function MapOpenLayers({
       if (
         oldCRS &&
         states.bbox.includes("") &&
-        (states.country.countryBboxWGS84 || states.region.regionBboxWGS84)
+        (states.country.ISO3 || states.region.regionGID)
       ) {
         // The bounding box is gone, try to reuse the country one, if available
-        const b = states.region.regionBboxWGS4
-          ? states.region.regionBboxWGS4
-          : states.country.countryBboxWGS84;
         dispatch({
-          bbox: b,
+          bbox: states.country.bboxWGS84,
           CRS: defaultCRS,
           type: "changeBboxCRS",
         });
@@ -435,7 +433,25 @@ export default function MapOpenLayers({
           top: "0px",
           left: "0px",
         }}
-      ></div>
+      >
+        {" "}
+        {showSpinner && (
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              position: "absolute",
+              zIndex: "90",
+              top: "50%",
+              left: "0px",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress size={60} />
+          </div>
+        )}
+      </div>
       {message !== "" && (
         <div
           style={{

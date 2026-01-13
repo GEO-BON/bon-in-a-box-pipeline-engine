@@ -26,6 +26,8 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.net.URLEncoder
+import kotlin.toString
 
 
 /**
@@ -313,6 +315,89 @@ fun Application.configureRouting() {
             call.respond(Containers.toVersionsMap() + gitInfo)
         }
 
+        get("/api/captcha-config") {
+            val siteKey = System.getenv("RECAPTCHA_CLIENT_KEY")
+            val serverKey = System.getenv("RECAPTCHA_SERVER_KEY")
+            val enabled = !siteKey.isNullOrEmpty() && !serverKey.isNullOrEmpty()
+
+            val config = mapOf(
+                "enabled" to enabled,
+                "siteKey" to (if (enabled) siteKey else null)
+            )
+            call.respond(gson.toJson(config))
+        }
+
+        post("/api/verify-captcha") {
+            try {
+                val requestBody = call.receive<String>()
+                val requestJSON = try {
+                    JSONObject(requestBody)
+                } catch (e: JSONException) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        gson.toJson(mapOf("success" to false, "error" to "Invalid JSON"))
+                    )
+                    return@post
+                }
+
+                val token = requestJSON.optString("token", "")
+                if (token.isEmpty()) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        gson.toJson(mapOf("success" to false, "error" to "Token is required"))
+                    )
+                    return@post
+                }
+
+                val secretKey = System.getenv("RECAPTCHA_SERVER_KEY")
+                if (secretKey.isNullOrEmpty()) {
+                    logger.warn("RECAPTCHA_SERVER_KEY environment variable is not set - captcha verification disabled")
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        gson.toJson(mapOf("success" to false, "error" to "reCAPTCHA is not configured on this server"))
+                    )
+                    return@post
+                }
+
+                // Verify token with Google's reCAPTCHA API
+                val verifyUrl = "https://www.google.com/recaptcha/api/siteverify"
+                val formData = "secret=${URLEncoder.encode(secretKey, "UTF-8")}&response=${URLEncoder.encode(token, "UTF-8")}"
+
+                val verifyRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(verifyUrl))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(formData))
+                    .build()
+
+                val httpClient = HttpClient.newHttpClient()
+                val verifyResponse = httpClient.send(verifyRequest, HttpResponse.BodyHandlers.ofString())
+
+                if (verifyResponse.statusCode() == 200) {
+                    val responseJSON = JSONObject(verifyResponse.body())
+                    val success = responseJSON.optBoolean("success", false)
+
+                    if (success) {
+                        call.respond(gson.toJson(mapOf("success" to true)))
+                    } else {
+                        val errorCodes = responseJSON.optJSONArray("error-codes")
+                        logger.debug("reCAPTCHA verification failed: ${errorCodes?.toString()}")
+                        call.respond(gson.toJson(mapOf("success" to false)))
+                    }
+                } else {
+                    logger.error("reCAPTCHA API returned status code: ${verifyResponse.statusCode()}")
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        gson.toJson(mapOf("success" to false, "error" to "Verification service unavailable"))
+                    )
+                }
+            } catch (ex: Exception) {
+                logger.error("Error verifying reCAPTCHA token", ex)
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    gson.toJson(mapOf("success" to false, "error" to "Internal server error"))
+                )
+            }
+        }
 
         post("/pipeline/save/{filename}") {
             if (System.getenv("SAVE_PIPELINE_TO_SERVER") == "deny") {

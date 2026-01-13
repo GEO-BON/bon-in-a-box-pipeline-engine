@@ -4,12 +4,14 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getHPCStatus**](DefaultApi.md#getHPCStatus) | **GET** /hpc/status | Get status of HPC connection.
+[**getCountriesList**](DefaultApi.md#getCountriesList) | **GET** /region/countries_list | Returns the list of countries from GADM with their ISO3/GID and English names
 [**getHistory**](DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 [**getInfo**](DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
 [**getListOf**](DefaultApi.md#getListOf) | **GET** /{type}/list | Get a list of available steps of given type and their names.
 [**getOutputFolders**](DefaultApi.md#getOutputFolders) | **GET** /{type}/{id}/outputs | Get the output folders of the scripts composing this pipeline
 [**getPipeline**](DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
+[**getRegionGeometry**](DefaultApi.md#getRegionGeometry) | **GET** /region/geometry | Returns the geometry of the specified region from GADM in GeoJSON format
+[**getRegionsList**](DefaultApi.md#getRegionsList) | **GET** /region/regions_list | Returns the list of regions with their ID, Country, English names and bounding box
 [**getSystemStatus**](DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 [**getVersions**](DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
 [**hpcPrepareGet**](DefaultApi.md#hpcPrepareGet) | **GET** /hpc/prepare | Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.
@@ -19,11 +21,11 @@ Method | HTTP request | Description
 
 
 
-## getHPCStatus
+## getCountriesList
 
-> {String: GetHPCStatus200ResponseValue} getHPCStatus()
+> [Object] getCountriesList()
 
-Get status of HPC connection.
+Returns the list of countries from GADM with their ISO3/GID and English names
 
 ### Example
 
@@ -31,7 +33,7 @@ Get status of HPC connection.
 import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
-apiInstance.getHPCStatus((error, data, response) => {
+apiInstance.getCountriesList((error, data, response) => {
   if (error) {
     console.error(error);
   } else {
@@ -46,7 +48,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**{String: GetHPCStatus200ResponseValue}**](GetHPCStatus200ResponseValue.md)
+**[Object]**
 
 ### Authorization
 
@@ -270,6 +272,96 @@ Name | Type | Description  | Notes
 ### Return type
 
 **Object**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## getRegionGeometry
+
+> File getRegionGeometry(id, opts)
+
+Returns the geometry of the specified region from GADM in GeoJSON format
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+let id = "id_example"; // String | ID of the region to get the geometry for, from the UN regions codes
+let opts = {
+  'type': "'country'" // String | Type of region to get the geometry for (country or region)
+};
+apiInstance.getRegionGeometry(id, opts, (error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**| ID of the region to get the geometry for, from the UN regions codes |
+ **type** | **String**| Type of region to get the geometry for (country or region) | [optional] [default to &#39;country&#39;]
+
+### Return type
+
+**File**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/geopackage+sqlite3
+
+
+## getRegionsList
+
+> [Object] getRegionsList(countryIso)
+
+Returns the list of regions with their ID, Country, English names and bounding box
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+let countryIso = "countryIso_example"; // String | ISO3 code of the country to get the regions for (e.g. \"CAN\" for Canada)
+apiInstance.getRegionsList(countryIso, (error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **countryIso** | **String**| ISO3 code of the country to get the regions for (e.g. \&quot;CAN\&quot; for Canada) |
+
+### Return type
+
+**[Object]**
 
 ### Authorization
 
