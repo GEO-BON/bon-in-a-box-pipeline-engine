@@ -17,7 +17,7 @@ biab_output_list <- list()
 ## Helper functions definitions
 # Read inputs, calling script should assign the return value to a variable
 biab_inputs <- function(){
-    fromJSON(file=file.path(outputFolder, "input.json"))
+    rjson::fromJSON(file=file.path(outputFolder, "input.json"))
 }
 
 # Add outputs throughout the script
@@ -57,7 +57,7 @@ withCallingHandlers(source(scriptFile),
 
 if(length(biab_output_list) > 0) {
     cat("Writing outputs to BON in a Box...\n")
-    jsonData <- toJSON(biab_output_list, indent=2)
+    jsonData <- rjson::toJSON(biab_output_list, indent=2)
     write(jsonData, file.path(outputFolder,"output.json"))
 }
 
