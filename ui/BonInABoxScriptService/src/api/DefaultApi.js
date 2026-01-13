@@ -45,7 +45,7 @@ export default class DefaultApi {
      */
 
     /**
-     * Returns the list of countries from GADM with their ISO3/GID and English names
+     * Returns the list of countries from FieldMaps.io with their ISO3 and English names
      * @param {module:api/DefaultApi~getCountriesListCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<Object>}
      */
@@ -67,6 +67,42 @@ export default class DefaultApi {
       let returnType = [Object];
       return this.apiClient.callApi(
         '/region/countries_list', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getHPCStatus operation.
+     * @callback module:api/DefaultApi~getHPCStatusCallback
+     * @param {String} error Error message, if any.
+     * @param {Object.<String, module:model/{String: GetHPCStatus200ResponseValue}>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get status of HPC connection.
+     * @param {module:api/DefaultApi~getHPCStatusCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Object.<String, module:model/{String: GetHPCStatus200ResponseValue}>}
+     */
+    getHPCStatus(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = {'String': GetHPCStatus200ResponseValue};
+      return this.apiClient.callApi(
+        '/hpc/status', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -303,8 +339,8 @@ export default class DefaultApi {
      */
 
     /**
-     * Returns the geometry of the specified region from GADM in GeoJSON format
-     * @param {String} id ID of the region to get the geometry for, from the UN regions codes
+     * Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
+     * @param {String} id ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes
      * @param {Object} opts Optional parameters
      * @param {module:model/String} [type = 'country')] Type of region to get the geometry for (country or region)
      * @param {module:api/DefaultApi~getRegionGeometryCallback} callback The callback function, accepting three arguments: error, data, response
@@ -349,7 +385,7 @@ export default class DefaultApi {
      */
 
     /**
-     * Returns the list of regions with their ID, Country, English names and bounding box
+     * Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
      * @param {String} countryIso ISO3 code of the country to get the regions for (e.g. \"CAN\" for Canada)
      * @param {module:api/DefaultApi~getRegionsListCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<Object>}

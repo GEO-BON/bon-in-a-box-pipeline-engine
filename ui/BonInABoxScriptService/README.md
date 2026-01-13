@@ -120,15 +120,15 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*BonInABoxScriptService.DefaultApi* | [**getCountriesList**](docs/DefaultApi.md#getCountriesList) | **GET** /region/countries_list | Returns the list of countries from FieldMaps.io with their ISO3 and English names
 *BonInABoxScriptService.DefaultApi* | [**getHPCStatus**](docs/DefaultApi.md#getHPCStatus) | **GET** /hpc/status | Get status of HPC connection.
-*BonInABoxScriptService.DefaultApi* | [**getCountriesList**](docs/DefaultApi.md#getCountriesList) | **GET** /region/countries_list | Returns the list of countries from GADM with their ISO3/GID and English names
 *BonInABoxScriptService.DefaultApi* | [**getHistory**](docs/DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 *BonInABoxScriptService.DefaultApi* | [**getInfo**](docs/DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
 *BonInABoxScriptService.DefaultApi* | [**getListOf**](docs/DefaultApi.md#getListOf) | **GET** /{type}/list | Get a list of available steps of given type and their names.
 *BonInABoxScriptService.DefaultApi* | [**getOutputFolders**](docs/DefaultApi.md#getOutputFolders) | **GET** /{type}/{id}/outputs | Get the output folders of the scripts composing this pipeline
 *BonInABoxScriptService.DefaultApi* | [**getPipeline**](docs/DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
-*BonInABoxScriptService.DefaultApi* | [**getRegionGeometry**](docs/DefaultApi.md#getRegionGeometry) | **GET** /region/geometry | Returns the geometry of the specified region from GADM in GeoJSON format
-*BonInABoxScriptService.DefaultApi* | [**getRegionsList**](docs/DefaultApi.md#getRegionsList) | **GET** /region/regions_list | Returns the list of regions with their ID, Country, English names and bounding box
+*BonInABoxScriptService.DefaultApi* | [**getRegionGeometry**](docs/DefaultApi.md#getRegionGeometry) | **GET** /region/geometry | Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
+*BonInABoxScriptService.DefaultApi* | [**getRegionsList**](docs/DefaultApi.md#getRegionsList) | **GET** /region/regions_list | Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
 *BonInABoxScriptService.DefaultApi* | [**getSystemStatus**](docs/DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 *BonInABoxScriptService.DefaultApi* | [**getVersions**](docs/DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
 *BonInABoxScriptService.DefaultApi* | [**hpcPrepareGet**](docs/DefaultApi.md#hpcPrepareGet) | **GET** /hpc/prepare | Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.

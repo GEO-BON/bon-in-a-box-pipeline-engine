@@ -4,14 +4,15 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**getCountriesList**](DefaultApi.md#getCountriesList) | **GET** /region/countries_list | Returns the list of countries from GADM with their ISO3/GID and English names
+[**getCountriesList**](DefaultApi.md#getCountriesList) | **GET** /region/countries_list | Returns the list of countries from FieldMaps.io with their ISO3 and English names
+[**getHPCStatus**](DefaultApi.md#getHPCStatus) | **GET** /hpc/status | Get status of HPC connection.
 [**getHistory**](DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 [**getInfo**](DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
 [**getListOf**](DefaultApi.md#getListOf) | **GET** /{type}/list | Get a list of available steps of given type and their names.
 [**getOutputFolders**](DefaultApi.md#getOutputFolders) | **GET** /{type}/{id}/outputs | Get the output folders of the scripts composing this pipeline
 [**getPipeline**](DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
-[**getRegionGeometry**](DefaultApi.md#getRegionGeometry) | **GET** /region/geometry | Returns the geometry of the specified region from GADM in GeoJSON format
-[**getRegionsList**](DefaultApi.md#getRegionsList) | **GET** /region/regions_list | Returns the list of regions with their ID, Country, English names and bounding box
+[**getRegionGeometry**](DefaultApi.md#getRegionGeometry) | **GET** /region/geometry | Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
+[**getRegionsList**](DefaultApi.md#getRegionsList) | **GET** /region/regions_list | Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
 [**getSystemStatus**](DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 [**getVersions**](DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
 [**hpcPrepareGet**](DefaultApi.md#hpcPrepareGet) | **GET** /hpc/prepare | Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.
@@ -25,7 +26,7 @@ Method | HTTP request | Description
 
 > [Object] getCountriesList()
 
-Returns the list of countries from GADM with their ISO3/GID and English names
+Returns the list of countries from FieldMaps.io with their ISO3 and English names
 
 ### Example
 
@@ -49,6 +50,45 @@ This endpoint does not need any parameter.
 ### Return type
 
 **[Object]**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## getHPCStatus
+
+> {String: GetHPCStatus200ResponseValue} getHPCStatus()
+
+Get status of HPC connection.
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+apiInstance.getHPCStatus((error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**{String: GetHPCStatus200ResponseValue}**](GetHPCStatus200ResponseValue.md)
 
 ### Authorization
 
@@ -287,7 +327,7 @@ No authorization required
 
 > File getRegionGeometry(id, opts)
 
-Returns the geometry of the specified region from GADM in GeoJSON format
+Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
 
 ### Example
 
@@ -295,9 +335,9 @@ Returns the geometry of the specified region from GADM in GeoJSON format
 import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
-let id = "id_example"; // String | ID of the region to get the geometry for, from the UN regions codes
+let id = "LKA"; // String | ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes
 let opts = {
-  'type': "'country'" // String | Type of region to get the geometry for (country or region)
+  'type': "country" // String | Type of region to get the geometry for (country or region)
 };
 apiInstance.getRegionGeometry(id, opts, (error, data, response) => {
   if (error) {
@@ -313,7 +353,7 @@ apiInstance.getRegionGeometry(id, opts, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**| ID of the region to get the geometry for, from the UN regions codes |
+ **id** | **String**| ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes |
  **type** | **String**| Type of region to get the geometry for (country or region) | [optional] [default to &#39;country&#39;]
 
 ### Return type
@@ -334,7 +374,7 @@ No authorization required
 
 > [Object] getRegionsList(countryIso)
 
-Returns the list of regions with their ID, Country, English names and bounding box
+Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
 
 ### Example
 
@@ -342,7 +382,7 @@ Returns the list of regions with their ID, Country, English names and bounding b
 import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
-let countryIso = "countryIso_example"; // String | ISO3 code of the country to get the regions for (e.g. \"CAN\" for Canada)
+let countryIso = "CAN"; // String | ISO3 code of the country to get the regions for (e.g. \"CAN\" for Canada)
 apiInstance.getRegionsList(countryIso, (error, data, response) => {
   if (error) {
     console.error(error);
