@@ -151,7 +151,6 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
   }, [states.actions]);
 
   const updateCRS = (value, ignore = false) => {
-    let code = `${states.CRS.authority}:${states.CRS.code}`;
     if (value) {
       let code = "";
       code = value.value.split(":");
