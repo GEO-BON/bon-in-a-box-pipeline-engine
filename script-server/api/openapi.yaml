@@ -92,9 +92,9 @@ paths:
                       runId: "path>to>script>hash",
                       type: "script",
                       startTime: "2024-01-01 00:00",
-                      inputs: { 
-                        input1: "value", 
-                        input2: "value" 
+                      inputs: {
+                        input1: "value",
+                        input2: "value"
                       },
                       status: "completed",
                     },
@@ -456,7 +456,7 @@ paths:
           content:
             application/geopackage+sqlite3:
               schema:
-                type: binary
+                type: string
                 format: binary
         "404":
           description: Region ID not found
