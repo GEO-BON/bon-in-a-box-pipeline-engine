@@ -397,7 +397,7 @@ paths:
                     }
   /region/regions_list:
     get:
-      summary: Returns the list of regions with their ID, Country, English names and bounding box
+      summary: Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
       operationId: getRegionsList
       parameters:
         - name: country_iso
@@ -434,7 +434,7 @@ paths:
           description: Country ID not found
   /region/geometry:
     get:
-      summary: Returns the geometry of the specified region from GADM in GeoJSON format
+      summary: Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
       operationId: getRegionGeometry
       parameters:
         - name: type
@@ -447,7 +447,7 @@ paths:
             default: country
         - name: id
           in: query
-          description: ID of the region to get the geometry for, from the UN regions codes
+          description: ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes
           required: true
           schema:
             type: string

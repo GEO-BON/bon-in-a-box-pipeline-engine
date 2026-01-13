@@ -52,7 +52,7 @@ def countries_list():
 @app.get("/region/regions_list")
 def regions_list(country_iso:str):
     df = pd.read_json('/app/regions.json', orient='records')
-    names = df[df['adm0_src'] == country_iso]
+    names = df[(df['adm0_src'] == country_iso) | (df['adm0_src'] == country_iso+'_1')]
     if names.empty:
         raise HTTPException(status_code=404, detail="Country ISO code not valid")
     return names.to_dict(orient='records')
