@@ -404,6 +404,7 @@ paths:
           in: query
           description: ISO3 code of the country to get the regions for (e.g. "CAN" for Canada)
           required: true
+          example: CAN
           schema:
             type: string
       responses:
