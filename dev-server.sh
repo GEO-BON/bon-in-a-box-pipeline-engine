@@ -53,8 +53,9 @@ function command { # args appended to the docker compose command
 
 function clean {
     echo "Removing containers..."
-    docker container rm biab-gateway biab-ui biab-script-server \
-        biab-tiler biab-runner-conda biab-runner-julia biab-viewer swagger_editor
+    docker container rm biab-ui biab-viewer biab-script-server biab-python-api \
+        biab-runner-conda biab-runner-julia swagger_editor \
+        biab-tiler
 
     # Legacy volumes
     echo "Removing legacy volumes..."

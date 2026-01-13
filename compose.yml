@@ -2,7 +2,6 @@
 # Contains all that is common between production and development configurations.
 
 services:
-
   # This can be accessed within the docker network with http://biab-script-server:8080/script/...
   script-server:
     container_name: biab-script-server
@@ -28,6 +27,22 @@ services:
       GIT_LOCATION: /.git
       PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
       USE_RUNNERS: true
+
+  python-api: # Serves Titiler and a FastAPI app to serve country and region names and geometries
+    container_name: biab-python-api
+    volumes:
+      - ${PIPELINE_REPO_PATH}/output:/output:ro
+      - ./python-api/app:/app:rw
+    user: ${MY_UID}:${DOCKER_GID}
+    environment:
+      PORT: 8000
+      WORKERS_PER_CORE: 1
+      TITILER_API_CORS_ORIGINS: "*"
+    expose:
+      - "8000"
+      - "8001"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   runner-conda:
     container_name: biab-runner-conda
@@ -69,17 +84,5 @@ services:
       - ${PIPELINE_REPO_PATH}/userdata:/static/userdata:ro
     depends_on:
       - script-server
+      - python-api
 
-  tiler:
-    container_name: biab-tiler
-    image: ghcr.io/developmentseed/titiler:0.18.9
-    volumes:
-      - ${PIPELINE_REPO_PATH}/output:/output:ro
-      - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
-    user: ${MY_UID}:${DOCKER_GID}
-    environment:
-      PORT: 8000
-      WORKERS_PER_CORE: 1
-      TITILER_API_CORS_ORIGINS: "*"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"

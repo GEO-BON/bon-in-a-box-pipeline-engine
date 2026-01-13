@@ -40,25 +40,26 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
     if (states.actions.includes("updateCRSListFromNames")) {
       setSearching(true);
       // Suggest from names
-      const searchTerm = searchValue ? searchValue : states.country.englishName;
-      if (searchTerm && searchTerm !== "" && searchTerm !== states.CRS?.name) {
-        getCRSListFromName(searchTerm).then((result) => {
-          if (result) {
-            const suggestions = result.map((proj) => {
-              const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
-              return {
-                label: `${proj.name} (${p})`,
-                value: `${p}`,
-              };
-            });
-            setCRSList(defaultCRSList.concat(suggestions));
-          } else {
-            setCRSList(defaultCRSList);
-          }
-          setSearching(false);
-        });
+      if(states.country && states.country?.englishName){
+        const searchTerm = searchValue ? searchValue : states.country.englishName;
+        if (searchTerm && searchTerm !== "" && searchTerm !== states.CRS?.name) {
+          getCRSListFromName(searchTerm).then((result) => {
+            if (result) {
+              const suggestions = result.map((proj) => {
+                const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
+                return {
+                  label: `${proj.name} (${p})`,
+                  value: `${p}`,
+                };
+              });
+              setCRSList(defaultCRSList.concat(suggestions));
+            } else {
+              setCRSList(defaultCRSList);
+            }
+            setSearching(false);
+          });
+        }
       } else {
-        //setCRSList(defaultCRSList);
         setSearching(false);
       }
     }
@@ -149,7 +150,6 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
   }, [states.actions]);
 
   const updateCRS = (value, ignore = false) => {
-    let code = `${states.CRS.authority}:${states.CRS.code}`;
     if (value) {
       let code = "";
       code = value.value.split(":");
@@ -247,19 +247,18 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
             label="Search / Select CRS"
             InputProps={{
               ...params.InputProps,
-              endAdornment: (
+              startAdornment: (
                 <>
                   {CRSList.length > 0 && (
                     <>
                       <InputAdornment
-                        position="end"
                         style={{ cursor: "pointer" }}
                         onClick={() => {
                           setOpenCRSMenu(true);
                         }}
                       >
                         <KeyboardArrowDownIcon
-                          sx={{ color: "var(--biab-green-main)" }}
+                          sx={{ color: "var(--biab-green-main)"}}
                         />
                       </InputAdornment>
                       {params.InputProps.endAdornment}

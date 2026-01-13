@@ -36,6 +36,42 @@ export default class DefaultApi {
 
 
     /**
+     * Callback function to receive the result of the getCountriesList operation.
+     * @callback module:api/DefaultApi~getCountriesListCallback
+     * @param {String} error Error message, if any.
+     * @param {Array.<Object>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Returns the list of countries from GADM with their ISO3/GID and English names
+     * @param {module:api/DefaultApi~getCountriesListCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<Object>}
+     */
+    getCountriesList(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = [Object];
+      return this.apiClient.callApi(
+        '/region/countries_list', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the getHistory operation.
      * @callback module:api/DefaultApi~getHistoryCallback
      * @param {String} error Error message, if any.
@@ -252,6 +288,94 @@ export default class DefaultApi {
       let returnType = Object;
       return this.apiClient.callApi(
         '/pipeline/{descriptionPath}/get', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getRegionGeometry operation.
+     * @callback module:api/DefaultApi~getRegionGeometryCallback
+     * @param {String} error Error message, if any.
+     * @param {File} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Returns the geometry of the specified region from GADM in GeoJSON format
+     * @param {String} id ID of the region to get the geometry for, from the UN regions codes
+     * @param {Object} opts Optional parameters
+     * @param {module:model/String} [type = 'country')] Type of region to get the geometry for (country or region)
+     * @param {module:api/DefaultApi~getRegionGeometryCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link File}
+     */
+    getRegionGeometry(id, opts, callback) {
+      opts = opts || {};
+      let postBody = null;
+      // verify the required parameter 'id' is set
+      if (id === undefined || id === null) {
+        throw new Error("Missing the required parameter 'id' when calling getRegionGeometry");
+      }
+
+      let pathParams = {
+      };
+      let queryParams = {
+        'type': opts['type'],
+        'id': id
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/geopackage+sqlite3'];
+      let returnType = File;
+      return this.apiClient.callApi(
+        '/region/geometry', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getRegionsList operation.
+     * @callback module:api/DefaultApi~getRegionsListCallback
+     * @param {String} error Error message, if any.
+     * @param {Array.<Object>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Returns the list of regions with their ID, Country, English names and bounding box
+     * @param {String} countryIso ISO3 code of the country to get the regions for (e.g. \"CAN\" for Canada)
+     * @param {module:api/DefaultApi~getRegionsListCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Array.<Object>}
+     */
+    getRegionsList(countryIso, callback) {
+      let postBody = null;
+      // verify the required parameter 'countryIso' is set
+      if (countryIso === undefined || countryIso === null) {
+        throw new Error("Missing the required parameter 'countryIso' when calling getRegionsList");
+      }
+
+      let pathParams = {
+      };
+      let queryParams = {
+        'country_iso': countryIso
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = [Object];
+      return this.apiClient.callApi(
+        '/region/regions_list', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
