@@ -58,7 +58,7 @@ BON in a Box is designed to run analyses with both publicly available data and d
 
 #### **Naming standards:**
 
--   Input and output file names should be machine readable, with no spaces, symbols, capital letters, or special characters. Spaces should be replaced with an underscore (\_).
+-   Input and output file names should be machine readable, with no spaces, symbols, or special characters. Spaces should be replaced with an underscore (\_).
 
 -   File names should be descriptive (e.g. “population_polygons.gpkg”).
 

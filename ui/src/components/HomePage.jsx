@@ -139,8 +139,8 @@ export default function HomePage() {
 
 
             </div>
-                <LastNRuns n={3} />
-        </div>
+                <LastNRuns n={4} />
+            </div>
 
         </div>
 

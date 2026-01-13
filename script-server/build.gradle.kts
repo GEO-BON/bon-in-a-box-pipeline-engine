@@ -12,12 +12,14 @@ plugins {
 }
 
 group = "org.geobon"
-version = "1.1.3"
+version = "1.1.5"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
+}
 
-    val isDevelopment: Boolean = ("true" == System.getenv("DEV"))
-    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+ktor {
+    development = ("true" == System.getenv("DEV"))
+    println("ktor.development=${development.get()}")
 }
 
 repositories {
@@ -35,6 +37,7 @@ tasks.test {
         "SCRIPT_LOCATION" to "$projectDir/src/test/resources/scripts/",
         "SCRIPT_STUBS_LOCATION" to projectDir.parent + "/script-stubs/",
         "PIPELINES_LOCATION" to "$projectDir/src/test/resources/pipelines/",
+        "USERDATA_LOCATION" to "$projectDir/src/test/resources/userdata/",
         "OUTPUT_LOCATION" to "$projectDir/src/test/resources/outputs/",
         "SCRIPT_SERVER_CACHE_CLEANER" to "full"
     ))

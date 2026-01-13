@@ -14,9 +14,8 @@ The code in this repository runs an engine, but the engine needs content! Here a
 1. Clone this repo: `git clone git@github.com:GEO-BON/bon-in-a-box-pipeline-engine.git pipeline-engine`
 2. `cd pipeline-engine`
 3. Clone the BON in a Box repo (or any compatible repo of your choice) **into the pipeline-repo folder**: `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git pipeline-repo`
-4. Create a runner.env file as per [user instructions](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_install.html#deploying-the-servers-locally).
-5. `cd ..`
-6. Pull the pre-compiled images: `./dev-server.sh pull`
+4. Create a runner.env file in the `pipeline-repo` folder as per [user instructions](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_install.html#deploying-the-servers-locally).
+5. Pull the pre-compiled images: `./dev-server.sh pull`
 
 ## IDE setup
 
@@ -99,13 +98,14 @@ gitGraph
 5. Send the above command to a few beta users.
 
 ### Public release
-1. Merge to main
+1. Regenerate documentation by running `quarto render` in the docs_source folder.
+2. Merge to main
 
     The changes are live as soon as they are merged to main branch: the dockers are built, pushed to the GitHub package registry ([server](https://github.com/orgs/GEO-BON/packages?repo_name=bon-in-a-box-pipeline-engine) and [runners](https://github.com/orgs/GEO-BON/packages?repo_name=bon-in-a-box-pipelines)), and next time someone starts the server, the new docker images will be pulled.
 
     Old packages can be found on [GEO BON's Docker Hub](https://hub.docker.com/r/geobon/bon-in-a-box)
 
-2. Manually tag the version and create a release via GitHub. See [releases](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/releases).
+3. Manually tag the version and create a release via GitHub. See [releases](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/releases).
 
 
 ### Debugging prod servers

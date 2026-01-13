@@ -115,7 +115,7 @@ export function PipelinePage({ runType }) {
             setHttpError(formatError(error, response, "while getting pipeline outputs from script server"));
           } else {
             if (data.error) {
-              setHttpError(data.error);
+              setHttpError(data.error.replaceAll("\n","\n\n"));
               delete data.error;
             }
 
