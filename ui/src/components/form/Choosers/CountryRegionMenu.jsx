@@ -2,14 +2,13 @@
 import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import { DefaultApi } from "bon_in_a_box_script_service";
+export const api = new DefaultApi();
 
 import {
-  getCountriesAPI,
-  getStateAPI,
   defaultRegion,
   paperStyle,
 } from "./utils";
-import { bbox } from "@turf/turf";
 
 export default function CountryRegionMenu({
   states,
@@ -37,27 +36,31 @@ export default function CountryRegionMenu({
   );
 
   useEffect(() => {
-    // Fetch country options from the JSON file
-    getCountriesAPI().then((response) => {
-      if (response.data === null) {
-        setCountryOptions([]);
-        return;
+    api.getCountriesList((error, data, response) => {
+      if (error) {
+        console.error(error);
+      } else {
+        if (data === null) {
+            setCountryOptions([]);
+            return;
+          }
+          const resp = data.filter(
+            (obj, index, self) =>
+              index === self.findIndex((o) => o.adm0_name === obj.adm0_name) &&
+              obj.adm0_name !== null
+          );
+          let countryOpts = resp.map((country) => ({
+            label: country.adm0_name,
+            value: country.adm0_src,
+            bbox: Object.values(country.geometry_bbox),
+          }));
+          countryOpts.sort((a, b) => {
+            return a.label.toLowerCase().localeCompare(b.label.toLowerCase());
+          });
+          setCountryOptions(countryOpts);
+        }
       }
-      const resp = response.data.filter(
-        (obj, index, self) =>
-          index === self.findIndex((o) => o.adm0_name === obj.adm0_name) &&
-          obj.adm0_name !== null
-      );
-      let countryOpts = resp.map((country) => ({
-        label: country.adm0_name,
-        value: country.adm0_src,
-        bbox: Object.values(country.geometry_bbox),
-      }));
-      countryOpts.sort((a, b) => {
-        return a.label.toLowerCase().localeCompare(b.label.toLowerCase());
-      });
-      setCountryOptions(countryOpts);
-    });
+    );
   }, []);
 
   // Set from controlled values coming in
@@ -95,22 +98,27 @@ export default function CountryRegionMenu({
   useEffect(() => {
     if (selectedCountry && selectedCountry.value) {
       // Fetch states or provinces based on the selected country
-      getStateAPI(selectedCountry.value).then((response) => {
-        if (response.data && response.data) {
-          const regionOpts = response.data.map((reg) => ({
-            label: reg.adm1_name,
-            value: reg.adm1_src,
-            bbox: Object.values(reg.geometry_bbox),
-          }));
-          setRegionOptions(regionOpts);
-          setRegionJSON(response.data);
-        } else {
+      api.getRegionsList(selectedCountry.value, (error, data, response) => {
+        if (error) {
+          console.error(error);
           setRegionOptions([]);
         }
-      });
-    } else {
-      setRegionOptions([]);
+        else{
+          if (data) {
+            const regionOpts = data.map((reg) => ({
+              label: reg.adm1_name,
+              value: reg.adm1_src,
+              bbox: Object.values(reg.geometry_bbox),
+            }));
+            setRegionOptions(regionOpts);
+            setRegionJSON(data);
+          } else {
+            setRegionOptions([]);
+          }
+        }
+      })
     }
+
   }, [selectedCountry]);
 
   const selectionChanged = (type, value) => {

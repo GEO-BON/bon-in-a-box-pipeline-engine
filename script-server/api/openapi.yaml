@@ -372,7 +372,7 @@ paths:
                   }
   /region/countries_list:
     get:
-      summary: Returns the list of countries from GADM with their ISO3/GID and English names
+      summary: Returns the list of countries from FieldMaps.io with their ISO3 and English names
       operationId: getCountriesList
       responses:
         "200":

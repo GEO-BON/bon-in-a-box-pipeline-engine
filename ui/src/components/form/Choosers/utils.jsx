@@ -2,6 +2,8 @@ import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { polygon, bbox } from "@turf/turf";
 import proj4 from "proj4";
+import { DefaultApi } from "bon_in_a_box_script_service";
+export const api = new DefaultApi();
 
 const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
 
@@ -102,35 +104,6 @@ export const paperStyle = (dialog) => {
       margin: "0px",
     };
   }
-};
-
-export const getCountriesAPI = async () => {
-  let result;
-  const base_url = "/region/countries_list";
-  try {
-    result = await axios({
-      method: "get",
-      baseURL: `${base_url}`,
-    });
-  } catch (error) {
-    result = { data: null };
-  }
-  return result;
-};
-
-export const getStateAPI = async (country_iso) => {
-  let result;
-  const base_url = "/region/regions_list";
-  try {
-    result = await axios({
-      method: "get",
-      baseURL: `${base_url}`,
-      params: { country_iso: country_iso },
-    });
-  } catch (error) {
-    result = { data: null };
-  }
-  return result;
 };
 
 export const getProjestAPI = async (geojson) => {
