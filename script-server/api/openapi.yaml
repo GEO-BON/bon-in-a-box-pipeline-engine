@@ -445,12 +445,14 @@ paths:
             type: string
             enum: [country, region]
             default: country
+          example: country
         - name: id
           in: query
           description: ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes
           required: true
           schema:
             type: string
+          example: LKA
       responses:
         "200":
           description: Geometry of the region in GeoPackage format.

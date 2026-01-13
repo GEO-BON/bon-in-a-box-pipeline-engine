@@ -60,7 +60,6 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
           });
         }
       } else {
-        //setCRSList(defaultCRSList);
         setSearching(false);
       }
     }
@@ -248,19 +247,18 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
             label="Search / Select CRS"
             InputProps={{
               ...params.InputProps,
-              endAdornment: (
+              startAdornment: (
                 <>
                   {CRSList.length > 0 && (
                     <>
                       <InputAdornment
-                        position="end"
                         style={{ cursor: "pointer" }}
                         onClick={() => {
                           setOpenCRSMenu(true);
                         }}
                       >
                         <KeyboardArrowDownIcon
-                          sx={{ color: "var(--biab-green-main)" }}
+                          sx={{ color: "var(--biab-green-main)"}}
                         />
                       </InputAdornment>
                       {params.InputProps.endAdornment}
