@@ -27,6 +27,9 @@ class HPCConnection(
     val knownHostsPath: String? = System.getenv("HPC_KNOWN_HOSTS_FILE")
     val hpcRoot: String? = System.getenv("HPC_BIAB_ROOT")
     val account: String? = System.getenv("HPC_SBATCH_ACCOUNT")
+    val apptainerVersion: String = System.getenv("HPC_APPTAINER_VERSION").let {
+        if(it.isNullOrBlank()) "" else "/$it"
+    }
 
     val sshCommand: List<String>?
 
@@ -217,7 +220,7 @@ class HPCConnection(
                                         exit 1
                                     fi
 
-                                    module load apptainer
+                                    module load apptainer$apptainerVersion
                                     if [ $? -ne 0 ]; then exit 1; fi
                                     echo "apptainer version:" $(apptainer version)
 
@@ -382,7 +385,7 @@ class HPCConnection(
             echo "Batch job started, contains ${tasksToSend.size} tasks" | tee -a ${hpcLogFiles.joinToString(" ")}
             trap "echo 'Received termination signal from SLURM.' | tee -a ${hpcLogFiles.joinToString(" ")} && exit" TERM
 
-            module load apptainer
+            module load apptainer$apptainerVersion
 
             srun ${tasksToSend.joinToString("\n\nsrun ")}
 

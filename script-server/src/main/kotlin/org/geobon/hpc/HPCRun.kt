@@ -68,7 +68,7 @@ class HPCRun(
                         condaSyncMutex.withLock {
                             logFile.appendText("Lock acquired. Syncing conda environment towards HPC...\n")
                             hpcConnection.runCommand("""
-                                module load apptainer && ${getApptainerBaseCommand(hpcConnection.condaImage, true)} '
+                                module load apptainer${hpcConnection.apptainerVersion} && ${getApptainerBaseCommand(hpcConnection.condaImage, true)} '
                                     source $condaEnvWrapper ${context.outputFolderEscaped} "$condaEnvName" "$condaEnvFile"
                                 '
                             """.replace(Regex("""\s*\n\s*"""), " "),
