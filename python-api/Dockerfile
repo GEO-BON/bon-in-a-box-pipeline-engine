@@ -34,4 +34,7 @@ ENV HOST=0.0.0.0
 ENV PORT=8000
 ENV WEB_CONCURRENCY=1
 
+ARG BIAB_VERSION
+RUN echo $BIAB_VERSION "($(date +'%Y-%m-%d %R'))" > /version.txt
+
 CMD sh ./startup.sh

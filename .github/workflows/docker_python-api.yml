@@ -12,10 +12,10 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/gateway
+  IMAGE_NAME: ${{ github.repository }}/python-api
 
 jobs:
-  gateway:
+  python-api:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -66,8 +66,7 @@ jobs:
         id: push
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: Dockerfile.gateway.prod
+          context: python-api
           build-args: |
             "BIAB_VERSION=${{ env.TAG_VERSION }}"
           push: true
