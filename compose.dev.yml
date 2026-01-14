@@ -48,7 +48,10 @@ services:
       DEV: true
 
   python-api:
-    build: python-api/
+    build:
+      context: python-api/
+      args:
+        BIAB_VERSION: "dev"
 
   gateway:
     image: nginxinc/nginx-unprivileged

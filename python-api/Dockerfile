@@ -1,4 +1,3 @@
-
 ARG TITILER_VERSION=0.18.9
 
 FROM ghcr.io/developmentseed/titiler:${TITILER_VERSION} AS builder
@@ -15,7 +14,10 @@ WORKDIR /app/
 
 RUN uv pip install fastapi "uvicorn[standard]" requests duckdb pandas geopandas pandas_geojson shapely pygadm fiona
 
-COPY . .
+COPY app /app
+
+ARG TITILER_VERSION
+RUN echo ${TITILER_VERSION} > /app/titiler_version.txt
 
 FROM ghcr.io/developmentseed/titiler:${TITILER_VERSION} AS runtime
 
@@ -36,5 +38,8 @@ ENV WEB_CONCURRENCY=1
 
 ARG BIAB_VERSION
 RUN echo $BIAB_VERSION "($(date +'%Y-%m-%d %R'))" > /version.txt
+
+ARG TITILER_VERSION
+ENV TITILER_VERSION=${TITILER_VERSION}
 
 CMD sh ./startup.sh

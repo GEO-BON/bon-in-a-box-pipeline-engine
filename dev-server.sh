@@ -53,7 +53,8 @@ function command { # args appended to the docker compose command
 
 function clean {
     echo "Removing containers..."
-    docker container rm biab-ui biab-viewer biab-script-server biab-python-api \
+    docker container rm biab-ui biab-viewer biab-gateway \
+        biab-script-server biab-python-api \
         biab-runner-conda biab-runner-julia swagger_editor \
         biab-tiler
 
