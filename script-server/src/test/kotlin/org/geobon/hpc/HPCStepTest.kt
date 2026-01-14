@@ -325,6 +325,7 @@ internal class HPCStepTest {
             every { hpcScriptStubsRoot } returns "$hpcRoot/script-stubs"
             every { hpcOutputRoot } returns "$hpcRoot/output"
             every { hpcUserDataRoot } returns "$hpcRoot/userdata"
+            every { apptainerVersion } returns ""
         }
 
         every { hpc.ready(any()) } answers {
