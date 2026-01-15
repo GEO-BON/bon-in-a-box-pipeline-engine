@@ -104,7 +104,9 @@ export default function CountryRegionMenu({
         }
         else{
           if (data) {
-            const regionOpts = data.map((reg) => ({
+            const regionOpts = data
+              .filter((reg) => reg.adm1_name && reg.adm1_src && reg.geometry_bbox)
+              .map((reg) => ({
               label: reg.adm1_name,
               value: reg.adm1_src,
               bbox: Object.values(reg.geometry_bbox),
@@ -213,7 +215,7 @@ export default function CountryRegionMenu({
             renderInput={(params) => (
               <TextField {...params} label="Select region" />
             )}
-            onChange={(event, value) => {
+            onChange={(_, value) => {
               setSelectedRegion(value);
               selectionChanged("region", value?.value ? value : null);
             }}
