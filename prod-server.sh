@@ -406,7 +406,7 @@ function clean {
     output=$(docker container rm \
         biab-gateway \
         biab-script-server \
-        biab-tiler \
+        biab-python-api \
         biab-runner-conda \
         biab-runner-julia 2>&1)
 
