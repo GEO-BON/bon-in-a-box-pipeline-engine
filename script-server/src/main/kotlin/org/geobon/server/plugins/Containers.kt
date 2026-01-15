@@ -19,7 +19,7 @@ enum class Containers(
      * Script server container hosts the server but can also run scripts that
      * don't require a specific environment (such as shell scripts).
      */
-    PYTHON_API_SERVER("biab-python-api", envCommand = "echo ${"$"}TITILER_VERSION"),
+    PYTHON_API_SERVER("biab-python-api", envCommand = """bash -c "echo \${"$"}TITILER_VERSION";"""),
 
     /**
      * Runner for Julia scripts
@@ -42,7 +42,7 @@ enum class Containers(
 
     val dockerCommandList: List<String> by lazy {
         when (this) {
-            SCRIPT_SERVER, PYTHON_API_SERVER -> emptyList()
+            SCRIPT_SERVER -> emptyList()
             else -> listOf("docker", "exec", "-i", containerName)
         }
     }

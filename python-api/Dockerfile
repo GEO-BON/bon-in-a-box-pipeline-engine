@@ -16,9 +16,6 @@ RUN uv pip install fastapi "uvicorn[standard]" requests duckdb pandas geopandas 
 
 COPY app /app
 
-ARG TITILER_VERSION
-RUN echo ${TITILER_VERSION} > /app/titiler_version.txt
-
 FROM ghcr.io/developmentseed/titiler:${TITILER_VERSION} AS runtime
 
 # Set up virtual environment path
