@@ -32,7 +32,6 @@ services:
     container_name: biab-python-api
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
-      - ./python-api/app:/app:rw
     user: ${MY_UID}:${DOCKER_GID}
     environment:
       PORT: 8000

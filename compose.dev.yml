@@ -52,6 +52,8 @@ services:
       context: python-api/
       args:
         BIAB_VERSION: "dev"
+    volumes:
+      - ./python-api/app:/app:rw
 
   gateway:
     image: nginxinc/nginx-unprivileged
