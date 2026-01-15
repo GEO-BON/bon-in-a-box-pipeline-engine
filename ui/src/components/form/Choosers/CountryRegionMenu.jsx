@@ -197,6 +197,7 @@ export default function CountryRegionMenu({
         <>
           <Autocomplete
             options={regionOptions}
+            disabled={regionOptions.length === 0}
             size="small"
             sx={{
               marginTop: "20px",
