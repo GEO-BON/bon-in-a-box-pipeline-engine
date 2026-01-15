@@ -25,6 +25,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 # Copy virtual environment and application code from builder stage
 COPY --from=builder $VIRTUAL_ENV $VIRTUAL_ENV
 COPY --from=builder /app /app
+RUN chmod -R 777 /app/ddb_home
 WORKDIR /app
 
 ENV MODULE_NAME=
