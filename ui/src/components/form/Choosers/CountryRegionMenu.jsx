@@ -20,7 +20,6 @@ export default function CountryRegionMenu({
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
   const [regionOptions, setRegionOptions] = useState([]);
-  const [regionJSON, setRegionJSON] = useState([]);
   const savedCountryValue =
     value?.country?.englishName && value?.country?.ISO3
       ? { label: states.country.englishName, value: states.country.ISO3 }
@@ -111,7 +110,6 @@ export default function CountryRegionMenu({
               bbox: Object.values(reg.geometry_bbox),
             }));
             setRegionOptions(regionOpts);
-            setRegionJSON(data);
           } else {
             setRegionOptions([]);
           }
