@@ -15,11 +15,10 @@ export default function CountryRegionMenu({
   dispatch,
   showRegion = true,
   dialog = false,
-  //updateValues = () => {},
   value = null,
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
-  const [regionOptions, setRegionOptions] = useState([]);
+  const [regionOptions, setRegionOptions] = useState(null);
   const savedCountryValue =
     value?.country?.englishName && value?.country?.ISO3
       ? { label: states.country.englishName, value: states.country.ISO3 }
@@ -40,7 +39,7 @@ export default function CountryRegionMenu({
         console.error(error);
       } else {
         if (data === null) {
-            setCountryOptions([]);
+            setCountryOptions(su);
             return;
           }
           const resp = data.filter(
@@ -100,7 +99,7 @@ export default function CountryRegionMenu({
       api.getRegionsList(selectedCountry.value, (error, data, response) => {
         if (error) {
           console.error(error);
-          setRegionOptions([]);
+          setRegionOptions(null);
         }
         else{
           if (data) {
@@ -113,7 +112,7 @@ export default function CountryRegionMenu({
             }));
             setRegionOptions(regionOpts);
           } else {
-            setRegionOptions([]);
+            setRegionOptions(null);
           }
         }
       })
@@ -199,7 +198,7 @@ export default function CountryRegionMenu({
         <>
           <Autocomplete
             options={regionOptions}
-            disabled={regionOptions.length === 0}
+            disabled={!regionOptions}
             size="small"
             sx={{
               marginTop: "20px",
