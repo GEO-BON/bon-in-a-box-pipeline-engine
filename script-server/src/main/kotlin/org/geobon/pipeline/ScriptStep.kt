@@ -1,24 +1,48 @@
 package org.geobon.pipeline
 
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
+import org.geobon.hpc.HPCRequirements
+import org.geobon.hpc.HPCRun
+import org.geobon.script.Description
 import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
+import org.geobon.script.Description.HPC
 import org.geobon.script.Description.SCRIPT
 import org.geobon.script.Description.TIMEOUT
-import org.geobon.script.ScriptRun
-import org.geobon.script.ScriptRun.Companion.DEFAULT_TIMEOUT
+import org.geobon.script.DockerizedRun
+import org.geobon.script.Run
+import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.geobon.utils.fromSlurm
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 
-class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()) :
-    YMLStep(yamlFile, stepId, inputs = inputs) {
+class ScriptStep : YMLStep {
 
-    private val scriptFile = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
+    constructor(
+        serverContext: ServerContext,
+        yamlFile: File,
+        stepId: StepId,
+        inputs: MutableMap<String, Pipe> = mutableMapOf()
+    ) : super(serverContext, yamlFile, stepId, inputs) {
+        serverContext.hpc?.register(this)
+    }
 
-    constructor(fileName: String, stepId: StepId, inputs: MutableMap<String, Pipe> = mutableMapOf()) : this(
-        File(scriptRoot, fileName),
+    private val scriptFile: File = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
+
+    /**
+     * Used for a lighter test syntax
+     */
+    constructor(
+        fileName: String,
+        stepId: StepId,
+        serverContext: ServerContext = ServerContext(),
+        inputs: MutableMap<String, Pipe> = mutableMapOf()
+    ) : this(
+        serverContext,
+        File(scriptsRoot, fileName),
         stepId,
         inputs
     )
@@ -28,62 +52,112 @@ class ScriptStep(yamlFile: File, stepId: StepId, inputs: MutableMap<String, Pipe
             return "Description file not found: ${yamlFile.path}"
 
         if (!scriptFile.exists()) {
-            return "Script file not found: ${scriptFile.relativeTo(scriptRoot)}\n"
+            return "Script file not found: ${scriptFile.relativeTo(scriptsRoot)}\n"
         }
 
         return ""
     }
 
     override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
+        @Suppress("KotlinUnreachableCode") // the code is reachable. There is an error with the linting...
+        context?.let { context ->
+            val specificTimeout = (yamlParsed[TIMEOUT] as? Int)?.minutes
 
-        val specificTimeout = (yamlParsed[TIMEOUT] as? Int)?.minutes
+            var runOwner = false
+            val run = synchronized(currentRuns) {
+                currentRuns.getOrPut(context.runId) {
+                    runOwner = true
 
-        var runOwner = false
-        val scriptRun = synchronized(currentRuns) {
-            currentRuns.getOrPut(context!!.runId) {
-                runOwner = true
+                    // Optional specific conda environment for this script
+                    var condaEnvName: String? = null
+                    val condaEnvYml = yamlParsed[CONDA]?.let { condaSection ->
+                        try {
+                            condaEnvName = yamlFile.relativeTo(scriptsRoot).path
+                                .replace("/", "__").replace(' ', '_').removeSuffix(".yml")
 
-                // Optional specific conda environment for this script
-                val condaEnvName = yamlFile.relativeTo(scriptRoot).path.replace("/", "__").replace(' ', '_').removeSuffix(".yml")
-                val condaEnvYml = yamlParsed[CONDA]?.let { condaSection ->
-                    try { @Suppress("UNCHECKED_CAST")
-                        (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName
-                        Yaml().dump(condaSection)
-                    } catch (_: Exception) {
-                        null
+                            @Suppress("UNCHECKED_CAST")
+                            (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName
+                            Yaml().dump(condaSection)
+                        } catch (_: Exception) {
+                            null
+                        }
+                    }
+
+                    val hpcSection = yamlParsed[HPC]
+                    if (hpcSection is Map<*, *> && context.serverContext.hpc?.connection?.ready == true) {
+                        val memory = (hpcSection[Description.HPC__MEMORY] as? String)?.let {
+                            Regex("""(\d+)G""").find(it)?.groups?.get(1)?.value?.toInt() // Get rid of the G
+                        } ?: throw RuntimeException("HPC ${Description.HPC__MEMORY} parameter is not formatted as gigabytes. \nExample: 30G \nGot: ${hpcSection[Description.HPC__MEMORY]}")
+
+                        val cpus = hpcSection[Description.HPC__CPUS] as? Int
+                            ?: throw RuntimeException("HPC ${Description.HPC__CPUS} parameter should be an int. Got: ${hpcSection[Description.HPC__CPUS]}")
+
+                        val durationString = hpcSection[Description.HPC__DURATION]
+                            ?: throw RuntimeException("HPC ${Description.HPC__DURATION} parameter missing.")
+
+                        if (durationString !is String) {
+                            throw RuntimeException(
+                                """
+                                    HPC parameter ${Description.HPC__DURATION} must be expressed as a string, for example "1:30:00".
+                                    See [SLURM documentation](https://slurm.schedmd.com/sbatch.html#OPT_time) for accepted formats.
+                                """.trimIndent()
+                            )
+                        }
+                        val duration = Duration.fromSlurm(durationString)
+
+                        HPCRun(
+                            context,
+                            scriptFile,
+                            inputs,
+                            HPCRequirements(
+                                memory,
+                                cpus,
+                                duration
+                            ),
+                            condaEnvName,
+                            condaEnvYml
+                        )
+                    } else {
+                        DockerizedRun(
+                            context,
+                            scriptFile,
+                            specificTimeout ?: Run.DEFAULT_TIMEOUT,
+                            condaEnvName,
+                            condaEnvYml
+                        )
                     }
                 }
-
-                ScriptRun(
-                    scriptFile,
-                    context!!,
-                    specificTimeout ?: DEFAULT_TIMEOUT,
-                    condaEnvName,
-                    condaEnvYml
-                )
             }
-        }
 
-        if(runOwner) {
-            scriptRun.execute()
-            synchronized(currentRuns) {
-                currentRuns.remove(context!!.runId)
+            if (runOwner) {
+                try {
+                    run.execute()
+                } finally {
+                    synchronized(currentRuns) {
+                        currentRuns.remove(context.runId)
+                    }
+                }
+            } else {
+                run.waitForResults()
             }
-        } else {
-            scriptRun.waitForResults()
-        }
 
-        if (scriptRun.results.containsKey(ScriptRun.ERROR_KEY))
-            throw RuntimeException("Script \"${toDisplayName()}\": ${scriptRun.results[ScriptRun.ERROR_KEY]}")
+            if (run.results.containsKey(Run.ERROR_KEY))
+                throw RuntimeException("Script \"${toDisplayName()}\": ${run.results[Run.ERROR_KEY]}")
 
-        return scriptRun.results
+            return run.results
+        } ?: throw RuntimeException("Context not defined.")
+    }
+
+    override fun cleanUp() {
+        super.cleanUp()
+        serverContext.hpc?.unregister(this)
     }
 
     companion object {
         /**
          * runId to ScriptRun
          */
-        val currentRuns = mutableMapOf<String, ScriptRun>()
+        val currentRuns = mutableMapOf<String, Run>()
     }
 
 }

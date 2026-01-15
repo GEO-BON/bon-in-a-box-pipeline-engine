@@ -5,7 +5,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
-import org.geobon.server.module
+import org.geobon.server.scriptModule
 import org.json.JSONArray
 import kotlin.test.*
 
@@ -29,7 +29,7 @@ class HistoryTest {
     fun givenCancelledPipeline_whenGettingStatus_thenStatusCancelled() = testApplication {
         // This CANNOT be tested with this framework, since client.post waits for the call to complete,
         // and doesn't continue once the response if finished.
-//        application { module() }
+//        application { scriptModule() }
 //
 //        var id: String
 //        client.post("/script/sleep.yml/run") {
@@ -51,7 +51,7 @@ class HistoryTest {
 
     @Test
     fun givenPipelineHasError_whenGettingStatus_thenStatusError() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         var id: String
         client.post("/pipeline/AssertTextToNull.json/run") {
@@ -79,7 +79,7 @@ class HistoryTest {
 
     @Test
     fun givenLastScriptHasError_whenGettingStatus_thenStatusError() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         var id: String
         client.post("/pipeline/AssertTextToNull.json/run") {
@@ -107,7 +107,7 @@ class HistoryTest {
 
     @Test
     fun givenPipelineRan_whenGettingStatus_thenStatusComplete() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         var id: String
         client.post("/pipeline/0in1out_1step.json/run") {
@@ -138,7 +138,7 @@ class HistoryTest {
 
     @Test
     fun givenNoHistory_whenGettingHistory_thenEmptyArray() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         client.get("/api/history").apply {
             println(bodyAsText())
@@ -148,7 +148,7 @@ class HistoryTest {
 
     @Test
     fun givenLongHistory_whenGettingHistory_thenPaging() = testApplication {
-        application { module() }
+        application { scriptModule() }
 
         for(i in 0..8) {
             client.post("/pipeline/1in1out_1step.json/run") { setBody("{helloWorld>helloPython.yml@0|some_int: $i}") }

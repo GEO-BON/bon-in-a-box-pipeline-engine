@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "org.geobon"
-version = "1.1.5"
+version = "1.2.0"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 }
@@ -25,6 +25,7 @@ ktor {
 repositories {
     mavenCentral()
     maven("https://s01.oss.sonatype.org/content/repositories/releases")
+    maven("https://jitpack.io")
 }
 
 tasks.test {
@@ -67,6 +68,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementation("org.yaml:snakeyaml:2.5")
+
+    // https://github.com/vishna/watchservice-ktx?tab=readme-ov-file
+    implementation("com.github.vishna:watchservice-ktx:master-SNAPSHOT")
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")

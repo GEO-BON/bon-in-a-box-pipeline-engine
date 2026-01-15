@@ -250,3 +250,41 @@ Every second, the UI polls for:
 Since runner-conda and runner-julia run in a separate docker, when the user stops the pipeline, the signal must go from the script-server, to the runner, to the running script. Docker does not allow this by default, this is why we save the PID in a file and use a separate exec command to kill the process.
 
 The PID file is called `.pid` and is located in the output folder of the run. It is deleted when the script completes. For details, see [ScriptRun.kt](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/blob/main/script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt).
+
+## Setting up Digital Research Alliance of Canada (DRAC) cluster connection
+To connect to the DRAC automation node, you will need
+- A valid account
+- Manual authorisation from tech support
+- The IP address of your server or PC can be obtained with `curl ifcfg.me`.
+- The [allowed_commands.sh](./script-stubs/hpc/allowed_commands.sh) script, with execute permissions in the node.
+
+1. Follow [these instructions](https://docs.alliancecan.ca/wiki/Automation_in_the_context_of_multifactor_authentication/)
+2. Manually connect once to the automation node via SSH to accept the fingerprint of the HPC's node. This is mandatory since known_hosts will be used to connect.
+3. Create an ssh config file dedicated to BON in a Box, with the details for your HPC's automation node as such:
+    ```
+    host yourHPC
+      hostname robot.yourHPC.domain.edu
+      user yourUser
+      identitiesonly yes
+      requesttty no
+    ```
+3. Configure all the HPC_ environment variables in runner.env. (Make sure your runner.env contains all the HPC_ variables in the up-to-date runner-sample.env)
+4. Start the BON in a Box server normally.
+5. Check the info tag of the UI to see if the HPC connection is successful. If not, check the logs of the script-server for errors.
+
+### HPC connection states
+```mermaid
+stateDiagram-v2
+    [*] --> NOT_CONFIGURED
+    NOT_CONFIGURED --> CONFIGURED
+    CONFIGURED --> PREPARING
+    PREPARING --> READY
+    PREPARING --> ERROR
+```
+
+### Limitations
+The current implementation is basic, and has the following limitations:
+- Batches must be started via API call (for ex. a script sending curl calls)
+- Conda is supported, but: it is not possible for two HPC-enabled tasks to verify or edit the conda environment withing the apptainer image at the same time. Only one writeable access can be granted to the overlay.
+- Max 1 HPC-enabled script per pipeline.
+- Steps are grouped together by batches of max 10 to create a SLURM job. The max memory and CPU are used, and the sum of times.

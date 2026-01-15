@@ -1,11 +1,13 @@
 package org.geobon.pipeline
 
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
+import org.geobon.script.Description.IO__EXAMPLE
+import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.json.JSONObject
 import java.io.File
 import kotlin.system.exitProcess
 
-private val pipelinesRoot = File(System.getenv("PIPELINES_LOCATION"))
 
 object Validator {
     /**
@@ -29,7 +31,7 @@ object Validator {
                 inputsSpec.optJSONObject(key)?.let { inputSpec ->
                     fakeInputs.put(
                         key,
-                        inputSpec.opt(INPUTS__EXAMPLE) ?: JSONObject.NULL
+                        inputSpec.opt(IO__EXAMPLE) ?: JSONObject.NULL
                     )
                 }
             }
@@ -49,7 +51,7 @@ object Validator {
                     val fakeInputs = generateInputFromExamples(pipelineJSON)
 
                     // Run validation
-                    createRootPipeline(file, fakeInputs.toString(2))
+                    createRootPipeline(ServerContext(), file, fakeInputs.toString(2))
                     println("$file: OK")
                 } catch (e: Exception) {
                     errorMessages += "${file.relativeTo(pipelinesRoot)}:\n\t${e.message}\n"
