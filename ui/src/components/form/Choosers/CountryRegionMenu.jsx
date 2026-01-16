@@ -15,12 +15,10 @@ export default function CountryRegionMenu({
   dispatch,
   showRegion = true,
   dialog = false,
-  //updateValues = () => {},
   value = null,
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
-  const [regionOptions, setRegionOptions] = useState([]);
-  const [regionJSON, setRegionJSON] = useState([]);
+  const [regionOptions, setRegionOptions] = useState(null);
   const savedCountryValue =
     value?.country?.englishName && value?.country?.ISO3
       ? { label: states.country.englishName, value: states.country.ISO3 }
@@ -41,7 +39,7 @@ export default function CountryRegionMenu({
         console.error(error);
       } else {
         if (data === null) {
-            setCountryOptions([]);
+            setCountryOptions(su);
             return;
           }
           const resp = data.filter(
@@ -101,19 +99,20 @@ export default function CountryRegionMenu({
       api.getRegionsList(selectedCountry.value, (error, data, response) => {
         if (error) {
           console.error(error);
-          setRegionOptions([]);
+          setRegionOptions(null);
         }
         else{
           if (data) {
-            const regionOpts = data.map((reg) => ({
+            const regionOpts = data
+              .filter((reg) => reg.adm1_name && reg.adm1_src && reg.geometry_bbox)
+              .map((reg) => ({
               label: reg.adm1_name,
               value: reg.adm1_src,
               bbox: Object.values(reg.geometry_bbox),
             }));
             setRegionOptions(regionOpts);
-            setRegionJSON(data);
           } else {
-            setRegionOptions([]);
+            setRegionOptions(null);
           }
         }
       })
@@ -199,6 +198,7 @@ export default function CountryRegionMenu({
         <>
           <Autocomplete
             options={regionOptions}
+            disabled={!regionOptions}
             size="small"
             sx={{
               marginTop: "20px",
@@ -214,7 +214,7 @@ export default function CountryRegionMenu({
             renderInput={(params) => (
               <TextField {...params} label="Select region" />
             )}
-            onChange={(event, value) => {
+            onChange={(_, value) => {
               setSelectedRegion(value);
               selectionChanged("region", value?.value ? value : null);
             }}
