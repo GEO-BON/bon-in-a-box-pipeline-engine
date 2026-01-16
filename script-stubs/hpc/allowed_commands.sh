@@ -34,6 +34,7 @@ function is_safe_command() {
 		"^rm "
 		"^mkdir "
 		"^tee "
+		"^touch "
 		## git
 		"^git "
 		## archiving commands
@@ -160,6 +161,7 @@ function test_command_filter() {
 		"exit=PASS"
 		"exit 1=PASS"
 		"echo yes | tee file.txt=PASS"
+		"touch .bashrc=PASS"
 		"sbatch /folder/file.sbatch | tee logs.txt=PASS"
 		'bash -c "sbatch /folder/file.sbatch | tee logs.txt"=PASS'
 		"bash -c 'sbatch /folder/file.sbatch | tee logs1.txt logs2.txt' =PASS" # notice the trailing whitespace
