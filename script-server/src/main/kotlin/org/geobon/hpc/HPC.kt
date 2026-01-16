@@ -106,7 +106,7 @@ open class HPC (
             } else {
                 syncJob = syncScope.launch {
                     var failCount = 0
-                    delay(5000) // Small delay to be able to see batch job submission log on first sync
+                    delay(10000) // Small delay to be able to see batch job submission log on first sync
 
                     // This loop ensures only one sync runs at a time
                     // + use of coroutines and delay makes sure that no thread is reserved.
