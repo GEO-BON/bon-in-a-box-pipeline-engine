@@ -133,15 +133,18 @@ class HPCConnection(
                         syncFiles(File(scriptStubsRoot, "system").listFiles().asList())
 
                         // Create other mount endpoints
+                        // and dummy runner.env file (we might need a real one in the future, but this just removes the "not found" warnings)
                         val callResult = systemCall.run(
-                            sshCommand + "mkdir -p $hpcScriptsRoot && mkdir -p $hpcOutputRoot && mkdir -p $hpcUserDataRoot",
+                            sshCommand + "mkdir -p $hpcScriptsRoot && mkdir -p $hpcOutputRoot && mkdir -p $hpcUserDataRoot && touch $hpcRoot/runner.env",
                             timeoutAmount = 1, timeoutUnit = MINUTES, logger = logger, mergeErrors = true
                         )
 
-                        logger.trace(callResult.output)
-
-                        scriptsStatus.state =
-                            if (callResult.exitCode == 0) RemoteSetupState.READY else RemoteSetupState.ERROR
+                        scriptsStatus.state = if (callResult.exitCode == 0) {
+                            RemoteSetupState.READY
+                        } else {
+                            logger.error(callResult.output)
+                            RemoteSetupState.ERROR
+                        }
                     }
                 } catch (ex: Throwable) {
                     logger.warn("Exception preparing HPC connection: ${ex.message}")
