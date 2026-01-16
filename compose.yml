@@ -93,3 +93,10 @@ services:
       - script-server
       - python-api
 
+secrets:
+  hpc_ssh_key:
+    file: $HPC_SSH_KEY
+  hpc_known_hosts_file:
+    file: $HPC_KNOWN_HOSTS_FILE
+  hpc_ssh_config_file:
+    file: $HPC_SSH_CONFIG_FILE
