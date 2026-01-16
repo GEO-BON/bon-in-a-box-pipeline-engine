@@ -2,8 +2,11 @@ ARG TITILER_VERSION=0.18.9
 
 FROM ghcr.io/developmentseed/titiler:${TITILER_VERSION} AS builder
 
-RUN apt update
-RUN apt install -y libgdal-dev
+RUN set -ex; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends libgdal-dev; \
+    apt-get clean all; \
+    rm -rf /var/lib/apt/lists/*
 RUN pip install uv
 
 ENV VIRTUAL_ENV=/opt/venv
