@@ -21,10 +21,10 @@ export default function CountryRegionMenu({
   const [regionOptions, setRegionOptions] = useState([]);
   const savedCountryValue =
     value?.country?.englishName && value?.country?.ISO3
-      ? { label: states.country.englishName, value: states.country.ISO3 }
+      ? { label: value.country.englishName, value: value.country.ISO3 }
       : null;
   const savedRegionValue = value?.region?.regionName
-    ? { label: states.region.regionName, value: states.region.regionGID }
+    ? { label: value.region.regionName, value: value.region.regionGID }
     : null;
   const [selectedCountry, setSelectedCountry] = useState(
     savedCountryValue || null
