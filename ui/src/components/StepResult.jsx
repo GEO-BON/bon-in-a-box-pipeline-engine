@@ -256,7 +256,7 @@ export const SingleIOResult = memo(
           }
         }
 
-        return Object.values(content).join(", ");
+        return Object.values(content).map(v => JSON.stringify(v)).join(", ");
       }
 
       return content;
