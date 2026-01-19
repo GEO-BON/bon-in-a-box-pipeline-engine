@@ -27,10 +27,10 @@ export default function CountryRegionMenu({
     ? { label: value.region.regionName, value: value.region.regionGID }
     : null;
   const [selectedCountry, setSelectedCountry] = useState(
-    savedCountryValue || null
+    savedCountryValue
   );
   const [selectedRegion, setSelectedRegion] = useState(
-    savedRegionValue || null
+    savedRegionValue
   );
 
   useEffect(() => {
