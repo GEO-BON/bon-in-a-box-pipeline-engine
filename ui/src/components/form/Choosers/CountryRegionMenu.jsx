@@ -72,6 +72,7 @@ export default function CountryRegionMenu({
         setSelectedRegion(null);
         return;
       }
+
       if (states.country?.ISO3 !== selectedCountry?.value) {
         setSelectedCountry({
           label: states.country.englishName,
@@ -79,11 +80,13 @@ export default function CountryRegionMenu({
           bbox: states.country.bboxWGS84,
         });
       }
+
       if (!states.region?.regionName) {
         setSelectedRegion(null);
         return;
       }
-      if (states.region?.regionName !== selectedRegion?.value) {
+
+      if (states.region.regionName !== selectedRegion?.value) {
         setSelectedRegion({
           label: states.region.regionName,
           value: states.region.adm1_src,

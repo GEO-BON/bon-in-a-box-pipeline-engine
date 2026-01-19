@@ -290,12 +290,12 @@ export default function MapOpenLayers({
   useEffect(() => {
     if (states.actions.includes("updateBboxFromCountryRegion")) {
       if (
-        (states.country.ISO3 !== "" || states.region.regionID !== "") &&
+        (states.country?.ISO3 || states.region?.regionID) &&
         mapp &&
         states.CRS.code &&
         get(`${states.CRS.authority}:${states.CRS.code}`)
       ) {
-        const bbox = states.region.bboxWGS84
+        const bbox = states.region?.bboxWGS84
           ? states.region.bboxWGS84
           : states.country.bboxWGS84;
         setDigitize(false);
@@ -303,8 +303,8 @@ export default function MapOpenLayers({
         dispatch({ bbox: cleanBbox(bbox, "degree"), type: "changeBbox" });
         setShowSpinner(false);
       } else if (
-        states.country.ISO3 == "" &&
-        states.region.regionID == "" &&
+        !states.country?.ISO3 &&
+        !states.region?.regionID &&
         mapp
       ) {
         clearLayers();
@@ -377,7 +377,7 @@ export default function MapOpenLayers({
       if (
         oldCRS &&
         states.bbox.includes("") &&
-        (states.country.ISO3 || states.region.regionGID)
+        (states.country?.bboxWGS84)
       ) {
         // The bounding box is gone, try to reuse the country one, if available
         dispatch({
