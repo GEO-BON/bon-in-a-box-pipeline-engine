@@ -201,7 +201,7 @@ fun Application.configureRouting() {
             // Unique   to this pipeline                    and to these params
             val runId = withoutExtension + FILE_SEPARATOR + RunContext.inputsToMd5(inputFileContent)
             val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
-            logger.info("Pipeline: $descriptionPath\nFolder: $pipelineOutputFolder\nBody: $inputFileContent")
+            logger.info("${call.parameters["type"]}: $descriptionPath\nFolder: $pipelineOutputFolder\nBody: $inputFileContent")
 
             // Validate the existence of the file
             val descriptionFile = File(

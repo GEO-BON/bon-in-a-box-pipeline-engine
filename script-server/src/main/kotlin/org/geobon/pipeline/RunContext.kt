@@ -115,16 +115,25 @@ data class RunContext(val runId: String, val inputs: String?) {
             return mapOf(commit, branch, timestamp)
         }
 
-        /**
+         /**
          * Makes sure the file gives the same hash, regardless of the key order.
          */
         fun inputsToMd5(jsonString: String): String {
-            val sorted = gson.fromJson<Map<String, Any>>(
+            val inputs = gson.fromJson<Map<String, Any>>(
                 jsonString,
                 object : TypeToken<Map<String, Any>>() {}.type
-            ).toSortedMap()
+            )
 
-            return gson.toJson(sorted).toMD5()
+            fun sortRecursively(obj: Any?): Any? = when (obj) {
+                is Map<*, *> -> obj
+                    .mapKeys { it.key.toString() }
+                    .mapValues { sortRecursively(it.value) }
+                    .toSortedMap()
+                is List<*> -> obj.map { sortRecursively(it) }
+                else -> obj
+            }
+
+            return gson.toJson(sortRecursively(inputs)).toMD5()
         }
 
 
