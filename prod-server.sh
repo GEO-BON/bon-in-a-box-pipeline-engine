@@ -5,6 +5,8 @@ GREEN="\033[32m"
 YELLOW="\033[33m"
 ENDCOLOR="\033[0m"
 
+COPYRIGHT_RANGE="2021-2026"
+
 # Checking for symlink development setup
 [[ -L ".server" || -L "./pipeline-repo/.server" ]]
 symlink=$?
@@ -59,9 +61,10 @@ function help {
     echo "                         This is useful in development switching from prod to dev server,"
     echo "                         in cases when we get the following error:"
     echo "                         \"The container name ... is already in use by container ...\""
+    echo "    version              Display the current version of the server"
+    echo "    licence              Display the licence information"
     echo "    command [ARGS...]    Run an arbitrary docker compose command,"
     echo "                         such as (pull|run|up|down|build|logs)"
-    echo
 }
 
 # Must be called once before command function can be called
@@ -416,6 +419,40 @@ function clean {
     fi
 }
 
+function version {
+    if [[ -f version.txt ]]; then
+        cat version.txt
+        echo ""
+    else
+        echo -e "${RED}Version file not found.${ENDCOLOR}"
+    fi
+    echo ""
+    echo "More detailed version information is available in the info tab"
+    echo "of the BON in a Box web interface."
+    echo ""
+    echo "Copyright (C) ${COPYRIGHT_RANGE}  McGill University"
+    echo "License: GPL-3.0-or-later"
+    echo "This is free software; there is NO WARRANTY."
+}
+
+function licence {
+    echo "BON in a Box Pipeline Engine"
+    echo "Copyright (C) ${COPYRIGHT_RANGE}  McGill University"
+    echo ""
+    echo "This program is free software: you can redistribute it and/or modify"
+    echo "it under the terms of the GNU General Public License as published by"
+    echo "the Free Software Foundation, either version 3 of the License, or"
+    echo "(at your option) any later version."
+    echo ""
+    echo "This program is distributed in the hope that it will be useful,"
+    echo "but WITHOUT ANY WARRANTY; without even the implied warranty of"
+    echo "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the"
+    echo "GNU General Public License for more details."
+    echo ""
+    echo "You should have received a copy of the GNU General Public License"
+    echo "along with this program.  If not, see <https://www.gnu.org/licenses/>."
+}
+
 case "$1" in
     help)
         help
@@ -452,6 +489,12 @@ case "$1" in
         prepareCommands
         clean
         echo -e "${GREEN}Clean complete.${ENDCOLOR}"
+        ;;
+    version)
+        version
+        ;;
+    licence)
+        licence
         ;;
     *)
         help
