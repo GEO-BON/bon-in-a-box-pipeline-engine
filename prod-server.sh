@@ -267,10 +267,10 @@ function up {
     containersToDiscard=""
 
     # Installing or updating
-    docker image ls | grep ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/ 2> /dev/null 1>&2
+    docker image ls --format '{{.Repository}}' | grep ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/ 2> /dev/null 1>&2
     if [[ $? -eq 1 ]] ; then
         # Not installed, or legacy installation
-        docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
+        docker image ls --format '{{.Repository}}' | grep geobon/bon-in-a-box 2> /dev/null 1>&2
         if [[ $? -eq 0 ]] ; then
             echo -e "${YELLOW}Docker Hub containers found: cleaning up before installing the new version.${ENDCOLOR}"
             echo -e "${YELLOW}Please be patient while we save some disk space: this may take a while.${ENDCOLOR}"
