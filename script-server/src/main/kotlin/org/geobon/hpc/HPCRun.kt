@@ -147,6 +147,7 @@ class HPCRun(
                 -B ${hpcConnection.hpcScriptStubsRoot}:$scriptStubsRoot
                 -B ${hpcConnection.hpcOutputRoot}:$outputRoot
                 -B ${hpcConnection.hpcUserDataRoot}:$userDataRoot
+                -B ${hpcConnection.hpcRoot}/runner.env:/runner.env
                 ${image.imagePath}
                 bash -c
         """.replace(Regex("""\s*\n\s*"""), " ")
