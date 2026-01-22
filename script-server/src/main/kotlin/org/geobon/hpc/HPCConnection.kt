@@ -379,8 +379,8 @@ class HPCConnection(
             #SBATCH --cpus-per-task=${requirements.cpus}
             #SBATCH --time=${requirements.duration.toSlurmDuration()}
             #SBATCH --nodes=1
-            #SBATCH --signal=B:SIGTERM@40
-            #SBATCH --signal=SIGTERM@30
+            #SBATCH --signal=B:TERM@40
+            #SBATCH --signal=TERM@30
             ${account?.isNotBlank().let { "#SBATCH --account=$account" }}
             #SBATCH --job-name=boninabox_$timestamp
             #SBATCH --output=%x_%j.out
