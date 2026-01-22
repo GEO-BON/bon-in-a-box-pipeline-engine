@@ -373,6 +373,8 @@ class HPCConnection(
         // --signal PARAM: two signals are needed.
         // One to the task, so that it quits cleany,
         // and one to the batch script to make sure it doesn't start the other tasks in the small buffer time that is left.
+        //
+        // Exit code 143 for SIGTERM, see https://medium.com/@himanshurahangdale153/list-of-exit-status-codes-in-linux-f4c00c46c9e0
         sBatchFileLocal.writeText("""
             #!/bin/bash
             #SBATCH --mem=${requirements.memoryG}G
@@ -385,8 +387,12 @@ class HPCConnection(
             #SBATCH --job-name=boninabox_$timestamp
             #SBATCH --output=%x_%j.out
 
-            echo "Batch job started, contains ${tasksToSend.size} tasks" | tee -a ${hpcLogFiles.joinToString(" ")}
-            trap "echo 'Received termination signal from SLURM.' | tee -a ${hpcLogFiles.joinToString(" ")} && exit" TERM
+            logAll() {
+                tee -a ${hpcLogFiles.joinToString(" ")} $@
+            }
+
+            echo "Batch job started, contains ${tasksToSend.size} tasks" | logAll
+            trap "echo 'Received termination signal from SLURM.' | logAll && exit 143" TERM
 
             module load apptainer$apptainerVersion
 
@@ -406,9 +412,6 @@ class HPCConnection(
             multiLog(logFiles, callResult.error)
             throw RuntimeException(callResult.error)
         }
-
-
-
 
         val sBatchFileRemote = File(hpcOutputRoot, sBatchFileLocal.name)
         callResult = systemCall.run(
