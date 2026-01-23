@@ -170,8 +170,17 @@ class HPCRun(
             "r", "R" ->
                 """
                     ${getApptainerBaseCommand(hpcConnection.rImage)} '
+                        child=0
+                        trap "echo HPCRun_TERM; kill -INT \"-${"$"}child\"; wait \"${"$"}child\"; exit 143" TERM
+
                         source /.bashrc; mamba activate ${condaEnvName ?: "rbase"};
-                        Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath
+                        Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath &
+                        child=$!
+                        wait "${"$"}child"
+                        status=$?
+
+                        echo "srun completion with exit code ${"$"}status"
+                        exit "${"$"}status"
                     ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
 
