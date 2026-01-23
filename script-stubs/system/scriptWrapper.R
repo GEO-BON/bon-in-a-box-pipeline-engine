@@ -43,26 +43,42 @@ writeLines(as.character(Sys.getpid()), pidFile)
 on.exit(unlink(pidFile), add = TRUE)
 
 # Execute the script
-withCallingHandlers(source(scriptFile),
-    error=function(e){
-        if(grepl("ignoring SIGPIPE signal",e$message)) {
-            cat("Suppressed: ignoring SIGPIPE signal\n");
-        } else if (is.null(biab_output_list[["error"]])) {
-            biab_output_list[["error"]] <<- conditionMessage(e)
-            cat("Caught error, stack trace:\n")
-            print(sys.calls()[-seq(1:5)])
-        }
+exitCode <- 0
+tryCatch(
+    {
+        withCallingHandlers(source(scriptFile),
+            error=function(e){
+                if(grepl("ignoring SIGPIPE signal",e$message)) {
+                    cat("Suppressed: ignoring SIGPIPE signal\n");
+                } else {
+                    exitCode <- 1
+                    if (is.null(biab_output_list[["error"]])) {
+                        biab_output_list[["error"]] <<- conditionMessage(e)
+                        cat("Caught error, stack trace:\n")
+                        print(sys.calls()[-seq(1:5)])
+                    }
+                }
+            }
+        )
+    },
+    interrupt = function(i) {
+        cat("R wrapper caught interrupt\n");
+        biab_output_list[["error"]] <<- "Cancelled"
+        exitCode <- 130
     }
 )
 
-if(length(biab_output_list) > 0) {
-    cat("Writing outputs to BON in a Box...\n")
-    jsonData <- rjson::toJSON(biab_output_list, indent=2)
-    write(jsonData, file.path(outputFolder,"output.json"))
-}
+suspendInterrupts({
+    if(length(biab_output_list) > 0) {
+        cat("Writing outputs to BON in a Box...\n")
+        jsonData <- rjson::toJSON(biab_output_list, indent=2)
+        write(jsonData, file.path(outputFolder, "output.json"))
+    }
 
-cat("Writing dependencies to file...\n")
-capture.output(sessionInfo(), file = paste0(outputFolder, "/dependencies.txt"))
-cat(" done.\n")
+    cat("Writing dependencies to file...\n")
+    capture.output(sessionInfo(), file = paste0(outputFolder, "/dependencies.txt"))
+    cat(" done.\n")
+})
 
 gc()
+quit(status=exitCode)
