@@ -392,6 +392,8 @@ paths:
                       type: string
                     message:
                       type: string
+                  additionalProperties:
+                    type: string
               examples:
                 ready:
                   value: {"R":{"state":"READY","image":"geobon/bon-in-a-box@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e","message":""},"Python":{"state":"READY","image":"geobon/bon-in-a-box@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e","message":""},"Julia":{"state":"READY","image":"geobon/bon-in-a-box@sha256:5a808f9c89fc23303bd23510f15a9111799cc8ba4e2cd76b1e7797326b4923e7","message":""}}

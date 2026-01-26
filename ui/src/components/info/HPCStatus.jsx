@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Spinner } from "../Spinner";
 import { HttpError } from "../HttpErrors";
+import { isEmptyObject } from "../../utils/isEmptyObject";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import HideSourceIcon from '@mui/icons-material/HideSource';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
@@ -68,9 +69,11 @@ export default function HPCStatus() {
   return (
     <div>
       {Object.keys(status).sort().map(key => {
-        const digest = [status[key]['image']]
+        const { state, message, image , ...otherProps } = status[key]
+        console.log("all", status[key])
+        console.log("other", otherProps)
 
-        return <span key={key}>
+        return <div key={key}>
           <p>
             <strong>{key}</strong>
             {
@@ -96,24 +99,29 @@ export default function HPCStatus() {
                   <Tooltip title="Error"><ErrorIcon style={{ height: "1rem" }} onClick={connect} /></Tooltip>
                   <a onClick={connect} style={{ cursor: 'pointer' }}>Try again</a>
                 </>,
-              }[status[key]['state']]
+              }[state]
             }
           </p>
 
-          {status[key]['message'] &&
+          {message &&
             <pre style={{ maxHeight: "20em", overflowY: "scroll" }}>{status[key]['message']}</pre>
           }
-          {status[key]['image'] &&
+          {image &&
             <p>
               <small>Image:&nbsp;
-                <a href={"https://" + status[key]['image']}
+                <a href={"https://" + image}
                   target="_blank">
-                  {digest}
+                  {image}
                 </a>
               </small>
             </p>
           }
-        </span>
+          {!isEmptyObject(otherProps) &&
+            <ul>
+              {Object.keys(otherProps).sort().map(key => <li>{key}: {otherProps[key]}</li>)}
+            </ul>
+          }
+        </div>
       })}
     </div>
   );

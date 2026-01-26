@@ -273,12 +273,22 @@ class HPCConnection(
     }
 
     fun statusMap(): Map<String, Map<String, String?>> {
-        return mapOf(
-            "R" to rImage.statusMap(),
-            "Python" to pythonImage.statusMap(),
-            "Julia" to juliaImage.statusMap(),
-            "Launch scripts" to scriptsStatus.statusMap()
-        )
+        return
+            if(configured)
+                mapOf(
+                    "Configuration" to mapOf(
+                        "state" to RemoteSetupState.READY.toString(),
+                        "host" to sshConfig,
+                        "root" to hpcRoot,
+                        "apptainer version" to apptainerVersion
+                    ),
+                    "R" to rImage.statusMap(),
+                    "Python" to pythonImage.statusMap(),
+                    "Julia" to juliaImage.statusMap(),
+                    "Launch scripts" to scriptsStatus.statusMap()
+                )
+
+            else mapOf("state" to RemoteSetupState.NOT_CONFIGURED.toString())
     }
 
     private fun validatePath(file: File, logFile: File?): Boolean {
