@@ -1,5 +1,5 @@
 ## Config file to support apple M2 chips, see https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/issues/85
 
 services:
-  tiler:
+  python-api:
     platform: linux/x86_64

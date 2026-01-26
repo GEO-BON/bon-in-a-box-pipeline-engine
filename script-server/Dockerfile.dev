@@ -15,6 +15,7 @@ RUN chmod 755 /usr/local/bin/docker
 RUN set -ex; \
     apt-get update; \
     apt-get install -y --no-install-recommends rsync; \
-    apt-get clean all;
+    apt-get clean all; \
+    rm -rf /var/lib/apt/lists/*
 
 RUN echo "dev" > /version.txt

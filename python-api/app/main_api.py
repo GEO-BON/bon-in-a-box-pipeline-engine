@@ -20,7 +20,7 @@ app.add_middleware(
 )
 
 ddb = duckdb.connect()
-ddb.execute("SET home_directory='/app'") 
+ddb.execute("SET home_directory='/app/ddb_home'")
 ddb.install_extension("spatial")
 ddb.load_extension("spatial")
 ddb.install_extension("httpfs")
@@ -31,14 +31,18 @@ countries_parquet = "https://data.fieldmaps.io/adm0/osm/intl/adm0_polygons.parqu
 regions_parquet = "https://data.fieldmaps.io/edge-matched/humanitarian/intl/adm1_polygons.parquet"
 
 if os.path.exists("/app/countries.json") == False:
+    print("Generating countries.json...")
     countries=ddb.sql("SELECT adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % countries_parquet).df()
     with open('/app/countries.json', 'w') as f:
         json.dump(countries.to_dict(orient='records'), f)
+    print("done")
 
 if os.path.exists("/app/regions.json") == False:
+    print("Generating regions.json...")
     regions=ddb.sql("SELECT adm1_src, adm1_name, adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % regions_parquet).df()
     with open('/app/regions.json', 'w') as f:
-        json.dump(regions.to_dict(orient='records'), f)    
+        json.dump(regions.to_dict(orient='records'), f)
+    print("done")
 
 @app.get("/region")
 def read_root():

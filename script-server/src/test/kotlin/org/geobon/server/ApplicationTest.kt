@@ -263,13 +263,9 @@ class ApplicationTest {
         val result = JSONObject(response.bodyAsText())
         assertEquals("offline", result.get("UI") )
         assertEquals("offline" , result.get("Script server"))
+        assertEquals("{\"container version\":\"offline\",\"TiTiler\":\"\"}", result.get("Python API server").toString())
         assertEquals("{\"container version\":\"offline\",\"environment\":\"\"}", result.get("Conda runner").toString())
         assertEquals("{\"container version\":\"offline\",\"environment\":\"\"}", result.get("Julia runner").toString())
-        assertTrue {
-            (result.get("TiTiler") as String).let {
-                it == "offline" || it.matches(Regex("""\d{4}-\d{2}-\d{2} \d{2}:\d{2}"""))
-            }
-        }
     }
 
 }
