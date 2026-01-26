@@ -163,7 +163,10 @@ class HPCRun(
             "jl", "JL" ->
                 """
                     ${getApptainerBaseCommand(hpcConnection.juliaImage)} '
-                        julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath
+                        child=0
+                        trap "echo \"Job received termination signal.\"; kill -INT -${"$"}child; wait ${"$"}child; exit 143" TERM
+                        julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath &
+                        child=$!; wait ${"$"}child; exit $?
                     ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
 
