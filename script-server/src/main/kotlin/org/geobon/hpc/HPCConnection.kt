@@ -381,8 +381,8 @@ class HPCConnection(
         val timestamp = sdf.format(Date())
         val sBatchFileLocal = File(outputRoot, "boninabox_$timestamp.sbatch")
         // --signal PARAM: two signals are needed.
-        // One to the task, so that it quits cleany,
-        // and one to the batch script to make sure it doesn't start the other tasks in the small buffer time that is left.
+        // One to the task, so that it quits cleany, and one to the batch script.
+        // The latter is sent before to make sure it doesn't start remaining tasks in the small buffer time that is left.
         //
         // Exit code 143 for SIGTERM, see https://medium.com/@himanshurahangdale153/list-of-exit-status-codes-in-linux-f4c00c46c9e0
         sBatchFileLocal.writeText("""

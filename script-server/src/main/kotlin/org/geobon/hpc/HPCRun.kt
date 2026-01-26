@@ -168,16 +168,15 @@ class HPCRun(
                 """.trimIndent()
 
             "r", "R" ->
+                // Note, if child is 0 during mamba activate, the trap signals the whole process group.
+                // In our case, this should correspond to the bash -c entrypoint of the apptainer exec.
                 """
                     ${getApptainerBaseCommand(hpcConnection.rImage)} '
                         child=0
                         trap "echo \"Job received termination signal.\"; kill -INT -${"$"}child; wait ${"$"}child; exit 143" TERM
-
                         source /.bashrc; mamba activate ${condaEnvName ?: "rbase"};
                         Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath &
-                        child=$!
-                        wait ${"$"}child
-                        exit $?
+                        child=$!; wait ${"$"}child; exit $?
                     ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
 
