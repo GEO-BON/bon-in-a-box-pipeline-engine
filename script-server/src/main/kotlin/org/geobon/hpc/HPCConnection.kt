@@ -273,8 +273,7 @@ class HPCConnection(
     }
 
     fun statusMap(): Map<String, Map<String, String?>> {
-        return
-            if(configured)
+        return if(configured)
                 mapOf(
                     "Configuration" to mapOf(
                         "state" to RemoteSetupState.READY.toString(),
@@ -288,7 +287,7 @@ class HPCConnection(
                     "Launch scripts" to scriptsStatus.statusMap()
                 )
 
-            else mapOf("state" to RemoteSetupState.NOT_CONFIGURED.toString())
+            else mapOf("Configuration" to mapOf("state" to RemoteSetupState.NOT_CONFIGURED.toString()))
     }
 
     private fun validatePath(file: File, logFile: File?): Boolean {

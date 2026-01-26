@@ -16,6 +16,7 @@ import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.scriptModule
 import org.geobon.utils.CallResult
 import org.geobon.utils.SystemCall
+import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
 import kotlin.time.Duration.Companion.hours
@@ -73,7 +74,7 @@ class HPCConnectionTest {
         client.get("/hpc/status").apply {
             assertEquals(HttpStatusCode.OK, status)
             assertEquals(
-                """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"},"Launch scripts":{"state":"NOT_CONFIGURED"}}""",
+                """{"Configuration":{"state":"NOT_CONFIGURED"}}""",
                 bodyAsText()
             )
         }
@@ -88,10 +89,12 @@ class HPCConnectionTest {
 
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
-                assertEquals(
-                    """{"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"},"Launch scripts":{"state":"CONFIGURED"}}""",
-                    bodyAsText()
-                )
+                val json = JSONObject(bodyAsText())
+                assertEquals("READY", json.getJSONObject("Configuration").getString("state"))
+                assertEquals("CONFIGURED", json.getJSONObject("Python").getString("state"))
+                assertEquals("CONFIGURED", json.getJSONObject("Julia").getString("state"))
+                assertEquals("CONFIGURED", json.getJSONObject("R").getString("state"))
+                assertEquals("CONFIGURED", json.getJSONObject("Launch scripts").getString("state"))
             }
         }
     }
@@ -105,7 +108,7 @@ class HPCConnectionTest {
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
                 assertEquals(
-                    """{"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"},"Launch scripts":{"state":"NOT_CONFIGURED"}}""",
+                    """{"Configuration":{"state":"NOT_CONFIGURED"}}""",
                     bodyAsText()
                 )
             }
@@ -121,10 +124,8 @@ class HPCConnectionTest {
 
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
-                assertEquals(
-                    """{"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"},"Launch scripts":{"state":"CONFIGURED"}}""",
-                    bodyAsText()
-                )
+                val json = JSONObject(bodyAsText())
+                assertEquals("READY", json.getJSONObject("Configuration").getString("state"))
             }
 
             client.get("/hpc/prepare").apply {
