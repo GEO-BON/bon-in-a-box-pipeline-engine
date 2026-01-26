@@ -73,10 +73,7 @@ class HPCConnectionTest {
 
         client.get("/hpc/status").apply {
             assertEquals(HttpStatusCode.OK, status)
-            assertEquals(
-                """{"Configuration":{"state":"NOT_CONFIGURED"}}""",
-                bodyAsText()
-            )
+            assertTrue(bodyAsText().startsWith("""{"Configuration":{"state":"NOT_CONFIGURED""""))
         }
     }
 
@@ -107,10 +104,7 @@ class HPCConnectionTest {
 
             client.get("/hpc/status").apply {
                 assertEquals(HttpStatusCode.OK, status)
-                assertEquals(
-                    """{"Configuration":{"state":"NOT_CONFIGURED"}}""",
-                    bodyAsText()
-                )
+                assertTrue(bodyAsText().startsWith("""{"Configuration":{"state":"NOT_CONFIGURED","message":"HPC not configured: missing HPC_SSH_CONFIG_FILE"""))
             }
         }
     }

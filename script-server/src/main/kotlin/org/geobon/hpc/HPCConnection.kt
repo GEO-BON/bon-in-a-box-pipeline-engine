@@ -11,9 +11,9 @@ import org.geobon.utils.toSlurmDuration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.util.concurrent.TimeUnit.MINUTES
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
+import java.util.concurrent.TimeUnit.MINUTES
 
 @OptIn(DelicateCoroutinesApi::class)
 class HPCConnection(
@@ -43,6 +43,7 @@ class HPCConnection(
     val pythonImage: ApptainerImage
         get() = condaImage
 
+    var configurationError:String? = null
     val configured: Boolean
         get() = rImage.state != RemoteSetupState.NOT_CONFIGURED
                 && juliaImage.state != RemoteSetupState.NOT_CONFIGURED
@@ -66,24 +67,24 @@ class HPCConnection(
         get() = "$hpcRoot/userdata"
 
     init {
-        if (configPath == null || !File(configPath).exists()) {
-            logger.info("HPC not configured: missing HPC_SSH_CONFIG_FILE ($configPath)")
+        if (sshConfig.isNullOrBlank()) {
+            configurationError = "HPC not configured: missing HPC_SSH_CONFIG_NAME."
             sshCommand = null
 
-        } else if (sshConfig.isNullOrBlank()) {
-            logger.info("HPC not configured: missing HPC_SSH_CONFIG_NAME.")
+        } else if (configPath == null || !File(configPath).exists()) {
+            configurationError = "HPC not configured: missing HPC_SSH_CONFIG_FILE ($configPath)"
             sshCommand = null
 
         } else if (sshKeyPath == null || !File(sshKeyPath).exists()) {
-            logger.info("HPC not configured: missing HPC_SSH_KEY ($sshKeyPath).")
+            configurationError = "HPC not configured: missing HPC_SSH_KEY ($sshKeyPath)."
             sshCommand = null
 
         } else if (knownHostsPath == null || !File(knownHostsPath).exists()) {
-            logger.info("HPC not configured: missing HPC_KNOWN_HOSTS_FILE ($knownHostsPath).")
+            configurationError = "HPC not configured: missing HPC_KNOWN_HOSTS_FILE ($knownHostsPath)."
             sshCommand = null
 
         } else if (hpcRoot.isNullOrBlank()) {
-            logger.info("HPC not configured: missing HPC_BIAB_ROOT.")
+            configurationError = "HPC not configured: missing HPC_BIAB_ROOT."
             sshCommand = null
 
         } else {
@@ -273,21 +274,25 @@ class HPCConnection(
     }
 
     fun statusMap(): Map<String, Map<String, String?>> {
-        return if(configured)
-                mapOf(
-                    "Configuration" to mapOf(
-                        "state" to RemoteSetupState.READY.toString(),
-                        "host" to sshConfig,
-                        "root" to hpcRoot,
-                        "apptainer version" to apptainerVersion
-                    ),
-                    "R" to rImage.statusMap(),
-                    "Python" to pythonImage.statusMap(),
-                    "Julia" to juliaImage.statusMap(),
-                    "Launch scripts" to scriptsStatus.statusMap()
-                )
-
-            else mapOf("Configuration" to mapOf("state" to RemoteSetupState.NOT_CONFIGURED.toString()))
+        return if (configured)
+            mapOf(
+                "Configuration" to mapOf(
+                    "state" to RemoteSetupState.READY.toString(),
+                    "host" to sshConfig,
+                    "root" to hpcRoot,
+                    "apptainer version" to apptainerVersion
+                ),
+                "R" to rImage.statusMap(),
+                "Python" to pythonImage.statusMap(),
+                "Julia" to juliaImage.statusMap(),
+                "Launch scripts" to scriptsStatus.statusMap()
+            )
+        else mapOf(
+            "Configuration" to mapOf(
+                "state" to RemoteSetupState.NOT_CONFIGURED.toString(),
+                "message" to configurationError,
+            )
+        )
     }
 
     private fun validatePath(file: File, logFile: File?): Boolean {
