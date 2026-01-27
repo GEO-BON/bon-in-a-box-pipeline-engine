@@ -282,9 +282,27 @@ stateDiagram-v2
     PREPARING --> ERROR
 ```
 
+### Enabling a script for HPC usage
+A script requires additional metadata in it's .yml description file in order to be sent to a HPC.
+When all of the below fields are present, the script is considered "hpc-enabled".
+For example, the following script would be allowed a maximum of 30G of memory for 1 hour,
+and run with 16 CPUs.
+
+``` yml
+hpc:
+  mem: 30G # Maximum amount of memory allowed before Out Of Memory exception occurs
+  cpus-per-task: 16 #  Number of CPUs for this task
+  time: "01:00:00" # Maximum time allowed before timeout.
+```
+
+It is recommended to check the documentation of the cluster that will receive the calls,
+to tailor the requested resources to best fit it's compute nodes specification.
+
 ### Limitations
 The current implementation is basic, and has the following limitations:
-- Batches must be started via API call (for ex. a script sending curl calls)
-- Conda is supported, but: it is not possible for two HPC-enabled tasks to verify or edit the conda environment withing the apptainer image at the same time. Only one writeable access can be granted to the overlay.
 - Max 1 HPC-enabled script per pipeline.
+- No UI support for batches in the pipeline editor.
+- Batches must be started via API call (for ex. a script sending curl calls)
+- Conda is supported, but: it is not possible for two HPC-enabled tasks to verify or edit the conda environment within the apptainer image at the same time. Only one writeable access can be granted to the overlay.
 - Steps are grouped together by batches of max 10 to create a SLURM job. The max memory and CPU are used, and the sum of times.
+- If a batch job fails _before it begins_, it will not be detected. Jobs will remain running untill cancelled manually.
