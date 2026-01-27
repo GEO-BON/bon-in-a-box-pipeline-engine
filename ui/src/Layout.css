@@ -422,6 +422,10 @@ img#greenSquares {
   margin: 0;
 }
 
+.MuiChip-label {
+  user-select: none;
+}
+
 .outputContent .stepDescription {
   font-size: small;
   background: #444;
