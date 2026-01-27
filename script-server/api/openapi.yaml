@@ -625,6 +625,21 @@ components:
         timeout:
           type: number
           example: 60
+        hpc:
+          type: object
+          properties:
+            mem:
+              type: string
+              example: 30G
+              description: Maximum amount of memory allowed before Out Of Memory exception occurs.
+            cpus-per-task:
+              type: integer
+              example: 16
+              description: Number of CPUs for this task.
+            time:
+              type: string
+              example: "01:00:00"
+              description: Maximum time allowed before timeout, for syntax see https://slurm.schedmd.com/sbatch.html#OPT_time.
         inputs:
           type: object
           additionalProperties:

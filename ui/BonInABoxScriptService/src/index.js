@@ -17,6 +17,7 @@ import GetHPCStatus200ResponseValue from './model/GetHPCStatus200ResponseValue';
 import GetHistory200ResponseInner from './model/GetHistory200ResponseInner';
 import Info from './model/Info';
 import InfoAuthorInner from './model/InfoAuthorInner';
+import InfoHpc from './model/InfoHpc';
 import InfoInputsValue from './model/InfoInputsValue';
 import InfoInputsValueExample from './model/InfoInputsValueExample';
 import InfoInputsValueExampleOneOfInner from './model/InfoInputsValueExampleOneOfInner';
@@ -89,6 +90,12 @@ export {
      * @property {module:model/InfoAuthorInner}
      */
     InfoAuthorInner,
+
+    /**
+     * The InfoHpc model constructor.
+     * @property {module:model/InfoHpc}
+     */
+    InfoHpc,
 
     /**
      * The InfoInputsValue model constructor.

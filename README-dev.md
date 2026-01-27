@@ -292,7 +292,7 @@ and run with 16 CPUs.
 hpc:
   mem: 30G # Maximum amount of memory allowed before Out Of Memory exception occurs
   cpus-per-task: 16 #  Number of CPUs for this task
-  time: "01:00:00" # Maximum time allowed before timeout.
+  time: "01:00:00" # Maximum time allowed before timeout, for syntax see https://slurm.schedmd.com/sbatch.html#OPT_time.
 ```
 
 It is recommended to check the documentation of the cluster that will receive the calls,
