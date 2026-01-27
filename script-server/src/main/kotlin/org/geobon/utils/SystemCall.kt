@@ -71,8 +71,8 @@ open class SystemCall {
                 fileOutputJob?.join()
 
                 // If read continuously,
-                inputString += process.inputReader().readText().also { logFile?.appendText("$it") }
-                errorString += process.errorReader().readText().also { logFile?.appendText("$it") }
+                inputString += process.inputReader().readText().also { logFile?.appendText(it) }
+                errorString += process.errorReader().readText().also { logFile?.appendText(it) }
 
                 CallResult(process.exitValue(), inputString, errorString)
             } catch (ex: Exception) {
@@ -82,7 +82,7 @@ open class SystemCall {
                 CallResult(
                     1,
                     inputString,
-                    errorString + ex.message ?: ex.javaClass.name)
+                    errorString + (ex.message ?: ex.javaClass.name))
             }
         }
     }
