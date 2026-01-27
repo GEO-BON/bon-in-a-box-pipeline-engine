@@ -163,6 +163,7 @@ class HPCRun(
             "jl", "JL" ->
                 """
                     ${getApptainerBaseCommand(hpcConnection.juliaImage)} '
+                        echo "Starting this job."
                         child=0
                         trap "echo \"Job received termination signal.\"; kill -INT -${"$"}child; wait ${"$"}child; exit 143" TERM
                         julia --project=${"$"}JULIA_DEPOT_PATH $scriptStubsRoot/system/scriptWrapper.jl $escapedOutputFolder $scriptPath &
@@ -175,9 +176,11 @@ class HPCRun(
                 // In our case, this should correspond to the bash -c entrypoint of the apptainer exec.
                 """
                     ${getApptainerBaseCommand(hpcConnection.rImage)} '
+                        echo "Starting this job. Activating environment..."
                         child=0
                         trap "echo \"Job received termination signal.\"; kill -INT -${"$"}child; wait ${"$"}child; exit 143" TERM
                         source /.bashrc; mamba activate ${condaEnvName ?: "rbase"};
+                        echo "Starting R script."
                         Rscript $scriptStubsRoot/system/scriptWrapper.R $escapedOutputFolder $scriptPath &
                         child=$!; wait ${"$"}child; exit $?
                     ' >> $logFileAbsolute 2>&1
@@ -188,7 +191,9 @@ class HPCRun(
             "py", "PY" -> // exec call to replace shell by python, python receives signal directly.
                 """
                     ${getApptainerBaseCommand(hpcConnection.pythonImage)} '
+                        echo "Starting this job. Activating environment..."
                         source /.bashrc; mamba activate ${condaEnvName ?: "pythonbase"};
+                        echo "Starting Python script."
                         exec python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath
                     ' >> $logFileAbsolute 2>&1
                 """.trimIndent()

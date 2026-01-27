@@ -373,13 +373,20 @@ class HPCConnection(
         }
     }
 
-    fun sendJobs(tasksToSend: List<String>, requirements: HPCRequirements, logFiles: List<File> = listOf()) {
+    fun sendJobs(
+            tasksToSend: List<String>,
+            requirements: HPCRequirements,
+            logFiles: List<File> = listOf(),
+            resultFiles: List<File> = listOf()
+        )
+    {
         if(!ready || sshCommand == null) {
             logger.warn("Cannot send jobs to HPC while not ready")
             return
         }
 
-        val hpcLogFiles = logFiles.map { it.absolutePath.replace(outputRoot.absolutePath, hpcOutputRoot) }
+        val hpcLogFiles = logFiles.map { it.absolutePath.replaceFirst(outputRoot.absolutePath, hpcOutputRoot) }
+        val hpcResultFiles = resultFiles.map { it.absolutePath.replaceFirst(outputRoot.absolutePath, hpcOutputRoot) }
 
         val sdf = SimpleDateFormat("yyyy-M-dd_hh-mm-ss-SSS")
         val timestamp = sdf.format(Date())
@@ -405,8 +412,20 @@ class HPCConnection(
                 tee -a ${hpcLogFiles.joinToString(" ")} $@
             }
 
+            timeoutReached() {
+                echo 'Batch received termination signal from SLURM.' | logAll
+                for file in ${hpcResultFiles.joinToString(" ")}; do
+                    if [ ! -f "${"$"}file" ]; then
+                        echo '{"error": "Batch job timed out before script began"}' > "${"$"}file"
+                    else
+                        echo 'Result file ${"$"}file already exists.' | logAll
+                    fi
+                done
+                exit 143
+            }
+            trap "timeoutReached" TERM
+
             echo "Batch job started, contains ${tasksToSend.size} tasks" | logAll
-            trap "echo 'Received termination signal from SLURM.' | logAll && exit 143" TERM
 
             module load apptainer$apptainerVersion
 

@@ -306,3 +306,4 @@ The current implementation is basic, and has the following limitations:
 - Conda is supported, but: it is not possible for two HPC-enabled tasks to verify or edit the conda environment within the apptainer image at the same time. Only one writeable access can be granted to the overlay.
 - Steps are grouped together by batches of max 10 to create a SLURM job. The max memory and CPU are used, and the sum of times.
 - If a batch job fails _before it begins_, it will not be detected. Jobs will remain running untill cancelled manually.
+- Stopping a script through the BON in a Box UI does not cancel the job on the HPC.

@@ -79,7 +79,8 @@ open class HPC (
                         tasksToSend.values.maxOf { it.requirements.cpus },
                         tasksToSend.values.sumOf { it.requirements.duration.inWholeSeconds }.seconds
                     ),
-                    tasksToSend.map { it.value.context.logFile }
+                    tasksToSend.map { it.value.context.logFile },
+                    tasksToSend.map { it.value.context.resultFile }
                 )
 
             } catch (e:Exception) {
