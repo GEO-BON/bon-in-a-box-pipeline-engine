@@ -416,7 +416,7 @@ class HPCConnection(
                 echo 'Batch received termination signal from SLURM.' | logAll
                 for file in ${hpcResultFiles.joinToString(" ")}; do
                     if [ ! -f "${"$"}file" ]; then
-                        echo '{"error": "Batch job timed out before script began"}' > "${"$"}file"
+                        echo '{"error": "Batch job timed out before the script began"}' > "${"$"}file"
                     else
                         echo 'Result file ${"$"}file already exists.' | logAll
                     fi
