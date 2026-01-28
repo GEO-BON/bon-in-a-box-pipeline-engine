@@ -79,14 +79,8 @@ export const defaultCRSList = [
   },
 ];
 
-export const defaultCountry = {
-  englishName: "",
-  ISO3: "",
-};
-export const defaultRegion = {
-  regionName: "",
-  regionID: "",
-};
+export const defaultCountry = null
+export const defaultRegion = null
 
 export const paperStyle = (dialog) => {
   if (dialog) {

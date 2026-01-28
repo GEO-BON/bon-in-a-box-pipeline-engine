@@ -699,6 +699,10 @@ textarea.autoResizeWidth {
   color: #444;
 }
 
+.yaml {
+  font-family: monospace;
+}
+
 .gray,
 .gray h3 {
   color: #aaaaaa;

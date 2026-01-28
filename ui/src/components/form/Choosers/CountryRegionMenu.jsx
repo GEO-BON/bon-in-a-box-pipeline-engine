@@ -15,24 +15,22 @@ export default function CountryRegionMenu({
   dispatch,
   showRegion = true,
   dialog = false,
-  //updateValues = () => {},
   value = null,
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
   const [regionOptions, setRegionOptions] = useState([]);
-  const [regionJSON, setRegionJSON] = useState([]);
   const savedCountryValue =
     value?.country?.englishName && value?.country?.ISO3
-      ? { label: states.country.englishName, value: states.country.ISO3 }
+      ? { label: value.country.englishName, value: value.country.ISO3 }
       : null;
   const savedRegionValue = value?.region?.regionName
-    ? { label: states.region.regionName, value: states.region.regionGID }
+    ? { label: value.region.regionName, value: value.region.regionGID }
     : null;
   const [selectedCountry, setSelectedCountry] = useState(
-    savedCountryValue || null
+    savedCountryValue
   );
   const [selectedRegion, setSelectedRegion] = useState(
-    savedRegionValue || null
+    savedRegionValue
   );
 
   useEffect(() => {
@@ -74,6 +72,7 @@ export default function CountryRegionMenu({
         setSelectedRegion(null);
         return;
       }
+
       if (states.country?.ISO3 !== selectedCountry?.value) {
         setSelectedCountry({
           label: states.country.englishName,
@@ -81,11 +80,13 @@ export default function CountryRegionMenu({
           bbox: states.country.bboxWGS84,
         });
       }
+
       if (!states.region?.regionName) {
         setSelectedRegion(null);
         return;
       }
-      if (states.region?.regionName !== selectedRegion?.value) {
+
+      if (states.region.regionName !== selectedRegion?.value) {
         setSelectedRegion({
           label: states.region.regionName,
           value: states.region.adm1_src,
@@ -105,13 +106,14 @@ export default function CountryRegionMenu({
         }
         else{
           if (data) {
-            const regionOpts = data.map((reg) => ({
+            const regionOpts = data
+              .filter((reg) => reg.adm1_name && reg.adm1_src && reg.geometry_bbox)
+              .map((reg) => ({
               label: reg.adm1_name,
               value: reg.adm1_src,
               bbox: Object.values(reg.geometry_bbox),
             }));
             setRegionOptions(regionOpts);
-            setRegionJSON(data);
           } else {
             setRegionOptions([]);
           }
@@ -199,6 +201,7 @@ export default function CountryRegionMenu({
         <>
           <Autocomplete
             options={regionOptions}
+            disabled={!regionOptions}
             size="small"
             sx={{
               marginTop: "20px",
@@ -214,7 +217,7 @@ export default function CountryRegionMenu({
             renderInput={(params) => (
               <TextField {...params} label="Select region" />
             )}
-            onChange={(event, value) => {
+            onChange={(_, value) => {
               setSelectedRegion(value);
               selectionChanged("region", value?.value ? value : null);
             }}
