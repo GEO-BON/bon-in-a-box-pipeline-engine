@@ -452,7 +452,13 @@ paths:
           required: true
           schema:
             type: string
-          example: LKA
+          examples:
+            adm0:
+              value: LKA
+              summary: With country type (adm0), a three-letter code
+            adm1:
+              value: "82249235B5553315981608"
+              summary: With region type (adm1), a series of digits
       responses:
         "200":
           description: Geometry of the region in GeoPackage format.
