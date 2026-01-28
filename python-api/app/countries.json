@@ -1,1 +1,3182 @@
-[{"adm0_src": "ABW", "adm0_name": "Aruba (Neth.)", "geometry_bbox": {"xmin": -70.0638427734375, "ymin": 12.411824226379395, "xmax": -69.86544799804688, "ymax": 12.623372077941895}}, {"adm0_src": "AFG", "adm0_name": "Afghanistan", "geometry_bbox": {"xmin": 60.51759719848633, "ymin": 29.377199172973633, "xmax": 74.88986206054688, "ymax": 38.4907341003418}}, {"adm0_src": "AGO", "adm0_name": "Angola", "geometry_bbox": {"xmin": 11.669419288635254, "ymin": -18.039104461669922, "xmax": 24.087888717651367, "ymax": -4.388062953948975}}, {"adm0_src": "AIA", "adm0_name": "Anguilla (UK)", "geometry_bbox": {"xmin": -63.42933654785156, "ymin": 18.149946212768555, "xmax": -62.9227180480957, "ymax": 18.595191955566406}}, {"adm0_src": "ALA", "adm0_name": "\u00c5land Islands (Fin.)", "geometry_bbox": {"xmin": 19.131023406982422, "ymin": 59.50394058227539, "xmax": 21.326650619506836, "ymax": 60.665592193603516}}, {"adm0_src": "ALB", "adm0_name": "Albania", "geometry_bbox": {"xmin": 19.263973236083984, "ymin": 39.64480972290039, "xmax": 21.05728530883789, "ymax": 42.66108703613281}}, {"adm0_src": "AND", "adm0_name": "Andorra", "geometry_bbox": {"xmin": 1.4135733842849731, "ymin": 42.428741455078125, "xmax": 1.7866939306259155, "ymax": 42.655887603759766}}, {"adm0_src": "ARE", "adm0_name": "United Arab Emirates", "geometry_bbox": {"xmin": 51.49785614013672, "ymin": 22.631479263305664, "xmax": 56.38323211669922, "ymax": 26.069395065307617}}, {"adm0_src": "ARG", "adm0_name": "Argentina", "geometry_bbox": {"xmin": -73.56036376953125, "ymin": -55.061431884765625, "xmax": -53.63736343383789, "ymax": -21.78104591369629}}, {"adm0_src": "ARM", "adm0_name": "Armenia", "geometry_bbox": {"xmin": 43.447410583496094, "ymin": 38.840240478515625, "xmax": 46.63434982299805, "ymax": 41.301151275634766}}, {"adm0_src": "ASM", "adm0_name": "American Samoa (USA)", "geometry_bbox": {"xmin": -171.0899200439453, "ymin": -14.548662185668945, "xmax": -168.1432647705078, "ymax": -11.047811508178711}}, {"adm0_src": "ATA", "adm0_name": "Antarctica", "geometry_bbox": {"xmin": -180.0, "ymin": -90.0, "xmax": 180.0, "ymax": -60.35515213012695}}, {"adm0_src": "ATF_1", "adm0_name": "Kerguelen Islands (Fr.)", "geometry_bbox": {"xmin": 68.12388610839844, "ymin": -50.018592834472656, "xmax": 70.55717468261719, "ymax": -48.45172882080078}}, {"adm0_src": "ATF_2", "adm0_name": "Crozet Archipelago (Fr.)", "geometry_bbox": {"xmin": 50.16497802734375, "ymin": -46.47996139526367, "xmax": 52.328224182128906, "ymax": -45.937255859375}}, {"adm0_src": "ATF_3", "adm0_name": "Saint Paul and Amsterdam Islands (Fr.)", "geometry_bbox": {"xmin": 77.50456237792969, "ymin": -38.73915481567383, "xmax": 77.5970687866211, "ymax": -37.792476654052734}}, {"adm0_src": "ATF_4", "adm0_name": "Bassas da India (Fr.)", "geometry_bbox": {"xmin": 39.63985061645508, "ymin": -21.479082107543945, "xmax": 39.73873519897461, "ymax": -21.456228256225586}}, {"adm0_src": "ATF_5", "adm0_name": "Europa Island (Fr.)", "geometry_bbox": {"xmin": 40.329002380371094, "ymin": -22.398765563964844, "xmax": 40.39913558959961, "ymax": -22.336030960083008}}, {"adm0_src": "ATF_6", "adm0_name": "Glorioso Islands (Fr.)", "geometry_bbox": {"xmin": 47.28472137451172, "ymin": -11.593549728393555, "xmax": 47.38127899169922, "ymax": -11.514459609985352}}, {"adm0_src": "ATF_7", "adm0_name": "Juan de Nova Island (Fr.)", "geometry_bbox": {"xmin": 42.698795318603516, "ymin": -17.064077377319336, "xmax": 42.75013732910156, "ymax": -17.045547485351562}}, {"adm0_src": "ATF_8", "adm0_name": "Tromelin Island (Fr.)", "geometry_bbox": {"xmin": 54.51769256591797, "ymin": -15.897546768188477, "xmax": 54.528480529785156, "ymax": -15.885112762451172}}, {"adm0_src": "ATG", "adm0_name": "Antigua and Barbuda", "geometry_bbox": {"xmin": -62.348236083984375, "ymin": 16.932294845581055, "xmax": -61.657127380371094, "ymax": 17.729110717773438}}, {"adm0_src": "AUS_1", "adm0_name": "Australia", "geometry_bbox": {"xmin": 112.9209976196289, "ymin": -55.11579132080078, "xmax": 159.28146362304688, "ymax": -9.140691757202148}}, {"adm0_src": "AUS_2", "adm0_name": "Ashmore & Cartier Islands (Aust.)", "geometry_bbox": {"xmin": 122.96186065673828, "ymin": -12.531357765197754, "xmax": 123.55748748779297, "ymax": -12.240156173706055}}, {"adm0_src": "AUS_3", "adm0_name": "Coral Sea Islands (Aust.)", "geometry_bbox": {"xmin": 148.44561767578125, "ymin": -23.252361297607422, "xmax": 155.8713836669922, "ymax": -16.11193084716797}}, {"adm0_src": "AUT", "adm0_name": "Austria", "geometry_bbox": {"xmin": 9.530734062194824, "ymin": 46.37230682373047, "xmax": 17.160776138305664, "ymax": 49.020530700683594}}, {"adm0_src": "AZE", "adm0_name": "Azerbaijan", "geometry_bbox": {"xmin": 44.7633056640625, "ymin": 38.392215728759766, "xmax": 50.88005065917969, "ymax": 41.91234588623047}}, {"adm0_src": "BDI", "adm0_name": "Burundi", "geometry_bbox": {"xmin": 29.000965118408203, "ymin": -4.469329357147217, "xmax": 30.84954071044922, "ymax": -2.309729814529419}}, {"adm0_src": "BEL", "adm0_name": "Belgium", "geometry_bbox": {"xmin": 2.4945428371429443, "ymin": 49.496944427490234, "xmax": 6.40805721282959, "ymax": 51.528968811035156}}, {"adm0_src": "BEN", "adm0_name": "Benin", "geometry_bbox": {"xmin": 0.7754122018814087, "ymin": 6.23518705368042, "xmax": 3.8430631160736084, "ymax": 12.408611297607422}}, {"adm0_src": "BES_1", "adm0_name": "Bonaire (Neth.)", "geometry_bbox": {"xmin": -68.42095184326172, "ymin": 12.024734497070312, "xmax": -68.19546508789062, "ymax": 12.312167167663574}}, {"adm0_src": "BES_2", "adm0_name": "Sint Eustatius (Neth.)", "geometry_bbox": {"xmin": -63.003143310546875, "ymin": 17.464576721191406, "xmax": -62.94590377807617, "ymax": 17.526046752929688}}, {"adm0_src": "BES_3", "adm0_name": "Saba (Neth.)", "geometry_bbox": {"xmin": -63.25846481323242, "ymin": 17.614255905151367, "xmax": -63.21468734741211, "ymax": 17.650270462036133}}, {"adm0_src": "BFA", "adm0_name": "Burkina Faso", "geometry_bbox": {"xmin": -5.513241767883301, "ymin": 9.410470962524414, "xmax": 2.404359817504883, "ymax": 15.084033966064453}}, {"adm0_src": "BGD", "adm0_name": "Bangladesh", "geometry_bbox": {"xmin": 88.00861358642578, "ymin": 20.575883865356445, "xmax": 92.68013000488281, "ymax": 26.6339168548584}}, {"adm0_src": "BGR", "adm0_name": "Bulgaria", "geometry_bbox": {"xmin": 22.35715675354004, "ymin": 41.2353401184082, "xmax": 28.609256744384766, "ymax": 44.21548080444336}}, {"adm0_src": "BHR", "adm0_name": "Bahrain", "geometry_bbox": {"xmin": 50.3101692199707, "ymin": 25.569286346435547, "xmax": 50.901790618896484, "ymax": 26.487382888793945}}, {"adm0_src": "BHS", "adm0_name": "Bahamas", "geometry_bbox": {"xmin": -80.47624206542969, "ymin": 20.912939071655273, "xmax": -72.71240997314453, "ymax": 27.272903442382812}}, {"adm0_src": "BIH", "adm0_name": "Bosnia and Herzegovina", "geometry_bbox": {"xmin": 15.728730201721191, "ymin": 42.55547332763672, "xmax": 19.62370491027832, "ymax": 45.276546478271484}}, {"adm0_src": "BLM", "adm0_name": "Saint Barth\u00e9lemy (Fr.)", "geometry_bbox": {"xmin": -62.95111846923828, "ymin": 17.87078285217285, "xmax": -62.78902053833008, "ymax": 17.974103927612305}}, {"adm0_src": "BLR", "adm0_name": "Belarus", "geometry_bbox": {"xmin": 23.17833709716797, "ymin": 51.26219177246094, "xmax": 32.776885986328125, "ymax": 56.17222595214844}}, {"adm0_src": "BLZ", "adm0_name": "Belize", "geometry_bbox": {"xmin": -89.22760009765625, "ymin": 15.88561725616455, "xmax": -87.486083984375, "ymax": 18.49594497680664}}, {"adm0_src": "BMU", "adm0_name": "Bermuda (UK)", "geometry_bbox": {"xmin": -64.88751983642578, "ymin": 32.24325180053711, "xmax": -64.64643096923828, "ymax": 32.3909912109375}}, {"adm0_src": "BOL", "adm0_name": "Bolivia (Plurinational State of)", "geometry_bbox": {"xmin": -69.64494323730469, "ymin": -22.89809226989746, "xmax": -57.449798583984375, "ymax": -9.668649673461914}}, {"adm0_src": "BRA", "adm0_name": "Brazil", "geometry_bbox": {"xmin": -73.98318481445312, "ymin": -33.751094818115234, "xmax": -28.847637176513672, "ymax": 5.271787166595459}}, {"adm0_src": "BRB", "adm0_name": "Barbados", "geometry_bbox": {"xmin": -59.650840759277344, "ymin": 13.04471206665039, "xmax": -59.42011260986328, "ymax": 13.33517074584961}}, {"adm0_src": "BRN", "adm0_name": "Brunei Darussalam", "geometry_bbox": {"xmin": 114.07591247558594, "ymin": 4.002643585205078, "xmax": 115.36468505859375, "ymax": 5.078883171081543}}, {"adm0_src": "BTN", "adm0_name": "Bhutan", "geometry_bbox": {"xmin": 88.74552154541016, "ymin": 26.7020206451416, "xmax": 92.125244140625, "ymax": 28.246990203857422}}, {"adm0_src": "BVT", "adm0_name": "Bouvet Island (Nor.)", "geometry_bbox": {"xmin": 3.280628204345703, "ymin": -54.45417404174805, "xmax": 3.433380603790283, "ymax": -54.38691711425781}}, {"adm0_src": "BWA", "adm0_name": "Botswana", "geometry_bbox": {"xmin": 19.9989013671875, "ymin": -26.90754508972168, "xmax": 29.375307083129883, "ymax": -17.778135299682617}}, {"adm0_src": "CAF", "adm0_name": "Central African Republic", "geometry_bbox": {"xmin": 14.415096282958984, "ymin": 2.223052978515625, "xmax": 27.45830535888672, "ymax": 11.017958641052246}}, {"adm0_src": "CAN", "adm0_name": "Canada", "geometry_bbox": {"xmin": -141.00186157226562, "ymin": 41.67656707763672, "xmax": -52.61936569213867, "ymax": 83.13709259033203}}, {"adm0_src": "CCK", "adm0_name": "Cocos (Keeling) Islands (Aust.)", "geometry_bbox": {"xmin": 96.81685638427734, "ymin": -12.20886516571045, "xmax": 96.92962646484375, "ymax": -11.822476387023926}}, {"adm0_src": "CHE", "adm0_name": "Switzerland", "geometry_bbox": {"xmin": 5.955896854400635, "ymin": 45.81795120239258, "xmax": 10.492172241210938, "ymax": 47.8084602355957}}, {"adm0_src": "CHL", "adm0_name": "Chile", "geometry_bbox": {"xmin": -109.45487976074219, "ymin": -56.538299560546875, "xmax": -66.41598510742188, "ymax": -17.498342514038086}}, {"adm0_src": "CHN", "adm0_name": "China", "geometry_bbox": {"xmin": 73.49925994873047, "ymin": 18.159196853637695, "xmax": 134.7754669189453, "ymax": 53.56097412109375}}, {"adm0_src": "CIV", "adm0_name": "C\u00f4te d'Ivoire", "geometry_bbox": {"xmin": -8.602059364318848, "ymin": 4.36121940612793, "xmax": -2.4930307865142822, "ymax": 10.741095542907715}}, {"adm0_src": "CMR", "adm0_name": "Cameroon", "geometry_bbox": {"xmin": 8.49866771697998, "ymin": 1.6558997631072998, "xmax": 16.194408416748047, "ymax": 13.083335876464844}}, {"adm0_src": "COD", "adm0_name": "Democratic Republic of the Congo", "geometry_bbox": {"xmin": 12.202476501464844, "ymin": -13.459036827087402, "xmax": 31.31461524963379, "ymax": 5.392003059387207}}, {"adm0_src": "COG", "adm0_name": "Congo", "geometry_bbox": {"xmin": 11.153038024902344, "ymin": -5.040242671966553, "xmax": 18.650423049926758, "ymax": 3.7077910900115967}}, {"adm0_src": "COK", "adm0_name": "Cook Islands (NZ)", "geometry_bbox": {"xmin": -165.92491149902344, "ymin": -21.959211349487305, "xmax": -157.3214874267578, "ymax": -8.91666030883789}}, {"adm0_src": "COL", "adm0_name": "Colombia", "geometry_bbox": {"xmin": -81.84131622314453, "ymin": -4.227110385894775, "xmax": -66.84630584716797, "ymax": 15.886398315429688}}, {"adm0_src": "COM", "adm0_name": "Comoros", "geometry_bbox": {"xmin": 43.228736877441406, "ymin": -12.422616958618164, "xmax": 44.54064178466797, "ymax": -11.365527153015137}}, {"adm0_src": "CPT", "adm0_name": "Clipperton Island (Fr.)", "geometry_bbox": {"xmin": -109.234619140625, "ymin": 10.287152290344238, "xmax": -109.19977569580078, "ymax": 10.319571495056152}}, {"adm0_src": "CPV", "adm0_name": "Cabo Verde", "geometry_bbox": {"xmin": -25.36094856262207, "ymin": 14.803215026855469, "xmax": -22.65821075439453, "ymax": 17.205310821533203}}, {"adm0_src": "CRI", "adm0_name": "Costa Rica", "geometry_bbox": {"xmin": -87.10199737548828, "ymin": 5.499159336090088, "xmax": -82.55134582519531, "ymax": 11.219682693481445}}, {"adm0_src": "CUB", "adm0_name": "Cuba", "geometry_bbox": {"xmin": -84.95209503173828, "ymin": 19.826427459716797, "xmax": -74.13166809082031, "ymax": 23.276823043823242}}, {"adm0_src": "CUW", "adm0_name": "Cura\u00e7ao (Neth.)", "geometry_bbox": {"xmin": -69.1626968383789, "ymin": 11.978303909301758, "xmax": -68.6397705078125, "ymax": 12.392730712890625}}, {"adm0_src": "CXR", "adm0_name": "Christmas Island (Aust.)", "geometry_bbox": {"xmin": 105.5334243774414, "ymin": -10.570083618164062, "xmax": 105.71302795410156, "ymax": -10.41230297088623}}, {"adm0_src": "CYM", "adm0_name": "Cayman Islands (UK)", "geometry_bbox": {"xmin": -81.42021179199219, "ymin": 19.26287269592285, "xmax": -79.72290802001953, "ymax": 19.75695037841797}}, {"adm0_src": "CYP", "adm0_name": "Cyprus", "geometry_bbox": {"xmin": 32.26921081542969, "ymin": 34.63238525390625, "xmax": 34.60721969604492, "ymax": 35.71089553833008}}, {"adm0_src": "CZE", "adm0_name": "Czechia", "geometry_bbox": {"xmin": 12.090569496154785, "ymin": 48.55180740356445, "xmax": 18.8592586517334, "ymax": 51.05570602416992}}, {"adm0_src": "DEU", "adm0_name": "Germany", "geometry_bbox": {"xmin": 5.866313934326172, "ymin": 47.27010726928711, "xmax": 15.041834831237793, "ymax": 55.05866241455078}}, {"adm0_src": "DJI", "adm0_name": "Djibouti", "geometry_bbox": {"xmin": 41.77083969116211, "ymin": 10.912951469421387, "xmax": 43.45305633544922, "ymax": 12.71362590789795}}, {"adm0_src": "DMA", "adm0_name": "Dominica", "geometry_bbox": {"xmin": -61.48011779785156, "ymin": 15.207630157470703, "xmax": -61.24008560180664, "ymax": 15.64077377319336}}, {"adm0_src": "DNK", "adm0_name": "Denmark", "geometry_bbox": {"xmin": 8.074393272399902, "ymin": 54.55906295776367, "xmax": 15.197376251220703, "ymax": 57.75223922729492}}, {"adm0_src": "DOM", "adm0_name": "Dominican Republic", "geometry_bbox": {"xmin": -72.00751495361328, "ymin": 17.4705810546875, "xmax": -68.32290649414062, "ymax": 19.932050704956055}}, {"adm0_src": "DZA", "adm0_name": "Algeria", "geometry_bbox": {"xmin": -8.667612075805664, "ymin": 18.9681453704834, "xmax": 11.998501777648926, "ymax": 37.09466552734375}}, {"adm0_src": "ECU", "adm0_name": "Ecuador", "geometry_bbox": {"xmin": -92.00919342041016, "ymin": -5.016158103942871, "xmax": -75.1871337890625, "ymax": 1.6814017295837402}}, {"adm0_src": "EGY", "adm0_name": "Egypt", "geometry_bbox": {"xmin": 24.6967716217041, "ymin": 22.0, "xmax": 36.248348236083984, "ymax": 31.670913696289062}}, {"adm0_src": "ERI", "adm0_name": "Eritrea", "geometry_bbox": {"xmin": 36.43334197998047, "ymin": 12.35472297668457, "xmax": 43.13694763183594, "ymax": 18.020307540893555}}, {"adm0_src": "ESH", "adm0_name": "Western Sahara", "geometry_bbox": {"xmin": -17.104629516601562, "ymin": 20.769948959350586, "xmax": -8.667524337768555, "ymax": 27.667272567749023}}, {"adm0_src": "ESP_1", "adm0_name": "Spain", "geometry_bbox": {"xmin": -9.30153751373291, "ymin": 35.93763732910156, "xmax": 4.328026294708252, "ymax": 43.790428161621094}}, {"adm0_src": "ESP_2", "adm0_name": "Canary Islands (Sp.)", "geometry_bbox": {"xmin": -18.161182403564453, "ymin": 27.63773536682129, "xmax": -13.332014083862305, "ymax": 29.416065216064453}}, {"adm0_src": "ESP_3", "adm0_name": "Plazas de soberan\u00eda (Sp.)", "geometry_bbox": {"xmin": -5.421949863433838, "ymin": 35.170814514160156, "xmax": -2.4186902046203613, "ymax": 35.91800308227539}}, {"adm0_src": "EST", "adm0_name": "Estonia", "geometry_bbox": {"xmin": 21.76430892944336, "ymin": 57.50931167602539, "xmax": 28.21002960205078, "ymax": 59.822017669677734}}, {"adm0_src": "ETH", "adm0_name": "Ethiopia", "geometry_bbox": {"xmin": 32.99773025512695, "ymin": 3.404136896133423, "xmax": 48.00105667114258, "ymax": 14.89421558380127}}, {"adm0_src": "FIN", "adm0_name": "Finland", "geometry_bbox": {"xmin": 20.548633575439453, "ymin": 59.67560958862305, "xmax": 31.58670425415039, "ymax": 70.09230041503906}}, {"adm0_src": "FJI", "adm0_name": "Fiji", "geometry_bbox": {"xmin": -180.0, "ymin": -21.736711502075195, "xmax": 180.0, "ymax": -12.461886405944824}}, {"adm0_src": "FLK", "adm0_name": "Falkland Islands (Malvinas)", "geometry_bbox": {"xmin": -61.458194732666016, "ymin": -52.91911697387695, "xmax": -57.68733596801758, "ymax": -50.996639251708984}}, {"adm0_src": "FRA", "adm0_name": "France", "geometry_bbox": {"xmin": -5.151034832000732, "ymin": 41.33319091796875, "xmax": 9.560012817382812, "ymax": 51.08899688720703}}, {"adm0_src": "FRO", "adm0_name": "Faroe Islands (Den.)", "geometry_bbox": {"xmin": -7.691868305206299, "ymin": 61.33790588378906, "xmax": -6.253578186035156, "ymax": 62.39430618286133}}, {"adm0_src": "FSM", "adm0_name": "Micronesia (Federated States of)", "geometry_bbox": {"xmin": 137.42373657226562, "ymin": 1.026230812072754, "xmax": 163.03564453125, "ymax": 10.090381622314453}}, {"adm0_src": "GAB", "adm0_name": "Gabon", "geometry_bbox": {"xmin": 8.563959121704102, "ymin": -3.9603214263916016, "xmax": 14.526923179626465, "ymax": 2.3181090354919434}}, {"adm0_src": "GBR", "adm0_name": "United Kingdom of Great Britain and Northern Ireland", "geometry_bbox": {"xmin": -13.687582015991211, "ymin": 49.86328887939453, "xmax": 1.763219952583313, "ymax": 60.86077880859375}}, {"adm0_src": "GEO", "adm0_name": "Georgia", "geometry_bbox": {"xmin": 40.0066032409668, "ymin": 41.055152893066406, "xmax": 46.73677444458008, "ymax": 43.58662796020508}}, {"adm0_src": "GGY", "adm0_name": "Guernsey (UK)", "geometry_bbox": {"xmin": -2.676144599914551, "ymin": 49.40005111694336, "xmax": -2.1563522815704346, "ymax": 49.7377815246582}}, {"adm0_src": "GHA", "adm0_name": "Ghana", "geometry_bbox": {"xmin": -3.2607860565185547, "ymin": 4.739342212677002, "xmax": 1.1996426582336426, "ymax": 11.174954414367676}}, {"adm0_src": "GIB", "adm0_name": "Gibraltar (UK)", "geometry_bbox": {"xmin": -5.367415904998779, "ymin": 36.108848571777344, "xmax": -5.33764123916626, "ymax": 36.155033111572266}}, {"adm0_src": "GIN", "adm0_name": "Guinea", "geometry_bbox": {"xmin": -15.366719245910645, "ymin": 7.190603733062744, "xmax": -7.637852191925049, "ymax": 12.6748628616333}}, {"adm0_src": "GLP", "adm0_name": "Guadeloupe (Fr.)", "geometry_bbox": {"xmin": -61.80976486206055, "ymin": 15.831974029541016, "xmax": -61.00129699707031, "ymax": 16.514480590820312}}, {"adm0_src": "GMB", "adm0_name": "Gambia", "geometry_bbox": {"xmin": -16.82387924194336, "ymin": 13.063915252685547, "xmax": -13.79237174987793, "ymax": 13.82550048828125}}, {"adm0_src": "GNB", "adm0_name": "Guinea-Bissau", "geometry_bbox": {"xmin": -16.715381622314453, "ymin": 10.864463806152344, "xmax": -13.626521110534668, "ymax": 12.686948776245117}}, {"adm0_src": "GNQ", "adm0_name": "Equatorial Guinea", "geometry_bbox": {"xmin": 5.616768836975098, "ymin": -1.4886795282363892, "xmax": 11.333301544189453, "ymax": 3.7882351875305176}}, {"adm0_src": "GRC", "adm0_name": "Greece", "geometry_bbox": {"xmin": 19.372962951660156, "ymin": 34.8008918762207, "xmax": 28.247629165649414, "ymax": 41.75025177001953}}, {"adm0_src": "GRD", "adm0_name": "Grenada", "geometry_bbox": {"xmin": -61.802459716796875, "ymin": 11.984901428222656, "xmax": -61.3781623840332, "ymax": 12.530118942260742}}, {"adm0_src": "GRL", "adm0_name": "Greenland (Den.)", "geometry_bbox": {"xmin": -73.25300598144531, "ymin": 59.71495056152344, "xmax": -11.35110855102539, "ymax": 83.66511535644531}}, {"adm0_src": "GTM", "adm0_name": "Guatemala", "geometry_bbox": {"xmin": -92.23210144042969, "ymin": 13.740020751953125, "xmax": -88.2330551147461, "ymax": 17.815696716308594}}, {"adm0_src": "GUF", "adm0_name": "French Guiana (Fr.)", "geometry_bbox": {"xmin": -54.60323715209961, "ymin": 2.1110732555389404, "xmax": -51.614501953125, "ymax": 5.776949882507324}}, {"adm0_src": "GUM", "adm0_name": "Guam (USA)", "geometry_bbox": {"xmin": 144.6181182861328, "ymin": 13.234110832214355, "xmax": 144.95697021484375, "ymax": 13.654382705688477}}, {"adm0_src": "GUY", "adm0_name": "Guyana", "geometry_bbox": {"xmin": -61.41077423095703, "ymin": 1.1693055629730225, "xmax": -56.491119384765625, "ymax": 8.546156883239746}}, {"adm0_src": "HKG", "adm0_name": "China, Hong Kong SAR", "geometry_bbox": {"xmin": 113.83009338378906, "ymin": 22.153348922729492, "xmax": 114.44176483154297, "ymax": 22.561948776245117}}, {"adm0_src": "HMD", "adm0_name": "Heard Island and McDonald Islands (Aust.)", "geometry_bbox": {"xmin": 72.5781021118164, "ymin": -53.19491195678711, "xmax": 73.87675476074219, "ymax": -52.902740478515625}}, {"adm0_src": "HND", "adm0_name": "Honduras", "geometry_bbox": {"xmin": -89.35648345947266, "ymin": 12.980818748474121, "xmax": -82.40740966796875, "ymax": 17.417705535888672}}, {"adm0_src": "HRV", "adm0_name": "Croatia", "geometry_bbox": {"xmin": 13.489900588989258, "ymin": 42.37782669067383, "xmax": 19.447372436523438, "ymax": 46.55502700805664}}, {"adm0_src": "HTI", "adm0_name": "Haiti", "geometry_bbox": {"xmin": -74.4809341430664, "ymin": 18.02176284790039, "xmax": -71.62174224853516, "ymax": 20.08962631225586}}, {"adm0_src": "HUN", "adm0_name": "Hungary", "geometry_bbox": {"xmin": 16.11386489868164, "ymin": 45.7370719909668, "xmax": 22.89679527282715, "ymax": 48.58525085449219}}, {"adm0_src": "IDN", "adm0_name": "Indonesia", "geometry_bbox": {"xmin": 94.971923828125, "ymin": -11.007671356201172, "xmax": 141.02215576171875, "ymax": 6.076744079589844}}, {"adm0_src": "IMN", "adm0_name": "Isle of Man (UK)", "geometry_bbox": {"xmin": -4.838066577911377, "ymin": 54.03776550292969, "xmax": -4.307835102081299, "ymax": 54.41799545288086}}, {"adm0_src": "IND", "adm0_name": "India", "geometry_bbox": {"xmin": 68.43211364746094, "ymin": 6.7562665939331055, "xmax": 97.16571044921875, "ymax": 33.25441360473633}}, {"adm0_src": "IOT", "adm0_name": "British Indian Ocean Territory", "geometry_bbox": {"xmin": 71.23741912841797, "ymin": -7.443901538848877, "xmax": 72.4947280883789, "ymax": -5.2358927726745605}}, {"adm0_src": "IRL", "adm0_name": "Ireland", "geometry_bbox": {"xmin": -10.662618637084961, "ymin": 51.388702392578125, "xmax": -5.994503974914551, "ymax": 55.45100021362305}}, {"adm0_src": "IRN", "adm0_name": "Iran (Islamic Republic of)", "geometry_bbox": {"xmin": 44.03263854980469, "ymin": 25.05924415588379, "xmax": 63.333343505859375, "ymax": 39.7822265625}}, {"adm0_src": "IRQ", "adm0_name": "Iraq", "geometry_bbox": {"xmin": 38.793670654296875, "ymin": 29.061203002929688, "xmax": 48.618690490722656, "ymax": 37.38069152832031}}, {"adm0_src": "ISL", "adm0_name": "Iceland", "geometry_bbox": {"xmin": -24.53204917907715, "ymin": 63.296085357666016, "xmax": -13.273391723632812, "ymax": 67.15044403076172}}, {"adm0_src": "ISR", "adm0_name": "Israel", "geometry_bbox": {"xmin": 34.26725387573242, "ymin": 29.49056053161621, "xmax": 35.68460464477539, "ymax": 33.290836334228516}}, {"adm0_src": "ITA", "adm0_name": "Italy", "geometry_bbox": {"xmin": 6.626806735992432, "ymin": 35.492950439453125, "xmax": 18.5205135345459, "ymax": 47.09214782714844}}, {"adm0_src": "JAM_1", "adm0_name": "Jamaica", "geometry_bbox": {"xmin": -78.36893463134766, "ymin": 17.705562591552734, "xmax": -76.1829605102539, "ymax": 18.525556564331055}}, {"adm0_src": "JAM_2", "adm0_name": "Pedro Bank (Jam.)", "geometry_bbox": {"xmin": -77.82547760009766, "ymin": 16.946304321289062, "xmax": -77.50030517578125, "ymax": 17.05333137512207}}, {"adm0_src": "JAM_3", "adm0_name": "Morant Cays (Jam.)", "geometry_bbox": {"xmin": -76.00350952148438, "ymin": 17.383983612060547, "xmax": -75.96998596191406, "ymax": 17.416677474975586}}, {"adm0_src": "JEY", "adm0_name": "Jersey (UK)", "geometry_bbox": {"xmin": -2.254512071609497, "ymin": 48.954925537109375, "xmax": -1.912393569946289, "ymax": 49.30296325683594}}, {"adm0_src": "JOR", "adm0_name": "Jordan", "geometry_bbox": {"xmin": 34.960243225097656, "ymin": 29.184152603149414, "xmax": 39.30115509033203, "ymax": 33.37473678588867}}, {"adm0_src": "JPN", "adm0_name": "Japan", "geometry_bbox": {"xmin": 122.93255615234375, "ymin": 20.422636032104492, "xmax": 153.98658752441406, "ymax": 45.52648162841797}}, {"adm0_src": "KAZ", "adm0_name": "Kazakhstan", "geometry_bbox": {"xmin": 46.493202209472656, "ymin": 40.568687438964844, "xmax": 87.31542205810547, "ymax": 55.44289779663086}}, {"adm0_src": "KEN", "adm0_name": "Kenya", "geometry_bbox": {"xmin": 33.90974426269531, "ymin": -4.741661071777344, "xmax": 41.906864166259766, "ymax": 4.631039142608643}}, {"adm0_src": "KGZ", "adm0_name": "Kyrgyzstan", "geometry_bbox": {"xmin": 69.26405334472656, "ymin": 39.18096923828125, "xmax": 80.22816467285156, "ymax": 43.26618576049805}}, {"adm0_src": "KHM", "adm0_name": "Cambodia", "geometry_bbox": {"xmin": 102.33365631103516, "ymin": 9.913875579833984, "xmax": 107.63123321533203, "ymax": 14.690747261047363}}, {"adm0_src": "KIR", "adm0_name": "Kiribati", "geometry_bbox": {"xmin": -174.54312133789062, "ymin": -11.446451187133789, "xmax": 176.84762573242188, "ymax": 4.6993408203125}}, {"adm0_src": "KNA", "adm0_name": "Saint Kitts and Nevis", "geometry_bbox": {"xmin": -62.86416244506836, "ymin": 17.09417152404785, "xmax": -62.53962707519531, "ymax": 17.418058395385742}}, {"adm0_src": "KOR", "adm0_name": "Republic of Korea", "geometry_bbox": {"xmin": 124.60985565185547, "ymin": 33.11249542236328, "xmax": 130.94032287597656, "ymax": 38.61711120605469}}, {"adm0_src": "KWT", "adm0_name": "Kuwait", "geometry_bbox": {"xmin": 46.55303955078125, "ymin": 28.524442672729492, "xmax": 48.77759552001953, "ymax": 30.103702545166016}}, {"adm0_src": "LAO", "adm0_name": "Lao People's Democratic Republic", "geometry_bbox": {"xmin": 100.08386993408203, "ymin": 13.90971851348877, "xmax": 107.6351089477539, "ymax": 22.509048461914062}}, {"adm0_src": "LBN", "adm0_name": "Lebanon", "geometry_bbox": {"xmin": 35.10353469848633, "ymin": 33.055023193359375, "xmax": 36.62372589111328, "ymax": 34.69209289550781}}, {"adm0_src": "LBR", "adm0_name": "Liberia", "geometry_bbox": {"xmin": -11.499053001403809, "ymin": 4.353907585144043, "xmax": -7.369254112243652, "ymax": 8.553008079528809}}, {"adm0_src": "LBY", "adm0_name": "Libya", "geometry_bbox": {"xmin": 9.39146614074707, "ymin": 19.5, "xmax": 25.149572372436523, "ymax": 33.16638946533203}}, {"adm0_src": "LCA", "adm0_name": "Saint Lucia", "geometry_bbox": {"xmin": -61.07988357543945, "ymin": 13.70761775970459, "xmax": -60.872920989990234, "ymax": 14.110426902770996}}, {"adm0_src": "LIE", "adm0_name": "Liechtenstein", "geometry_bbox": {"xmin": 9.471681594848633, "ymin": 47.04842758178711, "xmax": 9.635692596435547, "ymax": 47.27058029174805}}, {"adm0_src": "LKA", "adm0_name": "Sri Lanka", "geometry_bbox": {"xmin": 79.52197265625, "ymin": 5.918674468994141, "xmax": 81.87898254394531, "ymax": 9.835858345031738}}, {"adm0_src": "LSO", "adm0_name": "Lesotho", "geometry_bbox": {"xmin": 27.011188507080078, "ymin": -30.677736282348633, "xmax": 29.456192016601562, "ymax": -28.570505142211914}}, {"adm0_src": "LTU", "adm0_name": "Lithuania", "geometry_bbox": {"xmin": 20.95380210876465, "ymin": 53.896793365478516, "xmax": 26.83552360534668, "ymax": 56.45041275024414}}, {"adm0_src": "LUX", "adm0_name": "Luxembourg", "geometry_bbox": {"xmin": 5.735701084136963, "ymin": 49.447845458984375, "xmax": 6.530877590179443, "ymax": 50.18278884887695}}, {"adm0_src": "LVA", "adm0_name": "Latvia", "geometry_bbox": {"xmin": 20.967796325683594, "ymin": 55.6746826171875, "xmax": 28.241497039794922, "ymax": 58.085575103759766}}, {"adm0_src": "MAC", "adm0_name": "China, Macao SAR", "geometry_bbox": {"xmin": 113.52863311767578, "ymin": 22.109786987304688, "xmax": 113.59835815429688, "ymax": 22.21706199645996}}, {"adm0_src": "MAF", "adm0_name": "Saint Martin (Fr.)", "geometry_bbox": {"xmin": -63.15333938598633, "ymin": 18.046588897705078, "xmax": -62.9703369140625, "ymax": 18.12520408630371}}, {"adm0_src": "MAR", "adm0_name": "Morocco", "geometry_bbox": {"xmin": -13.17211627960205, "ymin": 27.667268753051758, "xmax": -0.9982954859733582, "ymax": 35.922454833984375}}, {"adm0_src": "MCO", "adm0_name": "Monaco", "geometry_bbox": {"xmin": 7.409076690673828, "ymin": 43.72477722167969, "xmax": 7.439871311187744, "ymax": 43.75191116333008}}, {"adm0_src": "MDA", "adm0_name": "Republic of Moldova", "geometry_bbox": {"xmin": 26.61643409729004, "ymin": 45.4664421081543, "xmax": 30.16370964050293, "ymax": 48.49197769165039}}, {"adm0_src": "MDG", "adm0_name": "Madagascar", "geometry_bbox": {"xmin": 43.187049865722656, "ymin": -25.60614013671875, "xmax": 50.493404388427734, "ymax": -11.949811935424805}}, {"adm0_src": "MDV", "adm0_name": "Maldives", "geometry_bbox": {"xmin": 72.63839721679688, "ymin": -0.70367431640625, "xmax": 73.76509094238281, "ymax": 7.106341361999512}}, {"adm0_src": "MEX", "adm0_name": "Mexico", "geometry_bbox": {"xmin": -118.3670883178711, "ymin": 14.534547805786133, "xmax": -86.71064758300781, "ymax": 32.718746185302734}}, {"adm0_src": "MHL", "adm0_name": "Marshall Islands", "geometry_bbox": {"xmin": 160.79791259765625, "ymin": 4.572882175445557, "xmax": 172.1702117919922, "ymax": 14.672775268554688}}, {"adm0_src": "MKD", "adm0_name": "North Macedonia", "geometry_bbox": {"xmin": 20.453344345092773, "ymin": 40.85394287109375, "xmax": 23.03404426574707, "ymax": 42.37364959716797}}, {"adm0_src": "MLI", "adm0_name": "Mali", "geometry_bbox": {"xmin": -12.240345001220703, "ymin": 10.143610954284668, "xmax": 4.266668319702148, "ymax": 25.001087188720703}}, {"adm0_src": "MLT", "adm0_name": "Malta", "geometry_bbox": {"xmin": 14.183465003967285, "ymin": 35.786338806152344, "xmax": 14.576493263244629, "ymax": 36.0821533203125}}, {"adm0_src": "MMR", "adm0_name": "Myanmar", "geometry_bbox": {"xmin": 92.1719741821289, "ymin": 9.598024368286133, "xmax": 101.17027282714844, "ymax": 28.54776382446289}}, {"adm0_src": "MNE", "adm0_name": "Montenegro", "geometry_bbox": {"xmin": 18.433454513549805, "ymin": 41.8463020324707, "xmax": 20.352920532226562, "ymax": 43.558231353759766}}, {"adm0_src": "MNG", "adm0_name": "Mongolia", "geometry_bbox": {"xmin": 87.73446655273438, "ymin": 41.58183288574219, "xmax": 119.93151092529297, "ymax": 52.14836120605469}}, {"adm0_src": "MNP", "adm0_name": "Northern Mariana Islands (USA)", "geometry_bbox": {"xmin": 144.88623046875, "ymin": 14.110373497009277, "xmax": 146.06497192382812, "ymax": 20.55373191833496}}, {"adm0_src": "MOZ", "adm0_name": "Mozambique", "geometry_bbox": {"xmin": 30.21554946899414, "ymin": -26.868162155151367, "xmax": 40.83930969238281, "ymax": -10.470714569091797}}, {"adm0_src": "MRT", "adm0_name": "Mauritania", "geometry_bbox": {"xmin": -17.068729400634766, "ymin": 14.721271514892578, "xmax": -4.834133148193359, "ymax": 27.315895080566406}}, {"adm0_src": "MSR", "adm0_name": "Montserrat (UK)", "geometry_bbox": {"xmin": -62.241920471191406, "ymin": 16.674440383911133, "xmax": -62.144187927246094, "ymax": 16.824079513549805}}, {"adm0_src": "MTQ", "adm0_name": "Martinique (Fr.)", "geometry_bbox": {"xmin": -61.229026794433594, "ymin": 14.38866901397705, "xmax": -60.8097038269043, "ymax": 14.878734588623047}}, {"adm0_src": "MUS", "adm0_name": "Mauritius", "geometry_bbox": {"xmin": 56.58521270751953, "ymin": -20.52553367614746, "xmax": 63.50199508666992, "ymax": -10.337050437927246}}, {"adm0_src": "MWI", "adm0_name": "Malawi", "geometry_bbox": {"xmin": 32.67251968383789, "ymin": -17.1295223236084, "xmax": 35.9185791015625, "ymax": -9.367226600646973}}, {"adm0_src": "MYS", "adm0_name": "Malaysia", "geometry_bbox": {"xmin": 99.64049530029297, "ymin": 0.8539280891418457, "xmax": 119.26912689208984, "ymax": 7.379385471343994}}, {"adm0_src": "MYT", "adm0_name": "Mayotte (Fr.)", "geometry_bbox": {"xmin": 44.95954513549805, "ymin": -13.021045684814453, "xmax": 46.49363708496094, "ymax": -12.288790702819824}}, {"adm0_src": "NAM", "adm0_name": "Namibia", "geometry_bbox": {"xmin": 11.736716270446777, "ymin": -28.97064208984375, "xmax": 25.261754989624023, "ymax": -16.963483810424805}}, {"adm0_src": "NCL", "adm0_name": "New Caledonia (Fr.)", "geometry_bbox": {"xmin": 158.2359619140625, "ymin": -22.881710052490234, "xmax": 172.0900115966797, "ymax": -18.02504539489746}}, {"adm0_src": "NER", "adm0_name": "Niger", "geometry_bbox": {"xmin": 0.16171778738498688, "ymin": 11.693754196166992, "xmax": 16.000001907348633, "ymax": 23.515003204345703}}, {"adm0_src": "NFK", "adm0_name": "Norfolk Island (Aust.)", "geometry_bbox": {"xmin": 167.9147186279297, "ymin": -29.13662338256836, "xmax": 167.9966583251953, "ymax": -28.994260787963867}}, {"adm0_src": "NGA", "adm0_name": "Nigeria", "geometry_bbox": {"xmin": 2.6635608673095703, "ymin": 4.270262718200684, "xmax": 14.677983283996582, "ymax": 13.88564682006836}}, {"adm0_src": "NIC", "adm0_name": "Nicaragua", "geometry_bbox": {"xmin": -87.69194793701172, "ymin": 10.708054542541504, "xmax": -82.74700927734375, "ymax": 15.02973747253418}}, {"adm0_src": "NIU", "adm0_name": "Niue (NZ)", "geometry_bbox": {"xmin": -169.9497833251953, "ymin": -19.155441284179688, "xmax": -169.7743682861328, "ymax": -18.95250701904297}}, {"adm0_src": "NLD", "adm0_name": "Netherlands (Kingdom of the)", "geometry_bbox": {"xmin": 3.3583900928497314, "ymin": 50.75035095214844, "xmax": 7.227485179901123, "ymax": 53.55350112915039}}, {"adm0_src": "NOR", "adm0_name": "Norway", "geometry_bbox": {"xmin": 4.499833106994629, "ymin": 57.95852279663086, "xmax": 31.16843032836914, "ymax": 71.18563079833984}}, {"adm0_src": "NPL", "adm0_name": "Nepal", "geometry_bbox": {"xmin": 80.05846405029297, "ymin": 26.347373962402344, "xmax": 88.20184326171875, "ymax": 30.4473934173584}}, {"adm0_src": "NRU", "adm0_name": "Nauru", "geometry_bbox": {"xmin": 166.90896606445312, "ymin": -0.554133415222168, "xmax": 166.958984375, "ymax": -0.5025905966758728}}, {"adm0_src": "NZL", "adm0_name": "New Zealand", "geometry_bbox": {"xmin": -178.82652282714844, "ymin": -52.620887756347656, "xmax": 179.0677947998047, "ymax": -29.231338500976562}}, {"adm0_src": "OMN", "adm0_name": "Oman", "geometry_bbox": {"xmin": 52.0, "ymin": 16.65045166015625, "xmax": 59.83942413330078, "ymax": 26.50790786743164}}, {"adm0_src": "PAK", "adm0_name": "Pakistan", "geometry_bbox": {"xmin": 60.87297058105469, "ymin": 24.051645278930664, "xmax": 75.38148498535156, "ymax": 36.90879440307617}}, {"adm0_src": "PAN", "adm0_name": "Panama", "geometry_bbox": {"xmin": -83.05258178710938, "ymin": 7.203555583953857, "xmax": -77.1585693359375, "ymax": 9.647235870361328}}, {"adm0_src": "PCN", "adm0_name": "Pitcairn (UK)", "geometry_bbox": {"xmin": -130.75050354003906, "ymin": -25.080543518066406, "xmax": -124.77238464355469, "ymax": -23.917137145996094}}, {"adm0_src": "PER", "adm0_name": "Peru", "geometry_bbox": {"xmin": -81.32839965820312, "ymin": -18.351097106933594, "xmax": -68.65230560302734, "ymax": -0.03877699375152588}}, {"adm0_src": "PHL", "adm0_name": "Philippines", "geometry_bbox": {"xmin": 116.92919158935547, "ymin": 4.587226867675781, "xmax": 126.60502624511719, "ymax": 21.121896743774414}}, {"adm0_src": "PLW", "adm0_name": "Palau", "geometry_bbox": {"xmin": 131.1201171875, "ymin": 2.96978759765625, "xmax": 134.72113037109375, "ymax": 8.172309875488281}}, {"adm0_src": "PNG", "adm0_name": "Papua New Guinea", "geometry_bbox": {"xmin": 140.8419647216797, "ymin": -11.654706954956055, "xmax": 159.492431640625, "ymax": -0.7559310793876648}}, {"adm0_src": "POL", "adm0_name": "Poland", "geometry_bbox": {"xmin": 14.122884750366211, "ymin": 49.002044677734375, "xmax": 24.145877838134766, "ymax": 54.836181640625}}, {"adm0_src": "PRI", "adm0_name": "Puerto Rico (USA)", "geometry_bbox": {"xmin": -67.95140838623047, "ymin": 17.881322860717773, "xmax": -65.22108459472656, "ymax": 18.515979766845703}}, {"adm0_src": "PRK", "adm0_name": "Democratic People's Republic of Korea", "geometry_bbox": {"xmin": 124.18074798583984, "ymin": 37.625404357910156, "xmax": 130.69775390625, "ymax": 43.00917053222656}}, {"adm0_src": "PRT_1", "adm0_name": "Portugal", "geometry_bbox": {"xmin": -9.549811363220215, "ymin": 36.959964752197266, "xmax": -6.1891770362854, "ymax": 42.154273986816406}}, {"adm0_src": "PRT_2", "adm0_name": "Madeira Islands (Port.)", "geometry_bbox": {"xmin": -17.265928268432617, "ymin": 30.028779983520508, "xmax": -15.853670120239258, "ymax": 33.1281623840332}}, {"adm0_src": "PRT_3", "adm0_name": "Azores Islands (Port.)", "geometry_bbox": {"xmin": -31.275634765625, "ymin": 36.92762756347656, "xmax": -24.779848098754883, "ymax": 39.727256774902344}}, {"adm0_src": "PRY", "adm0_name": "Paraguay", "geometry_bbox": {"xmin": -62.639976501464844, "ymin": -27.606891632080078, "xmax": -54.25856018066406, "ymax": -19.28765869140625}}, {"adm0_src": "PSE_1", "adm0_name": "West Bank", "geometry_bbox": {"xmin": 34.88026809692383, "ymin": 31.342601776123047, "xmax": 35.57405471801758, "ymax": 32.552101135253906}}, {"adm0_src": "PSE_2", "adm0_name": "Gaza", "geometry_bbox": {"xmin": 34.21882629394531, "ymin": 31.220048904418945, "xmax": 34.56780242919922, "ymax": 31.59449577331543}}, {"adm0_src": "PYF", "adm0_name": "French Polynesia (Fr.)", "geometry_bbox": {"xmin": -154.72669982910156, "ymin": -27.900178909301758, "xmax": -134.45248413085938, "ymax": -7.859320640563965}}, {"adm0_src": "QAT", "adm0_name": "Qatar", "geometry_bbox": {"xmin": 50.73229217529297, "ymin": 24.471107482910156, "xmax": 52.417118072509766, "ymax": 26.182985305786133}}, {"adm0_src": "REU", "adm0_name": "R\u00e9union (Fr.)", "geometry_bbox": {"xmin": 55.2164192199707, "ymin": -21.38970947265625, "xmax": 55.836692810058594, "ymax": -20.871740341186523}}, {"adm0_src": "ROU", "adm0_name": "Romania", "geometry_bbox": {"xmin": 20.261816024780273, "ymin": 43.61943435668945, "xmax": 29.768091201782227, "ymax": 48.265586853027344}}, {"adm0_src": "RUS", "adm0_name": "Russian Federation", "geometry_bbox": {"xmin": -180.0, "ymin": 41.18578338623047, "xmax": 180.0, "ymax": 81.85905456542969}}, {"adm0_src": "RWA", "adm0_name": "Rwanda", "geometry_bbox": {"xmin": 28.861753463745117, "ymin": -2.8399384021759033, "xmax": 30.899118423461914, "ymax": -1.047375202178955}}, {"adm0_src": "SAU", "adm0_name": "Saudi Arabia", "geometry_bbox": {"xmin": 34.49440383911133, "ymin": 16.379526138305664, "xmax": 55.66670608520508, "ymax": 32.1542854309082}}, {"adm0_src": "SDN", "adm0_name": "Sudan", "geometry_bbox": {"xmin": 21.814634323120117, "ymin": 8.682454109191895, "xmax": 38.8467903137207, "ymax": 22.224918365478516}}, {"adm0_src": "SEN", "adm0_name": "Senegal", "geometry_bbox": {"xmin": -17.54435157775879, "ymin": 12.307287216186523, "xmax": -11.345767974853516, "ymax": 16.69295883178711}}, {"adm0_src": "SGP", "adm0_name": "Singapore", "geometry_bbox": {"xmin": 103.60565185546875, "ymin": 1.1586815118789673, "xmax": 104.40641784667969, "ymax": 1.4715642929077148}}, {"adm0_src": "SGS", "adm0_name": "South Georgia and the South Sandwich Islands (UK)", "geometry_bbox": {"xmin": -42.021854400634766, "ymin": -59.46242141723633, "xmax": -26.267364501953125, "ymax": -53.54679489135742}}, {"adm0_src": "SHN_1", "adm0_name": "Saint Helena (UK)", "geometry_bbox": {"xmin": -5.789960861206055, "ymin": -16.032033920288086, "xmax": -5.631438732147217, "ymax": -15.90385627746582}}, {"adm0_src": "SHN_2", "adm0_name": "Ascencion (UK)", "geometry_bbox": {"xmin": -14.420761108398438, "ymin": -7.993067264556885, "xmax": -14.294876098632812, "ymax": -7.888999938964844}}, {"adm0_src": "SHN_3", "adm0_name": "Tristan da Cunha (UK)", "geometry_bbox": {"xmin": -12.70632553100586, "ymin": -37.434234619140625, "xmax": -12.216556549072266, "ymax": -37.06206512451172}}, {"adm0_src": "SHN_4", "adm0_name": "Gough (UK)", "geometry_bbox": {"xmin": -10.019018173217773, "ymin": -40.37153625488281, "xmax": -9.874091148376465, "ymax": -40.27185821533203}}, {"adm0_src": "SJM_1", "adm0_name": "Svalbard Islands (Nor.)", "geometry_bbox": {"xmin": 10.45906925201416, "ymin": 74.33454895019531, "xmax": 33.51425552368164, "ymax": 80.82901000976562}}, {"adm0_src": "SJM_2", "adm0_name": "Jan Mayen Island (Nor.)", "geometry_bbox": {"xmin": -9.07717514038086, "ymin": 70.82532501220703, "xmax": -7.928524971008301, "ymax": 71.16033935546875}}, {"adm0_src": "SLB", "adm0_name": "Solomon Islands", "geometry_bbox": {"xmin": 155.5123291015625, "ymin": -12.307709693908691, "xmax": 170.1920623779297, "ymax": -5.026336669921875}}, {"adm0_src": "SLE", "adm0_name": "Sierra Leone", "geometry_bbox": {"xmin": -13.300277709960938, "ymin": 6.921615123748779, "xmax": -10.271682739257812, "ymax": 9.99997329711914}}, {"adm0_src": "SLV", "adm0_name": "El Salvador", "geometry_bbox": {"xmin": -90.13380432128906, "ymin": 13.155394554138184, "xmax": -87.68378448486328, "ymax": 14.45055866241455}}, {"adm0_src": "SMR", "adm0_name": "San Marino", "geometry_bbox": {"xmin": 12.403324127197266, "ymin": 43.89363098144531, "xmax": 12.516203880310059, "ymax": 43.99209976196289}}, {"adm0_src": "SOM", "adm0_name": "Somalia", "geometry_bbox": {"xmin": 40.991241455078125, "ymin": -1.6621239185333252, "xmax": 51.415069580078125, "ymax": 11.988285064697266}}, {"adm0_src": "SPM", "adm0_name": "Saint Pierre and Miquelon (Fr.)", "geometry_bbox": {"xmin": -56.4058837890625, "ymin": 46.748985290527344, "xmax": -56.10005187988281, "ymax": 47.14426040649414}}, {"adm0_src": "SRB", "adm0_name": "Serbia", "geometry_bbox": {"xmin": 18.839040756225586, "ymin": 41.85763931274414, "xmax": 23.00638771057129, "ymax": 46.1900520324707}}, {"adm0_src": "SSD", "adm0_name": "South Sudan", "geometry_bbox": {"xmin": 24.153301239013672, "ymin": 3.4888041019439697, "xmax": 35.948997497558594, "ymax": 12.23638916015625}}, {"adm0_src": "STP", "adm0_name": "Sao Tome and Principe", "geometry_bbox": {"xmin": 6.460190773010254, "ymin": -0.013921601697802544, "xmax": 7.469974517822266, "ymax": 1.72593355178833}}, {"adm0_src": "SUR", "adm0_name": "Suriname", "geometry_bbox": {"xmin": -58.0715217590332, "ymin": 1.8385132551193237, "xmax": -53.97002029418945, "ymax": 6.010417938232422}}, {"adm0_src": "SVK", "adm0_name": "Slovakia", "geometry_bbox": {"xmin": 16.833179473876953, "ymin": 47.73119354248047, "xmax": 22.56569480895996, "ymax": 49.613807678222656}}, {"adm0_src": "SVN", "adm0_name": "Slovenia", "geometry_bbox": {"xmin": 13.37546157836914, "ymin": 45.421424865722656, "xmax": 16.597421646118164, "ymax": 46.87667465209961}}, {"adm0_src": "SWE", "adm0_name": "Sweden", "geometry_bbox": {"xmin": 10.957831382751465, "ymin": 55.33667755126953, "xmax": 24.166664123535156, "ymax": 69.05997467041016}}, {"adm0_src": "SWZ", "adm0_name": "Eswatini", "geometry_bbox": {"xmin": 30.790639877319336, "ymin": -27.317405700683594, "xmax": 32.13490676879883, "ymax": -25.71791648864746}}, {"adm0_src": "SXM", "adm0_name": "Sint Maarten (Neth.)", "geometry_bbox": {"xmin": -63.13895797729492, "ymin": 18.005159378051758, "xmax": -62.99825668334961, "ymax": 18.064115524291992}}, {"adm0_src": "SYC", "adm0_name": "Seychelles", "geometry_bbox": {"xmin": 46.20325469970703, "ymin": -10.227594375610352, "xmax": 56.29444885253906, "ymax": -3.710298538208008}}, {"adm0_src": "SYR", "adm0_name": "Syrian Arab Republic", "geometry_bbox": {"xmin": 35.61357116699219, "ymin": 32.311134338378906, "xmax": 42.376312255859375, "ymax": 37.32057189941406}}, {"adm0_src": "TCA", "adm0_name": "Turks and Caicos Islands (UK)", "geometry_bbox": {"xmin": -72.48282623291016, "ymin": 21.17072296142578, "xmax": -71.08284759521484, "ymax": 21.962451934814453}}, {"adm0_src": "TCD", "adm0_name": "Chad", "geometry_bbox": {"xmin": 13.47055721282959, "ymin": 7.442974090576172, "xmax": 24.000001907348633, "ymax": 23.452363967895508}}, {"adm0_src": "TGO", "adm0_name": "Togo", "geometry_bbox": {"xmin": -0.1440420001745224, "ymin": 6.112363815307617, "xmax": 1.808907389640808, "ymax": 11.139617919921875}}, {"adm0_src": "THA", "adm0_name": "Thailand", "geometry_bbox": {"xmin": 97.3433837890625, "ymin": 5.612850189208984, "xmax": 105.63682556152344, "ymax": 20.46514320373535}}, {"adm0_src": "TJK", "adm0_name": "Tajikistan", "geometry_bbox": {"xmin": 67.33719635009766, "ymin": 36.672035217285156, "xmax": 75.15396881103516, "ymax": 41.044864654541016}}, {"adm0_src": "TKL", "adm0_name": "Tokelau (NZ)", "geometry_bbox": {"xmin": -172.52059936523438, "ymin": -9.443711280822754, "xmax": -171.1818389892578, "ymax": -8.532371520996094}}, {"adm0_src": "TKM", "adm0_name": "Turkmenistan", "geometry_bbox": {"xmin": 52.44707489013672, "ymin": 35.12908935546875, "xmax": 66.70735931396484, "ymax": 42.79826354980469}}, {"adm0_src": "TLS", "adm0_name": "Timor-Leste", "geometry_bbox": {"xmin": 124.0418701171875, "ymin": -9.50374984741211, "xmax": 127.34207916259766, "ymax": -8.126898765563965}}, {"adm0_src": "TON", "adm0_name": "Tonga", "geometry_bbox": {"xmin": -176.21824645996094, "ymin": -22.351076126098633, "xmax": -173.7369384765625, "ymax": -15.566133499145508}}, {"adm0_src": "TTO", "adm0_name": "Trinidad and Tobago", "geometry_bbox": {"xmin": -62.015445709228516, "ymin": 10.042815208435059, "xmax": -60.49269485473633, "ymax": 11.362544059753418}}, {"adm0_src": "TUN", "adm0_name": "Tunisia", "geometry_bbox": {"xmin": 7.522310256958008, "ymin": 30.2280330657959, "xmax": 11.599217414855957, "ymax": 37.56095504760742}}, {"adm0_src": "TUR", "adm0_name": "T\u00fcrkiye", "geometry_bbox": {"xmin": 25.66544532775879, "ymin": 35.81217575073242, "xmax": 44.81776809692383, "ymax": 42.104896545410156}}, {"adm0_src": "TUV", "adm0_name": "Tuvalu", "geometry_bbox": {"xmin": 176.05911254882812, "ymin": -10.79163646697998, "xmax": 179.87112426757812, "ymax": -5.642288684844971}}, {"adm0_src": "TWN", "adm0_name": "Taiwan", "geometry_bbox": {"xmin": 116.71015930175781, "ymin": 20.697147369384766, "xmax": 122.10916137695312, "ymax": 26.385164260864258}}, {"adm0_src": "TZA", "adm0_name": "United Republic of Tanzania", "geometry_bbox": {"xmin": 29.339996337890625, "ymin": -11.761255264282227, "xmax": 40.44540023803711, "ymax": -0.9843969941139221}}, {"adm0_src": "UGA", "adm0_name": "Uganda", "geometry_bbox": {"xmin": 29.573766708374023, "ymin": -1.4821193218231201, "xmax": 35.03199005126953, "ymax": 4.224449634552002}}, {"adm0_src": "UKR", "adm0_name": "Ukraine", "geometry_bbox": {"xmin": 22.137052536010742, "ymin": 44.38610076904297, "xmax": 40.22782516479492, "ymax": 52.379737854003906}}, {"adm0_src": "UMI_1", "adm0_name": "Baker Island (USA)", "geometry_bbox": {"xmin": -176.48687744140625, "ymin": 0.18989379703998566, "xmax": -176.47027587890625, "ymax": 0.20087930560112}}, {"adm0_src": "UMI_2", "adm0_name": "Howland Island (USA)", "geometry_bbox": {"xmin": -176.62368774414062, "ymin": 0.7963470816612244, "xmax": -176.61245727539062, "ymax": 0.8187372088432312}}, {"adm0_src": "UMI_3", "adm0_name": "Jarvis Island (USA)", "geometry_bbox": {"xmin": -160.01353454589844, "ymin": -0.380497545003891, "xmax": -159.9846649169922, "ymax": -0.36388489603996277}}, {"adm0_src": "UMI_4", "adm0_name": "Johnston Atoll (USA)", "geometry_bbox": {"xmin": -169.5478057861328, "ymin": 16.719606399536133, "xmax": -169.4855499267578, "ymax": 16.763124465942383}}, {"adm0_src": "UMI_5", "adm0_name": "Kingman Reef (USA)", "geometry_bbox": {"xmin": -162.3834228515625, "ymin": 6.383609771728516, "xmax": -162.3491973876953, "ymax": 6.404052257537842}}, {"adm0_src": "UMI_6", "adm0_name": "Midway Islands (USA)", "geometry_bbox": {"xmin": -177.423828125, "ymin": 28.19245719909668, "xmax": -177.31549072265625, "ymax": 28.269458770751953}}, {"adm0_src": "UMI_7", "adm0_name": "Palmyra Atoll (USA)", "geometry_bbox": {"xmin": -162.10848999023438, "ymin": 5.8697590827941895, "xmax": -162.04017639160156, "ymax": 5.893103122711182}}, {"adm0_src": "UMI_8", "adm0_name": "Wake Island (USA)", "geometry_bbox": {"xmin": 166.59902954101562, "ymin": 19.269981384277344, "xmax": 166.6573944091797, "ymax": 19.318683624267578}}, {"adm0_src": "UMI_9", "adm0_name": "Navassa Island (USA)", "geometry_bbox": {"xmin": -75.02970123291016, "ymin": 18.391069412231445, "xmax": -75.0019302368164, "ymax": 18.413982391357422}}, {"adm0_src": "URY", "adm0_name": "Uruguay", "geometry_bbox": {"xmin": -58.49136734008789, "ymin": -35.031578063964844, "xmax": -53.07557678222656, "ymax": -30.085426330566406}}, {"adm0_src": "USA", "adm0_name": "United States of America", "geometry_bbox": {"xmin": -179.14999389648438, "ymin": 18.91069221496582, "xmax": 179.7752227783203, "ymax": 71.38683319091797}}, {"adm0_src": "UZB", "adm0_name": "Uzbekistan", "geometry_bbox": {"xmin": 55.99821090698242, "ymin": 37.17266082763672, "xmax": 73.21893310546875, "ymax": 45.5900764465332}}, {"adm0_src": "VAT", "adm0_name": "Holy See", "geometry_bbox": {"xmin": 12.44573974609375, "ymin": 41.90019226074219, "xmax": 12.4583740234375, "ymax": 41.90743637084961}}, {"adm0_src": "VCT", "adm0_name": "Saint Vincent and the Grenadines", "geometry_bbox": {"xmin": -61.46092224121094, "ymin": 12.530350685119629, "xmax": -61.11482238769531, "ymax": 13.3831787109375}}, {"adm0_src": "VEN_1", "adm0_name": "Venezuela (Bolivarian Republic of)", "geometry_bbox": {"xmin": -73.3670425415039, "ymin": 0.6475289463996887, "xmax": -59.80550765991211, "ymax": 12.492252349853516}}, {"adm0_src": "VEN_2", "adm0_name": "Bird Island (Ven.)", "geometry_bbox": {"xmin": -63.62095642089844, "ymin": 15.666239738464355, "xmax": -63.61762237548828, "ymax": 15.672246932983398}}, {"adm0_src": "VGB", "adm0_name": "British Virgin Islands (UK)", "geometry_bbox": {"xmin": -64.8502426147461, "ymin": 18.30617332458496, "xmax": -64.2704086303711, "ymax": 18.74958038330078}}, {"adm0_src": "VIR", "adm0_name": "United States Virgin Islands (USA)", "geometry_bbox": {"xmin": -65.10154724121094, "ymin": 17.67446517944336, "xmax": -64.5648422241211, "ymax": 18.41556739807129}}, {"adm0_src": "VNM", "adm0_name": "Viet Nam", "geometry_bbox": {"xmin": 102.14391326904297, "ymin": 8.381065368652344, "xmax": 109.46829986572266, "ymax": 23.392650604248047}}, {"adm0_src": "VUT", "adm0_name": "Vanuatu", "geometry_bbox": {"xmin": 166.54177856445312, "ymin": -20.252479553222656, "xmax": 170.23826599121094, "ymax": -13.07270336151123}}, {"adm0_src": "WLF", "adm0_name": "Wallis and Futuna Islands (Fr.)", "geometry_bbox": {"xmin": -178.18177795410156, "ymin": -14.362186431884766, "xmax": -176.1248016357422, "ymax": -13.183243751525879}}, {"adm0_src": "WSM", "adm0_name": "Samoa", "geometry_bbox": {"xmin": -172.80409240722656, "ymin": -14.076445579528809, "xmax": -171.39837646484375, "ymax": -13.43880558013916}}, {"adm0_src": "XAB", "adm0_name": "Abyei", "geometry_bbox": {"xmin": 27.833330154418945, "ymin": 9.347219467163086, "xmax": 29.000001907348633, "ymax": 10.166667938232422}}, {"adm0_src": "XAC", "adm0_name": null, "geometry_bbox": {"xmin": 77.92323303222656, "ymin": 33.38691329956055, "xmax": 80.39049530029297, "ymax": 35.97343826293945}}, {"adm0_src": "XAP", "adm0_name": null, "geometry_bbox": {"xmin": 91.56229400634766, "ymin": 26.880266189575195, "xmax": 97.39537048339844, "ymax": 29.37481117248535}}, {"adm0_src": "XCE", "adm0_name": null, "geometry_bbox": {"xmin": 78.66561889648438, "ymin": 32.65640640258789, "xmax": 78.74598693847656, "ymax": 32.70969009399414}}, {"adm0_src": "XCH", "adm0_name": null, "geometry_bbox": {"xmin": 78.56925201416016, "ymin": 32.60041427612305, "xmax": 78.64108276367188, "ymax": 32.642337799072266}}, {"adm0_src": "XCR", "adm0_name": null, "geometry_bbox": {"xmin": 14.869158744812012, "ymin": -4.751716613769531, "xmax": 17.723670959472656, "ymax": -0.5047436952590942}}, {"adm0_src": "XDE", "adm0_name": null, "geometry_bbox": {"xmin": 79.14269256591797, "ymin": 32.51909255981445, "xmax": 79.56129455566406, "ymax": 33.23788833618164}}, {"adm0_src": "XDI", "adm0_name": null, "geometry_bbox": {"xmin": 43.139774322509766, "ymin": 12.711807250976562, "xmax": 43.158592224121094, "ymax": 12.721357345581055}}, {"adm0_src": "XDS", "adm0_name": null, "geometry_bbox": {"xmin": 89.0027084350586, "ymin": 27.507831573486328, "xmax": 89.16217803955078, "ymax": 27.616853713989258}}, {"adm0_src": "XHI", "adm0_name": null, "geometry_bbox": {"xmin": -66.4920425415039, "ymin": 80.82125091552734, "xmax": -66.4151611328125, "ymax": 80.83232116699219}}, {"adm0_src": "XHT", "adm0_name": null, "geometry_bbox": {"xmin": 34.08061981201172, "ymin": 22.0, "xmax": 36.894493103027344, "ymax": 23.17726707458496}}, {"adm0_src": "XIB", "adm0_name": null, "geometry_bbox": {"xmin": -57.64848709106445, "ymin": -30.1938419342041, "xmax": -57.604610443115234, "ymax": -30.1741886138916}}, {"adm0_src": "XIK", "adm0_name": null, "geometry_bbox": {"xmin": 27.144298553466797, "ymin": 37.046749114990234, "xmax": 27.151161193847656, "ymax": 37.0504035949707}}, {"adm0_src": "XIT", "adm0_name": null, "geometry_bbox": {"xmin": 34.37699890136719, "ymin": 4.617066860198975, "xmax": 35.5987663269043, "ymax": 5.033421039581299}}, {"adm0_src": "XJK", "adm0_name": "Jammu and Kashmir", "geometry_bbox": {"xmin": 72.51276397705078, "ymin": 32.275146484375, "xmax": 79.30585479736328, "ymax": 37.09141540527344}}, {"adm0_src": "XJL", "adm0_name": null, "geometry_bbox": {"xmin": 34.9556884765625, "ymin": 31.74436378479004, "xmax": 35.4958381652832, "ymax": 32.401668548583984}}, {"adm0_src": "XJN", "adm0_name": null, "geometry_bbox": {"xmin": 78.88255310058594, "ymin": 30.949344635009766, "xmax": 79.41726684570312, "ymax": 31.459016799926758}}, {"adm0_src": "XKA", "adm0_name": null, "geometry_bbox": {"xmin": 80.91691589355469, "ymin": 30.177040100097656, "xmax": 81.0451889038086, "ymax": 30.246685028076172}}, {"adm0_src": "XKI", "adm0_name": null, "geometry_bbox": {"xmin": 145.39865112304688, "ymin": 43.33906936645508, "xmax": 148.89503479003906, "ymax": 45.557559967041016}}, {"adm0_src": "XKO", "adm0_name": null, "geometry_bbox": {"xmin": 0.9166665077209473, "ymin": 10.999998092651367, "xmax": 0.9717310070991516, "ymax": 11.023107528686523}}, {"adm0_src": "XKT", "adm0_name": null, "geometry_bbox": {"xmin": 70.48609924316406, "ymin": 39.89764404296875, "xmax": 70.55905151367188, "ymax": 39.96610641479492}}, {"adm0_src": "XKU", "adm0_name": null, "geometry_bbox": {"xmin": 78.42835998535156, "ymin": 31.94768524169922, "xmax": 78.7796401977539, "ymax": 32.27595138549805}}, {"adm0_src": "XLB", "adm0_name": null, "geometry_bbox": {"xmin": 79.70057678222656, "ymin": 30.650110244750977, "xmax": 80.24930572509766, "ymax": 31.00580406188965}}, {"adm0_src": "XLE", "adm0_name": null, "geometry_bbox": {"xmin": 69.59615325927734, "ymin": 40.0838737487793, "xmax": 70.05533599853516, "ymax": 40.23261260986328}}, {"adm0_src": "XLR", "adm0_name": null, "geometry_bbox": {"xmin": 131.86134338378906, "ymin": 37.237937927246094, "xmax": 131.872802734375, "ymax": 37.24779510498047}}, {"adm0_src": "XMA", "adm0_name": null, "geometry_bbox": {"xmin": -67.10335540771484, "ymin": 44.49971389770508, "xmax": -67.08611297607422, "ymax": 44.538291931152344}}, {"adm0_src": "XMB", "adm0_name": null, "geometry_bbox": {"xmin": 6.858497142791748, "ymin": 45.824134826660156, "xmax": 6.8725361824035645, "ymax": 45.839481353759766}}, {"adm0_src": "XMR", "adm0_name": null, "geometry_bbox": {"xmin": 6.112285614013672, "ymin": 49.46921920776367, "xmax": 6.531200408935547, "ymax": 50.129878997802734}}, {"adm0_src": "XMS", "adm0_name": null, "geometry_bbox": {"xmin": 33.17240524291992, "ymin": 21.72488021850586, "xmax": 34.080623626708984, "ymax": 22.000011444091797}}, {"adm0_src": "XPI", "adm0_name": null, "geometry_bbox": {"xmin": 111.19369506835938, "ymin": 15.779891014099121, "xmax": 112.74036407470703, "ymax": 17.06621551513672}}, {"adm0_src": "XSI", "adm0_name": null, "geometry_bbox": {"xmin": 111.66413116455078, "ymin": 7.368255138397217, "xmax": 115.8232650756836, "ymax": 11.454944610595703}}, {"adm0_src": "XSK", "adm0_name": null, "geometry_bbox": {"xmin": 123.45779418945312, "ymin": 25.7203426361084, "xmax": 124.56109619140625, "ymax": 25.92914581298828}}, {"adm0_src": "XSP", "adm0_name": null, "geometry_bbox": {"xmin": 78.64961242675781, "ymin": 31.78059196472168, "xmax": 78.74940490722656, "ymax": 31.885372161865234}}, {"adm0_src": "XUK_1", "adm0_name": "Akrotiri (UK)", "geometry_bbox": {"xmin": 32.75489044189453, "ymin": 34.562400817871094, "xmax": 33.036380767822266, "ymax": 34.705867767333984}}, {"adm0_src": "XUK_2", "adm0_name": "Dekelia (UK)", "geometry_bbox": {"xmin": 33.673702239990234, "ymin": 34.942596435546875, "xmax": 33.91655731201172, "ymax": 35.12373352050781}}, {"adm0_src": "XVO", "adm0_name": null, "geometry_bbox": {"xmin": 70.49278259277344, "ymin": 39.86392593383789, "xmax": 70.53170776367188, "ymax": 39.89674377441406}}, {"adm0_src": "YEM", "adm0_name": "Yemen", "geometry_bbox": {"xmin": 41.81501007080078, "ymin": 12.108077049255371, "xmax": 54.536067962646484, "ymax": 18.9996337890625}}, {"adm0_src": "ZAF_1", "adm0_name": "South Africa", "geometry_bbox": {"xmin": 16.45404815673828, "ymin": -34.83354568481445, "xmax": 32.89115524291992, "ymax": -22.125423431396484}}, {"adm0_src": "ZAF_2", "adm0_name": "Prince Edward Islands (SA)", "geometry_bbox": {"xmin": 37.58110046386719, "ymin": -46.9819450378418, "xmax": 38.003318786621094, "ymax": -46.5993537902832}}, {"adm0_src": "ZMB", "adm0_name": "Zambia", "geometry_bbox": {"xmin": 21.999347686767578, "ymin": -18.077499389648438, "xmax": 33.70903396606445, "ymax": -8.203283309936523}}, {"adm0_src": "ZWE", "adm0_name": "Zimbabwe", "geometry_bbox": {"xmin": 25.237367630004883, "ymin": -22.422000885009766, "xmax": 33.0682373046875, "ymax": -15.609618186950684}}]
+[
+    {
+        "adm0_src": "ABW",
+        "adm0_name": "Aruba (Neth.)",
+        "geometry_bbox": {
+            "xmin": -70.0638427734375,
+            "ymin": 12.411824226379395,
+            "xmax": -69.86544799804688,
+            "ymax": 12.623372077941895
+        }
+    },
+    {
+        "adm0_src": "AFG",
+        "adm0_name": "Afghanistan",
+        "geometry_bbox": {
+            "xmin": 60.51759719848633,
+            "ymin": 29.377199172973633,
+            "xmax": 74.88986206054688,
+            "ymax": 38.4907341003418
+        }
+    },
+    {
+        "adm0_src": "AGO",
+        "adm0_name": "Angola",
+        "geometry_bbox": {
+            "xmin": 11.669419288635254,
+            "ymin": -18.039104461669922,
+            "xmax": 24.087888717651367,
+            "ymax": -4.388062953948975
+        }
+    },
+    {
+        "adm0_src": "AIA",
+        "adm0_name": "Anguilla (UK)",
+        "geometry_bbox": {
+            "xmin": -63.42933654785156,
+            "ymin": 18.149946212768555,
+            "xmax": -62.9227180480957,
+            "ymax": 18.595191955566406
+        }
+    },
+    {
+        "adm0_src": "ALA",
+        "adm0_name": "\u00c5land Islands (Fin.)",
+        "geometry_bbox": {
+            "xmin": 19.131023406982422,
+            "ymin": 59.50394058227539,
+            "xmax": 21.326650619506836,
+            "ymax": 60.665592193603516
+        }
+    },
+    {
+        "adm0_src": "ALB",
+        "adm0_name": "Albania",
+        "geometry_bbox": {
+            "xmin": 19.263973236083984,
+            "ymin": 39.64480972290039,
+            "xmax": 21.05728530883789,
+            "ymax": 42.66108703613281
+        }
+    },
+    {
+        "adm0_src": "AND",
+        "adm0_name": "Andorra",
+        "geometry_bbox": {
+            "xmin": 1.4135733842849731,
+            "ymin": 42.428741455078125,
+            "xmax": 1.7866939306259155,
+            "ymax": 42.655887603759766
+        }
+    },
+    {
+        "adm0_src": "ARE",
+        "adm0_name": "United Arab Emirates",
+        "geometry_bbox": {
+            "xmin": 51.49785614013672,
+            "ymin": 22.631479263305664,
+            "xmax": 56.38323211669922,
+            "ymax": 26.069395065307617
+        }
+    },
+    {
+        "adm0_src": "ARG",
+        "adm0_name": "Argentina",
+        "geometry_bbox": {
+            "xmin": -73.56036376953125,
+            "ymin": -55.061431884765625,
+            "xmax": -53.63736343383789,
+            "ymax": -21.78104591369629
+        }
+    },
+    {
+        "adm0_src": "ARM",
+        "adm0_name": "Armenia",
+        "geometry_bbox": {
+            "xmin": 43.447410583496094,
+            "ymin": 38.840240478515625,
+            "xmax": 46.63434982299805,
+            "ymax": 41.301151275634766
+        }
+    },
+    {
+        "adm0_src": "ASM",
+        "adm0_name": "American Samoa (USA)",
+        "geometry_bbox": {
+            "xmin": -171.0899200439453,
+            "ymin": -14.548662185668945,
+            "xmax": -168.1432647705078,
+            "ymax": -11.047811508178711
+        }
+    },
+    {
+        "adm0_src": "ATA",
+        "adm0_name": "Antarctica",
+        "geometry_bbox": {
+            "xmin": -180.0,
+            "ymin": -90.0,
+            "xmax": 180.0,
+            "ymax": -60.35515213012695
+        }
+    },
+    {
+        "adm0_src": "ATF_1",
+        "adm0_name": "Kerguelen Islands (Fr.)",
+        "geometry_bbox": {
+            "xmin": 68.12388610839844,
+            "ymin": -50.018592834472656,
+            "xmax": 70.55717468261719,
+            "ymax": -48.45172882080078
+        }
+    },
+    {
+        "adm0_src": "ATF_2",
+        "adm0_name": "Crozet Archipelago (Fr.)",
+        "geometry_bbox": {
+            "xmin": 50.16497802734375,
+            "ymin": -46.47996139526367,
+            "xmax": 52.328224182128906,
+            "ymax": -45.937255859375
+        }
+    },
+    {
+        "adm0_src": "ATF_3",
+        "adm0_name": "Saint Paul and Amsterdam Islands (Fr.)",
+        "geometry_bbox": {
+            "xmin": 77.50456237792969,
+            "ymin": -38.73915481567383,
+            "xmax": 77.5970687866211,
+            "ymax": -37.792476654052734
+        }
+    },
+    {
+        "adm0_src": "ATF_4",
+        "adm0_name": "Bassas da India (Fr.)",
+        "geometry_bbox": {
+            "xmin": 39.63985061645508,
+            "ymin": -21.479082107543945,
+            "xmax": 39.73873519897461,
+            "ymax": -21.456228256225586
+        }
+    },
+    {
+        "adm0_src": "ATF_5",
+        "adm0_name": "Europa Island (Fr.)",
+        "geometry_bbox": {
+            "xmin": 40.329002380371094,
+            "ymin": -22.398765563964844,
+            "xmax": 40.39913558959961,
+            "ymax": -22.336030960083008
+        }
+    },
+    {
+        "adm0_src": "ATF_6",
+        "adm0_name": "Glorioso Islands (Fr.)",
+        "geometry_bbox": {
+            "xmin": 47.28472137451172,
+            "ymin": -11.593549728393555,
+            "xmax": 47.38127899169922,
+            "ymax": -11.514459609985352
+        }
+    },
+    {
+        "adm0_src": "ATF_7",
+        "adm0_name": "Juan de Nova Island (Fr.)",
+        "geometry_bbox": {
+            "xmin": 42.698795318603516,
+            "ymin": -17.064077377319336,
+            "xmax": 42.75013732910156,
+            "ymax": -17.045547485351562
+        }
+    },
+    {
+        "adm0_src": "ATF_8",
+        "adm0_name": "Tromelin Island (Fr.)",
+        "geometry_bbox": {
+            "xmin": 54.51769256591797,
+            "ymin": -15.897546768188477,
+            "xmax": 54.528480529785156,
+            "ymax": -15.885112762451172
+        }
+    },
+    {
+        "adm0_src": "ATG",
+        "adm0_name": "Antigua and Barbuda",
+        "geometry_bbox": {
+            "xmin": -62.348236083984375,
+            "ymin": 16.932294845581055,
+            "xmax": -61.657127380371094,
+            "ymax": 17.729110717773438
+        }
+    },
+    {
+        "adm0_src": "AUS_1",
+        "adm0_name": "Australia",
+        "geometry_bbox": {
+            "xmin": 112.9209976196289,
+            "ymin": -55.11579132080078,
+            "xmax": 159.28146362304688,
+            "ymax": -9.140691757202148
+        }
+    },
+    {
+        "adm0_src": "AUS_2",
+        "adm0_name": "Ashmore & Cartier Islands (Aust.)",
+        "geometry_bbox": {
+            "xmin": 122.96186065673828,
+            "ymin": -12.531357765197754,
+            "xmax": 123.55748748779297,
+            "ymax": -12.240156173706055
+        }
+    },
+    {
+        "adm0_src": "AUS_3",
+        "adm0_name": "Coral Sea Islands (Aust.)",
+        "geometry_bbox": {
+            "xmin": 148.44561767578125,
+            "ymin": -23.252361297607422,
+            "xmax": 155.8713836669922,
+            "ymax": -16.11193084716797
+        }
+    },
+    {
+        "adm0_src": "AUT",
+        "adm0_name": "Austria",
+        "geometry_bbox": {
+            "xmin": 9.530734062194824,
+            "ymin": 46.37230682373047,
+            "xmax": 17.160776138305664,
+            "ymax": 49.020530700683594
+        }
+    },
+    {
+        "adm0_src": "AZE",
+        "adm0_name": "Azerbaijan",
+        "geometry_bbox": {
+            "xmin": 44.7633056640625,
+            "ymin": 38.392215728759766,
+            "xmax": 50.88005065917969,
+            "ymax": 41.91234588623047
+        }
+    },
+    {
+        "adm0_src": "BDI",
+        "adm0_name": "Burundi",
+        "geometry_bbox": {
+            "xmin": 29.000965118408203,
+            "ymin": -4.469329357147217,
+            "xmax": 30.84954071044922,
+            "ymax": -2.309729814529419
+        }
+    },
+    {
+        "adm0_src": "BEL",
+        "adm0_name": "Belgium",
+        "geometry_bbox": {
+            "xmin": 2.4945428371429443,
+            "ymin": 49.496944427490234,
+            "xmax": 6.40805721282959,
+            "ymax": 51.528968811035156
+        }
+    },
+    {
+        "adm0_src": "BEN",
+        "adm0_name": "Benin",
+        "geometry_bbox": {
+            "xmin": 0.7754122018814087,
+            "ymin": 6.23518705368042,
+            "xmax": 3.8430631160736084,
+            "ymax": 12.408611297607422
+        }
+    },
+    {
+        "adm0_src": "BES_1",
+        "adm0_name": "Bonaire (Neth.)",
+        "geometry_bbox": {
+            "xmin": -68.42095184326172,
+            "ymin": 12.024734497070312,
+            "xmax": -68.19546508789062,
+            "ymax": 12.312167167663574
+        }
+    },
+    {
+        "adm0_src": "BES_2",
+        "adm0_name": "Sint Eustatius (Neth.)",
+        "geometry_bbox": {
+            "xmin": -63.003143310546875,
+            "ymin": 17.464576721191406,
+            "xmax": -62.94590377807617,
+            "ymax": 17.526046752929688
+        }
+    },
+    {
+        "adm0_src": "BES_3",
+        "adm0_name": "Saba (Neth.)",
+        "geometry_bbox": {
+            "xmin": -63.25846481323242,
+            "ymin": 17.614255905151367,
+            "xmax": -63.21468734741211,
+            "ymax": 17.650270462036133
+        }
+    },
+    {
+        "adm0_src": "BFA",
+        "adm0_name": "Burkina Faso",
+        "geometry_bbox": {
+            "xmin": -5.513241767883301,
+            "ymin": 9.410470962524414,
+            "xmax": 2.404359817504883,
+            "ymax": 15.084033966064453
+        }
+    },
+    {
+        "adm0_src": "BGD",
+        "adm0_name": "Bangladesh",
+        "geometry_bbox": {
+            "xmin": 88.00861358642578,
+            "ymin": 20.575883865356445,
+            "xmax": 92.68013000488281,
+            "ymax": 26.6339168548584
+        }
+    },
+    {
+        "adm0_src": "BGR",
+        "adm0_name": "Bulgaria",
+        "geometry_bbox": {
+            "xmin": 22.35715675354004,
+            "ymin": 41.2353401184082,
+            "xmax": 28.609256744384766,
+            "ymax": 44.21548080444336
+        }
+    },
+    {
+        "adm0_src": "BHR",
+        "adm0_name": "Bahrain",
+        "geometry_bbox": {
+            "xmin": 50.3101692199707,
+            "ymin": 25.569286346435547,
+            "xmax": 50.901790618896484,
+            "ymax": 26.487382888793945
+        }
+    },
+    {
+        "adm0_src": "BHS",
+        "adm0_name": "Bahamas",
+        "geometry_bbox": {
+            "xmin": -80.47624206542969,
+            "ymin": 20.912939071655273,
+            "xmax": -72.71240997314453,
+            "ymax": 27.272903442382812
+        }
+    },
+    {
+        "adm0_src": "BIH",
+        "adm0_name": "Bosnia and Herzegovina",
+        "geometry_bbox": {
+            "xmin": 15.728730201721191,
+            "ymin": 42.55547332763672,
+            "xmax": 19.62370491027832,
+            "ymax": 45.276546478271484
+        }
+    },
+    {
+        "adm0_src": "BLM",
+        "adm0_name": "Saint Barth\u00e9lemy (Fr.)",
+        "geometry_bbox": {
+            "xmin": -62.95111846923828,
+            "ymin": 17.87078285217285,
+            "xmax": -62.78902053833008,
+            "ymax": 17.974103927612305
+        }
+    },
+    {
+        "adm0_src": "BLR",
+        "adm0_name": "Belarus",
+        "geometry_bbox": {
+            "xmin": 23.17833709716797,
+            "ymin": 51.26219177246094,
+            "xmax": 32.776885986328125,
+            "ymax": 56.17222595214844
+        }
+    },
+    {
+        "adm0_src": "BLZ",
+        "adm0_name": "Belize",
+        "geometry_bbox": {
+            "xmin": -89.22760009765625,
+            "ymin": 15.88561725616455,
+            "xmax": -87.486083984375,
+            "ymax": 18.49594497680664
+        }
+    },
+    {
+        "adm0_src": "BMU",
+        "adm0_name": "Bermuda (UK)",
+        "geometry_bbox": {
+            "xmin": -64.88751983642578,
+            "ymin": 32.24325180053711,
+            "xmax": -64.64643096923828,
+            "ymax": 32.3909912109375
+        }
+    },
+    {
+        "adm0_src": "BOL",
+        "adm0_name": "Bolivia (Plurinational State of)",
+        "geometry_bbox": {
+            "xmin": -69.64494323730469,
+            "ymin": -22.89809226989746,
+            "xmax": -57.449798583984375,
+            "ymax": -9.668649673461914
+        }
+    },
+    {
+        "adm0_src": "BRA",
+        "adm0_name": "Brazil",
+        "geometry_bbox": {
+            "xmin": -73.98318481445312,
+            "ymin": -33.751094818115234,
+            "xmax": -28.847637176513672,
+            "ymax": 5.271787166595459
+        }
+    },
+    {
+        "adm0_src": "BRB",
+        "adm0_name": "Barbados",
+        "geometry_bbox": {
+            "xmin": -59.650840759277344,
+            "ymin": 13.04471206665039,
+            "xmax": -59.42011260986328,
+            "ymax": 13.33517074584961
+        }
+    },
+    {
+        "adm0_src": "BRN",
+        "adm0_name": "Brunei Darussalam",
+        "geometry_bbox": {
+            "xmin": 114.07591247558594,
+            "ymin": 4.002643585205078,
+            "xmax": 115.36468505859375,
+            "ymax": 5.078883171081543
+        }
+    },
+    {
+        "adm0_src": "BTN",
+        "adm0_name": "Bhutan",
+        "geometry_bbox": {
+            "xmin": 88.74552154541016,
+            "ymin": 26.7020206451416,
+            "xmax": 92.125244140625,
+            "ymax": 28.246990203857422
+        }
+    },
+    {
+        "adm0_src": "BVT",
+        "adm0_name": "Bouvet Island (Nor.)",
+        "geometry_bbox": {
+            "xmin": 3.280628204345703,
+            "ymin": -54.45417404174805,
+            "xmax": 3.433380603790283,
+            "ymax": -54.38691711425781
+        }
+    },
+    {
+        "adm0_src": "BWA",
+        "adm0_name": "Botswana",
+        "geometry_bbox": {
+            "xmin": 19.9989013671875,
+            "ymin": -26.90754508972168,
+            "xmax": 29.375307083129883,
+            "ymax": -17.778135299682617
+        }
+    },
+    {
+        "adm0_src": "CAF",
+        "adm0_name": "Central African Republic",
+        "geometry_bbox": {
+            "xmin": 14.415096282958984,
+            "ymin": 2.223052978515625,
+            "xmax": 27.45830535888672,
+            "ymax": 11.017958641052246
+        }
+    },
+    {
+        "adm0_src": "CAN",
+        "adm0_name": "Canada",
+        "geometry_bbox": {
+            "xmin": -141.00186157226562,
+            "ymin": 41.67656707763672,
+            "xmax": -52.61936569213867,
+            "ymax": 83.13709259033203
+        }
+    },
+    {
+        "adm0_src": "CCK",
+        "adm0_name": "Cocos (Keeling) Islands (Aust.)",
+        "geometry_bbox": {
+            "xmin": 96.81685638427734,
+            "ymin": -12.20886516571045,
+            "xmax": 96.92962646484375,
+            "ymax": -11.822476387023926
+        }
+    },
+    {
+        "adm0_src": "CHE",
+        "adm0_name": "Switzerland",
+        "geometry_bbox": {
+            "xmin": 5.955896854400635,
+            "ymin": 45.81795120239258,
+            "xmax": 10.492172241210938,
+            "ymax": 47.8084602355957
+        }
+    },
+    {
+        "adm0_src": "CHL",
+        "adm0_name": "Chile",
+        "geometry_bbox": {
+            "xmin": -109.45487976074219,
+            "ymin": -56.538299560546875,
+            "xmax": -66.41598510742188,
+            "ymax": -17.498342514038086
+        }
+    },
+    {
+        "adm0_src": "CHN",
+        "adm0_name": "China",
+        "geometry_bbox": {
+            "xmin": 73.49925994873047,
+            "ymin": 18.159196853637695,
+            "xmax": 134.7754669189453,
+            "ymax": 53.56097412109375
+        }
+    },
+    {
+        "adm0_src": "CIV",
+        "adm0_name": "C\u00f4te d'Ivoire",
+        "geometry_bbox": {
+            "xmin": -8.602059364318848,
+            "ymin": 4.36121940612793,
+            "xmax": -2.4930307865142822,
+            "ymax": 10.741095542907715
+        }
+    },
+    {
+        "adm0_src": "CMR",
+        "adm0_name": "Cameroon",
+        "geometry_bbox": {
+            "xmin": 8.49866771697998,
+            "ymin": 1.6558997631072998,
+            "xmax": 16.194408416748047,
+            "ymax": 13.083335876464844
+        }
+    },
+    {
+        "adm0_src": "COD",
+        "adm0_name": "Democratic Republic of the Congo",
+        "geometry_bbox": {
+            "xmin": 12.202476501464844,
+            "ymin": -13.459036827087402,
+            "xmax": 31.31461524963379,
+            "ymax": 5.392003059387207
+        }
+    },
+    {
+        "adm0_src": "COG",
+        "adm0_name": "Congo",
+        "geometry_bbox": {
+            "xmin": 11.153038024902344,
+            "ymin": -5.040242671966553,
+            "xmax": 18.650423049926758,
+            "ymax": 3.7077910900115967
+        }
+    },
+    {
+        "adm0_src": "COK",
+        "adm0_name": "Cook Islands (NZ)",
+        "geometry_bbox": {
+            "xmin": -165.92491149902344,
+            "ymin": -21.959211349487305,
+            "xmax": -157.3214874267578,
+            "ymax": -8.91666030883789
+        }
+    },
+    {
+        "adm0_src": "COL",
+        "adm0_name": "Colombia",
+        "geometry_bbox": {
+            "xmin": -81.84131622314453,
+            "ymin": -4.227110385894775,
+            "xmax": -66.84630584716797,
+            "ymax": 15.886398315429688
+        }
+    },
+    {
+        "adm0_src": "COM",
+        "adm0_name": "Comoros",
+        "geometry_bbox": {
+            "xmin": 43.228736877441406,
+            "ymin": -12.422616958618164,
+            "xmax": 44.54064178466797,
+            "ymax": -11.365527153015137
+        }
+    },
+    {
+        "adm0_src": "CPT",
+        "adm0_name": "Clipperton Island (Fr.)",
+        "geometry_bbox": {
+            "xmin": -109.234619140625,
+            "ymin": 10.287152290344238,
+            "xmax": -109.19977569580078,
+            "ymax": 10.319571495056152
+        }
+    },
+    {
+        "adm0_src": "CPV",
+        "adm0_name": "Cabo Verde",
+        "geometry_bbox": {
+            "xmin": -25.36094856262207,
+            "ymin": 14.803215026855469,
+            "xmax": -22.65821075439453,
+            "ymax": 17.205310821533203
+        }
+    },
+    {
+        "adm0_src": "CRI",
+        "adm0_name": "Costa Rica",
+        "geometry_bbox": {
+            "xmin": -87.10199737548828,
+            "ymin": 5.499159336090088,
+            "xmax": -82.55134582519531,
+            "ymax": 11.219682693481445
+        }
+    },
+    {
+        "adm0_src": "CUB",
+        "adm0_name": "Cuba",
+        "geometry_bbox": {
+            "xmin": -84.95209503173828,
+            "ymin": 19.826427459716797,
+            "xmax": -74.13166809082031,
+            "ymax": 23.276823043823242
+        }
+    },
+    {
+        "adm0_src": "CUW",
+        "adm0_name": "Cura\u00e7ao (Neth.)",
+        "geometry_bbox": {
+            "xmin": -69.1626968383789,
+            "ymin": 11.978303909301758,
+            "xmax": -68.6397705078125,
+            "ymax": 12.392730712890625
+        }
+    },
+    {
+        "adm0_src": "CXR",
+        "adm0_name": "Christmas Island (Aust.)",
+        "geometry_bbox": {
+            "xmin": 105.5334243774414,
+            "ymin": -10.570083618164062,
+            "xmax": 105.71302795410156,
+            "ymax": -10.41230297088623
+        }
+    },
+    {
+        "adm0_src": "CYM",
+        "adm0_name": "Cayman Islands (UK)",
+        "geometry_bbox": {
+            "xmin": -81.42021179199219,
+            "ymin": 19.26287269592285,
+            "xmax": -79.72290802001953,
+            "ymax": 19.75695037841797
+        }
+    },
+    {
+        "adm0_src": "CYP",
+        "adm0_name": "Cyprus",
+        "geometry_bbox": {
+            "xmin": 32.26921081542969,
+            "ymin": 34.63238525390625,
+            "xmax": 34.60721969604492,
+            "ymax": 35.71089553833008
+        }
+    },
+    {
+        "adm0_src": "CZE",
+        "adm0_name": "Czechia",
+        "geometry_bbox": {
+            "xmin": 12.090569496154785,
+            "ymin": 48.55180740356445,
+            "xmax": 18.8592586517334,
+            "ymax": 51.05570602416992
+        }
+    },
+    {
+        "adm0_src": "DEU",
+        "adm0_name": "Germany",
+        "geometry_bbox": {
+            "xmin": 5.866313934326172,
+            "ymin": 47.27010726928711,
+            "xmax": 15.041834831237793,
+            "ymax": 55.05866241455078
+        }
+    },
+    {
+        "adm0_src": "DJI",
+        "adm0_name": "Djibouti",
+        "geometry_bbox": {
+            "xmin": 41.77083969116211,
+            "ymin": 10.912951469421387,
+            "xmax": 43.45305633544922,
+            "ymax": 12.71362590789795
+        }
+    },
+    {
+        "adm0_src": "DMA",
+        "adm0_name": "Dominica",
+        "geometry_bbox": {
+            "xmin": -61.48011779785156,
+            "ymin": 15.207630157470703,
+            "xmax": -61.24008560180664,
+            "ymax": 15.64077377319336
+        }
+    },
+    {
+        "adm0_src": "DNK",
+        "adm0_name": "Denmark",
+        "geometry_bbox": {
+            "xmin": 8.074393272399902,
+            "ymin": 54.55906295776367,
+            "xmax": 15.197376251220703,
+            "ymax": 57.75223922729492
+        }
+    },
+    {
+        "adm0_src": "DOM",
+        "adm0_name": "Dominican Republic",
+        "geometry_bbox": {
+            "xmin": -72.00751495361328,
+            "ymin": 17.4705810546875,
+            "xmax": -68.32290649414062,
+            "ymax": 19.932050704956055
+        }
+    },
+    {
+        "adm0_src": "DZA",
+        "adm0_name": "Algeria",
+        "geometry_bbox": {
+            "xmin": -8.667612075805664,
+            "ymin": 18.9681453704834,
+            "xmax": 11.998501777648926,
+            "ymax": 37.09466552734375
+        }
+    },
+    {
+        "adm0_src": "ECU",
+        "adm0_name": "Ecuador",
+        "geometry_bbox": {
+            "xmin": -92.00919342041016,
+            "ymin": -5.016158103942871,
+            "xmax": -75.1871337890625,
+            "ymax": 1.6814017295837402
+        }
+    },
+    {
+        "adm0_src": "EGY",
+        "adm0_name": "Egypt",
+        "geometry_bbox": {
+            "xmin": 24.6967716217041,
+            "ymin": 22.0,
+            "xmax": 36.248348236083984,
+            "ymax": 31.670913696289062
+        }
+    },
+    {
+        "adm0_src": "ERI",
+        "adm0_name": "Eritrea",
+        "geometry_bbox": {
+            "xmin": 36.43334197998047,
+            "ymin": 12.35472297668457,
+            "xmax": 43.13694763183594,
+            "ymax": 18.020307540893555
+        }
+    },
+    {
+        "adm0_src": "ESH",
+        "adm0_name": "Western Sahara",
+        "geometry_bbox": {
+            "xmin": -17.104629516601562,
+            "ymin": 20.769948959350586,
+            "xmax": -8.667524337768555,
+            "ymax": 27.667272567749023
+        }
+    },
+    {
+        "adm0_src": "ESP_1",
+        "adm0_name": "Spain",
+        "geometry_bbox": {
+            "xmin": -9.30153751373291,
+            "ymin": 35.93763732910156,
+            "xmax": 4.328026294708252,
+            "ymax": 43.790428161621094
+        }
+    },
+    {
+        "adm0_src": "ESP_2",
+        "adm0_name": "Canary Islands (Sp.)",
+        "geometry_bbox": {
+            "xmin": -18.161182403564453,
+            "ymin": 27.63773536682129,
+            "xmax": -13.332014083862305,
+            "ymax": 29.416065216064453
+        }
+    },
+    {
+        "adm0_src": "ESP_3",
+        "adm0_name": "Plazas de soberan\u00eda (Sp.)",
+        "geometry_bbox": {
+            "xmin": -5.421949863433838,
+            "ymin": 35.170814514160156,
+            "xmax": -2.4186902046203613,
+            "ymax": 35.91800308227539
+        }
+    },
+    {
+        "adm0_src": "EST",
+        "adm0_name": "Estonia",
+        "geometry_bbox": {
+            "xmin": 21.76430892944336,
+            "ymin": 57.50931167602539,
+            "xmax": 28.21002960205078,
+            "ymax": 59.822017669677734
+        }
+    },
+    {
+        "adm0_src": "ETH",
+        "adm0_name": "Ethiopia",
+        "geometry_bbox": {
+            "xmin": 32.99773025512695,
+            "ymin": 3.404136896133423,
+            "xmax": 48.00105667114258,
+            "ymax": 14.89421558380127
+        }
+    },
+    {
+        "adm0_src": "FIN",
+        "adm0_name": "Finland",
+        "geometry_bbox": {
+            "xmin": 20.548633575439453,
+            "ymin": 59.67560958862305,
+            "xmax": 31.58670425415039,
+            "ymax": 70.09230041503906
+        }
+    },
+    {
+        "adm0_src": "FJI",
+        "adm0_name": "Fiji",
+        "geometry_bbox": {
+            "xmin": -180.0,
+            "ymin": -21.736711502075195,
+            "xmax": 180.0,
+            "ymax": -12.461886405944824
+        }
+    },
+    {
+        "adm0_src": "FLK",
+        "adm0_name": "Falkland Islands (Malvinas)",
+        "geometry_bbox": {
+            "xmin": -61.458194732666016,
+            "ymin": -52.91911697387695,
+            "xmax": -57.68733596801758,
+            "ymax": -50.996639251708984
+        }
+    },
+    {
+        "adm0_src": "FRA",
+        "adm0_name": "France",
+        "geometry_bbox": {
+            "xmin": -5.151034832000732,
+            "ymin": 41.33319091796875,
+            "xmax": 9.560012817382812,
+            "ymax": 51.08899688720703
+        }
+    },
+    {
+        "adm0_src": "FRO",
+        "adm0_name": "Faroe Islands (Den.)",
+        "geometry_bbox": {
+            "xmin": -7.691868305206299,
+            "ymin": 61.33790588378906,
+            "xmax": -6.253578186035156,
+            "ymax": 62.39430618286133
+        }
+    },
+    {
+        "adm0_src": "FSM",
+        "adm0_name": "Micronesia (Federated States of)",
+        "geometry_bbox": {
+            "xmin": 137.42373657226562,
+            "ymin": 1.026230812072754,
+            "xmax": 163.03564453125,
+            "ymax": 10.090381622314453
+        }
+    },
+    {
+        "adm0_src": "GAB",
+        "adm0_name": "Gabon",
+        "geometry_bbox": {
+            "xmin": 8.563959121704102,
+            "ymin": -3.9603214263916016,
+            "xmax": 14.526923179626465,
+            "ymax": 2.3181090354919434
+        }
+    },
+    {
+        "adm0_src": "GBR",
+        "adm0_name": "United Kingdom of Great Britain and Northern Ireland",
+        "geometry_bbox": {
+            "xmin": -13.687582015991211,
+            "ymin": 49.86328887939453,
+            "xmax": 1.763219952583313,
+            "ymax": 60.86077880859375
+        }
+    },
+    {
+        "adm0_src": "GEO",
+        "adm0_name": "Georgia",
+        "geometry_bbox": {
+            "xmin": 40.0066032409668,
+            "ymin": 41.055152893066406,
+            "xmax": 46.73677444458008,
+            "ymax": 43.58662796020508
+        }
+    },
+    {
+        "adm0_src": "GGY",
+        "adm0_name": "Guernsey (UK)",
+        "geometry_bbox": {
+            "xmin": -2.676144599914551,
+            "ymin": 49.40005111694336,
+            "xmax": -2.1563522815704346,
+            "ymax": 49.7377815246582
+        }
+    },
+    {
+        "adm0_src": "GHA",
+        "adm0_name": "Ghana",
+        "geometry_bbox": {
+            "xmin": -3.2607860565185547,
+            "ymin": 4.739342212677002,
+            "xmax": 1.1996426582336426,
+            "ymax": 11.174954414367676
+        }
+    },
+    {
+        "adm0_src": "GIB",
+        "adm0_name": "Gibraltar (UK)",
+        "geometry_bbox": {
+            "xmin": -5.367415904998779,
+            "ymin": 36.108848571777344,
+            "xmax": -5.33764123916626,
+            "ymax": 36.155033111572266
+        }
+    },
+    {
+        "adm0_src": "GIN",
+        "adm0_name": "Guinea",
+        "geometry_bbox": {
+            "xmin": -15.366719245910645,
+            "ymin": 7.190603733062744,
+            "xmax": -7.637852191925049,
+            "ymax": 12.6748628616333
+        }
+    },
+    {
+        "adm0_src": "GLP",
+        "adm0_name": "Guadeloupe (Fr.)",
+        "geometry_bbox": {
+            "xmin": -61.80976486206055,
+            "ymin": 15.831974029541016,
+            "xmax": -61.00129699707031,
+            "ymax": 16.514480590820312
+        }
+    },
+    {
+        "adm0_src": "GMB",
+        "adm0_name": "Gambia",
+        "geometry_bbox": {
+            "xmin": -16.82387924194336,
+            "ymin": 13.063915252685547,
+            "xmax": -13.79237174987793,
+            "ymax": 13.82550048828125
+        }
+    },
+    {
+        "adm0_src": "GNB",
+        "adm0_name": "Guinea-Bissau",
+        "geometry_bbox": {
+            "xmin": -16.715381622314453,
+            "ymin": 10.864463806152344,
+            "xmax": -13.626521110534668,
+            "ymax": 12.686948776245117
+        }
+    },
+    {
+        "adm0_src": "GNQ",
+        "adm0_name": "Equatorial Guinea",
+        "geometry_bbox": {
+            "xmin": 5.616768836975098,
+            "ymin": -1.4886795282363892,
+            "xmax": 11.333301544189453,
+            "ymax": 3.7882351875305176
+        }
+    },
+    {
+        "adm0_src": "GRC",
+        "adm0_name": "Greece",
+        "geometry_bbox": {
+            "xmin": 19.372962951660156,
+            "ymin": 34.8008918762207,
+            "xmax": 28.247629165649414,
+            "ymax": 41.75025177001953
+        }
+    },
+    {
+        "adm0_src": "GRD",
+        "adm0_name": "Grenada",
+        "geometry_bbox": {
+            "xmin": -61.802459716796875,
+            "ymin": 11.984901428222656,
+            "xmax": -61.3781623840332,
+            "ymax": 12.530118942260742
+        }
+    },
+    {
+        "adm0_src": "GRL",
+        "adm0_name": "Greenland (Den.)",
+        "geometry_bbox": {
+            "xmin": -73.25300598144531,
+            "ymin": 59.71495056152344,
+            "xmax": -11.35110855102539,
+            "ymax": 83.66511535644531
+        }
+    },
+    {
+        "adm0_src": "GTM",
+        "adm0_name": "Guatemala",
+        "geometry_bbox": {
+            "xmin": -92.23210144042969,
+            "ymin": 13.740020751953125,
+            "xmax": -88.2330551147461,
+            "ymax": 17.815696716308594
+        }
+    },
+    {
+        "adm0_src": "GUF",
+        "adm0_name": "French Guiana (Fr.)",
+        "geometry_bbox": {
+            "xmin": -54.60323715209961,
+            "ymin": 2.1110732555389404,
+            "xmax": -51.614501953125,
+            "ymax": 5.776949882507324
+        }
+    },
+    {
+        "adm0_src": "GUM",
+        "adm0_name": "Guam (USA)",
+        "geometry_bbox": {
+            "xmin": 144.6181182861328,
+            "ymin": 13.234110832214355,
+            "xmax": 144.95697021484375,
+            "ymax": 13.654382705688477
+        }
+    },
+    {
+        "adm0_src": "GUY",
+        "adm0_name": "Guyana",
+        "geometry_bbox": {
+            "xmin": -61.41077423095703,
+            "ymin": 1.1693055629730225,
+            "xmax": -56.491119384765625,
+            "ymax": 8.546156883239746
+        }
+    },
+    {
+        "adm0_src": "HKG",
+        "adm0_name": "China, Hong Kong SAR",
+        "geometry_bbox": {
+            "xmin": 113.83009338378906,
+            "ymin": 22.153348922729492,
+            "xmax": 114.44176483154297,
+            "ymax": 22.561948776245117
+        }
+    },
+    {
+        "adm0_src": "HMD",
+        "adm0_name": "Heard Island and McDonald Islands (Aust.)",
+        "geometry_bbox": {
+            "xmin": 72.5781021118164,
+            "ymin": -53.19491195678711,
+            "xmax": 73.87675476074219,
+            "ymax": -52.902740478515625
+        }
+    },
+    {
+        "adm0_src": "HND",
+        "adm0_name": "Honduras",
+        "geometry_bbox": {
+            "xmin": -89.35648345947266,
+            "ymin": 12.980818748474121,
+            "xmax": -82.40740966796875,
+            "ymax": 17.417705535888672
+        }
+    },
+    {
+        "adm0_src": "HRV",
+        "adm0_name": "Croatia",
+        "geometry_bbox": {
+            "xmin": 13.489900588989258,
+            "ymin": 42.37782669067383,
+            "xmax": 19.447372436523438,
+            "ymax": 46.55502700805664
+        }
+    },
+    {
+        "adm0_src": "HTI",
+        "adm0_name": "Haiti",
+        "geometry_bbox": {
+            "xmin": -74.4809341430664,
+            "ymin": 18.02176284790039,
+            "xmax": -71.62174224853516,
+            "ymax": 20.08962631225586
+        }
+    },
+    {
+        "adm0_src": "HUN",
+        "adm0_name": "Hungary",
+        "geometry_bbox": {
+            "xmin": 16.11386489868164,
+            "ymin": 45.7370719909668,
+            "xmax": 22.89679527282715,
+            "ymax": 48.58525085449219
+        }
+    },
+    {
+        "adm0_src": "IDN",
+        "adm0_name": "Indonesia",
+        "geometry_bbox": {
+            "xmin": 94.971923828125,
+            "ymin": -11.007671356201172,
+            "xmax": 141.02215576171875,
+            "ymax": 6.076744079589844
+        }
+    },
+    {
+        "adm0_src": "IMN",
+        "adm0_name": "Isle of Man (UK)",
+        "geometry_bbox": {
+            "xmin": -4.838066577911377,
+            "ymin": 54.03776550292969,
+            "xmax": -4.307835102081299,
+            "ymax": 54.41799545288086
+        }
+    },
+    {
+        "adm0_src": "IND",
+        "adm0_name": "India",
+        "geometry_bbox": {
+            "xmin": 68.43211364746094,
+            "ymin": 6.7562665939331055,
+            "xmax": 97.16571044921875,
+            "ymax": 33.25441360473633
+        }
+    },
+    {
+        "adm0_src": "IOT",
+        "adm0_name": "British Indian Ocean Territory",
+        "geometry_bbox": {
+            "xmin": 71.23741912841797,
+            "ymin": -7.443901538848877,
+            "xmax": 72.4947280883789,
+            "ymax": -5.2358927726745605
+        }
+    },
+    {
+        "adm0_src": "IRL",
+        "adm0_name": "Ireland",
+        "geometry_bbox": {
+            "xmin": -10.662618637084961,
+            "ymin": 51.388702392578125,
+            "xmax": -5.994503974914551,
+            "ymax": 55.45100021362305
+        }
+    },
+    {
+        "adm0_src": "IRN",
+        "adm0_name": "Iran (Islamic Republic of)",
+        "geometry_bbox": {
+            "xmin": 44.03263854980469,
+            "ymin": 25.05924415588379,
+            "xmax": 63.333343505859375,
+            "ymax": 39.7822265625
+        }
+    },
+    {
+        "adm0_src": "IRQ",
+        "adm0_name": "Iraq",
+        "geometry_bbox": {
+            "xmin": 38.793670654296875,
+            "ymin": 29.061203002929688,
+            "xmax": 48.618690490722656,
+            "ymax": 37.38069152832031
+        }
+    },
+    {
+        "adm0_src": "ISL",
+        "adm0_name": "Iceland",
+        "geometry_bbox": {
+            "xmin": -24.53204917907715,
+            "ymin": 63.296085357666016,
+            "xmax": -13.273391723632812,
+            "ymax": 67.15044403076172
+        }
+    },
+    {
+        "adm0_src": "ISR",
+        "adm0_name": "Israel",
+        "geometry_bbox": {
+            "xmin": 34.26725387573242,
+            "ymin": 29.49056053161621,
+            "xmax": 35.68460464477539,
+            "ymax": 33.290836334228516
+        }
+    },
+    {
+        "adm0_src": "ITA",
+        "adm0_name": "Italy",
+        "geometry_bbox": {
+            "xmin": 6.626806735992432,
+            "ymin": 35.492950439453125,
+            "xmax": 18.5205135345459,
+            "ymax": 47.09214782714844
+        }
+    },
+    {
+        "adm0_src": "JAM_1",
+        "adm0_name": "Jamaica",
+        "geometry_bbox": {
+            "xmin": -78.36893463134766,
+            "ymin": 17.705562591552734,
+            "xmax": -76.1829605102539,
+            "ymax": 18.525556564331055
+        }
+    },
+    {
+        "adm0_src": "JAM_2",
+        "adm0_name": "Pedro Bank (Jam.)",
+        "geometry_bbox": {
+            "xmin": -77.82547760009766,
+            "ymin": 16.946304321289062,
+            "xmax": -77.50030517578125,
+            "ymax": 17.05333137512207
+        }
+    },
+    {
+        "adm0_src": "JAM_3",
+        "adm0_name": "Morant Cays (Jam.)",
+        "geometry_bbox": {
+            "xmin": -76.00350952148438,
+            "ymin": 17.383983612060547,
+            "xmax": -75.96998596191406,
+            "ymax": 17.416677474975586
+        }
+    },
+    {
+        "adm0_src": "JEY",
+        "adm0_name": "Jersey (UK)",
+        "geometry_bbox": {
+            "xmin": -2.254512071609497,
+            "ymin": 48.954925537109375,
+            "xmax": -1.912393569946289,
+            "ymax": 49.30296325683594
+        }
+    },
+    {
+        "adm0_src": "JOR",
+        "adm0_name": "Jordan",
+        "geometry_bbox": {
+            "xmin": 34.960243225097656,
+            "ymin": 29.184152603149414,
+            "xmax": 39.30115509033203,
+            "ymax": 33.37473678588867
+        }
+    },
+    {
+        "adm0_src": "JPN",
+        "adm0_name": "Japan",
+        "geometry_bbox": {
+            "xmin": 122.93255615234375,
+            "ymin": 20.422636032104492,
+            "xmax": 153.98658752441406,
+            "ymax": 45.52648162841797
+        }
+    },
+    {
+        "adm0_src": "KAZ",
+        "adm0_name": "Kazakhstan",
+        "geometry_bbox": {
+            "xmin": 46.493202209472656,
+            "ymin": 40.568687438964844,
+            "xmax": 87.31542205810547,
+            "ymax": 55.44289779663086
+        }
+    },
+    {
+        "adm0_src": "KEN",
+        "adm0_name": "Kenya",
+        "geometry_bbox": {
+            "xmin": 33.90974426269531,
+            "ymin": -4.741661071777344,
+            "xmax": 41.906864166259766,
+            "ymax": 4.631039142608643
+        }
+    },
+    {
+        "adm0_src": "KGZ",
+        "adm0_name": "Kyrgyzstan",
+        "geometry_bbox": {
+            "xmin": 69.26405334472656,
+            "ymin": 39.18096923828125,
+            "xmax": 80.22816467285156,
+            "ymax": 43.26618576049805
+        }
+    },
+    {
+        "adm0_src": "KHM",
+        "adm0_name": "Cambodia",
+        "geometry_bbox": {
+            "xmin": 102.33365631103516,
+            "ymin": 9.913875579833984,
+            "xmax": 107.63123321533203,
+            "ymax": 14.690747261047363
+        }
+    },
+    {
+        "adm0_src": "KIR",
+        "adm0_name": "Kiribati",
+        "geometry_bbox": {
+            "xmin": -174.54312133789062,
+            "ymin": -11.446451187133789,
+            "xmax": 176.84762573242188,
+            "ymax": 4.6993408203125
+        }
+    },
+    {
+        "adm0_src": "KNA",
+        "adm0_name": "Saint Kitts and Nevis",
+        "geometry_bbox": {
+            "xmin": -62.86416244506836,
+            "ymin": 17.09417152404785,
+            "xmax": -62.53962707519531,
+            "ymax": 17.418058395385742
+        }
+    },
+    {
+        "adm0_src": "KOR",
+        "adm0_name": "Republic of Korea",
+        "geometry_bbox": {
+            "xmin": 124.60985565185547,
+            "ymin": 33.11249542236328,
+            "xmax": 130.94032287597656,
+            "ymax": 38.61711120605469
+        }
+    },
+    {
+        "adm0_src": "KWT",
+        "adm0_name": "Kuwait",
+        "geometry_bbox": {
+            "xmin": 46.55303955078125,
+            "ymin": 28.524442672729492,
+            "xmax": 48.77759552001953,
+            "ymax": 30.103702545166016
+        }
+    },
+    {
+        "adm0_src": "LAO",
+        "adm0_name": "Lao People's Democratic Republic",
+        "geometry_bbox": {
+            "xmin": 100.08386993408203,
+            "ymin": 13.90971851348877,
+            "xmax": 107.6351089477539,
+            "ymax": 22.509048461914062
+        }
+    },
+    {
+        "adm0_src": "LBN",
+        "adm0_name": "Lebanon",
+        "geometry_bbox": {
+            "xmin": 35.10353469848633,
+            "ymin": 33.055023193359375,
+            "xmax": 36.62372589111328,
+            "ymax": 34.69209289550781
+        }
+    },
+    {
+        "adm0_src": "LBR",
+        "adm0_name": "Liberia",
+        "geometry_bbox": {
+            "xmin": -11.499053001403809,
+            "ymin": 4.353907585144043,
+            "xmax": -7.369254112243652,
+            "ymax": 8.553008079528809
+        }
+    },
+    {
+        "adm0_src": "LBY",
+        "adm0_name": "Libya",
+        "geometry_bbox": {
+            "xmin": 9.39146614074707,
+            "ymin": 19.5,
+            "xmax": 25.149572372436523,
+            "ymax": 33.16638946533203
+        }
+    },
+    {
+        "adm0_src": "LCA",
+        "adm0_name": "Saint Lucia",
+        "geometry_bbox": {
+            "xmin": -61.07988357543945,
+            "ymin": 13.70761775970459,
+            "xmax": -60.872920989990234,
+            "ymax": 14.110426902770996
+        }
+    },
+    {
+        "adm0_src": "LIE",
+        "adm0_name": "Liechtenstein",
+        "geometry_bbox": {
+            "xmin": 9.471681594848633,
+            "ymin": 47.04842758178711,
+            "xmax": 9.635692596435547,
+            "ymax": 47.27058029174805
+        }
+    },
+    {
+        "adm0_src": "LKA",
+        "adm0_name": "Sri Lanka",
+        "geometry_bbox": {
+            "xmin": 79.52197265625,
+            "ymin": 5.918674468994141,
+            "xmax": 81.87898254394531,
+            "ymax": 9.835858345031738
+        }
+    },
+    {
+        "adm0_src": "LSO",
+        "adm0_name": "Lesotho",
+        "geometry_bbox": {
+            "xmin": 27.011188507080078,
+            "ymin": -30.677736282348633,
+            "xmax": 29.456192016601562,
+            "ymax": -28.570505142211914
+        }
+    },
+    {
+        "adm0_src": "LTU",
+        "adm0_name": "Lithuania",
+        "geometry_bbox": {
+            "xmin": 20.95380210876465,
+            "ymin": 53.896793365478516,
+            "xmax": 26.83552360534668,
+            "ymax": 56.45041275024414
+        }
+    },
+    {
+        "adm0_src": "LUX",
+        "adm0_name": "Luxembourg",
+        "geometry_bbox": {
+            "xmin": 5.735701084136963,
+            "ymin": 49.447845458984375,
+            "xmax": 6.530877590179443,
+            "ymax": 50.18278884887695
+        }
+    },
+    {
+        "adm0_src": "LVA",
+        "adm0_name": "Latvia",
+        "geometry_bbox": {
+            "xmin": 20.967796325683594,
+            "ymin": 55.6746826171875,
+            "xmax": 28.241497039794922,
+            "ymax": 58.085575103759766
+        }
+    },
+    {
+        "adm0_src": "MAC",
+        "adm0_name": "China, Macao SAR",
+        "geometry_bbox": {
+            "xmin": 113.52863311767578,
+            "ymin": 22.109786987304688,
+            "xmax": 113.59835815429688,
+            "ymax": 22.21706199645996
+        }
+    },
+    {
+        "adm0_src": "MAF",
+        "adm0_name": "Saint Martin (Fr.)",
+        "geometry_bbox": {
+            "xmin": -63.15333938598633,
+            "ymin": 18.046588897705078,
+            "xmax": -62.9703369140625,
+            "ymax": 18.12520408630371
+        }
+    },
+    {
+        "adm0_src": "MAR",
+        "adm0_name": "Morocco",
+        "geometry_bbox": {
+            "xmin": -13.17211627960205,
+            "ymin": 27.667268753051758,
+            "xmax": -0.9982954859733582,
+            "ymax": 35.922454833984375
+        }
+    },
+    {
+        "adm0_src": "MCO",
+        "adm0_name": "Monaco",
+        "geometry_bbox": {
+            "xmin": 7.409076690673828,
+            "ymin": 43.72477722167969,
+            "xmax": 7.439871311187744,
+            "ymax": 43.75191116333008
+        }
+    },
+    {
+        "adm0_src": "MDA",
+        "adm0_name": "Republic of Moldova",
+        "geometry_bbox": {
+            "xmin": 26.61643409729004,
+            "ymin": 45.4664421081543,
+            "xmax": 30.16370964050293,
+            "ymax": 48.49197769165039
+        }
+    },
+    {
+        "adm0_src": "MDG",
+        "adm0_name": "Madagascar",
+        "geometry_bbox": {
+            "xmin": 43.187049865722656,
+            "ymin": -25.60614013671875,
+            "xmax": 50.493404388427734,
+            "ymax": -11.949811935424805
+        }
+    },
+    {
+        "adm0_src": "MDV",
+        "adm0_name": "Maldives",
+        "geometry_bbox": {
+            "xmin": 72.63839721679688,
+            "ymin": -0.70367431640625,
+            "xmax": 73.76509094238281,
+            "ymax": 7.106341361999512
+        }
+    },
+    {
+        "adm0_src": "MEX",
+        "adm0_name": "Mexico",
+        "geometry_bbox": {
+            "xmin": -118.3670883178711,
+            "ymin": 14.534547805786133,
+            "xmax": -86.71064758300781,
+            "ymax": 32.718746185302734
+        }
+    },
+    {
+        "adm0_src": "MHL",
+        "adm0_name": "Marshall Islands",
+        "geometry_bbox": {
+            "xmin": 160.79791259765625,
+            "ymin": 4.572882175445557,
+            "xmax": 172.1702117919922,
+            "ymax": 14.672775268554688
+        }
+    },
+    {
+        "adm0_src": "MKD",
+        "adm0_name": "North Macedonia",
+        "geometry_bbox": {
+            "xmin": 20.453344345092773,
+            "ymin": 40.85394287109375,
+            "xmax": 23.03404426574707,
+            "ymax": 42.37364959716797
+        }
+    },
+    {
+        "adm0_src": "MLI",
+        "adm0_name": "Mali",
+        "geometry_bbox": {
+            "xmin": -12.240345001220703,
+            "ymin": 10.143610954284668,
+            "xmax": 4.266668319702148,
+            "ymax": 25.001087188720703
+        }
+    },
+    {
+        "adm0_src": "MLT",
+        "adm0_name": "Malta",
+        "geometry_bbox": {
+            "xmin": 14.183465003967285,
+            "ymin": 35.786338806152344,
+            "xmax": 14.576493263244629,
+            "ymax": 36.0821533203125
+        }
+    },
+    {
+        "adm0_src": "MMR",
+        "adm0_name": "Myanmar",
+        "geometry_bbox": {
+            "xmin": 92.1719741821289,
+            "ymin": 9.598024368286133,
+            "xmax": 101.17027282714844,
+            "ymax": 28.54776382446289
+        }
+    },
+    {
+        "adm0_src": "MNE",
+        "adm0_name": "Montenegro",
+        "geometry_bbox": {
+            "xmin": 18.433454513549805,
+            "ymin": 41.8463020324707,
+            "xmax": 20.352920532226562,
+            "ymax": 43.558231353759766
+        }
+    },
+    {
+        "adm0_src": "MNG",
+        "adm0_name": "Mongolia",
+        "geometry_bbox": {
+            "xmin": 87.73446655273438,
+            "ymin": 41.58183288574219,
+            "xmax": 119.93151092529297,
+            "ymax": 52.14836120605469
+        }
+    },
+    {
+        "adm0_src": "MNP",
+        "adm0_name": "Northern Mariana Islands (USA)",
+        "geometry_bbox": {
+            "xmin": 144.88623046875,
+            "ymin": 14.110373497009277,
+            "xmax": 146.06497192382812,
+            "ymax": 20.55373191833496
+        }
+    },
+    {
+        "adm0_src": "MOZ",
+        "adm0_name": "Mozambique",
+        "geometry_bbox": {
+            "xmin": 30.21554946899414,
+            "ymin": -26.868162155151367,
+            "xmax": 40.83930969238281,
+            "ymax": -10.470714569091797
+        }
+    },
+    {
+        "adm0_src": "MRT",
+        "adm0_name": "Mauritania",
+        "geometry_bbox": {
+            "xmin": -17.068729400634766,
+            "ymin": 14.721271514892578,
+            "xmax": -4.834133148193359,
+            "ymax": 27.315895080566406
+        }
+    },
+    {
+        "adm0_src": "MSR",
+        "adm0_name": "Montserrat (UK)",
+        "geometry_bbox": {
+            "xmin": -62.241920471191406,
+            "ymin": 16.674440383911133,
+            "xmax": -62.144187927246094,
+            "ymax": 16.824079513549805
+        }
+    },
+    {
+        "adm0_src": "MTQ",
+        "adm0_name": "Martinique (Fr.)",
+        "geometry_bbox": {
+            "xmin": -61.229026794433594,
+            "ymin": 14.38866901397705,
+            "xmax": -60.8097038269043,
+            "ymax": 14.878734588623047
+        }
+    },
+    {
+        "adm0_src": "MUS",
+        "adm0_name": "Mauritius",
+        "geometry_bbox": {
+            "xmin": 56.58521270751953,
+            "ymin": -20.52553367614746,
+            "xmax": 63.50199508666992,
+            "ymax": -10.337050437927246
+        }
+    },
+    {
+        "adm0_src": "MWI",
+        "adm0_name": "Malawi",
+        "geometry_bbox": {
+            "xmin": 32.67251968383789,
+            "ymin": -17.1295223236084,
+            "xmax": 35.9185791015625,
+            "ymax": -9.367226600646973
+        }
+    },
+    {
+        "adm0_src": "MYS",
+        "adm0_name": "Malaysia",
+        "geometry_bbox": {
+            "xmin": 99.64049530029297,
+            "ymin": 0.8539280891418457,
+            "xmax": 119.26912689208984,
+            "ymax": 7.379385471343994
+        }
+    },
+    {
+        "adm0_src": "MYT",
+        "adm0_name": "Mayotte (Fr.)",
+        "geometry_bbox": {
+            "xmin": 44.95954513549805,
+            "ymin": -13.021045684814453,
+            "xmax": 46.49363708496094,
+            "ymax": -12.288790702819824
+        }
+    },
+    {
+        "adm0_src": "NAM",
+        "adm0_name": "Namibia",
+        "geometry_bbox": {
+            "xmin": 11.736716270446777,
+            "ymin": -28.97064208984375,
+            "xmax": 25.261754989624023,
+            "ymax": -16.963483810424805
+        }
+    },
+    {
+        "adm0_src": "NCL",
+        "adm0_name": "New Caledonia (Fr.)",
+        "geometry_bbox": {
+            "xmin": 158.2359619140625,
+            "ymin": -22.881710052490234,
+            "xmax": 172.0900115966797,
+            "ymax": -18.02504539489746
+        }
+    },
+    {
+        "adm0_src": "NER",
+        "adm0_name": "Niger",
+        "geometry_bbox": {
+            "xmin": 0.16171778738498688,
+            "ymin": 11.693754196166992,
+            "xmax": 16.000001907348633,
+            "ymax": 23.515003204345703
+        }
+    },
+    {
+        "adm0_src": "NFK",
+        "adm0_name": "Norfolk Island (Aust.)",
+        "geometry_bbox": {
+            "xmin": 167.9147186279297,
+            "ymin": -29.13662338256836,
+            "xmax": 167.9966583251953,
+            "ymax": -28.994260787963867
+        }
+    },
+    {
+        "adm0_src": "NGA",
+        "adm0_name": "Nigeria",
+        "geometry_bbox": {
+            "xmin": 2.6635608673095703,
+            "ymin": 4.270262718200684,
+            "xmax": 14.677983283996582,
+            "ymax": 13.88564682006836
+        }
+    },
+    {
+        "adm0_src": "NIC",
+        "adm0_name": "Nicaragua",
+        "geometry_bbox": {
+            "xmin": -87.69194793701172,
+            "ymin": 10.708054542541504,
+            "xmax": -82.74700927734375,
+            "ymax": 15.02973747253418
+        }
+    },
+    {
+        "adm0_src": "NIU",
+        "adm0_name": "Niue (NZ)",
+        "geometry_bbox": {
+            "xmin": -169.9497833251953,
+            "ymin": -19.155441284179688,
+            "xmax": -169.7743682861328,
+            "ymax": -18.95250701904297
+        }
+    },
+    {
+        "adm0_src": "NLD",
+        "adm0_name": "Netherlands (Kingdom of the)",
+        "geometry_bbox": {
+            "xmin": 3.3583900928497314,
+            "ymin": 50.75035095214844,
+            "xmax": 7.227485179901123,
+            "ymax": 53.55350112915039
+        }
+    },
+    {
+        "adm0_src": "NOR",
+        "adm0_name": "Norway",
+        "geometry_bbox": {
+            "xmin": 4.499833106994629,
+            "ymin": 57.95852279663086,
+            "xmax": 31.16843032836914,
+            "ymax": 71.18563079833984
+        }
+    },
+    {
+        "adm0_src": "NPL",
+        "adm0_name": "Nepal",
+        "geometry_bbox": {
+            "xmin": 80.05846405029297,
+            "ymin": 26.347373962402344,
+            "xmax": 88.20184326171875,
+            "ymax": 30.4473934173584
+        }
+    },
+    {
+        "adm0_src": "NRU",
+        "adm0_name": "Nauru",
+        "geometry_bbox": {
+            "xmin": 166.90896606445312,
+            "ymin": -0.554133415222168,
+            "xmax": 166.958984375,
+            "ymax": -0.5025905966758728
+        }
+    },
+    {
+        "adm0_src": "NZL",
+        "adm0_name": "New Zealand",
+        "geometry_bbox": {
+            "xmin": -178.82652282714844,
+            "ymin": -52.620887756347656,
+            "xmax": 179.0677947998047,
+            "ymax": -29.231338500976562
+        }
+    },
+    {
+        "adm0_src": "OMN",
+        "adm0_name": "Oman",
+        "geometry_bbox": {
+            "xmin": 52.0,
+            "ymin": 16.65045166015625,
+            "xmax": 59.83942413330078,
+            "ymax": 26.50790786743164
+        }
+    },
+    {
+        "adm0_src": "PAK",
+        "adm0_name": "Pakistan",
+        "geometry_bbox": {
+            "xmin": 60.87297058105469,
+            "ymin": 24.051645278930664,
+            "xmax": 75.38148498535156,
+            "ymax": 36.90879440307617
+        }
+    },
+    {
+        "adm0_src": "PAN",
+        "adm0_name": "Panama",
+        "geometry_bbox": {
+            "xmin": -83.05258178710938,
+            "ymin": 7.203555583953857,
+            "xmax": -77.1585693359375,
+            "ymax": 9.647235870361328
+        }
+    },
+    {
+        "adm0_src": "PCN",
+        "adm0_name": "Pitcairn (UK)",
+        "geometry_bbox": {
+            "xmin": -130.75050354003906,
+            "ymin": -25.080543518066406,
+            "xmax": -124.77238464355469,
+            "ymax": -23.917137145996094
+        }
+    },
+    {
+        "adm0_src": "PER",
+        "adm0_name": "Peru",
+        "geometry_bbox": {
+            "xmin": -81.32839965820312,
+            "ymin": -18.351097106933594,
+            "xmax": -68.65230560302734,
+            "ymax": -0.03877699375152588
+        }
+    },
+    {
+        "adm0_src": "PHL",
+        "adm0_name": "Philippines",
+        "geometry_bbox": {
+            "xmin": 116.92919158935547,
+            "ymin": 4.587226867675781,
+            "xmax": 126.60502624511719,
+            "ymax": 21.121896743774414
+        }
+    },
+    {
+        "adm0_src": "PLW",
+        "adm0_name": "Palau",
+        "geometry_bbox": {
+            "xmin": 131.1201171875,
+            "ymin": 2.96978759765625,
+            "xmax": 134.72113037109375,
+            "ymax": 8.172309875488281
+        }
+    },
+    {
+        "adm0_src": "PNG",
+        "adm0_name": "Papua New Guinea",
+        "geometry_bbox": {
+            "xmin": 140.8419647216797,
+            "ymin": -11.654706954956055,
+            "xmax": 159.492431640625,
+            "ymax": -0.7559310793876648
+        }
+    },
+    {
+        "adm0_src": "POL",
+        "adm0_name": "Poland",
+        "geometry_bbox": {
+            "xmin": 14.122884750366211,
+            "ymin": 49.002044677734375,
+            "xmax": 24.145877838134766,
+            "ymax": 54.836181640625
+        }
+    },
+    {
+        "adm0_src": "PRI",
+        "adm0_name": "Puerto Rico (USA)",
+        "geometry_bbox": {
+            "xmin": -67.95140838623047,
+            "ymin": 17.881322860717773,
+            "xmax": -65.22108459472656,
+            "ymax": 18.515979766845703
+        }
+    },
+    {
+        "adm0_src": "PRK",
+        "adm0_name": "Democratic People's Republic of Korea",
+        "geometry_bbox": {
+            "xmin": 124.18074798583984,
+            "ymin": 37.625404357910156,
+            "xmax": 130.69775390625,
+            "ymax": 43.00917053222656
+        }
+    },
+    {
+        "adm0_src": "PRT_1",
+        "adm0_name": "Portugal",
+        "geometry_bbox": {
+            "xmin": -9.549811363220215,
+            "ymin": 36.959964752197266,
+            "xmax": -6.1891770362854,
+            "ymax": 42.154273986816406
+        }
+    },
+    {
+        "adm0_src": "PRT_2",
+        "adm0_name": "Madeira Islands (Port.)",
+        "geometry_bbox": {
+            "xmin": -17.265928268432617,
+            "ymin": 30.028779983520508,
+            "xmax": -15.853670120239258,
+            "ymax": 33.1281623840332
+        }
+    },
+    {
+        "adm0_src": "PRT_3",
+        "adm0_name": "Azores Islands (Port.)",
+        "geometry_bbox": {
+            "xmin": -31.275634765625,
+            "ymin": 36.92762756347656,
+            "xmax": -24.779848098754883,
+            "ymax": 39.727256774902344
+        }
+    },
+    {
+        "adm0_src": "PRY",
+        "adm0_name": "Paraguay",
+        "geometry_bbox": {
+            "xmin": -62.639976501464844,
+            "ymin": -27.606891632080078,
+            "xmax": -54.25856018066406,
+            "ymax": -19.28765869140625
+        }
+    },
+    {
+        "adm0_src": "PSE_1",
+        "adm0_name": "West Bank",
+        "geometry_bbox": {
+            "xmin": 34.88026809692383,
+            "ymin": 31.342601776123047,
+            "xmax": 35.57405471801758,
+            "ymax": 32.552101135253906
+        }
+    },
+    {
+        "adm0_src": "PSE_2",
+        "adm0_name": "Gaza",
+        "geometry_bbox": {
+            "xmin": 34.21882629394531,
+            "ymin": 31.220048904418945,
+            "xmax": 34.56780242919922,
+            "ymax": 31.59449577331543
+        }
+    },
+    {
+        "adm0_src": "PYF",
+        "adm0_name": "French Polynesia (Fr.)",
+        "geometry_bbox": {
+            "xmin": -154.72669982910156,
+            "ymin": -27.900178909301758,
+            "xmax": -134.45248413085938,
+            "ymax": -7.859320640563965
+        }
+    },
+    {
+        "adm0_src": "QAT",
+        "adm0_name": "Qatar",
+        "geometry_bbox": {
+            "xmin": 50.73229217529297,
+            "ymin": 24.471107482910156,
+            "xmax": 52.417118072509766,
+            "ymax": 26.182985305786133
+        }
+    },
+    {
+        "adm0_src": "REU",
+        "adm0_name": "R\u00e9union (Fr.)",
+        "geometry_bbox": {
+            "xmin": 55.2164192199707,
+            "ymin": -21.38970947265625,
+            "xmax": 55.836692810058594,
+            "ymax": -20.871740341186523
+        }
+    },
+    {
+        "adm0_src": "ROU",
+        "adm0_name": "Romania",
+        "geometry_bbox": {
+            "xmin": 20.261816024780273,
+            "ymin": 43.61943435668945,
+            "xmax": 29.768091201782227,
+            "ymax": 48.265586853027344
+        }
+    },
+    {
+        "adm0_src": "RUS",
+        "adm0_name": "Russian Federation",
+        "geometry_bbox": {
+            "xmin": -180.0,
+            "ymin": 41.18578338623047,
+            "xmax": 180.0,
+            "ymax": 81.85905456542969
+        }
+    },
+    {
+        "adm0_src": "RWA",
+        "adm0_name": "Rwanda",
+        "geometry_bbox": {
+            "xmin": 28.861753463745117,
+            "ymin": -2.8399384021759033,
+            "xmax": 30.899118423461914,
+            "ymax": -1.047375202178955
+        }
+    },
+    {
+        "adm0_src": "SAU",
+        "adm0_name": "Saudi Arabia",
+        "geometry_bbox": {
+            "xmin": 34.49440383911133,
+            "ymin": 16.379526138305664,
+            "xmax": 55.66670608520508,
+            "ymax": 32.1542854309082
+        }
+    },
+    {
+        "adm0_src": "SDN",
+        "adm0_name": "Sudan",
+        "geometry_bbox": {
+            "xmin": 21.814634323120117,
+            "ymin": 8.682454109191895,
+            "xmax": 38.8467903137207,
+            "ymax": 22.224918365478516
+        }
+    },
+    {
+        "adm0_src": "SEN",
+        "adm0_name": "Senegal",
+        "geometry_bbox": {
+            "xmin": -17.54435157775879,
+            "ymin": 12.307287216186523,
+            "xmax": -11.345767974853516,
+            "ymax": 16.69295883178711
+        }
+    },
+    {
+        "adm0_src": "SGP",
+        "adm0_name": "Singapore",
+        "geometry_bbox": {
+            "xmin": 103.60565185546875,
+            "ymin": 1.1586815118789673,
+            "xmax": 104.40641784667969,
+            "ymax": 1.4715642929077148
+        }
+    },
+    {
+        "adm0_src": "SGS",
+        "adm0_name": "South Georgia and the South Sandwich Islands (UK)",
+        "geometry_bbox": {
+            "xmin": -42.021854400634766,
+            "ymin": -59.46242141723633,
+            "xmax": -26.267364501953125,
+            "ymax": -53.54679489135742
+        }
+    },
+    {
+        "adm0_src": "SHN_1",
+        "adm0_name": "Saint Helena (UK)",
+        "geometry_bbox": {
+            "xmin": -5.789960861206055,
+            "ymin": -16.032033920288086,
+            "xmax": -5.631438732147217,
+            "ymax": -15.90385627746582
+        }
+    },
+    {
+        "adm0_src": "SHN_2",
+        "adm0_name": "Ascencion (UK)",
+        "geometry_bbox": {
+            "xmin": -14.420761108398438,
+            "ymin": -7.993067264556885,
+            "xmax": -14.294876098632812,
+            "ymax": -7.888999938964844
+        }
+    },
+    {
+        "adm0_src": "SHN_3",
+        "adm0_name": "Tristan da Cunha (UK)",
+        "geometry_bbox": {
+            "xmin": -12.70632553100586,
+            "ymin": -37.434234619140625,
+            "xmax": -12.216556549072266,
+            "ymax": -37.06206512451172
+        }
+    },
+    {
+        "adm0_src": "SHN_4",
+        "adm0_name": "Gough (UK)",
+        "geometry_bbox": {
+            "xmin": -10.019018173217773,
+            "ymin": -40.37153625488281,
+            "xmax": -9.874091148376465,
+            "ymax": -40.27185821533203
+        }
+    },
+    {
+        "adm0_src": "SJM_1",
+        "adm0_name": "Svalbard Islands (Nor.)",
+        "geometry_bbox": {
+            "xmin": 10.45906925201416,
+            "ymin": 74.33454895019531,
+            "xmax": 33.51425552368164,
+            "ymax": 80.82901000976562
+        }
+    },
+    {
+        "adm0_src": "SJM_2",
+        "adm0_name": "Jan Mayen Island (Nor.)",
+        "geometry_bbox": {
+            "xmin": -9.07717514038086,
+            "ymin": 70.82532501220703,
+            "xmax": -7.928524971008301,
+            "ymax": 71.16033935546875
+        }
+    },
+    {
+        "adm0_src": "SLB",
+        "adm0_name": "Solomon Islands",
+        "geometry_bbox": {
+            "xmin": 155.5123291015625,
+            "ymin": -12.307709693908691,
+            "xmax": 170.1920623779297,
+            "ymax": -5.026336669921875
+        }
+    },
+    {
+        "adm0_src": "SLE",
+        "adm0_name": "Sierra Leone",
+        "geometry_bbox": {
+            "xmin": -13.300277709960938,
+            "ymin": 6.921615123748779,
+            "xmax": -10.271682739257812,
+            "ymax": 9.99997329711914
+        }
+    },
+    {
+        "adm0_src": "SLV",
+        "adm0_name": "El Salvador",
+        "geometry_bbox": {
+            "xmin": -90.13380432128906,
+            "ymin": 13.155394554138184,
+            "xmax": -87.68378448486328,
+            "ymax": 14.45055866241455
+        }
+    },
+    {
+        "adm0_src": "SMR",
+        "adm0_name": "San Marino",
+        "geometry_bbox": {
+            "xmin": 12.403324127197266,
+            "ymin": 43.89363098144531,
+            "xmax": 12.516203880310059,
+            "ymax": 43.99209976196289
+        }
+    },
+    {
+        "adm0_src": "SOM",
+        "adm0_name": "Somalia",
+        "geometry_bbox": {
+            "xmin": 40.991241455078125,
+            "ymin": -1.6621239185333252,
+            "xmax": 51.415069580078125,
+            "ymax": 11.988285064697266
+        }
+    },
+    {
+        "adm0_src": "SPM",
+        "adm0_name": "Saint Pierre and Miquelon (Fr.)",
+        "geometry_bbox": {
+            "xmin": -56.4058837890625,
+            "ymin": 46.748985290527344,
+            "xmax": -56.10005187988281,
+            "ymax": 47.14426040649414
+        }
+    },
+    {
+        "adm0_src": "SRB",
+        "adm0_name": "Serbia",
+        "geometry_bbox": {
+            "xmin": 18.839040756225586,
+            "ymin": 41.85763931274414,
+            "xmax": 23.00638771057129,
+            "ymax": 46.1900520324707
+        }
+    },
+    {
+        "adm0_src": "SSD",
+        "adm0_name": "South Sudan",
+        "geometry_bbox": {
+            "xmin": 24.153301239013672,
+            "ymin": 3.4888041019439697,
+            "xmax": 35.948997497558594,
+            "ymax": 12.23638916015625
+        }
+    },
+    {
+        "adm0_src": "STP",
+        "adm0_name": "Sao Tome and Principe",
+        "geometry_bbox": {
+            "xmin": 6.460190773010254,
+            "ymin": -0.013921601697802544,
+            "xmax": 7.469974517822266,
+            "ymax": 1.72593355178833
+        }
+    },
+    {
+        "adm0_src": "SUR",
+        "adm0_name": "Suriname",
+        "geometry_bbox": {
+            "xmin": -58.0715217590332,
+            "ymin": 1.8385132551193237,
+            "xmax": -53.97002029418945,
+            "ymax": 6.010417938232422
+        }
+    },
+    {
+        "adm0_src": "SVK",
+        "adm0_name": "Slovakia",
+        "geometry_bbox": {
+            "xmin": 16.833179473876953,
+            "ymin": 47.73119354248047,
+            "xmax": 22.56569480895996,
+            "ymax": 49.613807678222656
+        }
+    },
+    {
+        "adm0_src": "SVN",
+        "adm0_name": "Slovenia",
+        "geometry_bbox": {
+            "xmin": 13.37546157836914,
+            "ymin": 45.421424865722656,
+            "xmax": 16.597421646118164,
+            "ymax": 46.87667465209961
+        }
+    },
+    {
+        "adm0_src": "SWE",
+        "adm0_name": "Sweden",
+        "geometry_bbox": {
+            "xmin": 10.957831382751465,
+            "ymin": 55.33667755126953,
+            "xmax": 24.166664123535156,
+            "ymax": 69.05997467041016
+        }
+    },
+    {
+        "adm0_src": "SWZ",
+        "adm0_name": "Eswatini",
+        "geometry_bbox": {
+            "xmin": 30.790639877319336,
+            "ymin": -27.317405700683594,
+            "xmax": 32.13490676879883,
+            "ymax": -25.71791648864746
+        }
+    },
+    {
+        "adm0_src": "SXM",
+        "adm0_name": "Sint Maarten (Neth.)",
+        "geometry_bbox": {
+            "xmin": -63.13895797729492,
+            "ymin": 18.005159378051758,
+            "xmax": -62.99825668334961,
+            "ymax": 18.064115524291992
+        }
+    },
+    {
+        "adm0_src": "SYC",
+        "adm0_name": "Seychelles",
+        "geometry_bbox": {
+            "xmin": 46.20325469970703,
+            "ymin": -10.227594375610352,
+            "xmax": 56.29444885253906,
+            "ymax": -3.710298538208008
+        }
+    },
+    {
+        "adm0_src": "SYR",
+        "adm0_name": "Syrian Arab Republic",
+        "geometry_bbox": {
+            "xmin": 35.61357116699219,
+            "ymin": 32.311134338378906,
+            "xmax": 42.376312255859375,
+            "ymax": 37.32057189941406
+        }
+    },
+    {
+        "adm0_src": "TCA",
+        "adm0_name": "Turks and Caicos Islands (UK)",
+        "geometry_bbox": {
+            "xmin": -72.48282623291016,
+            "ymin": 21.17072296142578,
+            "xmax": -71.08284759521484,
+            "ymax": 21.962451934814453
+        }
+    },
+    {
+        "adm0_src": "TCD",
+        "adm0_name": "Chad",
+        "geometry_bbox": {
+            "xmin": 13.47055721282959,
+            "ymin": 7.442974090576172,
+            "xmax": 24.000001907348633,
+            "ymax": 23.452363967895508
+        }
+    },
+    {
+        "adm0_src": "TGO",
+        "adm0_name": "Togo",
+        "geometry_bbox": {
+            "xmin": -0.1440420001745224,
+            "ymin": 6.112363815307617,
+            "xmax": 1.808907389640808,
+            "ymax": 11.139617919921875
+        }
+    },
+    {
+        "adm0_src": "THA",
+        "adm0_name": "Thailand",
+        "geometry_bbox": {
+            "xmin": 97.3433837890625,
+            "ymin": 5.612850189208984,
+            "xmax": 105.63682556152344,
+            "ymax": 20.46514320373535
+        }
+    },
+    {
+        "adm0_src": "TJK",
+        "adm0_name": "Tajikistan",
+        "geometry_bbox": {
+            "xmin": 67.33719635009766,
+            "ymin": 36.672035217285156,
+            "xmax": 75.15396881103516,
+            "ymax": 41.044864654541016
+        }
+    },
+    {
+        "adm0_src": "TKL",
+        "adm0_name": "Tokelau (NZ)",
+        "geometry_bbox": {
+            "xmin": -172.52059936523438,
+            "ymin": -9.443711280822754,
+            "xmax": -171.1818389892578,
+            "ymax": -8.532371520996094
+        }
+    },
+    {
+        "adm0_src": "TKM",
+        "adm0_name": "Turkmenistan",
+        "geometry_bbox": {
+            "xmin": 52.44707489013672,
+            "ymin": 35.12908935546875,
+            "xmax": 66.70735931396484,
+            "ymax": 42.79826354980469
+        }
+    },
+    {
+        "adm0_src": "TLS",
+        "adm0_name": "Timor-Leste",
+        "geometry_bbox": {
+            "xmin": 124.0418701171875,
+            "ymin": -9.50374984741211,
+            "xmax": 127.34207916259766,
+            "ymax": -8.126898765563965
+        }
+    },
+    {
+        "adm0_src": "TON",
+        "adm0_name": "Tonga",
+        "geometry_bbox": {
+            "xmin": -176.21824645996094,
+            "ymin": -22.351076126098633,
+            "xmax": -173.7369384765625,
+            "ymax": -15.566133499145508
+        }
+    },
+    {
+        "adm0_src": "TTO",
+        "adm0_name": "Trinidad and Tobago",
+        "geometry_bbox": {
+            "xmin": -62.015445709228516,
+            "ymin": 10.042815208435059,
+            "xmax": -60.49269485473633,
+            "ymax": 11.362544059753418
+        }
+    },
+    {
+        "adm0_src": "TUN",
+        "adm0_name": "Tunisia",
+        "geometry_bbox": {
+            "xmin": 7.522310256958008,
+            "ymin": 30.2280330657959,
+            "xmax": 11.599217414855957,
+            "ymax": 37.56095504760742
+        }
+    },
+    {
+        "adm0_src": "TUR",
+        "adm0_name": "T\u00fcrkiye",
+        "geometry_bbox": {
+            "xmin": 25.66544532775879,
+            "ymin": 35.81217575073242,
+            "xmax": 44.81776809692383,
+            "ymax": 42.104896545410156
+        }
+    },
+    {
+        "adm0_src": "TUV",
+        "adm0_name": "Tuvalu",
+        "geometry_bbox": {
+            "xmin": 176.05911254882812,
+            "ymin": -10.79163646697998,
+            "xmax": 179.87112426757812,
+            "ymax": -5.642288684844971
+        }
+    },
+    {
+        "adm0_src": "TWN",
+        "adm0_name": "Taiwan",
+        "geometry_bbox": {
+            "xmin": 116.71015930175781,
+            "ymin": 20.697147369384766,
+            "xmax": 122.10916137695312,
+            "ymax": 26.385164260864258
+        }
+    },
+    {
+        "adm0_src": "TZA",
+        "adm0_name": "United Republic of Tanzania",
+        "geometry_bbox": {
+            "xmin": 29.339996337890625,
+            "ymin": -11.761255264282227,
+            "xmax": 40.44540023803711,
+            "ymax": -0.9843969941139221
+        }
+    },
+    {
+        "adm0_src": "UGA",
+        "adm0_name": "Uganda",
+        "geometry_bbox": {
+            "xmin": 29.573766708374023,
+            "ymin": -1.4821193218231201,
+            "xmax": 35.03199005126953,
+            "ymax": 4.224449634552002
+        }
+    },
+    {
+        "adm0_src": "UKR",
+        "adm0_name": "Ukraine",
+        "geometry_bbox": {
+            "xmin": 22.137052536010742,
+            "ymin": 44.38610076904297,
+            "xmax": 40.22782516479492,
+            "ymax": 52.379737854003906
+        }
+    },
+    {
+        "adm0_src": "UMI_1",
+        "adm0_name": "Baker Island (USA)",
+        "geometry_bbox": {
+            "xmin": -176.48687744140625,
+            "ymin": 0.18989379703998566,
+            "xmax": -176.47027587890625,
+            "ymax": 0.20087930560112
+        }
+    },
+    {
+        "adm0_src": "UMI_2",
+        "adm0_name": "Howland Island (USA)",
+        "geometry_bbox": {
+            "xmin": -176.62368774414062,
+            "ymin": 0.7963470816612244,
+            "xmax": -176.61245727539062,
+            "ymax": 0.8187372088432312
+        }
+    },
+    {
+        "adm0_src": "UMI_3",
+        "adm0_name": "Jarvis Island (USA)",
+        "geometry_bbox": {
+            "xmin": -160.01353454589844,
+            "ymin": -0.380497545003891,
+            "xmax": -159.9846649169922,
+            "ymax": -0.36388489603996277
+        }
+    },
+    {
+        "adm0_src": "UMI_4",
+        "adm0_name": "Johnston Atoll (USA)",
+        "geometry_bbox": {
+            "xmin": -169.5478057861328,
+            "ymin": 16.719606399536133,
+            "xmax": -169.4855499267578,
+            "ymax": 16.763124465942383
+        }
+    },
+    {
+        "adm0_src": "UMI_5",
+        "adm0_name": "Kingman Reef (USA)",
+        "geometry_bbox": {
+            "xmin": -162.3834228515625,
+            "ymin": 6.383609771728516,
+            "xmax": -162.3491973876953,
+            "ymax": 6.404052257537842
+        }
+    },
+    {
+        "adm0_src": "UMI_6",
+        "adm0_name": "Midway Islands (USA)",
+        "geometry_bbox": {
+            "xmin": -177.423828125,
+            "ymin": 28.19245719909668,
+            "xmax": -177.31549072265625,
+            "ymax": 28.269458770751953
+        }
+    },
+    {
+        "adm0_src": "UMI_7",
+        "adm0_name": "Palmyra Atoll (USA)",
+        "geometry_bbox": {
+            "xmin": -162.10848999023438,
+            "ymin": 5.8697590827941895,
+            "xmax": -162.04017639160156,
+            "ymax": 5.893103122711182
+        }
+    },
+    {
+        "adm0_src": "UMI_8",
+        "adm0_name": "Wake Island (USA)",
+        "geometry_bbox": {
+            "xmin": 166.59902954101562,
+            "ymin": 19.269981384277344,
+            "xmax": 166.6573944091797,
+            "ymax": 19.318683624267578
+        }
+    },
+    {
+        "adm0_src": "UMI_9",
+        "adm0_name": "Navassa Island (USA)",
+        "geometry_bbox": {
+            "xmin": -75.02970123291016,
+            "ymin": 18.391069412231445,
+            "xmax": -75.0019302368164,
+            "ymax": 18.413982391357422
+        }
+    },
+    {
+        "adm0_src": "URY",
+        "adm0_name": "Uruguay",
+        "geometry_bbox": {
+            "xmin": -58.49136734008789,
+            "ymin": -35.031578063964844,
+            "xmax": -53.07557678222656,
+            "ymax": -30.085426330566406
+        }
+    },
+    {
+        "adm0_src": "USA",
+        "adm0_name": "United States of America",
+        "geometry_bbox": {
+            "xmin": -179.14999389648438,
+            "ymin": 18.91069221496582,
+            "xmax": 179.7752227783203,
+            "ymax": 71.38683319091797
+        }
+    },
+    {
+        "adm0_src": "UZB",
+        "adm0_name": "Uzbekistan",
+        "geometry_bbox": {
+            "xmin": 55.99821090698242,
+            "ymin": 37.17266082763672,
+            "xmax": 73.21893310546875,
+            "ymax": 45.5900764465332
+        }
+    },
+    {
+        "adm0_src": "VAT",
+        "adm0_name": "Holy See",
+        "geometry_bbox": {
+            "xmin": 12.44573974609375,
+            "ymin": 41.90019226074219,
+            "xmax": 12.4583740234375,
+            "ymax": 41.90743637084961
+        }
+    },
+    {
+        "adm0_src": "VCT",
+        "adm0_name": "Saint Vincent and the Grenadines",
+        "geometry_bbox": {
+            "xmin": -61.46092224121094,
+            "ymin": 12.530350685119629,
+            "xmax": -61.11482238769531,
+            "ymax": 13.3831787109375
+        }
+    },
+    {
+        "adm0_src": "VEN_1",
+        "adm0_name": "Venezuela (Bolivarian Republic of)",
+        "geometry_bbox": {
+            "xmin": -73.3670425415039,
+            "ymin": 0.6475289463996887,
+            "xmax": -59.80550765991211,
+            "ymax": 12.492252349853516
+        }
+    },
+    {
+        "adm0_src": "VEN_2",
+        "adm0_name": "Bird Island (Ven.)",
+        "geometry_bbox": {
+            "xmin": -63.62095642089844,
+            "ymin": 15.666239738464355,
+            "xmax": -63.61762237548828,
+            "ymax": 15.672246932983398
+        }
+    },
+    {
+        "adm0_src": "VGB",
+        "adm0_name": "British Virgin Islands (UK)",
+        "geometry_bbox": {
+            "xmin": -64.8502426147461,
+            "ymin": 18.30617332458496,
+            "xmax": -64.2704086303711,
+            "ymax": 18.74958038330078
+        }
+    },
+    {
+        "adm0_src": "VIR",
+        "adm0_name": "United States Virgin Islands (USA)",
+        "geometry_bbox": {
+            "xmin": -65.10154724121094,
+            "ymin": 17.67446517944336,
+            "xmax": -64.5648422241211,
+            "ymax": 18.41556739807129
+        }
+    },
+    {
+        "adm0_src": "VNM",
+        "adm0_name": "Viet Nam",
+        "geometry_bbox": {
+            "xmin": 102.14391326904297,
+            "ymin": 8.381065368652344,
+            "xmax": 109.46829986572266,
+            "ymax": 23.392650604248047
+        }
+    },
+    {
+        "adm0_src": "VUT",
+        "adm0_name": "Vanuatu",
+        "geometry_bbox": {
+            "xmin": 166.54177856445312,
+            "ymin": -20.252479553222656,
+            "xmax": 170.23826599121094,
+            "ymax": -13.07270336151123
+        }
+    },
+    {
+        "adm0_src": "WLF",
+        "adm0_name": "Wallis and Futuna Islands (Fr.)",
+        "geometry_bbox": {
+            "xmin": -178.18177795410156,
+            "ymin": -14.362186431884766,
+            "xmax": -176.1248016357422,
+            "ymax": -13.183243751525879
+        }
+    },
+    {
+        "adm0_src": "WSM",
+        "adm0_name": "Samoa",
+        "geometry_bbox": {
+            "xmin": -172.80409240722656,
+            "ymin": -14.076445579528809,
+            "xmax": -171.39837646484375,
+            "ymax": -13.43880558013916
+        }
+    },
+    {
+        "adm0_src": "XAB",
+        "adm0_name": "Abyei",
+        "geometry_bbox": {
+            "xmin": 27.833330154418945,
+            "ymin": 9.347219467163086,
+            "xmax": 29.000001907348633,
+            "ymax": 10.166667938232422
+        }
+    },
+    {
+        "adm0_src": "XAC",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 77.92323303222656,
+            "ymin": 33.38691329956055,
+            "xmax": 80.39049530029297,
+            "ymax": 35.97343826293945
+        }
+    },
+    {
+        "adm0_src": "XAP",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 91.56229400634766,
+            "ymin": 26.880266189575195,
+            "xmax": 97.39537048339844,
+            "ymax": 29.37481117248535
+        }
+    },
+    {
+        "adm0_src": "XCE",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 78.66561889648438,
+            "ymin": 32.65640640258789,
+            "xmax": 78.74598693847656,
+            "ymax": 32.70969009399414
+        }
+    },
+    {
+        "adm0_src": "XCH",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 78.56925201416016,
+            "ymin": 32.60041427612305,
+            "xmax": 78.64108276367188,
+            "ymax": 32.642337799072266
+        }
+    },
+    {
+        "adm0_src": "XCR",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 14.869158744812012,
+            "ymin": -4.751716613769531,
+            "xmax": 17.723670959472656,
+            "ymax": -0.5047436952590942
+        }
+    },
+    {
+        "adm0_src": "XDE",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 79.14269256591797,
+            "ymin": 32.51909255981445,
+            "xmax": 79.56129455566406,
+            "ymax": 33.23788833618164
+        }
+    },
+    {
+        "adm0_src": "XDI",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 43.139774322509766,
+            "ymin": 12.711807250976562,
+            "xmax": 43.158592224121094,
+            "ymax": 12.721357345581055
+        }
+    },
+    {
+        "adm0_src": "XDS",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 89.0027084350586,
+            "ymin": 27.507831573486328,
+            "xmax": 89.16217803955078,
+            "ymax": 27.616853713989258
+        }
+    },
+    {
+        "adm0_src": "XHI",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": -66.4920425415039,
+            "ymin": 80.82125091552734,
+            "xmax": -66.4151611328125,
+            "ymax": 80.83232116699219
+        }
+    },
+    {
+        "adm0_src": "XHT",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 34.08061981201172,
+            "ymin": 22.0,
+            "xmax": 36.894493103027344,
+            "ymax": 23.17726707458496
+        }
+    },
+    {
+        "adm0_src": "XIB",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": -57.64848709106445,
+            "ymin": -30.1938419342041,
+            "xmax": -57.604610443115234,
+            "ymax": -30.1741886138916
+        }
+    },
+    {
+        "adm0_src": "XIK",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 27.144298553466797,
+            "ymin": 37.046749114990234,
+            "xmax": 27.151161193847656,
+            "ymax": 37.0504035949707
+        }
+    },
+    {
+        "adm0_src": "XIT",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 34.37699890136719,
+            "ymin": 4.617066860198975,
+            "xmax": 35.5987663269043,
+            "ymax": 5.033421039581299
+        }
+    },
+    {
+        "adm0_src": "XJK",
+        "adm0_name": "Jammu and Kashmir",
+        "geometry_bbox": {
+            "xmin": 72.51276397705078,
+            "ymin": 32.275146484375,
+            "xmax": 79.30585479736328,
+            "ymax": 37.09141540527344
+        }
+    },
+    {
+        "adm0_src": "XJL",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 34.9556884765625,
+            "ymin": 31.74436378479004,
+            "xmax": 35.4958381652832,
+            "ymax": 32.401668548583984
+        }
+    },
+    {
+        "adm0_src": "XJN",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 78.88255310058594,
+            "ymin": 30.949344635009766,
+            "xmax": 79.41726684570312,
+            "ymax": 31.459016799926758
+        }
+    },
+    {
+        "adm0_src": "XKA",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 80.91691589355469,
+            "ymin": 30.177040100097656,
+            "xmax": 81.0451889038086,
+            "ymax": 30.246685028076172
+        }
+    },
+    {
+        "adm0_src": "XKI",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 145.39865112304688,
+            "ymin": 43.33906936645508,
+            "xmax": 148.89503479003906,
+            "ymax": 45.557559967041016
+        }
+    },
+    {
+        "adm0_src": "XKO",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 0.9166665077209473,
+            "ymin": 10.999998092651367,
+            "xmax": 0.9717310070991516,
+            "ymax": 11.023107528686523
+        }
+    },
+    {
+        "adm0_src": "XKT",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 70.48609924316406,
+            "ymin": 39.89764404296875,
+            "xmax": 70.55905151367188,
+            "ymax": 39.96610641479492
+        }
+    },
+    {
+        "adm0_src": "XKU",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 78.42835998535156,
+            "ymin": 31.94768524169922,
+            "xmax": 78.7796401977539,
+            "ymax": 32.27595138549805
+        }
+    },
+    {
+        "adm0_src": "XLB",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 79.70057678222656,
+            "ymin": 30.650110244750977,
+            "xmax": 80.24930572509766,
+            "ymax": 31.00580406188965
+        }
+    },
+    {
+        "adm0_src": "XLE",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 69.59615325927734,
+            "ymin": 40.0838737487793,
+            "xmax": 70.05533599853516,
+            "ymax": 40.23261260986328
+        }
+    },
+    {
+        "adm0_src": "XLR",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 131.86134338378906,
+            "ymin": 37.237937927246094,
+            "xmax": 131.872802734375,
+            "ymax": 37.24779510498047
+        }
+    },
+    {
+        "adm0_src": "XMA",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": -67.10335540771484,
+            "ymin": 44.49971389770508,
+            "xmax": -67.08611297607422,
+            "ymax": 44.538291931152344
+        }
+    },
+    {
+        "adm0_src": "XMB",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 6.858497142791748,
+            "ymin": 45.824134826660156,
+            "xmax": 6.8725361824035645,
+            "ymax": 45.839481353759766
+        }
+    },
+    {
+        "adm0_src": "XMR",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 6.112285614013672,
+            "ymin": 49.46921920776367,
+            "xmax": 6.531200408935547,
+            "ymax": 50.129878997802734
+        }
+    },
+    {
+        "adm0_src": "XMS",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 33.17240524291992,
+            "ymin": 21.72488021850586,
+            "xmax": 34.080623626708984,
+            "ymax": 22.000011444091797
+        }
+    },
+    {
+        "adm0_src": "XPI",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 111.19369506835938,
+            "ymin": 15.779891014099121,
+            "xmax": 112.74036407470703,
+            "ymax": 17.06621551513672
+        }
+    },
+    {
+        "adm0_src": "XSI",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 111.66413116455078,
+            "ymin": 7.368255138397217,
+            "xmax": 115.8232650756836,
+            "ymax": 11.454944610595703
+        }
+    },
+    {
+        "adm0_src": "XSK",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 123.45779418945312,
+            "ymin": 25.7203426361084,
+            "xmax": 124.56109619140625,
+            "ymax": 25.92914581298828
+        }
+    },
+    {
+        "adm0_src": "XSP",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 78.64961242675781,
+            "ymin": 31.78059196472168,
+            "xmax": 78.74940490722656,
+            "ymax": 31.885372161865234
+        }
+    },
+    {
+        "adm0_src": "XUK_1",
+        "adm0_name": "Akrotiri (UK)",
+        "geometry_bbox": {
+            "xmin": 32.75489044189453,
+            "ymin": 34.562400817871094,
+            "xmax": 33.036380767822266,
+            "ymax": 34.705867767333984
+        }
+    },
+    {
+        "adm0_src": "XUK_2",
+        "adm0_name": "Dekelia (UK)",
+        "geometry_bbox": {
+            "xmin": 33.673702239990234,
+            "ymin": 34.942596435546875,
+            "xmax": 33.91655731201172,
+            "ymax": 35.12373352050781
+        }
+    },
+    {
+        "adm0_src": "XVO",
+        "adm0_name": null,
+        "geometry_bbox": {
+            "xmin": 70.49278259277344,
+            "ymin": 39.86392593383789,
+            "xmax": 70.53170776367188,
+            "ymax": 39.89674377441406
+        }
+    },
+    {
+        "adm0_src": "YEM",
+        "adm0_name": "Yemen",
+        "geometry_bbox": {
+            "xmin": 41.81501007080078,
+            "ymin": 12.108077049255371,
+            "xmax": 54.536067962646484,
+            "ymax": 18.9996337890625
+        }
+    },
+    {
+        "adm0_src": "ZAF_1",
+        "adm0_name": "South Africa",
+        "geometry_bbox": {
+            "xmin": 16.45404815673828,
+            "ymin": -34.83354568481445,
+            "xmax": 32.89115524291992,
+            "ymax": -22.125423431396484
+        }
+    },
+    {
+        "adm0_src": "ZAF_2",
+        "adm0_name": "Prince Edward Islands (SA)",
+        "geometry_bbox": {
+            "xmin": 37.58110046386719,
+            "ymin": -46.9819450378418,
+            "xmax": 38.003318786621094,
+            "ymax": -46.5993537902832
+        }
+    },
+    {
+        "adm0_src": "ZMB",
+        "adm0_name": "Zambia",
+        "geometry_bbox": {
+            "xmin": 21.999347686767578,
+            "ymin": -18.077499389648438,
+            "xmax": 33.70903396606445,
+            "ymax": -8.203283309936523
+        }
+    },
+    {
+        "adm0_src": "ZWE",
+        "adm0_name": "Zimbabwe",
+        "geometry_bbox": {
+            "xmin": 25.237367630004883,
+            "ymin": -22.422000885009766,
+            "xmax": 33.0682373046875,
+            "ymax": -15.609618186950684
+        }
+    }
+]
