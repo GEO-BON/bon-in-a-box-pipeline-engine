@@ -78,5 +78,5 @@ def region_geometry(type: str = 'country', id: str = ""):
     gdf = gpd.GeoDataFrame(reg, geometry=gs, crs="EPSG:4326")
     file_path = "/tmp/%s_%s.gpkg" % (type,fname)
     gdf.to_file(file_path, driver='GPKG', layer='country_region', overwrite=True)
-    return FileResponse(file_path, media_type="application/geopackage+sqlite3", filename=fname)
+    return FileResponse(file_path, media_type="application/geopackage+sqlite3", filename="%s.gpkg" % fname)
 
