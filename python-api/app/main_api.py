@@ -4,10 +4,8 @@ from fastapi.responses import FileResponse
 import duckdb
 import os
 import json
-from shapely.geometry import shape
 import geopandas as gpd
 import pandas as pd
-import pygadm as pg
 
 app = FastAPI()
 
@@ -30,14 +28,14 @@ ddb.load_extension("httpfs")
 countries_parquet = "https://data.fieldmaps.io/adm0/osm/intl/adm0_polygons.parquet"
 regions_parquet = "https://data.fieldmaps.io/edge-matched/humanitarian/intl/adm1_polygons.parquet"
 
-if os.path.exists("/app/countries.json") == False:
+if not os.path.exists("/app/countries.json"):
     print("Generating countries.json...")
     countries=ddb.sql("SELECT adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % countries_parquet).df()
     with open('/app/countries.json', 'w') as f:
         json.dump(countries.to_dict(orient='records'), f)
     print("done")
 
-if os.path.exists("/app/regions.json") == False:
+if not os.path.exists("/app/regions.json"):
     print("Generating regions.json...")
     regions=ddb.sql("SELECT adm1_src, adm1_name, adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % regions_parquet).df()
     with open('/app/regions.json', 'w') as f:
@@ -51,6 +49,7 @@ def read_root():
 @app.get("/region/countries_list")
 def countries_list():
     df = pd.read_json('/app/countries.json', orient='records')
+    df = df.dropna()
     return df.to_dict(orient='records')
 
 @app.get("/region/regions_list")
@@ -64,20 +63,25 @@ def regions_list(country_iso:str):
 @app.get("/region/geometry")
 def region_geometry(type: str = 'country', id: str = ""):
     if type == 'country':
-        reg = ddb.sql("SELECT *, ST_AsText(geometry) AS geom FROM read_parquet('%s') WHERE adm0_src='%s'" % (countries_parquet, id)).df()
+        reg = ddb.sql("SELECT *, ST_AsText(geometry) AS geom FROM read_parquet(?) WHERE adm0_src=?", params=[countries_parquet, id]).df()
         if( reg.empty ):
             raise HTTPException(status_code=404, detail="Country ID not found")
         fname = reg['adm0_name'].iloc[0].replace(' ','_')
+        gs = gpd.GeoSeries.from_wkt(reg["geom"])
+
     elif type == 'region':
-        reg = ddb.sql("SELECT *, ST_AsWKB(geometry) AS geom FROM read_parquet('%s') WHERE adm1_src='%s'" % (regions_parquet, id)).df()
-        if( reg.empty ):
-            raise HTTPException(status_code=404, detail="Region ID not found")
-        fname = reg['adm1_name'].iloc[0].replace(' ','_')
-    gs = gpd.GeoSeries.from_wkt(reg["geom"])
+        raise HTTPException(status_code=501, detail="Getting region geometry is not yet implemented.")
+        # reg = ddb.sql("SELECT *, ST_AsHEXWKB(geometry) AS geom FROM read_parquet(?) WHERE adm1_src=?", params=[regions_parquet, id]).df()
+        # if( reg.empty ):
+        #     raise HTTPException(status_code=404, detail="Region ID not found")
+        # fname = reg['adm1_name'].iloc[0].replace(' ','_')
+        # print(reg)
+        # gs = gpd.GeoSeries.from_wkb(reg["geom"], crs="EPSG:4326")
+
     del reg["geom"]
     del reg["geometry"]
     gdf = gpd.GeoDataFrame(reg, geometry=gs, crs="EPSG:4326")
     file_path = "/tmp/%s_%s.gpkg" % (type,fname)
     gdf.to_file(file_path, driver='GPKG', layer='country_region', overwrite=True)
-    return FileResponse(file_path, media_type="application/geopackage+sqlite3", filename=fname)
+    return FileResponse(file_path, media_type="application/geopackage+sqlite3", filename="%s.gpkg" % fname)
 
