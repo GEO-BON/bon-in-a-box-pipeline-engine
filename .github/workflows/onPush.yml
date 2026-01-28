@@ -51,7 +51,7 @@ jobs:
         document_path: script-server/src/test/resources/scripts/
         validate_file_extension: no
         filter_extensions: .yml
-    - name: YML test files syntax validation (stubs)
+    - name: YML syntax validation (stubs)
       uses: navikt/yaml-validator@v4
       with:
         schema_path: .github/scriptValidationSchema.yml
@@ -79,3 +79,11 @@ jobs:
       working-directory: script-server/src/test/resources/pipelines/
       run:  $GITHUB_WORKSPACE/.github/findDuplicateIds.sh
       shell: bash
+
+  run-allowed-commands-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Allowed commands validation
+      working-directory: script-stubs/hpc/
+      run: ./allowed_commands.sh test_command_filter

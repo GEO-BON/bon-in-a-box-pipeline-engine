@@ -78,7 +78,7 @@ external_link:
 
 timeout:
   required: false
-  type: number
+  type: integer
 
 inputs:
   required: false
@@ -216,3 +216,19 @@ conda:
     dependencies:
       required: true
       type: list
+
+hpc:
+  required: false
+  type: dict
+  schema:
+    mem:
+      required: true
+      type: string
+      regex: "^[0-9]+[GM]$"
+    cpus-per-task:
+      required: true
+      type: integer
+    time:
+      required: true
+      type: string
+      regex: '^(\d-)?(\d?\d:){0,2}\d?\d$'

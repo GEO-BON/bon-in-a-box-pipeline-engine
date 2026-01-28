@@ -370,6 +370,55 @@ paths:
                     "Julia": "julia version 1.8.1",
                     "TiTiler": "2023-08-30 15:44",
                   }
+
+  /hpc/status:
+    get:
+      summary: Get status of HPC connection.
+      operationId: getHPCStatus
+      responses:
+        "200":
+          description: The status of the HPC connection.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    state:
+                      type: string
+                      enum: [NOT_CONFIGURED, CONFIGURED, PREPARING, READY, ERROR]
+                    image:
+                      type: string
+                    message:
+                      type: string
+                  additionalProperties:
+                    type: string
+              examples:
+                ready:
+                  value: {"R":{"state":"READY","image":"geobon/bon-in-a-box@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e","message":""},"Python":{"state":"READY","image":"geobon/bon-in-a-box@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e","message":""},"Julia":{"state":"READY","image":"geobon/bon-in-a-box@sha256:5a808f9c89fc23303bd23510f15a9111799cc8ba4e2cd76b1e7797326b4923e7","message":""}}
+                not_configured:
+                  value: {"R":{"state":"NOT_CONFIGURED"},"Python":{"state":"NOT_CONFIGURED"},"Julia":{"state":"NOT_CONFIGURED"}}
+                configured:
+                  value: {"R":{"state":"CONFIGURED"},"Python":{"state":"CONFIGURED"},"Julia":{"state":"CONFIGURED"}}
+                error:
+                  value: {"R":{"state":"ERROR","message":"Some error message for Conda runner"},"Python":{"state":"ERROR","message":"Some error message for Conda runner"},"Julia":{"state":"ERROR","message":"Some error message for Julia runner"}}
+
+  /hpc/prepare:
+    get:
+      summary:
+        Prepare the HPC to run tasks from BON in a Box.
+        The apptainer images will be created for every runner.
+      responses:
+        "200":
+          description: |
+            The HPC preparation has been launched.
+            Watch /hpc/status for changes.
+
+        "503":
+          description: |
+            Service unavailable: the HPC has not been configured on that host.
+
   /region/countries_list:
     get:
       summary: Returns the list of countries from FieldMaps.io with their ISO3 and English names
@@ -582,6 +631,21 @@ components:
         timeout:
           type: number
           example: 60
+        hpc:
+          type: object
+          properties:
+            mem:
+              type: string
+              example: 30G
+              description: Maximum amount of memory allowed before Out Of Memory exception occurs.
+            cpus-per-task:
+              type: integer
+              example: 16
+              description: Number of CPUs for this task.
+            time:
+              type: string
+              example: "01:00:00"
+              description: Maximum time allowed before timeout, for syntax see https://slurm.schedmd.com/sbatch.html#OPT_time.
         inputs:
           type: object
           additionalProperties:

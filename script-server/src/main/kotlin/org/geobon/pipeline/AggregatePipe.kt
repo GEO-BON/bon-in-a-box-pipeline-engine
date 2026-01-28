@@ -2,6 +2,7 @@ package org.geobon.pipeline
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.io.File
 
 class AggregatePipe(pipesToAggregate: List<Pipe>) : Pipe {
     override val type: String
@@ -65,6 +66,13 @@ class AggregatePipe(pipesToAggregate: List<Pipe>) : Pipe {
         }
 
         return if(resultList.isEmpty()) null else resultList
+    }
+
+    override fun asFiles(): Collection<File>? {
+        if (Pipe.Companion.MIME_TYPE_REGEX.matches(type)) {
+            return pipes.mapNotNull { it.asFiles() }.flatten()
+        }
+        return null
     }
 
     override fun dumpOutputFolders(allOutputs: MutableMap<String, String>) {

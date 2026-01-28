@@ -131,6 +131,8 @@ Installation steps on a server are the same as installing on a Linux computer, b
 
 -   By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy (documentation [here](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)) and activate https with certbot (documentation [here](https://certbot.eff.org/)).
 
+-   Connecting to a High-Performance Computer (HPC) is still experimental. Refer to the [developer documentation](README-dev.html#setting-up-drac-cluster-connection).
+
 # Troubleshooting
 
 Here are some common installation errors and how to fix them.

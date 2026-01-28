@@ -1,13 +1,12 @@
 package org.geobon.pipeline
 
+import io.kotest.extensions.system.withEnvironment
+import org.geobon.server.ServerContext
 import org.geobon.server.plugins.Containers
+import org.geobon.utils.noHPCContext
+import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
-import kotlin.test.assertEquals
-import kotlin.test.assertNotEquals
-import kotlin.test.assertTrue
-import io.kotest.extensions.system.withEnvironment
-import org.json.JSONObject
 
 internal class RunContextTest {
     @BeforeTest
@@ -26,12 +25,12 @@ internal class RunContextTest {
 
     @Test
     fun givenSameInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdSame() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{bbb:222, aaa:111}"
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = RunContext(someFile, inputs1, noHPCContext)
+        val run2 = RunContext(someFile, inputs2, noHPCContext)
 
         println(run1.runId)
         println(run2.runId)
@@ -41,36 +40,36 @@ internal class RunContextTest {
 
     @Test
     fun givenSameInputs_whenTheOrderOfEntriesIsSame_thenRunIdSame() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{aaa:111, bbb:222}"
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = RunContext(someFile, inputs1, noHPCContext)
+        val run2 = RunContext(someFile, inputs2, noHPCContext)
 
         assertEquals(run1.runId, run2.runId)
     }
 
     @Test
     fun givenDifferentInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdDifferent() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{bbb:222, aaa:123}"
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = RunContext(someFile, inputs1, noHPCContext)
+        val run2 = RunContext(someFile, inputs2, noHPCContext)
 
         assertNotEquals(run1.runId, run2.runId)
     }
 
     @Test
     fun givenDifferentInputs_whenTheOrderOfEntriesIsSame_thenRunIdDifferent() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val inputs2 = "{aaa:123, bbb:222}"
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = RunContext(someFile, inputs1, noHPCContext)
+        val run2 = RunContext(someFile, inputs2, noHPCContext)
 
         assertNotEquals(run1.runId, run2.runId)
     }
@@ -101,9 +100,9 @@ internal class RunContextTest {
 
     @Test
     fun givenScriptHasRun_whenGettingEnvironment_thenDependenciesAreRead() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
-        val run = RunContext(someFile, inputs1)
+        val run = RunContext(someFile, inputs1, noHPCContext)
         run.outputFolder.mkdirs()
         File("${run.outputFolder.absolutePath}/dependencies.txt").writeText("here are some dependencies")
         val environmentInfo = run.getEnvironment(Containers.SCRIPT_SERVER)
@@ -116,15 +115,15 @@ internal class RunContextTest {
 
     @Test
     fun givenRunContext_whenCreateEnvironmentFile_thenFileExistsAndContainsEnvInfo() {
-        val someFile = File(RunContext.scriptRoot, "someFile")
+        val someFile = File(ServerContext.scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
-        val run = RunContext(someFile, inputs1)
+        val run = RunContext(someFile, inputs1, noHPCContext)
         run.outputFolder.mkdirs()
        run.createEnvironmentFile(Containers.SCRIPT_SERVER)
 
         val environmentFile = File( run.outputFolder.absolutePath, "environment.json" )
         assertTrue(environmentFile.isFile)
-        val environmentInfo: JSONObject = JSONObject(environmentFile.readText())
+        val environmentInfo = JSONObject(environmentFile.readText())
         assertTrue(environmentInfo.has("server"))
         assertTrue(environmentInfo.has("git"))
         assertTrue(environmentInfo.has("runner"))

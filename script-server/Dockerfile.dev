@@ -14,7 +14,7 @@ RUN chmod 755 /usr/local/bin/docker
 
 RUN set -ex; \
     apt-get update; \
-    apt-get install -y --no-install-recommends python3 libc6-dev; \
+    apt-get install -y --no-install-recommends rsync; \
     apt-get clean all; \
     rm -rf /var/lib/apt/lists/*
 

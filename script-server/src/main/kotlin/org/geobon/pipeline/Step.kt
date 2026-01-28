@@ -28,6 +28,7 @@ abstract class Step(
         executeMutex.withLock {
             if(executed) { // this has already been executed!
                 exception?.let { throw it } // (failure)
+                cleanUp()
                 return // (success)
             }
 
@@ -46,11 +47,16 @@ abstract class Step(
                 throw ex
             } finally {
                 executed = true
+                cleanUp()
             }
         }
     }
 
     open fun onInputsReceived(resolvedInputs: Map<String, Any?>) {
+        // Default nothing
+    }
+
+    open fun cleanUp() {
         // Default nothing
     }
 
