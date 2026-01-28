@@ -70,16 +70,12 @@ def region_geometry(type: str = 'country', id: str = ""):
         gs = gpd.GeoSeries.from_wkt(reg["geom"])
 
     elif type == 'region':
-        raise HTTPException(status_code=501, detail="Getting region geometry is not yet implemented.")
-        # reg = ddb.sql("SELECT *, ST_AsHEXWKB(geometry) AS geom FROM read_parquet(?) WHERE adm1_src=?", params=[regions_parquet, id]).df()
-        # if( reg.empty ):
-        #     raise HTTPException(status_code=404, detail="Region ID not found")
-        # fname = reg['adm1_name'].iloc[0].replace(' ','_')
-        # print(reg)
-        # gs = gpd.GeoSeries.from_wkb(reg["geom"], crs="EPSG:4326")
+        reg = ddb.sql("SELECT *, ST_AsText(geometry) AS geom FROM read_parquet(?) WHERE adm1_src=?", params=[regions_parquet, id]).df()
+        if( reg.empty ):
+            raise HTTPException(status_code=404, detail="Region ID not found")
+        fname = reg['adm1_name'].iloc[0].replace(' ','_')
+        gs = gpd.GeoSeries.from_wkt(reg["geom"], crs="EPSG:4326")
 
-    del reg["geom"]
-    del reg["geometry"]
     gdf = gpd.GeoDataFrame(reg, geometry=gs, crs="EPSG:4326")
     file_path = "/tmp/%s_%s.gpkg" % (type,fname)
     gdf.to_file(file_path, driver='GPKG', layer='country_region', overwrite=True)
