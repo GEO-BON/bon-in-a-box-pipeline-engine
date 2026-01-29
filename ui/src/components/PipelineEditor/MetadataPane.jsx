@@ -14,9 +14,9 @@ license: # Optional. If unspecified, the project's MIT license will apply.
 external_link: # Optional, link to a separate project, github repo, etc.
 references: # 0 to many
   - text: # plain text reference
-    doi: # link
+    link: # full link to the resource (ex. https://doi.org/...)
   - text: # plain text reference
-    doi: # link
+    link: # full link to the resource (ex. https://doi.org/...)
 `
 
 /**

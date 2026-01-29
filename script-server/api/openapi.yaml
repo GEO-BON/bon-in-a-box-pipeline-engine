@@ -686,8 +686,13 @@ components:
                 type: string
                 example: Rick Bonney Expanding the Impact of Citizen Science BioScience Volume 71 Issue 5 May 2021 Pages 448–451
               doi:
+                description: deprecated, use "link" instead.
                 type: string
-                example: 10.1093/biosci/biab041
+                example: https://doi.org/10.1093/biosci/biaf189
+              link:
+                description: Full link to the resource (ex. https://doi.org/...)
+                type: string
+                example: https://doi.org/10.1093/biosci/biaf189
   requestBodies:
     run_input_body:
       description: Content of input.json for this run
