@@ -99,19 +99,19 @@ export default function MapOpenLayers({
       var oppositeVertex = diffVertex > 1 ? diffVertex - 2 : diffVertex + 2;
       var minX = Math.min(
         newCoordinates[0][diffVertex][0],
-        newCoordinates[0][oppositeVertex][0]
+        newCoordinates[0][oppositeVertex][0],
       );
       var minY = Math.min(
         newCoordinates[0][diffVertex][1],
-        newCoordinates[0][oppositeVertex][1]
+        newCoordinates[0][oppositeVertex][1],
       );
       var maxX = Math.max(
         newCoordinates[0][diffVertex][0],
-        newCoordinates[0][oppositeVertex][0]
+        newCoordinates[0][oppositeVertex][0],
       );
       var maxY = Math.max(
         newCoordinates[0][diffVertex][1],
-        newCoordinates[0][oppositeVertex][1]
+        newCoordinates[0][oppositeVertex][1],
       );
       result = [minX, minY, maxX, maxY];
     } else {
@@ -254,7 +254,7 @@ export default function MapOpenLayers({
 
   // The CRS gets updated. We need to reproject the map
   useEffect(() => {
-    if (states.actions.includes("changeMapCRS")) {
+    if (mapp && states.actions.includes("changeMapCRS")) {
       const crsCode = `${states.CRS.authority}:${states.CRS.code}`;
       const mapProjection = mapp.getView().getProjection().getCode();
       if (states.CRS.proj4Def && mapProjection !== crsCode) {
@@ -263,7 +263,7 @@ export default function MapOpenLayers({
         register(proj4);
         if (!get(crsCode) || !projectMap) {
           setMessage(
-            "This CRS cannot be shown on the map. The bounding box can still be entered manually."
+            "This CRS cannot be shown on the map. The bounding box can still be entered manually.",
           );
           return;
         } else {
@@ -302,11 +302,7 @@ export default function MapOpenLayers({
         setOldCRS(defaultCRS);
         dispatch({ bbox: cleanBbox(bbox, "degree"), type: "changeBbox" });
         setShowSpinner(false);
-      } else if (
-        !states.country?.ISO3 &&
-        !states.region?.regionID &&
-        mapp
-      ) {
+      } else if (!states.country?.ISO3 && !states.region?.regionID && mapp) {
         clearLayers();
       }
     }
@@ -315,8 +311,9 @@ export default function MapOpenLayers({
   //Reproject the BBox if necessary and set features
   useEffect(() => {
     if (
-      states.actions.includes("changeBboxCRS") ||
-      states.actions.includes("updateBbox")
+      oldCRS &&
+      (states.actions.includes("changeBboxCRS") ||
+        states.actions.includes("updateBbox"))
     ) {
       setDigitize(false);
       // openLayers does not recognize this CRS, but try with mapTiler anyways
@@ -343,7 +340,7 @@ export default function MapOpenLayers({
         const currentCRS = `${states.CRS.authority}:${states.CRS.code}`;
         if (oldCRS && states.CRS && states.CRS.code === oldCRS.code) {
           setFeatures(
-            new GeoJSON().readFeatures(turf.bboxPolygon(states.bbox))
+            new GeoJSON().readFeatures(turf.bboxPolygon(states.bbox)),
           );
         } else if (
           oldCRS &&
@@ -374,11 +371,7 @@ export default function MapOpenLayers({
           setOldCRS(states.CRS);
         }
       }
-      if (
-        oldCRS &&
-        states.bbox.includes("") &&
-        (states.country?.bboxWGS84)
-      ) {
+      if (oldCRS && states.bbox.includes("") && states.country?.bboxWGS84) {
         // The bounding box is gone, try to reuse the country one, if available
         dispatch({
           bbox: states.country.bboxWGS84,
