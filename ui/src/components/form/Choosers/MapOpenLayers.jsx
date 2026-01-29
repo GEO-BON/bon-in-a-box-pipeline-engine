@@ -252,11 +252,41 @@ export default function MapOpenLayers({
     }
   }, [mapp, features, digitize]);
 
-  // The CRS gets updated. We need to reproject the map
+
   useEffect(() => {
-    if (mapp && states.actions.includes("changeMapCRS")) {
+    let map = mapp
+    // Initial creation of the map
+    if (!map && states.CRS.code) {
+      const crsString = `${states.CRS.authority}:${states.CRS.code}`
+      const projCRS = get(crsString)
+      if (projCRS) {
+        map = new Map({
+          target: "map",
+          layers: [
+            new Layer({
+              source: new Source({
+                attributions: ["Carto"],
+                url: "https://2.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+              }),
+              projection: `EPSG:3857`,
+            }),
+          ],
+          view: new View({
+            center: [0, 0],
+            zoom: 3,
+            projection: `${states.CRS.authority}:${states.CRS.code}`,
+          }),
+        });
+        setMapp(map);
+      } else {
+        setMessage(`Failed to create map for ${crsString}`)
+      }
+    }
+
+    // The CRS gets updated. We need to reproject the map
+    if (map &&states.actions.includes("changeMapCRS")) {
       const crsCode = `${states.CRS.authority}:${states.CRS.code}`;
-      const mapProjection = mapp.getView().getProjection().getCode();
+      const mapProjection = map.getView().getProjection().getCode();
       if (states.CRS.proj4Def && mapProjection !== crsCode) {
         proj4.defs(crsCode, states.CRS.proj4Def);
         let projectMap = true;
@@ -273,7 +303,7 @@ export default function MapOpenLayers({
             zoom: 2,
             projection: crsCode,
           });
-          mapp.setView(newView);
+          map.setView(newView);
         }
       }
     }
@@ -382,34 +412,6 @@ export default function MapOpenLayers({
       }
     }
   }, [states.actions, oldCRS]);
-
-  useEffect(() => {
-    if (states.actions.includes("load")) {
-      if (
-        states.CRS.code &&
-        get(`${states.CRS.authority}:${states.CRS.code}`)
-      ) {
-        const map = new Map({
-          target: "map",
-          layers: [
-            new Layer({
-              source: new Source({
-                attributions: ["Carto"],
-                url: "https://2.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-              }),
-              projection: `EPSG:3857`,
-            }),
-          ],
-          view: new View({
-            center: [0, 0],
-            zoom: 3,
-            projection: `${states.CRS.authority}:${states.CRS.code}`,
-          }),
-        });
-        setMapp(map);
-      }
-    }
-  }, [states.actions]);
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
