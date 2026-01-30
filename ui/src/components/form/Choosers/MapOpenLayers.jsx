@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 
 import "ol/ol.css";
 import Map from "ol/Map";
@@ -183,9 +183,13 @@ export default function MapOpenLayers({
       mapp.addLayer(vector);
       mapp.addInteraction(drawInt);
       if (features.length > 0 && !digitize) {
-        mapp.getView().fit(source.getExtent(), {
-          padding: [100, 100, 100, 100],
-        });
+        const extent = source.getExtent();
+        // Validate extent before fitting
+        if (extent && extent.every((val) => isFinite(val))) {
+          mapp.getView().fit(extent, {
+            padding: [100, 100, 100, 100],
+          });
+        }
       }
       const modify = new Modify({
         source: source,
@@ -252,13 +256,12 @@ export default function MapOpenLayers({
     }
   }, [mapp, features, digitize]);
 
-
   useEffect(() => {
-    let map = mapp
-    // Initial creation of the map
-    if (!map && states.CRS.code) {
-      const crsString = `${states.CRS.authority}:${states.CRS.code}`
-      const projCRS = get(crsString)
+    if (!mapp && states.CRS.code) {
+      const crsString = `${states.CRS.authority}:${states.CRS.code}`;
+      proj4.defs(crsString, states.CRS.proj4Def);
+      register(proj4);
+      const projCRS = get(crsString);
       if (projCRS) {
         map = new Map({
           target: "map",
@@ -278,15 +281,17 @@ export default function MapOpenLayers({
           }),
         });
         setMapp(map);
+        // Initialize oldCRS to trigger the bbox reprojection effect
+        setOldCRS(states.CRS);
       } else {
-        setMessage(`Failed to create map for ${crsString}`)
+        setMessage(`Failed to create map for ${crsString}`);
       }
     }
 
     // The CRS gets updated. We need to reproject the map
-    if (map &&states.actions.includes("changeMapCRS")) {
+    if (mapp && states.actions.includes("changeMapCRS")) {
       const crsCode = `${states.CRS.authority}:${states.CRS.code}`;
-      const mapProjection = map.getView().getProjection().getCode();
+      const mapProjection = mapp.getView().getProjection().getCode();
       if (states.CRS.proj4Def && mapProjection !== crsCode) {
         proj4.defs(crsCode, states.CRS.proj4Def);
         let projectMap = true;
@@ -303,7 +308,7 @@ export default function MapOpenLayers({
             zoom: 2,
             projection: crsCode,
           });
-          map.setView(newView);
+          mapp.setView(newView);
         }
       }
     }
@@ -338,6 +343,40 @@ export default function MapOpenLayers({
     }
   }, [states.actions]);
 
+  // Handle initial bbox loading when map is ready
+  useEffect(() => {
+    if (
+      mapp &&
+      oldCRS &&
+      states.bbox &&
+      states.bbox.length > 0 &&
+      !states.bbox.includes("") &&
+      states.CRS.code &&
+      states.CRS.proj4Def
+    ) {
+      // If bbox is in a different CRS than the map, trigger transformation
+      if (oldCRS.code !== states.CRS.code) {
+        // Trigger the reprojection effect by dispatching an action
+        dispatch({
+          type: "changeBboxCRS",
+          bbox: states.bbox,
+          CRS: states.CRS,
+        });
+      } else {
+        // Same CRS, just create features
+        try {
+          const poly = turf.bboxPolygon(states.bbox);
+          const features = new GeoJSON().readFeatures(poly);
+          if (features.length > 0) {
+            setFeatures(features);
+          }
+        } catch (e) {
+          console.error("Error creating features from bbox:", e);
+        }
+      }
+    }
+  }, [mapp, oldCRS, states.CRS.code, states.CRS.proj4Def]);
+
   //Reproject the BBox if necessary and set features
   useEffect(() => {
     if (
@@ -369,9 +408,12 @@ export default function MapOpenLayers({
         const mapProjection = mapp.getView().getProjection().getCode();
         const currentCRS = `${states.CRS.authority}:${states.CRS.code}`;
         if (oldCRS && states.CRS && states.CRS.code === oldCRS.code) {
-          setFeatures(
-            new GeoJSON().readFeatures(turf.bboxPolygon(states.bbox)),
-          );
+          try {
+            const poly = turf.bboxPolygon(states.bbox);
+            setFeatures(new GeoJSON().readFeatures(poly));
+          } catch (e) {
+            console.error("Error creating features:", e);
+          }
         } else if (
           oldCRS &&
           states.CRS &&
@@ -379,23 +421,20 @@ export default function MapOpenLayers({
           currentCRS == mapProjection
         ) {
           //Just reproject the bbox if the map projection has been set to the new CRS
-          let newpoly = turf.bboxPolygon(states.bbox);
-          if (states.CRS.code !== oldCRS.code) {
-            newpoly = transformPolyToBboxCRS(newpoly, oldCRS, states.CRS);
-          }
-          if (newpoly.includes(Infinity)) {
-            setMessage("CRS not recognized");
+          try {
+            let newpoly = turf.bboxPolygon(states.bbox);
+            if (states.CRS.code !== oldCRS.code) {
+              newpoly = transformPolyToBboxCRS(newpoly, oldCRS, states.CRS);
+            }
+            const cleanedBbox = cleanBbox(newpoly, states.CRS.unit);
             dispatch({
-              bbox: ["", "", "", ""],
+              bbox: cleanedBbox,
               type: "changeBbox",
-            }); // Set update BBox in new CRS and re-run this block to set features
+            });
             setOldCRS(states.CRS);
-          } else {
-            dispatch({
-              bbox: cleanBbox(newpoly, states.CRS.unit),
-              type: "changeBbox",
-            }); // Set update BBox in new CRS and re-run this block to set features
-            setOldCRS(states.CRS);
+          } catch (e) {
+            console.error("Error transforming bbox:", e);
+            setMessage("Error transforming bounding box between CRS");
           }
         } else if (states.CRS) {
           setOldCRS(states.CRS);
