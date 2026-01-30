@@ -107,7 +107,8 @@ export function GeneralDescription({ ymlPath, metadata }) {
                 <Chip label="HPC" size="small" title={hpcMessage} style={{
                     marginBottom: '8px',
                     border: '1px solid black',
-                    color: 'white'
+                    background: 'white',
+                    color: 'black'
                 }} />
             }
             {metadata.lifecycle?.message &&
