@@ -518,6 +518,12 @@ img#greenSquares {
   border-left: 0.4em solid #115ca2;
 }
 
+.inlinePreview .file-download {
+  height: 1.6rem;
+  padding-top: 0.1rem;
+  text-decoration: none;
+}
+
 .outputTitle .clickable {
   display: flex;
   align-items: center;

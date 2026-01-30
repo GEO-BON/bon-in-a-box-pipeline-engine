@@ -39,6 +39,7 @@ export function FoldableOutputWithContext({
   componentId,
   inline,
   inlineCollapsed,
+  inlineExpanded,
   children,
   keepWhenHidden,
 }) {
@@ -54,6 +55,7 @@ export function FoldableOutputWithContext({
       title={title}
       inline={inline}
       inlineCollapsed={inlineCollapsed}
+      inlineExpanded={inlineExpanded}
       children={children}
       keepWhenHidden={keepWhenHidden}
     />
@@ -66,6 +68,7 @@ export function FoldableOutput({
   title,
   inline,
   inlineCollapsed,
+  inlineExpanded,
   children,
   isActive,
   keepWhenHidden,
@@ -84,6 +87,7 @@ export function FoldableOutput({
       title={title}
       inline={inline}
       inlineCollapsed={inlineCollapsed}
+      inlineExpanded={inlineExpanded}
       children={children}
       keepWhenHidden={keepWhenHidden}
     />
@@ -98,6 +102,7 @@ function FoldableOutputInternal({
   title,
   inline,
   inlineCollapsed,
+  inlineExpanded,
   children,
   keepWhenHidden,
 }) {
@@ -138,7 +143,7 @@ function FoldableOutputInternal({
           <h3 ref={titleRef}>{title}</h3>
           <div className="inlinePreview">
             {inline}
-            {!active && inlineCollapsed}
+            {active ? inlineExpanded : inlineCollapsed}
           </div>
         </div>
       </div>

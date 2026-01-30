@@ -26,6 +26,7 @@ import {
 } from "./StepDescription";
 import { getScript } from "../utils/IOId";
 import { fetchStepDescriptionAsync } from "./PipelineEditor/StepDescriptionStore";
+import downloadImg from "../img/fa-file-arrow-down.svg"
 
 export function PipelineResults({
   pipelineMetadata,
@@ -332,7 +333,15 @@ export function DelayedResult({
   if (folder && scriptMetadata) {
     if (inputData) {
       inputsContent = (
-        <FoldableOutput title="Inputs" className="stepInputs">
+        <FoldableOutput
+          title="Inputs"
+          className="stepInputs"
+          inlineExpanded={
+            <a href={`/output/${folder}/input.json`} title="Download YAML input file" download>
+              <img alt="Downlad YAML file" src={downloadImg} className="file-download" />
+            </a>
+          }
+        >
           <StepResult
             data={inputData}
             sectionMetadata={scriptMetadata.inputs}
