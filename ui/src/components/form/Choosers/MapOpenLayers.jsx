@@ -24,6 +24,36 @@ import * as turf from "@turf/turf";
 import proj4 from "proj4";
 import { transformPolyToBboxCRS, cleanBbox, defaultCRS } from "./utils";
 
+const styles = {
+  Polygon: new Style({
+    stroke: new Stroke({
+      color: "#1d7368",
+      width: 3,
+    }),
+    fill: new Fill({
+      color: "#1d736822",
+    }),
+  }),
+};
+
+const modifyStyles = {
+  Polygon: new Style({
+    stroke: new Stroke({
+      color: "#1d7368",
+      width: 3,
+    }),
+    fill: new Fill({
+      color: "#1d736866",
+    }),
+  }),
+};
+const styleFunction = function (feature) {
+  return styles[feature.getGeometry().getType()];
+};
+const modifyStyleFunction = function (feature) {
+  return modifyStyles[feature.getGeometry().getType()];
+};
+
 export default function MapOpenLayers({
   states,
   dispatch,
@@ -38,36 +68,6 @@ export default function MapOpenLayers({
   const [message, setMessage] = useState("");
   const [showSpinner, setShowSpinner] = useState(false);
   var featureId = 0;
-
-  const styles = {
-    Polygon: new Style({
-      stroke: new Stroke({
-        color: "#1d7368",
-        width: 3,
-      }),
-      fill: new Fill({
-        color: "#1d736822",
-      }),
-    }),
-  };
-
-  const modifyStyles = {
-    Polygon: new Style({
-      stroke: new Stroke({
-        color: "#1d7368",
-        width: 3,
-      }),
-      fill: new Fill({
-        color: "#1d736866",
-      }),
-    }),
-  };
-  const styleFunction = function (feature) {
-    return styles[feature.getGeometry().getType()];
-  };
-  const modifyStyleFunction = function (feature) {
-    return modifyStyles[feature.getGeometry().getType()];
-  };
 
   const clearLayers = () => {
     if (draw) {
