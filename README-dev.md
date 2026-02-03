@@ -153,6 +153,35 @@ In addition to these services,
 - `scripts` folder contains all the scripts that can be run.
 - `output` folder contains all script results.
 
+### Restrict access to a BON in a Box instance
+In order to require authentication to access a BON in a Box instance,
+a simple http authentication can be configured in the host instance.
+For this, we assume that the host machine has a routing that redirects the outside traffic to the local BON in a Box instance. (This NGINX router
+is separate from the one built-in with the BON in a Box microservice infrastructure.)
+
+```mermaid
+architecture-beta
+    service client(internet)[Client]
+
+    group host(cloud)[Host]
+
+    service routing(server)[NGINX routing] in host
+    service biab(server)[BON in a Box] in host
+
+    client:R -- L:routing
+    routing:R -- L:biab
+```
+
+Follow these steps from the NGINX documentation: https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/
+
+In the NGINX configuration of the router, you should then have something like this:
+``` nginx
+  # Uncomment this section to make a restricted instance
+  # see https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/
+  auth_basic "Restricted BON in a Box instance";
+  auth_basic_user_file /etc/apache2/.htpasswd;
+```
+
 ## Script lifecycle & artifacts
 
 ```mermaid
