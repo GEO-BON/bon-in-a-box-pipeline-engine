@@ -235,4 +235,63 @@ class HPCTest {
             any(), any())
         }
     }
+
+    @Test
+    fun `given conda sync_when called twice with same environment_then same job is returned`() = runTest {
+        val condaEnvName = "test-env"
+        val logFile = outputRoot.resolve("test.log")
+        val syncCommand = "sync command"
+
+        val step0 = mockHPCStep(0)
+        val run0 = mockRun(step0, "run command")
+        val step1 = mockHPCStep(0)
+        val run1 = mockRun(step1, "run command")
+
+
+        coEvery { hpc.connection.runCommand(any(), any(), any()) } coAnswers { delay(5000); }
+        coEvery { hpc.connection.syncFiles(any(), any(), any()) } just runs
+
+        val job1 = hpc.syncCondaEnvironment(run0, condaEnvName, logFile, syncCommand)
+        val job2 = hpc.syncCondaEnvironment(run1, condaEnvName, logFile, syncCommand)
+
+        assertTrue(job1 === job2)
+    }
+
+    @Test
+    fun `given conda sync fails_when command throws exception_then all registered steps with same environment are failed`() = runTest {
+        hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
+        every { hpc.connection.sendJobs(any(), any(), any(), any()) } just runs
+        coEvery { hpc.connection.retrieveFiles(allAny()) } just runs
+        serverContext = ServerContext(hpc)
+
+        val condaEnvName = "failing-env"
+        val logFile = outputRoot.resolve("test.log")
+        val command = "conda env sync command"
+
+        val step1 = mockHPCStep(1)
+        val run1 = mockRun(step1, "echo test1", HPCRequirements(1, 4, 10.minutes))
+        every { run1.condaEnvName } returns condaEnvName
+        every { run1.fail(any()) } just runs
+
+        val step2 = mockHPCStep(2)
+        val run2 = mockRun(step2, "echo test2", HPCRequirements(1, 4, 10.minutes))
+        every { run2.condaEnvName } returns condaEnvName
+        every { run2.fail(any()) } just runs
+
+        hpc.register(step1)
+        hpc.register(step2)
+
+        coEvery { hpc.connection.runCommand(any(), any(), any()) } coAnswers {
+            Thread.sleep(100) // This would not work with TestScope().launch { delay(1000) }
+            throw RuntimeException("This is an error message")
+        }
+
+        hpc.syncCondaEnvironment(run1, condaEnvName, logFile, command)
+        hpc.syncCondaEnvironment(run2, condaEnvName, logFile, command)
+
+        Thread.sleep(200) // This would not work delay(2000)
+
+        verify { run1.fail(any()) }
+        verify { run2.fail(any()) }
+    }
 }

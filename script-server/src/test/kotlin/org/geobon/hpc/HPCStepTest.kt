@@ -18,12 +18,12 @@ import org.junit.jupiter.api.assertThrows
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.File.createTempFile
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.fail
 import kotlin.time.Duration.Companion.hours
-import java.io.File.createTempFile
 
 @ExperimentalCoroutinesApi
 internal class HPCStepTest {
@@ -300,6 +300,7 @@ internal class HPCStepTest {
     @Test
     fun givenScriptHasCondaEnv_whenExecute_thenEnvironmentPrepared() = runTest {
         every { hpc.register(any()) } just runs
+        every { hpc.syncCondaEnvironment(any(), any(), any(), any()) } returns launch { println("inside job") }
         val inputFile = File(outputRoot, "someFile.csv")
         inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
         val step = ScriptStep(
@@ -355,6 +356,7 @@ internal class HPCStepTest {
         coVerifyOrder {
             hpc.register(step)
             connection.syncFiles(allAny())
+            hpc.syncCondaEnvironment(any(), any(), any(), any())
             hpc.ready(any())
             hpc.unregister(step)
         }

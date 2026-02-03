@@ -4,8 +4,6 @@ import dev.vishna.watchservice.KWatchEvent
 import dev.vishna.watchservice.asWatchChannel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.RunContext
 import org.geobon.pipeline.outputRoot
@@ -21,7 +19,7 @@ class HPCRun(
     scriptFile: File,
     private val inputPipes: Map<String, Pipe>,
     val requirements: HPCRequirements,
-    private val condaEnvName: String? = null,
+    val condaEnvName: String? = null,
     private val condaEnvYml: String? = null
 ) : Run(scriptFile, context) {
 
@@ -39,10 +37,10 @@ class HPCRun(
         val watchChannel = context.outputFolder.asWatchChannel()
         try {
             coroutineScope {
-                val condaEnvFile = File(context.outputFolder, "$condaEnvName.conda.yml")
-                if(condaEnvYml != null && condaEnvName != null) {
-                    condaEnvFile.writeText(condaEnvYml)
-                }
+                val condaEnvFile = if (condaEnvName != null && condaEnvYml != null) {
+                    File(context.outputFolder, "$condaEnvName.conda.yml")
+                        .apply { writeText(condaEnvYml) }
+                } else null
 
                 val fileSyncJob = launch {
                     logFile.appendText("Please be patient, after submission logs will only appear when the job starts on the HPC.\nLogs are updated every minute.\n")
@@ -60,26 +58,18 @@ class HPCRun(
                 }
                 fileSyncJob.join() // We want the conda file to be present while conda sync is happening.
 
-                val condaSyncJob = launch {
-                    if(condaEnvYml != null && condaEnvName != null) {
-                        logFile.appendText("Acquiring lock to check conda environment on HPC...\n")
+                val condaSyncJob =
+                    if (condaEnvName != null && condaEnvFile != null) {
                         val condaEnvWrapper = "$scriptStubsRoot/system/condaEnvironmentHPC.sh"
-
-                        condaSyncMutex.withLock {
-                            logFile.appendText("Lock acquired. Syncing conda environment towards HPC...\n")
-                            hpcConnection.runCommand("""
+                        hpc.syncCondaEnvironment(
+                            this@HPCRun, condaEnvName, logFile,
+                            """
                                 module load apptainer${hpcConnection.apptainerVersion} && ${getApptainerBaseCommand(hpcConnection.condaImage, true)} '
                                     source $condaEnvWrapper ${context.outputFolderEscaped} "$condaEnvName" "$condaEnvFile"
                                 '
-                            """.replace(Regex("""\s*\n\s*"""), " "),
-                                30,
-                                logFile)
-                        }
-
-                        // Send edited log file to HPC
-                        hpcConnection.syncFiles(listOf(context.logFile), null, logFile)
-                    }
-                }
+                            """.replace(Regex("""\s*\n\s*"""), " ")
+                        )
+                    } else null
 
                 launch {
                     withContext(Dispatchers.IO) {
@@ -104,7 +94,7 @@ class HPCRun(
 
                 // Signal job is ready to be sent
                 fileSyncJob.join()
-                condaSyncJob.join()
+                condaSyncJob?.join()
                 hpc.ready(this@HPCRun)
                 logger.debug("Waiting for results to be synced back... {}", context.resultFile)
                 // this will stop when watchChannel.close() called above, is cancelled, or script times out.
@@ -207,10 +197,5 @@ class HPCRun(
             mapOf<String, Any>(ERROR_KEY to message)
         ))
     }
-
-    companion object {
-        val condaSyncMutex = Mutex()
-    }
-
 }
 

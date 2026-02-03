@@ -2,7 +2,10 @@ package org.geobon.hpc
 
 import kotlinx.coroutines.*
 import org.geobon.pipeline.ScriptStep
+import java.io.File
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
 import kotlin.time.Duration.Companion.seconds
 
 open class HPC (
@@ -12,9 +15,16 @@ open class HPC (
 ) {
     val registeredSteps = WeakHashMap<ScriptStep, HPCRun?>()
     val runningSteps = WeakHashMap<ScriptStep, HPCRun>()
+    val condaSyncJobs = ConcurrentHashMap<String, Pair<Job, MutableList<HPCRun>>>()
+
+    /** Makes sure only one conda sync happens at the same time. */
+    val condaSyncDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    private val condaSyncScope = CoroutineScope(
+        SupervisorJob() + condaSyncDispatcher + CoroutineName("CondaSyncScope")
+    )
 
 
-    var syncJob: Job? = null
+    var resultsSyncJob: Job? = null
 
     constructor() : this(HPCConnection())
 
@@ -33,6 +43,35 @@ open class HPC (
 
         // A cancelled task can trigger all the other tasks to be ready
         verifySend()
+    }
+
+    fun syncCondaEnvironment(run: HPCRun, condaEnvName:String, logFile: File, command: String): Job {
+        if(condaSyncJobs.contains(condaEnvName)) {
+            logFile.appendText("Conda sync for $condaEnvName already in progress, launched by another script.\n")
+        }
+
+        val jobRuns = condaSyncJobs.computeIfAbsent(condaEnvName) {
+            condaSyncScope.launch {
+                try {
+                    logFile.appendText("Lock acquired. Syncing conda environment towards HPC...\n")
+                    connection.runCommand(command, 60, logFile)
+                    logFile.appendText("Releasing lock.\n")
+
+                    // Send edited log file to HPC
+                    connection.syncFiles(listOf(logFile), null, logFile)
+                } catch (t: Throwable) {
+                    t.printStackTrace()
+                    condaSyncJobs[condaEnvName]?.second?.let { runs ->
+                        runs.forEach { it.fail("Failed to sync conda environment $condaEnvName: ${t.message}") }
+                    }
+                } finally {
+                    condaSyncJobs.remove(condaEnvName)
+                }
+            } to mutableListOf()
+        }
+
+        jobRuns.second.add(run)
+        return jobRuns.first
     }
 
     fun ready(run: HPCRun) {
@@ -98,14 +137,14 @@ open class HPC (
     private fun updateRetrieveJob() {
         synchronized(syncScope) {
             if (runningSteps.isEmpty()) {
-                syncJob?.cancel("No more running steps.")
-                syncJob = null
+                resultsSyncJob?.cancel("No more running steps.")
+                resultsSyncJob = null
 
-            } else if (syncJob?.isActive == true) {
+            } else if (resultsSyncJob?.isActive == true) {
                 return // leave it running
 
             } else {
-                syncJob = syncScope.launch {
+                resultsSyncJob = syncScope.launch {
                     var failCount = 0
                     delay(10000) // Small delay to be able to see batch job submission log on first sync
 
