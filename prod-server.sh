@@ -212,16 +212,26 @@ function checkForUpdates {
 
     check_image_update() {
         local image="$1"
+        local logFile="TEMP_$(basename "$image" | tr ':' '_').log"
+        rm -f $logFile
+
         # Get the local digest in the format sha256:<hash>
+        echo docker image inspect "$image" 2>/dev/null >> $logFile
+        echo "Local digest: " $(docker image inspect "$image" 2>/dev/null | cut -d '@' -f2) >> $logFile
         local localDigest=$(docker image inspect --format='{{index .RepoDigests 0}}' "$image" 2>/dev/null | cut -d '@' -f2)
         if [[ -z "$localDigest" ]]; then
+            echo "Not available locally" >> $logFile
             echo "$image" # Not available locally
             return
         fi
 
         local remoteDigest=$(docker manifest inspect -v "$image")
+        echo "Remote digest: $remoteDigest" >> $logFile
         if ! echo "$remoteDigest" | grep -q "$localDigest"; then
+            echo "Local digest does not match remote digest for $image" >> $logFile
             echo "$image"
+        else
+            echo "Local digest matches: $image up to date" >> $logFile
         fi
     }
 
