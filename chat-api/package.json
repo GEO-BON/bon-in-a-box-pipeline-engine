@@ -1,0 +1,21 @@
+{
+  "name": "chat-api",
+  "version": "1.0.0",
+  "description": "Chat API for pipeline engine",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@copilotkit/runtime": "^1.51.3",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

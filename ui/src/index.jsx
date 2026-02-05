@@ -18,6 +18,7 @@ import StepChooser from "./components/PipelineEditor/StepChooser";
 import { Layout } from "./Layout";
 import InfoPage from "./components/InfoPage";
 import RunHistory from "./components/RunHistory";
+import Chat from "./components/chat";
 import { Spinner } from "./components/Spinner";
 import { HttpError } from "./components/HttpErrors";
 const PipelineEditor = lazy(() =>
@@ -48,6 +49,12 @@ const router = createBrowserRouter([
     path: "script-form/:pipeline?/:runHash?",
     element: (
       <Layout right={<PipelinePage key="singleScriptRun" runType="script" />} />
+    ),
+  },
+  {
+    path: "chat",
+    element: (
+      <Layout right={<Chat />} />
     ),
   },
   {

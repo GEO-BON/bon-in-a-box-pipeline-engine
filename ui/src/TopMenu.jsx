@@ -15,6 +15,7 @@ const pages = [
   { title: 'Home', link: '/' },
   { title: 'Run a script', link: '/script-form' },
   { title: 'Run a pipeline', link: '/pipeline-form' },
+  { title: 'Chat', link: '/chat' },
   { title: 'Pipeline editor', link: '/pipeline-editor' },
   { title: 'History', link: '/history' },
   { title: 'Info', link: '/info' }

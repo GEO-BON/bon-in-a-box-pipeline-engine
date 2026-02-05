@@ -85,3 +85,19 @@ services:
       - script-server
       - python-api
 
+  chat-api:
+    build:
+      context: ./chat-api
+    volumes:
+      - ./chat-api:/usr/src/app:rw
+    working_dir: /usr/src/app
+    command: sh -c "npm install; npm run start;"
+    expose:
+      - "4000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      GOOGLE_GENERATIVE_AI_API_KEY: ${GOOGLE_GENERATIVE_AI_API_KEY}
+
