@@ -78,6 +78,8 @@ open class SystemCall {
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 if(errorString.isNotBlank()) errorString += "\n"
+                errorString += "${ex.message}\n"
+                logFile?.appendText(errorString)
 
                 CallResult(
                     1,

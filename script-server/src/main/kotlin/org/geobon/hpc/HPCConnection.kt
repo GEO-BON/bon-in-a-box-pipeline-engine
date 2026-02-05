@@ -140,7 +140,7 @@ class HPCConnection(
                             timeoutAmount = 1, timeoutUnit = MINUTES, logger = logger, mergeErrors = true
                         )
 
-                        scriptsStatus.state = if (callResult.exitCode == 0) {
+                        scriptsStatus.state = if (callResult.success) {
                             RemoteSetupState.READY
                         } else {
                             logger.error(callResult.output)
@@ -256,7 +256,7 @@ class HPCConnection(
                     if (callResult.output.isNotBlank())
                         logger.info(callResult.output) // excludes error stream
 
-                    apptainerImage.state = if (callResult.exitCode == 0) {
+                    apptainerImage.state = if (callResult.success) {
                         RemoteSetupState.READY
                     } else {
                         apptainerImage.message = callResult.error
