@@ -77,10 +77,12 @@ else
     # function to prevent two different sub-environments from doing transactions
     # at the same time.
     lockFile="/conda-env-yml/$condaEnvName.lock"
-    exec {lockfd}>"$lockFile"
-    trap 'exec {lockfd}>&-; rm -f "$lockFile"' EXIT
-    flock --verbose -x "$lockfd"
+    exec {lockfd}>>"$lockFile" ; assertSuccess
+    trap 'exec {lockfd}>&- 2>/dev/null || true' EXIT INT TERM HUP
+    flock --verbose -x "$lockfd" ; assertSuccess
 
     activateSubEnvironment
+
+    exec {lockfd}>&-
 fi
 echo "Conda environment ready."
