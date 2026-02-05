@@ -212,13 +212,14 @@ function checkForUpdates {
 
     check_image_update() {
         local image="$1"
-        local logFile="TEMP_$(basename "$image" | tr ':' '_').log"
+        local logFile="$(whoami)_$(basename "$image" | tr ':' '_').log"
         rm -f $logFile
 
         # Get the local digest in the format sha256:<hash>
         echo docker image inspect "$image" 2>/dev/null >> $logFile
-        echo "Local digest: " $(docker image inspect "$image" 2>/dev/null | cut -d '@' -f2) >> $logFile
-        local localDigest=$(docker image inspect --format='{{index .RepoDigests 0}}' "$image" 2>/dev/null | cut -d '@' -f2)
+        local localDigest=$(docker image inspect --format='{{index .Id}}' "$image" 2>/dev/null | cut -d '@' -f2)
+        echo "Local digest: $localDigest" >> $logFile
+        echo "Local inspect: " $(docker image inspect "$image" 2>/dev/null | cut -d '@' -f2) >> $logFile
         if [[ -z "$localDigest" ]]; then
             echo "Not available locally" >> $logFile
             echo "$image" # Not available locally
@@ -232,6 +233,15 @@ function checkForUpdates {
             echo "$image"
         else
             echo "Local digest matches: $image up to date" >> $logFile
+        fi
+
+        # Make sure the current container uses the same image (in case we switch tags with compose.env.yml)
+        local container=$(docker container ls -a --format "table {{.Image}}" | grep "^$image$")
+        if [[ -n "$container" ]]; then
+            echo "Container exists for $image" >> $logFile
+        else
+            echo "No container exists for $image" >> $logFile
+            echo "$image"
         fi
     }
 
@@ -349,7 +359,8 @@ function up {
             if [[ -n "$containersToDiscard" ]]; then
                 echo -e "${YELLOW}This update will discard the following runner containers: ${ENDCOLOR}"
                 for container in $containersToDiscard; do
-                    echo -e "${YELLOW} - $container${ENDCOLOR}"
+                    local containerNoTag=$(echo $container | cut -d':' -f1)
+                    echo -e "${YELLOW} - $containerNoTag${ENDCOLOR}"
                 done
                 echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
             fi
@@ -378,9 +389,9 @@ function up {
     returnCode=0 # 0=true in bash
     for service in $savedContainerServices; do
         flag="--no-recreate" # By default, we keep runners unless they are updated
-        if [[ $containersToDiscard == "*$service*" ]]; then
+        if [[ $containersToDiscard == *"$service"* ]]; then
             echo "  Discarding $service runner"
-            flag=""
+            flag="--force-recreate"
         fi
 
         lastOutput=$(command up -d $flag $service 2>&1); lastReturnCode=$?;
