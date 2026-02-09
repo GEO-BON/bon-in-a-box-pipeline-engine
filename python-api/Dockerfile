@@ -15,9 +15,9 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR /app/
 
-RUN uv pip install fastapi "uvicorn[standard]" requests duckdb pandas geopandas pandas_geojson shapely pygadm fiona
-
 COPY app /app
+
+RUN uv pip install -r /app/requirements.txt
 
 FROM ghcr.io/developmentseed/titiler:${TITILER_VERSION} AS runtime
 

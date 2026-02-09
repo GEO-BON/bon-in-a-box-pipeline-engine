@@ -13,6 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "@copilotkit/runtime": "^1.51.3",
+    "@copilotkit/shared": "^1.51.3",
+    "@google/generative-ai": "^0.24.1",
     "express": "^4.18.2"
   },
   "devDependencies": {

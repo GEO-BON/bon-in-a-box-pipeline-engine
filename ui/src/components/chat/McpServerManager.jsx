@@ -7,10 +7,10 @@ function McpServerManager() {
   const { setMcpServers } = useCopilotChat();
 
   useEffect(() => {
-    if(!setMcpServers) return;
+    if (!setMcpServers) return;
     setMcpServers([
       {
-        endpoint: "http://localhost:8001/mcp",
+        endpoint: "/mcp",
       },
     ]);
   }, [setMcpServers]);
