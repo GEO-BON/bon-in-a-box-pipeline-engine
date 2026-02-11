@@ -25,8 +25,8 @@ export function Layout(props) {
     <PopupContentContext.Provider value={{popupContent, setPopupContent}}>
       <ThemeProvider theme={theme}>
         <CopilotKit 
-          runtimeUrl="/copilotkit" 
-          showDevConsole={false}
+          runtimeUrl="/copilotkit"
+          showDevConsole={true}
           useSingleEndpoint={true}
         > 
         <div className="left-pane">

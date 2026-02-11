@@ -1,9 +1,11 @@
 import "@copilotkit/react-ui/styles.css";
 import { CopilotChat } from "@copilotkit/react-ui";
+import McpServerManager from "./McpServerManager";
 
 export default function Chat() {
   return (
     <>
+      {false && <McpServerManager />}
       <CopilotChat
         copilotkitUrl="/copilotkit"
         className="copilot-chat"

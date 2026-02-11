@@ -58,7 +58,22 @@ TOOL_INJECTED_CONTEXT = f"""
 # -------------------------------------------------------------------------
 # 5. MCP RESOURCES (BON in a Box Scripts & Pipelines)
 # -------------------------------------------------------------------------
-BON_IN_A_BOX_API_BASE = os.getenv("BON_IN_A_BOX_API_BASE", "http://localhost")
+BON_IN_A_BOX_API_BASE = os.getenv("BON_IN_A_BOX_API_BASE", "http://biab-script-server:8080")
+MAX_TOOL_OUTPUT_CHARS = int(os.getenv("MAX_TOOL_OUTPUT_CHARS", "8000"))
+
+
+def truncate_output(value: object) -> str:
+    """Ensure tool outputs are strings and cap length to avoid oversized prompts."""
+    if isinstance(value, str):
+        text = value
+    else:
+        try:
+            text = str(value)
+        except Exception:
+            text = ""
+    if MAX_TOOL_OUTPUT_CHARS > 0 and len(text) > MAX_TOOL_OUTPUT_CHARS:
+        return text[:MAX_TOOL_OUTPUT_CHARS] + "\n...<truncated>"
+    return text
 
 def fetch_step_list(step_type: str) -> dict:
     base = BON_IN_A_BOX_API_BASE.rstrip("/")
@@ -115,6 +130,24 @@ def analyst_persona() -> str:
 # 7. TOOL DEFINITION & MANUAL REGISTRATION
 # -------------------------------------------------------------------------
 
+@mcp.tool()
+# def get_step_info(step_type: str, description_path: str) -> str:
+#     """Get detailed information about a script or pipeline, including required input parameters.
+    
+#     Args:
+#         step_type: The type of step ('script' or 'pipeline')
+#         description_path: The path to the step's description file
+#     """
+#     base = BON_IN_A_BOX_API_BASE.rstrip("/")
+#     url = f"{base}/{step_type}/{description_path}/info"
+#     try:
+#         response = requests.get(url, timeout=10)
+#         response.raise_for_status()
+#         payload = response.json()
+#         return truncate_output(payload)
+#     except Exception as exc:
+#         return truncate_output(f"Error fetching info for {step_type} at {url}: {str(exc)}")
+
 def execute_step(step_type: str, description_path: str, input_params: dict) -> str:
     """Execute a BON in a Box step or pipeline.
     
@@ -133,11 +166,11 @@ def execute_step(step_type: str, description_path: str, input_params: dict) -> s
         response = requests.post(url, json=input_params, timeout=10)
         response.raise_for_status()
         payload = response.json()
-        return str(payload) if isinstance(payload, dict) else str(payload)
+        return truncate_output(payload)
     except Exception as exc:
         error_msg = f"Error executing {step_type} at {url}: {str(exc)}"
         print(f"⚠️ {error_msg}", file=sys.stderr)
-        return error_msg
+        return truncate_output(error_msg)
 
 execute_step.__doc__ = f"""
 Executes queries on the BON in a Box platform through its API. 
