@@ -55,7 +55,6 @@ open class HPC (
                 try {
                     logFile.appendText("Lock acquired. Syncing conda environment towards HPC...\n")
                     connection.runCommand(command, 60, logFile)
-                    logFile.appendText("Releasing lock.\n")
 
                     // Send edited log file to HPC
                     connection.syncFiles(listOf(logFile), null, logFile)
@@ -66,6 +65,7 @@ open class HPC (
                     }
                 } finally {
                     condaSyncJobs.remove(condaEnvName)
+                    logFile.appendText("Releasing lock.\n")
                 }
             } to mutableListOf()
         }
