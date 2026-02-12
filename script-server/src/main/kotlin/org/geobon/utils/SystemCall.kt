@@ -20,6 +20,7 @@ open class SystemCall {
     ): CallResult {
         var inputString = ""
         var errorString = ""
+        println("TEMP SystemCall: ${call.joinToString(" ")}")
         return runBlocking(Dispatchers.IO) {
             try {
                 val process = ProcessBuilder(call)
@@ -70,9 +71,14 @@ open class SystemCall {
                 }
                 fileOutputJob?.join()
 
-                // If read continuously,
-                inputString += process.inputReader().readText().also { logFile?.appendText(it) }
-                errorString += process.errorReader().readText().also { logFile?.appendText(it) }
+                // Read the rest (when read continuously), or read it all (when no log file)
+                // Checking ready avoids exceptions when stream has been closed.
+                process.inputReader().apply {
+                    if (ready()) inputString += readText().also { logFile?.appendText(it) }
+                }
+                process.errorReader().apply {
+                    if (ready()) errorString += readText().also { logFile?.appendText(it) }
+                }
 
                 CallResult(process.exitValue(), inputString, errorString)
             } catch (ex: Exception) {
