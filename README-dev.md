@@ -298,6 +298,56 @@ hpc:
 It is recommended to check the documentation of the cluster that will receive the calls,
 to tailor the requested resources to best fit it's compute nodes specification.
 
+### Flow
+The following diagram shows the states a script run undergoes when being sent to the HPC.
+
+```mermaid
+stateDiagram-v2
+    biab: BON in a Box
+    state HPC {
+        state before_synced <<join>>
+        state before_submitted <<join>>
+    }
+
+    state biab {
+        [*] --> Registered
+        Registered --> syncing : prerequisite steps completed
+        syncing --> Ready : scripts, inputs and environments synced
+        syncing --> before_synced
+
+        Ready --> Running : batch accumulated
+        Running --> retrieved
+        Running --> before_submitted
+        retrieved --> [*]
+    }
+
+    state HPC {
+        [*] --> hpcReady : create images and overlays
+        hpcReady --> before_synced
+        before_synced --> Synced
+        Synced --> before_submitted
+        before_submitted --> submitted
+        submitted --> hpcRunning
+        hpcRunning --> results
+        results --> retrieved
+    }
+
+
+
+    state HPC {
+        hpcReady : Ready
+        submitted: Batch submitted
+        results: Results generated
+        hpcRunning: Running on commpute node
+    }
+
+    state biab {
+        retrieved : Results retrieved
+        syncing : Synchronisation
+    }
+
+```
+
 ### Limitations
 The current implementation is basic, and has the following limitations:
 - Max 1 HPC-enabled script per pipeline. (In reality, one HPC task must not depend on the results of another, to avoid waiting forever for the batch to be sent.)
