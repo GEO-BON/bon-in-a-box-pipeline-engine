@@ -1,11 +1,12 @@
 import "@copilotkit/react-ui/styles.css";
 import { CopilotChat } from "@copilotkit/react-ui";
 import McpServerManager from "./McpServerManager";
+import ToolRenderer from "./ToolRenderer";
 
 export default function Chat() {
   return (
     <>
-      {false && <McpServerManager />}
+      <McpServerManager />
       <CopilotChat
         copilotkitUrl="/copilotkit"
         className="copilot-chat"
@@ -17,6 +18,7 @@ export default function Chat() {
           initial: "Hi! 👋 How can I assist you today?",
         }}
       />
+      <ToolRenderer />
     </>
   );
 }

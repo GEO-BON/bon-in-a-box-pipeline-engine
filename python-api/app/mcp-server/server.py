@@ -133,7 +133,7 @@ def analyst_persona() -> str:
 @mcp.tool()
 # def get_step_info(step_type: str, description_path: str) -> str:
 #     """Get detailed information about a script or pipeline, including required input parameters.
-    
+
 #     Args:
 #         step_type: The type of step ('script' or 'pipeline')
 #         description_path: The path to the step's description file
