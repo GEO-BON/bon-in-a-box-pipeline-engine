@@ -524,7 +524,7 @@ img#greenSquares {
   text-decoration: none;
 }
 
-.outputTitle .clickable {
+.outputTitle {
   display: flex;
   align-items: center;
   width: 100%;
@@ -932,7 +932,7 @@ h2.MuiDialogTitle-root {
     margin-bottom: 10px;
   }
 
-  .outputTitle .clickable {
+  .outputTitle {
     flex-wrap: wrap
   }
 

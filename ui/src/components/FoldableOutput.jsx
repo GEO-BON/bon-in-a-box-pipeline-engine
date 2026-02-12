@@ -117,34 +117,32 @@ function FoldableOutputInternal({
   return (
     <div className={className}>
       <div className="outputTitle">
-        <div className="clickable" onClick={toggle}>
-          <div className="expandIcon">
-            {active ? (
-              <ExpandLessIcon
-                sx={{
-                  verticalAlign: "middle",
-                  fontSize: "2em",
-                  color: "var(--biab-green-main)",
-                  marginTop: "-3px",
-                }}
-              />
-            ) : (
-              <ExpandMoreIcon
-                sx={{
-                  verticalAlign: "middle",
-                  fontSize: "2em",
-                  color: "var(--biab-green-main)",
-                  marginTop: "-3px",
-                }}
-              />
-            )}{" "}
-            {icon}
-          </div>
-          <h3 ref={titleRef}>{title}</h3>
-          <div className="inlinePreview">
-            {inline}
-            {active ? inlineExpanded : inlineCollapsed}
-          </div>
+        <div className="expandIcon clickable" onClick={toggle}>
+          {active ? (
+            <ExpandLessIcon
+              sx={{
+                verticalAlign: "middle",
+                fontSize: "2em",
+                color: "var(--biab-green-main)",
+                marginTop: "-3px",
+              }}
+            />
+          ) : (
+            <ExpandMoreIcon
+              sx={{
+                verticalAlign: "middle",
+                fontSize: "2em",
+                color: "var(--biab-green-main)",
+                marginTop: "-3px",
+              }}
+            />
+          )}{" "}
+          {icon}
+        </div>
+        <h3 className="clickable" ref={titleRef} onClick={toggle}>{title}</h3>
+        <div className="inlinePreview">
+          {inline}
+          {active ? inlineExpanded : inlineCollapsed}
         </div>
       </div>
 
