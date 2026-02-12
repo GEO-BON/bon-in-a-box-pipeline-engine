@@ -44,7 +44,7 @@ export default class DefaultApi {
      */
 
     /**
-     * Returns the list of countries from GADM with their ISO3/GID and English names
+     * Returns the list of countries from FieldMaps.io with their ISO3 and English names
      * @param {module:api/DefaultApi~getCountriesListCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<Object>}
      */
@@ -302,8 +302,8 @@ export default class DefaultApi {
      */
 
     /**
-     * Returns the geometry of the specified region from GADM in GeoJSON format
-     * @param {String} id ID of the region to get the geometry for, from the UN regions codes
+     * Returns the geometry of the specified country or region from FieldMaps.io in GeoJSON format
+     * @param {String} id ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes
      * @param {Object} opts Optional parameters
      * @param {module:model/String} [type = 'country')] Type of region to get the geometry for (country or region)
      * @param {module:api/DefaultApi~getRegionGeometryCallback} callback The callback function, accepting three arguments: error, data, response
@@ -348,7 +348,7 @@ export default class DefaultApi {
      */
 
     /**
-     * Returns the list of regions with their ID, Country, English names and bounding box
+     * Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
      * @param {String} countryIso ISO3 code of the country to get the regions for (e.g. \"CAN\" for Canada)
      * @param {module:api/DefaultApi~getRegionsListCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<Object>}

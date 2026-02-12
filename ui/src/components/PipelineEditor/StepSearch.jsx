@@ -76,7 +76,8 @@ export function getMetadataExcerpt(metadata, keywords) {
       let ref = metadata.references[i];
       let refStr = "In references: ";
       if (ref.text) refStr += ref.text + " ";
-      if (ref.doi) refStr += ref.doi;
+      if (ref.link) refStr += ref.link;
+      else if (ref.doi) refStr += ref.doi; // deprecated in favor of link
 
       found = extractExcerpt(refStr, keywords);
       if (found) return found;

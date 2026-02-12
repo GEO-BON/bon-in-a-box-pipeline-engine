@@ -53,6 +53,9 @@ class InfoReferencesInner {
             if (data.hasOwnProperty('doi')) {
                 obj['doi'] = ApiClient.convertToType(data['doi'], 'String');
             }
+            if (data.hasOwnProperty('link')) {
+                obj['link'] = ApiClient.convertToType(data['link'], 'String');
+            }
         }
         return obj;
     }
@@ -71,6 +74,10 @@ class InfoReferencesInner {
         if (data['doi'] && !(typeof data['doi'] === 'string' || data['doi'] instanceof String)) {
             throw new Error("Expected the field `doi` to be a primitive type in the JSON string but got " + data['doi']);
         }
+        // ensure the json data is a string
+        if (data['link'] && !(typeof data['link'] === 'string' || data['link'] instanceof String)) {
+            throw new Error("Expected the field `link` to be a primitive type in the JSON string but got " + data['link']);
+        }
 
         return true;
     }
@@ -86,9 +93,16 @@ class InfoReferencesInner {
 InfoReferencesInner.prototype['text'] = undefined;
 
 /**
+ * deprecated, use \"link\" instead.
  * @member {String} doi
  */
 InfoReferencesInner.prototype['doi'] = undefined;
+
+/**
+ * Full link to the resource (ex. https://doi.org/...)
+ * @member {String} link
+ */
+InfoReferencesInner.prototype['link'] = undefined;
 
 
 

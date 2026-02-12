@@ -372,7 +372,7 @@ outputs: # 1 to many
 
 references: # 0 to many
   - text: # plain text reference
-    doi: # link
+    link: # full link to the resource (ex. https://doi.org/...)
 
 conda: # Optional, only needed if your script has specific package dependencies
   channels: # programs that you need
