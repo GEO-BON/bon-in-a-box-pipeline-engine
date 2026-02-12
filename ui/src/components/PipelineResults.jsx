@@ -95,12 +95,12 @@ export function PipelineResults({
                       pipelineOutputResults[breadcrumbs][outputId];
 
                     // If not in outputs, check if it was an input marked as output
-                    if (!value) {
+                    if (value === null || value === undefined) {
                       value = inputFileContent[breadcrumbs];
                     }
 
 
-                    if (!value) {
+                    if (value === null || value === undefined) {
                       let noValueStatus = null;
                       if (/pipeline@\d+|default_output/.test(ioId)) {
                         noValueStatus = <span>N/A</span>;
