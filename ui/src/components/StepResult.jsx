@@ -99,7 +99,7 @@ export const SingleIOResult = memo(
 
     function renderContent(content) {
       if (content === null || content === undefined) return "null";
-      if (content === "") return "Empty string"
+      if (content === "") return "Empty string";
 
       let error = "";
       if (ioMetadata) {

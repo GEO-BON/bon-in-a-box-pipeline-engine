@@ -26,7 +26,7 @@ import {
 } from "./StepDescription";
 import { getScript } from "../utils/IOId";
 import { fetchStepDescriptionAsync } from "./PipelineEditor/StepDescriptionStore";
-import downloadImg from "../img/fa-file-arrow-down.svg"
+import downloadImg from "../img/fa-file-arrow-down.svg";
 
 export function PipelineResults({
   pipelineMetadata,

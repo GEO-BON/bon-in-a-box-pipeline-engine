@@ -302,7 +302,7 @@ export default class DefaultApi {
      */
 
     /**
-     * Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
+     * Returns the geometry of the specified country or region from FieldMaps.io in GeoJSON format
      * @param {String} id ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes
      * @param {Object} opts Optional parameters
      * @param {module:model/String} [type = 'country')] Type of region to get the geometry for (country or region)
