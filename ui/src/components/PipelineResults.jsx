@@ -337,8 +337,8 @@ export function DelayedResult({
           title="Inputs"
           className="stepInputs"
           inlineExpanded={
-            <a href={`/output/${folder}/input.json`} title="Download YAML input file" download>
-              <img alt="Downlad YAML file" src={downloadImg} className="file-download" />
+            <a href={`/output/${folder}/input.json`} title="Download input file" download>
+              <img alt="Downlad input file" src={downloadImg} className="file-download" />
             </a>
           }
         >
