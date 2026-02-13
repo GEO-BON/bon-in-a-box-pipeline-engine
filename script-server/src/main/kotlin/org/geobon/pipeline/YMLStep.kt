@@ -90,7 +90,7 @@ abstract class YMLStep(
                         ?: throw RuntimeException("$yamlFile: No options found for input parameter $key.")
 
                     if (!options.contains(resolvedInputs[key])) {
-                        throw RuntimeException("$yamlFile: Received value ${resolvedInputs[key]} not in options $options.")
+                        throw RuntimeException("$yamlFile: Received value ${resolvedInputs[key]} as ${resolvedInputs[key]?.javaClass?.simpleName} not in options $options as ${options.first()?.javaClass?.simpleName}.")
                     }
                 }
             }
