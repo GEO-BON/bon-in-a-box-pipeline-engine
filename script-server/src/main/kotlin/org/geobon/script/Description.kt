@@ -16,6 +16,7 @@ object Description {
     const val LABEL = "label"
     const val TYPE = "type"
     const val TYPE_OPTIONS = "options"
+    const val TYPE_TEXT = "text"
 
     const val CONDA = "conda"
     const val CONDA__NAME = "name"
