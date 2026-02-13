@@ -47,16 +47,19 @@ abstract class YMLStep(
         // Validate presence and type of each input
         var errorMessages = ""
         inputsDefinition.forEach { (inputKey, expectedType) ->
-            errorMessages += inputs[inputKey]?.let {
-                if (it.type == expectedType) ""
-                // Check for convertible types (currently only int to float, use a map/when if more conversions are possible)
+            errorMessages += inputs[inputKey]?.let {inputPipe ->
+                if (inputPipe.type == expectedType) ""
+                // Check for type conversions
                 else when {
                     // int to float accepted
-                    it.type == "int" && expectedType == "float" -> ""
+                    inputPipe.type == "int" && expectedType == "float" -> ""
+
+                    // options to text accepted
+                    inputPipe.type == TYPE_OPTIONS && expectedType == "text" -> ""
 
                     // Non-array to single-element array accepted
-                    expectedType.endsWith("[]") && it.type == expectedType.dropLast(2) -> {
-                        inputs[inputKey] = AggregatePipe(listOf(it))
+                    expectedType.endsWith("[]") && inputPipe.type == expectedType.dropLast(2) -> {
+                        inputs[inputKey] = AggregatePipe(listOf(inputPipe))
                         ""
                     }
 
@@ -64,9 +67,9 @@ abstract class YMLStep(
                     else -> {
                         val description = readIODescription(INPUTS, inputKey)
                         val label = description?.get(LABEL) as? String?
-                        var displayName = if (label != null) "\"$label\" ($inputKey)" else inputKey
+                        val displayName = if (label != null) "\"$label\" ($inputKey)" else inputKey
 
-                        "Wrong type for input $displayName: expected \"$expectedType\" but \"${it.type}\" was received.\n"
+                        "Wrong type for input $displayName: expected \"$expectedType\" but \"${inputPipe.type}\" was received.\n"
                     }
                 }
             } ?: "Missing key $inputKey\n\tYAML spec: ${inputsDefinition.keys}\n\tReceived:  ${inputs.keys}\n"
