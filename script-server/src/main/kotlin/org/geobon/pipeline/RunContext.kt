@@ -5,12 +5,17 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.MalformedJsonException
+import org.eclipse.jgit.revwalk.RevWalk
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.runToText
 import org.geobon.utils.toMD5
 import org.json.JSONObject
 import java.io.File
 import kotlin.math.floor
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+
 
 val outputRoot = File(System.getenv("OUTPUT_LOCATION"))
 
@@ -58,10 +63,11 @@ data class RunContext(val runId: String, val inputs: String?) {
         return environment
     }
 
-    fun createEnvironmentFile(container: Containers): Unit {
+    fun createEnvironmentFile(container: Containers) {
         val environment = getEnvironment(container)
         File("${outputFolder.absolutePath}/environment.json").writeText(JSONObject(environment).toString(2))
     }
+
     companion object {
         val scriptRoot
             get() = File(System.getenv("SCRIPT_LOCATION"))
@@ -96,23 +102,40 @@ data class RunContext(val runId: String, val inputs: String?) {
             }
             .create()
 
+        @OptIn(ExperimentalTime::class)
         fun getGitInfo(): Map<String, String?> {
-            val gitBinPath = "/usr/bin/git"
-            val gitDir = System.getenv("GIT_LOCATION")
-            val gitDirOpt = "--git-dir=$gitDir"
-            val gitCmd = "$gitBinPath $gitDirOpt"
+            val gitPath = System.getenv("GIT_LOCATION")
+            if(gitPath == null)
+                return mapOf("error" to "Git folder not defined.")
 
-            val gitCommitIDCommand = "$gitCmd log --format=%h -1"
-            val commit = "commit" to gitCommitIDCommand.runToText(showErrors = false)
+            val gitDir = File(gitPath)
+            if(!gitDir.isDirectory) {
+                return mapOf("error" to "Invalid .git directory path $gitPath")
+            }
 
-            val gitCurrentBranchCommand =  "$gitCmd  branch --show-current"
-            val branch = "branch" to gitCurrentBranchCommand.runToText(showErrors = false)
+            val builder = FileRepositoryBuilder()
+            val repository = builder.setGitDir(gitDir)
+                .readEnvironment() // scan environment GIT_* variables
+                .findGitDir() // scan up the file system tree
+                .build()
 
-            val gitTimeStampCommand = "$gitCmd log --format=%cd -1"
-            val timestamp = "timestamp" to gitTimeStampCommand.runToText(showErrors = false)
+            return repository?.use {
+                val branch = try {
+                    repository.branch
+                } catch (_: Throwable) {
+                    "Failed to read branch"
+                }
 
+                val head = repository.resolve("HEAD")
+                val commitSha = head?.name
+                    ?: "Failed to get commit sha1"
 
-            return mapOf(commit, branch, timestamp)
+                val timestamp = RevWalk(repository).use { walk ->
+                    Instant.fromEpochSeconds(walk.parseCommit(head).commitTime.toLong()).toString()
+                }
+
+                mapOf("branch" to branch, "commit" to commitSha, "timestamp" to timestamp)
+            } ?: mapOf("error" to "Could not read repository")
         }
 
          /**
