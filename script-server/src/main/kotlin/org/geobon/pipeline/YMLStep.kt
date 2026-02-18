@@ -6,6 +6,7 @@ import org.geobon.script.Description.IO__TYPE
 import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
+import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.script.Run
 import org.geobon.server.ServerContext
 import org.json.JSONObject
@@ -29,7 +30,7 @@ abstract class YMLStep(
      */
     var context:RunContext? = null
 
-    val inputsDefinition = readInputs(yamlParsed, logger)
+    val inputTypes = readInputTypes(yamlParsed, logger)
     override fun getDisplayBreadcrumbs(): String {
         return if (yamlParsed.containsKey(NAME)) "\"${yamlParsed[NAME]}\" (${id.toBreadcrumbs()})"
         else id.toBreadcrumbs()
@@ -37,27 +38,30 @@ abstract class YMLStep(
 
     override fun validateInputsConfiguration(): String {
 
-        if (inputs.size != inputsDefinition.size) {
+        if (inputs.size != inputTypes.size) {
             return "Bad number of inputs." +
-                    "\n\tYAML spec: ${inputsDefinition.keys}" +
+                    "\n\tYAML spec: ${inputTypes.keys}" +
                     "\n\tReceived:  ${inputs.keys}" +
-                    "\n\tExtra keys: ${inputs.mapNotNull { if (inputsDefinition.containsKey(it.key)) null else it.key }}" +
-                    "\n\tMissing keys: ${inputsDefinition.mapNotNull { if (inputs.containsKey(it.key)) null else it.key }}\n"
+                    "\n\tExtra keys: ${inputs.mapNotNull { if (inputTypes.containsKey(it.key)) null else it.key }}" +
+                    "\n\tMissing keys: ${inputTypes.mapNotNull { if (inputs.containsKey(it.key)) null else it.key }}\n"
         }
 
         // Validate presence and type of each input
         var errorMessages = ""
-        inputsDefinition.forEach { (inputKey, expectedType) ->
-            errorMessages += inputs[inputKey]?.let {
-                if (it.type == expectedType) ""
-                // Check for convertible types (currently only int to float, use a map/when if more conversions are possible)
+        inputTypes.forEach { (inputKey, expectedType) ->
+            errorMessages += inputs[inputKey]?.let {inputPipe ->
+                if (inputPipe.type == expectedType) ""
+                // Check for type conversions
                 else when {
                     // int to float accepted
-                    it.type == "int" && expectedType == "float" -> ""
+                    inputPipe.type == "int" && expectedType == "float" -> ""
+
+                    // options to text accepted
+                    inputPipe.type == IO__TYPE_OPTIONS && expectedType == IO__TYPE_TEXT -> ""
 
                     // Non-array to single-element array accepted
-                    expectedType.endsWith("[]") && it.type == expectedType.dropLast(2) -> {
-                        inputs[inputKey] = AggregatePipe(listOf(it))
+                    expectedType.endsWith("[]") && inputPipe.type == expectedType.dropLast(2) -> {
+                        inputs[inputKey] = AggregatePipe(listOf(inputPipe))
                         ""
                     }
 
@@ -67,10 +71,10 @@ abstract class YMLStep(
                         val label = description?.get(IO__LABEL) as? String?
                         val displayName = if (label != null) "\"$label\" ($inputKey)" else inputKey
 
-                        "Wrong type for input $displayName: expected \"$expectedType\" but \"${it.type}\" was received.\n"
+                        "Wrong type for input $displayName: expected \"$expectedType\" but \"${inputPipe.type}\" was received.\n"
                     }
                 }
-            } ?: "Missing key $inputKey\n\tYAML spec: ${inputsDefinition.keys}\n\tReceived:  ${inputs.keys}\n"
+            } ?: "Missing key $inputKey\n\tYAML spec: ${inputTypes.keys}\n\tReceived:  ${inputs.keys}\n"
         }
 
         return errorMessages
@@ -82,11 +86,13 @@ abstract class YMLStep(
 
         try { // Validation
             inputs.filter { (_, pipe) -> pipe.type == IO__TYPE_OPTIONS }.forEach { (key, _) ->
-                val options = readIODescription(INPUTS, key)?.get(IO__TYPE_OPTIONS) as? List<*>
-                    ?: throw RuntimeException("$yamlFile: No options found for input parameter $key.")
+                if(inputTypes[key] != IO__TYPE_TEXT) { // Ignore options to text conversion
+                    val options = readIODescription(INPUTS, key)?.get(IO__TYPE_OPTIONS) as? List<*>
+                        ?: throw RuntimeException("$yamlFile: No options found for input parameter $key.")
 
-                if (!options.contains(resolvedInputs[key])) {
-                    throw RuntimeException("$yamlFile: Received value ${resolvedInputs[key]} not in options $options.")
+                    if (!options.contains(resolvedInputs[key])) {
+                        throw RuntimeException("$yamlFile: Received value ${resolvedInputs[key]} as ${resolvedInputs[key]?.javaClass?.simpleName} not in options $options as ${options.first()?.javaClass?.simpleName}.")
+                    }
                 }
             }
         } catch (e:RuntimeException) {
@@ -140,7 +146,7 @@ abstract class YMLStep(
         /**
          * @return Map of input name to type
          */
-        private fun readInputs(yamlParsed: Map<String, Any>, logger: Logger): Map<String, String> {
+        private fun readInputTypes(yamlParsed: Map<String, Any>, logger: Logger): Map<String, String> {
             val inputs = mutableMapOf<String, String>()
             readIO(yamlParsed, INPUTS, logger) { key, type ->
                 inputs[key] = type

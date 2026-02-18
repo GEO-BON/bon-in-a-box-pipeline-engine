@@ -74,7 +74,8 @@ external_link:
   required: false
   nullable: true
   type: string
-  regex: '^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$'
+  regex:  &link_regex
+    '^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$'
 
 timeout:
   required: false
@@ -198,7 +199,11 @@ references:
       text:
         required: true
         type: string
-      doi:
+      link:
+        required: false
+        type: string
+        regex: *link_regex
+      doi: # deprecated in favor of link
         required: false
         type: string
 

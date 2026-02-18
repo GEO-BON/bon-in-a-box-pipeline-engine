@@ -12,10 +12,11 @@ class Output(override val type:String) : Pipe {
         }
 
     fun getId():IOId {
-        step?.let { step ->
+        return step?.let { step ->
             val entry = step.outputs.entries.find { it.value == this }
                 ?: throw RuntimeException("Could not find id for output of type $type in step $step")
-            return IOId(step.id, entry.key)
+
+            IOId(step.id, entry.key)
         } ?: throw RuntimeException("Output of type $type disconnected from any step when calling findId()")
     }
 

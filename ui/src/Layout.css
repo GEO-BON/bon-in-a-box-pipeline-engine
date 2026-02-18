@@ -522,7 +522,13 @@ img#greenSquares {
   border-left: 0.4em solid #115ca2;
 }
 
-.outputTitle .clickable {
+.inlinePreview .file-download {
+  height: 1.6rem;
+  padding-top: 0.1rem;
+  text-decoration: none;
+}
+
+.outputTitle {
   display: flex;
   align-items: center;
   width: 100%;
@@ -930,7 +936,7 @@ h2.MuiDialogTitle-root {
     margin-bottom: 10px;
   }
 
-  .outputTitle .clickable {
+  .outputTitle {
     flex-wrap: wrap
   }
 

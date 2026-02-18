@@ -26,6 +26,7 @@ import {
 } from "./StepDescription";
 import { getScript } from "../utils/IOId";
 import { fetchStepDescriptionAsync } from "./PipelineEditor/StepDescriptionStore";
+import downloadImg from "../img/fa-file-arrow-down.svg";
 
 export function PipelineResults({
   pipelineMetadata,
@@ -94,12 +95,12 @@ export function PipelineResults({
                       pipelineOutputResults[breadcrumbs][outputId];
 
                     // If not in outputs, check if it was an input marked as output
-                    if (!value) {
+                    if (value === null || value === undefined) {
                       value = inputFileContent[breadcrumbs];
                     }
 
 
-                    if (!value) {
+                    if (value === null || value === undefined) {
                       let noValueStatus = null;
                       if (/pipeline@\d+|default_output/.test(ioId)) {
                         noValueStatus = <span>N/A</span>;
@@ -341,7 +342,15 @@ export function DelayedResult({
   if (folder && scriptMetadata) {
     if (inputData) {
       inputsContent = (
-        <FoldableOutput title="Inputs" className="stepInputs">
+        <FoldableOutput
+          title="Inputs"
+          className="stepInputs"
+          inlineExpanded={
+            <a href={`/output/${folder}/input.json`} title="Download input file" download>
+              <img alt="Downlad input file" src={downloadImg} className="file-download" />
+            </a>
+          }
+        >
           <StepResult
             data={inputData}
             sectionMetadata={scriptMetadata.inputs}

@@ -91,4 +91,14 @@ internal class YMLStepTest {
         assertNotNull(step.outputs["tell_me"])
         assertEquals("text/plain", step.outputs["tell_me"]!!.type)
     }
+
+    @Test
+    fun givenTextInput_whenReceivingOptionsInput_thenConversionAccepted() {
+        val correctInput = mockk<Pipe>()
+        every { correctInput.type } returns "options"
+        every { correctInput.validateGraph() } returns ""
+        val step = ResourceYml("scripts/assertText.yml", mutableMapOf("input" to correctInput))
+
+        assertTrue(step.validateGraph().isEmpty())
+    }
 }
