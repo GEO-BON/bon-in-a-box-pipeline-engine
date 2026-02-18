@@ -105,15 +105,23 @@ Specifying an example will auto-fill that input with the example unless changed 
 
 There are several different types of user inputs that can be specified in the YAML file:
 
++----------------------------------+----------------------------+-----------------------------------------------------------------------------------+
 | "Type" attribute in the yaml     | UI rendering               | Description                                                                       |
-|------------------------|------------------------|------------------------|
++==================================+============================+===================================================================================+
 | boolean                          | Plain text                 | true/false                                                                        |
++----------------------------------+----------------------------+-----------------------------------------------------------------------------------+
 | float or float\[\] (float array) | Plain text                 | positive or negative numbers with a decimal point, accepts int and a valid input. |
++----------------------------------+----------------------------+-----------------------------------------------------------------------------------+
 | int or int\[\] (int array)       | Plain text                 | integer                                                                           |
++----------------------------------+----------------------------+-----------------------------------------------------------------------------------+
 | options^1^                       | Dropdown menu              | Select one from predefined options                                                |
++----------------------------------+----------------------------+-----------------------------------------------------------------------------------+
 | options\[\]^1^                   | Multi-select dropdown menu | Select several from predefined options                                            |
++----------------------------------+----------------------------+-----------------------------------------------------------------------------------+
 | text or text\[\] (text array)    | Plain text                 | text input (words)                                                                |
++----------------------------------+----------------------------+-----------------------------------------------------------------------------------+
 | (any unknown type)               | Plain text                 |                                                                                   |
++----------------------------------+----------------------------+-----------------------------------------------------------------------------------+
 
 -   Note that the square brackets specify an array, where the user can input multiple values separated by a comma. This is useful if you want the analysis to run with several different parameters (e.g. for multiple species or with multiple raster bands).
 
@@ -133,15 +141,23 @@ options_example:
 
 The user inputs can also be file types if you want to upload a file or connect the script to a previous one that outputs a specific file type. There are several file types that you can specify:
 
-| File Type  | MIME type to use in the yaml   | Description                                                               |
-|------------------|----------------------------|--------------------------|
-| CSV        | text/csv                       | Comma separated values file format (.csv)                                 |
-| GeoJSON    | application/geo+json           | GeoJSON file format (.geojson)                                            |
-| GeoPackage | application/geopackage+sqlite3 | GeoPackage file format (.gpkg)                                            |
-| GeoTIFF^2^ | image/tiff;application=geotiff | GeoTIFF file format (.tif)                                                |
-| Shapefile  | application/dbf                | Shapefile format (.shp)                                                   |
-| Text       | text/plain                     | Plain text output (no need to save as a format just output in the script) |
-| TSV        | text/tab-separated-values      | Tab separated values format (.tsv)                                        |
++----------------+--------------------------------+---------------------------------------------------------------------------+
+| File Type      | MIME type to use in the yaml   | Description                                                               |
++================+================================+===========================================================================+
+| CSV            | text/csv                       | Comma separated values file format (.csv)                                 |
++----------------+--------------------------------+---------------------------------------------------------------------------+
+| GeoJSON        | application/geo+json           | GeoJSON file format (.geojson)                                            |
++----------------+--------------------------------+---------------------------------------------------------------------------+
+| GeoPackage     | application/geopackage+sqlite3 | GeoPackage file format (.gpkg)                                            |
++----------------+--------------------------------+---------------------------------------------------------------------------+
+| GeoTIFF^2^     | image/tiff;application=geotiff | GeoTIFF file format (.tif)                                                |
++----------------+--------------------------------+---------------------------------------------------------------------------+
+| Shapefile      | application/dbf                | Shapefile format (.shp)                                                   |
++----------------+--------------------------------+---------------------------------------------------------------------------+
+| Text           | text/plain                     | Plain text output (no need to save as a format just output in the script) |
++----------------+--------------------------------+---------------------------------------------------------------------------+
+| TSV            | text/tab-separated-values      | Tab separated values format (.tsv)                                        |
++----------------+--------------------------------+---------------------------------------------------------------------------+
 
 For example:
 
@@ -161,13 +177,19 @@ inputs:
 
 The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying 'country' as input type will create a dropdown menu with a standardized list of countries from GeoNames. Selecting 'bboxCRS' will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:
 
-| Input name       | Description                                                                                                                                                                                                                                                       |     |
-|------------------|----------------------------|--------------------------|
-| country          | Creates a selector (drop down menu) with a standardized list of countries. GeoNames is used as the reference for the country list.                                                                                                                                |     |
-| countryRegion    | Creates a selector (drop down menu) with a standardized list of regions (provinces, states, etc) within a selected country. GeoNames is used as the reference for the list of regions.                                                                            |     |
-| countryRegionCRS | Creates a selector (drop down menu) for choosing a coordinate reference system adapted for a specific country and/or region.                                                                                                                                      |     |
-| CRS              | Creates a selector for specifying a coordinate reference system.                                                                                                                                                                                                  |     |
-| bboxCRS          | Creates a button to open an interface that allows the user to specify a bounding box (geographical minima and maxima) based on an optional selection of country/region and on a CRS, or by clicking on the map to set the bounds of the area of interest for the analysis. |     |
++------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
+| Input name       | Description                                                                                                                                                                                                                                                                |                        |
++==================+============================================================================================================================================================================================================================================================================+========================+
+| country          | Creates a selector (drop down menu) with a standardized list of countries. GeoNames is used as the reference for the country list.                                                                                                                                         |                        |
++------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
+| countryRegion    | Creates a selector (drop down menu) with a standardized list of regions (provinces, states, etc) within a selected country. GeoNames is used as the reference for the list of regions.                                                                                     |                        |
++------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
+| countryRegionCRS | Creates a selector (drop down menu) for choosing a coordinate reference system adapted for a specific country and/or region.                                                                                                                                               |                        |
++------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
+| CRS              | Creates a selector for specifying a coordinate reference system.                                                                                                                                                                                                           |                        |
++------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
+| bboxCRS          | Creates a button to open an interface that allows the user to specify a bounding box (geographical minima and maxima) based on an optional selection of country/region and on a CRS, or by clicking on the map to set the bounds of the area of interest for the analysis. |                        |
++------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
 
 Note that the use of these selectors will create objects that contain multiple elements. For example, the country selector will create an input object that contains the country name in English, the ISO3 code of the country, the ISO2 code, as well as the bounding box of that country, in longitude, latitude coordinates. [See the full list of those keys for each selector here](selectors.qmd).
 
@@ -177,18 +199,29 @@ After specifying the inputs, you can specify the files that you want to output f
 
 There are also several types of outputs that can be created
 
-| File Type  | MIME type to use in the yaml   | UI rendering                 |
-|------------|--------------------------------|------------------------------|
-| CSV        | text/csv                       | HTML table (partial content) |
-| GeoJSON^2^ | application/geo+json           | Map                          |
-| GeoPackage | application/geopackage+sqlite3 | Link                         |
-| GeoTIFF^3^ | image/tiff;application=geotiff | Map widget (leaflet)         |
-| HTML       | text/html                      | Open in new tab              |
-| JPG        | image/jpg                      | tag                          |
-| Shapefile  | application/dbf                | Link                         |
-| Text       | text/plain                     | Plain text                   |
-| TSV        | text/tab-separated-values      | HTML table (partial content) |
-|            | (any unknown type)             | Plain text or link           |
++--------------+--------------------------------+------------------------------+
+| File Type    | MIME type to use in the yaml   | UI rendering                 |
++==============+================================+==============================+
+| CSV          | text/csv                       | HTML table (partial content) |
++--------------+--------------------------------+------------------------------+
+| GeoJSON^2^   | application/geo+json           | Map                          |
++--------------+--------------------------------+------------------------------+
+| GeoPackage   | application/geopackage+sqlite3 | Link                         |
++--------------+--------------------------------+------------------------------+
+| GeoTIFF^3^   | image/tiff;application=geotiff | Map widget (leaflet)         |
++--------------+--------------------------------+------------------------------+
+| HTML         | text/html                      | Open in new tab              |
++--------------+--------------------------------+------------------------------+
+| JPG          | image/jpg                      | tag                          |
++--------------+--------------------------------+------------------------------+
+| Shapefile    | application/dbf                | Link                         |
++--------------+--------------------------------+------------------------------+
+| Text         | text/plain                     | Plain text                   |
++--------------+--------------------------------+------------------------------+
+| TSV          | text/tab-separated-values      | HTML table (partial content) |
++--------------+--------------------------------+------------------------------+
+|              | (any unknown type)             | Plain text or link           |
++--------------+--------------------------------+------------------------------+
 
 ^2^ GeoJSON coordinates *must* be in WGS 84. See [specification section 4](https://datatracker.ietf.org/doc/html/rfc7946#section-4) for details.
 
@@ -481,7 +514,6 @@ crs_id <- paste0(input$study_area_bbox$CRS$authority,input$study_area_bbox$CRS$c
 :::
 
 ::: panel-tabset
-
 ## Python
 
 A convenience function `biab_inputs` is loaded in Python by default to load the file into a list. Here is an example of how to read the input file in the script and use it's value:
@@ -495,7 +527,7 @@ my_int = data['some_int_input']
 To access selector values in Python, the approach is similar to R. For example, to create the CRS ID from the authority and code:
 :::
 
-::: panel-tabset
+:::: panel-tabset
 ``` python
 crs_id = data['study_area_bbox']['CRS']['authority']+':'+str(data['study_area_bbox']['CRS']['code'])
 ```
@@ -523,7 +555,7 @@ To access selector values in Julia, the approach is similar to R or Python. For 
 ``` julia
 crs_id = string(input_data["study_area_bbox"]["CRS"]["authority"],":",input_data["study_area_bbox"]["CRS"]["code"])
 ```
-:::
+::::
 
 ### Writing outputs
 
@@ -731,14 +763,12 @@ In most cases, an output can only receive a value of the exact same type. This m
 
 +---------------+-----------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
 | # Source type | # Target type         | # Example                                                                                                                                   |
-|               |                       |                                                                                                                                             |
-| Any type      | An array of that type | An array of GeoTIFFs receives a single GeoTIFF.                                                                                             |
-|               |                       |                                                                                                                                             |
-|               |                       | `layer.tiff` becomes \`\[layer.tiff\]                                                                                                       |
 +---------------+-----------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+| Any type      | An array of that type | When an array of GeoTIFFs is expected, a single GeoTIFF which is automatically wrapped in a single-element array.                           |
 |               |                       |                                                                                                                                             |
+|               |                       | `layer.tiff` becomes `[layer.tiff]`                                                                                                         |
 +---------------+-----------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
-| int           | float                 | A buffer in kilometers received as an int by one script and as a float by another can share the same user input. \| \| `1` becomes `1.0` \| |
+| int           | float                 | A buffer in kilometers received as an int by one script and as a float by another can share the same user input. `1` becomes `1.0`          |
 +---------------+-----------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
 | options       | text                  | A script receiving a link to any geospatial collection on a STAC as a string can be restricted at pipeline level to a few selected options. |
 +---------------+-----------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
