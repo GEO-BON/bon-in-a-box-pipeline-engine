@@ -1,4 +1,4 @@
-# Pipeline Engine
+# BON in a Box Pipeline Engine
 
 A pipeline engine to seamlessly run pipelines of scripts in R, Julia and Python, to transform data into valuable outputs.
 
