@@ -55,9 +55,6 @@ open class HPC (
                 try {
                     logFile.appendText("Lock acquired. Syncing conda environment towards HPC...\n")
                     connection.runCommand(command, 60, logFile)
-
-                    // Send edited log file to HPC
-                    connection.syncFiles(listOf(logFile), null, logFile)
                 } catch (t: Throwable) {
                     t.printStackTrace()
                     condaSyncJobs[condaEnvName]?.second?.let { runs ->

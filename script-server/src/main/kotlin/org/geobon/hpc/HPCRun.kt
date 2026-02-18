@@ -42,35 +42,42 @@ class HPCRun(
                         .apply { writeText(condaEnvYml) }
                 } else null
 
-                val fileSyncJob = launch {
-                    logFile.appendText("Please be patient, after submission logs will only appear when the job starts on the HPC.\nLogs are updated every minute.\n")
+                val waitText = "Please be patient, after submission logs will only appear when the job starts on the HPC.\nLogs are updated every minute.\n"
+                val doCondaSync = condaEnvName != null && condaEnvYml != null
+                if(!doCondaSync)
+                    logFile.appendText(waitText)
 
-                    // Sync the output folder (has inputs.json) and any files the script depends on
-                    val filesToSend = mutableListOf(
-                        context.outputFolder,
-                        scriptFile
-                    )
-                    filesToSend.addAll(
-                        inputPipes.mapNotNull { it.value.asFiles() }.flatten()
+                // Sync the output folder (has inputs.json) and any files the script depends on
+                val filesToSend = mutableListOf(
+                    context.outputFolder,
+                    scriptFile
+                )
+                filesToSend.addAll(
+                    inputPipes.mapNotNull { it.value.asFiles() }.flatten()
+                )
+
+                hpcConnection.syncFiles(filesToSend, listOf(context.outputFolder), logFile)
+
+                if (doCondaSync) {
+
+                    val condaEnvWrapper = "$scriptStubsRoot/system/condaEnvironmentHPC.sh"
+                    val condaSyncJob = hpc.syncCondaEnvironment(
+                        this@HPCRun, condaEnvName, logFile,
+                        """
+                            module load apptainer${hpcConnection.apptainerVersion} && ${getApptainerBaseCommand(hpcConnection.condaImage, true)} '
+                                source $condaEnvWrapper ${context.outputFolderEscaped} "$condaEnvName" "$condaEnvFile"
+                            '
+                        """.replace(Regex("""\s*\n\s*"""), " ")
                     )
 
-                    hpcConnection.syncFiles(filesToSend, listOf(context.outputFolder), logFile)
+                    condaSyncJob?.join()
+
+                    // Environment ready, send edited log file to HPC
+                    logFile.appendText(waitText)
+                    hpcConnection.syncFiles(listOf(logFile), null, logFile)
                 }
-                fileSyncJob.join() // We want the conda file to be present while conda sync is happening.
 
-                val condaSyncJob =
-                    if (condaEnvName != null && condaEnvFile != null) {
-                        val condaEnvWrapper = "$scriptStubsRoot/system/condaEnvironmentHPC.sh"
-                        hpc.syncCondaEnvironment(
-                            this@HPCRun, condaEnvName, logFile,
-                            """
-                                module load apptainer${hpcConnection.apptainerVersion} && ${getApptainerBaseCommand(hpcConnection.condaImage, true)} '
-                                    source $condaEnvWrapper ${context.outputFolderEscaped} "$condaEnvName" "$condaEnvFile"
-                                '
-                            """.replace(Regex("""\s*\n\s*"""), " ")
-                        )
-                    } else null
-
+                // Signal job is ready to be sent, install file watcher
                 launch {
                     withContext(Dispatchers.IO) {
                         logger.trace("Watching for changes to {}", context.outputFolder)
@@ -92,9 +99,6 @@ class HPCRun(
                     }
                 }
 
-                // Signal job is ready to be sent
-                fileSyncJob.join()
-                condaSyncJob?.join()
                 hpc.ready(this@HPCRun)
                 logger.debug("Waiting for results to be synced back... {}", context.resultFile)
                 // this will stop when watchChannel.close() called above, is cancelled, or script times out.
