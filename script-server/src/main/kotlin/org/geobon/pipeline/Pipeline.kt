@@ -340,8 +340,8 @@ open class Pipeline constructor(
             val inputsParsed = JSONObject(inputsString)
             val constants = mutableMapOf<String, Pipe>()
             inputsParsed.keySet().forEach { key ->
-                val type = step.inputsDefinition[key]
-                    ?: throw RuntimeException("Input received \"$key\" is not listed in script inputs. Listed inputs are ${step.inputsDefinition.keys}")
+                val type = step.inputTypes[key]
+                    ?: throw RuntimeException("Input received \"$key\" is not listed in script inputs. Listed inputs are ${step.inputTypes.keys}")
 
                 val inputId = IOId(step.id, key)
                 constants[inputId.toBreadcrumbs()] = createConstant(key, inputsParsed, type, key)
