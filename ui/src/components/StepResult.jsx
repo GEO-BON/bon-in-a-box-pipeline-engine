@@ -98,7 +98,8 @@ export const SingleIOResult = memo(
     if (!componentId) componentId = ioId;
 
     function renderContent(content) {
-      if (!content) return "null";
+      if (content === null || content === undefined) return "null";
+      if (content === "") return "Empty string";
 
       let error = "";
       if (ioMetadata) {
@@ -207,7 +208,8 @@ export const SingleIOResult = memo(
     }
 
     function renderInline(content) {
-      if (!content) return "null";
+      if (content === null || content === undefined) return "null";
+      if (content === "") return "Empty string";
 
       if (Array.isArray(content)) {
         return content

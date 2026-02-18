@@ -123,7 +123,8 @@ export function GeneralDescription({ ymlPath, metadata }) {
             <div className='references'>
                 <p className='noMargin'>References: </p>
                 <ul>{metadata.references.map((r, i) => {
-                    return <li key={i}>{r.text} {r.doi && <><br /><a href={r.doi} target="_blank">{r.doi}</a></>}</li>
+                    let link = r.link || r.doi
+                    return <li key={i}>{r.text} {link && <><br /><a href={link} target="_blank">{link}</a></>}</li>
                 })}
                 </ul>
             </div>

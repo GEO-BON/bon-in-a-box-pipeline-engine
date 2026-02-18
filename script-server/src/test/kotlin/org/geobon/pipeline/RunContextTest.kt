@@ -78,18 +78,19 @@ internal class RunContextTest {
     @Test
     fun givenNoGitFolder_whenGetGitInfo_thenEmptyWithNoErrorMessage() {
         val gitInfo: Map<String, String?> = RunContext.getGitInfo()
-        assertTrue(gitInfo.contains("commit"))
-        assertEquals("", gitInfo.get("commit"))
-        assertTrue(gitInfo.contains("branch"))
-        assertEquals("", gitInfo.get("branch"))
-        assertTrue(gitInfo.contains("timestamp"))
-        assertEquals("", gitInfo.get("timestamp"))
+        assertTrue(gitInfo.contains("error"), "Error not found in $gitInfo")
+        assertTrue(gitInfo["error"]!!.isNotEmpty())
+
+        assertFalse(gitInfo.contains("commit"))
+        assertFalse(gitInfo.contains("branch"))
+        assertFalse(gitInfo.contains("timestamp"))
     }
 
     @Test
     fun givenGitFolder_whenGetGitInfo_thenShouldHaveGitInfo() {
         withEnvironment("GIT_LOCATION", "../.git") {
             val gitInfo: Map<String, String?> = RunContext.getGitInfo()
+            println(gitInfo)
             assertTrue(gitInfo.contains("commit"))
             assertTrue(gitInfo["commit"]?.isNotEmpty() == true)
             assertTrue(gitInfo.contains("branch"))
@@ -120,11 +121,11 @@ internal class RunContextTest {
         val inputs1 = "{aaa:111, bbb:222}"
         val run = RunContext(someFile, inputs1)
         run.outputFolder.mkdirs()
-       run.createEnvironmentFile(Containers.SCRIPT_SERVER)
+        run.createEnvironmentFile(Containers.SCRIPT_SERVER)
 
         val environmentFile = File( run.outputFolder.absolutePath, "environment.json" )
         assertTrue(environmentFile.isFile)
-        val environmentInfo: JSONObject = JSONObject(environmentFile.readText())
+        val environmentInfo = JSONObject(environmentFile.readText())
         assertTrue(environmentInfo.has("server"))
         assertTrue(environmentInfo.has("git"))
         assertTrue(environmentInfo.has("runner"))
