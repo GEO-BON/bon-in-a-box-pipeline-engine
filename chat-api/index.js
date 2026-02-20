@@ -13,6 +13,13 @@ import { z } from "zod";
 
 const app = express();
 
+const model = "liquid/lfm-2.5-1.2b-thinking:free";
+// "stepfun/step-3.5-flash:free";
+// "nvidia/nemotron-3-nano-30b-a3b:free"
+
+const instructions =
+  "You are a helpful AI assistant for the BON in a Box platform with access to MCP servers. You can answer questions about biodiversity, help with data processing, execute scripts and pipelines, and provide general assistance. Be conversational and helpful. You have access to general knowledge. You can look at the resources for pipelines and scripts to see what pipeliens are available and what parameters you need to set. Try to finish answering all questions by running a pipeline on the BON in a Box API. Never claim to have limited capabilities - answer all questions to the best of your ability.";
+
 app.use(
   cors({
     origin: "*",
@@ -27,7 +34,7 @@ const openRouterClient = new OpenAI({
 
 const serviceAdapter = new OpenAIAdapter({
   openai: openRouterClient,
-  model: "nvidia/nemotron-3-nano-30b-a3b:free",
+  model: model,
 });
 
 const openaiProvider = createOpenAI({
@@ -36,9 +43,10 @@ const openaiProvider = createOpenAI({
 });
 
 const defaultAgent = new BuiltInAgent({
-  model: openaiProvider.chat("nvidia/nemotron-3-nano-30b-a3b:free"),
+  model: openaiProvider.chat("stepfun/step-3.5-flash:free"),
   maxSteps: 12,
   toolChoice: "auto",
+  prompt: instructions,
   mcpServers: [
     {
       type: "http",
@@ -53,15 +61,15 @@ const runtime = new CopilotRuntime({
   },
 });
 
-app.use('/copilotkit', (req, res, next) => {
-  if (req.path === '/info' && req.method === 'GET') {
+app.use("/copilotkit", (req, res, next) => {
+  if (req.path === "/info" && req.method === "GET") {
     next();
     return;
   }
 
   (async () => {
     const handler = copilotRuntimeNodeHttpEndpoint({
-      endpoint: '/',
+      endpoint: "/",
       runtime,
       serviceAdapter,
     });
@@ -82,11 +90,6 @@ app.get("/copilotkit/info", (req, res) => {
     },
   });
 });
-
-
-const instructions =
-  "You are a helpful AI assistant for the BON in a Box platform with access to MCP servers. You can answer questions about biodiversity, help with data processing, execute scripts and pipelines, and provide general assistance. Be conversational and helpful. You have access to general knowledge. Try to finish answering all questions by running a pipeline on the BON in a Box API. Never claim to have limited capabilities - answer all questions to the best of your ability."
-
 
 app.listen(4000, () => {
   console.log("Listening at http://localhost:4000/copilotkit");

@@ -75,7 +75,14 @@ def truncate_output(value: object) -> str:
         return text[:MAX_TOOL_OUTPUT_CHARS] + "\n...<truncated>"
     return text
 
+# -------------------------------------------------------------------------
+# 4. UTILS & HELPERS
+# -------------------------------------------------------------------------
+
+
 def fetch_step_list(step_type: str) -> dict:
+    """ Get the list of available scripts or pipelines from the BON in a Box API. Returns a dict of {path: name}.`    
+    `resource_type` should be "script" or "pipeline". """
     base = BON_IN_A_BOX_API_BASE.rstrip("/")
     url = f"{base}/{step_type}/list"
     try:
@@ -99,19 +106,91 @@ def format_step_list(title: str, steps: dict) -> str:
         lines.append(f"- {label} ({path})")
     return "\n".join(lines)
 
-@mcp.resource("bon://scripts")
+#@mcp.resource("bon://scripts")
+@mcp.tool()
 def list_scripts() -> str:
+    """
+    List all available scripts on the BON in a Box platform.
+    
+    :return: Description
+    :rtype: str
+    """
     return format_step_list("Scripts", fetch_step_list("script"))
 
-@mcp.resource("bon://pipelines")
+#@mcp.resource("bon://pipelines")
+@mcp.tool()
 def list_pipelines() -> str:
+    """
+    List all available pipelines on the BON in a Box platform.
+    
+    :return: Description
+    :rtype: str
+    """
     return format_step_list("Pipelines", fetch_step_list("pipeline"))
 
-@mcp.resource("bon://list")
+#@mcp.resource("bon://list")
+@mcp.tool()
 def list_scripts_and_pipelines() -> str:
+    """
+    List all available scripts and pipelines on the BON in a Box platform. 
+    This resource is intended to provide a comprehensive overview of the tools at your disposal. 
+    Always check this list before attempting to execute any operations, as it contains the most up-to-date information about what is available on the platform.
+    
+    :return: Description
+    :rtype: str
+    """
     scripts = format_step_list("Scripts", fetch_step_list("script"))
     pipelines = format_step_list("Pipelines", fetch_step_list("pipeline"))
     return f"{scripts}\n\n{pipelines}"
+
+
+#@mcp.resource("bon://pipeline-info/{step_type}/{description_path}")
+@mcp.tool()
+def pipeline_info(step_type: str, description_path: str) -> str:
+    """
+    Get detailed information about a specific pipeline, including required input parameters. 
+    This resource is essential for understanding how to properly execute a pipeline and what inputs are necessary. 
+    Always refer to this information before attempting to run a pipeline to ensure you have the correct parameters and understand the expected outputs.
+    
+    :param type: The type of resource, either "script" or "pipeline".
+    :param description_path: The path to the resource's description file, which provides details about the resource.
+
+    :return: Description
+    :rtype: str
+    """
+    base = BON_IN_A_BOX_API_BASE.rstrip("/")
+    url = f"{base}/{step_type}/{description_path}/info"
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        payload = response.json()
+        return payload if isinstance(payload, dict) else {}
+    except Exception as exc:
+        print(
+            f"⚠️ Warning: Could not fetch {step_type}: {description_path} info from {url}: {exc}",
+            file=sys.stderr,
+        )
+        return {}
+    
+#@mcp.resource("bon://openapi-docs") 
+@mcp.tool()
+def swagger_api_docs() -> str:
+    """Fetch the OpenPI YAML from the BON in a Box API. 
+    This can be useful for understanding the available endpoints and their expected inputs/outputs."""
+    base = BON_IN_A_BOX_API_BASE.rstrip("/")
+    url = "http://swagger_ui:8080/swagger/openapi.yaml"
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        return response.text
+    except Exception as exc:
+        print(
+            f"⚠️ Warning: Could not fetch Swagger API docs from {url}: {exc}",
+            file=sys.stderr,
+        )
+        return "Error fetching API documentation."
+
+
 
 # -------------------------------------------------------------------------
 # 6. MCP PROMPTS (Personas for Smart Clients)
@@ -130,23 +209,22 @@ def analyst_persona() -> str:
 # 7. TOOL DEFINITION & MANUAL REGISTRATION
 # -------------------------------------------------------------------------
 
-@mcp.tool()
-# def get_step_info(step_type: str, description_path: str) -> str:
-#     """Get detailed information about a script or pipeline, including required input parameters.
+def get_step_info(step_type: str, description_path: str) -> str:
+    """Get detailed information about a script or pipeline, including required input parameters.
 
-#     Args:
-#         step_type: The type of step ('script' or 'pipeline')
-#         description_path: The path to the step's description file
-#     """
-#     base = BON_IN_A_BOX_API_BASE.rstrip("/")
-#     url = f"{base}/{step_type}/{description_path}/info"
-#     try:
-#         response = requests.get(url, timeout=10)
-#         response.raise_for_status()
-#         payload = response.json()
-#         return truncate_output(payload)
-#     except Exception as exc:
-#         return truncate_output(f"Error fetching info for {step_type} at {url}: {str(exc)}")
+    Args:
+        step_type: The type of step ('script' or 'pipeline')
+        description_path: The path to the step's description file
+    """
+    base = BON_IN_A_BOX_API_BASE.rstrip("/")
+    url = f"{base}/{step_type}/{description_path}/info"
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        payload = response.json()
+        return truncate_output(payload)
+    except Exception as exc:
+        return truncate_output(f"Error fetching info for {step_type} at {url}: {str(exc)}")
 
 def execute_step(step_type: str, description_path: str, input_params: dict) -> str:
     """Execute a BON in a Box step or pipeline.
