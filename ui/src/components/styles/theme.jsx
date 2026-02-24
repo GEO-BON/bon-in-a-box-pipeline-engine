@@ -36,6 +36,7 @@ const theme = {
       defaultProps: {
         renderOption: (props, option, state, ownerState) => (
           <Box
+            key={option}
             sx={{
               borderRadius: "28px",
               margin: "5px",
