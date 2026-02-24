@@ -1,5 +1,6 @@
 package org.geobon.pipeline
 
+import com.google.gson.reflect.TypeToken
 import org.geobon.server.plugins.Containers
 import java.io.File
 import kotlin.test.*
@@ -10,6 +11,12 @@ import io.kotest.extensions.system.withEnvironment
 import org.json.JSONObject
 
 internal class RunContextTest {
+    class TestRunContext(descriptionFile: File, inputs: String?): RunContext(descriptionFile,
+        gson.fromJson<Map<String, Any>>(
+            inputs,
+            object : TypeToken<Map<String, Any?>>() {}.type
+        ))
+
     @BeforeTest
     fun setupOutputFolder() {
         with(outputRoot) {
@@ -27,11 +34,11 @@ internal class RunContextTest {
     @Test
     fun givenSameInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdSame() {
         val someFile = File(RunContext.scriptRoot, "someFile")
-        val inputs1 = "{aaa:111, bbb:222}"
-        val inputs2 = "{bbb:222, aaa:111}"
+        val inputs1 = "{AAA:000, aaa:111, bbb:222, BBB:333}"
+        val inputs2 = "{BBB:333, bbb:222, aaa:111, AAA:000}"
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = TestRunContext(someFile, inputs1)
+        val run2 = TestRunContext(someFile, inputs2)
 
         println(run1.runId)
         println(run2.runId)
@@ -42,11 +49,11 @@ internal class RunContextTest {
     @Test
     fun givenSameInputs_whenTheOrderOfEntriesIsSame_thenRunIdSame() {
         val someFile = File(RunContext.scriptRoot, "someFile")
-        val inputs1 = "{aaa:111, bbb:222}"
-        val inputs2 = "{aaa:111, bbb:222}"
+        val inputs1 = "{AAA:000, aaa:111, bbb:222, BBB:333}"
+        val inputs2 = "{AAA:000, aaa:111, bbb:222, BBB:333}"
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = TestRunContext(someFile, inputs1)
+        val run2 = TestRunContext(someFile, inputs2)
 
         assertEquals(run1.runId, run2.runId)
     }
@@ -54,11 +61,11 @@ internal class RunContextTest {
     @Test
     fun givenDifferentInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdDifferent() {
         val someFile = File(RunContext.scriptRoot, "someFile")
-        val inputs1 = "{aaa:111, bbb:222}"
-        val inputs2 = "{bbb:222, aaa:123}"
+        val inputs1 = """{"AAA":000, "aaa":111, "bbb":222, "BBB":333}"""
+        val inputs2 = """{"BBB":333, "bbb":222, "aaa":999, "AAA":000}"""
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = TestRunContext(someFile, inputs1)
+        val run2 = TestRunContext(someFile, inputs2)
 
         assertNotEquals(run1.runId, run2.runId)
     }
@@ -66,11 +73,11 @@ internal class RunContextTest {
     @Test
     fun givenDifferentInputs_whenTheOrderOfEntriesIsSame_thenRunIdDifferent() {
         val someFile = File(RunContext.scriptRoot, "someFile")
-        val inputs1 = "{aaa:111, bbb:222}"
-        val inputs2 = "{aaa:123, bbb:222}"
+        val inputs1 = "{AAA:000, aaa:111, bbb:222, BBB:333}"
+        val inputs2 = "{AAA:000, aaa:999, bbb:222, BBB:333}"
 
-        val run1 = RunContext(someFile, inputs1)
-        val run2 = RunContext(someFile, inputs2)
+        val run1 = TestRunContext(someFile, inputs1)
+        val run2 = TestRunContext(someFile, inputs2)
 
         assertNotEquals(run1.runId, run2.runId)
     }
@@ -104,7 +111,7 @@ internal class RunContextTest {
     fun givenScriptHasRun_whenGettingEnvironment_thenDependenciesAreRead() {
         val someFile = File(RunContext.scriptRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
-        val run = RunContext(someFile, inputs1)
+        val run = TestRunContext(someFile, inputs1)
         run.outputFolder.mkdirs()
         File("${run.outputFolder.absolutePath}/dependencies.txt").writeText("here are some dependencies")
         val environmentInfo = run.getEnvironment(Containers.SCRIPT_SERVER)
@@ -119,7 +126,7 @@ internal class RunContextTest {
     fun givenRunContext_whenCreateEnvironmentFile_thenFileExistsAndContainsEnvInfo() {
         val someFile = File(RunContext.scriptRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
-        val run = RunContext(someFile, inputs1)
+        val run = TestRunContext(someFile, inputs1)
         run.outputFolder.mkdirs()
         run.createEnvironmentFile(Containers.SCRIPT_SERVER)
 

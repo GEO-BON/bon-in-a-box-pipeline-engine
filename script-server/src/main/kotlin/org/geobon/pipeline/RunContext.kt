@@ -23,21 +23,17 @@ val outputRoot = File(System.getenv("OUTPUT_LOCATION"))
  * @param runId A unique string identifier representing a run of this step with these specific parameters.
  *           i.e. Calling the same script with the same param would result in the same ID.
  */
-data class RunContext(val runId: String, val inputs: String?) {
-    constructor(descriptionFile: File, inputs: String?) : this(
+open class RunContext(val runId: String, val inputs: Map<String, Any?>) {
+
+    constructor(descriptionFile: File, inputs: Map<String, Any?>) : this(
         File(
             // Unique to this script
             descriptionFile.relativeTo(scriptRoot).path.removeSuffix(".yml")
                 .replace("../", ""), // This replacement is to accommodate script-stubs
             // Unique to these params
-            if (inputs.isNullOrEmpty()) "no_params" else inputsToMd5(inputs)
+            if (inputs.isEmpty()) "no_params" else inputsToMd5(inputs)
         ).path,
         inputs
-    )
-
-    constructor(descriptionFile: File, inputMap: Map<String, Any?>) : this(
-        descriptionFile,
-        if (inputMap.isEmpty()) null else JSONObject(preserveNulls(inputMap)).toString()
     )
 
     val outputFolder
@@ -66,6 +62,13 @@ data class RunContext(val runId: String, val inputs: String?) {
     fun createEnvironmentFile(container: Containers) {
         val environment = getEnvironment(container)
         File("${outputFolder.absolutePath}/environment.json").writeText(JSONObject(environment).toString(2))
+    }
+
+    fun createInputFile() {
+        if (!inputs.isEmpty()) {
+            val inputAsText = JSONObject(preserveNulls(inputs)).toString()
+            inputFile.writeText(inputAsText)
+        }
     }
 
     companion object {
@@ -138,7 +141,7 @@ data class RunContext(val runId: String, val inputs: String?) {
             } ?: mapOf("error" to "Could not read repository")
         }
 
-         /**
+        /**
          * Makes sure the file gives the same hash, regardless of the key order.
          */
         fun inputsToMd5(jsonString: String): String {
@@ -146,19 +149,29 @@ data class RunContext(val runId: String, val inputs: String?) {
                 jsonString,
                 object : TypeToken<Map<String, Any>>() {}.type
             )
-
-            fun sortRecursively(obj: Any?): Any? = when (obj) {
-                is Map<*, *> -> obj
-                    .mapKeys { it.key.toString() }
-                    .mapValues { sortRecursively(it.value) }
-                    .toSortedMap()
-                is List<*> -> obj.map { sortRecursively(it) }
-                else -> obj
-            }
-
-            return gson.toJson(sortRecursively(inputs)).toMD5()
+            return inputsToMd5(inputs)
         }
 
+        /**
+         * Makes sure the file gives the same hash, regardless of the key order.
+         */
+        fun inputsToMd5(inputs: Map<String, Any?>): String {
+            return gson.toJson(sortKeysRecursively(inputs)).toMD5()
+        }
 
+        fun sortKeysRecursively(obj: Any?): Any? = when (obj) {
+            // Sorting maps, which have no ordering by JSON spec and cannot be otherwise compared as string
+            is Map<*, *> -> obj
+                .mapKeys { it.key.toString() }
+                .mapValues { sortKeysRecursively(it.value) }
+                .toSortedMap()
+
+            // NOT sorting the lists.
+            // They don't have the same problem as the objects that are rendered in an arbitrary order,
+            // and their order does matter in most cases (e.g. bounding boxes).
+            is List<*> -> obj.map { sortKeysRecursively(it) }
+
+            else -> obj
+        }
     }
 }
