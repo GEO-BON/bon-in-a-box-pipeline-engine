@@ -244,6 +244,7 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
                         onClick={() => {
                           setOpenCRSMenu(true);
                         }}
+                        position="start"
                       >
                         <KeyboardArrowDownIcon
                           sx={{ color: "var(--biab-green-main)"}}
