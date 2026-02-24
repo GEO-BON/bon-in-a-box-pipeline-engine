@@ -156,7 +156,7 @@ open class RunContext(val runId: String, val inputs: Map<String, Any?>) {
          * Makes sure the file gives the same hash, regardless of the key order.
          */
         fun inputsToMd5(inputs: Map<String, Any?>): String {
-            return gson.toJson(sortKeysRecursively(inputs)).toMD5()
+            return sortKeysRecursively(inputs).toString().toMD5()
         }
 
         fun sortKeysRecursively(obj: Any?): Any? = when (obj) {
