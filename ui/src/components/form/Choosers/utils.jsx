@@ -207,10 +207,10 @@ export const getCRSListFromName = async (name) => {
       ) {
         // Filter and add results
         const filtered = result.data.results.filter((r) => {
-          if (!("exports" in r && r.exports !== null)) {
-            return false;
-          }
-          return filterProj4String(r.exports.proj4);
+          if (r.exports && r.exports.proj4)
+            return filterProj4String(r.exports.proj4);
+
+          return false;
         });
         allResults = allResults.concat(filtered);
 
@@ -224,7 +224,7 @@ export const getCRSListFromName = async (name) => {
         keepGoing = false;
       }
     } catch (error) {
-      console.error("getCRSListFromName error:", error);
+      console.log(`Failed to get CRS list for "${name}":`, error);
       keepGoing = false;
     }
   }
