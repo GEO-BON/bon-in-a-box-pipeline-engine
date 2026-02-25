@@ -23,7 +23,6 @@ export default function Choosers({
     label: "",
     type: "",
   },
-  onChange = () => {},
   descriptionCell = true,
   leftLabel = true,
   updateValue,
@@ -84,7 +83,6 @@ export default function Choosers({
                       inputDescription,
                       value,
                       updateValue,
-                      onChange,
                     }}
                   />
                 )}
@@ -104,7 +102,6 @@ export default function Choosers({
                 inputDescription,
                 value,
                 updateValue,
-                onChange,
               }}
             />
           </td>

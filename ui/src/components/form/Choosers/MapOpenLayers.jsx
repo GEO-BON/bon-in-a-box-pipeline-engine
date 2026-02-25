@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 
 import "ol/ol.css";
 import Map from "ol/Map";
@@ -24,6 +24,36 @@ import * as turf from "@turf/turf";
 import proj4 from "proj4";
 import { transformPolyToBboxCRS, cleanBbox, defaultCRS } from "./utils";
 
+const styles = {
+  Polygon: new Style({
+    stroke: new Stroke({
+      color: "#1d7368",
+      width: 3,
+    }),
+    fill: new Fill({
+      color: "#1d736822",
+    }),
+  }),
+};
+
+const modifyStyles = {
+  Polygon: new Style({
+    stroke: new Stroke({
+      color: "#1d7368",
+      width: 3,
+    }),
+    fill: new Fill({
+      color: "#1d736866",
+    }),
+  }),
+};
+const styleFunction = function (feature) {
+  return styles[feature.getGeometry().getType()];
+};
+const modifyStyleFunction = function (feature) {
+  return modifyStyles[feature.getGeometry().getType()];
+};
+
 export default function MapOpenLayers({
   states,
   dispatch,
@@ -38,36 +68,6 @@ export default function MapOpenLayers({
   const [message, setMessage] = useState("");
   const [showSpinner, setShowSpinner] = useState(false);
   var featureId = 0;
-
-  const styles = {
-    Polygon: new Style({
-      stroke: new Stroke({
-        color: "#1d7368",
-        width: 3,
-      }),
-      fill: new Fill({
-        color: "#1d736822",
-      }),
-    }),
-  };
-
-  const modifyStyles = {
-    Polygon: new Style({
-      stroke: new Stroke({
-        color: "#1d7368",
-        width: 3,
-      }),
-      fill: new Fill({
-        color: "#1d736866",
-      }),
-    }),
-  };
-  const styleFunction = function (feature) {
-    return styles[feature.getGeometry().getType()];
-  };
-  const modifyStyleFunction = function (feature) {
-    return modifyStyles[feature.getGeometry().getType()];
-  };
 
   const clearLayers = () => {
     if (draw) {
@@ -99,19 +99,19 @@ export default function MapOpenLayers({
       var oppositeVertex = diffVertex > 1 ? diffVertex - 2 : diffVertex + 2;
       var minX = Math.min(
         newCoordinates[0][diffVertex][0],
-        newCoordinates[0][oppositeVertex][0]
+        newCoordinates[0][oppositeVertex][0],
       );
       var minY = Math.min(
         newCoordinates[0][diffVertex][1],
-        newCoordinates[0][oppositeVertex][1]
+        newCoordinates[0][oppositeVertex][1],
       );
       var maxX = Math.max(
         newCoordinates[0][diffVertex][0],
-        newCoordinates[0][oppositeVertex][0]
+        newCoordinates[0][oppositeVertex][0],
       );
       var maxY = Math.max(
         newCoordinates[0][diffVertex][1],
-        newCoordinates[0][oppositeVertex][1]
+        newCoordinates[0][oppositeVertex][1],
       );
       result = [minX, minY, maxX, maxY];
     } else {
@@ -183,9 +183,13 @@ export default function MapOpenLayers({
       mapp.addLayer(vector);
       mapp.addInteraction(drawInt);
       if (features.length > 0 && !digitize) {
-        mapp.getView().fit(source.getExtent(), {
-          padding: [100, 100, 100, 100],
-        });
+        const extent = source.getExtent();
+        // Validate extent before fitting
+        if (extent && extent.every((val) => isFinite(val))) {
+          mapp.getView().fit(extent, {
+            padding: [100, 100, 100, 100],
+          });
+        }
       }
       const modify = new Modify({
         source: source,
@@ -252,9 +256,40 @@ export default function MapOpenLayers({
     }
   }, [mapp, features, digitize]);
 
-  // The CRS gets updated. We need to reproject the map
   useEffect(() => {
-    if (states.actions.includes("changeMapCRS")) {
+    if (!mapp && states.CRS.code) {
+      const crsString = `${states.CRS.authority}:${states.CRS.code}`;
+      proj4.defs(crsString, states.CRS.proj4Def);
+      register(proj4);
+      const projCRS = get(crsString);
+      if (projCRS) {
+        map = new Map({
+          target: "map",
+          layers: [
+            new Layer({
+              source: new Source({
+                attributions: ["Carto"],
+                url: "https://2.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+              }),
+              projection: `EPSG:3857`,
+            }),
+          ],
+          view: new View({
+            center: [0, 0],
+            zoom: 3,
+            projection: `${states.CRS.authority}:${states.CRS.code}`,
+          }),
+        });
+        setMapp(map);
+        // Initialize oldCRS to trigger the bbox reprojection effect
+        setOldCRS(states.CRS);
+      } else {
+        setMessage(`Failed to create map for ${crsString}`);
+      }
+    }
+
+    // The CRS gets updated. We need to reproject the map
+    if (mapp && states.actions.includes("changeMapCRS")) {
       const crsCode = `${states.CRS.authority}:${states.CRS.code}`;
       const mapProjection = mapp.getView().getProjection().getCode();
       if (states.CRS.proj4Def && mapProjection !== crsCode) {
@@ -263,7 +298,7 @@ export default function MapOpenLayers({
         register(proj4);
         if (!get(crsCode) || !projectMap) {
           setMessage(
-            "This CRS cannot be shown on the map. The bounding box can still be entered manually."
+            "This CRS cannot be shown on the map. The bounding box can still be entered manually.",
           );
           return;
         } else {
@@ -302,21 +337,52 @@ export default function MapOpenLayers({
         setOldCRS(defaultCRS);
         dispatch({ bbox: cleanBbox(bbox, "degree"), type: "changeBbox" });
         setShowSpinner(false);
-      } else if (
-        !states.country?.ISO3 &&
-        !states.region?.regionID &&
-        mapp
-      ) {
+      } else if (!states.country?.ISO3 && !states.region?.regionID && mapp) {
         clearLayers();
       }
     }
   }, [states.actions]);
 
+  // Handle initial bbox loading when map is ready
+  useEffect(() => {
+    if (
+      mapp &&
+      oldCRS &&
+      states.bbox &&
+      states.bbox.length > 0 &&
+      !states.bbox.includes("") &&
+      states.CRS.code &&
+      states.CRS.proj4Def
+    ) {
+      // If bbox is in a different CRS than the map, trigger transformation
+      if (oldCRS.code !== states.CRS.code) {
+        // Trigger the reprojection effect by dispatching an action
+        dispatch({
+          type: "changeBboxCRS",
+          bbox: states.bbox,
+          CRS: states.CRS,
+        });
+      } else {
+        // Same CRS, just create features
+        try {
+          const poly = turf.bboxPolygon(states.bbox);
+          const features = new GeoJSON().readFeatures(poly);
+          if (features.length > 0) {
+            setFeatures(features);
+          }
+        } catch (e) {
+          console.error("Error creating features from bbox:", e);
+        }
+      }
+    }
+  }, [mapp, oldCRS, states.CRS.code, states.CRS.proj4Def]);
+
   //Reproject the BBox if necessary and set features
   useEffect(() => {
     if (
-      states.actions.includes("changeBboxCRS") ||
-      states.actions.includes("updateBbox")
+      oldCRS &&
+      (states.actions.includes("changeBboxCRS") ||
+        states.actions.includes("updateBbox"))
     ) {
       setDigitize(false);
       // openLayers does not recognize this CRS, but try with mapTiler anyways
@@ -342,9 +408,12 @@ export default function MapOpenLayers({
         const mapProjection = mapp.getView().getProjection().getCode();
         const currentCRS = `${states.CRS.authority}:${states.CRS.code}`;
         if (oldCRS && states.CRS && states.CRS.code === oldCRS.code) {
-          setFeatures(
-            new GeoJSON().readFeatures(turf.bboxPolygon(states.bbox))
-          );
+          try {
+            const poly = turf.bboxPolygon(states.bbox);
+            setFeatures(new GeoJSON().readFeatures(poly));
+          } catch (e) {
+            console.error("Error creating features:", e);
+          }
         } else if (
           oldCRS &&
           states.CRS &&
@@ -352,33 +421,26 @@ export default function MapOpenLayers({
           currentCRS == mapProjection
         ) {
           //Just reproject the bbox if the map projection has been set to the new CRS
-          let newpoly = turf.bboxPolygon(states.bbox);
-          if (states.CRS.code !== oldCRS.code) {
-            newpoly = transformPolyToBboxCRS(newpoly, oldCRS, states.CRS);
-          }
-          if (newpoly.includes(Infinity)) {
-            setMessage("CRS not recognized");
+          try {
+            let newpoly = turf.bboxPolygon(states.bbox);
+            if (states.CRS.code !== oldCRS.code) {
+              newpoly = transformPolyToBboxCRS(newpoly, oldCRS, states.CRS);
+            }
+            const cleanedBbox = cleanBbox(newpoly, states.CRS.unit);
             dispatch({
-              bbox: ["", "", "", ""],
+              bbox: cleanedBbox,
               type: "changeBbox",
-            }); // Set update BBox in new CRS and re-run this block to set features
+            });
             setOldCRS(states.CRS);
-          } else {
-            dispatch({
-              bbox: cleanBbox(newpoly, states.CRS.unit),
-              type: "changeBbox",
-            }); // Set update BBox in new CRS and re-run this block to set features
-            setOldCRS(states.CRS);
+          } catch (e) {
+            console.error("Error transforming bbox:", e);
+            setMessage("Error transforming bounding box between CRS");
           }
         } else if (states.CRS) {
           setOldCRS(states.CRS);
         }
       }
-      if (
-        oldCRS &&
-        states.bbox.includes("") &&
-        (states.country?.bboxWGS84)
-      ) {
+      if (oldCRS && states.bbox.includes("") && states.country?.bboxWGS84) {
         // The bounding box is gone, try to reuse the country one, if available
         dispatch({
           bbox: states.country.bboxWGS84,
@@ -389,34 +451,6 @@ export default function MapOpenLayers({
       }
     }
   }, [states.actions, oldCRS]);
-
-  useEffect(() => {
-    if (states.actions.includes("load")) {
-      if (
-        states.CRS.code &&
-        get(`${states.CRS.authority}:${states.CRS.code}`)
-      ) {
-        const map = new Map({
-          target: "map",
-          layers: [
-            new Layer({
-              source: new Source({
-                attributions: ["Carto"],
-                url: "https://2.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-              }),
-              projection: `EPSG:3857`,
-            }),
-          ],
-          view: new View({
-            center: [0, 0],
-            zoom: 3,
-            projection: `${states.CRS.authority}:${states.CRS.code}`,
-          }),
-        });
-        setMapp(map);
-      }
-    }
-  }, [states.actions]);
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>

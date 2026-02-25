@@ -201,18 +201,6 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
     []
   );
 
-  const debouncedSearchAutocomplete = useCallback(
-    debounce((value) => {
-      if(value) {
-        setSearchValue(value.target.value);
-        dispatch({
-          type: "searchCRSFromAutocomplete",
-        });
-      }
-    }, 500),
-    []
-  );
-
   return (
     <div style={paperStyle(dialog)}>
       {dialog && (
@@ -256,6 +244,7 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
                         onClick={() => {
                           setOpenCRSMenu(true);
                         }}
+                        position="start"
                       >
                         <KeyboardArrowDownIcon
                           sx={{ color: "var(--biab-green-main)"}}
@@ -269,9 +258,6 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
             }}
           />
         )}
-        onInputChange={(event, value) => {
-          debouncedSearchAutocomplete(event);
-        }}
         onChange={(event, newValue) => {
           updateCRS(newValue);
         }}
