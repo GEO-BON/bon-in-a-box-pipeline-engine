@@ -182,6 +182,12 @@ export const getCRSDef = async (epsg_number) => {
 };
 
 export const getCRSListFromName = async (name) => {
+  // Strip trailing parenthesis, for example "American Samoa (USA)"" => "American Samoa"
+  const parenthesisIx = name.indexOf(" (")
+  if (parenthesisIx > 0) {
+    name = name.substring(0, parenthesisIx);
+  }
+
   let allResults = [];
   const base_url = `https://api.maptiler.com/coordinates/search/${name} kind:CRS-PROJCRS kind:CRS-GEOCRS deprecated:0.json`;
   let offset = 0;
