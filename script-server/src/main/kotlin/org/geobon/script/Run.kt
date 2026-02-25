@@ -129,11 +129,7 @@ abstract class Run(
 
                 // Script run pre-requisites
                 logFile.writeText(logBuffer)
-                context.inputs?.let {
-                    // Create input.json
-                    context.inputFile.writeText(it)
-                }
-
+                context.createInputFile()
             }
         } catch (ex: Exception) {
             ex.printStackTrace()

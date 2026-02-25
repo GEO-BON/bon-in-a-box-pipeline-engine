@@ -23,7 +23,6 @@ export default function Choosers({
     label: "",
     type: "",
   },
-  onChange = () => {},
   descriptionCell = true,
   leftLabel = true,
   updateValue,
@@ -45,7 +44,7 @@ export default function Choosers({
               </>
             )}
             {value && !isCompact && (
-              <pre style={{ maxWidth: "500px", overflowX: "scroll" }}>
+              <pre style={{ maxWidth: "330px", overflowX: "scroll" }}>
                 {yaml.dump(value)}
               </pre>
             )}
@@ -84,7 +83,6 @@ export default function Choosers({
                       inputDescription,
                       value,
                       updateValue,
-                      onChange,
                     }}
                   />
                 )}
@@ -104,7 +102,6 @@ export default function Choosers({
                 inputDescription,
                 value,
                 updateValue,
-                onChange,
               }}
             />
           </td>

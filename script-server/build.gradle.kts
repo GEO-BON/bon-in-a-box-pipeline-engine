@@ -63,6 +63,9 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.5.18")
     implementation("io.ktor:ktor-server-config-yaml:$ktorVersion")
 
+    // Source: https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.5.0.202512021534-r")
+
     // https://mvnrepository.com/artifact/org.json/json
     implementation("org.json:json:20250107")
 

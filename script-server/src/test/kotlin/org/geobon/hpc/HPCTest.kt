@@ -41,7 +41,7 @@ class HPCTest {
     }
 
     private fun mockHPCStep(id: Int = 0): ScriptStep {
-        val context = RunContext("testRun-$id", """{"some":"inputs"}""", serverContext)
+        val context = RunContext("testRun-$id", mapOf("some" to "inputs"), serverContext)
         val step = mockk<ScriptStep>()
         every { step.context } returns context
         hpc.register(step)
