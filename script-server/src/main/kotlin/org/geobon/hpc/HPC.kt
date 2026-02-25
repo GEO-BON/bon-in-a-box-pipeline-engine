@@ -58,7 +58,7 @@ open class HPC (
                 } catch (t: Throwable) {
                     t.printStackTrace()
                     condaSyncJobs[condaEnvName]?.second?.let { runs ->
-                        runs.forEach { it.fail("Failed to sync conda environment $condaEnvName: ${t.message}") }
+                        runs.forEach { it.fail("Conda environment sync failure for $condaEnvName: ${t.message}") }
                     }
                 } finally {
                     condaSyncJobs.remove(condaEnvName)
@@ -156,7 +156,7 @@ open class HPC (
                             println("Cannot retrieve files: ${e.message}")
                             failCount++
                             if (failCount >= 10) {
-                                runs.forEach { it.fail("Syncing files back from HPC failed multiple times. \n${e.message}") }
+                                runs.forEach { it.fail("Could not sync files back from HPC. Stopping after $failCount attempts. \n${e.message}") }
                                 cancel() // stops the recurrent retrieve job
                             }
                         }

@@ -258,7 +258,7 @@ class HPCTest {
     }
 
     @Test
-    fun `given conda sync fails_when command throws exception_then all registered steps with same environment are failed`() = runTest {
+    fun `given conda sync fails_when command throws exception_then all registered steps with same environment fail`() = runTest {
         hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
         every { hpc.connection.sendJobs(any(), any(), any(), any()) } just runs
         coEvery { hpc.connection.retrieveFiles(allAny()) } just runs
