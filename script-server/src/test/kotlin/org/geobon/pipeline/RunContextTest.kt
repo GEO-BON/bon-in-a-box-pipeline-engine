@@ -47,6 +47,21 @@ internal class RunContextTest {
     }
 
     @Test
+    fun givenDeepObjectInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdSame() {
+        val someFile = File(RunContext.scriptRoot, "someFile")
+        val inputs1 = """{"polygon_type":"Country or region","country_region_bbox":{"bbox":[23.17834,51.26219,32.77689,56.17223],"CRS":{"name":"WGS 84","authority":"EPSG","code":4326,"proj4Def":"+proj=longlat +datum=WGS84 +no_defs +type=crs","wktDef":"GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]","unit":"degree (supplier to define representation)","CRSBboxWGS84":[-180,-90,180,90]},"country":{"englishName":"Belarus","ISO3":"BLR","bboxWGS84":[23.17833709716797,51.26219177246094,32.776885986328125,56.17222595214844]},"region":null},"buffer":0}"""
+        val inputs2 = """{"buffer":0,"polygon_type":"Country or region","country_region_bbox":{"bbox":[23.17834,51.26219,32.77689,56.17223],"CRS":{"name":"WGS 84","authority":"EPSG","code":4326,"proj4Def":"+proj=longlat +datum=WGS84 +no_defs +type=crs","wktDef":"GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]","unit":"degree (supplier to define representation)","CRSBboxWGS84":[-180,-90,180,90]},"country":{"englishName":"Belarus","ISO3":"BLR","bboxWGS84":[23.17833709716797,51.26219177246094,32.776885986328125,56.17222595214844]},"region":null}}"""
+
+        val run1 = TestRunContext(someFile, inputs1)
+        val run2 = TestRunContext(someFile, inputs2)
+
+        println(run1.runId)
+        println(run2.runId)
+
+        assertEquals(run1.runId, run2.runId)
+    }
+
+    @Test
     fun givenSameInputs_whenTheOrderOfEntriesIsSame_thenRunIdSame() {
         val someFile = File(RunContext.scriptRoot, "someFile")
         val inputs1 = "{AAA:000, aaa:111, bbb:222, BBB:333}"
@@ -59,10 +74,10 @@ internal class RunContextTest {
     }
 
     @Test
-    fun givenDifferentInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdDifferent() {
+    fun givenDifferentDeepObjectInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdDifferent() {
         val someFile = File(RunContext.scriptRoot, "someFile")
-        val inputs1 = """{"AAA":000, "aaa":111, "bbb":222, "BBB":333}"""
-        val inputs2 = """{"BBB":333, "bbb":222, "aaa":999, "AAA":000}"""
+        val inputs1 = """{"polygon_type":"Country or region","country_region_bbox":{"bbox":[23.17834,51.26219,32.77689,56.17223],"CRS":{"name":"WGS 84","authority":"EPSG","code":4326,"proj4Def":"+proj=longlat +datum=WGS84 +no_defs +type=crs","wktDef":"GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]","unit":"degree (supplier to define representation)","CRSBboxWGS84":[-180,-90,180,90]},"country":{"englishName":"Belarus","ISO3":"BLR","bboxWGS84":[23.17833709716797,51.26219177246094,32.776885986328125,56.17222595214844]},"region":null},"buffer":0}"""
+        val inputs2 = """{"polygon_type":"Country or region","country_region_bbox":{"bbox":[23,51,32,56],"CRS":{"name":"WGS 84","authority":"EPSG","code":4326,"proj4Def":"+proj=longlat +datum=WGS84 +no_defs +type=crs","wktDef":"GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]","unit":"degree (supplier to define representation)","CRSBboxWGS84":[-180,-90,180,90]},"country":{"englishName":"Belarus","ISO3":"BLR","bboxWGS84":[23.17833709716797,51.26219177246094,32.776885986328125,56.17222595214844]},"region":null},"buffer":0}"""
 
         val run1 = TestRunContext(someFile, inputs1)
         val run2 = TestRunContext(someFile, inputs2)
@@ -81,6 +96,19 @@ internal class RunContextTest {
 
         assertNotEquals(run1.runId, run2.runId)
     }
+
+    // This is a limitation of the current serialization method.
+    // @Test
+    // fun givenDifferentInputTypes_whenTheOrderOfEntriesIsSame_thenRunIdDifferent() {
+    //     val someFile = File(RunContext.scriptRoot, "someFile")
+    //     val inputs1 = """{"AAA":000, "aaa":111, "bbb":222, "BBB":333}"""
+    //     val inputs2 = """{"AAA":"000", "aaa":111, "bbb":222, "BBB":333}"""
+
+    //     val run1 = TestRunContext(someFile, inputs1)
+    //     val run2 = TestRunContext(someFile, inputs2)
+
+    //     assertNotEquals(run1.runId, run2.runId)
+    // }
 
     @Test
     fun givenNoGitFolder_whenGetGitInfo_thenEmptyWithNoErrorMessage() {

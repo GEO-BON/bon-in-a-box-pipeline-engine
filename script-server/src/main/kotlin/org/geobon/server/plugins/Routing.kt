@@ -22,7 +22,6 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.net.URLEncoder
-import kotlin.toString
 
 
 /**
@@ -199,7 +198,7 @@ fun Application.configureRouting() {
             val withoutExtension = descriptionPath.removeSuffix(".json").removeSuffix(".yml")
 
             // Unique   to this pipeline                    and to these params
-            val runId = withoutExtension + FILE_SEPARATOR + RunContext.inputsToMd5(inputFileContent)
+            val runId = withoutExtension + FILE_SEPARATOR + RunContext.inputsToHash(inputFileContent)
             val pipelineOutputFolder = File(outputRoot, runId.replace(FILE_SEPARATOR, '/'))
             logger.info("${call.parameters["type"]}: $descriptionPath\nFolder: $pipelineOutputFolder\nBody: $inputFileContent")
 

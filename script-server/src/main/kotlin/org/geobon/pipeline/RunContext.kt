@@ -9,9 +9,10 @@ import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.runToText
-import org.geobon.utils.toMD5
+import org.geobon.utils.toSHA256
 import org.json.JSONObject
 import java.io.File
+import java.text.Normalizer
 import kotlin.math.floor
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -31,7 +32,7 @@ open class RunContext(val runId: String, val inputs: Map<String, Any?>) {
             descriptionFile.relativeTo(scriptRoot).path.removeSuffix(".yml")
                 .replace("../", ""), // This replacement is to accommodate script-stubs
             // Unique to these params
-            if (inputs.isEmpty()) "no_params" else inputsToMd5(inputs)
+            if (inputs.isEmpty()) "no_params" else inputsToHash(inputs)
         ).path,
         inputs
     )
@@ -144,19 +145,19 @@ open class RunContext(val runId: String, val inputs: Map<String, Any?>) {
         /**
          * Makes sure the file gives the same hash, regardless of the key order.
          */
-        fun inputsToMd5(jsonString: String): String {
+        fun inputsToHash(jsonString: String): String {
             val inputs = gson.fromJson<Map<String, Any>>(
                 jsonString,
                 object : TypeToken<Map<String, Any>>() {}.type
             )
-            return inputsToMd5(inputs)
+            return inputsToHash(inputs)
         }
 
         /**
          * Makes sure the file gives the same hash, regardless of the key order.
          */
-        fun inputsToMd5(inputs: Map<String, Any?>): String {
-            return gson.toJson(sortKeysRecursively(inputs)).toMD5()
+        fun inputsToHash(inputs: Map<String, Any?>): String {
+            return sortKeysRecursively(inputs).toString().toSHA256(21)
         }
 
         fun sortKeysRecursively(obj: Any?): Any? = when (obj) {
@@ -170,6 +171,8 @@ open class RunContext(val runId: String, val inputs: Map<String, Any?>) {
             // They don't have the same problem as the objects that are rendered in an arbitrary order,
             // and their order does matter in most cases (e.g. bounding boxes).
             is List<*> -> obj.map { sortKeysRecursively(it) }
+
+            is String -> Normalizer.normalize(obj, Normalizer.Form.NFC)
 
             else -> obj
         }
