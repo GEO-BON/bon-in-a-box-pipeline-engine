@@ -70,7 +70,7 @@ class HPCRun(
                         """.replace(Regex("""\s*\n\s*"""), " ")
                     )
 
-                    condaSyncJob?.join()
+                    condaSyncJob.join()
 
                     // Environment ready, send edited log file to HPC
                     logFile.appendText(waitText)
@@ -85,7 +85,7 @@ class HPCRun(
                             if (event.file == context.resultFile) {
                                 when (event.kind) {
                                     KWatchEvent.Kind.Created, KWatchEvent.Kind.Modified -> {
-                                        logger.debug("Watched file ${event.kind}: {}", context.resultFile)
+                                        logger.debug("Watched file {}: {}", event.kind, context.resultFile)
                                         readOutputs()?.let {
                                             output = it
                                             watchChannel.close()
