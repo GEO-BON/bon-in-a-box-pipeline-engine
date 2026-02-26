@@ -1,0 +1,755 @@
+#!/usr/bin/env python3
+"""
+BON in a Box Pipeline Engine - Production Server Management Script
+
+Converted from prod-server.sh to Python for better maintainability.
+"""
+
+from __future__ import annotations
+
+import grp
+import json
+import logging
+import os
+import platform
+import re
+import shutil
+import subprocess
+import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BOLD = "\033[1m"
+ENDCOLOR = "\033[0m"
+
+COPYRIGHT_RANGE = "2021-2026"
+
+# ---------------------------------------------------------------------------
+# Logging setup – the *trace* level replaces the old per-image log files.
+# Activate with -d / --debug on the command-line.
+# ---------------------------------------------------------------------------
+TRACE = 5  # custom log level, below DEBUG
+logging.addLevelName(TRACE, "TRACE")
+
+
+def _trace(self, message, *args, **kwargs):
+    if self.isEnabledFor(TRACE):
+        self._log(TRACE, message, args, **kwargs)
+
+
+logging.Logger.trace = _trace  # type: ignore[attr-defined]
+logger = logging.getLogger("prod-server")
+
+# ---------------------------------------------------------------------------
+# Global state
+# ---------------------------------------------------------------------------
+n_errors = 0
+is_symlink_dev = False
+compose_files: list[str] = []
+docker_suffix = "latest"
+script_dir = str(Path(__file__).resolve().parent)
+repo_dir = ""  # pipeline-repo folder; set by prepare_commands()
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+def color_print(color: str, text: str) -> None:
+    print(f"{color}{text}{ENDCOLOR}")
+
+
+def run(
+    cmd: list[str] | str,
+    *,
+    check: bool = False,
+    capture: bool = False,
+    shell: bool = False,
+    cwd: str | None = None,
+    suppress_stderr: bool = False,
+) -> subprocess.CompletedProcess:
+    """Thin wrapper around subprocess.run."""
+    stderr = subprocess.DEVNULL if suppress_stderr else None
+    stdout = subprocess.PIPE if capture else None
+    return subprocess.run(
+        cmd,
+        check=check,
+        stdout=stdout,
+        stderr=stderr,
+        text=True,
+        shell=shell,
+        cwd=cwd,
+    )
+
+
+def assert_success(result: subprocess.CompletedProcess) -> None:
+    if result.returncode != 0:
+        color_print(RED, "FAILED")
+        sys.exit(1)
+
+
+def flag_errors(result: subprocess.CompletedProcess) -> None:
+    global n_errors
+    if result.returncode != 0:
+        color_print(RED, "FAILED")
+        n_errors += 1
+
+
+def exclude_strings(lines: list[str], pattern: str) -> list[str]:
+    """Return *lines* that do **not** match the regex *pattern*."""
+    regex = re.compile(pattern)
+    return [line for line in lines if not regex.search(line)]
+
+
+def command_exists(name: str) -> bool:
+    return shutil.which(name) is not None
+
+
+# ---------------------------------------------------------------------------
+# Docker-compose helper
+# ---------------------------------------------------------------------------
+def _compose_cmd(*extra_args: str) -> list[str]:
+    """Build the full docker compose command list."""
+    cmd = ["docker", "compose"]
+    for f in compose_files:
+        cmd += ["-f", f]
+    cmd += ["--env-file", "runner.env", "--env-file", ".server/.prod-paths.env"]
+    cmd += list(extra_args)
+    return cmd
+
+
+def docker_compose(
+    *extra_args: str,
+    capture: bool = False,
+    capture_all: bool = False,
+) -> subprocess.CompletedProcess:
+    """Build and run the full docker compose command.
+
+    *capture*     – capture stdout only (stderr goes to terminal).
+    *capture_all* – capture both stdout **and** stderr.
+    All compose calls run with ``cwd=repo_dir`` so that the relative
+    env-file paths (``runner.env``, ``.server/.prod-paths.env``) resolve
+    correctly against the pipeline-repo folder.
+    """
+    cmd = _compose_cmd(*extra_args)
+    logger.trace("docker_compose cmd: %s  (cwd=%s)", " ".join(cmd), repo_dir)  # type: ignore[attr-defined]
+    if capture_all:
+        return subprocess.run(cmd, capture_output=True, text=True, cwd=repo_dir or None)
+    return run(cmd, capture=capture, cwd=repo_dir or None)
+
+
+# ---------------------------------------------------------------------------
+# check_for_updates – replaces the bash checkForUpdates + xargs parallelism
+# ---------------------------------------------------------------------------
+def _check_single_image(image: str) -> str | None:
+    """Return the image name if it needs updating, else *None*.
+
+    All the log-file writes from the bash version are replaced by
+    logger.log(TRACE, …) calls.
+    """
+
+    # --- local digest ---
+    logger.log(TRACE, "Inspecting local image: %s", image)
+    result = run(
+        ["docker", "image", "inspect", "--format", "{{index .Id}}", image],
+        capture=True,
+        suppress_stderr=True,
+    )
+    local_digest = result.stdout.strip()
+    # The bash version did `cut -d '@' -f2`; .Id already is the digest.
+    if "@" in local_digest:
+        local_digest = local_digest.split("@", 1)[1]
+
+    logger.log(TRACE, "Local digest for %s: %s", image, local_digest)
+
+    if not local_digest:
+        logger.log(TRACE, "Not available locally: %s", image)
+        return image  # not available locally
+
+    # --- remote digest ---
+    result = run(
+        ["docker", "manifest", "inspect", "-v", image],
+        capture=True,
+        suppress_stderr=True,
+    )
+    remote_manifest = result.stdout.strip()
+    logger.log(TRACE, "Remote manifest for %s: %s", image, remote_manifest[:200])
+
+    if local_digest not in remote_manifest:
+        logger.log(TRACE, "Local digest does not match remote digest for %s", image)
+        return image
+
+    logger.log(TRACE, "Local digest matches: %s up to date", image)
+
+    # --- container check ---
+    result = run(
+        ["docker", "container", "ls", "-a", "--format", "{{.Image}}"],
+        capture=True,
+    )
+    containers = result.stdout.strip().splitlines()
+    if image not in containers:
+        logger.log(TRACE, "No container exists for %s", image)
+        return image
+
+    logger.log(TRACE, "Container exists for %s", image)
+    return None
+
+
+def check_for_updates(images: list[str]) -> list[str]:
+    """Return a list of images that need updating.
+
+    Uses a thread-pool (like the bash ``xargs -P8``) for parallelism.
+    """
+    needs_update: list[str] = []
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        futures = {pool.submit(_check_single_image, img): img for img in images}
+        for future in as_completed(futures):
+            result = future.result()
+            if result is not None:
+                needs_update.append(result)
+    return needs_update
+
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
+def show_help() -> None:
+    print(
+        """\
+Usage: ./prod-server COMMAND [ARGS...]
+
+Commands:
+    help                 Display this help
+    checkout [BRANCH]    Checkout config files from given branch of pipeline engine repo.
+    up [-y]              Start the server, accessible in http://localhost
+                         Use -y or --yes to skip confirmation prompts (for automation)
+    down                 Stops the server
+    validate             Run basic validation on pipelines and scripts.
+    clean                Removes the docker containers of all services and the volume
+                         used to store the conda sub-environment info.
+                         This is useful in development switching from prod to dev server,
+                         in cases when we get the following error:
+                         "The container name ... is already in use by container ..."
+    version              Display the current version of the server
+    licence              Display the licence information
+    command [ARGS...]    Run an arbitrary docker compose command,
+                         such as (pull|run|up|down|build|logs)
+
+Options:
+    -d, --debug          Enable debug (trace) logging"""
+    )
+
+
+def prepare_commands() -> None:
+    global compose_files, docker_suffix, is_symlink_dev, repo_dir
+
+    # The pipeline-repo folder is the parent of the directory that
+    # contains this script (.server/ in production).  All docker compose
+    # commands must run from there so that relative env-file paths
+    # (runner.env, .server/.prod-paths.env) resolve correctly.
+    repo_dir = str(Path(script_dir).parent)
+    logger.log(TRACE, "repo_dir: %s", repo_dir)
+
+    # Docker GID
+    docker_gid = ""
+    try:
+        docker_gid = str(grp.getgrnam("docker").gr_gid)
+    except (KeyError, AttributeError):
+        pass
+
+    os.environ["DOCKER_GID"] = docker_gid
+
+    print(f"Server config location: {script_dir}")
+
+    # Branch detection
+    if is_symlink_dev:
+        branch = run(["git", "branch", "--show-current"], capture=True).stdout.strip()
+    else:
+        fetch_line = run(
+            ["git", "-C", script_dir, "config", "remote.origin.fetch"],
+            capture=True,
+        ).stdout.strip()
+        # sed 's/.*remotes\/origin\///'
+        branch = re.sub(r".*/remotes/origin/", "", fetch_line) if fetch_line else ""
+
+    if branch == "*":
+        branch = run(["git", "branch", "--show-current"], capture=True).stdout.strip()
+
+    if branch.endswith("staging"):
+        docker_suffix = branch
+        os.environ["DOCKER_SUFFIX"] = docker_suffix
+        print(f'Using staging containers with tag "{branch}"')
+    elif branch == "edge":
+        docker_suffix = "edge"
+        os.environ["DOCKER_SUFFIX"] = docker_suffix
+        print("Using edge releases: you'll be up to date with the latest possible server.")
+    else:
+        docker_suffix = "latest"
+        os.environ["DOCKER_SUFFIX"] = docker_suffix
+        print("Using default branch.")
+
+    if not docker_gid:
+        os.environ["DOCKER_GID"] = ""
+        os.environ["MY_UID"] = ""
+    else:
+        os.environ["MY_UID"] = str(os.getuid())
+
+    # Compose files
+    compose_files = [
+        ".server/compose.yml",
+        ".server/compose.prod.yml",
+        "compose.env.yml",
+    ]
+
+    # Apple M-series chip detection
+    if platform.system() == "Darwin":
+        result = run(
+            ["sysctl", "-n", "machdep.cpu.brand_string"],
+            capture=True,
+            suppress_stderr=True,
+        )
+        mac_cpu = result.stdout.strip()
+        if mac_cpu and re.match(r"^Apple M[1-9]", mac_cpu):
+            print("Apple M* chip detected")
+            compose_files.append(".server/compose.apple.yml")
+
+
+def cmd_validate() -> None:
+    global n_errors
+    cwd = os.getcwd()
+
+    print("Running basic validation of pipelines and scripts...")
+
+    print("Checking for duplicate descriptions in scripts...")
+    os.chdir("scripts")
+    flag_errors(run(["../.server/.github/findDuplicateDescriptions.sh"]))
+    os.chdir(cwd)
+
+    print("Validating script metadata against schema...")
+    flag_errors(
+        run(
+            [
+                "docker",
+                "run",
+                "--rm",
+                "--name",
+                "biab-yaml-validator",
+                "-v",
+                f"{cwd}/scripts:/scripts",
+                "-v",
+                f"{cwd}/.server/.github/:/.github",
+                "navikt/yaml-validator:v4",
+                ".github/scriptValidationSchema.yml",
+                "scripts/",
+                "no",
+                ".yml",
+            ]
+        )
+    )
+
+    print("Checking for duplicate ids in pipelines...")
+    os.chdir("pipelines")
+    flag_errors(run(["../.server/.github/findDuplicateIds.sh"]))
+    os.chdir(cwd)
+
+    print("Validating pipeline structure")
+    flag_errors(
+        docker_compose(
+            "run",
+            "script-server",
+            "java",
+            "-cp",
+            "biab-script-server.jar",
+            "org.geobon.pipeline.Validator",
+        )
+    )
+
+    print("Validating pipeline metadata")
+    if not command_exists("python3"):
+        color_print(RED, "Python is required to validate the pipeline metadata.")
+        sys.exit(1)
+    if not command_exists("pip"):
+        color_print(RED, "pip is required to validate the pipeline metadata.")
+        sys.exit(1)
+
+    run(["pip", "install", "pyyaml", "cerberus"])
+    schema = f"{cwd}/.server/.github/validateCerberusSchema.py"
+    validation_script = f"{cwd}/.server/.github/pipelineValidationSchema.yml"
+    print(f"Using schema: {schema}")
+    print(f"Using validation script: {validation_script}")
+    os.chdir(f"{cwd}/pipelines")
+    flag_errors(run(["python3", schema, validation_script]))
+    os.chdir(cwd)
+
+    if n_errors == 0:
+        color_print(GREEN, "Validation complete.")
+    else:
+        color_print(RED, "Errors occured during validation. Check logs above.")
+        sys.exit(1)
+
+
+def cmd_checkout(branch_name: str) -> None:
+    branch = f"origin/{branch_name}"
+    print(f"Updating server configuration from {branch}...")
+
+    files_assert = [
+        ".prod-paths.env",
+        "compose.yml",
+        "compose.prod.yml",
+        "compose.apple.yml",
+        ".github/findDuplicateDescriptions.sh",
+        ".github/findDuplicateIds.sh",
+        ".github/scriptValidationSchema.yml",
+        ".github/pipelineValidationSchema.yml",
+        ".github/validateCerberusSchema.py",
+        "http-proxy/conf.d-prod/ngnix.conf",
+        "script-stubs",
+    ]
+    for f in files_assert:
+        assert_success(run(["git", "checkout", branch, "--", f]))
+
+    # version.txt: don't assert — only informative
+    run(["git", "checkout", branch, "--", "version.txt"])
+
+    color_print(GREEN, "Server configuration updated.")
+
+
+def cmd_up(extra_args: list[str]) -> None:
+    auto_yes = "-y" in extra_args or "--yes" in extra_args
+
+    # No need to os.chdir – docker_compose() always runs from repo_dir.
+
+    print("Checking requirements...")
+    result = docker_compose("ps", capture_all=True)
+    output = (result.stdout or "") + (result.stderr or "")
+
+    if 'service "runner-conda" has neither an image nor a build context specified' in output:
+        color_print(
+            RED,
+            f"{BOLD}Cannot start server until branch is updated:{ENDCOLOR}",
+        )
+        print(f"{BOLD}BON in a Box now supports conda dependencies!")
+        print(
+            f"{BOLD}Update your development branch or fork with the main branch "
+            f"from GEO-BON/bon-in-a-box-pipelines and launch the server again{ENDCOLOR}"
+        )
+        print()
+        color_print(RED, f"{BOLD}Workaround for legacy branches:{ENDCOLOR}")
+        print("Run the server with the following command")
+        print("    ./server-up.sh pre-conda-staging")
+        sys.exit(1)
+
+    elif "ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/gateway" in output:
+        color_print(RED, "BON in a Box is already running.")
+        sys.exit(1)
+
+    # Check for legacy Docker Hub images
+    images_result = docker_compose("config", "--images", capture=True)
+    images_text = images_result.stdout.strip()
+    images = [i for i in images_text.splitlines() if i.strip()]
+
+    if any("geobon/bon-in-a-box:runner" in i for i in images):
+        color_print(
+            YELLOW,
+            "Legacy Docker Hub images detected in your configuration.\n"
+            "Please update your branch by merging the changes from the main branch "
+            "to use the images from GitHub Packages (ghcr.io).",
+        )
+        print("This can be done visually or on the command line with the following commands:")
+        print("    git fetch")
+        print("    git merge origin/main")
+        color_print(RED, "FAILED")
+        sys.exit(1)
+
+    print("Building (if necessary)...")
+    assert_success(docker_compose("build"))
+
+    containers_to_discard: list[str] = []
+
+    # Check if already installed
+    img_ls = run(
+        ["docker", "image", "ls", "--format", "{{.Repository}}"],
+        capture=True,
+    )
+    installed_repos = img_ls.stdout.strip().splitlines()
+    has_ghcr = any("ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/" in r for r in installed_repos)
+
+    if not has_ghcr:
+        # Check legacy
+        has_legacy = any("geobon/bon-in-a-box" in r for r in installed_repos)
+        if has_legacy:
+            color_print(YELLOW, "Docker Hub containers found: cleaning up before installing the new version.")
+            color_print(YELLOW, "Please be patient while we save some disk space: this may take a while.")
+
+            cmd_clean()
+
+            print("Removing obsolete containers...")
+            container_ls = run(
+                ["docker", "container", "ls", "-a", "--format", "{{.Image}} {{.ID}}"],
+                capture=True,
+            )
+            for line in container_ls.stdout.strip().splitlines():
+                if "geobon/bon-in-a-box:" in line:
+                    cid = line.split()[-1]
+                    run(["docker", "container", "rm", cid])
+
+            print("Removing obsolete images...")
+            image_ls = run(
+                ["docker", "image", "ls", "--format", "{{.Repository}}:{{.Tag}} {{.ID}}"],
+                capture=True,
+            )
+            for line in image_ls.stdout.strip().splitlines():
+                if line.startswith("geobon/bon-in-a-box"):
+                    iid = line.split()[-1]
+                    run(["docker", "image", "rm", iid])
+
+            print("Removing obsolete volumes...")
+            run(
+                [
+                    "docker",
+                    "volume",
+                    "rm",
+                    "conda-dir-dev",
+                    "conda-cache-dev",
+                    "conda-env-yml",
+                    "r-libs-user-dev",
+                ],
+                suppress_stderr=True,
+            )
+            color_print(GREEN, "Clean complete.")
+
+        print("Installing...")
+        assert_success(docker_compose("pull"))
+
+    else:
+        # Already installed -- check for updates
+        print("Checking for updates to docker images...")
+
+        services_result = docker_compose("config", "--services", capture=True)
+        services = [s for s in services_result.stdout.strip().splitlines() if s.strip()]
+
+        saved_container_regex = re.compile(r"^(runner-conda|runner-julia)$")
+        saved_container_services = ["runner-conda", "runner-julia"]
+        other_services = [s for s in services if not saved_container_regex.match(s)]
+
+        # Exclude images we don't want to check
+        excluded_images_pattern = r"ghcr\.io/developmentseed/titiler:.*"
+        images_to_check = exclude_strings(images, excluded_images_pattern)
+        images_to_update = check_for_updates(images_to_check)
+
+        saved_regex = re.compile(r"(runner-conda|runner-julia)")
+        containers_to_discard = [i for i in images_to_update if saved_regex.search(i)]
+
+        if images_to_update:
+            print("Updates found.")
+            if containers_to_discard:
+                color_print(YELLOW, "This update will discard the following runner containers: ")
+                for container in containers_to_discard:
+                    container_no_tag = container.split(":")[0]
+                    color_print(YELLOW, f" - {container_no_tag}")
+                color_print(
+                    YELLOW,
+                    "This means that conda environments and dependencies installed at runtime will need to be reinstalled.",
+                )
+
+            if auto_yes:
+                choice = "y"
+            else:
+                choice = input("Do you want to update? (Y/n): ").strip()
+
+            if not choice or choice.lower() == "y":
+                assert_success(docker_compose("pull"))
+            else:
+                images_to_update = []
+                containers_to_discard = []
+        else:
+            print("No updates found.")
+
+    print("Starting the server...")
+
+    saved_container_services = ["runner-conda", "runner-julia"]
+    services_result = docker_compose("config", "--services", capture=True)
+    services = [s for s in services_result.stdout.strip().splitlines() if s.strip()]
+    saved_container_regex_filter = re.compile(r"^(runner-conda|runner-julia)$")
+    other_services = [s for s in services if not saved_container_regex_filter.match(s)]
+
+    combined_output = ""
+    combined_rc = 0
+
+    for service in saved_container_services:
+        flag = "--no-recreate"
+        if any(service in c for c in containers_to_discard):
+            print(f"  Discarding {service} runner")
+            flag = "--force-recreate"
+
+        result = docker_compose("up", "-d", flag, service, capture_all=True)
+        combined_output += (result.stdout or "") + (result.stderr or "")
+        if result.returncode != 0:
+            combined_rc = 1
+
+    # Start the rest
+    result = docker_compose("up", "-d", *other_services, capture_all=True)
+    combined_output += (result.stdout or "") + (result.stderr or "")
+    if result.returncode != 0:
+        combined_rc = 1
+
+    if "is already in use by container" in combined_output:
+        print("A container name conflict was found, we will clean and try again.")
+        cmd_clean()
+        print("Starting the server after a clean...")
+        assert_success(docker_compose("up", "-d"))
+    elif combined_rc != 0:
+        print(combined_output)
+        color_print(RED, "FAILED")
+        sys.exit(1)
+
+    color_print(GREEN, "Server is running.")
+
+
+def cmd_down() -> None:
+    print("Stopping the servers...")
+    assert_success(docker_compose("stop"))
+    color_print(GREEN, "Server has stopped.")
+
+
+def cmd_clean() -> None:
+    print("Removing docker containers...")
+    result = subprocess.run(
+        [
+            "docker",
+            "container",
+            "rm",
+            "biab-gateway",
+            "biab-script-server",
+            "biab-python-api",
+            "biab-runner-conda",
+            "biab-runner-julia",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    output = (result.stdout or "") + (result.stderr or "")
+    if "container is running" in output:
+        color_print(RED, "Cannot clean while BON in a Box is running.")
+        sys.exit(1)
+
+
+def cmd_version() -> None:
+    version_file = Path(script_dir) / "version.txt"
+    if version_file.is_file():
+        print(version_file.read_text().strip())
+        print()
+    else:
+        color_print(RED, "Version file not found.")
+
+    print()
+    print("More detailed version information is available in the info tab")
+    print("of the BON in a Box web interface.")
+    print()
+    print(f"Copyright (C) {COPYRIGHT_RANGE}  McGill University")
+    print("License: GPL-3.0-or-later")
+    print("This is free software; there is NO WARRANTY.")
+
+
+def cmd_licence() -> None:
+    print("BON in a Box Pipeline Engine")
+    print(f"Copyright (C) {COPYRIGHT_RANGE}  McGill University")
+    print()
+    print("This program is free software: you can redistribute it and/or modify")
+    print("it under the terms of the GNU General Public License as published by")
+    print("the Free Software Foundation, either version 3 of the License, or")
+    print("(at your option) any later version.")
+    print()
+    print("This program is distributed in the hope that it will be useful,")
+    print("but WITHOUT ANY WARRANTY; without even the implied warranty of")
+    print("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the")
+    print("GNU General Public License for more details.")
+    print()
+    print("You should have received a copy of the GNU General Public License")
+    print("along with this program.  If not, see <https://www.gnu.org/licenses/>.")
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+def main() -> None:
+    global is_symlink_dev
+
+    # Check for -d / --debug anywhere in args and remove it
+    args = sys.argv[1:]
+    debug = False
+    if "-d" in args:
+        debug = True
+        args.remove("-d")
+    if "--debug" in args:
+        debug = True
+        args.remove("--debug")
+
+    if debug:
+        logging.basicConfig(level=TRACE, format="%(levelname)s: %(message)s")
+    else:
+        logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
+    # Symlink check
+    is_symlink_dev = Path(".server").is_symlink() or Path("./pipeline-repo/.server").is_symlink()
+    if is_symlink_dev:
+        print("Detected a symlink on .server folder: this is a development setup!")
+
+    # Prerequisite checks
+    if not command_exists("docker"):
+        color_print(RED, "Docker and docker compose plugin are required to run the pipeline engine.")
+        sys.exit(1)
+    if not command_exists("git"):
+        color_print(RED, "Git is required to run the latest version of the pipeline engine.")
+        sys.exit(1)
+
+    if not args:
+        show_help()
+        sys.exit(1)
+
+    command = args[0]
+
+    if command == "help":
+        show_help()
+    elif command == "checkout":
+        if len(args) < 2:
+            print("Error: checkout requires a branch name.")
+            sys.exit(1)
+        cmd_checkout(args[1])
+    elif command == "up":
+        prepare_commands()
+        cmd_up(args[1:])
+    elif command == "down":
+        prepare_commands()
+        cmd_down()
+    elif command == "validate":
+        prepare_commands()
+        cmd_validate()
+    elif command == "command":
+        prepare_commands()
+        assert_success(docker_compose(*args[1:]))
+    elif command == "purge":
+        print("Deprecated: Purge is now an alias to the clean command.")
+        prepare_commands()
+        cmd_clean()
+        color_print(GREEN, "Clean complete.")
+    elif command == "clean":
+        prepare_commands()
+        cmd_clean()
+        color_print(GREEN, "Clean complete.")
+    elif command == "version":
+        cmd_version()
+    elif command == "licence":
+        cmd_licence()
+    else:
+        show_help()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
