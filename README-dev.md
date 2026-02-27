@@ -288,7 +288,7 @@ To connect to the DRAC automation node, you will need
 - The [allowed_commands.sh](./script-stubs/hpc/allowed_commands.sh) script, with execute permissions in the node.
 
 1. Follow [these instructions](https://docs.alliancecan.ca/wiki/Automation_in_the_context_of_multifactor_authentication/)
-2. Manually connect once to the automation node via SSH to accept the fingerprint of the HPC's node. This is mandatory since known_hosts will be used to connect.
+2. Manually execute a command through SSH once to the automation node to accept the fingerprint of the HPC's. For example by running `ssh hpc-name "ls -l"`. This is mandatory since known_hosts will be used to connect.
 3. Create an ssh config file dedicated to BON in a Box, with the details for your HPC's automation node as such:
     ```
     host yourHPC
