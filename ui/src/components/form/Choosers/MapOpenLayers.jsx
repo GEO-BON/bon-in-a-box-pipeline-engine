@@ -59,13 +59,14 @@ export default function MapOpenLayers({
   dispatch,
   digitize,
   setDigitize,
+  message,
+  setMessage,
 }) {
   const mapContainer = useRef(null);
   const [mapp, setMapp] = useState(null);
   const [draw, setDraw] = useState(null);
   const [features, setFeatures] = useState([]);
   const [oldCRS, setOldCRS] = useState(null);
-  const [message, setMessage] = useState("");
   const [showSpinner, setShowSpinner] = useState(false);
   var featureId = 0;
 
@@ -263,7 +264,7 @@ export default function MapOpenLayers({
       register(proj4);
       const projCRS = get(crsString);
       if (projCRS) {
-        map = new Map({
+        const map = new Map({
           target: "map",
           layers: [
             new Layer({

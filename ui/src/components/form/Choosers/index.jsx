@@ -2,7 +2,7 @@
 import { useEffect, useState, lazy, useReducer, Suspense } from "react";
 import Grid from "@mui/material/Grid";
 import CropIcon from "@mui/icons-material/Crop";
-const MapOpenLayers = lazy(() => import('./MapOpenLayers'));
+const MapOpenLayers = lazy(() => import("./MapOpenLayers"));
 import CountryRegionMenu from "./CountryRegionMenu";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
@@ -153,10 +153,11 @@ export function Chooser({
     "bboxCRS",
   ].includes(type);
   const showRegion = ["countryRegion", "countryRegionCRS", "bboxCRS"].includes(
-    type
+    type,
   );
   const showCRS = ["countryRegionCRS", "bboxCRS", "CRS"].includes(type);
   const [oldValues, setOldValues] = useState({});
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (value) {
@@ -232,8 +233,9 @@ export function Chooser({
       }}
     >
       <Grid container spacing={0} sx={{ height: "100%" }}>
-        <Grid className="inputGrid"
-          size={{xs:(showMap ? 3 : 12)}}
+        <Grid
+          className="inputGrid"
+          size={{ xs: showMap ? 3 : 12 }}
           sx={{
             padding: "10px",
             height: showMap ? "100%" : "auto",
@@ -284,6 +286,7 @@ export function Chooser({
                 states,
                 dispatch,
                 value,
+                setMessage,
               }}
             />
           )}
@@ -327,6 +330,8 @@ export function Chooser({
                   clearFeatures,
                   digitize,
                   setDigitize,
+                  message,
+                  setMessage,
                 }}
               />
             </Suspense>
