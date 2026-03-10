@@ -21,4 +21,4 @@ pipeline-repo
 
 /python-api/app/*duckdb*
 
-/ui/dist/
+ui/dist/
