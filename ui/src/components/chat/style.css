@@ -1,0 +1,28 @@
+.copilot-chat textarea{
+    background-color: #333 ;
+}
+/*
+.copilot-chat h1{
+    color: #fff;
+}
+
+.copilot-chat .prose{
+    color:white;
+}
+
+.copilot-chat button {
+    color: white;
+}
+
+.copilot-chat {
+    margin-bottom: 100px;
+}
+    */
+
+.copilot-chat{
+    padding-bottom: 100px;
+}
+
+cpk-web-inspector {
+    display: none;
+}

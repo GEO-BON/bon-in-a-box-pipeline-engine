@@ -8,6 +8,12 @@ export default defineConfig({
     open: true, // Automatically open the app in the browser
     port: 3000,
     allowedHosts: ["biab-ui"],
+    proxy: {
+      "/copilotkit": {
+        target: "http://chat-api:4000",
+        changeOrigin: true,
+      },
+    },
   },
   resolve: {
     preserveSymlinks: true, //Needed for BonInABoxScriptService to load

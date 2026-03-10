@@ -6,7 +6,7 @@ import theme from "./components/styles/theme";
 import useWindowDimensions from "./utils/WindowDimensions";
 import TopMenu from "./TopMenu";
 import { ReactNode } from "react";
-import { CopilotKit } from "@copilotkit/react-core"; 
+import { CopilotKitProvider } from "@copilotkit/react-core/v2";
 
 export const PopupContentContext = createContext();
 
@@ -24,10 +24,9 @@ export function Layout(props) {
   return (
     <PopupContentContext.Provider value={{popupContent, setPopupContent}}>
       <ThemeProvider theme={theme}>
-        <CopilotKit 
+        <CopilotKitProvider 
           runtimeUrl="/copilotkit"
           showDevConsole={true}
-          useSingleEndpoint={true}
         > 
         <div className="left-pane">
           <div>
@@ -56,7 +55,7 @@ export function Layout(props) {
           <main style={{ height: mainHeight }}>{props.right}</main>
         </div>
         </div>
-        </CopilotKit>
+        </CopilotKitProvider>
       </ThemeProvider>
     </PopupContentContext.Provider>
   );

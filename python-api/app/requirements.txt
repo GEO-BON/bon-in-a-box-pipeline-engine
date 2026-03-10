@@ -6,6 +6,7 @@ tabulate
 pystac
 requests
 fastapi 
+fastmcp
 uvicorn[standard] 
 requests 
 geopandas
