@@ -2,6 +2,7 @@ package org.geobon.hpc
 
 import kotlinx.coroutines.*
 import org.geobon.pipeline.outputRoot
+import org.geobon.script.ScriptType
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
@@ -53,6 +54,15 @@ class HPCConnection(
         get() = rImage.state == RemoteSetupState.READY
                 && juliaImage.state == RemoteSetupState.READY
                 && scriptsStatus.state == RemoteSetupState.READY
+
+    fun statusFor(type: ScriptType): RemoteSetupState {
+        return when (type) {
+            ScriptType.R -> rImage.state
+            ScriptType.PYTHON -> pythonImage.state
+            ScriptType.JULIA -> juliaImage.state
+            ScriptType.SHELL -> scriptsStatus.state
+        }
+    }
 
     val hpcScriptsRoot: String
         get() = "$hpcRoot/scripts"

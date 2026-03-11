@@ -48,8 +48,8 @@ class DockerizedRun( // Constructor used in single script run
         runCatching {
             val escapedOutputFolder = context.outputFolderEscaped
             val command: List<String>
-            when (scriptFile.extension) {
-                "jl", "JL" -> {
+            when (ScriptType.fromFile(scriptFile)) {
+                ScriptType.JULIA -> {
                     container = Containers.JULIA
                     stopSignal = "INT" // Using SIGINT since Julia does not allow to handle cleanup on SIGTERM.
                     command = container.dockerCommandList + listOf(
@@ -61,7 +61,7 @@ class DockerizedRun( // Constructor used in single script run
                     )
                 }
 
-                "r", "R" -> {
+                ScriptType.R -> {
                     container = Containers.CONDA
                     stopSignal = "INT" // Using SIGINT since R does not allow to handle cleanup on SIGTERM.
 
@@ -74,8 +74,8 @@ class DockerizedRun( // Constructor used in single script run
                     )
                 }
 
-                "sh" -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
-                "py", "PY" -> {
+                ScriptType.SHELL -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
+                ScriptType.PYTHON -> {
                     val scriptPath = scriptFile.absolutePath
                     val pythonWrapper = "$scriptStubsRoot/system/scriptWrapper.py"
 
@@ -91,10 +91,6 @@ class DockerizedRun( // Constructor used in single script run
                     } else {
                         command = listOf("python3", pythonWrapper, context.outputFolder.absolutePath, scriptPath)
                     }
-                }
-
-                else -> {
-                    return flagError(mapOf(ERROR_KEY to "Unsupported script extension ${scriptFile.extension}"), true)
                 }
             }
 

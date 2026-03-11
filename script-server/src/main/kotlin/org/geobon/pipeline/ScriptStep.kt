@@ -2,6 +2,7 @@ package org.geobon.pipeline
 
 import org.geobon.hpc.HPCRequirements
 import org.geobon.hpc.HPCRun
+import org.geobon.hpc.RemoteSetupState
 import org.geobon.script.Description
 import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
@@ -10,6 +11,7 @@ import org.geobon.script.Description.SCRIPT
 import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.DockerizedRun
 import org.geobon.script.Run
+import org.geobon.script.ScriptType
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.fromSlurm
@@ -84,7 +86,7 @@ class ScriptStep : YMLStep {
                     }
 
                     val hpcSection = yamlParsed[HPC]
-                    if (hpcSection is Map<*, *> && context.serverContext.hpc?.connection?.ready == true) {
+                    if (hpcSection is Map<*, *> && shouldUseHPC()) {
                         val memory = (hpcSection[Description.HPC__MEMORY] as? String)?.let {
                             Regex("""(\d+)G""").find(it)?.groups?.get(1)?.value?.toInt() // Get rid of the G
                         } ?: throw RuntimeException("HPC ${Description.HPC__MEMORY} parameter is not formatted as gigabytes. \nExample: 30G \nGot: ${hpcSection[Description.HPC__MEMORY]}")
@@ -98,9 +100,9 @@ class ScriptStep : YMLStep {
                         if (durationString !is String) {
                             throw RuntimeException(
                                 """
-                                    HPC parameter ${Description.HPC__DURATION} must be expressed as a string, for example "1:30:00".
-                                    See [SLURM documentation](https://slurm.schedmd.com/sbatch.html#OPT_time) for accepted formats.
-                                """.trimIndent()
+                                HPC parameter ${Description.HPC__DURATION} must be expressed as a string, for example "1:30:00".
+                                See [SLURM documentation](https://slurm.schedmd.com/sbatch.html#OPT_time) for accepted formats.
+                            """.trimIndent()
                             )
                         }
                         val duration = Duration.fromSlurm(durationString)
@@ -146,6 +148,15 @@ class ScriptStep : YMLStep {
 
             return run.results
         } ?: throw RuntimeException("Context not defined.")
+    }
+
+    private fun shouldUseHPC(): Boolean{
+        return context?.serverContext?.hpc?.connection?.let { connection ->
+            when(connection.statusFor(ScriptType.fromFile(scriptFile))) {
+                RemoteSetupState.PREPARING, RemoteSetupState.READY -> true
+                else -> false
+            }
+        } ?: false
     }
 
     override fun cleanUp() {

@@ -8,6 +8,7 @@ import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.RunContext
 import org.geobon.pipeline.outputRoot
 import org.geobon.script.Run
+import org.geobon.script.ScriptType
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.ServerContext.Companion.userDataRoot
@@ -153,8 +154,8 @@ class HPCRun(
 
         val logFileAbsolute = File(hpcConnection.hpcRoot, logFile.absolutePath.removePrefix("/")).absolutePath
 
-        return when (scriptFile.extension) {
-            "jl", "JL" ->
+        return when (ScriptType.fromFile(scriptFile)) {
+            ScriptType.JULIA ->
                 """
                     ${getApptainerBaseCommand(hpcConnection.juliaImage)} '
                         echo "Starting this job."
@@ -165,7 +166,7 @@ class HPCRun(
                     ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
 
-            "r", "R" ->
+            ScriptType.R ->
                 // Note, if child is 0 during mamba activate, the trap signals the whole process group.
                 // In our case, this should correspond to the bash -c entrypoint of the apptainer exec.
                 """
@@ -180,9 +181,9 @@ class HPCRun(
                     ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
 
-            "sh" -> "$scriptPath $escapedOutputFolder >> ${logFile.absolutePath} 2>&1"
+            ScriptType.SHELL -> "$scriptPath $escapedOutputFolder >> ${logFile.absolutePath} 2>&1"
 
-            "py", "PY" -> // exec call to replace shell by python, python receives signal directly.
+            ScriptType.PYTHON -> // exec call to replace shell by python, python receives signal directly.
                 """
                     ${getApptainerBaseCommand(hpcConnection.pythonImage)} '
                         echo "Starting this job. Activating environment..."
@@ -191,8 +192,6 @@ class HPCRun(
                         exec python3 $scriptStubsRoot/system/scriptWrapper.py $escapedOutputFolder $scriptPath
                     ' >> $logFileAbsolute 2>&1
                 """.trimIndent()
-
-            else -> throw RuntimeException("Unsupported script extension $scriptPath")
         }
     }
 
