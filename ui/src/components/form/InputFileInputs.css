@@ -70,12 +70,14 @@ table.inputFileFields .example {
 }
 
 table.inputFileFields textarea.autoResizeHeight {
-  width: 300px;
+  max-width: 300px;
+  width: 100%;
   font-family: "Roboto";
   font-size: 0.85rem;
   outline: 1px solid var(--biab-green-trans-main);
   border: 1px solid transparent;
-  padding: 16.5px 14px;
+  padding: 15px;
+  box-sizing: border-box;
 }
 
 table.inputFileFields textarea.autoResizeHeight:focus {
@@ -93,6 +95,22 @@ table.inputFileFields textarea.autoResizeHeight:focus {
   }
 }
 
+.inputColumnL{
+  width: 35%;
+}
+.inputColumnC{
+  width: 65%;
+}  
+
+@media all and (max-width: 850px) {
+  .inputColumnL{
+    width: 50%;
+  }
+  .inputColumnC{
+    width: 50%;
+  }  
+}
+
 .inputFileFields .reactMarkdown p {
   margin: 0;
   color: var(--biab-blue-main);
@@ -100,7 +118,6 @@ table.inputFileFields textarea.autoResizeHeight:focus {
 }
 
 .inputForm {
-  max-width: 1200px;
   padding: 25px;
   transition: display 4s allow-discrete;
 }
@@ -113,7 +130,6 @@ table.inputFileFields .MuiInputBase-input {
   font-size: 0.85em !important;
   font-family: "Roboto" !important;
   max-width: 320px !important;
-  min-width: 275px !important;
 }
 
 .MuiAutocomplete-popper li {
@@ -149,3 +165,4 @@ table.inputFileFields .MuiInputBase-input {
 .inputsDescription h3 {
   color: #333 !important;
 }
+

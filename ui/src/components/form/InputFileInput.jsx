@@ -113,8 +113,8 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
     <div className="inputFileForm">
       <table className="inputFileFields">
         <colgroup>
-          <col style={{ width: "50%" }} />
-          <col style={{ width: "50%" }} />
+          <col className="inputColumnL" />
+          <col className="inputColumnR" />
         </colgroup>
         <tbody>
           {Object.entries(inputs)

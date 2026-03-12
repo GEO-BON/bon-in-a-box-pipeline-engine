@@ -89,7 +89,8 @@ export default function ScriptInput({
                   ? {
                       fontSize: "1em",
                       fontFamily: "Roboto",
-                      width: 220,
+                      width: "100%",
+                      maxWidth: 220,
                       "& .MuiAutocomplete-inputRoot": {
                         paddingTop: "0 !important",
                         paddingBottom: "0 !important",
@@ -97,7 +98,8 @@ export default function ScriptInput({
                       },
                     }
                   : {
-                      width: 328,
+                      width: "100%",
+                      maxWidth: 328,
                       "& .MuiOutlinedInput-notchedOutline": {
                         borderColor: "var(--biab-green-trans-main)",
                       },
@@ -157,7 +159,7 @@ export default function ScriptInput({
         onBlur={onUpdateArray}
         slotProps={{ input: { style: small ? smallPadding() : null } }}
         onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
-        sx={{ width: small ? 220 : 328 }}
+        sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
       />
     );
   }
@@ -204,7 +206,7 @@ export default function ScriptInput({
           slotProps={{
             htmlInput: { style: small ? smallPaddingNumeric() : null },
           }}
-          sx={{ width: small ? 220 : 328 }}
+          sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
         />
       );
 
@@ -229,7 +231,7 @@ export default function ScriptInput({
           slotProps={{
             htmlInput: { style: small ? smallPaddingNumeric() : null },
           }}
-          sx={{ width: small ? 220 : 328 }}
+          sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
         />
       );
     case "country":
@@ -292,7 +294,7 @@ export default function ScriptInput({
               if (e.key === "Enter" || e.ctrlKey) updateValue(e);
             }}
             slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
-            sx={{ width: small ? 220 : 328 }}
+            sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
           />
         );
       }

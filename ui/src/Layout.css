@@ -746,6 +746,10 @@ textarea.autoResizeWidth {
   padding: 10px;
 }
 
+.inputsTop{
+  max-width: 100%;
+}
+
 .inputsTop h3,
 .inputsTop h3 button span {
   color: #fff;
@@ -754,11 +758,12 @@ textarea.autoResizeWidth {
 }
 
 .inputsTop .MuiAccordion-root.Mui-expanded {
-  width: 850px;
+  width: 100%;
+  max-width: 1100px;
 }
 
 .inputsTop .MuiAccordion-root {
-  width: 250px;
+  max-width: 250px;
 }
 
 .inputsTop .MuiAccordion-root {
