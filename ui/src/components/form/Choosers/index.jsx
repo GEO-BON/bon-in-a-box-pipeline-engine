@@ -36,7 +36,7 @@ export default function Choosers({
     <>
       {type === "bboxCRS" && (
         <tr>
-          <td>
+          <td className="inputCell">
             {leftLabel && inputDescription.label && (
               <>
                 <strong>{inputDescription.label}</strong>
@@ -44,13 +44,13 @@ export default function Choosers({
               </>
             )}
             {value && !isCompact && (
-              <pre style={{ maxWidth: "330px", overflowX: "scroll" }}>
+              <pre style={{ maxWidth: "300px", overflowX: "scroll" }}>
                 {yaml.dump(value)}
               </pre>
             )}
             <br />
           </td>
-          <td>
+          <td className="descriptionCell">
             <CustomButtonGreen
               variant="contained"
               endIcon={<CropFreeIcon />}

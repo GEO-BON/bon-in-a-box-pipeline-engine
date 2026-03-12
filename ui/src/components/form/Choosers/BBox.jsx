@@ -47,7 +47,7 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
         size="small"
         value={bbInput[0]}
         onChange={(e) => updateBBox(0, e.target.value)}
-        sx={{ marginTop: "15px", marginBottom: "10px" }}
+        sx={{ marginTop: "15px", marginBottom: "10px", width: "100%" }}
         inputProps={inputProps}
       />
       <TextField
@@ -56,7 +56,7 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
         label="Minimum Y"
         value={bbInput[1]}
         onChange={(e) => updateBBox(1, e.target.value)}
-        sx={{ marginBottom: "10px" }}
+        sx={{ marginBottom: "10px", width: "100%" }}
         inputProps={inputProps}
       />
       <TextField
@@ -65,7 +65,7 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
         size="small"
         value={bbInput[2]}
         onChange={(e) => updateBBox(2, e.target.value)}
-        sx={{ marginBottom: "10px" }}
+        sx={{ marginBottom: "10px", width: "100%" }}
         inputProps={inputProps}
       />
       <TextField
@@ -74,7 +74,7 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
         size="small"
         value={bbInput[3]}
         onChange={(e) => updateBBox(3, e.target.value)}
-        sx={{ marginBottom: "10px" }}
+        sx={{ marginBottom: "10px", width: "100%" }}
         inputProps={inputProps}
       />
     </div>

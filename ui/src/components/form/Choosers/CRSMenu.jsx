@@ -220,7 +220,6 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
           return option.label || "";
         }}
         sx={{
-          width: "90%",
           background: "#fff",
           borderRadius: "4px",
           marginTop: "10px",
@@ -274,7 +273,7 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
           {badCRS}
         </div>
       )}
-      <FormControl sx={{ width: "90%", backgroundColor: "white" }}>
+      <FormControl sx={{ backgroundColor: "white", width: "100%" }}>
         <InputLabel
           htmlFor="crs-code"
           sx={{
