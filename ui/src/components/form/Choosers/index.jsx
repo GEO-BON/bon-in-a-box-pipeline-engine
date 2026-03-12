@@ -6,7 +6,6 @@ const MapOpenLayers = lazy(() => import("./MapOpenLayers"));
 import CountryRegionMenu from "./CountryRegionMenu";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
-import yaml from "js-yaml";
 import { CustomButtonGreen } from "../../CustomMUI";
 import ReactMarkdown from "react-markdown";
 import Alert from "@mui/material/Alert";
@@ -15,6 +14,7 @@ import CropFreeIcon from "@mui/icons-material/CropFree";
 import Modal from "@mui/material/Modal";
 import { chooserReducer } from "./chooserReducer";
 import { Spinner } from "../../Spinner";
+import CRSDescription from "./CRSDescription";
 
 export default function Choosers({
   inputId,
@@ -38,16 +38,11 @@ export default function Choosers({
         <tr>
           <td className="inputCell">
             {leftLabel && inputDescription.label && (
-              <>
-                <strong>{inputDescription.label}</strong>
-                {": "}
-              </>
+              <h4 style={{color: "var(--biab-green-main)"}}>
+                {inputDescription.label}
+              </h4>
             )}
-            {value && !isCompact && (
-              <pre style={{ maxWidth: "300px", overflowX: "scroll" }}>
-                {yaml.dump(value)}
-              </pre>
-            )}
+            {value && !isCompact && <CRSDescription bboxCRS={value} />}
             <br />
           </td>
           <td className="descriptionCell">
@@ -61,9 +56,11 @@ export default function Choosers({
                 setOpenModal(false);
               }}
               className="locationChooserButton"
+              style={{marginBottom: "1rem", fontSize: "1rem"}}
             >
               {`Choose ${inputDescription.label}`}
             </CustomButtonGreen>
+            <ReactMarkdown className="reactMarkdown">{inputDescription.description}</ReactMarkdown>
             <Modal
               key={`modal-chooser`}
               open={openModal}

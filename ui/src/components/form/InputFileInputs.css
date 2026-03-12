@@ -42,10 +42,6 @@ table.inputFileFields td:last-child {
   border-top-right-radius: 10px;
 }
 
-table.inputFileFields td.inputCell {
-  color: var(--biab-green-main);
-}
-
 table.inputFileFields td.inputCell label {
   width: 100%;
   color: var(--biab-green-main);
@@ -166,3 +162,8 @@ table.inputFileFields .MuiInputBase-input {
   color: #333 !important;
 }
 
+.textButton {
+  cursor: pointer;
+  color: var(--biab-green-main);
+  font-weight: normal;
+}
