@@ -267,12 +267,15 @@ export default function ScriptInput({
       if (stringValue.includes("\n")) {
         props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
         return (
-          <AutoResizeTextArea
-            size={size}
-            cols={cols}
-            keepWidth={keepWidth}
-            {...props}
-          />
+          <>
+            {!small && <label for={props.id}>{label}</label>}
+            <AutoResizeTextArea
+              size={size}
+              cols={cols}
+              keepWidth={keepWidth}
+              {...props}
+            />
+          </>
         );
       } else {
         return (
