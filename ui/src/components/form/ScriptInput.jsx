@@ -90,7 +90,7 @@ export default function ScriptInput({
                       fontSize: "1em",
                       fontFamily: "Roboto",
                       width: "100%",
-                      maxWidth: 220,
+                      minWidth: 220,
                       "& .MuiAutocomplete-inputRoot": {
                         paddingTop: "0 !important",
                         paddingBottom: "0 !important",
