@@ -234,27 +234,18 @@ export default function ScriptInput({
           sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
         />
       );
+
     case "country":
-      return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
-      );
     case "countryRegionCRS":
+    case "CRS":
+    case "countryRegion":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }} />
       );
 
     case "bboxCRS":
       return (
         <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={true} descriptionCell={false}/>
-      );
-
-    case "CRS":
-      return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
-      );
-    case "countryRegion":
-      return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
       );
 
     default:
