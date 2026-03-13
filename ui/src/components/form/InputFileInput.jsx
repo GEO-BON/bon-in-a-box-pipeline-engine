@@ -112,6 +112,10 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   return (
     <div className="inputFileForm">
       <table className="inputFileFields">
+        <colgroup>
+          <col className="inputColumnL" />
+          <col className="inputColumnR" />
+        </colgroup>
         <tbody>
           {Object.entries(inputs)
             .sort((a, b) => a[1].weight - b[1].weight)

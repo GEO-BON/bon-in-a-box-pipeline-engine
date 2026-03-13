@@ -89,7 +89,8 @@ export default function ScriptInput({
                   ? {
                       fontSize: "1em",
                       fontFamily: "Roboto",
-                      width: 220,
+                      width: "100%",
+                      minWidth: 220,
                       "& .MuiAutocomplete-inputRoot": {
                         paddingTop: "0 !important",
                         paddingBottom: "0 !important",
@@ -97,7 +98,8 @@ export default function ScriptInput({
                       },
                     }
                   : {
-                      width: 328,
+                      width: "100%",
+                      maxWidth: 328,
                       "& .MuiOutlinedInput-notchedOutline": {
                         borderColor: "var(--biab-green-trans-main)",
                       },
@@ -157,7 +159,7 @@ export default function ScriptInput({
         onBlur={onUpdateArray}
         slotProps={{ input: { style: small ? smallPadding() : null } }}
         onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
-        sx={{ width: small ? 220 : 328 }}
+        sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
       />
     );
   }
@@ -204,7 +206,7 @@ export default function ScriptInput({
           slotProps={{
             htmlInput: { style: small ? smallPaddingNumeric() : null },
           }}
-          sx={{ width: small ? 220 : 328 }}
+          sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
         />
       );
 
@@ -229,30 +231,21 @@ export default function ScriptInput({
           slotProps={{
             htmlInput: { style: small ? smallPaddingNumeric() : null },
           }}
-          sx={{ width: small ? 220 : 328 }}
+          sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
         />
       );
+
     case "country":
-      return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
-      );
     case "countryRegionCRS":
+    case "CRS":
+    case "countryRegion":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }} />
       );
 
     case "bboxCRS":
       return (
         <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={true} descriptionCell={false}/>
-      );
-
-    case "CRS":
-      return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
-      );
-    case "countryRegion":
-      return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }}/>
       );
 
     default:
@@ -292,7 +285,7 @@ export default function ScriptInput({
               if (e.key === "Enter" || e.ctrlKey) updateValue(e);
             }}
             slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
-            sx={{ width: small ? 220 : 328 }}
+            sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
           />
         );
       }
