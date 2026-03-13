@@ -76,7 +76,6 @@ export default function Choosers({
                     key={`choosers-modal-${inputId}`}
                     {...{
                       setOpenModal,
-                      inputId,
                       inputDescription,
                       value,
                       updateValue,
@@ -95,7 +94,6 @@ export default function Choosers({
               key={`choosers-modal-${inputId}`}
               {...{
                 setOpenModal,
-                inputId,
                 inputDescription,
                 value,
                 updateValue,
@@ -122,13 +120,11 @@ export default function Choosers({
   );
 }
 
-export function Chooser({
+function Chooser({
   setOpenModal,
-  inputId,
   inputDescription,
   value,
   updateValue = () => {},
-  onChange,
 }) {
   const [clearFeatures, setClearFeatures] = useState(0);
   const [digitize, setDigitize] = useState(false);
