@@ -49,6 +49,14 @@ table.inputFileFields td.inputCell label {
   font-weight: 1000;
 }
 
+table.inputFileFields td.inputCell h4 {
+  margin-block-start: 0;
+  margin-block-end: 0.25em;
+  font-size: 1em;
+  font-weight: 1000;
+  color: #000c;
+}
+
 table.inputFileFields td.inputCell .MuiOutlinedInput-notchedOutline {
   border-color: var(--biab-green-trans-main);
 }

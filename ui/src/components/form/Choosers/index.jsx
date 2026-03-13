@@ -32,16 +32,19 @@ export default function Choosers({
   const [openModal, setOpenModal] = useState(false);
 
   const type = inputDescription.type;
+
+  const label = leftLabel && inputDescription.label && (
+    <h4>
+      {inputDescription.label}
+    </h4>
+  )
+
   return (
     <>
       {type === "bboxCRS" && (
         <tr>
           <td className="inputCell">
-            {leftLabel && inputDescription.label && (
-              <h4 style={{color: "var(--biab-green-main)"}}>
-                {inputDescription.label}
-              </h4>
-            )}
+            {label}
             {value && !isCompact && <CRSDescription bboxCRS={value} />}
             <br />
           </td>
@@ -89,7 +92,8 @@ export default function Choosers({
       )}
       {type !== "bboxCRS" && (
         <tr>
-          <td>
+          <td className="inputCell">
+            {label}
             <Chooser
               key={`choosers-modal-${inputId}`}
               {...{
