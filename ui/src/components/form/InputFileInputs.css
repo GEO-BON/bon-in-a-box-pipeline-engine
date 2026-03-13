@@ -100,15 +100,15 @@ table.inputFileFields textarea.autoResizeHeight:focus {
 }
 .inputColumnC{
   width: 65%;
-}  
+}
 
-@media all and (max-width: 850px) {
+@media all and (max-width: 930px) {
   .inputColumnL{
     width: 50%;
   }
   .inputColumnC{
     width: 50%;
-  }  
+  }
 }
 
 .inputFileFields .reactMarkdown p {
