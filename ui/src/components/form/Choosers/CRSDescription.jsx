@@ -20,10 +20,10 @@ export default function CRSDescription({ bboxCRS }) {
         <p><strong>CRS:</strong> {bboxCRS.CRS?.name} (EPSG:{bboxCRS.CRS?.code})</p>
         <p><strong>Bounding box:</strong></p>
         <ul>
-            <li>West: {bboxCRS.bbox[0]}</li>
-            <li>South: {bboxCRS.bbox[1]}</li>
-            <li>East: {bboxCRS.bbox[2]}</li>
-            <li>North: {bboxCRS.bbox[3]}</li>
+            <li>Minimum X: {bboxCRS.bbox[0]}</li>
+            <li>Minimum Y: {bboxCRS.bbox[1]}</li>
+            <li>Maximum X: {bboxCRS.bbox[2]}</li>
+            <li>Maximum Y: {bboxCRS.bbox[3]}</li>
         </ul>
 
         <a className="textButton" onClick={() => setViewSource(true)} style={{fontSize: "0.9em"}}>
