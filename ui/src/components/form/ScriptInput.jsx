@@ -268,7 +268,7 @@ export default function ScriptInput({
         props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
         return (
           <>
-            {!small && <label for={props.id}>{label}</label>}
+            {!small && <label className="textareaLabel" for={props.id}>{label}</label>}
             <AutoResizeTextArea
               size={size}
               cols={cols}

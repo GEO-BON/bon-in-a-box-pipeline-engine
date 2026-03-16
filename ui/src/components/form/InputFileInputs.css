@@ -73,6 +73,16 @@ table.inputFileFields .example {
   background-color: transparent;
 }
 
+.textareaLabel {
+    position: absolute;
+    font-size: 0.8rem;
+    margin-top: -0.5rem;
+    margin-left: 10px;
+    background-color: white;
+    width: fit-content !important;
+    padding: 0px 5px;
+}
+
 table.inputFileFields textarea.autoResizeHeight {
   max-width: 300px;
   width: 100%;
