@@ -264,33 +264,33 @@ export default function ScriptInput({
         ...passedProps,
       };
 
-      if (stringValue.includes("\n")) {
-        props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
-        return (
-          <>
-            {!small && <label className="textareaLabel" for={props.id}>{label}</label>}
-            <AutoResizeTextArea
-              size={size}
-              cols={cols}
-              keepWidth={keepWidth}
-              {...props}
-            />
-          </>
-        );
-      } else {
-        return (
-          <TextField
-            type="text"
-            label={label}
-            size={size}
-            {...props}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.ctrlKey) updateValue(e);
-            }}
-            slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
-            sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
-          />
-        );
+      // Single line text fields
+      if (type.includes("/") /* assume MIME type, files have no line breaks */) {
+        return <TextField
+          type="text"
+          label={label}
+          size={size}
+          {...props}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.ctrlKey) updateValue(e);
+          }}
+          slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
+          sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
+        />
       }
-  }
+
+      // Multiline text field
+      props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
+      return (
+        <>
+          {!small && <label className="textareaLabel" for={props.id}>{label}</label>}
+          <AutoResizeTextArea
+            size={size}
+            cols={cols}
+            keepWidth={keepWidth}
+            {...props}
+          />
+        </>
+      );
+  }Z
 }
