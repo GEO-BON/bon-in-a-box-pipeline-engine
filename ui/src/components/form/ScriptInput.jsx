@@ -264,33 +264,19 @@ export default function ScriptInput({
         ...passedProps,
       };
 
-      if (stringValue.includes("\n")) {
-        props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
-        return (
-          <>
-            {!small && <label className="textareaLabel" for={props.id}>{label}</label>}
-            <AutoResizeTextArea
-              size={size}
-              cols={cols}
-              keepWidth={keepWidth}
-              {...props}
-            />
-          </>
-        );
-      } else {
-        return (
-          <TextField
-            type="text"
-            label={label}
+
+      // Display input as string
+      props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
+      return (
+        <>
+          {!small && <label className="textareaLabel" for={props.id}>{label}</label>}
+          <AutoResizeTextArea
             size={size}
+            cols={cols}
+            keepWidth={keepWidth}
             {...props}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.ctrlKey) updateValue(e);
-            }}
-            slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
-            sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
           />
-        );
-      }
+        </>
+      );
   }
 }
