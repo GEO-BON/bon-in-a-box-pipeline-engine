@@ -28,6 +28,7 @@ export default function Choosers({
   updateValue,
   value = null,
   isCompact = false,
+  layout = "table",
 }) {
   const [openModal, setOpenModal] = useState(false);
 
@@ -38,6 +39,69 @@ export default function Choosers({
       {inputDescription.label}
     </h4>
   )
+
+  if (layout === "div") {
+    if (type === "bboxCRS") {
+      return (
+        <div className="chooserFieldBody">
+          {label}
+          <CustomButtonGreen
+            variant="contained"
+            endIcon={<CropFreeIcon />}
+            onClick={() => {
+              setOpenModal(true);
+            }}
+            onClose={() => {
+              setOpenModal(false);
+            }}
+            className="locationChooserButton"
+            style={{ marginBottom: "1rem", fontSize: "1rem", width: "500px" }}
+          >
+            {`Choose ${inputDescription.label}`}
+          </CustomButtonGreen>
+          {value && !isCompact && <CRSDescription bboxCRS={value} />}
+          <Modal
+            key={`modal-chooser-div-${inputId}`}
+            open={openModal}
+            onClose={() => {
+              setOpenModal(false);
+            }}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <>
+              {openModal && (
+                <Chooser
+                  key={`choosers-modal-div-${inputId}`}
+                  {...{
+                    setOpenModal,
+                    inputDescription,
+                    value,
+                    updateValue,
+                  }}
+                />
+              )}
+            </>
+          </Modal>
+        </div>
+      );
+    }
+
+    return (
+      <div className="chooserFieldBody">
+        {label}
+        <Chooser
+          key={`choosers-div-${inputId}`}
+          {...{
+            setOpenModal,
+            inputDescription,
+            value,
+            updateValue,
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <>

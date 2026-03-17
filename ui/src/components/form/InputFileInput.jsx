@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import YAMLTextArea from "./YAMLTextArea";
 import { InputsDescription } from "../StepDescription";
 import ReactMarkdown from "react-markdown";
@@ -14,6 +14,8 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Alert from "@mui/material/Alert";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 import { styled } from "@mui/material";
 import { ScriptInputExample } from "./ScriptInputExample";
@@ -111,57 +113,38 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
 
   return (
     <div className="inputFileForm">
-      <table className="inputFileFields">
-        <colgroup>
-          <col className="inputColumnL" />
-          <col className="inputColumnR" />
-        </colgroup>
-        <tbody>
-          {Object.entries(inputs)
-            .sort((a, b) => a[1].weight - b[1].weight)
-            .map(([inputId, inputDescription]) => {
-              const { label, description, options, example, weight, ...theRest } =
-                inputDescription;
-              if (
-                [
-                  "country",
-                  "region",
-                  "countryRegion",
-                  "CRS",
-                  "countryRegionCRS",
-                  "bboxCRS",
-                ].includes(inputDescription.type)
-              ) {
-                return (
-                  <Choosers
-                    key={inputId}
-                    inputDescription={inputDescription}
-                    value={inputFileContent[inputId] || null}
-                    updateValue={(value) => updateInputFile(inputId, value)}
-                  />
-                );
-              } else {
-                return (
-                  <tr key={inputId}>
-                    <td className="inputCell">
-                      {false && (
-                        <label htmlFor={inputId}>
-                          {label ? (
-                            <strong>{label}</strong>
-                          ) : (
-                            <Alert severity="error" className="error">
-                              Missing label for input "{inputId}"
-                            </Alert>
-                          )}
-                          {!/^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId) &&
-                            !/pipeline@\d+$/.test(inputId) && (
-                              <Alert severity="warning">
-                                Input id {inputId.replace(/^(.*\|)/, "")} should be a
-                                snake_case id
-                              </Alert>
-                            )}
-                        </label>
-                      )}
+      <div className="inputFieldsList">
+        {Object.entries(inputs)
+          .sort((a, b) => a[1].weight - b[1].weight)
+          .map(([inputId, inputDescription]) => {
+            const { label, description, options, example, weight, ...theRest } =
+              inputDescription;
+            const title = label || inputId.replace(/^(.*\|)/, "");
+            const isChooserInput = [
+              "country",
+              "region",
+              "countryRegion",
+              "CRS",
+              "countryRegionCRS",
+              "bboxCRS",
+            ].includes(inputDescription.type);
+
+            return (
+              <div className="inputFieldCard" key={inputId}>
+                <h4 className="inputFieldTitle">{title}</h4>
+
+                <div className="inputFieldBody">
+                  {isChooserInput ? (
+                    <Choosers
+                      inputDescription={inputDescription}
+                      value={inputFileContent[inputId] || null}
+                      updateValue={(value) => updateInputFile(inputId, value)}
+                      descriptionCell={false}
+                      leftLabel={false}
+                      layout="div"
+                    />
+                  ) : (
+                    <>
                       <ScriptInput
                         id={inputId}
                         type={inputDescription.type}
@@ -172,32 +155,98 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                         size="medium"
                         keepWidth={true}
                       />
-                      {!inputFileContent ||
+                      <div style={{color:"#888", fontSize: "0.7rem", padding: "3px 0px 0px 10px"}}>{theRest.type}</div>
+                      {inputDescription.type !== "boolean" &&
+                        (!inputFileContent ||
                         (!_lang.isEqual(inputFileContent[inputId], example) && (
                           <ScriptInputExample
                             example={example}
                             type={inputDescription.type}
                           />
-                        ))}
-                    </td>
-                    <td className="descriptionCell">
-                      {description ? (
-                        <ReactMarkdown className="reactMarkdown">
-                          {description}
-                        </ReactMarkdown>
-                      ) : (
-                        <Alert severity="warning">
-                          Missing description for input "{inputId}"
-                        </Alert>
-                      )}
-                      {!isEmptyObject(theRest) && yaml.dump(theRest)}
-                    </td>
-                  </tr>
-                );
-              }
-            })}
-        </tbody>
-      </table>
+                        )))}
+                    </>
+                  )}
+                </div>
+
+                <DescriptionSection
+                  description={description}
+                  inputId={inputId}
+                  extraDetails={theRest}
+                />
+              </div>
+            );
+          })}
+      </div>
+    </div>
+  );
+};
+
+const DescriptionSection = ({ description, inputId, extraDetails }) => {
+  const DESCRIPTION_COLLAPSE_THRESHOLD_PX = 100;
+  const [expanded, setExpanded] = useState(false);
+  const [canCollapse, setCanCollapse] = useState(false);
+  const contentRef = useRef(null);
+
+  useEffect(() => {
+    const evaluateOverflow = () => {
+      if (!contentRef.current) {
+        setCanCollapse(false);
+        return;
+      }
+      const hasOverflow =
+        contentRef.current.scrollHeight > DESCRIPTION_COLLAPSE_THRESHOLD_PX + 1;
+      setCanCollapse(hasOverflow);
+      if (!hasOverflow) {
+        setExpanded(false);
+      }
+    };
+
+    const animationFrameId = requestAnimationFrame(evaluateOverflow);
+    window.addEventListener("resize", evaluateOverflow);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", evaluateOverflow);
+    };
+  }, [description, extraDetails, DESCRIPTION_COLLAPSE_THRESHOLD_PX]);
+
+  const isExpanded = expanded || !canCollapse;
+
+  return (
+    <div className="inputDescriptionWrapper">
+      <div
+        ref={contentRef}
+        className={`inputDescriptionContent ${isExpanded ? "expanded" : "collapsed"}`}
+        style={{
+          "--description-collapse-threshold": `${DESCRIPTION_COLLAPSE_THRESHOLD_PX}px`,
+        }}
+      >
+        {description ? (
+          <ReactMarkdown className="reactMarkdown">{description}</ReactMarkdown>
+        ) : (
+          <Alert severity="warning">
+            Missing description for input "{inputId}"
+          </Alert>
+        )}
+        {!isEmptyObject(extraDetails) && yaml.dump(extraDetails)}
+      </div>
+
+      {canCollapse && (
+        <div className="descriptionToggle" >
+        <button
+          type="button"
+          className="descriptionToggleButton"
+          onClick={() => setExpanded((oldValue) => !oldValue)}
+        >
+            {isExpanded ? (
+              <>Show less <ExpandLessIcon sx={{ fontSize: "1.2rem", color: "var(--biab-green-main)", verticalAlign: "middle" }} /></>
+            ) : (
+              <>Read more <ExpandMoreIcon sx={{ fontSize: "1.2rem", color: "var(--biab-green-main)", verticalAlign: "middle" }} /></>
+            )}
+        </button>
+        </div>
+
+)}
     </div>
   );
 };
