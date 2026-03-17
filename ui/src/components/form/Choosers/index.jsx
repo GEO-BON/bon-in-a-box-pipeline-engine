@@ -6,7 +6,6 @@ const MapOpenLayers = lazy(() => import("./MapOpenLayers"));
 import CountryRegionMenu from "./CountryRegionMenu";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
-import yaml from "js-yaml";
 import { CustomButtonGreen } from "../../CustomMUI";
 import ReactMarkdown from "react-markdown";
 import Alert from "@mui/material/Alert";
@@ -15,6 +14,7 @@ import CropFreeIcon from "@mui/icons-material/CropFree";
 import Modal from "@mui/material/Modal";
 import { chooserReducer } from "./chooserReducer";
 import { Spinner } from "../../Spinner";
+import CRSDescription from "./CRSDescription";
 
 export default function Choosers({
   inputId,
@@ -32,22 +32,20 @@ export default function Choosers({
   const [openModal, setOpenModal] = useState(false);
 
   const type = inputDescription.type;
+
+  const label = leftLabel && inputDescription.label && (
+    <h4>
+      {inputDescription.label}
+    </h4>
+  )
+
   return (
     <>
       {type === "bboxCRS" && (
         <tr>
           <td className="inputCell">
-            {leftLabel && inputDescription.label && (
-              <>
-                <strong>{inputDescription.label}</strong>
-                {": "}
-              </>
-            )}
-            {value && !isCompact && (
-              <pre style={{ maxWidth: "300px", overflowX: "scroll" }}>
-                {yaml.dump(value)}
-              </pre>
-            )}
+            {label}
+            {value && !isCompact && <CRSDescription bboxCRS={value} />}
             <br />
           </td>
           <td className="descriptionCell">
@@ -61,9 +59,11 @@ export default function Choosers({
                 setOpenModal(false);
               }}
               className="locationChooserButton"
+              style={{marginBottom: "1rem", fontSize: "1rem"}}
             >
               {`Choose ${inputDescription.label}`}
             </CustomButtonGreen>
+            <ReactMarkdown className="reactMarkdown">{inputDescription.description}</ReactMarkdown>
             <Modal
               key={`modal-chooser`}
               open={openModal}
@@ -79,7 +79,6 @@ export default function Choosers({
                     key={`choosers-modal-${inputId}`}
                     {...{
                       setOpenModal,
-                      inputId,
                       inputDescription,
                       value,
                       updateValue,
@@ -93,12 +92,12 @@ export default function Choosers({
       )}
       {type !== "bboxCRS" && (
         <tr>
-          <td>
+          <td className="inputCell">
+            {label}
             <Chooser
               key={`choosers-modal-${inputId}`}
               {...{
                 setOpenModal,
-                inputId,
                 inputDescription,
                 value,
                 updateValue,
@@ -125,13 +124,11 @@ export default function Choosers({
   );
 }
 
-export function Chooser({
+function Chooser({
   setOpenModal,
-  inputId,
   inputDescription,
   value,
   updateValue = () => {},
-  onChange,
 }) {
   const [clearFeatures, setClearFeatures] = useState(0);
   const [digitize, setDigitize] = useState(false);

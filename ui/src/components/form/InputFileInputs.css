@@ -42,15 +42,19 @@ table.inputFileFields td:last-child {
   border-top-right-radius: 10px;
 }
 
-table.inputFileFields td.inputCell {
-  color: var(--biab-green-main);
-}
-
 table.inputFileFields td.inputCell label {
   width: 100%;
   color: var(--biab-green-main);
   font-family: "Roboto";
   font-weight: 1000;
+}
+
+table.inputFileFields td.inputCell h4 {
+  margin-block-start: 0;
+  margin-block-end: 1em;
+  font-size: 1em;
+  font-weight: 1000;
+  color: var(--biab-green-main);
 }
 
 table.inputFileFields td.inputCell .MuiOutlinedInput-notchedOutline {
@@ -67,6 +71,16 @@ table.inputFileFields td.descriptionCell {
 table.inputFileFields .example {
   color: #444;
   background-color: transparent;
+}
+
+.textareaLabel {
+    position: absolute;
+    font-size: 0.8rem;
+    margin-top: -0.5rem;
+    margin-left: 10px;
+    background-color: white;
+    width: fit-content !important;
+    padding: 0px 5px;
 }
 
 table.inputFileFields textarea.autoResizeHeight {
@@ -166,3 +180,8 @@ table.inputFileFields .MuiInputBase-input {
   color: #333 !important;
 }
 
+.textButton {
+  cursor: pointer;
+  color: var(--biab-green-main);
+  font-weight: normal;
+}
