@@ -19,7 +19,7 @@ export default function CRSDescription({ bboxCRS }) {
         <p><strong>Region:</strong> {bboxCRS.region?.regionName}</p>
         <p><strong>CRS:</strong> {bboxCRS.CRS?.name} (EPSG:{bboxCRS.CRS?.code})</p>
         <p><strong>Bounding box:</strong></p>
-        <ul style={{fontFamily: "monospace"}}>
+        <ul style={{fontFamily: "monospace", listStyle: "none", paddingLeft: "1rem"}}>
             <li>Minimum X: {bboxCRS.bbox[0]}</li>
             <li>Minimum Y: {bboxCRS.bbox[1]}</li>
             <li>Maximum X: {bboxCRS.bbox[2]}</li>
