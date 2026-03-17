@@ -16,6 +16,7 @@ import Tab from "@mui/material/Tab";
 import Alert from "@mui/material/Alert";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import {inputTypes} from "./inputTypes"
 
 import { styled } from "@mui/material";
 import { ScriptInputExample } from "./ScriptInputExample";
@@ -155,7 +156,9 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                         size="medium"
                         keepWidth={true}
                       />
-                      <div style={{color:"#888", fontSize: "0.7rem", padding: "3px 0px 0px 10px"}}>{theRest.type}</div>
+                      <div style={{color:"#888", fontSize: "0.7rem", padding: "3px 0px 0px 10px"}}>
+                        {inputTypes(theRest.type)}
+                        </div>
                       {inputDescription.type !== "boolean" &&
                         (!inputFileContent ||
                         (!_lang.isEqual(inputFileContent[inputId], example) && (
