@@ -118,7 +118,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
         {Object.entries(inputs)
           .sort((a, b) => a[1].weight - b[1].weight)
           .map(([inputId, inputDescription]) => {
-            const { label, description, options, example, weight, ...theRest } =
+            const { label, description, options, example, weight, type } =
               inputDescription;
             const title = label || inputId.replace(/^(.*\|)/, "");
             const isChooserInput = [
@@ -157,7 +157,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                         keepWidth={true}
                       />
                       <div style={{color:"#888", fontSize: "0.7rem", padding: "3px 0px 0px 10px"}}>
-                        {inputTypes(theRest.type)}
+                        {inputTypes(type)}
                         </div>
                       {inputDescription.type !== "boolean" &&
                         (!inputFileContent ||
@@ -174,7 +174,6 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                 <DescriptionSection
                   description={description}
                   inputId={inputId}
-                  extraDetails={theRest}
                 />
               </div>
             );
@@ -184,7 +183,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
   );
 };
 
-const DescriptionSection = ({ description, inputId, extraDetails }) => {
+const DescriptionSection = ({ description, inputId }) => {
   const DESCRIPTION_COLLAPSE_THRESHOLD_PX = 100;
   const [expanded, setExpanded] = useState(false);
   const [canCollapse, setCanCollapse] = useState(false);
@@ -211,7 +210,7 @@ const DescriptionSection = ({ description, inputId, extraDetails }) => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", evaluateOverflow);
     };
-  }, [description, extraDetails, DESCRIPTION_COLLAPSE_THRESHOLD_PX]);
+  }, [description, DESCRIPTION_COLLAPSE_THRESHOLD_PX]);
 
   const isExpanded = expanded || !canCollapse;
 
@@ -231,7 +230,6 @@ const DescriptionSection = ({ description, inputId, extraDetails }) => {
             Missing description for input "{inputId}"
           </Alert>
         )}
-        {!isEmptyObject(extraDetails) && yaml.dump(extraDetails)}
       </div>
 
       {canCollapse && (
