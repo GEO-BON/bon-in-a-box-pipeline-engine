@@ -156,7 +156,7 @@ class ScriptStep : YMLStep {
                 RemoteSetupState.PREPARING, RemoteSetupState.READY -> true
                 else -> false
             }
-        } ?: false
+        } == true
     }
 
     override fun cleanUp() {

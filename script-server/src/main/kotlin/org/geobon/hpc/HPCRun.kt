@@ -14,6 +14,7 @@ import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.ServerContext.Companion.userDataRoot
 import java.io.File
 import java.util.concurrent.TimeoutException
+import kotlin.time.Duration.Companion.seconds
 
 class HPCRun(
     context: RunContext,
@@ -29,9 +30,30 @@ class HPCRun(
 
     private val hpcConnection = hpc.connection
 
+    private val scriptType = ScriptType.fromFile(scriptFile)
+
     override suspend fun runScript(): Map<String, Any> {
-        if (!hpcConnection.ready) {
-            throw RuntimeException("HPC connection is not ready to send jobs, aborting.")
+        val hpcStatus = hpcConnection.statusFor(scriptType)
+        when(hpcStatus) {
+            RemoteSetupState.NOT_CONFIGURED, RemoteSetupState.CONFIGURED, RemoteSetupState.ERROR ->
+                throw RuntimeException("HPC connection is not ready to send jobs, aborting.")
+
+            RemoteSetupState.PREPARING -> {
+                log(logger::debug, "HPC not ready, waiting for preparation to complete...")
+                val durationMinutes = 10
+                for(i in 0..durationMinutes * 60) {
+                    delay(1000) // 1 second
+                    if(hpcConnection.statusFor(scriptType) == RemoteSetupState.READY) {
+                        log(logger::debug, "HPC is now ready, waited ${i.seconds}.")
+                        break
+                    }
+                }
+
+                if(hpcConnection.statusFor(scriptType) != RemoteSetupState.READY)
+                    throw RuntimeException("HPC still not ready after $durationMinutes minutes.")
+            }
+
+            RemoteSetupState.READY -> {} // nothing
         }
 
         var output: MutableMap<String, Any>? = null
@@ -154,7 +176,7 @@ class HPCRun(
 
         val logFileAbsolute = File(hpcConnection.hpcRoot, logFile.absolutePath.removePrefix("/")).absolutePath
 
-        return when (ScriptType.fromFile(scriptFile)) {
+        return when (scriptType) {
             ScriptType.JULIA ->
                 """
                     ${getApptainerBaseCommand(hpcConnection.juliaImage)} '

@@ -7,6 +7,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.*
+import org.geobon.script.ScriptType
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
@@ -53,6 +54,46 @@ internal class HPCStepTest {
     }
 
     @Test
+    fun `given HPC task_when connection preparing_then waits`() = runTest {
+        every { hpc.register(any()) } just runs
+        every { hpc.unregister(any()) } just runs
+        coEvery { connection.syncFiles(allAny()) } just runs
+        val inputFile = File(outputRoot, "someFile.csv")
+        inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
+        val step = ScriptStep(
+            mockContext, File(scriptsRoot, "HPCSyncTest.yml"), StepId("HPCSyncTest.yml", "1"),
+            mutableMapOf(
+                "someFile" to ConstantPipe("text/csv", inputFile.absolutePath),
+                "someInt" to ConstantPipe("int", 10)
+            )
+        )
+        verify(exactly = 1) { hpc.register(any()) }
+
+        // we don't really want to run something, if we get to the hpc.ready() call, we're done
+        every { hpc.ready(any()) } throws RuntimeException("success")
+
+        // The first 5 calls will answer PREPARING, and the next one will answer READY.
+        var connectionCheckCount = 0
+        every { connection.statusFor(ScriptType.PYTHON) } answers {
+            verify(exactly = 0) { hpc.ready(any()) }
+            connectionCheckCount++
+            if(connectionCheckCount == 5)
+                every { connection.statusFor(ScriptType.PYTHON) } answers { RemoteSetupState.READY }
+
+            RemoteSetupState.PREPARING
+        }
+
+        try {
+            step.execute()
+        } catch (e: Exception) {
+            assertTrue(e.message?.endsWith("success") == true)
+        }
+
+        verify(atLeast = 6) { connection.statusFor(ScriptType.PYTHON) }
+        verify(exactly = 1) { hpc.ready(any()) }
+    }
+
+    @Test
     fun `given HPC task_when executing_then registered sync and ready`() = runTest {
         every { hpc.register(any()) } just runs
         val inputFile = File(outputRoot, "someFile.csv")
@@ -68,7 +109,7 @@ internal class HPCStepTest {
 
 
         coEvery { connection.syncFiles(allAny()) } just runs
-        every { connection.ready } returns true
+        every { connection.statusFor(ScriptType.PYTHON) } returns RemoteSetupState.READY
         every { hpc.ready(any()) } answers {
             this@runTest.launch {
                 // We need a real thread.sleep() here, since otherwise the OS is not ready yet to watch the file.
@@ -133,7 +174,7 @@ internal class HPCStepTest {
 
 
         coEvery { connection.syncFiles(allAny()) } just runs
-        every { connection.ready } returns true
+        every { connection.statusFor(ScriptType.PYTHON) } returns RemoteSetupState.READY
         every { hpc.ready(any()) } answers {
             this@runTest.launch {
                 // We need a real thread.sleep() here, since otherwise the OS is not ready yet to watch the file.
@@ -183,7 +224,7 @@ internal class HPCStepTest {
 
         var job: Job? = null
         coEvery { connection.syncFiles(allAny()) } just runs
-        every { connection.ready } returns true
+        every { connection.statusFor(ScriptType.PYTHON) } returns RemoteSetupState.READY
         every { hpc.ready(any()) } answers {
             // Calling ready starts the job. So we cancel here "while the job is running"
             job!!.cancel("Cancelled by test")
@@ -227,7 +268,7 @@ internal class HPCStepTest {
                 }
             }
         }
-        every { connection.ready } returns true
+        every { connection.statusFor(ScriptType.PYTHON) } returns RemoteSetupState.READY
         val inputFiles = (0..10).map { i ->
             File(outputRoot, "someFile$i.csv").apply {
                 writeText("a,b,c,d,e\n${(i..i + 4).joinToString(",")}")
@@ -311,7 +352,7 @@ internal class HPCStepTest {
             )
         )
         verify(exactly = 1) { hpc.register(any()) }
-
+        
         every { connection.condaImage } returns ApptainerImage (Containers.CONDA,
             RemoteSetupState.READY, "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:62849e38bc9105etcetc", null,
             "someImage.sif", "overlayPath.img"
@@ -320,7 +361,7 @@ internal class HPCStepTest {
         connection.apply {
             coEvery { runCommand(allAny()) } just runs
             coEvery { syncFiles(allAny()) } just runs
-            every { ready } returns true
+            every { statusFor(ScriptType.PYTHON) } returns RemoteSetupState.READY
             every { hpcRoot } returns "hpcRoot"
             every { hpcScriptsRoot } returns "$hpcRoot/scripts"
             every { hpcScriptStubsRoot } returns "$hpcRoot/script-stubs"
@@ -378,6 +419,7 @@ internal class HPCStepTest {
         )
         verify(exactly = 1) { hpc.register(any()) }
 
+        every { connection.statusFor(ScriptType.PYTHON) } returns RemoteSetupState.READY
         every { connection.condaImage } returns ApptainerImage(
             Containers.CONDA,
             RemoteSetupState.READY,
@@ -390,7 +432,7 @@ internal class HPCStepTest {
         connection.apply {
             coEvery { runCommand(allAny()) } just runs
             coEvery { syncFiles(allAny()) } just runs
-            every { ready } returns true
+            every { statusFor(ScriptType.PYTHON) } returns RemoteSetupState.READY
             every { hpcRoot } returns "hpcRoot"
             every { hpcScriptsRoot } returns "$hpcRoot/scripts"
             every { hpcScriptStubsRoot } returns "$hpcRoot/script-stubs"
@@ -429,6 +471,7 @@ internal class HPCStepTest {
         val badFile = createTempFile("HPCBadTimeTest", "yml")
         badFile.writeText(goodFile.readText().replace("time: \"1:00:00\"", "time: 1:00:00"))
 
+        every { connection.statusFor(ScriptType.PYTHON) } returns RemoteSetupState.READY
         every { hpc.register(any()) } just runs
         val inputFile = File(outputRoot, "someFile.csv")
         inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
