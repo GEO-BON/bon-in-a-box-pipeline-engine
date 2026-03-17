@@ -35,10 +35,6 @@
   background-color: #f9f9f9
 }
 
-.inputDescriptionWrapper {
-  /*border-top: 1px solid #e5e5e5;*/
-  /*padding-top: 10px;*/
-}
 
 .inputDescriptionContent {
   margin-top: 10px;
@@ -48,7 +44,8 @@
   word-break: break-word;
   padding:10px;
   max-width: 700px;
-
+  transition: max-height 0.2s linear;
+  overflow: hidden;
 }
 
 .inputDescriptionContent.collapsed {
@@ -57,7 +54,7 @@
 }
 
 .inputDescriptionContent.expanded {
-  max-height: none;
+  max-height: var(--description-expanded-height, 5000px);
 }
 
 .descriptionToggle{

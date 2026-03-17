@@ -187,6 +187,7 @@ const DescriptionSection = ({ description, inputId }) => {
   const DESCRIPTION_COLLAPSE_THRESHOLD_PX = 100;
   const [expanded, setExpanded] = useState(false);
   const [canCollapse, setCanCollapse] = useState(false);
+  const [expandedHeight, setExpandedHeight] = useState(0);
   const contentRef = useRef(null);
 
   useEffect(() => {
@@ -197,6 +198,7 @@ const DescriptionSection = ({ description, inputId }) => {
       }
       const hasOverflow =
         contentRef.current.scrollHeight > DESCRIPTION_COLLAPSE_THRESHOLD_PX + 1;
+      setExpandedHeight(contentRef.current.scrollHeight);
       setCanCollapse(hasOverflow);
       if (!hasOverflow) {
         setExpanded(false);
@@ -221,6 +223,7 @@ const DescriptionSection = ({ description, inputId }) => {
         className={`inputDescriptionContent ${isExpanded ? "expanded" : "collapsed"}`}
         style={{
           "--description-collapse-threshold": `${DESCRIPTION_COLLAPSE_THRESHOLD_PX}px`,
+          "--description-expanded-height": `${expandedHeight}px`,
         }}
       >
         {description ? (
