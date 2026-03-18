@@ -86,11 +86,83 @@ internal class HPCStepTest {
         try {
             step.execute()
         } catch (e: Exception) {
-            assertTrue(e.message?.endsWith("success") == true)
+            assertTrue(e.message!!.endsWith("success"))
         }
 
         verify(atLeast = 6) { connection.statusFor(ScriptType.PYTHON) }
         verify(exactly = 1) { hpc.ready(any()) }
+    }
+
+    @Test
+    fun `given HPC task_when connection preparation is too long_then times out`() = runTest {
+        every { hpc.register(any()) } just runs
+        every { hpc.unregister(any()) } just runs
+        coEvery { connection.syncFiles(allAny()) } just runs
+        val inputFile = File(outputRoot, "someFile.csv")
+        inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
+        val step = ScriptStep(
+            mockContext, File(scriptsRoot, "HPCSyncTest.yml"), StepId("HPCSyncTest.yml", "1"),
+            mutableMapOf(
+                "someFile" to ConstantPipe("text/csv", inputFile.absolutePath),
+                "someInt" to ConstantPipe("int", 10)
+            )
+        )
+        verify(exactly = 1) { hpc.register(any()) }
+
+        // we don't really want to run something, if we get to the hpc.ready() call, we got a problem
+        every { hpc.ready(any()) } throws RuntimeException("don't go here!")
+        every { connection.statusFor(ScriptType.PYTHON) } answers { RemoteSetupState.PREPARING }
+
+        try {
+            step.execute()
+            fail("We should get an exception")
+        } catch (e: Exception) {
+            assertTrue(e.message!!.contains("HPC still not ready after "))
+        }
+
+        verify(atLeast = 60) { connection.statusFor(ScriptType.PYTHON) }
+        verify(exactly = 0) { hpc.ready(any()) }
+    }
+
+    @Test
+    fun `given HPC task_when connection fails_then exits`() = runTest {
+        every { hpc.register(any()) } just runs
+        every { hpc.unregister(any()) } just runs
+        coEvery { connection.syncFiles(allAny()) } just runs
+        val inputFile = File(outputRoot, "someFile.csv")
+        inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
+        val step = ScriptStep(
+            mockContext, File(scriptsRoot, "HPCSyncTest.yml"), StepId("HPCSyncTest.yml", "1"),
+            mutableMapOf(
+                "someFile" to ConstantPipe("text/csv", inputFile.absolutePath),
+                "someInt" to ConstantPipe("int", 10)
+            )
+        )
+        verify(exactly = 1) { hpc.register(any()) }
+
+        // we don't really want to run something, if we get to the hpc.ready() call, we're done
+        every { hpc.ready(any()) } throws RuntimeException("Should not reach this")
+
+        // The first 5 calls will answer PREPARING, and the next one will answer ERROR.
+        var connectionCheckCount = 0
+        every { connection.statusFor(ScriptType.PYTHON) } answers {
+            verify(exactly = 0) { hpc.ready(any()) }
+            connectionCheckCount++
+            if(connectionCheckCount == 5)
+                every { connection.statusFor(ScriptType.PYTHON) } answers { RemoteSetupState.ERROR }
+
+            RemoteSetupState.PREPARING
+        }
+
+        try {
+            step.execute()
+            fail("We should get an exception")
+        } catch (e: Exception) {
+            assertTrue(e.message!!.endsWith("HPC preparation failed, aborting."))
+        }
+
+        verify(atLeast = 6) { connection.statusFor(ScriptType.PYTHON) }
+        verify(exactly = 0) { hpc.ready(any()) }
     }
 
     @Test
@@ -466,7 +538,7 @@ internal class HPCStepTest {
 
     @Test
     fun givenScriptIsHPCEnabled_whenTimeAsInt_thenErrorThrown() = runTest {
-        // We can't leave the bad file in the repo or github actions fail. So we forge it here.
+        // We can't leave the bad file in the repo or GitHub actions fail. So we forge it here.
         val goodFile = File(scriptsRoot, "HPCSyncTest.yml")
         val badFile = createTempFile("HPCBadTimeTest", "yml")
         badFile.writeText(goodFile.readText().replace("time: \"1:00:00\"", "time: 1:00:00"))
