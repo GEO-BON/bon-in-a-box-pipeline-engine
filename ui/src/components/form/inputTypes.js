@@ -1,25 +1,50 @@
 export const inputTypes = (type) => {
-  const types = {   
-    'options[]': 'multiple options',
-    'image/tiff;application=geotiff': "path to geotiff file",
-    'image/tiff;application=geotiff[]': "comma separated list of paths to geotiff files",
-    'application/geo+json': "path to geojson file",
-    'application/geo+json[]': "comma separated list of paths to geojson files",
-    'application/geopackage+sqlite3': "path to geopackage file",
-    'application/geopackage+sqlite3[]': "comma separated list of paths to geopackage files",
-    'application/dbf': "path to shapefile",
-    'application/dbf[]': "comma separated list of paths to shapefiles",
-    'text/csv': "path to comma separated values file",
-    'text/csv[]': "comma separated list of paths to comma separated values files",
-    'text/tab-separated-values': "path to tab separated values file",
-    'text/tab-separated-values[]': "comma separated list of paths to tab separated values files",
-    'text/plain': "path to text file",
-    'text/plain[]': "comma separated list of paths to text files",
-    'int': "integer",
-    'int[]': "comma separated list of integers",
-    'float': "decimal number",
-    'float[]': "comma separated list of decimal numbers",    
-    boolean: null
+  // Exceptions to the rules
+  switch(type) {
+      case 'boolean':
+        return null;
+      case 'options[]':
+        return 'multiple options';
   }
-  return Object.keys(types).includes('[]') ? types[type] : type;
+
+  // Detect arrays
+  let array = false;
+  if(type.endsWith('[]')) {
+    type = type.slice(0, -2);
+    array = true;
+  }
+
+  // Detect mime types
+  let isFile = false;
+  if(type.includes('/')) {
+    isFile = true;
+  }
+
+  // Check the lookup table
+  const types = {
+    'image/tiff;application=geotiff': "geotiff",
+    'application/geo+json': "geojson",
+    'application/geopackage+sqlite3': "geopackage",
+    'application/dbf': "shapefile",
+    'text/csv': "comma separated values",
+    'text/tab-separated-values': "tab separated values",
+    'text/plain': "text",
+    'int': "integer",
+    'float': "decimal number",
+  }
+
+  let message = types[type] || type;
+  if (isFile && !message.toLowerCase().includes("path")) {
+    if (array)
+      message = "paths to " + message + " files";
+    else
+      message = "path to " + message + " file";
+  }
+
+  if(array) {
+    message = "comma-separated list of " + message;
+    if(!isFile) message += "s";
+  }
+
+  return message;
 };
