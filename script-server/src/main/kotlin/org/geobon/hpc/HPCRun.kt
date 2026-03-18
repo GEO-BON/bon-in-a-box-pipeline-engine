@@ -41,11 +41,14 @@ class HPCRun(
             RemoteSetupState.PREPARING -> {
                 log(logger::debug, "HPC not ready, waiting for preparation to complete...")
                 val durationMinutes = 10
-                for(i in 0..durationMinutes * 60) {
+                val durationSeconds = durationMinutes * 60
+                for(i in 0..durationSeconds) {
                     delay(1000) // 1 second
                     if(hpcConnection.statusFor(scriptType) == RemoteSetupState.READY) {
                         log(logger::debug, "HPC is now ready, waited ${i.seconds}.")
                         break
+                    } else if(hpcConnection.statusFor(scriptType) == RemoteSetupState.ERROR) {
+                        throw RuntimeException("HPC preparation failed, aborting.")
                     }
                 }
 
