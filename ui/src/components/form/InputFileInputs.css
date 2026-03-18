@@ -46,6 +46,7 @@
   max-width: 700px;
   transition: max-height 0.2s linear;
   overflow: hidden;
+  padding-bottom:20px;
 }
 
 .inputDescriptionContent.collapsed {

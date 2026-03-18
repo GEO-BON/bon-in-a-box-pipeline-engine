@@ -184,7 +184,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
 };
 
 const DescriptionSection = ({ description, inputId }) => {
-  const DESCRIPTION_COLLAPSE_THRESHOLD_PX = 100;
+  const descriptionCollapseThreshold = 100;
   const [expanded, setExpanded] = useState(false);
   const [canCollapse, setCanCollapse] = useState(false);
   const [expandedHeight, setExpandedHeight] = useState(0);
@@ -197,8 +197,8 @@ const DescriptionSection = ({ description, inputId }) => {
         return;
       }
       const hasOverflow =
-        contentRef.current.scrollHeight > DESCRIPTION_COLLAPSE_THRESHOLD_PX + 1;
-      setExpandedHeight(contentRef.current.scrollHeight);
+        contentRef.current.scrollHeight > descriptionCollapseThreshold + 1;
+      
       setCanCollapse(hasOverflow);
       if (!hasOverflow) {
         setExpanded(false);
@@ -212,7 +212,12 @@ const DescriptionSection = ({ description, inputId }) => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", evaluateOverflow);
     };
-  }, [description, DESCRIPTION_COLLAPSE_THRESHOLD_PX]);
+  }, [description, descriptionCollapseThreshold]);
+
+  const expandCollapse = () => {
+    setExpandedHeight(contentRef.current.scrollHeight);
+    setExpanded((oldValue) => !oldValue)
+  }
 
   const isExpanded = expanded || !canCollapse;
 
@@ -222,7 +227,7 @@ const DescriptionSection = ({ description, inputId }) => {
         ref={contentRef}
         className={`inputDescriptionContent ${isExpanded ? "expanded" : "collapsed"}`}
         style={{
-          "--description-collapse-threshold": `${DESCRIPTION_COLLAPSE_THRESHOLD_PX}px`,
+          "--description-collapse-threshold": `${descriptionCollapseThreshold}px`,
           "--description-expanded-height": `${expandedHeight}px`,
         }}
       >
@@ -240,7 +245,7 @@ const DescriptionSection = ({ description, inputId }) => {
         <button
           type="button"
           className="descriptionToggleButton"
-          onClick={() => setExpanded((oldValue) => !oldValue)}
+          onClick={() => expandCollapse()}
         >
             {isExpanded ? (
               <>Show less <ExpandLessIcon sx={{ fontSize: "1.2rem", color: "var(--biab-green-main)", verticalAlign: "middle" }} /></>
