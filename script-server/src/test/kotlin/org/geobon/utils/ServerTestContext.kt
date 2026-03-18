@@ -10,9 +10,7 @@ val noHPCContext = ServerContext()
 
 fun createMockHPCContext (): ServerContext {
     return ServerContext(mockk<HPC>().also { hpc ->
-        val connection = mockk<HPCConnection>().also {
-            every { it.ready } returns true
-        }
+        val connection = mockk<HPCConnection>()
         every { hpc.connection } returns connection
     })
 }

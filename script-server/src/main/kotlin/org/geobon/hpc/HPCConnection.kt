@@ -46,14 +46,7 @@ class HPCConnection(
 
     var configurationError:String? = null
     val configured: Boolean
-        get() = rImage.state != RemoteSetupState.NOT_CONFIGURED
-                && juliaImage.state != RemoteSetupState.NOT_CONFIGURED
-                && scriptsStatus.state != RemoteSetupState.NOT_CONFIGURED
-
-    val ready: Boolean
-        get() = rImage.state == RemoteSetupState.READY
-                && juliaImage.state == RemoteSetupState.READY
-                && scriptsStatus.state == RemoteSetupState.READY
+        get() = scriptsStatus.state != RemoteSetupState.NOT_CONFIGURED
 
     fun statusFor(type: ScriptType): RemoteSetupState {
         return when (type) {
@@ -390,9 +383,8 @@ class HPCConnection(
             resultFiles: List<File> = listOf()
         )
     {
-        if(!ready || sshCommand == null) {
-            logger.warn("Cannot send jobs to HPC while not ready")
-            return
+        if(sshCommand == null) {
+            throw RuntimeException("Cannot send jobs on HPC when not configured.")
         }
 
         val hpcLogFiles = logFiles.map { it.absolutePath.replaceFirst(outputRoot.absolutePath, hpcOutputRoot) }
@@ -504,9 +496,8 @@ class HPCConnection(
      * Run an immediate command on the automation node.
      */
     suspend fun runCommand(command: String, timeoutMinutes: Long = 10, logFile: File? = null) {
-        if(!ready || sshCommand == null) {
-            logger.warn("Cannot run commands on HPC while not ready.")
-            return
+        if(sshCommand == null) {
+            throw RuntimeException("Cannot run commands on HPC when not configured.")
         }
 
         withContext(Dispatchers.IO) {
