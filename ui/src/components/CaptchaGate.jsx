@@ -58,6 +58,14 @@ export default function CaptchaGate({ children }) {
             localStorage.setItem(clientKeyVarName, config.siteKey);
             setClientKey(config.siteKey)
             return;
+
+          } else {
+            // If captcha was explicitly disable from an instance where it was previously enabled,
+            // clear local storage as well. This mostly covers a dev scenario.
+            localStorage.removeItem(clientKeyVarName)
+            localStorage.removeItem(expiryDelay)
+            localStorage.removeItem(humanVarName)
+            setClientKey(null)
           }
         }
       } catch (err) {
@@ -96,21 +104,21 @@ export default function CaptchaGate({ children }) {
   }, [clientKey]);
 
   // Execute reCAPTCHA verification
-  const executeRecaptcha = useCallback((siteKey) => {
+  const executeRecaptcha = useCallback((clientKey) => {
     showRecaptchaBadge();
     if (state === States.SHOW_CONTENT) {
       return;
     }
 
     if (!recaptchaReady()) {
-      setTimeout(() => executeRecaptcha(siteKey), 100);
+      setTimeout(() => executeRecaptcha(clientKey), 100);
       return;
     }
 
     window.grecaptcha.ready(async () => {
       try {
         // Execute recaptcha v3
-        const token = await window.grecaptcha.execute(siteKey, {
+        const token = await window.grecaptcha.execute(clientKey, {
           action: "run",
         });
 

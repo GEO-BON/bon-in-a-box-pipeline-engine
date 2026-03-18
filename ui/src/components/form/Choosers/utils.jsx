@@ -96,6 +96,7 @@ export const paperStyle = (dialog) => {
       border: "0px",
       padding: "2px",
       margin: "0px",
+      width: "100%",
     };
   }
 };

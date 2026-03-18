@@ -2,11 +2,10 @@
 import { useEffect, useState, lazy, useReducer, Suspense } from "react";
 import Grid from "@mui/material/Grid";
 import CropIcon from "@mui/icons-material/Crop";
-const MapOpenLayers = lazy(() => import('./MapOpenLayers'));
+const MapOpenLayers = lazy(() => import("./MapOpenLayers"));
 import CountryRegionMenu from "./CountryRegionMenu";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
-import yaml from "js-yaml";
 import { CustomButtonGreen } from "../../CustomMUI";
 import ReactMarkdown from "react-markdown";
 import Alert from "@mui/material/Alert";
@@ -15,6 +14,7 @@ import CropFreeIcon from "@mui/icons-material/CropFree";
 import Modal from "@mui/material/Modal";
 import { chooserReducer } from "./chooserReducer";
 import { Spinner } from "../../Spinner";
+import CRSDescription from "./CRSDescription";
 
 export default function Choosers({
   inputId,
@@ -32,25 +32,23 @@ export default function Choosers({
   const [openModal, setOpenModal] = useState(false);
 
   const type = inputDescription.type;
+
+  const label = leftLabel && inputDescription.label && (
+    <h4>
+      {inputDescription.label}
+    </h4>
+  )
+
   return (
     <>
       {type === "bboxCRS" && (
         <tr>
-          <td>
-            {leftLabel && inputDescription.label && (
-              <>
-                <strong>{inputDescription.label}</strong>
-                {": "}
-              </>
-            )}
-            {value && !isCompact && (
-              <pre style={{ maxWidth: "330px", overflowX: "scroll" }}>
-                {yaml.dump(value)}
-              </pre>
-            )}
+          <td className="inputCell">
+            {label}
+            {value && !isCompact && <CRSDescription bboxCRS={value} />}
             <br />
           </td>
-          <td>
+          <td className="descriptionCell">
             <CustomButtonGreen
               variant="contained"
               endIcon={<CropFreeIcon />}
@@ -61,9 +59,11 @@ export default function Choosers({
                 setOpenModal(false);
               }}
               className="locationChooserButton"
+              style={{marginBottom: "1rem", fontSize: "1rem"}}
             >
               {`Choose ${inputDescription.label}`}
             </CustomButtonGreen>
+            <ReactMarkdown className="reactMarkdown">{inputDescription.description}</ReactMarkdown>
             <Modal
               key={`modal-chooser`}
               open={openModal}
@@ -79,7 +79,6 @@ export default function Choosers({
                     key={`choosers-modal-${inputId}`}
                     {...{
                       setOpenModal,
-                      inputId,
                       inputDescription,
                       value,
                       updateValue,
@@ -93,12 +92,12 @@ export default function Choosers({
       )}
       {type !== "bboxCRS" && (
         <tr>
-          <td>
+          <td className="inputCell">
+            {label}
             <Chooser
               key={`choosers-modal-${inputId}`}
               {...{
                 setOpenModal,
-                inputId,
                 inputDescription,
                 value,
                 updateValue,
@@ -125,13 +124,11 @@ export default function Choosers({
   );
 }
 
-export function Chooser({
+function Chooser({
   setOpenModal,
-  inputId,
   inputDescription,
   value,
   updateValue = () => {},
-  onChange,
 }) {
   const [clearFeatures, setClearFeatures] = useState(0);
   const [digitize, setDigitize] = useState(false);
@@ -153,10 +150,11 @@ export function Chooser({
     "bboxCRS",
   ].includes(type);
   const showRegion = ["countryRegion", "countryRegionCRS", "bboxCRS"].includes(
-    type
+    type,
   );
   const showCRS = ["countryRegionCRS", "bboxCRS", "CRS"].includes(type);
   const [oldValues, setOldValues] = useState({});
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (value) {
@@ -232,8 +230,9 @@ export function Chooser({
       }}
     >
       <Grid container spacing={0} sx={{ height: "100%" }}>
-        <Grid className="inputGrid"
-          size={{xs:(showMap ? 3 : 12)}}
+        <Grid
+          className="inputGrid"
+          size={{ xs: showMap ? 3 : 12 }}
           sx={{
             padding: "10px",
             height: showMap ? "100%" : "auto",
@@ -284,6 +283,7 @@ export function Chooser({
                 states,
                 dispatch,
                 value,
+                setMessage,
               }}
             />
           )}
@@ -327,6 +327,8 @@ export function Chooser({
                   clearFeatures,
                   digitize,
                   setDigitize,
+                  message,
+                  setMessage,
                 }}
               />
             </Suspense>

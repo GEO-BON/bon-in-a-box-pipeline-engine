@@ -1,5 +1,6 @@
 table.inputFileFields {
   width: 100%;
+  table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0 10px;
   margin-top: -2px; /* correct offset on first border spacing if desired */
@@ -41,16 +42,19 @@ table.inputFileFields td:last-child {
   border-top-right-radius: 10px;
 }
 
-table.inputFileFields td.inputCell {
-  width: 300px;
-  color: var(--biab-green-main);
-}
-
 table.inputFileFields td.inputCell label {
-  width: 300px;
+  width: 100%;
   color: var(--biab-green-main);
   font-family: "Roboto";
   font-weight: 1000;
+}
+
+table.inputFileFields td.inputCell h4 {
+  margin-block-start: 0;
+  margin-block-end: 1em;
+  font-size: 1em;
+  font-weight: 1000;
+  color: var(--biab-green-main);
 }
 
 table.inputFileFields td.inputCell .MuiOutlinedInput-notchedOutline {
@@ -69,13 +73,25 @@ table.inputFileFields .example {
   background-color: transparent;
 }
 
+.textareaLabel {
+    position: absolute;
+    font-size: 0.8rem;
+    margin-top: -0.5rem;
+    margin-left: 10px;
+    background-color: white;
+    width: fit-content !important;
+    padding: 0px 5px;
+}
+
 table.inputFileFields textarea.autoResizeHeight {
-  width: 300px;
+  max-width: 300px;
+  width: 100%;
   font-family: "Roboto";
   font-size: 0.85rem;
   outline: 1px solid var(--biab-green-trans-main);
   border: 1px solid transparent;
-  padding: 16.5px 14px;
+  padding: 15px;
+  box-sizing: border-box;
 }
 
 table.inputFileFields textarea.autoResizeHeight:focus {
@@ -93,6 +109,22 @@ table.inputFileFields textarea.autoResizeHeight:focus {
   }
 }
 
+.inputColumnL{
+  width: 35%;
+}
+.inputColumnC{
+  width: 65%;
+}
+
+@media all and (max-width: 930px) {
+  .inputColumnL{
+    width: 50%;
+  }
+  .inputColumnC{
+    width: 50%;
+  }
+}
+
 .inputFileFields .reactMarkdown p {
   margin: 0;
   color: var(--biab-blue-main);
@@ -100,7 +132,6 @@ table.inputFileFields textarea.autoResizeHeight:focus {
 }
 
 .inputForm {
-  max-width: 850px;
   padding: 25px;
   transition: display 4s allow-discrete;
 }
@@ -112,8 +143,7 @@ table.inputFileFields textarea.autoResizeHeight:focus {
 table.inputFileFields .MuiInputBase-input {
   font-size: 0.85em !important;
   font-family: "Roboto" !important;
-  max-width: 350px !important;
-  min-width: 300px !important;
+  max-width: 320px !important;
 }
 
 .MuiAutocomplete-popper li {
@@ -148,4 +178,10 @@ table.inputFileFields .MuiInputBase-input {
 
 .inputsDescription h3 {
   color: #333 !important;
+}
+
+.textButton {
+  cursor: pointer;
+  color: var(--biab-green-main);
+  font-weight: normal;
 }
