@@ -28,7 +28,6 @@ export default function Choosers({
   updateValue,
   value = null,
   isCompact = false,
-  layout = "table",
 }) {
   const [openModal, setOpenModal] = useState(false);
 
@@ -40,7 +39,6 @@ export default function Choosers({
     </h4>
   )
 
-  if (layout === "div") {
     if (type === "bboxCRS") {
       return (
         <div className="chooserFieldBody">
@@ -86,7 +84,6 @@ export default function Choosers({
         </div>
       );
     }
-
     return (
       <div className="chooserFieldBody">
         {label}
@@ -101,91 +98,6 @@ export default function Choosers({
         />
       </div>
     );
-  }
-
-  return (
-    <>
-      {type === "bboxCRS" && (
-        <tr>
-          <td className="inputCell">
-            {label}
-            {value && !isCompact && <CRSDescription bboxCRS={value} />}
-            <br />
-          </td>
-          <td className="descriptionCell">
-            <CustomButtonGreen
-              variant="contained"
-              endIcon={<CropFreeIcon />}
-              onClick={() => {
-                setOpenModal(true);
-              }}
-              onClose={() => {
-                setOpenModal(false);
-              }}
-              className="locationChooserButton"
-              style={{marginBottom: "1rem", fontSize: "1rem"}}
-            >
-              {`Choose ${inputDescription.label}`}
-            </CustomButtonGreen>
-            <ReactMarkdown className="reactMarkdown">{inputDescription.description}</ReactMarkdown>
-            <Modal
-              key={`modal-chooser`}
-              open={openModal}
-              onClose={() => {
-                setOpenModal(false);
-              }}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-            >
-              <>
-                {openModal && (
-                  <Chooser
-                    key={`choosers-modal-${inputId}`}
-                    {...{
-                      setOpenModal,
-                      inputDescription,
-                      value,
-                      updateValue,
-                    }}
-                  />
-                )}
-              </>
-            </Modal>
-          </td>
-        </tr>
-      )}
-      {type !== "bboxCRS" && (
-        <tr>
-          <td className="inputCell">
-            {label}
-            <Chooser
-              key={`choosers-modal-${inputId}`}
-              {...{
-                setOpenModal,
-                inputDescription,
-                value,
-                updateValue,
-              }}
-            />
-          </td>
-          {descriptionCell && (
-            <td className="descriptionCell">
-              {inputDescription.description ? (
-                <ReactMarkdown
-                  className="reactMarkdown"
-                  children={inputDescription.description}
-                />
-              ) : (
-                <Alert severity="warning">
-                  Missing description for input "{inputId}"
-                </Alert>
-              )}
-            </td>
-          )}
-        </tr>
-      )}
-    </>
-  );
 }
 
 function Chooser({

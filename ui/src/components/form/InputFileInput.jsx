@@ -120,31 +120,21 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
           .map(([inputId, inputDescription]) => {
             const { label, description, options, example, weight, type } =
               inputDescription;
-            const title = label || inputId.replace(/^(.*\|)/, "");
-            const isChooserInput = [
-              "country",
-              "region",
-              "countryRegion",
-              "CRS",
-              "countryRegionCRS",
-              "bboxCRS",
-            ].includes(inputDescription.type);
-
             return (
               <div className="inputFieldCard" key={inputId}>
-                <h4 className="inputFieldTitle">{title}</h4>
-
+                <h4 className="inputFieldTitle"><label>{label || inputId}</label></h4>
+                {!label && (
+                  <Alert severity="error" className="error" sx={{ margin: "0 10px 10px 10px" }}>
+                    Missing label for input "{inputId}"
+                  </Alert>
+                )}
+                {!/^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId) && !/pipeline@\d+$/.test(inputId) && (
+                  <Alert severity="warning">
+                    Input id {inputId.replace(/^(.*\|)/, "")} should be a
+                    snake_case id
+                  </Alert>
+                )}
                 <div className="inputFieldBody">
-                  {isChooserInput ? (
-                    <Choosers
-                      inputDescription={inputDescription}
-                      value={inputFileContent[inputId] || null}
-                      updateValue={(value) => updateInputFile(inputId, value)}
-                      descriptionCell={false}
-                      leftLabel={false}
-                      layout="div"
-                    />
-                  ) : (
                     <>
                       <ScriptInput
                         id={inputId}
@@ -168,7 +158,6 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                           />
                         )))}
                     </>
-                  )}
                 </div>
 
                 <DescriptionSection

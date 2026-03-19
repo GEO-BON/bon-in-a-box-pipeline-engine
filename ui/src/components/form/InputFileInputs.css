@@ -27,11 +27,11 @@
   margin-right: 15px;
 }
 
-.inputFieldBody .MuiInputBase-root, .MuiInputBase-root input {
+.inputFieldBody .MuiInputBase-root, .inputFieldBody .MuiInputBase-root input {
   background-color: #f9f9f9
 }
 
-.inputFieldBody textarea, .inputFieldBody .autoResizeHeight {
+.inputFieldBody textarea, .inputFieldBody .inputFieldBody .autoResizeHeight {
   background-color: #f9f9f9
 }
 

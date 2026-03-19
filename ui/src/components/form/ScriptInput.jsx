@@ -244,7 +244,7 @@ export default function ScriptInput({
 
     case "bboxCRS":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={true} descriptionCell={false}/>
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={size=='small'} descriptionCell={false}/>
       );
 
     default:
