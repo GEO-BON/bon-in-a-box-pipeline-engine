@@ -6,7 +6,7 @@ export default function CRSDescription({ bboxCRS }) {
 
     if(viewSource) {
         return <div>
-            <pre style={{ maxWidth: "330px", overflowX: "scroll" }}>
+            <pre style={{ overflowX: "scroll" }}>
                 {yaml.dump(bboxCRS)}
             </pre>
             <a className="textButton" onClick={() => setViewSource(false)} style={{fontSize: "0.9em"}}>
