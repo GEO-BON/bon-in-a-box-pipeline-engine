@@ -5,10 +5,7 @@ import { InputsDescription } from "../StepDescription";
 import ReactMarkdown from "react-markdown";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
-import Choosers from "./Choosers";
 import _, { set } from "lodash";
-import yaml from "js-yaml";
-import { isEmptyObject } from "../../utils/isEmptyObject";
 import _lang from "lodash/lang";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
@@ -16,7 +13,7 @@ import Tab from "@mui/material/Tab";
 import Alert from "@mui/material/Alert";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import {inputTypes} from "./inputTypes"
+import InputType from "./InputType"
 
 import { styled } from "@mui/material";
 import { ScriptInputExample } from "./ScriptInputExample";
@@ -118,7 +115,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
         {Object.entries(inputs)
           .sort((a, b) => a[1].weight - b[1].weight)
           .map(([inputId, inputDescription]) => {
-            const { label, description, options, example, weight, type } =
+            const { label, description, options, example, type } =
               inputDescription;
             return (
               <div className="inputFieldCard" key={inputId}>
@@ -146,9 +143,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                         size="medium"
                         keepWidth={true}
                       />
-                      <div style={{color:"#888", fontSize: "0.7rem", padding: "3px 0px 0px 10px"}}>
-                        {inputTypes(type)}
-                        </div>
+                      <InputType type={type} />
                       {inputDescription.type !== "boolean" &&
                         (!inputFileContent ||
                         (!_lang.isEqual(inputFileContent[inputId], example) && (
@@ -187,7 +182,7 @@ const DescriptionSection = ({ description, inputId }) => {
       }
       const hasOverflow =
         contentRef.current.scrollHeight > descriptionCollapseThreshold + 1;
-      
+
       setCanCollapse(hasOverflow);
       if (!hasOverflow) {
         setExpanded(false);

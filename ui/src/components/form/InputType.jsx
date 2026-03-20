@@ -1,10 +1,24 @@
-export const inputTypes = (type) => {
+
+
+export default function InputType({ type }) {
+  return <div style={{ color: "#888", fontSize: "0.7rem", padding: "3px 0px 0px 10px" }}>
+    {inputTypeToDisplay(type)}
+  </div>
+}
+
+
+export const inputTypeToDisplay = (type) => {
   // Exceptions to the rules
-  switch(type) {
-      case 'boolean':
-        return null;
-      case 'options[]':
-        return 'multiple options';
+  switch (type) {
+    case 'boolean':
+    case 'country':
+    case 'countryRegion':
+    case 'countryRegionCRS':
+    case 'CRS':
+    case 'bboxCRS':
+      return null;
+    case 'options[]':
+      return 'multiple options';
   }
 
   // Detect arrays
