@@ -103,6 +103,7 @@ export function PipelineForm({
         value={pipelineOptions.find(
           (o) => o.value === pipStates.descriptionFile
         )}
+        placeholder="Type or select from list..."
         menuPortalTarget={document.body}
         onChange={(v) => handlePipelineChange(v.label, v.value)}
       />
@@ -114,22 +115,26 @@ export function PipelineForm({
         />
       )}
       <CaptchaGate>
-        <InputFileInput
-          metadata={pipelineMetadata}
-          inputFileContent={inputFileContent}
-          setInputFileContent={setInputFileContent}
-          setValidationError={setValidationError}
-          restoreDefaults={restoreDefaults}
-        />
-        <br />
-        {validationError && <Alert severity="error">
-          Error parsing YAML input.<br />
-          {validationError}
-        </Alert>}
-        <SpamField />
-        <CustomButtonGreen type="submit" disabled={validationError != null} variant="contained">
-          {runType === "pipeline" ? "Run pipeline" : "Run script"}
-        </CustomButtonGreen>
+        {pipelineMetadata && (
+          <>
+            <InputFileInput
+              metadata={pipelineMetadata}
+              inputFileContent={inputFileContent}
+              setInputFileContent={setInputFileContent}
+              setValidationError={setValidationError}
+              restoreDefaults={restoreDefaults}
+            />
+            <br />
+            {validationError && <Alert severity="error">
+              Error parsing YAML input.<br />
+              {validationError}
+            </Alert>}
+            <SpamField />
+            <CustomButtonGreen type="submit" disabled={validationError != null} variant="contained">
+              {runType === "pipeline" ? "Run pipeline" : "Run script"}
+            </CustomButtonGreen>
+          </>
+        )}
       </CaptchaGate>
     </form>
 }
