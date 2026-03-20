@@ -119,7 +119,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
               inputDescription;
             return (
               <div className="inputFieldCard" key={inputId}>
-                <h4 className="inputFieldTitle"><label>{label || inputId}</label></h4>
+                <h4 className="inputFieldTitle"><label htmlFor={inputId}>{label || inputId}</label></h4>
                 {!label && (
                   <Alert severity="error" className="error" sx={{ margin: "0 10px 10px 10px" }}>
                     Missing label for input "{inputId}"
