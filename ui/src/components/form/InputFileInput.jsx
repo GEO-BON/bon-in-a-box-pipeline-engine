@@ -11,9 +11,9 @@ import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Alert from "@mui/material/Alert";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import InputType from "./InputType"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import InputType from "./InputType";
 
 import { styled } from "@mui/material";
 import { ScriptInputExample } from "./ScriptInputExample";
@@ -47,7 +47,7 @@ export default function InputFileInput({
         color: "#fff",
         fontWeight: 1000,
       },
-    })
+    }),
   );
 
   return (
@@ -100,8 +100,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
 
   function updateInputFile(inputId, value) {
     setInputFileContent((oldContent) => {
-      if(_lang.isEqual(oldContent[inputId], value))
-        return oldContent
+      if (_lang.isEqual(oldContent[inputId], value)) return oldContent;
 
       const newContent = { ...oldContent };
       newContent[inputId] = value;
@@ -119,40 +118,49 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
               inputDescription;
             return (
               <div className="inputFieldCard" key={inputId}>
-                <h4 className="inputFieldTitle"><label htmlFor={inputId}>{label || inputId}</label></h4>
+                <h4 className="inputFieldTitle">
+                  <label htmlFor={inputId}>{label || inputId}</label>
+                </h4>
                 {!label && (
-                  <Alert severity="error" className="error" sx={{ margin: "0 10px 10px 10px" }}>
+                  <Alert
+                    severity="error"
+                    className="error"
+                    sx={{ margin: "0 10px 10px 10px" }}
+                  >
                     Missing label for input "{inputId}"
                   </Alert>
                 )}
-                {!/^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId) && !/pipeline@\d+$/.test(inputId) && (
-                  <Alert severity="warning">
-                    Input id {inputId.replace(/^(.*\|)/, "")} should be a
-                    snake_case id
-                  </Alert>
-                )}
+                {!/^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId) &&
+                  !/pipeline@\d+$/.test(inputId) && (
+                    <Alert severity="warning">
+                      Input id {inputId.replace(/^(.*\|)/, "")} should be a
+                      snake_case id
+                    </Alert>
+                  )}
                 <div className="inputFieldBody">
-                    <>
-                      <ScriptInput
-                        id={inputId}
-                        type={inputDescription.type}
-                        options={options}
-                        value={inputFileContent && inputFileContent[inputId]}
-                        onValueUpdated={(value) => updateInputFile(inputId, value)}
-                        label={label}
-                        size="medium"
-                        keepWidth={true}
-                      />
-                      <InputType type={type} />
-                      {inputDescription.type !== "boolean" &&
-                        (!inputFileContent ||
+                  <>
+                    <ScriptInput
+                      id={inputId}
+                      type={inputDescription.type}
+                      options={options}
+                      value={inputFileContent && inputFileContent[inputId]}
+                      onValueUpdated={(value) =>
+                        updateInputFile(inputId, value)
+                      }
+                      label={label}
+                      size="medium"
+                      keepWidth={true}
+                    />
+                    <InputType type={type} />
+                    {inputDescription.type !== "boolean" &&
+                      (!inputFileContent ||
                         (!_lang.isEqual(inputFileContent[inputId], example) && (
                           <ScriptInputExample
                             example={example}
                             type={inputDescription.type}
                           />
                         )))}
-                    </>
+                  </>
                 </div>
 
                 <DescriptionSection
@@ -200,8 +208,8 @@ const DescriptionSection = ({ description, inputId }) => {
 
   const expandCollapse = () => {
     setExpandedHeight(contentRef.current.scrollHeight);
-    setExpanded((oldValue) => !oldValue)
-  }
+    setExpanded((oldValue) => !oldValue);
+  };
 
   const isExpanded = expanded || !canCollapse;
 
@@ -212,7 +220,6 @@ const DescriptionSection = ({ description, inputId }) => {
         className={`inputDescriptionContent ${isExpanded ? "expanded" : "collapsed"}`}
         style={{
           "--description-collapse-threshold": `${descriptionCollapseThreshold}px`,
-          "--description-expanded-height": `${expandedHeight}px`,
         }}
       >
         {description ? (
@@ -225,21 +232,38 @@ const DescriptionSection = ({ description, inputId }) => {
       </div>
 
       {canCollapse && (
-        <div className="descriptionToggle" >
-        <button
-          type="button"
-          className="descriptionToggleButton"
-          onClick={() => expandCollapse()}
-        >
+        <div className="descriptionToggle">
+          <button
+            type="button"
+            className="descriptionToggleButton"
+            onClick={() => expandCollapse()}
+          >
             {isExpanded ? (
-              <>Show less <ExpandLessIcon sx={{ fontSize: "1.2rem", color: "var(--biab-green-main)", verticalAlign: "middle" }} /></>
+              <>
+                Show less{" "}
+                <ExpandLessIcon
+                  sx={{
+                    fontSize: "1.2rem",
+                    color: "var(--biab-green-main)",
+                    verticalAlign: "middle",
+                  }}
+                />
+              </>
             ) : (
-              <>Read more <ExpandMoreIcon sx={{ fontSize: "1.2rem", color: "var(--biab-green-main)", verticalAlign: "middle" }} /></>
+              <>
+                Read more{" "}
+                <ExpandMoreIcon
+                  sx={{
+                    fontSize: "1.2rem",
+                    color: "var(--biab-green-main)",
+                    verticalAlign: "middle",
+                  }}
+                />
+              </>
             )}
-        </button>
+          </button>
         </div>
-
-)}
+      )}
     </div>
   );
 };

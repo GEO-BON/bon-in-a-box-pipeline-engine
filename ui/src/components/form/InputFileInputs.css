@@ -27,14 +27,15 @@
   margin-right: 15px;
 }
 
-.inputFieldBody .MuiInputBase-root, .inputFieldBody .MuiInputBase-root input {
-  background-color: #f9f9f9
+.inputFieldBody .MuiInputBase-root,
+.inputFieldBody .MuiInputBase-root input {
+  background-color: #f9f9f9;
 }
 
-.inputFieldBody textarea, .inputFieldBody .inputFieldBody .autoResizeHeight {
-  background-color: #f9f9f9
+.inputFieldBody textarea,
+.inputFieldBody .inputFieldBody .autoResizeHeight {
+  background-color: #f9f9f9;
 }
-
 
 .inputDescriptionContent {
   margin-top: 10px;
@@ -42,11 +43,11 @@
   font-size: 0.75em;
   color: #666;
   word-break: break-word;
-  padding:10px;
+  padding: 10px;
   max-width: 700px;
   transition: max-height 0.2s linear;
   overflow: hidden;
-  padding-bottom:20px;
+  padding-bottom: 20px;
 }
 
 .inputDescriptionContent.collapsed {
@@ -54,11 +55,7 @@
   overflow: hidden;
 }
 
-.inputDescriptionContent.expanded {
-  max-height: var(--description-expanded-height, 5000px);
-}
-
-.descriptionToggle{
+.descriptionToggle {
   margin-left: 15px;
 }
 
@@ -73,14 +70,14 @@
   font-weight: 700;
 }
 
-.CRSDescriptionLabel{
+.CRSDescriptionLabel {
   color: #999;
   font-weight: bold;
 }
 
-.CRSDescriptionValue{
+.CRSDescriptionValue {
   color: #333;
-  font-weight: bold
+  font-weight: bold;
 }
 
 .inputFileForm .example {
@@ -89,13 +86,13 @@
 }
 
 .textareaLabel {
-    position: absolute;
-    font-size: 0.8rem;
-    margin-top: -0.5rem;
-    margin-left: 10px;
-    background-color: white;
-    width: fit-content !important;
-    padding: 0px 5px;
+  position: absolute;
+  font-size: 0.8rem;
+  margin-top: -0.5rem;
+  margin-left: 10px;
+  background-color: white;
+  width: fit-content !important;
+  padding: 0px 5px;
 }
 
 .inputFileForm textarea.autoResizeHeight {
@@ -124,18 +121,18 @@
   }
 }
 
-.inputColumnL{
+.inputColumnL {
   width: 35%;
 }
-.inputColumnC{
+.inputColumnC {
   width: 65%;
 }
 
 @media all and (max-width: 930px) {
-  .inputColumnL{
+  .inputColumnL {
     width: 50%;
   }
-  .inputColumnC{
+  .inputColumnC {
     width: 50%;
   }
 }
@@ -160,8 +157,8 @@
 }
 
 .inputFileForm {
-  font-family: 'Inter', sans-serif;
-  padding:10px
+  font-family: "Inter", sans-serif;
+  padding: 10px;
 }
 
 .inputFileForm .MuiInputBase-input {
