@@ -114,7 +114,7 @@ export function PipelineForm({
           metadata={pipelineMetadata}
         />
       )}
-      <CaptchaGate>
+      <CaptchaGate size={pipelineMetadata ? "large" : "small"}>
         {pipelineMetadata && (
           <>
             <InputFileInput
