@@ -107,9 +107,7 @@ export function PipelineResults({
                       } else if (runningScripts.size > 0) {
                         noValueStatus = <InlineSpinner />;
                       } else {
-                        noValueStatus = <Alert severity="warning">
-                                  See detailed results
-                                </Alert>;
+                        noValueStatus = <span>No output</span>;
                       }
                       return (
                         <div key={ioId} className="outputTitle">
