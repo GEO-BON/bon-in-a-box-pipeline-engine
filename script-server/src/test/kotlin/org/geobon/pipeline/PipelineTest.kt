@@ -4,7 +4,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
-import org.geobon.utils.productionPipelinesRoot
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
@@ -267,7 +266,7 @@ internal class PipelineTest {
     @Test
     fun `given a nested pipeline receiving a user input_when ran_then it behaves as a single pipeline`() = runTest {
         val pipeline = createRootPipeline("pipelineInPipeline/userInputOutside.json",
-            """ {"pipeline@3":5} """)
+            """ {"pipeline@3|inputId":5} """)
 
         val allOutputs = mutableMapOf<String, String>()
         pipeline.dumpOutputFolders(allOutputs)

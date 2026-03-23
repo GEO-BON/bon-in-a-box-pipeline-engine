@@ -14,9 +14,13 @@ internal class IOIdTest {
         )
 
         // Pipeline input
-        assertEquals(
+        assertEquals( // Legacy
             "pipeline@myNodeId",
             IOId(StepId("pipeline", "myNodeId")).toString()
+        )
+        assertEquals( // New (with inputId)
+            "pipeline@myNodeId|myInputId",
+            IOId(StepId("pipeline", "myNodeId"), "myInputId").toString()
         )
 
         // Nested pipeline input

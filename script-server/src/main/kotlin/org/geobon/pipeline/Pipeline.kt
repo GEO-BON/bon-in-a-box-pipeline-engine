@@ -251,15 +251,19 @@ open class Pipeline constructor(
                         NODE__TYPE_USER_INPUT -> {
                             val nodeData = node.getJSONObject(NODE__DATA)
                             val type = nodeData.getString(NODE__DATA__TYPE)
-                            val userInputId = StepId("pipeline", nodeId, stepId)
 
-                            steps[nodeId] = UserInput(
-                                userInputId,
-                                type,
-                                pipelineJSON.optJSONObject(INPUTS)
-                                    ?.optJSONObject(userInputId.toString())
-                                    ?.optString(INPUTS__LABEL, null)
-                            )
+                            val stepId = StepId("pipeline", nodeId, stepId)
+                            steps[nodeId] = pipelineJSON.optJSONObject(INPUTS)?.let {inputs ->
+                                inputs.keySet().find { it.startsWith(stepId.toString()) }?.let { userInputId ->
+                                    UserInput(
+                                        IOId( stepId, getStepInput(userInputId)),
+                                        type,
+                                        pipelineJSON.optJSONObject(INPUTS)
+                                            ?.optJSONObject(userInputId)
+                                            ?.optString(INPUTS__LABEL, null)
+                                    )
+                                }?: throw RuntimeException("Could not find input description associated with user input with node id $nodeId.")
+                            } ?: throw RuntimeException("Could not find inputs section, while reading user input 1$nodeId")
                         }
 
                         NODE__TYPE_OUTPUT -> outputIds.add(nodeId)
