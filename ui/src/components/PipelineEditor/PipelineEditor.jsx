@@ -390,7 +390,10 @@ export default function PipelineEditor(props) {
       const stepDescription = getStepDescription(nodeFound.data.descriptionFile)
 
       if (stepDescription && stepDescription.inputs) {
-        return stepDescription.inputs[edgeFound.targetHandle]
+        return {
+          ...stepDescription.inputs[edgeFound.targetHandle],
+          inputId: edgeFound.targetHandle
+        }
       }
     }
     return undefined
@@ -875,8 +878,10 @@ export default function PipelineEditor(props) {
           const [fullId, inputDescription] = entry;
 
           if (fullId.startsWith("pipeline@")) {
+            // Explicit user input
             inputsFromFile.push({
               nodeId: getStepNodeId(fullId),
+              inputId: getStepInput(fullId),
               ...inputDescription,
             });
           } else {

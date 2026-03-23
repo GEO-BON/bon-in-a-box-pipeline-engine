@@ -6,9 +6,11 @@
  * @returns the IO id: step@nodeId|input
  */
 export function toInputId(props) {
-    return props.file === undefined
-            ? toIOId("pipeline", props.nodeId)
-            : toIOId(props.file, props.nodeId, props.inputId);
+    return toIOId(
+        props.file === undefined ? "pipeline" : props.file,
+        props.nodeId,
+        props.inputId
+    );
 }
 
 /**
