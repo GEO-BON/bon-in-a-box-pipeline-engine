@@ -12,6 +12,11 @@ RUN curl -L "https://github.com/docker/compose/releases/download/v2.3.3/docker-c
 RUN chmod 755 /usr/local/bin/docker-compose
 RUN chmod 755 /usr/local/bin/docker
 
+RUN set -ex; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends rsync; \
+    apt-get clean all;
+
 ## This image builds the server code
 FROM gradle:9.0-jdk21 AS builder
 COPY . /home/gradle/project

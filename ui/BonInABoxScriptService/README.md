@@ -121,6 +121,7 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *BonInABoxScriptService.DefaultApi* | [**getCountriesList**](docs/DefaultApi.md#getCountriesList) | **GET** /region/countries_list | Returns the list of countries from FieldMaps.io with their ISO3 and English names
+*BonInABoxScriptService.DefaultApi* | [**getHPCStatus**](docs/DefaultApi.md#getHPCStatus) | **GET** /hpc/status | Get status of HPC connection.
 *BonInABoxScriptService.DefaultApi* | [**getHistory**](docs/DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 *BonInABoxScriptService.DefaultApi* | [**getInfo**](docs/DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
 *BonInABoxScriptService.DefaultApi* | [**getListOf**](docs/DefaultApi.md#getListOf) | **GET** /{type}/list | Get a list of available steps of given type and their names.
@@ -130,6 +131,7 @@ Class | Method | HTTP request | Description
 *BonInABoxScriptService.DefaultApi* | [**getRegionsList**](docs/DefaultApi.md#getRegionsList) | **GET** /region/regions_list | Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
 *BonInABoxScriptService.DefaultApi* | [**getSystemStatus**](docs/DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 *BonInABoxScriptService.DefaultApi* | [**getVersions**](docs/DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
+*BonInABoxScriptService.DefaultApi* | [**hpcPrepareGet**](docs/DefaultApi.md#hpcPrepareGet) | **GET** /hpc/prepare | Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.
 *BonInABoxScriptService.DefaultApi* | [**run**](docs/DefaultApi.md#run) | **POST** /{type}/{descriptionPath}/run | Runs the script or pipeline matching &#x60;descriptionPath&#x60;.
 *BonInABoxScriptService.DefaultApi* | [**savePipeline**](docs/DefaultApi.md#savePipeline) | **POST** /pipeline/save/{filename} | Save a json file to the pipeline folder.
 *BonInABoxScriptService.DefaultApi* | [**stop**](docs/DefaultApi.md#stop) | **GET** /{type}/{id}/stop | Stop the specified pipeline run.
@@ -137,9 +139,11 @@ Class | Method | HTTP request | Description
 
 ## Documentation for Models
 
+ - [BonInABoxScriptService.GetHPCStatus200ResponseValue](docs/GetHPCStatus200ResponseValue.md)
  - [BonInABoxScriptService.GetHistory200ResponseInner](docs/GetHistory200ResponseInner.md)
  - [BonInABoxScriptService.Info](docs/Info.md)
  - [BonInABoxScriptService.InfoAuthorInner](docs/InfoAuthorInner.md)
+ - [BonInABoxScriptService.InfoHpc](docs/InfoHpc.md)
  - [BonInABoxScriptService.InfoInputsValue](docs/InfoInputsValue.md)
  - [BonInABoxScriptService.InfoInputsValueExample](docs/InfoInputsValueExample.md)
  - [BonInABoxScriptService.InfoInputsValueExampleOneOfInner](docs/InfoInputsValueExampleOneOfInner.md)

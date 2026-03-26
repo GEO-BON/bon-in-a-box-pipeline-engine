@@ -7,8 +7,10 @@ import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.MalformedJsonException
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
-import org.geobon.utils.runToText
+import org.geobon.utils.run
 import org.geobon.utils.toSHA256
 import org.json.JSONObject
 import java.io.File
@@ -24,27 +26,33 @@ val outputRoot = File(System.getenv("OUTPUT_LOCATION"))
  * @param runId A unique string identifier representing a run of this step with these specific parameters.
  *           i.e. Calling the same script with the same param would result in the same ID.
  */
-open class RunContext(val runId: String, val inputs: Map<String, Any?>) {
-
-    constructor(descriptionFile: File, inputs: Map<String, Any?>) : this(
+open class RunContext(val runId: String, val inputs: Map<String, Any?>, val serverContext: ServerContext) {
+    constructor(descriptionFile: File, inputs: Map<String, Any?>, serverContext: ServerContext) : this(
         File(
             // Unique to this script
-            descriptionFile.relativeTo(scriptRoot).path.removeSuffix(".yml")
+            descriptionFile.relativeTo(scriptsRoot).path.removeSuffix(".yml")
                 .replace("../", ""), // This replacement is to accommodate script-stubs
             // Unique to these params
             if (inputs.isEmpty()) "no_params" else inputsToHash(inputs)
         ).path,
-        inputs
+        inputs,
+        serverContext
     )
 
     val outputFolder
         get() = File(outputRoot, runId)
+
+    val outputFolderEscaped
+        get() = outputFolder.absolutePath.replace(" ", "\\ ")
 
     val inputFile: File
         get() = File(outputFolder, "input.json")
 
     val resultFile: File
         get() = File(outputFolder, "output.json")
+
+    val logFile: File
+        get() = File(outputFolder, "logs.txt")
 
     fun getEnvironment(container: Containers): Map<String, Any?> {
         val environment = mapOf(
@@ -55,7 +63,7 @@ open class RunContext(val runId: String, val inputs: Map<String, Any?>) {
                 "environment" to container.environment,
                 "version" to container.version
             ),
-            "dependencies" to "cat ${outputFolder.absolutePath}/dependencies.txt".runToText(showErrors = false)
+            "dependencies" to "cat ${outputFolder.absolutePath}/dependencies.txt".run(showErrors = false)
         )
         return environment
     }
@@ -73,11 +81,6 @@ open class RunContext(val runId: String, val inputs: Map<String, Any?>) {
     }
 
     companion object {
-        val scriptRoot
-            get() = File(System.getenv("SCRIPT_LOCATION"))
-
-        val pipelineRoot
-            get() = File(System.getenv("PIPELINES_LOCATION"))
 
         private fun preserveNulls(inputMap: Map<String, Any?>) : Map<String, Any> {
             return inputMap.mapValues { it.value ?: JSONObject.NULL }

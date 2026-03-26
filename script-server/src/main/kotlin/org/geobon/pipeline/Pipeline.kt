@@ -1,16 +1,16 @@
 package org.geobon.pipeline
 
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import org.geobon.pipeline.RunContext.Companion.pipelineRoot
-import org.geobon.pipeline.RunContext.Companion.scriptRoot
+import kotlinx.coroutines.*
+import org.geobon.script.Description.IO__LABEL
+import org.geobon.script.Description.IO__TYPE
+import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.pipelinesRoot
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.File
 
-open class Pipeline constructor(
+open class Pipeline (
     override val id: StepId,
     private val debugName: String,
     /** Node id to Step */
@@ -25,12 +25,10 @@ open class Pipeline constructor(
 
     fun getPipelineOutputs(): List<Pipe> = outputs.values.map { it }
 
-    private val finalSteps: Set<Step>
-
     private var job: Job? = null
 
+    private val finalSteps: Set<Step> = outputs.values.mapNotNullTo(mutableSetOf()) { it.step }
     init {
-        finalSteps = outputs.values.mapNotNullTo(mutableSetOf()) { it.step }
         if (finalSteps.isEmpty())
             throw Exception("Pipeline has no designated output")
     }
@@ -83,12 +81,11 @@ open class Pipeline constructor(
                     execute()
                 }
             }
-
-            job?.apply { cancelled = isCancelled }
         } catch (ex: RuntimeException) {
             error = ex.message ?: ex.stackTraceToString()
-            logger.debug(error)
+            logger.debug("Pipeline execution error: $error")
 
+            cancelled = ex is CancellationException
             if (!cancelled) failure = true
         } catch (ex: Exception) {
             error =
@@ -121,6 +118,7 @@ open class Pipeline constructor(
     }
 
     override suspend fun execute() {
+        logger.info("TEMP Starting pipeline $this")
         coroutineScope {
             finalSteps.forEach { launch { it.execute() } }
         } // exits when all final steps have their results
@@ -128,6 +126,7 @@ open class Pipeline constructor(
 
     suspend fun stop() {
         job?.apply {
+            logger.info("Cancelling pipeline $debugName")
             cancel("Cancelled by user")
             join() // wait so the user receives response when really cancelled
         }
@@ -147,12 +146,14 @@ open class Pipeline constructor(
 
     companion object {
         fun createMiniPipelineFromScript(
+            serverContext: ServerContext,
             descriptionFile: File,
             descriptionFileId: String,
             inputsJSON: String? = null
         ): Pipeline {
             val pipelineId = StepId("", "")
             val step = ScriptStep(
+                serverContext,
                 descriptionFile,
                 StepId(
                     descriptionFileId,
@@ -163,7 +164,7 @@ open class Pipeline constructor(
 
             val miniPipeline = Pipeline(
                 pipelineId,
-                descriptionFile.relativeTo(scriptRoot.parentFile).path,
+                descriptionFile.relativeTo(scriptsRoot.parentFile).path,
                 mapOf(step.id.nodeId to step),
                 inputsToConstants(inputsJSON, step),
                 step.outputs.toMutableMap()
@@ -174,11 +175,12 @@ open class Pipeline constructor(
             return miniPipeline
         }
 
-        fun createRootPipeline(relPath: String, inputsJSON: String? = null) =
-            createRootPipeline(File(pipelineRoot, relPath), inputsJSON)
+        fun createRootPipeline(serverContext: ServerContext, relPath: String, inputsJSON: String? = null) =
+            createRootPipeline(serverContext, File(pipelinesRoot, relPath), inputsJSON)
 
-        fun createRootPipeline(descriptionFile: File, inputsJSON: String? = null): Pipeline {
+        fun createRootPipeline(serverContext: ServerContext, descriptionFile: File, inputsJSON: String? = null): Pipeline {
             return createFromFile(
+                serverContext,
                 StepId("", ""),
                 descriptionFile,
                 inputsJSON
@@ -187,8 +189,12 @@ open class Pipeline constructor(
             }
         }
 
-        fun createRootPipeline(debugName: String, pipelineJSON: JSONObject, inputsJSON: JSONObject): Pipeline {
+        fun createRootPipeline(
+            serverContext: ServerContext, debugName: String, pipelineJSON: JSONObject,
+            inputsJSON: JSONObject
+        ): Pipeline {
             return createFromJSON(
+                serverContext,
                 StepId("", ""),
                 debugName,
                 pipelineJSON,
@@ -198,18 +204,28 @@ open class Pipeline constructor(
             }
         }
 
-        private fun createFromFile(stepId: StepId, relPath: String, inputsJSON: String? = null): Pipeline =
-            createFromFile(stepId, File(pipelineRoot, relPath), inputsJSON)
+        private fun createFromFile(
+            serverContext: ServerContext, stepId: StepId, relPath: String,
+            inputsJSON: String? = null
+        ): Pipeline =
+            createFromFile(serverContext, stepId, File(pipelinesRoot, relPath), inputsJSON)
 
-        private fun createFromFile(stepId: StepId, descriptionFile: File, inputsJSON: String? = null): Pipeline =
+        private fun createFromFile(
+            serverContext: ServerContext, stepId: StepId, descriptionFile: File,
+            inputsJSON: String? = null
+        ): Pipeline =
             createFromJSON(
+                serverContext,
                 stepId,
-                descriptionFile.relativeTo(pipelineRoot.parentFile).path,
+                descriptionFile.relativeTo(pipelinesRoot.parentFile).path,
                 JSONObject(descriptionFile.readText()),
                 inputsJSON?.let { JSONObject(inputsJSON) } ?: JSONObject()
             )
 
-        private fun createFromJSON(stepId: StepId, debugName: String, pipelineJSON: JSONObject, inputsJSON: JSONObject): Pipeline {
+        private fun createFromJSON(
+            serverContext: ServerContext, stepId: StepId, debugName: String, pipelineJSON: JSONObject,
+            inputsJSON: JSONObject
+        ): Pipeline {
             val logger = LoggerFactory.getLogger(debugName)
 
             val constants = mutableMapOf<String, ConstantPipe>()
@@ -229,16 +245,16 @@ open class Pipeline constructor(
 
                             val innerStepId = StepId(script, nodeId, stepId)
                             steps[nodeId] = when {
-                                scriptFile.endsWith(".json") -> createFromFile(innerStepId, scriptFile)
+                                scriptFile.endsWith(".json") -> createFromFile(serverContext, innerStepId, scriptFile)
 
                                 // Instantiating kotlin "special steps".
                                 // Not done with reflection on purpose, since this could allow someone to instantiate any class,
                                 // resulting in a security breach.
-                                scriptFile == "pipeline/AssignId.yml" -> AssignId(innerStepId)
-                                scriptFile == "pipeline/PullLayersById.yml" -> PullLayersById(innerStepId)
+                                scriptFile == "pipeline/AssignId.yml" -> AssignId(serverContext, innerStepId)
+                                scriptFile == "pipeline/PullLayersById.yml" -> PullLayersById(serverContext, innerStepId)
 
                                 // Regular script steps
-                                else -> ScriptStep(scriptFile, innerStepId)
+                                else -> ScriptStep(scriptFile, innerStepId, serverContext)
                             }
                         }
 
@@ -258,7 +274,7 @@ open class Pipeline constructor(
                                 type,
                                 pipelineJSON.optJSONObject(INPUTS)
                                     ?.optJSONObject(userInputId.toString())
-                                    ?.optString(INPUTS__LABEL, null)
+                                    ?.optString(IO__LABEL, null)
                             )
                         }
 
@@ -324,7 +340,7 @@ open class Pipeline constructor(
                 inputsJSON.keySet().forEach { key ->
                     val inputSpec = inputsSpec.optJSONObject(key)
                         ?: throw RuntimeException("Input received \"$key\" is not listed in pipeline inputs. Listed inputs are ${inputsSpec.keySet()}")
-                    val type = inputSpec.getString(INPUTS__TYPE)
+                    val type = inputSpec.getString(IO__TYPE)
 
                     constants[key] = createConstant(key, inputsJSON, type, key)
                 }
@@ -360,7 +376,7 @@ open class Pipeline constructor(
             return if (type.endsWith("[]")) {
                 val jsonArray = try {
                     obj.getJSONArray(valueProperty)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     throw RuntimeException("Constant array #$idForUser has no value in JSON file.")
                 }
 

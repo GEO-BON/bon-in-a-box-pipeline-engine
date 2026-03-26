@@ -13,6 +13,7 @@
 
 import ApiClient from '../ApiClient';
 import InfoAuthorInner from './InfoAuthorInner';
+import InfoHpc from './InfoHpc';
 import InfoInputsValue from './InfoInputsValue';
 import InfoLifecycle from './InfoLifecycle';
 import InfoOutputsValue from './InfoOutputsValue';
@@ -80,6 +81,9 @@ class Info {
             if (data.hasOwnProperty('timeout')) {
                 obj['timeout'] = ApiClient.convertToType(data['timeout'], 'Number');
             }
+            if (data.hasOwnProperty('hpc')) {
+                obj['hpc'] = InfoHpc.constructFromObject(data['hpc']);
+            }
             if (data.hasOwnProperty('inputs')) {
                 obj['inputs'] = ApiClient.convertToType(data['inputs'], {'String': InfoInputsValue});
             }
@@ -142,6 +146,10 @@ class Info {
         // ensure the json data is a string
         if (data['external_link'] && !(typeof data['external_link'] === 'string' || data['external_link'] instanceof String)) {
             throw new Error("Expected the field `external_link` to be a primitive type in the JSON string but got " + data['external_link']);
+        }
+        // validate the optional field `hpc`
+        if (data['hpc']) { // data not null
+          InfoHpc.validateJSON(data['hpc']);
         }
         if (data['references']) { // data not null
             // ensure the json data is an array
@@ -206,6 +214,11 @@ Info.prototype['external_link'] = undefined;
  * @member {Number} timeout
  */
 Info.prototype['timeout'] = undefined;
+
+/**
+ * @member {module:model/InfoHpc} hpc
+ */
+Info.prototype['hpc'] = undefined;
 
 /**
  * @member {Object.<String, module:model/InfoInputsValue>} inputs

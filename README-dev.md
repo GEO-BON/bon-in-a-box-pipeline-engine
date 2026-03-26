@@ -279,3 +279,183 @@ Every second, the UI polls for:
 Since runner-conda and runner-julia run in a separate docker, when the user stops the pipeline, the signal must go from the script-server, to the runner, to the running script. Docker does not allow this by default, this is why we save the PID in a file and use a separate exec command to kill the process.
 
 The PID file is called `.pid` and is located in the output folder of the run. It is deleted when the script completes. For details, see [ScriptRun.kt](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/blob/main/script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt).
+
+## Setting up Digital Research Alliance of Canada (DRAC) cluster connection
+To connect to the DRAC automation node, you will need
+- A valid account
+- Manual authorisation from tech support
+- The IP address of your server or PC can be obtained with `curl ifcfg.me`.
+- The [allowed_commands.sh](./script-stubs/hpc/allowed_commands.sh) script, with execute permissions in the node.
+
+1. Follow [these instructions](https://docs.alliancecan.ca/wiki/Automation_in_the_context_of_multifactor_authentication/)
+2. Manually execute a command through SSH once to the automation node to accept the fingerprint of the HPC's. For example by running `ssh hpc-name "ls -l"`. This is mandatory since known_hosts will be used to connect.
+3. Create an ssh config file dedicated to BON in a Box, with the details for your HPC's automation node as such:
+    ```
+    host yourHPC
+      hostname robot.yourHPC.domain.edu
+      user yourUser
+      identitiesonly yes
+      requesttty no
+    ```
+3. Configure all the HPC_ environment variables in runner.env. (Make sure your runner.env contains all the HPC_ variables in the up-to-date runner-sample.env)
+4. Start the BON in a Box server normally.
+5. Check the info tag of the UI to see if the HPC connection is successful. If not, check the logs of the script-server for errors.
+
+### HPC connection states
+```mermaid
+stateDiagram-v2
+    [*] --> NOT_CONFIGURED
+    NOT_CONFIGURED --> CONFIGURED
+    CONFIGURED --> PREPARING
+    PREPARING --> READY
+    PREPARING --> ERROR
+```
+
+### Enabling a script for HPC usage
+A script requires additional metadata in it's .yml description file in order to be sent to a HPC.
+When all of the below fields are present, the script is considered "hpc-enabled".
+For example, the following script would be allowed a maximum of 30G of memory for 1 hour,
+and run with 16 CPUs.
+
+``` yml
+hpc:
+  mem: 30G # Maximum amount of memory allowed before Out Of Memory exception occurs
+  cpus-per-task: 16 #  Number of CPUs for this task
+  time: "01:00:00" # Maximum time allowed before timeout, for syntax see https://slurm.schedmd.com/sbatch.html#OPT_time.
+```
+
+It is recommended to check the documentation of the cluster that will receive the calls,
+to tailor the requested resources to best fit it's compute nodes specification.
+
+### Flow
+The following diagram shows the states a script run undergoes when being sent to the HPC.
+
+```mermaid
+stateDiagram-v2
+    biab: BON in a Box
+    state HPC {
+        state before_synced <<join>>
+        state before_submitted <<join>>
+    }
+
+    state biab {
+        [*] --> Registered
+        Registered --> syncing : prerequisite steps completed
+        syncing --> Ready : scripts, inputs and environments synced
+        syncing --> before_synced
+
+        Ready --> Running : batch accumulated
+        Running --> retrieved
+        Running --> before_submitted
+        retrieved --> [*]
+    }
+
+    state HPC {
+        [*] --> hpcReady : create images and overlays
+        hpcReady --> before_synced
+        before_synced --> Synced
+        Synced --> before_submitted
+        before_submitted --> submitted
+        submitted --> hpcRunning
+        hpcRunning --> results
+        results --> retrieved
+    }
+
+
+
+    state HPC {
+        hpcReady : Ready
+        submitted: Batch submitted
+        results: Results generated
+        hpcRunning: Running on commpute node
+    }
+
+    state biab {
+        retrieved : Results retrieved
+        syncing : Synchronisation
+    }
+
+```
+
+### Limitations
+The current implementation is basic, and has the following limitations:
+- Max 1 HPC-enabled script per pipeline. (In reality, one HPC task must not depend on the results of another, to avoid waiting forever for the batch to be sent.)
+- No UI support for batches in the pipeline editor.
+- Conda is supported, but: it is not possible for two HPC-enabled tasks to verify or edit the conda environment within the apptainer image at the same time. Only one writeable access can be granted to the overlay.
+- Steps are grouped together by batches of max 10 to create a SLURM job. The max memory and CPU are used, and the sum of times.
+- If a batch job fails _before it begins_, it will not be detected. Jobs will remain running untill cancelled manually.
+- Stopping a script through the BON in a Box UI does not cancel the job on the HPC.
+- Batches should be started via API call (for ex. a script sending curl calls). Example:
+ ```python
+ #!/usr/bin/env python3
+import requests
+
+loopParam = "pipeline@121"
+loopArray = [
+    ["Ambystoma laterale"],
+    ["Ambystoma jeffersonianum"],
+    ["Ambystoma texanum"],
+    ["Ambystoma tigrinum"],
+    ["Ambystoma barbouri"],
+    ["Plethodon cinereus"],
+    ["Plethodon richmondi"],
+    ["Eurycea bislineata"],
+    ["Eurycea longicauda"],
+    ["Hemidactylium scutatum"],
+    ["Desmognathus fuscus"],
+    ["Notophthalmus viridescens"],
+    ["Necturus maculosus"],
+]
+
+data = {
+    "SDM>runMaxent.yml@108|partition_type": "block",
+    "SDM>selectBackground.yml@40|method_background": "weighted_raster",
+    "SDM>selectBackground.yml@40|n_background": 30000,
+    "data>GBIFHeatmapFromSTAC.yml@139|taxa": "amphibians",
+    "data>getGBIFObservations>getGBIFObservations.yml@142|max_year": 2024,
+    "data>getGBIFObservations>getGBIFObservations.yml@142|min_year": 2010,
+    "data>loadFromStac.yml@144|collections_items": [
+        "chelsa-clim|bio1",
+        "chelsa-clim|bio2",
+        "chelsa-clim|bio3",
+        "chelsa-clim|bio4",
+        "chelsa-clim|bio5",
+        "chelsa-clim|bio6",
+    ],
+    "data>loadFromStac.yml@144|stac_url": "https://stac.geobon.org/",
+    "data>loadFromStac.yml@144|study_area": None,
+    "data>loadFromStac.yml@144|t0": None,
+    "data>loadFromStac.yml@144|t1": None,
+    "data>loadFromStac.yml@144|temporal_res": None,
+    "pipeline@121": ["Ambystoma laterale"],
+    "pipeline@128": 1000,
+    "pipeline@140": {
+        "CRS": {
+            "CRSBboxWGS84": [-93.17, 40.99, -54.75, 52.22],
+            "authority": "EPSG",
+            "code": 3175,
+            "name": "NAD83 / Great Lakes and St Lawrence Albers",
+            "proj4Def": "+proj=aea +lat_0=45.568977 +lon_0=-83.248627 +lat_1=42.122774 +lat_2=49.01518 +x_0=1000000 +y_0=1000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs",
+            "unit": "metre",
+            "wktDef": 'PROJCS["NAD83 / Great Lakes and St Lawrence Albers",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["latitude_of_center",45.568977],PARAMETER["longitude_of_center",-83.248627],PARAMETER["standard_parallel_1",42.122774],PARAMETER["standard_parallel_2",49.01518],PARAMETER["false_easting",1000000],PARAMETER["false_northing",1000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","3175"]]',
+        },
+        "bbox": [175523, 408483, 1719553, 1468175],
+        "country": None,
+        "region": None,
+    },
+    "pipeline@46": 5,
+}
+
+## Update the link for target instance
+url = "http://localhost/pipeline/SDM>SDM_maxEnt.json/run"
+headers = {"accept": "text/plain", "Content-Type": "text/plain"}
+
+for value in loopArray:
+    data_copy = data.copy()
+    data_copy[loopParam] = value
+
+    print(value)
+    response = requests.post(url, json=data_copy, headers=headers)
+    print(response)
+    print(response.text)
+ ```

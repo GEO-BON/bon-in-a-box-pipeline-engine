@@ -27,6 +27,13 @@ services:
       GIT_LOCATION: /.git
       PIPELINE_REPO_PATH: ${PIPELINE_REPO_PATH}
       USE_RUNNERS: true
+      HPC_SSH_CONFIG_FILE: /run/secrets/hpc_ssh_config_file
+      HPC_SSH_KEY: /run/secrets/hpc_ssh_key
+      HPC_KNOWN_HOSTS_FILE: /run/secrets/hpc_known_hosts_file
+    secrets:
+      - hpc_ssh_key
+      - hpc_known_hosts_file
+      - hpc_ssh_config_file
 
   python-api: # Serves Titiler and a FastAPI app to serve country and region names and geometries
     container_name: biab-python-api
@@ -85,3 +92,10 @@ services:
       - script-server
       - python-api
 
+secrets:
+  hpc_ssh_key:
+    file: $HPC_SSH_KEY
+  hpc_known_hosts_file:
+    file: $HPC_KNOWN_HOSTS_FILE
+  hpc_ssh_config_file:
+    file: $HPC_SSH_CONFIG_FILE
