@@ -232,28 +232,30 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
           <TextField
             {...params}
             label="Search / Select CRS"
-            InputProps={{
-              ...params.InputProps,
-              startAdornment: (
-                <>
-                  {CRSList.length > 0 && (
-                    <>
-                      <InputAdornment
-                        style={{ cursor: "pointer" }}
-                        onClick={() => {
-                          setOpenCRSMenu(true);
-                        }}
-                        position="start"
-                      >
-                        <KeyboardArrowDownIcon
-                          sx={{ color: "var(--biab-green-main)"}}
-                        />
-                      </InputAdornment>
-                      {params.InputProps.endAdornment}
-                    </>
-                  )}
-                </>
-              ),
+            slotProps={{
+              input: {
+                ...params.InputProps,
+                startAdornment: (
+                  <>
+                    {CRSList.length > 0 && (
+                      <>
+                        <InputAdornment
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {
+                            setOpenCRSMenu(true);
+                          }}
+                          position="start"
+                        >
+                          <KeyboardArrowDownIcon
+                            sx={{ color: "var(--biab-green-main)"}}
+                          />
+                        </InputAdornment>
+                        {params.InputProps.endAdornment}
+                      </>
+                    )}
+                  </>
+                ),
+              }
             }}
           />
         )}
