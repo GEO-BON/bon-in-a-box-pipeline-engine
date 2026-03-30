@@ -239,12 +239,12 @@ export default function ScriptInput({
     case "CRS":
     case "countryRegion":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }} />
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} value={value} updateValue={(value) => { onValueUpdated(value) }} />
       );
 
     case "bboxCRS":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={size=='small'} descriptionCell={false}/>
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={size=='small'}/>
       );
 
     default:

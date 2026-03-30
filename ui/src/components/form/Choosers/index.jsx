@@ -23,7 +23,6 @@ export default function Choosers({
     label: "",
     type: "",
   },
-  descriptionCell = true,
   leftLabel = true,
   updateValue,
   value = null,
@@ -53,7 +52,7 @@ export default function Choosers({
               setOpenModal(false);
             }}
             className="locationChooserButton"
-            style={{ marginBottom: "1rem", fontSize: "1rem", width: "500px" }}
+            style={{ marginBottom: "1rem", fontSize: "1rem", width: !isCompact && "500px" }}
           >
             {`Choose ${inputDescription.label}`}
           </CustomButtonGreen>
