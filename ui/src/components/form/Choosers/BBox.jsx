@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import { paperStyle } from "./utils";
-import _ from "lodash";
+import _lang from "lodash/lang";
 
 export default function BBox({ states, dispatch, value = null, setMessage }) {
   const bboxSavedValue =
@@ -16,7 +16,7 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
       if (states.bbox && states.bbox.length === 4) {
         b = states.bbox;
       }
-      if (!_.isEqual(bbInput, b)) {
+      if (!_lang.isEqual(bbInput, b)) {
         updateBBox(null, b, true);
       }
     }

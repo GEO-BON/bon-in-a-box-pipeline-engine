@@ -5,7 +5,6 @@ import { InputsDescription } from "../StepDescription";
 import ReactMarkdown from "react-markdown";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
-import _, { set } from "lodash";
 import _lang from "lodash/lang";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
