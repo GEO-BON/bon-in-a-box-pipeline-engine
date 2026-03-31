@@ -52,16 +52,16 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-flow-renderer": "^10.3.17",
-    "react-leaflet": "^4.2.1",
+    "react-leaflet": "^5.0.0",
     "react-markdown": "^10.1.0",
-    "react-router-dom": "^6.14.2",
+    "react-router-dom": "^7.13.2",
     "react-select": "^5.10.2",
     "web-vitals": "^5.2.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.4.0",
+    "@vitejs/plugin-react": "^6.0.1",
     "@watergis/maplibre-gl-terradraw": "^1.12.2",
-    "vite": "^6.3.0"
+    "vite": "^8.0.3"
   },
   "scripts": {
     "start": "vite --host --no-open",
