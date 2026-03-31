@@ -222,7 +222,7 @@ const DescriptionSection = ({ description, inputId }) => {
         }}
       >
         {description ? (
-          <ReactMarkdown className="reactMarkdown">{description}</ReactMarkdown>
+          <div className="reactMarkdown"><ReactMarkdown>{description}</ReactMarkdown></div>
         ) : (
           <Alert severity="warning">
             Missing description for input "{inputId}"

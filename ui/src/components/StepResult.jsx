@@ -281,10 +281,11 @@ export const SingleIOResult = memo(
 
       if (ioMetadata.description) {
         description = (
-          <ReactMarkdown
-            className="reactMarkdown outputDescription"
-            children={ioMetadata.description}
-          />
+          <div className="reactMarkdown outputDescription">
+            <ReactMarkdown>
+              {ioMetadata.description}
+            </ReactMarkdown>
+          </div>
         );
       } else {
         errorMsg = (

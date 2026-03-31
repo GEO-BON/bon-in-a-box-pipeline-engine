@@ -126,7 +126,7 @@ export function GeneralDescription({ ymlPath, metadata }) {
                 <i>{generatePersonList(metadata.reviewer)}</i>
             </small></div>
         }
-        {metadata.description && <ReactMarkdown className="reactMarkdown" children={metadata.description} />}
+        {metadata.description && <div className="reactMarkdown"><ReactMarkdown children={metadata.description} /></div>}
         {codeLink && <p>
                 Code: <a href={codeLink} target="_blank">{codeLink.substring(codeLink.search(/(scripts|pipelines)\//))}</a>
             </p>
@@ -242,7 +242,7 @@ function jsonToYaml(jsonObj, indent = 0, lineWidth = 80) {
         return <div key={key}>
             {'  '.repeat(indent) + key + ': '}
             {key === 'description'
-                ? <>|<ReactMarkdown className='ioDescription' children={jsonObj[key]} /></>
+                ? <div className='ioDescription'>|<ReactMarkdown children={jsonObj[key]} /></div>
                 : valuetoYaml(jsonObj[key], indent, lineWidth)}
         </div>
     })
