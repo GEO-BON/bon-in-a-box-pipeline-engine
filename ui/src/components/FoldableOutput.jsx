@@ -39,6 +39,7 @@ export function FoldableOutputWithContext({
   componentId,
   inline,
   inlineCollapsed,
+  inlineExpanded,
   children,
   keepWhenHidden,
 }) {
@@ -54,6 +55,7 @@ export function FoldableOutputWithContext({
       title={title}
       inline={inline}
       inlineCollapsed={inlineCollapsed}
+      inlineExpanded={inlineExpanded}
       children={children}
       keepWhenHidden={keepWhenHidden}
     />
@@ -66,6 +68,7 @@ export function FoldableOutput({
   title,
   inline,
   inlineCollapsed,
+  inlineExpanded,
   children,
   isActive,
   keepWhenHidden,
@@ -84,6 +87,7 @@ export function FoldableOutput({
       title={title}
       inline={inline}
       inlineCollapsed={inlineCollapsed}
+      inlineExpanded={inlineExpanded}
       children={children}
       keepWhenHidden={keepWhenHidden}
     />
@@ -98,6 +102,7 @@ function FoldableOutputInternal({
   title,
   inline,
   inlineCollapsed,
+  inlineExpanded,
   children,
   keepWhenHidden,
 }) {
@@ -112,34 +117,32 @@ function FoldableOutputInternal({
   return (
     <div className={className}>
       <div className="outputTitle">
-        <div className="clickable" onClick={toggle}>
-          <div className="expandIcon">
-            {active ? (
-              <ExpandLessIcon
-                sx={{
-                  verticalAlign: "middle",
-                  fontSize: "2em",
-                  color: "var(--biab-green-main)",
-                  marginTop: "-3px",
-                }}
-              />
-            ) : (
-              <ExpandMoreIcon
-                sx={{
-                  verticalAlign: "middle",
-                  fontSize: "2em",
-                  color: "var(--biab-green-main)",
-                  marginTop: "-3px",
-                }}
-              />
-            )}{" "}
-            {icon}
-          </div>
-          <h3 ref={titleRef}>{title}</h3>
-          <div className="inlinePreview">
-            {inline}
-            {!active && inlineCollapsed}
-          </div>
+        <div className="expandIcon clickable" onClick={toggle}>
+          {active ? (
+            <ExpandLessIcon
+              sx={{
+                verticalAlign: "middle",
+                fontSize: "2em",
+                color: "var(--biab-green-main)",
+                marginTop: "-3px",
+              }}
+            />
+          ) : (
+            <ExpandMoreIcon
+              sx={{
+                verticalAlign: "middle",
+                fontSize: "2em",
+                color: "var(--biab-green-main)",
+                marginTop: "-3px",
+              }}
+            />
+          )}{" "}
+          {icon}
+        </div>
+        <h3 className="clickable" ref={titleRef} onClick={toggle}>{title}</h3>
+        <div className="inlinePreview">
+          {inline}
+          {active ? inlineExpanded : inlineCollapsed}
         </div>
       </div>
 

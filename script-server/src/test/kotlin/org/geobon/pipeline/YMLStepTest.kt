@@ -2,14 +2,17 @@ package org.geobon.pipeline
 
 import io.mockk.every
 import io.mockk.mockk
+import org.geobon.utils.noHPCContext
 import java.io.File
 import kotlin.math.roundToInt
 import kotlin.test.*
 
 private class ResourceYml(resourcePath: String, inputs: MutableMap<String, Pipe> = mutableMapOf()) :
-    YMLStep(File(ResourceYml::class.java.classLoader.getResource(resourcePath)!!.path),
+    YMLStep(
+        noHPCContext,
+        File(ResourceYml::class.java.classLoader.getResource(resourcePath)!!.path),
         StepId("ResourceYml",(Math.random() * 10000).roundToInt().toString()),
-        inputs = inputs) {
+        inputs) {
     override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
         throw Exception("this is in YMLStep, should not be tested")
     }
@@ -87,5 +90,15 @@ internal class YMLStepTest {
 
         assertNotNull(step.outputs["tell_me"])
         assertEquals("text/plain", step.outputs["tell_me"]!!.type)
+    }
+
+    @Test
+    fun givenTextInput_whenReceivingOptionsInput_thenConversionAccepted() {
+        val correctInput = mockk<Pipe>()
+        every { correctInput.type } returns "options"
+        every { correctInput.validateGraph() } returns ""
+        val step = ResourceYml("scripts/assertText.yml", mutableMapOf("input" to correctInput))
+
+        assertTrue(step.validateGraph().isEmpty())
     }
 }

@@ -96,6 +96,7 @@ export const paperStyle = (dialog) => {
       border: "0px",
       padding: "2px",
       margin: "0px",
+      width: "100%",
     };
   }
 };
@@ -182,6 +183,12 @@ export const getCRSDef = async (epsg_number) => {
 };
 
 export const getCRSListFromName = async (name) => {
+  // Strip trailing parenthesis, for example "American Samoa (USA)"" => "American Samoa"
+  const parenthesisIx = name.indexOf(" (")
+  if (parenthesisIx > 0) {
+    name = name.substring(0, parenthesisIx);
+  }
+
   let allResults = [];
   const base_url = `https://api.maptiler.com/coordinates/search/${name} kind:CRS-PROJCRS kind:CRS-GEOCRS deprecated:0.json`;
   let offset = 0;
@@ -207,10 +214,10 @@ export const getCRSListFromName = async (name) => {
       ) {
         // Filter and add results
         const filtered = result.data.results.filter((r) => {
-          if (!("exports" in r && r.exports !== null)) {
-            return false;
-          }
-          return filterProj4String(r.exports.proj4);
+          if (r.exports && r.exports.proj4)
+            return filterProj4String(r.exports.proj4);
+
+          return false;
         });
         allResults = allResults.concat(filtered);
 
@@ -224,7 +231,7 @@ export const getCRSListFromName = async (name) => {
         keepGoing = false;
       }
     } catch (error) {
-      console.error("getCRSListFromName error:", error);
+      console.log(`Failed to get CRS list for "${name}":`, error);
       keepGoing = false;
     }
   }

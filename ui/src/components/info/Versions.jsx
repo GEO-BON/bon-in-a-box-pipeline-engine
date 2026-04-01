@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Spinner } from "./Spinner";
-import { HttpError } from "./HttpErrors";
+import { Spinner } from "../Spinner";
+import { HttpError } from "../HttpErrors";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 
 export const api = new BonInABoxScriptService.DefaultApi();

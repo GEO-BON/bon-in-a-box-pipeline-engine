@@ -16,7 +16,7 @@ import HomePage from "./components/HomePage";
 import { PipelinePage } from "./components/PipelinePage";
 import StepChooser from "./components/PipelineEditor/StepChooser";
 import { Layout } from "./Layout";
-import InfoPage from "./components/InfoPage";
+import InfoPage from "./components/info/InfoPage";
 import RunHistory from "./components/RunHistory";
 import Chat from "./components/chat";
 import { Spinner } from "./components/Spinner";

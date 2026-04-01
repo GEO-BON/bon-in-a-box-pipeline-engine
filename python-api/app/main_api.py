@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 import duckdb
@@ -58,7 +58,11 @@ def regions_list(country_iso:str):
     names = df[(df['adm0_src'] == country_iso) | (df['adm0_src'] == country_iso+'_1')]
     if names.empty:
         raise HTTPException(status_code=404, detail="Country ISO code not valid")
-    return names.to_dict(orient='records')
+
+    print("Returning %d regions for country %s" % (len(names), country_iso))
+
+    json_str = names.to_json(orient='records')
+    return Response(content=json_str, media_type='application/json')
 
 @app.get("/region/geometry")
 def region_geometry(type: str = 'country', id: str = ""):
