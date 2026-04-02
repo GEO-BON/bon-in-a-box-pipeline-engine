@@ -10,7 +10,7 @@ import { MapContainer } from "react-leaflet";
 import { BrowserRouter as Router } from "react-router-dom";
 
 function App() {
-  const [mapWidth, setMapWidth] = useState("70vw");
+  const mapWidth = "70vw";
   return (
     <Router basename="/viewer">
       <ThemeProvider theme={theme}>

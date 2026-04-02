@@ -1,5 +1,5 @@
 /* eslint-disable dot-notation */
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   ScaleControl,
   ZoomControl,
@@ -29,7 +29,6 @@ function MapWrapper(props: any) {
     setGeojson,
     generateStats,
     geojsonOutput,
-    mapWidth,
     map,
   } = props;
   const [opacity, setOpacity] = useState("80");
@@ -60,12 +59,7 @@ function MapWrapper(props: any) {
   };
 
   return (
-    <Box
-      style={{
-        width: mapWidth,
-        left: 100 - mapWidth,
-      }}
-    >
+    <Box>
       <CustomLayer {...props} map={map} opacity={opacity} />
       <MSMapSlider
         absolute={true}
