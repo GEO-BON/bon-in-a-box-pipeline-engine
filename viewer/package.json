@@ -36,7 +36,6 @@
     "typescript": "^6.0.2",
     "underscore": "^1.13.8",
     "vite": "^8.0.3",
-    "web-vitals": "^5.2.0",
     "yaml": "^2.8.3"
   },
   "scripts": {
