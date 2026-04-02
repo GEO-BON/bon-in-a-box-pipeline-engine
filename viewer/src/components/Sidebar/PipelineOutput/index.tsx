@@ -10,6 +10,7 @@ import { Item } from "../styles";
 import _ from "underscore";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import Markdown from "markdown-to-jsx";
+import "../sidebar.css";
 
 export function PipelineOutput(props: any) {
   const {
@@ -56,12 +57,12 @@ export function PipelineOutput(props: any) {
           <Typography color="primary.light" sx={{ fontWeight: 600 }}>
             {`${outputObj?.label[0].toUpperCase()}${outputObj.label.slice(1)}`}
           </Typography>
-          <Typography color="primary.light" fontSize={11}>
+          <div className="markdown" style={{fontSize: 11}}>
             <Markdown>
               {outputObj?.description[0].toUpperCase() +
                 outputObj.description.slice(1)}
             </Markdown>
-          </Typography>
+          </div>
           {Array.isArray(outs) && outputObj?.type?.includes("tif") && (
             <FormControl
               variant="standard"

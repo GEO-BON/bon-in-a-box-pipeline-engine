@@ -17,23 +17,19 @@ import _ from "underscore";
 import { PipelineOutput } from "./PipelineOutput";
 
 import type { FeatureCollection } from "geojson";
-import { url } from "inspector";
 import YAML from "yaml";
 import axios from "axios";
 import Markdown from "markdown-to-jsx";
+import "./sidebar.css";
 
 export default function Sidebar(props: any) {
   const {
-    t = (text: string) => text,
     setSelectedLayer,
     pipelineData,
     setPipelineRunId,
-    geojson,
-    setGeojson,
     setGeojsonOutput,
     setGeoPackage,
     generateStats,
-    map,
   } = props;
 
   interface Params {
@@ -343,12 +339,11 @@ export default function Sidebar(props: any) {
                       },
                     }}
                   >
-                    <Typography color="primary.contrastText" fontSize={14}>
-                      <Markdown>{pipelineDescription}</Markdown>
-                    </Typography>
+                    <Markdown className="markdown" style={{fontSize: 14}}>{pipelineDescription}</Markdown>
                     <Typography color="primary.contrastText" fontSize={11}>
-                      By: {pipelineAuthors}
+                      Pipeline authors:&nbsp;
                     </Typography>
+                    {pipelineAuthors}
                   </Box>
                 </Paper>
               </Box>
