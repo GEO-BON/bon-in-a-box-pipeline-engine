@@ -82,7 +82,7 @@ export function PipelineOutput(props: any) {
                 label="Layer"
               >
                 {outs.map((o: any) => (
-                  <CustomMenuItem key={`it-${o}`} value={o}>
+                  <CustomMenuItem key={`it-${o.url}`} value={o}>
                     {o?.description}
                   </CustomMenuItem>
                 ))}
@@ -193,7 +193,7 @@ export function PipelineOutput(props: any) {
                   label="Table"
                 >
                   {outs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o}`} value={o}>
+                    <CustomMenuItem key={`it-${o.url}`} value={o}>
                       {o.split("/").pop()}
                     </CustomMenuItem>
                   ))}
@@ -257,7 +257,7 @@ export function PipelineOutput(props: any) {
                   label="Layer"
                 >
                   {outs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o}`} value={o}>
+                    <CustomMenuItem key={`it-${o.url}`} value={o}>
                       {o.split("/").pop()}
                     </CustomMenuItem>
                   ))}
@@ -338,7 +338,7 @@ export function PipelineOutput(props: any) {
                   label="Layer"
                 >
                   {outs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o}`} value={o}>
+                    <CustomMenuItem key={`it-${o.url}`} value={o}>
                       {o.split("/").pop()}
                     </CustomMenuItem>
                   ))}
