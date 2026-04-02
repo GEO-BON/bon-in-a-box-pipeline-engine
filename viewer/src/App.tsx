@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import { useState } from "react";
 import Main from "./components/Main";
 import theme from "./styles/theme";
 import { ThemeProvider, createTheme } from "@mui/material/styles";

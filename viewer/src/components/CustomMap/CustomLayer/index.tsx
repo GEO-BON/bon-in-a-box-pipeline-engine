@@ -1,13 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import _ from "underscore";
-import { CircleMarker, Tooltip, useMap, GeoJSON } from "react-leaflet";
 import L from "leaflet";
 import { ColorPicker } from "../../ColormapPicker";
-import type { FeatureCollection } from "geojson";
 import GeoPackageLayer from "./GeoPackageLayer";
 import GeoJSONLayer from "./GeoJSONLayer";
 import TileLayer from "./TileLayer";
-import { clear } from "console";
 
 /**
  *

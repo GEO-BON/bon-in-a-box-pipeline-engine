@@ -1,4 +1,4 @@
-import L from 'leaflet';
+import L from "leaflet";
 import ReactDOMServer from 'react-dom/server';
 import './simple_legend.css';
 

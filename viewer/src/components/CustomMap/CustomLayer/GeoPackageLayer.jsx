@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useEffect } from "react";
 import _ from "underscore";
 import L from "leaflet";
 import "@ngageoint/geopackage";
