@@ -338,7 +338,9 @@ export default function Sidebar(props: any) {
                       },
                     }}
                   >
-                    <Markdown className="markdown" style={{fontSize: 14}}>{pipelineDescription}</Markdown>
+                    <div className="markdown">
+                      <Markdown style={{fontSize: 14}}>{pipelineDescription}</Markdown>
+                    </div>
                     <Typography color="primary.contrastText" fontSize={11}>
                       Pipeline authors:&nbsp;
                     </Typography>
