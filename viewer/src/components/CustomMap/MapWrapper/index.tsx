@@ -15,7 +15,6 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import MSMapSlider from "../MSMapSlider";
 import CustomLayer from "../CustomLayer";
-import Digitizer from "../../Digitizer";
 
 import {
   GetCountryList,
@@ -93,12 +92,6 @@ function MapWrapper(props: any) {
       />
       <ZoomControl position="topright" />
       <ScaleControl position="bottomright" />
-      <Digitizer
-        geojson={geojson}
-        setGeojson={setGeojson}
-        handleDeletePlace={handleDeletePlace}
-        popitup={popitup}
-      />
       {popupOpen && (
         <Popup key={`popup-${popupProps.key}`} position={popupProps.position}>
           <Box>

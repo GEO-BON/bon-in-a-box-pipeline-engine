@@ -5,7 +5,6 @@ import theme from "./styles/theme";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import "./App.css";
 import "leaflet/dist/leaflet.css";
-import "leaflet-draw/dist/leaflet.draw.css";
 import { MapContainer } from "react-leaflet";
 
 import { BrowserRouter as Router } from "react-router-dom";

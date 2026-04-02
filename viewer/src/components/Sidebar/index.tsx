@@ -247,19 +247,6 @@ export default function Sidebar(props: any) {
     }
   }, [pipelineData.pipeline_outputs]);
 
-  const drawPolygon = () => {
-    const el = document.getElementsByClassName("leaflet-draw-draw-polygon");
-    if (el[0] instanceof HTMLElement) {
-      el[0].click();
-    }
-  };
-  const drawRectangle = () => {
-    const el = document.getElementsByClassName("leaflet-draw-draw-rectangle");
-    if (el[0] instanceof HTMLElement) {
-      el[0].click();
-    }
-  };
-
   const modalClose = () => {
     setOpenModal(false);
   };
