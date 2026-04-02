@@ -303,10 +303,10 @@ export default function Sidebar(props: any) {
               justifyContent="flex-end"
               alignItems="center"
             >
-              <Grid item sm={2}>
+              <Grid size={{ sm: 2 }}>
                 <img src="/viewer/logo.png" style={{ width: "100%" }} />
               </Grid>
-              <Grid item sm={10}>
+              <Grid size={{ sm: 10 }}>
                 <Typography variant="h5" color="primary.light">
                   Results Viewer
                 </Typography>
