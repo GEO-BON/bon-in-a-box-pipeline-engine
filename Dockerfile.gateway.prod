@@ -18,7 +18,7 @@ COPY ui ./
 RUN npm run build
 
 ## Viewer build
-FROM node:current-alpine3.22 AS builder-viewer
+FROM node:25-alpine3.23 AS builder-viewer
 
 WORKDIR /app
 ENV PATH=/app/node_modules/.bin:$PATH
