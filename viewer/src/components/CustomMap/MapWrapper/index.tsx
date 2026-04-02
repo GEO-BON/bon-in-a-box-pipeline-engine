@@ -16,10 +16,6 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import MSMapSlider from "../MSMapSlider";
 import CustomLayer from "../CustomLayer";
 
-import {
-  GetCountryList,
-} from "../../../helpers/api";
-
 /**
  *
  * @param props properties
@@ -37,9 +33,6 @@ function MapWrapper(props: any) {
     map,
   } = props;
   const [opacity, setOpacity] = useState("80");
-  const [activeSearch, setActiveSearch] = useState(false);
-  const [countryList, setCountryList] = useState([]);
-  const [stateList, setStateList] = useState([]);
   const [clickedPlace, setClickedPlace] = useState("");
   const [popupOpen, setPopupOpen] = useState(false);
   const [popupProps, setPopupProps] = useState({
@@ -48,12 +41,6 @@ function MapWrapper(props: any) {
   });
 
   let numPopups = 0;
-
-  useEffect(() => {
-    GetCountryList().then((cl) => {
-      setCountryList(cl.data);
-    });
-  }, []);
 
   const popitup = (e: any, place: string) => {
     setPopupProps({
