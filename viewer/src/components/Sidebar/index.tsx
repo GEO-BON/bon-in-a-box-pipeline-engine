@@ -8,7 +8,7 @@ import {
   Link,
 } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import CustomTable from "../CustomTable";
 import CsvToGeojson, { CsvToMapArray } from "../../helpers/csv_processing";
 import { Item } from "./styles";
@@ -40,11 +40,9 @@ export default function Sidebar(props: any) {
     features: [],
   };
 
-  const navigate = useNavigate();
   const { pipeline_run_id } = useParams<keyof Params>() as Params;
   const containerRef = useRef<HTMLInputElement>(null);
   const [pips, setPips] = useState([]);
-  const { pathname } = useLocation();
   const [outputType, setOutputType] = useState("");
   const [selectedOutput, setSelectedOutput] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -186,6 +184,7 @@ export default function Sidebar(props: any) {
           let divider = i < arr.length - 1 ? <>, </> : "";
           let name = (
             <Typography
+              key={a.name}
               fontSize={11}
               color="primary.contrastText"
               sx={{ display: "inline" }}
@@ -197,13 +196,13 @@ export default function Sidebar(props: any) {
 
           if (a.identifier) {
             return (
-              <Link target="_blank" href={`${a.identifier}`}>
+              <Link key={a.name} target="_blank" href={`${a.identifier}`}>
                 {name}
               </Link>
             );
           } else if (a.email) {
             return (
-              <Link target="_blank" href={`mailto:${a.email}`}>
+              <Link key={a.name} target="_blank" href={`mailto:${a.email}`}>
                 {name}
               </Link>
             );
