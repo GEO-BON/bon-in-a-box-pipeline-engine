@@ -1,0 +1,94 @@
+{
+  "nodes": [
+    {
+      "id": "7",
+      "type": "io",
+      "position": {
+        "x": 561.6000061035156,
+        "y": 247.3000030517578
+      },
+      "data": {
+        "descriptionFile": "assertObject.yml"
+      }
+    },
+    {
+      "id": "8",
+      "type": "userInput",
+      "position": {
+        "x": 168.60000610351562,
+        "y": 251.3000030517578
+      },
+      "dragHandle": ".dragHandle",
+      "data": {
+        "type": "object",
+        "value": "[object Object]"
+      }
+    },
+    {
+      "id": "9",
+      "type": "output",
+      "position": {
+        "x": 977.6000061035156,
+        "y": 245.3000030517578
+      },
+      "data": {
+        "label": "Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "8",
+      "sourceHandle": null,
+      "target": "7",
+      "targetHandle": "some_object",
+      "id": "reactflow__edge-8-7some_object"
+    },
+    {
+      "source": "7",
+      "sourceHandle": "the_same",
+      "target": "9",
+      "targetHandle": null,
+      "id": "reactflow__edge-7the_same-9"
+    }
+  ],
+  "inputs": {
+    "pipeline@8": {
+      "label": "Some object",
+      "description": "The object body to check.",
+      "type": "object",
+      "example": {
+        "some_data": "bla bla"
+      },
+      "properties": [
+        "some_data"
+      ],
+      "weight": 0
+    }
+  },
+  "outputs": {
+    "assertObject.yml@7|the_same": {
+      "description": "The same object as in the inputs.",
+      "label": "Same value",
+      "type": "object",
+      "properties": [
+        "some_data",
+        "more_data"
+      ],
+      "example": {
+        "some_data": "bla bla",
+        "more_data": "even more bla bla"
+      },
+      "weight": 0
+    }
+  },
+  "metadata": {
+    "name": "Object conversion works",
+    "description": "This pipeline tests that object conversion works when the incoming object properties include all required properties.",
+    "author": [
+      {
+        "name": "Jean-Michel Lord"
+      }
+    ]
+  }
+}

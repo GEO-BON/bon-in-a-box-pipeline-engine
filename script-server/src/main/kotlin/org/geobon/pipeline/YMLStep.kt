@@ -5,9 +5,9 @@ import org.geobon.script.Description.IO__LABEL
 import org.geobon.script.Description.IO__PROPERTIES
 import org.geobon.script.Description.IO__TYPE
 import org.geobon.script.Description.IO__TYPE_OPTIONS
+import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
-import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.script.Run
 import org.geobon.server.ServerContext
 import org.json.JSONObject

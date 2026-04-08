@@ -287,27 +287,65 @@ internal class PipelineTest {
                 noHPCContext,
                 "countryToBbox.json",
                 """
-                {
-                  "pipeline@4": {
-                    "country": {
-                      "ISO3": "AUT",
-                      "bboxWGS84": [
-                        9.530734062194824,
-                        46.37230682373047,
-                        17.160776138305664,
-                        49.020530700683594
-                      ],
-                      "englishName": "Austria"
+                    {
+                      "pipeline@4": {
+                        "country": {
+                          "ISO3": "AUT",
+                          "bboxWGS84": [
+                            9.530734062194824,
+                            46.37230682373047,
+                            17.160776138305664,
+                            49.020530700683594
+                          ],
+                          "englishName": "Austria"
+                        }
+                      }
                     }
-                  }
-                }
-            """.trimIndent()
+                """.trimIndent()
             )
             fail("Invalid conversion produced no exception.")
         } catch (ex: RuntimeException) {
             assertContains(ex.message!!, "Wrong type for input ")
             assertContains(ex.message!!, """expected "bboxCRS" but "country" was received""")
         }
+    }
+
+    @Test
+    fun `given a pipeline with invalid object conversion_when validated_then error message`() = runTest {
+        try {
+            createRootPipeline(
+                noHPCContext,
+                "objectConversionFails.json",
+                """
+                    {
+                      "pipeline@8": { "some_random_property": "bla bla" }
+                    }
+                """.trimIndent()
+            )
+            fail("Invalid conversion produced no exception.")
+        } catch (ex: RuntimeException) {
+            assertContains(ex.message!!, "Wrong type for input ")
+            assertContains(ex.message!!, """expected "bboxCRS" but "country" was received""")
+        }
+    }
+
+    @Test
+    fun `given a pipeline with valid object conversion_when ran_then object received`() = runTest {
+        val pipeline = createRootPipeline(
+            noHPCContext,
+            "objectConversionWorks.json",
+            """
+                {
+                  "pipeline@8": {
+                    "some_data": "this is what the script expects",
+                    "more_data": "this is unexpected but accepted anyways"
+                  }
+                }
+            """.trimIndent()
+        )
+        val result = pipeline.getPipelineOutputs()[0].pull()
+        assertNotNull(result)
+        println(result)
     }
 
     @Test
