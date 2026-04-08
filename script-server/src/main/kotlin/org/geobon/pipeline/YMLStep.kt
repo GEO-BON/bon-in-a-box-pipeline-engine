@@ -54,9 +54,11 @@ abstract class YMLStep(
             val expectedType = expectedDefinition.type
 
             errorMessages += inputs[inputKey]?.let { inputPipe ->
-                if (inputPipe.type == expectedType) ""
-                // Check for type conversions
-                else when {
+                when {
+                    // Regular matching type success case
+                    inputPipe.type == expectedType -> ""
+
+                    // Check for type conversions
                     // int to float accepted
                     inputPipe.type == "int" && expectedType == "float" -> ""
 
@@ -70,8 +72,8 @@ abstract class YMLStep(
                     }
 
                     // Accept object type conversions if required fields are there
-                    // FIXME: this will fail for object definitions with properties.
-                    ObjectInputDefinition.fromDef(expectedType, expectedDefinition.properties)?.let { expected ->
+                    // This covers for example location chooser objects
+                    ObjectInputDefinition.fromDef(expectedType, null)?.let { expected ->
                         ObjectInputDefinition.fromDef(inputPipe.type, null)?.let { actual ->
                             expected.accepts(actual.requiredProperties)
                         }
@@ -97,6 +99,7 @@ abstract class YMLStep(
         context = RunContext(yamlFile, resolvedInputs, serverContext)
 
         try { // Validation
+            // Check that the selected option is one of the defined options
             inputs.filter { (_, pipe) -> pipe.type == IO__TYPE_OPTIONS }.forEach { (key, _) ->
                 if(inputDefinitions[key]?.type != IO__TYPE_TEXT) { // Ignore options to text conversion
                     val options = readIODescription(INPUTS, key)?.get(IO__TYPE_OPTIONS) as? List<*>
