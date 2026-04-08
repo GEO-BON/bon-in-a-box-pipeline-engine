@@ -1,0 +1,33 @@
+script: assertCountry.py
+name: Assert Country
+description: "Test python script if it receives a country object."
+author:
+  - name: Jean-Michel Lord
+inputs:
+  some_input:
+    label: Some country
+    description: The country body to check.
+    type: country
+    example:
+      country:
+        ISO3: ARG
+        bboxWGS84:
+          - -73.56036376953125
+          - -55.061431884765625
+          - -53.63736343383789
+          - -21.78104591369629
+        englishName: Argentina
+outputs:
+  the_same:
+    label: Same value
+    description: The same country as in the inputs.
+    type: country
+    example:
+      country:
+        ISO3: ARG
+        bboxWGS84:
+          - -73.56036376953125
+          - -55.061431884765625
+          - -53.63736343383789
+          - -21.78104591369629
+        englishName: Argentina

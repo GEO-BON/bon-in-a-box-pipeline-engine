@@ -10,5 +10,6 @@ if not isinstance(some_object, dict) :
     biab_error_stop('This is not a json object')
 
 print("Yes!")
+
 # Write outputs
-biab_output('some_object', some_object)
+biab_output('the_same', some_object)
