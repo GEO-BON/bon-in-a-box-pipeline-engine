@@ -186,8 +186,6 @@ outputs:
         - type: boolean
         - type: list
         - type: dict
-          dependencies:
-            type: [object]
 
 references:
   required: false
