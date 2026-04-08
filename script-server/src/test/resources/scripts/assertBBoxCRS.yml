@@ -4,7 +4,7 @@ description: "Test python script if it receives a bboxCRS object."
 author:
   - name: Jean-Michel Lord
 inputs:
-  some_country:
+  some_input:
     label: Some bboxCRS
     description: The bboxCRS body to check.
     type: bboxCRS

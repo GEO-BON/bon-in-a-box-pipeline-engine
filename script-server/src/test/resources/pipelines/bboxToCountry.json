@@ -47,8 +47,8 @@
       "source": "2",
       "sourceHandle": null,
       "target": "0",
-      "targetHandle": "some_country",
-      "id": "reactflow__edge-2-0some_country"
+      "targetHandle": "some_input",
+      "id": "reactflow__edge-2-0some_input"
     }
   ],
   "inputs": {

@@ -52,8 +52,8 @@
       "source": "4",
       "sourceHandle": null,
       "target": "3",
-      "targetHandle": "some_country",
-      "id": "reactflow__edge-4-3some_country"
+      "targetHandle": "some_input",
+      "id": "reactflow__edge-4-3some_input"
     },
     {
       "source": "3",
