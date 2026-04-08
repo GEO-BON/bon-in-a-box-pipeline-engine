@@ -1,0 +1,146 @@
+{
+  "nodes": [
+    {
+      "id": "3",
+      "type": "io",
+      "position": {
+        "x": 546.6000061035156,
+        "y": 325.3000030517578
+      },
+      "data": {
+        "descriptionFile": "assertBBoxCRS.yml"
+      }
+    },
+    {
+      "id": "4",
+      "type": "userInput",
+      "position": {
+        "x": 169.60000610351562,
+        "y": 313.3000030517578
+      },
+      "dragHandle": ".dragHandle",
+      "data": {
+        "type": "country",
+        "value": {
+          "country": {
+            "ISO3": "ARG",
+            "bboxWGS84": [
+              -73.56036376953125,
+              -55.061431884765625,
+              -53.63736343383789,
+              -21.78104591369629
+            ],
+            "englishName": "Argentina"
+          }
+        }
+      }
+    },
+    {
+      "id": "5",
+      "type": "output",
+      "position": {
+        "x": 914.6000061035156,
+        "y": 325.3000030517578
+      },
+      "data": {
+        "label": "Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "4",
+      "sourceHandle": null,
+      "target": "3",
+      "targetHandle": "some_country",
+      "id": "reactflow__edge-4-3some_country"
+    },
+    {
+      "source": "3",
+      "sourceHandle": "the_same",
+      "target": "5",
+      "targetHandle": null,
+      "id": "reactflow__edge-3the_same-5"
+    }
+  ],
+  "inputs": {
+    "pipeline@4": {
+      "label": "Some country",
+      "description": "The country body to check.",
+      "type": "country",
+      "example": {
+        "country": {
+          "ISO3": "ARG",
+          "bboxWGS84": [
+            -73.56036376953125,
+            -55.061431884765625,
+            -53.63736343383789,
+            -21.78104591369629
+          ],
+          "englishName": "Argentina"
+        }
+      },
+      "weight": 0
+    }
+  },
+  "outputs": {
+    "assertBBoxCRS.yml@3|the_same": {
+      "description": "The same bboxCRS as in the inputs.",
+      "label": "Same value",
+      "type": "bboxCRS",
+      "example": {
+        "CRS": {
+          "CRSBboxWGS84": [
+            -180,
+            -90,
+            180,
+            90
+          ],
+          "authority": "EPSG",
+          "code": 4326,
+          "name": "WGS 84",
+          "proj4Def": "+proj=longlat +datum=WGS84 +no_defs +type=crs",
+          "unit": "degree (supplier to define representation)",
+          "wktDef": "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]",
+          "bbox": [
+            10.09809,
+            46.65136,
+            12.96664,
+            47.74304
+          ],
+          "country": {
+            "ISO3": "AUT",
+            "bboxWGS84": [
+              9.530734062194824,
+              46.37230682373047,
+              17.160776138305664,
+              49.020530700683594
+            ],
+            "englishName": "Austria"
+          },
+          "region": {
+            "bboxWGS84": [
+              10.0980873108,
+              46.6513595581,
+              12.9666414261,
+              47.7430381775
+            ],
+            "countryEnglishName": "Austria",
+            "regionID": "97560089B46292059412713",
+            "regionName": "Tirol"
+          }
+        }
+      },
+      "weight": 0
+    }
+  },
+  "metadata": {
+    "name": "Country to BBox erroneous conversion",
+    "description": "This pipeline features an invalid Country to BBoxCRS object conversion",
+    "author": [
+      {
+        "name": "Jean-Michel Lord"
+      }
+    ]
+  }
+}
