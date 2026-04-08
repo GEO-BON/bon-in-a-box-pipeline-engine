@@ -76,7 +76,6 @@ enum class ObjectInputType(val typeStr:String, val requiredProperties: JSONObjec
 
     companion object {
         fun fromString(typeStr: String): ObjectInputType? {
-            println("From $typeStr")
             return ObjectInputType.entries.find { it.typeStr == typeStr }
         }
     }

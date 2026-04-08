@@ -14,7 +14,7 @@ class ObjectInputDefinition(val typeStr: String, val requiredProperties: JSONObj
     }
 
     companion object {
-        fun createObjectInputDefinition(typeStr:String, properties:Array<String>?): ObjectInputDefinition? {
+        fun fromDef(typeStr:String, properties: Iterable<String>?): ObjectInputDefinition? {
 
             val requiredProperties = if (typeStr == IO__TYPE_OBJECT) {
                 properties ?: throw RuntimeException("""Inputs of type "object" must define a "properties" array""")

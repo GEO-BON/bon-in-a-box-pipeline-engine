@@ -223,6 +223,94 @@ internal class PipelineTest {
     }
 
     @Test
+    fun `given a pipeline passing bbox to country_when validated and ran_then step receives the full object`() = runTest {
+        val pipeline = createRootPipeline(
+            noHPCContext,
+            "bboxToCountry.json",
+            """
+                {
+                  "pipeline@2": {
+                    "CRS": {
+                      "CRSBboxWGS84": [
+                        -180,
+                        -90,
+                        180,
+                        90
+                      ],
+                      "authority": "EPSG",
+                      "code": 4326,
+                      "name": "WGS 84",
+                      "proj4Def": "+proj=longlat +datum=WGS84 +no_defs +type=crs",
+                      "unit": "degree (supplier to define representation)",
+                      "wktDef": "GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]"
+                    },
+                    "bbox": [
+                      10.09809,
+                      46.65136,
+                      12.96664,
+                      47.74304
+                    ],
+                    "country": {
+                      "ISO3": "AUT",
+                      "bboxWGS84": [
+                        9.530734062194824,
+                        46.37230682373047,
+                        17.160776138305664,
+                        49.020530700683594
+                      ],
+                      "englishName": "Austria"
+                    },
+                    "region": {
+                      "bboxWGS84": [
+                        10.0980873108,
+                        46.6513595581,
+                        12.9666414261,
+                        47.7430381775
+                      ],
+                      "countryEnglishName": "Austria",
+                      "regionID": "97560089B46292059412713",
+                      "regionName": "Tirol"
+                    }
+                  }
+                }
+            """.trimIndent()
+        )
+        val result = pipeline.getPipelineOutputs()[0].pull()
+        assertNotNull(result)
+        println(result)
+    }
+
+    @Test
+    fun `given a pipeline passing country to bbox_when validated_then error message`() = runTest {
+        try {
+            createRootPipeline(
+                noHPCContext,
+                "countryToBbox.json",
+                """
+                {
+                  "pipeline@4": {
+                    "country": {
+                      "ISO3": "AUT",
+                      "bboxWGS84": [
+                        9.530734062194824,
+                        46.37230682373047,
+                        17.160776138305664,
+                        49.020530700683594
+                      ],
+                      "englishName": "Austria"
+                    }
+                  }
+                }
+            """.trimIndent()
+            )
+            fail("Invalid conversion produced no exception.")
+        } catch (ex: RuntimeException) {
+            assertContains(ex.message!!, "Wrong type for input ")
+            assertContains(ex.message!!, """expected "bboxCRS" but "country" was received""")
+        }
+    }
+
+    @Test
     fun `given a pipeline with userInput string_when ran_then input fed to first step`() = runTest {
         val pipeline = createRootPipeline(noHPCContext, "userInput.json", """ { "pipeline@1": 10} """)
         pipeline.pullFinalOutputs()
