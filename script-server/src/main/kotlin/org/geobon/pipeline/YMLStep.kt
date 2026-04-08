@@ -157,7 +157,7 @@ abstract class YMLStep(
 
         data class InputDefinition(val type: String, private val definition: Map<*, *>) {
             val properties
-                get() = (definition[IO__PROPERTIES] as? Array<*>)?.let { properties ->
+                get() = (definition[IO__PROPERTIES] as? Iterable<*>)?.let { properties ->
                     properties.map { it.toString() }
                 }
         }
