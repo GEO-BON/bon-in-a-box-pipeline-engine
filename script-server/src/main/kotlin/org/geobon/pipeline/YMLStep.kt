@@ -73,8 +73,8 @@ abstract class YMLStep(
 
                     // Accept object type conversions if required fields are there
                     // This covers for example location chooser objects
-                    ObjectInputDefinition.fromDef(expectedType, null)?.let { expected ->
-                        ObjectInputDefinition.fromDef(inputPipe.type, null)?.let { actual ->
+                    ObjectInputDefinition.fromDef(expectedType)?.let { expected ->
+                        ObjectInputDefinition.fromDef(inputPipe.type)?.let { actual ->
                             expected.accepts(actual.requiredProperties)
                         }
                     } == true -> ""
@@ -158,7 +158,7 @@ abstract class YMLStep(
 
     companion object {
 
-        data class InputDefinition(val type: String, private val definition: Map<*, *>) {
+        data class IODefinition(val type: String, private val definition: Map<*, *>) {
             val properties
                 get() = (definition[IO__PROPERTIES] as? Iterable<*>)?.let { properties ->
                     properties.map { it.toString() }
@@ -169,10 +169,10 @@ abstract class YMLStep(
         /**
          * @return Map of input name to type
          */
-        private fun readInputTypes(yamlParsed: Map<String, Any>, logger: Logger): Map<String, InputDefinition> {
-            val inputs = mutableMapOf<String, InputDefinition>()
+        private fun readInputTypes(yamlParsed: Map<String, Any>, logger: Logger): Map<String, IODefinition> {
+            val inputs = mutableMapOf<String, IODefinition>()
             readIO(yamlParsed, INPUTS, logger) { key, type, definition ->
-                inputs[key] = InputDefinition(type, definition)
+                inputs[key] = IODefinition(type, definition)
             }
             return inputs
         }
