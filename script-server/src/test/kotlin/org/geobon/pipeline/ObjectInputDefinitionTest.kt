@@ -9,28 +9,6 @@ import kotlin.test.assertTrue
 
 internal class ObjectInputDefinitionTest {
 
-    @Test
-    fun whenObjectMissesProperties_whenValidated_thenRejected() {
-        val def = fromDef("object", listOf("propA", "propB"))
-        assertNotNull(def)
-        assertFalse(def.accepts(JSONObject("""{"propA": "value"}""")))
-    }
-
-    @Test
-    fun whenObjectSatisfiesProperties_whenValidated_thenAccepted() {
-        val def = fromDef("object", listOf("propA", "propB"))
-
-        assertNotNull(def)
-        assertTrue(def.accepts(JSONObject("""{"propA": "value", "propB": "value"}""")))
-    }
-
-    @Test
-    fun whenObjectSatisfiesPropertiesWithExtras_whenValidated_thenAccepted() {
-        val def = fromDef("object", listOf("propA", "propB"))
-        assertNotNull(def)
-        assertTrue(def.accepts(JSONObject("""{"propA": "value", "propB": "value", "propC": "value"}""")))
-    }
-
     @Test // AI generated
     fun whenTypeConversionIsIncompatible_whenValidated_thenRejected() {
         assertFalse(canAcceptOutputOf(ObjectInputType.COUNTRY, ObjectInputType.CRS))
@@ -53,7 +31,7 @@ internal class ObjectInputDefinitionTest {
     }
 
     private fun canAcceptOutputOf(expectedType: ObjectInputType, actualType: ObjectInputType): Boolean {
-        val expected = fromDef(expectedType.typeStr, null)
+        val expected = fromDef(expectedType.typeStr)
         assertNotNull(expected)
         val actual = JSONObject(actualType.requiredProperties.toString())
         return expected.accepts(actual)

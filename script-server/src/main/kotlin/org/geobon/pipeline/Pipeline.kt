@@ -250,8 +250,8 @@ open class Pipeline (
                                 // Instantiating kotlin "special steps".
                                 // Not done with reflection on purpose, since this could allow someone to instantiate any class,
                                 // resulting in a security breach.
-                                scriptFile == "pipeline/AssignId.yml" -> AssignId(serverContext, innerStepId)
-                                scriptFile == "pipeline/PullLayersById.yml" -> PullLayersById(serverContext, innerStepId)
+                                // TODO: This will be needed for openEO steps, so keeping this comment as an example:
+                                //scriptFile == "pipeline/AssignId.yml" -> AssignId(serverContext, innerStepId)
 
                                 // Regular script steps
                                 else -> ScriptStep(scriptFile, innerStepId, serverContext)

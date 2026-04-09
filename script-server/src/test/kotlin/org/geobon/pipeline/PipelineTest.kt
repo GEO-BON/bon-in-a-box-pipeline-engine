@@ -311,44 +311,6 @@ internal class PipelineTest {
     }
 
     @Test
-    fun `given a pipeline with invalid object conversion_when validated_then error message`() = runTest {
-        try {
-            createRootPipeline(
-                noHPCContext,
-                "objectConversionFails.json",
-                """
-                    {
-                      "pipeline@8": { "some_random_property": "bla bla" }
-                    }
-                """.trimIndent()
-            )
-            fail("Invalid conversion produced no exception.")
-        } catch (ex: RuntimeException) {
-            assertContains(ex.message!!, "Wrong type for input ")
-            assertContains(ex.message!!, """expected "bboxCRS" but "country" was received""")
-        }
-    }
-
-    @Test
-    fun `given a pipeline with valid object conversion_when ran_then object received`() = runTest {
-        val pipeline = createRootPipeline(
-            noHPCContext,
-            "objectConversionWorks.json",
-            """
-                {
-                  "pipeline@8": {
-                    "some_data": "this is what the script expects",
-                    "more_data": "this is unexpected but accepted anyways"
-                  }
-                }
-            """.trimIndent()
-        )
-        val result = pipeline.getPipelineOutputs()[0].pull()
-        assertNotNull(result)
-        println(result)
-    }
-
-    @Test
     fun `given a pipeline with userInput string_when ran_then input fed to first step`() = runTest {
         val pipeline = createRootPipeline(noHPCContext, "userInput.json", """ { "pipeline@1": 10} """)
         pipeline.pullFinalOutputs()

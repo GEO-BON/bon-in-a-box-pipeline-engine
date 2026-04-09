@@ -100,21 +100,14 @@ inputs:
         required: true
         type: string
         oneof:
-        - forbidden: [options, "options[]", object, "object[]"]
+        - forbidden: [options, "options[]"]
         - allowed: [options, "options[]"]
           dependencies: options
-        - allowed: [object, "object[]"]
-          dependencies: properties
       options:
         required: false
         type: list
         dependencies:
           type: [options, "options[]"]
-      properties:
-        required: false
-        type: list
-        dependencies:
-          type: [object, "object[]"]
       example:
         required: true
         nullable: true
@@ -154,21 +147,14 @@ outputs:
           # normal case, with explicit type
           - type: string
             oneof:
-            - forbidden: [options, "options[]", object, "object[]"]
+            - forbidden: [options, "options[]"]
             - allowed: [options, "options[]"]
               dependencies: options
-            - allowed: [object, "object[]"]
-              dependencies: properties
       options:
         required: false
         type: list
         dependencies:
           type: [options, "options[]"]
-      properties:
-        required: false
-        type: list
-        dependencies:
-          type: [object, "object[]"]
       range:
         required: false
         type: list
