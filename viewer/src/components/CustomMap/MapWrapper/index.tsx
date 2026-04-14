@@ -1,5 +1,5 @@
 /* eslint-disable dot-notation */
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   ScaleControl,
   ZoomControl,
@@ -15,11 +15,6 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import MSMapSlider from "../MSMapSlider";
 import CustomLayer from "../CustomLayer";
-import Digitizer from "../../Digitizer";
-
-import {
-  GetCountryList,
-} from "../../../helpers/api";
 
 /**
  *
@@ -34,13 +29,9 @@ function MapWrapper(props: any) {
     setGeojson,
     generateStats,
     geojsonOutput,
-    mapWidth,
     map,
   } = props;
   const [opacity, setOpacity] = useState("80");
-  const [activeSearch, setActiveSearch] = useState(false);
-  const [countryList, setCountryList] = useState([]);
-  const [stateList, setStateList] = useState([]);
   const [clickedPlace, setClickedPlace] = useState("");
   const [popupOpen, setPopupOpen] = useState(false);
   const [popupProps, setPopupProps] = useState({
@@ -49,12 +40,6 @@ function MapWrapper(props: any) {
   });
 
   let numPopups = 0;
-
-  useEffect(() => {
-    GetCountryList().then((cl) => {
-      setCountryList(cl.data);
-    });
-  }, []);
 
   const popitup = (e: any, place: string) => {
     setPopupProps({
@@ -74,12 +59,7 @@ function MapWrapper(props: any) {
   };
 
   return (
-    <Box
-      style={{
-        width: mapWidth,
-        left: 100 - mapWidth,
-      }}
-    >
+    <Box>
       <CustomLayer {...props} map={map} opacity={opacity} />
       <MSMapSlider
         absolute={true}
@@ -93,12 +73,6 @@ function MapWrapper(props: any) {
       />
       <ZoomControl position="topright" />
       <ScaleControl position="bottomright" />
-      <Digitizer
-        geojson={geojson}
-        setGeojson={setGeojson}
-        handleDeletePlace={handleDeletePlace}
-        popitup={popitup}
-      />
       {popupOpen && (
         <Popup key={`popup-${popupProps.key}`} position={popupProps.position}>
           <Box>

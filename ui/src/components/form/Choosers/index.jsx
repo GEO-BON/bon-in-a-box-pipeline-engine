@@ -7,8 +7,6 @@ import CountryRegionMenu from "./CountryRegionMenu";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
 import { CustomButtonGreen } from "../../CustomMUI";
-import ReactMarkdown from "react-markdown";
-import Alert from "@mui/material/Alert";
 import { defaultCRS, defaultCountry, defaultRegion } from "./utils";
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import Modal from "@mui/material/Modal";

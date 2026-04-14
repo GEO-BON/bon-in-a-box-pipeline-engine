@@ -5,7 +5,6 @@ import { InputsDescription } from "../StepDescription";
 import ReactMarkdown from "react-markdown";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
-import _, { set } from "lodash";
 import _lang from "lodash/lang";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
@@ -223,7 +222,7 @@ const DescriptionSection = ({ description, inputId }) => {
         }}
       >
         {description ? (
-          <ReactMarkdown className="reactMarkdown">{description}</ReactMarkdown>
+          <div className="reactMarkdown"><ReactMarkdown>{description}</ReactMarkdown></div>
         ) : (
           <Alert severity="warning">
             Missing description for input "{inputId}"

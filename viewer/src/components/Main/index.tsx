@@ -1,9 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import Card from "@mui/material/Card";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
+import { useState, useEffect } from "react";
 import Sidebar from "../Sidebar";
 import MapWrapper from "../CustomMap/MapWrapper";
 import L from "leaflet";
@@ -13,22 +8,19 @@ import {
   GetCountryGeojson,
   GetStateGeojson,
   GetCOGBounds,
-  GetCOGStatsGeojson,
   GetMultipleCOGStatsGeojson,
 } from "../../helpers/api";
 import {
   createPipeline4Display,
-  GetPipelineRunInputs,
 } from "../../helpers/biab_api";
 import StatsModal from "../StatsModal";
 import { cmap } from "../../helpers/colormaps";
 import { createRangeLegendControl } from "../SimpleLegend";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import type { FeatureCollection } from "geojson";
 import { useMap } from "react-leaflet";
 
-export default function Main(props: any) {
-  const { textInCard, cardBGHref, onClick } = props;
+export default function Main() {
   const quantcmaps = ["inferno", "spectral", "terrain", "coolwarm"];
   const qualcmaps = ["tab10", "tab20", "tab20b"];
   const [collection, setCollection] = useState("chelsa-clim");
@@ -49,13 +41,11 @@ export default function Main(props: any) {
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [rasterStats, setRasterStats] = useState({});
-  const [rasterBand, setRasterBand] = useState("b1");
   const [timeSeriesStats, setTimeSeriesStats] = useState({});
   const [openStatsModal, setOpenStatsModal] = useState(false);
   const [showStatsButton, setShowStatsButton] = useState(true);
   const [pipelineData, setPipelineData] = useState({});
   const [pipelineRunId, setPipelineRunId] = useState("");
-  const [bounds, setBounds] = useState([]);
 
   const emptyFC: FeatureCollection = {
     type: "FeatureCollection",
@@ -136,7 +126,7 @@ export default function Main(props: any) {
       setSelectedLayerTiles("");
       clearLayers();
     }
-  }, [selectedLayer, logTransform, colormap, rasterBand]);
+  }, [selectedLayer, logTransform, colormap]);
 
   const clearLayers = () => {
     map.eachLayer(function (layer: any) {

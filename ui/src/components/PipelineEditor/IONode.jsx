@@ -20,7 +20,7 @@ export default function IONode({ id, data }) {
   }, [descriptionFileLocation])
 
   function showScriptTooltip() {
-    data.setToolTip(<ReactMarkdown className="reactMarkdown noLink" children={metadata.description} />)
+    data.setToolTip(<div className="reactMarkdown noLink"><ReactMarkdown>{metadata.description}</ReactMarkdown></div>)
   }
 
   function hideTooltip() {
@@ -90,7 +90,7 @@ function ScriptIO({children, desc, setToolTip, onDoubleClick, warning}) {
     setToolTip(<>
       {warning && <><span className='warning'>{warning}</span><br/></>}
       {desc.type && <>{renderType(desc.type)} <br /></>}
-      {desc.description && <><ReactMarkdown className="reactMarkdown noLink" children={desc.description} /></>}
+      {desc.description && <div className="reactMarkdown noLink"><ReactMarkdown>{desc.description}</ReactMarkdown></div>}
       {desc.example && <>Example: {renderExample(desc.example)}</>}
     </>)
   }

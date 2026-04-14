@@ -133,7 +133,7 @@ export const SingleIOResult = memo(
           mime.startsWith("text/csv") ||
           mime.startsWith("text/tab-separated-values")
         ) {
-          let splitMime = mime.slice(0, -2);
+          let actualMime = mime.slice(0, -2);
           return content.map((splitContent, i) => {
             return (
               <FoldableOutput
@@ -145,7 +145,7 @@ export const SingleIOResult = memo(
                 }
                 className="foldableOutput"
               >
-                {renderWithMime(splitContent, splitMime)}
+                {renderWithMime(splitContent, actualMime)}
               </FoldableOutput>
             );
           });
@@ -281,10 +281,11 @@ export const SingleIOResult = memo(
 
       if (ioMetadata.description) {
         description = (
-          <ReactMarkdown
-            className="reactMarkdown outputDescription"
-            children={ioMetadata.description}
-          />
+          <div className="reactMarkdown outputDescription">
+            <ReactMarkdown>
+              {ioMetadata.description}
+            </ReactMarkdown>
+          </div>
         );
       } else {
         errorMsg = (

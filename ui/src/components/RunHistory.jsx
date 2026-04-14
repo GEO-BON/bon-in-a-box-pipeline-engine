@@ -305,7 +305,7 @@ const RunCard = (props) => {
           <Collapse in={expanded} timeout="auto" unmountOnExit>
             {expanded && (
               <CardContent>
-                <ReactMarkdown className="historyDescription">
+                <ReactMarkdown>
                   {desc}
                 </ReactMarkdown>
                 <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>

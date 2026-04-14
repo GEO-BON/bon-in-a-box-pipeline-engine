@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import { paperStyle } from "./utils";
-import _ from "lodash";
+import _lang from "lodash/lang";
 
 export default function BBox({ states, dispatch, value = null, setMessage }) {
   const bboxSavedValue =
@@ -16,7 +16,7 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
       if (states.bbox && states.bbox.length === 4) {
         b = states.bbox;
       }
-      if (!_.isEqual(bbInput, b)) {
+      if (!_lang.isEqual(bbInput, b)) {
         updateBBox(null, b, true);
       }
     }
@@ -48,7 +48,9 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
         value={bbInput[0]}
         onChange={(e) => updateBBox(0, e.target.value)}
         sx={{ marginTop: "15px", marginBottom: "10px", width: "100%" }}
-        inputProps={inputProps}
+        slotProps={{
+          htmlInput: inputProps
+        }}
       />
       <TextField
         type="number"
@@ -57,7 +59,9 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
         value={bbInput[1]}
         onChange={(e) => updateBBox(1, e.target.value)}
         sx={{ marginBottom: "10px", width: "100%" }}
-        inputProps={inputProps}
+        slotProps={{
+          htmlInput: inputProps
+        }}
       />
       <TextField
         type="number"
@@ -66,7 +70,9 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
         value={bbInput[2]}
         onChange={(e) => updateBBox(2, e.target.value)}
         sx={{ marginBottom: "10px", width: "100%" }}
-        inputProps={inputProps}
+        slotProps={{
+          htmlInput: inputProps
+        }}
       />
       <TextField
         type="number"
@@ -75,7 +81,9 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
         value={bbInput[3]}
         onChange={(e) => updateBBox(3, e.target.value)}
         sx={{ marginBottom: "10px", width: "100%" }}
-        inputProps={inputProps}
+        slotProps={{
+          htmlInput: inputProps
+        }}
       />
     </div>
   );

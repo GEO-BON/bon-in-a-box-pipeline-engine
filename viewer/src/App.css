@@ -38,8 +38,3 @@
     transform: rotate(360deg);
   }
 }
-
-.leaflet-draw-draw-rectangle,
-.leaflet-draw-draw-polygon {
-  display: none !important;
-}
