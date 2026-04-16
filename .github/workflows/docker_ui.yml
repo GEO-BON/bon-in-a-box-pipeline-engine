@@ -22,7 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       repo_slug: ${{ steps.slug.outputs.repo_slug }}
-      tag_version: ${{ steps.set_version_tag.outputs.tag_version }}
+      tag_version: ${{ steps.set_versions.outputs.tag_version }}
+      date: ${{ steps.set_versions.outputs.date }}
     steps:
       - name: Compute lowercase GHCR slug
         id: slug
@@ -30,20 +31,19 @@ jobs:
         run: |
           echo "repo_slug=ghcr.io/${GITHUB_REPOSITORY@L}" >> "$GITHUB_OUTPUT"
 
-      - name: Read BON in a Box version
-        id: set_biab_version
-        run: echo "biab_version=$(cat version.txt)" >> "$GITHUB_OUTPUT"
-
-      - name: Set Version tag
-        id: set_version_tag
+      - name: Read versions
+        id: set_versions
         run: |
+          echo "date=$(date +'%Y-%m-%d %R')" >> "$GITHUB_OUTPUT"
+
+          biab_version=$(cat version.txt)
           if [ "${{ github.ref_name }}" == "main" ]; then
-            echo "tag_version=${{ steps.set_biab_version.outputs.biab_version }}" >> "$GITHUB_OUTPUT"
+            echo "tag_version=$biab_version" >> "$GITHUB_OUTPUT"
           else
             if [ "${{ github.ref_name }}" == "edge" ]; then
-              echo "tag_version=${{ steps.set_biab_version.outputs.biab_version }}-SNAPSHOT" >> "$GITHUB_OUTPUT"
+              echo "tag_version=$biab_version-SNAPSHOT" >> "$GITHUB_OUTPUT"
             else
-              echo "tag_version=${{ steps.set_biab_version.outputs.biab_version }}-${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+              echo "tag_version=$biab_version-${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
             fi
           fi
 
@@ -52,6 +52,7 @@ jobs:
     env:
       REPO_SLUG: ${{ needs.prepare.outputs.repo_slug }}
       TAG_VERSION: ${{ needs.prepare.outputs.tag_version }}
+      DATE: ${{ needs.prepare.outputs.date }}
     timeout-minutes: 60
     strategy:
       matrix:
@@ -112,7 +113,7 @@ jobs:
           file: Dockerfile.gateway.prod
           platforms: ${{ matrix.platform }}
           build-args: |
-            "BIAB_VERSION=${{ env.TAG_VERSION }}"
+            "BIAB_VERSION=${{ env.TAG_VERSION }} (${{ env.DATE }})"
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
