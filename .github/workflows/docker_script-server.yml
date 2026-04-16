@@ -117,7 +117,7 @@ jobs:
           file: script-server/Dockerfile.prod
           platforms: ${{ matrix.platform }}
           build-args: |
-            BIAB_VERSION=${{ env.TAG_VERSION }} (${{ env.DATE }})
+            "BIAB_VERSION=${{ env.TAG_VERSION }} (${{ env.DATE }})"
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
