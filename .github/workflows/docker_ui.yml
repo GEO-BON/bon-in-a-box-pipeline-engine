@@ -24,6 +24,7 @@ jobs:
       repo_slug: ${{ steps.slug.outputs.repo_slug }}
       tag_version: ${{ steps.set_versions.outputs.tag_version }}
       date: ${{ steps.set_versions.outputs.date }}
+      version_sha: ${{ steps.set_versions.outputs.version_sha }}
     steps:
       - name: Compute lowercase GHCR slug
         id: slug
@@ -41,6 +42,7 @@ jobs:
         id: set_versions
         run: |
           echo "date=$(date +'%Y-%m-%d %R')" >> "$GITHUB_OUTPUT"
+          echo "version_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
           biab_version=$(cat version.txt)
           if [ "${{ github.ref_name }}" == "main" ]; then
@@ -59,6 +61,7 @@ jobs:
       REPO_SLUG: ${{ needs.prepare.outputs.repo_slug }}
       TAG_VERSION: ${{ needs.prepare.outputs.tag_version }}
       DATE: ${{ needs.prepare.outputs.date }}
+      VERSION_SHA: ${{ needs.prepare.outputs.version_sha }}
     timeout-minutes: 60
     strategy:
       matrix:
@@ -106,7 +109,7 @@ jobs:
           images: ${{ env.REPO_SLUG }}/${{ env.IMAGE_NAME }}
           tags: |
             # In case we want to replicate a specific legacy setup
-            type=sha,value=${{ github.sha }}-${{ matrix.arch_tag }}
+            type=raw,value=${{ env.VERSION_SHA }}-${{ matrix.arch_tag }}
           labels: |
             org.opencontainers.image.licenses=GPL-v3
             org.opencontainers.image.title=BON in a Box Gateway
@@ -132,6 +135,7 @@ jobs:
     env:
       REPO_SLUG: ${{ needs.prepare.outputs.repo_slug }}
       TAG_VERSION: ${{ needs.prepare.outputs.tag_version }}
+      VERSION_SHA: ${{ needs.prepare.outputs.version_sha }}
     permissions:
       contents: read
       packages: write
@@ -157,6 +161,6 @@ jobs:
           docker buildx imagetools create \
             -t "${BASE}:${TAG_MAIN}" \
             -t "${BASE}:${TAG_VERSION}" \
-            -t "${BASE}:sha-${{ github.sha }}" \
-            "${BASE}:${{ github.sha }}-amd64" \
-            "${BASE}:${{ github.sha }}-arm64"
+            -t "${BASE}:sha-${{ env.VERSION_SHA }}" \
+            "${BASE}:${{ env.VERSION_SHA }}-amd64" \
+            "${BASE}:${{ env.VERSION_SHA }}-arm64"
