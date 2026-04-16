@@ -1,83 +1,161 @@
 name: Publish script server to Github Packages
-
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-      - '*staging'
       - edge
+      - '*staging'
     paths:
       - "script-server/**"
       - ".github/workflows/docker_script-server.yml"
-  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/script-server
+  IMAGE_NAME: script-server
 
 jobs:
-  script-server:
+
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      repo_slug: ${{ steps.slug.outputs.repo_slug }}
+      tag_version: ${{ steps.set_versions.outputs.tag_version }}
+      date: ${{ steps.set_versions.outputs.date }}
+      version_sha: ${{ steps.set_versions.outputs.version_sha }}
+    steps:
+      - name: Compute lowercase GHCR slug
+        id: slug
+        shell: bash
+        run: |
+          echo "repo_slug=ghcr.io/${GITHUB_REPOSITORY@L}" >> "$GITHUB_OUTPUT"
+
+      - name: Check out the repo
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: 'version.txt'
+          sparse-checkout-cone-mode: false
+
+      - name: Read versions
+        id: set_versions
+        run: |
+          echo "date=$(date +'%Y-%m-%d %R')" >> "$GITHUB_OUTPUT"
+          echo "version_sha=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+          biab_version=$(cat version.txt)
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            echo "tag_version=$biab_version" >> "$GITHUB_OUTPUT"
+          else
+            if [ "${{ github.ref_name }}" == "edge" ]; then
+              echo "tag_version=$biab_version-SNAPSHOT" >> "$GITHUB_OUTPUT"
+            else
+              echo "tag_version=$biab_version-${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            fi
+          fi
+
+  build:
+    needs: prepare
+    env:
+      REPO_SLUG: ${{ needs.prepare.outputs.repo_slug }}
+      TAG_VERSION: ${{ needs.prepare.outputs.tag_version }}
+      DATE: ${{ needs.prepare.outputs.date }}
+      VERSION_SHA: ${{ needs.prepare.outputs.version_sha }}
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        include:
+          # Get base image platforms with
+          # docker buildx imagetools inspect eclipse-temurin:21-jre | grep Platform
+          - platform: linux/amd64 # Most windows and linux machines, including Apple Silicon with Rosetta
+            runs_on: ubuntu-latest
+            arch_tag: amd64
+          - platform: linux/arm64 # Apple Silicon and some newer Windows ARM-based machines
+            runs_on: ubuntu-24.04-arm
+            arch_tag: arm64/v8
+          # - platform: windows/amd64 # This is not a windows container
+          # - platform: linux/ppc64le # PowerPC 64-bit Little Endian, used in some servers and high-performance computing
+          # - platform: linux/riscv64 # RISC-V 64-bit, used in some embedded systems and experimental hardware
+          # - platform: linux/s390x # IBM Z 64-bit, used in mainframes
+    runs-on: ${{ matrix.runs_on }}
     permissions:
       contents: read
       packages: write
-      attestations: write
-      id-token: write
 
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Log in to GitHub Packages
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Read BON in a Box version
-        run: echo "BIAB_VERSION=$(cat version.txt)" >> $GITHUB_ENV
-
-      - name: Set Docker tag
-        id: set-tag
-        run: |
-          if [ "${{ github.ref_name }}" == "main" ]; then
-            echo "TAG_BRANCH=latest" >> $GITHUB_ENV
-            echo "TAG_VERSION=${{ env.BIAB_VERSION }}" >> $GITHUB_ENV
-          else
-            echo "TAG_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
-            if [ "${{ github.ref_name }}" == "edge" ]; then
-              echo "TAG_VERSION=${{ env.BIAB_VERSION }}-SNAPSHOT" >> $GITHUB_ENV
-            else
-              echo "TAG_VERSION=${{ env.BIAB_VERSION }}-${{ github.ref_name }}" >> $GITHUB_ENV
-            fi
-          fi
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker-container # compatible for caching to GHA/registry
 
       - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
+        id: metadata
+        uses: docker/metadata-action@v6
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+          images: ${{ env.REPO_SLUG }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=${{ env.TAG_BRANCH }}
-            type=semver,pattern={{version}},value=${{ env.TAG_VERSION }}
-            type=sha,value=${{ github.sha }}
+            # In case we want to replicate a specific legacy setup
+            type=raw,value=${{ env.VERSION_SHA }}-${{ matrix.arch_tag }}
+          labels: |
+            org.opencontainers.image.licenses=GPL-v3
+            org.opencontainers.image.title=BON in a Box Script Server
 
       - name: Build and push Docker image
         id: push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: script-server
           file: script-server/Dockerfile.prod
+          platforms: ${{ matrix.platform }}
           build-args: |
-            "BIAB_VERSION=${{ env.TAG_VERSION }}"
+            BIAB_VERSION=${{ env.TAG_VERSION }} (${{ env.DATE }})
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REPO_SLUG }}/${{ env.IMAGE_NAME }}:buildcache-${{ matrix.arch_tag }}
+          cache-to: type=registry,ref=${{ env.REPO_SLUG }}/${{ env.IMAGE_NAME }}:buildcache-${{ matrix.arch_tag }},mode=max
 
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v2
+  manifest:
+    runs-on: ubuntu-latest
+    needs: [build, prepare]
+    env:
+      REPO_SLUG: ${{ needs.prepare.outputs.repo_slug }}
+      TAG_VERSION: ${{ needs.prepare.outputs.tag_version }}
+      VERSION_SHA: ${{ needs.prepare.outputs.version_sha }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
         with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver: docker-container # compatible for caching to GHA/registry
+
+      - name: Create and push manifest
+        run: |
+          TAG_MAIN="${{ github.ref_name == 'main' && 'latest' || github.ref_name }}"
+          TAG_VERSION="${{ env.TAG_VERSION }}"
+          BASE="${{ env.REPO_SLUG }}/${{ env.IMAGE_NAME }}"
+
+          docker buildx imagetools create \
+            -t "${BASE}:${TAG_MAIN}" \
+            -t "${BASE}:${TAG_VERSION}" \
+            -t "${BASE}:sha-${{ env.VERSION_SHA }}" \
+            "${BASE}:${{ env.VERSION_SHA }}-amd64" \
+            "${BASE}:${{ env.VERSION_SHA }}-arm64"
