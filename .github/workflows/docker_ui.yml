@@ -70,17 +70,17 @@ jobs:
           # docker buildx imagetools inspect nginxinc/nginx-unprivileged | grep Platform
           # Excluding windows/amd64 for now since we would need a separate builder.
           # Excluding linux/386 since this points to old 32-bit processor machines and it fails to compile.
-          - platform: linux/amd64
+          - platform: linux/amd64 # Most windows and linux machines, including Apple Silicon with Rosetta
             runs_on: ubuntu-latest
             arch_tag: amd64
-          - platform: linux/arm64
+          - platform: linux/arm64 # Apple Silicon and some newer Windows ARM-based machines
             runs_on: ubuntu-24.04-arm
             arch_tag: arm64
-          # - platform: linux/arm/v7
-          # - platform: linux/386
-          # - platform: linux/ppc64le
-          # - platform: linux/riscv64
-          # - platform: linux/s390x
+          # - platform: linux/ppc64le # PowerPC 64-bit Little Endian, used in some servers and high-performance computing
+          # - platform: linux/arm/v7 # 32-bit, used in older Raspberry Pi models and some embedded devices
+          # - platform: linux/386 # 32-bit, used in older PCs and some embedded devices
+          # - platform: linux/riscv64 # RISC-V 64-bit, used in some embedded systems and experimental hardware
+          # - platform: linux/s390x # IBM Z 64-bit, used in mainframes
     runs-on: ${{ matrix.runs_on }}
     permissions:
       contents: read
