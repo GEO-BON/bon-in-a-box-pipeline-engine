@@ -71,7 +71,7 @@ jobs:
             arch_tag: amd64
           - platform: linux/arm64 # Apple Silicon and some newer Windows ARM-based machines
             runs_on: ubuntu-24.04-arm
-            arch_tag: arm64/v8
+            arch_tag: arm64-v8
           # - platform: windows/amd64 # This is not a windows container
           # - platform: linux/ppc64le # PowerPC 64-bit Little Endian, used in some servers and high-performance computing
           # - platform: linux/riscv64 # RISC-V 64-bit, used in some embedded systems and experimental hardware
@@ -117,7 +117,7 @@ jobs:
           file: script-server/Dockerfile.prod
           platforms: ${{ matrix.platform }}
           build-args: |
-            "BIAB_VERSION=${{ env.TAG_VERSION }} (${{ env.DATE }})"
+            BIAB_VERSION=${{ env.TAG_VERSION }} (${{ env.DATE }})
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
