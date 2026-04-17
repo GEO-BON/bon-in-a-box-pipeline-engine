@@ -1,4 +1,4 @@
-ARG TITILER_VERSION=0.18.9
+ARG TITILER_VERSION=2.0.1
 
 FROM ghcr.io/developmentseed/titiler:${TITILER_VERSION} AS builder
 

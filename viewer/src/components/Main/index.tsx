@@ -75,7 +75,7 @@ export default function Main() {
     if (selectedLayer.url !== "" && typeof selectedLayer.url !== "undefined") {
       GetCOGStats(selectedLayer.url, selectedLayer.band_id, logTransform).then(
         (l: any) => {
-          const tiler = `/tiler/cog/tiles/{z}/{x}/{y}`;
+          const tiler = `/tiler/cog/tiles/WebMercatorQuad/{z}/{x}/{y}`;
           let data = [];
           if (Object.keys(l).includes("data")) {
             data = l.data[Object.keys(l.data)[0]];
@@ -115,7 +115,6 @@ export default function Main() {
         }
       );
       GetCOGBounds(selectedLayer.url).then((b: any) => {
-        b = b.data.bounds;
         var mapBounds = L.latLngBounds([
           [b[1], b[0]],
           [b[3], b[2]],
