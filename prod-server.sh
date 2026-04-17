@@ -106,16 +106,11 @@ function prepareCommands {
         export MY_UID="$(id -u)"
     fi
 
-    # Apple M2 chip check, see https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/issues/85
     composeFiles="-f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml"
-    macCPU=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
-    if ! [[ -z "$macCPU" ]]; then
-        # This is a Mac, check chip type
-        if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
-            echo "Apple M* chip detected"
-            composeFiles+=" -f .server/compose.apple.yml"
-        fi
-    fi
+    # macCPU=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
+    # if ! [[ -z "$macCPU" ]]; then
+    #     # This is a Mac, here we could do some specific things if needed
+    # fi
 }
 
 # Run your docker commands on the server manually.
@@ -187,7 +182,6 @@ function checkout {
     git checkout $branch -- .prod-paths.env ; assertSuccess
     git checkout $branch -- compose.yml ; assertSuccess
     git checkout $branch -- compose.prod.yml ; assertSuccess
-    git checkout $branch -- compose.apple.yml; assertSuccess
     git checkout $branch -- version.txt; ## Don't assert. Only informative, plus hasn't always been there.
 
     git checkout $branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
