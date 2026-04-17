@@ -356,7 +356,7 @@ function up {
                     local containerNoTag=$(echo $container | cut -d':' -f1)
                     echo -e "${YELLOW} - $containerNoTag${ENDCOLOR}"
                 done
-                echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
+                echo -e "${YELLOW}This means that environments and dependencies installed at runtime in these containers will need to be reinstalled.${ENDCOLOR}"
             fi
 
             if [[ " $@ " == *" -y "* || " $@ " == *" --yes "* ]]; then
