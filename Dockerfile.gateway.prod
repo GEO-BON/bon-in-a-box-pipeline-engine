@@ -8,12 +8,12 @@ ENV PATH=/app/node_modules/.bin:$PATH
 COPY ui/package.json ui/package-lock.jso[n] ./
 RUN npm ci
 
-# add BON in a Box script service
+# Add BON in a Box script service
 COPY ui/BonInABoxScriptService ./BonInABoxScriptService
 RUN cd BonInABoxScriptService; npm run build; cd ..; \
     npm install ./BonInABoxScriptService;
 
-# add app
+# Add app
 COPY ui ./
 RUN npm run build
 
@@ -45,10 +45,7 @@ USER root
 ARG BIAB_VERSION
 RUN echo $BIAB_VERSION > /version.txt
 
-ARG TARGETOS
-ARG TARGETARCH
-ARG TARGETVARIANT
 ARG TARGETPLATFORM
-RUN echo "Architecture: ${TARGETPLATFORM} (${TARGETOS}/${TARGETARCH}${TARGETVARIANT:+/$TARGETVARIANT})" >> /version.txt
+RUN echo "Architecture: ${TARGETPLATFORM}" >> /version.txt
 
 USER nginx
