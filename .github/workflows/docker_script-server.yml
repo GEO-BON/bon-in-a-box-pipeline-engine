@@ -158,4 +158,4 @@ jobs:
             -t "${BASE}:${TAG_VERSION}" \
             -t "${BASE}:sha-${{ env.VERSION_SHA }}" \
             "${BASE}:${{ env.VERSION_SHA }}-amd64" \
-            "${BASE}:${{ env.VERSION_SHA }}-arm64"
+            "${BASE}:${{ env.VERSION_SHA }}-arm64-v8"
