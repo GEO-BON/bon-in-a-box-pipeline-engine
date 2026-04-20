@@ -4,13 +4,15 @@ import ReactMarkdown from "react-markdown";
 import "./InputFileInputs.css";
 import _lang from "lodash/lang";
 import Alert from "@mui/material/Alert";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 
-export default InputDescription = ({ description, inputId }) => {
-  const descriptionCollapseThreshold = 100;
+export default function InputDescription({ description, inputId }) {
+  const descriptionCollapseThreshold = 90; // px
+  const descriptionCollapseTolerance = 30; // px
   const [expanded, setExpanded] = useState(false);
   const [canCollapse, setCanCollapse] = useState(false);
-  const [expandedHeight, setExpandedHeight] = useState(0);
   const contentRef = useRef(null);
 
   useEffect(() => {
@@ -20,7 +22,7 @@ export default InputDescription = ({ description, inputId }) => {
         return;
       }
       const hasOverflow =
-        contentRef.current.scrollHeight > descriptionCollapseThreshold + 1;
+        contentRef.current.scrollHeight > descriptionCollapseThreshold + descriptionCollapseTolerance;
 
       setCanCollapse(hasOverflow);
       if (!hasOverflow) {
@@ -35,10 +37,9 @@ export default InputDescription = ({ description, inputId }) => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", evaluateOverflow);
     };
-  }, [description, descriptionCollapseThreshold]);
+  }, [description, descriptionCollapseThreshold, descriptionCollapseTolerance]);
 
   const expandCollapse = () => {
-    setExpandedHeight(contentRef.current.scrollHeight);
     setExpanded((oldValue) => !oldValue);
   };
 
@@ -51,6 +52,7 @@ export default InputDescription = ({ description, inputId }) => {
         className={`inputDescriptionContent ${isExpanded ? "expanded" : "collapsed"}`}
         style={{
           "--description-collapse-threshold": `${descriptionCollapseThreshold}px`,
+          "--description-collapse-tolerance": `${descriptionCollapseTolerance}px`,
         }}
       >
         {description ? (
