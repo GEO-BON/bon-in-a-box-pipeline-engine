@@ -35,12 +35,9 @@ export function PipelineOutput(props: any) {
   }
 
   // Fold array of 1 into single value
-  if (arrayOutputs.length === 1) {
+  if (Array.isArray(arrayOutputs) && arrayOutputs.length === 1) {
     arrayOutputs = arrayOutputs[0];
   }
-  console.log("OUTPUT OBJ", outputObj, arrayOutputs,
-  !Array.isArray(arrayOutputs), outputObj?.type.startsWith("image/"),
-            "type" in outputObj);
 
   const handleSelect = (value: string) => {
     setSelectedOutput(value);

@@ -16,26 +16,25 @@ function GeoPackageLayer(props) {
     clearLayers();
     setSqljsWasmLocateFile((file) => sqlWasmUrl);
     if (geoPackage !== "" && map) {
-      const markerStyle = {
-        radius: 2.5,
-        fillColor: "#ff7800",
-        color: "#000",
-        weight: 1,
-        opacity: 0.3,
-        fillOpacity: 0.5,
-      };
       const loadGeoPackage = async () => {
         try {
           const geoP = await GeoPackageAPI.open(geoPackage);
+          var bounds = L.latLngBounds();
           const layers = geoP.getFeatureTables();
           layers.forEach((ly) => {
-            L.geoPackageFeatureLayer([], {
+            const gpkgLayer = L.geoPackageFeatureLayer([], {
               geoPackageUrl: geoPackage,
               layerName: ly,
               attribution: "io",
-            }).addTo(map);
+            });
+            gpkgLayer.addTo(map);
+            bounds.extend(gpkgLayer.getBounds());
           });
           geoP.close();
+
+          if(bounds.isValid())
+            map.fitBounds(bounds);
+
         } catch (error) {
           console.error("Error loading GeoPackage:", error);
         }

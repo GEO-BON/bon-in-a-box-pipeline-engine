@@ -1,4 +1,4 @@
-ARG TITILER_VERSION=0.18.9
+ARG TITILER_VERSION=2.0.1
 
 FROM ghcr.io/developmentseed/titiler:${TITILER_VERSION} AS builder
 
@@ -38,7 +38,10 @@ ENV PORT=8000
 ENV WEB_CONCURRENCY=1
 
 ARG BIAB_VERSION
-RUN echo $BIAB_VERSION "($(date +'%Y-%m-%d %R'))" > /version.txt
+RUN echo $BIAB_VERSION > /version.txt
+
+ARG TARGETPLATFORM
+RUN echo "Architecture: ${TARGETPLATFORM}" >> /version.txt
 
 ARG TITILER_VERSION
 ENV TITILER_VERSION=${TITILER_VERSION}

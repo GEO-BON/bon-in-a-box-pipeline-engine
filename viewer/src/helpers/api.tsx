@@ -166,18 +166,21 @@ export const GetCOGStatsGeojson = async (link: any, geojson: any) => {
 };
 
 export const GetCOGBounds = async (link: any) => {
-  let result;
   const obj = {
     url: link,
   };
-  const base_url = `/tiler/cog/bounds`;
+  const base_url = `/tiler/cog/info.geojson`;
   try {
-    result = await axios({ method: "get", url: base_url, params: obj });
+    return await axios({ method: "get", url: base_url, params: obj }).then((res) => {
+      if (!res.data.bbox) {
+        throw new Error("Bounds result is empty");
+      }
+      return res.data.bbox;
+    });
   } catch (error) {
     console.log(error);
-    result = { data: null };
+    return null ;
   }
-  return result;
 };
 
 export const GetCountryList = async () => {
