@@ -170,29 +170,6 @@ export const SingleIOResult = memo(
 
           break;
 
-        case "object":
-          return Object.entries(content).map((entry) => {
-            const [key, value] = entry;
-            let isLink = isRelativeLink(value);
-            return (
-              <FoldableOutput
-                key={key}
-                title={key}
-                inline={
-                  isLink && (
-                    <a href={value} target="_blank" rel="noreferrer">
-                      {value}
-                    </a>
-                  )
-                }
-                inlineCollapsed={!isLink && renderInline(value)}
-                className="foldableOutput"
-              >
-                {renderWithMime(value, "unknown")}
-              </FoldableOutput>
-            );
-          });
-
         case "application":
           if (subtype === "geo+json") return <MapResult json={content} />;
           if (subtype.includes("geopackage")) return <MapResult geopackage={content} />;

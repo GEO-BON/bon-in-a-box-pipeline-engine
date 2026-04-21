@@ -1,6 +1,5 @@
 package org.geobon.script
 
-import org.geobon.hpc.RemoteSetupState
 import java.io.File
 
 enum class ScriptType {

@@ -305,9 +305,11 @@ export function PipelinePage({ runType }) {
         </CustomButtonGreen>
       )}
       {httpError && (
-        <Alert severity="error" key="httpError">
-          <ReactMarkdown>{httpError}</ReactMarkdown>
-        </Alert>
+        <div style={{ marginTop: "20px", paddingBottom: "30px" }}>
+          <Alert severity="error" key="httpError" >
+            <ReactMarkdown>{httpError}</ReactMarkdown>
+          </Alert>
+        </div>
       )}
       {pipelineMetadata && (
         <PipelineResults

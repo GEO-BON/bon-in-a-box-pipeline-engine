@@ -250,8 +250,8 @@ open class Pipeline (
                                 // Instantiating kotlin "special steps".
                                 // Not done with reflection on purpose, since this could allow someone to instantiate any class,
                                 // resulting in a security breach.
-                                scriptFile == "pipeline/AssignId.yml" -> AssignId(serverContext, innerStepId)
-                                scriptFile == "pipeline/PullLayersById.yml" -> PullLayersById(serverContext, innerStepId)
+                                // TODO: This will be needed for openEO steps, so keeping this comment as an example:
+                                //scriptFile == "pipeline/AssignId.yml" -> AssignId(serverContext, innerStepId)
 
                                 // Regular script steps
                                 else -> ScriptStep(scriptFile, innerStepId, serverContext)
@@ -356,8 +356,8 @@ open class Pipeline (
             val inputsParsed = JSONObject(inputsString)
             val constants = mutableMapOf<String, Pipe>()
             inputsParsed.keySet().forEach { key ->
-                val type = step.inputTypes[key]
-                    ?: throw RuntimeException("Input received \"$key\" is not listed in script inputs. Listed inputs are ${step.inputTypes.keys}")
+                val type = step.inputDefinitions[key]?.type
+                    ?: throw RuntimeException("Input received \"$key\" is not listed in script inputs. Listed inputs are ${step.inputDefinitions.keys}")
 
                 val inputId = IOId(step.id, key)
                 constants[inputId.toBreadcrumbs()] = createConstant(key, inputsParsed, type, key)
