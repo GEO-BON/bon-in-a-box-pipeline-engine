@@ -51,7 +51,7 @@
 }
 
 .inputDescriptionContent.collapsed {
-  max-height: var(--description-collapse-threshold, 8.5rem);
+  max-height: calc(var(--description-collapse-threshold, 8.5rem) - var(--description-collapse-tolerance, 2rem));
   overflow: hidden;
 }
 
