@@ -3,17 +3,7 @@ package org.geobon.script
 import io.kubernetes.client.openapi.ApiClient
 import io.kubernetes.client.openapi.ApiException
 import io.kubernetes.client.openapi.apis.BatchV1Api
-import io.kubernetes.client.openapi.models.V1Container
-import io.kubernetes.client.openapi.models.V1HostPathVolumeSource
-import io.kubernetes.client.openapi.models.V1Job
-import io.kubernetes.client.openapi.models.V1JobSpec
-import io.kubernetes.client.openapi.models.V1ObjectMeta
-import io.kubernetes.client.openapi.models.V1PodSpec
-import io.kubernetes.client.openapi.models.V1PodTemplateSpec
-import io.kubernetes.client.openapi.models.V1ResourceRequirements
-import io.kubernetes.client.openapi.models.V1Toleration
-import io.kubernetes.client.openapi.models.V1Volume
-import io.kubernetes.client.openapi.models.V1VolumeMount
+import io.kubernetes.client.openapi.models.*
 import io.kubernetes.client.util.Config
 import kotlinx.coroutines.delay
 import org.geobon.pipeline.RunContext
@@ -21,7 +11,7 @@ import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.plugins.Containers
 import java.io.File
-import java.util.Locale
+import java.util.*
 import java.util.concurrent.TimeoutException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -213,7 +203,7 @@ class KubernetesRun(
         val started = markNow()
         while (true) {
             val job = api.readNamespacedJobStatus(jobName, namespace)
-            val status = job.status
+            val status = job.execute().status
 
             if ((status?.succeeded ?: 0) > 0) {
                 log(logger::info, "Kubernetes job '$jobName' completed successfully.")
