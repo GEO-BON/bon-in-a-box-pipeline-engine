@@ -311,12 +311,12 @@ fun Application.configureRouting() {
             call.respond(HttpStatusCode.OK)
         }
 
-        get("/k8s/status") {
+        get("/api/k8s/status") {
             k8s.refreshStatus()
             call.respond(k8s.statusMap())
         }
 
-        get("/k8s/prepare") {
+        get("/api/k8s/prepare") {
             if (!k8s.configured) {
                 call.respond(HttpStatusCode.ServiceUnavailable, "Kubernetes not configured on this server")
                 return@get

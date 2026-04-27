@@ -419,7 +419,7 @@ paths:
           description: |
             Service unavailable: the HPC has not been configured on that host.
 
-  /k8s/status:
+  /api/k8s/status:
     get:
       summary: Get status of Kubernetes cluster workers.
       operationId: getK8sStatus
@@ -452,7 +452,7 @@ paths:
                 partial_failure:
                   value: {"Configuration":{"state":"ERROR","namespace":"default","message":"At least one worker node has an error"},"worker-1":{"state":"READY","image":null,"message":null},"worker-2":{"state":"ERROR","image":null,"message":"Connection failed"}}
 
-  /k8s/prepare:
+  /api/k8s/prepare:
     get:
       summary:
         Refresh and validate Kubernetes worker readiness for BON in a Box tasks.
