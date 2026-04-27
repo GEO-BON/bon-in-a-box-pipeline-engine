@@ -65,14 +65,16 @@ class K8sConnection {
 			get() = V1VolumeMount().name(mountName).mountPath(mountRoot)
 	}
 
-	val namespace: String = System.getenv("K8S_NAMESPACE") ?: DEFAULT_NAMESPACE
+	val namespace: String = System.getenv("K8S_NAMESPACE").let { ns ->
+		if(ns.isNullOrBlank()) DEFAULT_NAMESPACE else ns
+	}
+
 	val autoConnect = System.getenv("K8S_AUTO_CONNECT") == "true"
 
 	private var client: ApiClient? = null
 
 	var clusterStatus = RemoteSetup()
 	var workersStatus: MutableMap<String, RemoteSetup> = mutableMapOf()
-	var configurationError: String? = null
 
 	val configured: Boolean
 		get() = clusterStatus.state != RemoteSetupState.NOT_CONFIGURED
@@ -84,16 +86,26 @@ class K8sConnection {
 				apiClient.readTimeout = 0
 			}
 
-			clusterStatus = RemoteSetup(state = RemoteSetupState.CONFIGURED)
+			val missingMounts = Mount.entries.filter { it.hostRoot.isBlank() }
+			if(missingMounts.isNotEmpty()) {
+				println("Missing mount points ${missingMounts.map { it.name }}") // TEMP
+				clusterStatus = RemoteSetup(
+					state = RemoteSetupState.NOT_CONFIGURED,
+					message = "Check runner.env config, missing mount root for the following volumes: ${missingMounts.map { it.name }}"
+				)
+			} else {
+				println("Kubernetes client configured with namespace '$namespace'") // TEMP
+				clusterStatus = RemoteSetup(state = RemoteSetupState.CONFIGURED)
 
-			if (autoConnect) {
-				refreshStatus()
+				if (autoConnect) {
+					refreshStatus()
+				}
 			}
 		} catch (ex: Exception) {
-			configurationError = "Kubernetes not configured: ${ex.message ?: ex.javaClass.name}"
+			client = null
 			clusterStatus = RemoteSetup(
 				state = RemoteSetupState.NOT_CONFIGURED,
-				message = configurationError
+				message = "Kubernetes not configured: ${ex.message ?: ex.javaClass.name}"
 			)
 		}
 	}
@@ -107,13 +119,15 @@ class K8sConnection {
 	}
 
 	private fun getClient(): ApiClient {
-		return client ?: throw RuntimeException(configurationError ?: "Kubernetes not configured")
+		return client ?: throw RuntimeException(clusterStatus.message ?: "Kubernetes not configured")
 	}
 
 	fun refreshStatus() {
-		if (client == null) {
+		if (client == null || clusterStatus.state == RemoteSetupState.NOT_CONFIGURED) {
 			return
 		}
+
+		println("Refreshing Kubernetes cluster status...") // TEMP
 
 		try {
 			val nodes = createCoreApi().listNode().execute().items.orEmpty()
@@ -183,8 +197,8 @@ class K8sConnection {
 		return if (!configured) {
 			mapOf(
 				"Configuration" to mapOf(
-					"state" to RemoteSetupState.NOT_CONFIGURED.toString(),
-					"message" to configurationError
+					"state" to clusterStatus.toString(),
+					"message" to clusterStatus.message
 				)
 			)
 		} else {
@@ -271,7 +285,7 @@ class K8sConnection {
 
 	private fun isControlPlaneNode(labels: Map<String, String>): Boolean {
 		return labels.containsKey("node-role.kubernetes.io/control-plane")
-			|| labels.containsKey("node-role.kubernetes.io/master")
+				|| labels.containsKey("node-role.kubernetes.io/master")
 	}
 
 }
