@@ -291,7 +291,21 @@ class KubernetesRun(
         )
     }
 
+    /**
+     * Convert the very long run id to a compliant job name.
+     * From https://kubernetes.io/docs/concepts/workloads/controllers/job/ :
+     * > For best compatibility, the name should follow the more restrictive rules for a DNS label.
+     * > Even when the name is a DNS subdomain, the name must be no longer than 63 characters.
+     *
+     * From https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-label-names :
+     * > Some resource types require their names to follow the DNS label standard as defined in RFC 1123. This means the name must:
+     * > - contain at most 63 characters
+     * > - contain only lowercase alphanumeric characters or '-'
+     * > - start with an alphabetic character
+     * > - end with an alphanumeric character
+     */
     private fun toJobName(runId: String): String {
+        println("Run name $runId") // TEMP
         val normalized = runId.lowercase(Locale.ROOT)
             .replace("_", "-")
             .replace("/", "-")
@@ -305,5 +319,6 @@ class KubernetesRun(
         val prefixMax = maxLength - suffix.length - 1
         val prefix = normalized.take(prefixMax).trim('-').ifBlank { "run" }
         return "$prefix-$suffix"
+            .also { println("Job name $it") } // TEMP
     }
 }
