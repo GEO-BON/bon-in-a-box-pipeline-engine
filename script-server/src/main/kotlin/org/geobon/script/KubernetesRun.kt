@@ -15,7 +15,6 @@ import java.util.*
 import java.util.concurrent.TimeoutException
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource.Monotonic.markNow
 
@@ -35,16 +34,55 @@ class KubernetesRun(
     ) : this(RunContext(scriptFile, inputMap, serverContext), scriptFile, timeout)
 
     companion object {
+        /**
+         *  "default": Kubernetes includes this namespace so that you can start using your new cluster without first creating a namespace.
+         *  see https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/
+         */
         private const val DEFAULT_NAMESPACE = "default"
-        // TODO Utiliser l'image du main comme sur HPCRun
+
+        // TODO Utiliser l'image du main comme sur HPCRun, ou créer une image avec tout conda pré-compilée
         private const val RUNNER_CONDA_IMAGE = "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda"
         private const val RUNNER_JULIA_IMAGE = "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia"
 
-        // Defaults copied from temp.yaml and made configurable for deployments (must match terraform configuration).
-        private val SHARED_OUTPUT_HOST_PATH = System.getenv("K8S_SHARED_OUTPUT_HOST_PATH") ?: "/mnt/biab-shared/output"
-        private val SHARED_SCRIPTS_HOST_PATH = System.getenv("K8S_SHARED_SCRIPTS_HOST_PATH") ?: "/mnt/biab-shared/scripts"
-        private const val SHARED_OUTPUT_MOUNT_PATH = "/output"
-        private const val SHARED_SCRIPTS_MOUNT_PATH = "/scripts"
+        /** Mount configuration for docker containers inside worker nodes. Must match terraform configuration */
+        private enum class Mount(val hostRoot: String, val mountRoot: String) {
+            OUTPUT(
+                System.getenv("K8S_SHARED_OUTPUT_HOST_PATH") ?: "/mnt/biab-shared/pipeline-repo/output",
+                "/output"
+            ),
+            SCRIPTS(
+                System.getenv("K8S_SHARED_SCRIPTS_HOST_PATH") ?: "/mnt/biab-shared/pipeline-repo/scripts",
+                "/scripts"
+            ),
+            SCRIPT_STUBS(
+                System.getenv("K8S_SHARED_SCRIPT_STUBS_HOST_PATH")
+                    ?: "/mnt/biab-shared/pipeline-repo/.server/script-stubs",
+                "/script-stubs"
+            ),
+            USERDATA(
+                System.getenv("K8S_SHARED_USERDATA_HOST_PATH") ?: "/mnt/biab-shared/pipeline-repo/userdata",
+                "/userdata"
+            ),
+            RUNNER_ENV(
+                System.getenv("K8S_SHARED_RUNNER_ENV_HOST_PATH") ?: "/mnt/biab-shared/pipeline-repo/runner.env",
+                "/runner.env"
+            );
+
+            val mountName: String
+                get() = this.name.lowercase()
+
+            val asVolume: V1Volume
+                get() = V1Volume()
+                    .name(mountName)
+                    .hostPath(
+                        V1HostPathVolumeSource()
+                            .path(hostRoot)
+                            .type("Directory")
+                    )
+
+            val asVolumeMount: V1VolumeMount
+                get() = V1VolumeMount().name(mountName).mountPath(mountRoot)
+        }
 
         private val POLL_INTERVAL = 2.seconds
     }
@@ -55,7 +93,6 @@ class KubernetesRun(
         var outputs: MutableMap<String, Any>? = null
         var containerForEnv: Containers = Containers.CONDA
 
-        // TODO: kessé ça?
         val namespace = System.getenv("K8S_NAMESPACE") ?: DEFAULT_NAMESPACE
         val jobName = toJobName(context.runId)
 
@@ -90,17 +127,17 @@ class KubernetesRun(
                 is TimeoutException -> {
                     val event = ex.message ?: ex.javaClass.name
                     log(logger::info, "$event: done.")
-                    outputs!![ERROR_KEY] = event
+                    outputs[ERROR_KEY] = event
                 }
 
                 is ApiException -> {
                     val message = "Kubernetes API error (${ex.code}): ${ex.responseBody ?: ex.message}"
-                    outputs!![ERROR_KEY] = message.also { log(logger::warn, it) }
+                    outputs[ERROR_KEY] = message.also { log(logger::warn, it) }
                 }
 
                 else -> {
                     val message = "An error occurred when running the script: ${ex.message}"
-                    outputs!![ERROR_KEY] = message.also { log(logger::warn, it) }
+                    outputs[ERROR_KEY] = message.also { log(logger::warn, it) }
                     logger.warn(ex.stackTraceToString())
                 }
             }
@@ -121,12 +158,19 @@ class KubernetesRun(
 
     private fun buildJob(jobName: String, scriptCommand: String, scriptType: ScriptType): V1Job {
         // TODO: Utiliser org.geobon.utils.run.Containers mais en ajoutant la méthode pour obtenir l'image (voir HPCRun)
-        val image = when (scriptType) {
-            ScriptType.JULIA -> RUNNER_JULIA_IMAGE
-            else -> RUNNER_CONDA_IMAGE
-        }
+        val image: String;
+        val containerName: String;
+        when (scriptType) {
+            ScriptType.JULIA -> {
+                image = RUNNER_JULIA_IMAGE
+                containerName = "runner-julia"
+            }
 
-        val containerName = if (scriptType == ScriptType.JULIA) "runner-julia" else "runner-conda"
+            else -> { // R, Python, Bash
+                image = RUNNER_CONDA_IMAGE
+                containerName = "runner-conda"
+            }
+        }
 
         val container = V1Container()
             .name(containerName)
@@ -143,11 +187,7 @@ class KubernetesRun(
                     .putLimitsItem("cpu", io.kubernetes.client.custom.Quantity("4"))
             )
             .volumeMounts(
-                listOf(
-                    V1VolumeMount().name("shared-output").mountPath(SHARED_OUTPUT_MOUNT_PATH),
-                    V1VolumeMount().name("shared-scripts").mountPath(SHARED_SCRIPTS_MOUNT_PATH)
-                    // TODO: ajouter les autres volumes
-                )
+                Mount.entries.mapTo(mutableListOf()) { it.asVolumeMount }
             )
 
         val podSpec = V1PodSpec()
@@ -161,25 +201,7 @@ class KubernetesRun(
                 )
             )
             .containers(listOf(container))
-            .volumes(
-                listOf(
-                    V1Volume()
-                        .name("shared-output")
-                        .hostPath(
-                            V1HostPathVolumeSource()
-                                .path(SHARED_OUTPUT_HOST_PATH)
-                                .type("Directory")
-                        ),
-                    V1Volume()
-                        .name("shared-scripts")
-                        .hostPath(
-                            V1HostPathVolumeSource()
-                                .path(SHARED_SCRIPTS_HOST_PATH)
-                                .type("Directory")
-                        )
-                    // TODO: ajouter les autres volumes
-                )
-            )
+            .volumes(Mount.entries.mapTo(mutableListOf()) { it.asVolume })
             .restartPolicy("Never")
 
         return V1Job()
@@ -218,7 +240,7 @@ class KubernetesRun(
                 throw TimeoutException("Timeout occurred after $timeout")
             }
 
-            delay(POLL_INTERVAL.toLong(DurationUnit.MILLISECONDS))
+            delay(POLL_INTERVAL)
         }
     }
 
@@ -227,9 +249,9 @@ class KubernetesRun(
         val hostScript = scriptFile.absolutePath
         val hostStubs = scriptStubsRoot.absolutePath
 
-        val outputPath = toMountedPath(hostOutput, SHARED_OUTPUT_HOST_PATH, SHARED_OUTPUT_MOUNT_PATH)
-        val scriptPath = toMountedPath(hostScript, SHARED_SCRIPTS_HOST_PATH, SHARED_SCRIPTS_MOUNT_PATH)
-        val scriptStubsPath = toMountedPath(hostStubs, SHARED_SCRIPTS_HOST_PATH, SHARED_SCRIPTS_MOUNT_PATH)
+        val outputPath = toMountedPath(hostOutput, Mount.OUTPUT)
+        val scriptPath = toMountedPath(hostScript, Mount.SCRIPTS)
+        val scriptStubsPath = toMountedPath(hostStubs, Mount.SCRIPT_STUBS)
 
         val escapedOutputPath = outputPath.replace(" ", "\\ ")
         val condaEnvScript = "$scriptStubsPath/system/condaEnvironment.sh"
@@ -262,15 +284,11 @@ class KubernetesRun(
         }
     }
 
-    private fun toMountedPath(path: String, hostRoot: String, mountRoot: String): String {
-        val normalizedHostRoot = hostRoot.trimEnd('/')
-        return if (path == normalizedHostRoot) {
-            mountRoot
-        } else if (path.startsWith("$normalizedHostRoot/")) {
-            mountRoot + path.removePrefix(normalizedHostRoot)
-        } else {
-            path
-        }
+    private fun toMountedPath(path: String, mount: Mount): String {
+        return path.replace(
+            mount.hostRoot.trimEnd('/'),
+            mount.mountRoot.trimEnd('/')
+        )
     }
 
     private fun toJobName(runId: String): String {
