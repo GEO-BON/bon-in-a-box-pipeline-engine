@@ -9,6 +9,7 @@ import org.geobon.pipeline.RunContext
 import org.geobon.pipeline.outputRoot
 import org.geobon.script.Run
 import org.geobon.script.ScriptType
+import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.ServerContext.Companion.userDataRoot

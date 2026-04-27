@@ -12,6 +12,7 @@ import io.mockk.verify
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.outputRoot
+import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.scriptModule
 import org.geobon.utils.CallResult
