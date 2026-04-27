@@ -35,7 +35,7 @@ class KubernetesRun(
         private val POLL_INTERVAL = 2.seconds
     }
 
-    private val connection = context.serverContext.k8s ?: K8sConnection()
+    private val connection = context.serverContext.k8s ?: K8sConnection() // TODO: don't instantiate here
 
     @OptIn(ExperimentalTime::class)
     override suspend fun runScript(): Map<String, Any> {
@@ -183,6 +183,7 @@ class KubernetesRun(
      * > - end with an alphanumeric character
      */
     private fun toJobName(runId: String): String {
+        println("Run name $runId") // TEMP
         val normalized = runId.lowercase(Locale.ROOT)
             .replace("_", "-")
             .replace("/", "-")
@@ -196,5 +197,6 @@ class KubernetesRun(
         val prefixMax = maxLength - suffix.length - 1
         val prefix = normalized.take(prefixMax).trim('-').ifBlank { "run" }
         return "$prefix-$suffix"
+            .also { println("Job name $it") } // TEMP
     }
 }

@@ -2,7 +2,7 @@ package org.geobon.pipeline
 
 import org.geobon.hpc.HPCRequirements
 import org.geobon.hpc.HPCRun
-import org.geobon.server.RemoteSetupState
+import org.geobon.k8s.KubernetesRun
 import org.geobon.script.Description
 import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
@@ -12,6 +12,7 @@ import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.DockerizedRun
 import org.geobon.script.Run
 import org.geobon.script.ScriptType
+import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.fromSlurm
@@ -119,8 +120,14 @@ class ScriptStep : YMLStep {
                             condaEnvName,
                             condaEnvYml
                         )
-                    /*TOBO } else if( k8s) {
-*/
+                    } else if(shouldUseK8s()) {
+                        KubernetesRun(
+                            context,
+                            scriptFile,
+                            specificTimeout ?: Run.DEFAULT_TIMEOUT,
+                            condaEnvName,
+                            condaEnvYml
+                        )
                     } else {
                         DockerizedRun(
                             context,
@@ -152,13 +159,22 @@ class ScriptStep : YMLStep {
         } ?: throw RuntimeException("Context not defined.")
     }
 
-    private fun shouldUseHPC(): Boolean{
+    private fun shouldUseHPC(): Boolean {
         return context?.serverContext?.hpc?.connection?.let { connection ->
-            when(connection.statusFor(ScriptType.fromFile(scriptFile))) {
+            when (connection.statusFor(ScriptType.fromFile(scriptFile))) {
                 RemoteSetupState.PREPARING, RemoteSetupState.READY -> true
                 else -> false
             }
         } == true
+    }
+
+    private fun shouldUseK8s(): Boolean {
+        val connection = context?.serverContext?.k8s
+        return if (connection == null) false
+        else when (connection.clusterStatus.state) {
+            RemoteSetupState.PREPARING, RemoteSetupState.READY -> true
+            else -> false
+        }
     }
 
     override fun cleanUp() {
