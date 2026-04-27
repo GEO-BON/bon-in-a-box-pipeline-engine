@@ -2,7 +2,7 @@ package org.geobon.pipeline
 
 import org.geobon.hpc.HPCRequirements
 import org.geobon.hpc.HPCRun
-import org.geobon.hpc.RemoteSetupState
+import org.geobon.server.RemoteSetupState
 import org.geobon.script.Description
 import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
@@ -119,6 +119,8 @@ class ScriptStep : YMLStep {
                             condaEnvName,
                             condaEnvYml
                         )
+                    /*TOBO } else if( k8s) {
+*/
                     } else {
                         DockerizedRun(
                             context,

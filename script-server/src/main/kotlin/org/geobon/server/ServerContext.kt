@@ -1,9 +1,13 @@
 package org.geobon.server
 
 import org.geobon.hpc.HPC
+import org.geobon.k8s.K8sConnection
 import java.io.File
 
-class ServerContext(val hpc: HPC? = null) {
+class ServerContext(
+    val hpc: HPC? = null,
+    val k8s: K8sConnection? = null
+) {
 
     companion object {
         val scriptsRoot
