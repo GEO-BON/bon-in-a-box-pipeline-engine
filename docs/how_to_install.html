@@ -239,7 +239,10 @@ ul.task-list li input[type="checkbox"] {
 <section id="step-3-clone-repository" class="level3">
 <h3 class="anchored" data-anchor-id="step-3-clone-repository">Step 3: Clone repository</h3>
 <ol type="1">
-<li>Clone repository (Windows users: make sure the cloned repo is under the user folder (`C:\Users\yourname\…`), and <strong>not</strong> under OneDrive.) This can be done in terminal using the following code: <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git</code> or in GitHub desktop.</li>
+<li><p>Choose a folder outside any cloud backup system.</p>
+<p><strong>Windows users:</strong> make sure the cloned repo is under the user folder (for example <code>C:\Users\yourname\bon-in-a-box</code>), and <strong>not</strong> under OneDrive.</p>
+<p><strong>Mac users:</strong> make sure the cloned repo is under the user folder (for example <code>~/bon-in-a-box</code>), and <strong>not</strong> under iCloud.</p></li>
+<li><p>Clone the repository either via terminal using <code>git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git</code> or in GitHub desktop.</p></li>
 </ol>
 </section>
 <section id="step-4-set-environment-file" class="level3">
@@ -290,7 +293,7 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li><p>You are currently using an unstable, rate-limited, or billable Internet connection. Defer the update by typing <code>n</code> (no) until a better internet connection is available. You can also use <code>./server-up.sh --offline</code> option to completely skip update checks. Use with caution, since this may create errors if elements of the repository depend on new server features.</p></li>
 <li><p>The runner containers need to be discarded, and you are using a pipeline that has installed dependencies. This is the case for a minority of script whose dependencies cannot be found on anaconda.org. Since we know that installing dependencies live can take a while, when the runners need an update, you will see a warning like this:<br>
-<img src="images/runner-container-updates.png" class="img-fluid" alt="Checking for updates to docker images... Updates found. This update will discard the following runner containers:  - ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda:mamba_update_staging  - ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia:mamba_update_staging This means that conda environments and dependencies installed at runtime will need to be reinstalled. Do you want to update? (Y/n):"><br>
+<img src="images/runner-container-updates.png" class="img-fluid" alt="Checking for updates to docker images... Updates found. This update will discard the following runner containers:  - ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda:mamba_update_staging  - ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia:mamba_update_staging This means that environments and dependencies installed at runtime in these containers will need to be reinstalled. Do you want to update? (Y/n):"><br>
 In this case, defer the update until you can afford the time to start a run that will reinstall the dependencies.</p></li>
 </ul>
 </section>
@@ -304,6 +307,7 @@ In this case, defer the update until you can afford the time to start a run that
 <li><p>In the case where a server is used for demonstration purposes only, set environment variable <code>BLOCK_RUNS=true</code></p></li>
 <li><p>The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.</p></li>
 <li><p>By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy (documentation <a href="https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/">here</a>) and activate https with certbot (documentation <a href="https://certbot.eff.org/">here</a>).</p></li>
+<li><p>Connecting to a High-Performance Computer (HPC) is still experimental. Refer to the <a href="README-dev.html#setting-up-drac-cluster-connection">developer documentation</a>.</p></li>
 </ul>
 </section>
 <section id="troubleshooting" class="level1">

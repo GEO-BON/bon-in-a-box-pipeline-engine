@@ -2,7 +2,7 @@
 title: "About"
 ---
 
-BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration, as well as a project catalogue. *For more information about BON in a Box in general, please refer to [BON in a Box's website](https://boninabox.geobon.org/about)*
+BON in a Box serves as a hub for Biodiversity Observation Networks (BONs), consolidating diverse tools and resources to enhance data analysis and collaboration, as well as a project catalogue. *For more information about BON in a Box in general, please refer to [BON in a Box's website](https://boninabox.geobon.org/about)*. *For more details on the rationale supporting the pipeline engine, refer to our [BioScience publication](https://doi.org/10.1093/biosci/biaf189 "BON in a Box: An Open and Collaborative Platform for Biodiversity Monitoring, Indicator Calculation, and Reporting").*
 
 # What is BON in a Box's pipeline engine?
 
@@ -24,10 +24,16 @@ A pipeline is a collection of steps needed to transform input data into valuable
 
 The smaller steps composing a pipeline are scripts. These scripts also convert input data into valuable outputs, just like pipelines, but at a finer scale: cleaning, augmenting, standardizing, or performing statistical analyses. Importantly, these scripts can be reused or repurposed across varied contexts. For instance, data cleaning scripts could be applied to multiple pipelines that use similar types of data, enhancing efficiency and consistency in data processing workflows. Since the outputs are in-between every step, the pipeline can abstract the programming language, allowing a pipeline to mix R, python and Julia scripts without any interoperability issues.
 
-If a pipeline builds upon the results of another pipeline, this “inner pipeline” can be included as a step in the “outer pipeline”; we call this a subpipeline. An SDM pipeline could serve to generate range maps inside a Species Habitat Index pipeline, or embedded in a Species Richness pipeline. We can thus define a step as “a script or a subpipeline performing an operation in the context of a pipeline”.
+If a pipeline builds upon the results of another pipeline, this "inner pipeline" can be included as a step in the "outer pipeline"; we call this a subpipeline. An SDM pipeline could serve to generate range maps inside a Species Habitat Index pipeline, or embedded in a Species Richness pipeline. We can thus define a step as "a script or a subpipeline performing an operation in the context of a pipeline".
 
 ![Simplified pipeline with steps (blue), intermediate results (grey), and final results (green)](pipeline.png)
 
 # Why should you contribute?
 
 Contributing to BON in a Box can increase the impact of your research by allowing your analysis workflows to be used in broader areas and contexts for decision-making. Contributors will become part of a global community generating analyses of the status and trends of biodiversity to inform management decisions.
+
+# How to cite
+
+Please cite the BON in a Box platform as:
+
+Jory Griffith, Jean-Michel Lord, Michael D Catchen, Maria Isabel Arce-Plata, F Guillaume Blanchet, Mathusan Chandramohan, M Camila Diaz-Corzo, Dominique Gravel, César Gutiérrez, Isabelle S Helfenstein, Sean Hoban, Jamie M Kass, Linda Laikre, Guillaume Larocque, Deborah M Leigh, Brian Leung, Alicia Mastretta-Yanes, Katie L Millette, Maria Alejandra Molina Berbeo, Dat Nguyen, Kari E Norman, María Helena Olaya-Rodríguez, Simon Pahls, Kaitlyn Pereira, Pedro R Peres-Neto, Timothée Poisot, Laura J Pollock, Juan Carlos Rey-Velasco, Victor J Rincon-Parra, Claudia Roeoesli, François Rousseu, Lina María Sánchez-Clavijo, Meredith C Schuman, Oliver Selmoni, Jessica M da Silva, Erika Suarez-Valencia, Thilina D Surasinghe, Eren Turak, Luis Fernando Urbina, Sarah Valentin, Noah Wightman, Juan Zuloaga, Maria Cecilia Londoño, Andrew Gonzalez, BON in a Box: An Open and Collaborative Platform for Biodiversity Monitoring, Indicator Calculation, and Reporting, BioScience, 2026, biaf189, https://doi.org/10.1093/biosci/biaf189

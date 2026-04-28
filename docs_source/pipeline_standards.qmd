@@ -15,16 +15,16 @@ format: html
 
 ## Glossary
 
-|  |  |
-|------------------------------------|------------------------------------|
-| Script | A sequence of code written in a programming language that accomplishes a single task, such as data cleaning, analysis, visualization, or modeling. |
-| Pipeline | A sequence of scripts connected to automate an entire analysis workflow, from the input parameters to the analysis result. |
-| Biodiversity Observation Network (BON) | A network of observation sites or stations and/or a network of experts and groups who collect and analyze biodiversity data for different needs. A BON coordinates monitoring efforts to support conservation policy and/or management action from national biodiversity strategies and action plans. A BON can be regional (e.g. Europe, Asia-Pacific), national (e.g. Japan), or thematic (e.g. Marine, Freshwater). |
-| Essential Biodiversity Variable (EBV) | “A biological variable that critically contributes to the characterization of Earth's biodiversity; they are a minimum set of common and complementary sets of observable variables across the dimensions of biodiversity that can be used to create indicators of system-level biodiversity trends” (after [Brummitt et al. 2017](https://doi.org/10.1016/j.biocon.2016.09.006). EBVs provide scalable, comparable metrics that can be aggregated into time-series or spatial maps, enabling the detection of patterns and drivers of biodiversity change. |
-| Indicator | A derived metric informed by biodiversity datasets (e.g. EBVs) that summarizes biodiversity information into a single value that can help track changes in biodiversity status or the pressures affecting it, thereby providing measurable data that informs policy decisions and conservation actions. In the context of the Kunming-Montreal Global Biodiversity Framework, an indicator is used to assess progress toward the framework's goals and targets. |
-| Kunming-Montreal Global Biodiversity Framework (GBF) | The latest agreement of the United Nations Convention on Biological Diversity (CBD) adopted by 196 Parties at its 15th Conference of the Parties in December 2022. The GBF sets an ambitious pathway to reach a global vision of living in harmony with nature and halting biodiversity loss by 2050 and supports the achievement of the Sustainable Development Goals (CBD, 2022a). \| |
-| GBF Monitoring Framework | The Monitoring framework is designed to track progress toward the goals and targets of the GBF through a set of indicators. It emphasizes the need for consistent data collection, reporting, and evaluation at national and global levels to ensure accountability and transparency. It calls upon the development of national and regional monitoring systems, including the technologies, tools, networks and communities needed to sustain monitoring. |
-| FAIR principles | Four foundational principles of data - findability, accessibility, interoperability, and reusability - which aim to increase the openness, equity, and integrity of the scientific process. See <https://www.go-fair.org/fair-principles/> |
+|                                                      |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+|------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Script                                               | A sequence of code written in a programming language that accomplishes a single task, such as data cleaning, analysis, visualization, or modeling.                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Pipeline                                             | A sequence of scripts connected to automate an entire analysis workflow, from the input parameters to the analysis result.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Biodiversity Observation Network (BON)               | A network of observation sites or stations and/or a network of experts and groups who collect and analyze biodiversity data for different needs. A BON coordinates monitoring efforts to support conservation policy and/or management action from national biodiversity strategies and action plans. A BON can be regional (e.g. Europe, Asia-Pacific), national (e.g. Japan), or thematic (e.g. Marine, Freshwater).                                                                                                                                      |
+| Essential Biodiversity Variable (EBV)                | "A biological variable that critically contributes to the characterization of Earth's biodiversity; they are a minimum set of common and complementary sets of observable variables across the dimensions of biodiversity that can be used to create indicators of system-level biodiversity trends" (after [Brummitt et al. 2017](https://doi.org/10.1016/j.biocon.2016.09.006). EBVs provide scalable, comparable metrics that can be aggregated into time-series or spatial maps, enabling the detection of patterns and drivers of biodiversity change. |
+| Indicator                                            | A derived metric informed by biodiversity datasets (e.g. EBVs) that summarizes biodiversity information into a single value that can help track changes in biodiversity status or the pressures affecting it, thereby providing measurable data that informs policy decisions and conservation actions. In the context of the Kunming-Montreal Global Biodiversity Framework, an indicator is used to assess progress toward the framework's goals and targets.                                                                                             |
+| Kunming-Montreal Global Biodiversity Framework (GBF) | The latest agreement of the United Nations Convention on Biological Diversity (CBD) adopted by 196 Parties at its 15th Conference of the Parties in December 2022. The GBF sets an ambitious pathway to reach a global vision of living in harmony with nature and halting biodiversity loss by 2050 and supports the achievement of the Sustainable Development Goals (CBD, 2022a). \|                                                                                                                                                                     |
+| GBF Monitoring Framework                             | The Monitoring framework is designed to track progress toward the goals and targets of the GBF through a set of indicators. It emphasizes the need for consistent data collection, reporting, and evaluation at national and global levels to ensure accountability and transparency. It calls upon the development of national and regional monitoring systems, including the technologies, tools, networks and communities needed to sustain monitoring.                                                                                                  |
+| FAIR principles                                      | Four foundational principles of data - findability, accessibility, interoperability, and reusability - which aim to increase the openness, equity, and integrity of the scientific process. See <https://www.go-fair.org/fair-principles/>                                                                                                                                                                                                                                                                                                                  |
 
 ## Guidelines and Requirements
 
@@ -32,9 +32,9 @@ format: html
 
 BON in a Box is a platform to share expertise and knowledge and promote collaboration by allowing scientists to share analysis workflows in an organized and open way. BON in a Box has three main groups of pipelines:
 
-1.  **Pipelines for reporting:** Pipelines to calculate Essential Biodiversity Variables and indicators that are in the Convention on Biological Diversity’s Global Biodiversity Framework. These pipelines have undergone a more rigorous peer review process and must adhere to the EBV guidelines and/or the official methodology in the GBF’s Monitoring Framework outlined in the [UNEP-WCMC documentation](https://www.gbf-indicators.org/), if it exists. Pipelines will be created or reviewed by members of the EBV working group or the custodial institution to assure that they follow standards for reporting. These pipelines will be accompanied by a tag that specifies them as reporting ready.
+1.  **Pipelines for reporting:** Pipelines to calculate Essential Biodiversity Variables and indicators that are in the Convention on Biological Diversity's Global Biodiversity Framework. These pipelines have undergone a more rigorous peer review process and must adhere to the EBV guidelines and/or the official methodology in the GBF's Monitoring Framework outlined in the [UNEP-WCMC documentation](https://www.gbf-indicators.org/), if it exists. Pipelines will be created or reviewed by members of the EBV working group or the custodial institution to assure that they follow standards for reporting. These pipelines will be accompanied by a tag that specifies them as reporting ready.
 
-2.  **General biodiversity monitoring:** Pipelines that are relevant to biodiversity monitoring at any scale but don’t have direct relevance to national reporting through the CBD. These pipelines can be more directed at specific biomes, habitats, or ecosystems but still useful to share between national or thematic biodiversity observation networks. 
+2.  **General biodiversity monitoring:** Pipelines that are relevant to biodiversity monitoring at any scale but don't have direct relevance to national reporting through the CBD. These pipelines can be more directed at specific biomes, habitats, or ecosystems but still useful to share between national or thematic biodiversity observation networks. 
 
 3.  **Pipelines for sampling prioritization:** Pipelines to help build national BONs by prioritizing sampling areas based on different criteria such as environmental distance, presence of threatened species, or accessibility. These sampling pipelines will help national and regional BONs expand their sampling programs in a systematic way. 
 
@@ -44,7 +44,7 @@ Additionally, all analyses must be:
 
 -   **Scalable:** Pipelines should be able to be calculated at different scales.
 
--   **Scientifically robust:** Pipelines should follow a method that has been published in the literature or verified in some way. Sometimes, pipeline and method development will happen concurrently but pipelines will keep the “experimental pipeline” tag until the science has been verified by independent experts. Ideally, models will be ground-truthed with independent data sources.
+-   **Scientifically robust:** Pipelines should follow a method that has been published in the literature or verified in some way. Sometimes, pipeline and method development will happen concurrently but pipelines will keep the "experimental pipeline" tag until the science has been verified by independent experts. Ideally, models will be ground-truthed with independent data sources.
 
 -   **FAIR:** Findable, accessible, interoperable, and reproducible\*
 
@@ -58,15 +58,15 @@ BON in a Box is designed to run analyses with both publicly available data and d
 
 #### **Naming standards:**
 
--   Input and output file names should be machine readable, with no spaces, symbols, capital letters, or special characters. Spaces should be replaced with an underscore (\_).
+-   Input and output file names should be machine readable, with no spaces, symbols, or special characters. Spaces should be replaced with an underscore (\_).
 
--   File names should be descriptive (e.g. “population_polygons.gpkg”).
+-   File names should be descriptive (e.g. "population_polygons.gpkg").
 
 #### **Standards for publicly available input data:**
 
 -   When using publicly available data, BON in a Box should use APIs when they are available so pipelines can be run with the most up to date data available.
 
-    -   When processing GBIF data in a pipeline, the **GBIF download API** should be used to ensure reproducibility and citability, as it provides a download DOI for each run, and this doi script output must be included in the pipeline outputs. The “GBIF observations with download API” script should be used for basic GBIF data retrieval. 
+    -   When processing GBIF data in a pipeline, the **GBIF download API** should be used to ensure reproducibility and citability, as it provides a download DOI for each run, and this doi script output must be included in the pipeline outputs. The "GBIF observations with download API" script should be used for basic GBIF data retrieval. 
 
 -   Raster data should be in cloud optimized GeoTIFF (e.g. [STAC catalog](https://stacspec.org/en)) formats whenever possible. 
 
@@ -76,7 +76,7 @@ BON in a Box is designed to run analyses with both publicly available data and d
 
 -   **Point, line, and polygon data** should be in the form of a geopackage.
 
-    -   The geometry column must be called “geom”.
+    -   The geometry column must be called "geom".
 
     -   Data should be in the coordinate reference system (CRS) appropriate for the region of interest (to find a CRS, search [here](https://epsg.io/)).
 
@@ -86,7 +86,7 @@ BON in a Box is designed to run analyses with both publicly available data and d
 
     -   Multi-band rasters are allowed when the band names can be easily interpreted (e.g. year, species, model). 
 
--   Tabular data can be uploaded as CSV (comma separated values) or TSV (tab separated values). Column names should be in snake_case and should avoid special characters and capital letters. When geographical coordinates are included, use the CRS EPSG:4326 (latitude, longitude WGS 84) and column names “latitude” and “longitude”, whenever possible. 
+-   Tabular data can be uploaded as CSV (comma separated values) or TSV (tab separated values). Column names should be in snake_case and should avoid special characters and capital letters. When geographical coordinates are included, use the CRS EPSG:4326 (latitude, longitude WGS 84) and column names "latitude" and "longitude", whenever possible. 
 
     -   Specific file formats and column formatting guidelines will depend on the pipeline and should be specified in the pipeline documentation.
 
@@ -124,11 +124,11 @@ Code should adhere to the following requirements:
 
 -   Scripts should check and validate that user inputs are properly entered and are in the expected format. Scripts should output informative messages and stop the execution with the biab_error_stop() function when invalid inputs are detected. 
 
-    -   For example, if someone misspells a country name and the country polygon is not found, write if(is.null(country_polygon)) { biab_error_stop(“Country polygon not found. Check the spelling of the country name”)
+    -   For example, if someone misspells a country name and the country polygon is not found, write if(is.null(country_polygon)) { biab_error_stop("Country polygon not found. Check the spelling of the country name")
 
 -   Each main step of the script prints a log (console output) message so the user can know at what stage the analysis is. The contributor is encouraged to add additional information messages that will be added to the log:
 
-    -   Messages can be added with the biab_info() function. For example biab_info(“Study area downloaded”)
+    -   Messages can be added with the biab_info() function. For example biab_info("Study area downloaded")
 
     -   Warning messages can be added with the biab_warning() function.
 
@@ -158,7 +158,7 @@ Each script will be accompanied by a YAML description file (.yml format) that ha
 
 -   For **primitive outputs**, such as text and numbers, use a primitive type (int, float, text). Refer to [the inputs section of the user documentation](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#inputs).
 
--   The example will autofill in the document. If the example is a file, make sure the file is in the appropriate folder (note the ‘userdata’ folder is local only and will not be pushed to GitHub) and the file path starts at that folder (e.g. /scripts/data/protected_area_file_example.gpkg). Note BON in a Box cannot access the whole computer so the root must be in the BON in a Box pipelines folder. Make sure the whole script runs with the chosen examples.
+-   The example will autofill in the document. If the example is a file, make sure the file is in the appropriate folder (note the 'userdata' folder is local only and will not be pushed to GitHub) and the file path starts at that folder (e.g. /scripts/data/protected_area_file_example.gpkg). Note BON in a Box cannot access the whole computer so the root must be in the BON in a Box pipelines folder. Make sure the whole script runs with the chosen examples.
 
 ##### **Conda dependencies**
 

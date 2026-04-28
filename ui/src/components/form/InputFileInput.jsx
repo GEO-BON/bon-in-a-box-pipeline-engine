@@ -1,22 +1,19 @@
 /* eslint-disable prettier/prettier */
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import YAMLTextArea from "./YAMLTextArea";
 import { InputsDescription } from "../StepDescription";
-import ReactMarkdown from "react-markdown";
 import "./InputFileInputs.css";
 import ScriptInput from "./ScriptInput";
-import Choosers from "./Choosers";
-import _, { set } from "lodash";
-import yaml from "js-yaml";
-import { isEmptyObject } from "../../utils/isEmptyObject";
 import _lang from "lodash/lang";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Alert from "@mui/material/Alert";
+import InputType from "./InputType";
 
 import { styled } from "@mui/material";
 import { ScriptInputExample } from "./ScriptInputExample";
+import InputDescription from "./InputDescription";
 
 /**
  * An input that we use to fill the input file's content.
@@ -47,7 +44,7 @@ export default function InputFileInput({
         color: "#fff",
         fontWeight: 1000,
       },
-    })
+    }),
   );
 
   return (
@@ -100,8 +97,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
 
   function updateInputFile(inputId, value) {
     setInputFileContent((oldContent) => {
-      if(_lang.isEqual(oldContent[inputId], value))
-        return oldContent
+      if (_lang.isEqual(oldContent[inputId], value)) return oldContent;
 
       const newContent = { ...oldContent };
       newContent[inputId] = value;
@@ -111,89 +107,68 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
 
   return (
     <div className="inputFileForm">
-      <table className="inputFileFields">
-        <tbody>
-          {Object.entries(inputs)
-            .sort((a, b) => a[1].weight - b[1].weight)
-            .map(([inputId, inputDescription]) => {
-              const { label, description, options, example, weight, ...theRest } =
-                inputDescription;
-              if (
-                [
-                  "country",
-                  "region",
-                  "countryRegion",
-                  "CRS",
-                  "countryRegionCRS",
-                  "bboxCRS",
-                ].includes(inputDescription.type)
-              ) {
-                return (
-                  <Choosers
-                    key={inputId}
-                    inputDescription={inputDescription}
-                    value={inputFileContent[inputId] || null}
-                    updateValue={(value) => updateInputFile(inputId, value)}
-                  />
-                );
-              } else {
-                return (
-                  <tr key={inputId}>
-                    <td className="inputCell">
-                      {false && (
-                        <label htmlFor={inputId}>
-                          {label ? (
-                            <strong>{label}</strong>
-                          ) : (
-                            <Alert severity="error" className="error">
-                              Missing label for input "{inputId}"
-                            </Alert>
-                          )}
-                          {!/^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId) &&
-                            !/pipeline@\d+$/.test(inputId) && (
-                              <Alert severity="warning">
-                                Input id {inputId.replace(/^(.*\|)/, "")} should be a
-                                snake_case id
-                              </Alert>
-                            )}
-                        </label>
-                      )}
-                      <ScriptInput
-                        id={inputId}
-                        type={inputDescription.type}
-                        options={options}
-                        value={inputFileContent && inputFileContent[inputId]}
-                        onValueUpdated={(value) => updateInputFile(inputId, value)}
-                        label={label}
-                        size="medium"
-                        keepWidth={true}
-                      />
-                      {!inputFileContent ||
+      <div className="inputFieldsList">
+        {Object.entries(inputs)
+          .sort((a, b) => a[1].weight - b[1].weight)
+          .map(([inputId, inputDescription]) => {
+            const { label, description, options, example, type } =
+              inputDescription;
+            return (
+              <div className="inputFieldCard" key={inputId}>
+                <h4 className="inputFieldTitle">
+                  <label htmlFor={inputId}>{label || inputId}</label>
+                </h4>
+                {!label && (
+                  <Alert
+                    severity="error"
+                    className="error"
+                    sx={{ margin: "0 10px 10px 10px" }}
+                  >
+                    Missing label for input "{inputId}"
+                  </Alert>
+                )}
+                {!/^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId) &&
+                  !/pipeline@\d+$/.test(inputId) && (
+                    <Alert severity="warning">
+                      Input id {inputId.replace(/^(.*\|)/, "")} should be a
+                      snake_case id
+                    </Alert>
+                  )}
+                <div className="inputFieldBody">
+                  <>
+                    <ScriptInput
+                      id={inputId}
+                      type={inputDescription.type}
+                      options={options}
+                      value={inputFileContent && inputFileContent[inputId]}
+                      onValueUpdated={(value) =>
+                        updateInputFile(inputId, value)
+                      }
+                      label={label}
+                      size="medium"
+                      keepWidth={true}
+                    />
+                    <InputType type={type} />
+                    {inputDescription.type !== "boolean" &&
+                      (!inputFileContent ||
                         (!_lang.isEqual(inputFileContent[inputId], example) && (
                           <ScriptInputExample
                             example={example}
                             type={inputDescription.type}
                           />
-                        ))}
-                    </td>
-                    <td className="descriptionCell">
-                      {description ? (
-                        <ReactMarkdown className="reactMarkdown">
-                          {description}
-                        </ReactMarkdown>
-                      ) : (
-                        <Alert severity="warning">
-                          Missing description for input "{inputId}"
-                        </Alert>
-                      )}
-                      {!isEmptyObject(theRest) && yaml.dump(theRest)}
-                    </td>
-                  </tr>
-                );
-              }
-            })}
-        </tbody>
-      </table>
+                        )))}
+                  </>
+                </div>
+
+                <InputDescription
+                  description={description}
+                  inputId={inputId}
+                />
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 };
+

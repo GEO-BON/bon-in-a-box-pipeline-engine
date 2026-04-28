@@ -44,6 +44,24 @@ aside.stepChooser .description {
     font-weight: 600;
 }
 
+.dnd-head.folder-header {
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 0;
+    margin: 4px 0;
+    transition: background-color 0.2s ease;
+    border-radius: 3px;
+    padding-left: 4px;
+    padding-right: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.dnd-head.folder-header:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
 
 .inFolder {
     padding-left: 1em;
@@ -59,4 +77,80 @@ aside.stepChooser .description {
 
 .stepChooser h3 {
     border-bottom: 1px solid #1a192b;
+}
+
+.search-container {
+    margin-bottom: 15px;
+    margin-right: 20px;
+}
+
+.step-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #83829b;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background: #fcfcfc url('../../img/magnifying-glass.svg') no-repeat right 12px center;
+    background-size: 20px;
+}
+
+.step-search-input:focus {
+    outline: none;
+    border-color: var(--biab-green-main, #4caf50);
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.no-results {
+    padding: 10px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+.search-highlight {
+    background-color: #ffeb3b;
+    color: #000;
+    border-radius: 2px;
+    font-weight: 600;
+}
+
+.dndnode.search-result {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px;
+    min-height: auto;
+    text-align: left;
+}
+
+.dndnode.search-result.pipeline-step {
+    border-width: 4px;
+    border-style: double;
+}
+
+.search-result-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+}
+
+.search-result-name {
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.metadata-excerpt {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+    margin-top: 2px;
+    font-style: italic;
+}
+
+.metadata-excerpt .search-highlight {
+    background-color: #fff598;
+    font-weight: 500;
 }

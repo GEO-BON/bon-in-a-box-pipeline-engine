@@ -40,25 +40,26 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
     if (states.actions.includes("updateCRSListFromNames")) {
       setSearching(true);
       // Suggest from names
-      const searchTerm = searchValue ? searchValue : states.country.englishName;
-      if (searchTerm && searchTerm !== "" && searchTerm !== states.CRS?.name) {
-        getCRSListFromName(searchTerm).then((result) => {
-          if (result) {
-            const suggestions = result.map((proj) => {
-              const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
-              return {
-                label: `${proj.name} (${p})`,
-                value: `${p}`,
-              };
-            });
-            setCRSList(defaultCRSList.concat(suggestions));
-          } else {
-            setCRSList(defaultCRSList);
-          }
-          setSearching(false);
-        });
+      if(states.country && states.country?.englishName){
+        const searchTerm = searchValue ? searchValue : states.country.englishName;
+        if (searchTerm && searchTerm !== "" && searchTerm !== states.CRS?.name) {
+          getCRSListFromName(searchTerm).then((result) => {
+            if (result) {
+              const suggestions = result.map((proj) => {
+                const p = `${proj.id.authority}:${parseInt(proj.id.code)}`;
+                return {
+                  label: `${proj.name} (${p})`,
+                  value: `${p}`,
+                };
+              });
+              setCRSList(defaultCRSList.concat(suggestions));
+            } else {
+              setCRSList(defaultCRSList);
+            }
+            setSearching(false);
+          });
+        }
       } else {
-        //setCRSList(defaultCRSList);
         setSearching(false);
       }
     }
@@ -149,7 +150,6 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
   }, [states.actions]);
 
   const updateCRS = (value, ignore = false) => {
-    let code = `${states.CRS.authority}:${states.CRS.code}`;
     if (value) {
       let code = "";
       code = value.value.split(":");
@@ -201,18 +201,6 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
     []
   );
 
-  const debouncedSearchAutocomplete = useCallback(
-    debounce((value) => {
-      if(value) {
-        setSearchValue(value.target.value);
-        dispatch({
-          type: "searchCRSFromAutocomplete",
-        });
-      }
-    }, 500),
-    []
-  );
-
   return (
     <div style={paperStyle(dialog)}>
       {dialog && (
@@ -232,7 +220,6 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
           return option.label || "";
         }}
         sx={{
-          width: "90%",
           background: "#fff",
           borderRadius: "4px",
           marginTop: "10px",
@@ -245,34 +232,33 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
           <TextField
             {...params}
             label="Search / Select CRS"
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {CRSList.length > 0 && (
-                    <>
-                      <InputAdornment
-                        position="end"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => {
-                          setOpenCRSMenu(true);
-                        }}
-                      >
-                        <KeyboardArrowDownIcon
-                          sx={{ color: "var(--biab-green-main)" }}
-                        />
-                      </InputAdornment>
-                      {params.InputProps.endAdornment}
-                    </>
-                  )}
-                </>
-              ),
+            slotProps={{
+              input: {
+                ...params.InputProps,
+                startAdornment: (
+                  <>
+                    {CRSList.length > 0 && (
+                      <>
+                        <InputAdornment
+                          style={{ cursor: "pointer" }}
+                          onClick={() => {
+                            setOpenCRSMenu(true);
+                          }}
+                          position="start"
+                        >
+                          <KeyboardArrowDownIcon
+                            sx={{ color: "var(--biab-green-main)"}}
+                          />
+                        </InputAdornment>
+                        {params.InputProps.endAdornment}
+                      </>
+                    )}
+                  </>
+                ),
+              }
             }}
           />
         )}
-        onInputChange={(event, value) => {
-          debouncedSearchAutocomplete(event);
-        }}
         onChange={(event, newValue) => {
           updateCRS(newValue);
         }}
@@ -289,7 +275,7 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
           {badCRS}
         </div>
       )}
-      <FormControl sx={{ width: "90%", backgroundColor: "white" }}>
+      <FormControl sx={{ backgroundColor: "white", width: "100%" }}>
         <InputLabel
           htmlFor="crs-code"
           sx={{

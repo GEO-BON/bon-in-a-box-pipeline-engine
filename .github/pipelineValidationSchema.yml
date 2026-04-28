@@ -17,7 +17,7 @@ metadata:
         - schema:
             status:
               type: string
-              allowed: ["in_development", "in_review", "reviewed", "example"]
+              allowed: ["in_development", "in_review", "reviewed", "core", "example"]
               required: true
             message:
               type: string
@@ -73,7 +73,8 @@ metadata:
       required: false
       nullable: true
       type: string
-      regex: '^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$'
+      regex: &link_regex
+        '^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$'
 
     references:
       required: false
@@ -85,7 +86,11 @@ metadata:
           text:
             required: true
             type: string
-          doi:
+          link:
+            required: false
+            type: string
+            regex: *link_regex
+          doi: # deprecated in favor of link
             required: false
             type: string
 
@@ -107,21 +112,14 @@ inputs:
         required: true
         type: string
         oneof:
-        - forbidden: [options, "options[]", object, "object[]"]
+        - forbidden: [options, "options[]"]
         - allowed: [options, "options[]"]
           dependencies: options
-        - allowed: [object, "object[]"]
-          dependencies: properties
       options:
         required: false
         type: list
         dependencies:
           type: [options, "options[]"]
-      properties:
-        required: false
-        type: list
-        dependencies:
-          type: [object, "object[]"]
 
       weight:
         required: false
@@ -157,21 +155,14 @@ outputs:
         required: true
         type: string
         oneof:
-        - forbidden: [options, "options[]", object, "object[]"]
+        - forbidden: [options, "options[]"]
         - allowed: [options, "options[]"]
           dependencies: options
-        - allowed: [object, "object[]"]
-          dependencies: properties
       options:
         required: false
         type: list
         dependencies:
           type: [options, "options[]"]
-      properties:
-        required: false
-        type: list
-        dependencies:
-          type: [object, "object[]"]
       range:
         required: false
         type: list
@@ -194,8 +185,6 @@ outputs:
         - type: boolean
         - type: list
         - type: dict
-          dependencies:
-            type: [object]
 
 edges:
   required: true

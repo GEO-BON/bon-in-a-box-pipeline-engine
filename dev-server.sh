@@ -36,16 +36,11 @@ function command { # args appended to the docker compose command
         export MY_UID="$(id -u)"
     fi
 
-    # Apple M2 chip check, see https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/issues/85
     composeFiles="-f compose.yml -f compose.dev.yml -f pipeline-repo/compose.env.yml"
-    macCPU=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
-    if ! [[ -z "$macCPU" ]]; then
-        # This is a Mac, check chip type
-        if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
-            echo "Apple M* chip detected"
-            composeFiles+=" -f compose.apple.yml"
-        fi
-    fi
+    # macCPU=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
+    # if ! [[ -z "$macCPU" ]]; then
+    #     # This is a Mac here we could do some specific things if needed
+    # fi
 
     docker compose $composeFiles \
         --env-file pipeline-repo/runner.env --env-file $@
@@ -53,8 +48,10 @@ function command { # args appended to the docker compose command
 
 function clean {
     echo "Removing containers..."
-    docker container rm biab-gateway biab-ui biab-script-server \
-        biab-tiler biab-runner-conda biab-runner-julia biab-viewer swagger_editor
+    docker container rm biab-ui biab-viewer biab-gateway \
+        biab-script-server biab-python-api \
+        biab-runner-conda biab-runner-julia swagger_editor \
+        biab-tiler
 
     # Legacy volumes
     echo "Removing legacy volumes..."

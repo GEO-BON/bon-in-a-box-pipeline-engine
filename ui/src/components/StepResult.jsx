@@ -1,6 +1,7 @@
 import { memo, useState } from "react";
 import MapResult from "./map/Map";
 import RenderedCSV from "./csv/RenderedCSV";
+import yaml from "js-yaml";
 import {
   FoldableOutputWithContext,
   FoldableOutput,
@@ -50,6 +51,10 @@ function isGeotiff(subtype) {
 
 // Fallback code to render the best we can. This can be useful if temporary outputs are added when debugging a script.
 function FallbackDisplay({ content }) {
+  if (typeof content === "object") {
+    return <p className="resultText yaml">{yaml.dump(content)}</p>;
+  }
+
   if (
     isRelativeLink(content) ||
     (typeof content.startsWith === "function" && content.startsWith("http"))
@@ -93,7 +98,8 @@ export const SingleIOResult = memo(
     if (!componentId) componentId = ioId;
 
     function renderContent(content) {
-      if (!content) return "null";
+      if (content === null || content === undefined) return "null";
+      if (content === "") return "Empty string";
 
       let error = "";
       if (ioMetadata) {
@@ -127,7 +133,7 @@ export const SingleIOResult = memo(
           mime.startsWith("text/csv") ||
           mime.startsWith("text/tab-separated-values")
         ) {
-          let splitMime = mime.slice(0, -2);
+          let actualMime = mime.slice(0, -2);
           return content.map((splitContent, i) => {
             return (
               <FoldableOutput
@@ -139,7 +145,7 @@ export const SingleIOResult = memo(
                 }
                 className="foldableOutput"
               >
-                {renderWithMime(splitContent, splitMime)}
+                {renderWithMime(splitContent, actualMime)}
               </FoldableOutput>
             );
           });
@@ -164,29 +170,6 @@ export const SingleIOResult = memo(
 
           break;
 
-        case "object":
-          return Object.entries(content).map((entry) => {
-            const [key, value] = entry;
-            let isLink = isRelativeLink(value);
-            return (
-              <FoldableOutput
-                key={key}
-                title={key}
-                inline={
-                  isLink && (
-                    <a href={value} target="_blank" rel="noreferrer">
-                      {value}
-                    </a>
-                  )
-                }
-                inlineCollapsed={!isLink && renderInline(value)}
-                className="foldableOutput"
-              >
-                {renderWithMime(value, "unknown")}
-              </FoldableOutput>
-            );
-          });
-
         case "application":
           if (subtype === "geo+json") return <MapResult json={content} />;
           if (subtype.includes("geopackage")) return <MapResult geopackage={content} />;
@@ -202,7 +185,8 @@ export const SingleIOResult = memo(
     }
 
     function renderInline(content) {
-      if (!content) return "null";
+      if (content === null || content === undefined) return "null";
+      if (content === "") return "Empty string";
 
       if (Array.isArray(content)) {
         return content
@@ -217,7 +201,42 @@ export const SingleIOResult = memo(
           .join(", ");
       }
 
-      if (typeof content === "object") return Object.keys(content).join(", ");
+      if (typeof content === "object") {
+        if(ioMetadata && ioMetadata.type && !ioMetadata.type.includes("/")) {
+          if(ioMetadata.type === "bboxCRS") {
+            if(content.CRS && content.bbox) {
+              const crs = content.CRS
+              if(crs.name && crs.authority && crs.code ) {
+                return `A bounding box in ${crs.name} (${crs.authority}:${crs.code})`
+              }
+            }
+            return null
+          }
+
+          // Extract values from our location choosers (empty array for other types)
+          let inlineValues = []
+          if(content.country?.englishName) {
+            inlineValues.push(content.country.englishName);
+          }
+
+          if(content.region?.regionName) {
+            inlineValues.push(content.region?.regionName);
+          }
+
+          if(content.CRS) {
+            const crs = content.CRS;
+            if(crs.name && crs.authority && crs.code) {
+              inlineValues.push(`${crs.name} (${crs.authority}:${crs.code})`);
+            }
+          }
+
+          if(inlineValues.length > 0) {
+            return inlineValues.join(", ");
+          }
+        }
+
+        return Object.values(content).map(v => JSON.stringify(v)).join(", ");
+      }
 
       return content;
     }
@@ -239,10 +258,11 @@ export const SingleIOResult = memo(
 
       if (ioMetadata.description) {
         description = (
-          <ReactMarkdown
-            className="reactMarkdown outputDescription"
-            children={ioMetadata.description}
-          />
+          <div className="reactMarkdown outputDescription">
+            <ReactMarkdown>
+              {ioMetadata.description}
+            </ReactMarkdown>
+          </div>
         );
       } else {
         errorMsg = (

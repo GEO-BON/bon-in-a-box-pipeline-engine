@@ -15,7 +15,7 @@ import Box from "@mui/material/Box";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ReactMarkdown from 'react-markdown';
 
-const pipelineConfig = { extension: ".json", defaultFile: "helloWorld.json" };
+const pipelineConfig = { extension: ".json", defaultFile: null };
 const scriptConfig = {
   extension: ".yml",
   defaultFile: "helloWorld>helloR.yml",
@@ -139,6 +139,11 @@ export function PipelinePage({ runType }) {
   }
 
   function loadPipelineMetadata(choice, setExamples = true) {
+    if(!choice) {
+      setPipelineMetadata(null)
+      return
+    }
+
     var callback = function (error, data, response) {
       if (error) {
         setHttpError(formatError(error, response, "while loading pipeline metadata from script server"));
@@ -300,9 +305,11 @@ export function PipelinePage({ runType }) {
         </CustomButtonGreen>
       )}
       {httpError && (
-        <Alert severity="error" key="httpError">
-          <ReactMarkdown>{httpError}</ReactMarkdown>
-        </Alert>
+        <div style={{ marginTop: "20px", paddingBottom: "30px" }}>
+          <Alert severity="error" key="httpError" >
+            <ReactMarkdown>{httpError}</ReactMarkdown>
+          </Alert>
+        </div>
       )}
       {pipelineMetadata && (
         <PipelineResults

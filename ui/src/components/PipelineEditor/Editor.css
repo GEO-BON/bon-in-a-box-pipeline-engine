@@ -140,6 +140,10 @@
   border-width: 5px;
 }
 
+.constant textarea {
+  position: relative;
+}
+
 .MuiGrid-root {
   background: none;
 }
@@ -413,7 +417,7 @@
 .collapseButton,
 .expandButton {
   height: 2rem;
-  z-index: 1000;
+  z-index: 1000; /* Collapse/expand button in IO pane */
   position: absolute;
   top: 5px;
   right: 10px;

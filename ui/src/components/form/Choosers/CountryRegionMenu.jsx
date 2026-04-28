@@ -2,9 +2,10 @@
 import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import countryOptionsJSON from "./countries.json"; // Assuming you have a JSON file with country data
+import { DefaultApi } from "bon_in_a_box_script_service";
+export const api = new DefaultApi();
+
 import {
-  getStateAPI,
   defaultRegion,
   paperStyle,
 } from "./utils";
@@ -14,39 +15,50 @@ export default function CountryRegionMenu({
   dispatch,
   showRegion = true,
   dialog = false,
-  //updateValues = () => {},
   value = null,
 }) {
   const [countryOptions, setCountryOptions] = useState([]);
   const [regionOptions, setRegionOptions] = useState([]);
-  const [regionJSON, setRegionJSON] = useState([]);
   const savedCountryValue =
     value?.country?.englishName && value?.country?.ISO3
-      ? { label: states.country.englishName, value: states.country.ISO3 }
+      ? { label: value.country.englishName, value: value.country.ISO3 }
       : null;
   const savedRegionValue = value?.region?.regionName
-    ? { label: states.region.regionName, value: states.region.regionName }
+    ? { label: value.region.regionName, value: value.region.regionGID }
     : null;
   const [selectedCountry, setSelectedCountry] = useState(
-    savedCountryValue || null
+    savedCountryValue
   );
   const [selectedRegion, setSelectedRegion] = useState(
-    savedRegionValue || null
+    savedRegionValue
   );
 
   useEffect(() => {
-    // Fetch country options from the JSON file
-    let countryOpts = countryOptionsJSON.geonames;
-    countryOpts.sort((a, b) => {
-      return a.countryName
-        .toLowerCase()
-        .localeCompare(b.countryName.toLowerCase());
-    });
-    countryOpts = countryOpts.map((countr) => ({
-      label: countr.countryName,
-      value: countr.isoAlpha3,
-    }));
-    setCountryOptions(countryOpts);
+    api.getCountriesList((error, data, response) => {
+      if (error) {
+        console.error(error);
+      } else {
+        if (data === null) {
+            setCountryOptions([]);
+            return;
+          }
+          const resp = data.filter(
+            (obj, index, self) =>
+              index === self.findIndex((o) => o.adm0_name === obj.adm0_name) &&
+              obj.adm0_name !== null
+          );
+          let countryOpts = resp.map((country) => ({
+            label: country.adm0_name,
+            value: country.adm0_src,
+            bbox: Object.values(country.geometry_bbox),
+          }));
+          countryOpts.sort((a, b) => {
+            return a.label.toLowerCase().localeCompare(b.label.toLowerCase());
+          });
+          setCountryOptions(countryOpts);
+        }
+      }
+    );
   }, []);
 
   // Set from controlled values coming in
@@ -60,20 +72,25 @@ export default function CountryRegionMenu({
         setSelectedRegion(null);
         return;
       }
+
       if (states.country?.ISO3 !== selectedCountry?.value) {
         setSelectedCountry({
           label: states.country.englishName,
           value: states.country.ISO3,
+          bbox: states.country.bboxWGS84,
         });
       }
+
       if (!states.region?.regionName) {
         setSelectedRegion(null);
         return;
       }
-      if (states.region?.regionName !== selectedRegion?.value) {
+
+      if (states.region.regionName !== selectedRegion?.value) {
         setSelectedRegion({
           label: states.region.regionName,
-          value: states.region.regionName,
+          value: states.region.adm1_src,
+          bbox: states.region.bboxWGS84,
         });
       }
     }
@@ -82,33 +99,37 @@ export default function CountryRegionMenu({
   useEffect(() => {
     if (selectedCountry && selectedCountry.value) {
       // Fetch states or provinces based on the selected country
-      const countryObj = countryOptionsJSON.geonames.find(
-        (c) => c.isoAlpha3 === selectedCountry.value
-      );
-      getStateAPI(countryObj.geonameId).then((response) => {
-        if (response.data && response.data.geonames) {
-          const regionOpts = response.data.geonames.map((state) => ({
-            label: state.name,
-            value: state.geonameId,
-          }));
-          setRegionOptions(regionOpts);
-          setRegionJSON(response.data.geonames);
-        } else {
+      api.getRegionsList(selectedCountry.value, (error, data, response) => {
+        if (error) {
+          console.error(error);
           setRegionOptions([]);
         }
-      });
-    } else {
-      setRegionOptions([]);
+        else{
+          if (data) {
+            const regionOpts = data
+              .filter((reg) => reg.adm1_name && reg.adm1_src && reg.geometry_bbox)
+              .map((reg) => ({
+              label: reg.adm1_name,
+              value: reg.adm1_src,
+              bbox: Object.values(reg.geometry_bbox),
+            }));
+            setRegionOptions(regionOpts);
+          } else {
+            setRegionOptions([]);
+          }
+        }
+      })
     }
+
   }, [selectedCountry]);
 
   const selectionChanged = (type, value) => {
     let countryValue, regionValue;
     if (type === "both") {
-      countryValue = selectedCountry.value;
-      regionValue = selectedRegion?.value;
+      countryValue = selectedCountry;
+      regionValue = selectedRegion;
     } else if (type === "region") {
-      countryValue = selectedCountry.value;
+      countryValue = selectedCountry;
       regionValue = value;
     } else if (type === "country") {
       countryValue = value;
@@ -119,45 +140,22 @@ export default function CountryRegionMenu({
       dispatch({ type: "clear" });
       return;
     }
-    const countryObj = countryOptionsJSON.geonames.find(
-      (c) => c.isoAlpha3 === countryValue
-    );
     let country;
     if (countryValue) {
-      let b = [
-        countryObj.west,
-        countryObj.south,
-        countryObj.east,
-        countryObj.north,
-      ];
-      b = b.map((c) => parseFloat(c.toFixed(6)));
       country = {
-        englishName: countryObj.countryName,
-        ISO3: countryObj.isoAlpha3,
-        code: countryObj.countryCode,
-        countryBboxWGS84: b,
+        englishName: countryValue?.label,
+        ISO3: countryValue?.value,
+        bboxWGS84: countryValue?.bbox,
       };
     }
     let region = defaultRegion;
     if (regionValue) {
-      const regionObj = regionJSON.find((s) => s.geonameId === regionValue);
-      let b = [
-        regionObj.bbox.west,
-        regionObj.bbox.south,
-        regionObj.bbox.east,
-        regionObj.bbox.north,
-      ];
-      b = b.map((c) => parseFloat(c.toFixed(6)));
-      region = regionObj
-        ? {
-            regionName: regionObj.name,
-            ISO3166_2: regionObj.adminCodes1.ISO3166_2
-              ? regionObj.adminCodes1.ISO3166_2
-              : "",
-            regionBboxWGS84: b,
-            countryEnglishName: countryObj.countryName,
-          }
-        : defaultRegion;
+      region = {
+        regionName: regionValue?.label,
+        regionID: regionValue?.value,
+        countryEnglishName: selectedCountry?.label,
+        bboxWGS84: regionValue?.bbox,
+      };
     }
     if (!country) {
       dispatch({ type: "clear" });
@@ -181,7 +179,6 @@ export default function CountryRegionMenu({
         options={countryOptions}
         size="small"
         sx={{
-          width: "90%",
           background: "#fff",
           color: "#fff",
           borderRadius: "4px",
@@ -196,17 +193,17 @@ export default function CountryRegionMenu({
         onChange={(event, value) => {
           setSelectedCountry(value);
           setSelectedRegion(null);
-          selectionChanged("country", value?.value ? value.value : null);
+          selectionChanged("country", value?.value ? value : null);
         }}
       />
       {showRegion && (
         <>
           <Autocomplete
             options={regionOptions}
+            disabled={!regionOptions}
             size="small"
             sx={{
               marginTop: "20px",
-              width: "90%",
               background: "#fff",
               color: "#fff",
               borderRadius: "4px",
@@ -218,9 +215,9 @@ export default function CountryRegionMenu({
             renderInput={(params) => (
               <TextField {...params} label="Select region" />
             )}
-            onChange={(event, value) => {
+            onChange={(_, value) => {
               setSelectedRegion(value);
-              selectionChanged("region", value?.value ? value.value : null);
+              selectionChanged("region", value?.value ? value : null);
             }}
             value={selectedRegion}
           />
@@ -231,8 +228,8 @@ export default function CountryRegionMenu({
             }}
           >
             Reference for toponyms:{" "}
-            <a target="_blank" href="https://geonames.org">
-              GeoNames
+            <a target="_blank" href="https://gadm.org/">
+              GADM
             </a>
           </p>
         </>

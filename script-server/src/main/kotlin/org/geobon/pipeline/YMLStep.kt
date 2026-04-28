@@ -1,34 +1,38 @@
 package org.geobon.pipeline
 
 import org.geobon.script.Description.INPUTS
-import org.geobon.script.Description.LABEL
+import org.geobon.script.Description.IO__LABEL
+import org.geobon.script.Description.IO__PROPERTIES
+import org.geobon.script.Description.IO__TYPE
+import org.geobon.script.Description.IO__TYPE_OPTIONS
+import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
-import org.geobon.script.Description.TYPE
-import org.geobon.script.Description.TYPE_OPTIONS
-import org.geobon.script.ScriptRun
+import org.geobon.script.Run
+import org.geobon.server.ServerContext
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
-import kotlin.collections.get
 
 
 abstract class YMLStep(
+    protected val serverContext: ServerContext,
     protected val yamlFile: File,
     stepId:StepId,
     inputs: MutableMap<String, Pipe> = mutableMapOf(),
-    private val logger: Logger = LoggerFactory.getLogger(yamlFile.name),
+    internal val logger: Logger = LoggerFactory.getLogger(yamlFile.name),
     protected val yamlParsed: Map<String, Any> = Yaml().load(yamlFile.readText())
 ) : Step(stepId, inputs, readOutputs(yamlParsed, logger)) {
 
     /**
-     * Context becomes set in validateInputsReceived(), once the invocation inputs are known.
+     * Context becomes set in onInputsReceived(), once the invocation inputs are known.
      */
-    protected var context:RunContext? = null
+    var context:RunContext? = null
 
-    val inputsDefinition = readInputs(yamlParsed, logger)
+    val inputDefinitions = readInputTypes(yamlParsed, logger)
+
     override fun getDisplayBreadcrumbs(): String {
         return if (yamlParsed.containsKey(NAME)) "\"${yamlParsed[NAME]}\" (${id.toBreadcrumbs()})"
         else id.toBreadcrumbs()
@@ -36,40 +40,55 @@ abstract class YMLStep(
 
     override fun validateInputsConfiguration(): String {
 
-        if (inputs.size != inputsDefinition.size) {
+        if (inputs.size != inputDefinitions.size) {
             return "Bad number of inputs." +
-                    "\n\tYAML spec: ${inputsDefinition.keys}" +
+                    "\n\tYAML spec: ${inputDefinitions.keys}" +
                     "\n\tReceived:  ${inputs.keys}" +
-                    "\n\tExtra keys: ${inputs.mapNotNull { if (inputsDefinition.containsKey(it.key)) null else it.key }}" +
-                    "\n\tMissing keys: ${inputsDefinition.mapNotNull { if (inputs.containsKey(it.key)) null else it.key }}\n"
+                    "\n\tExtra keys: ${inputs.mapNotNull { if (inputDefinitions.containsKey(it.key)) null else it.key }}" +
+                    "\n\tMissing keys: ${inputDefinitions.mapNotNull { if (inputs.containsKey(it.key)) null else it.key }}\n"
         }
 
         // Validate presence and type of each input
         var errorMessages = ""
-        inputsDefinition.forEach { (inputKey, expectedType) ->
-            errorMessages += inputs[inputKey]?.let {
-                if (it.type == expectedType) ""
-                // Check for convertible types (currently only int to float, use a map/when if more conversions are possible)
-                else when {
+        inputDefinitions.forEach { (inputKey, expectedDefinition) ->
+            val expectedType = expectedDefinition.type
+
+            errorMessages += inputs[inputKey]?.let { inputPipe ->
+                when {
+                    // Regular matching type success case
+                    inputPipe.type == expectedType -> ""
+
+                    // Check for type conversions
                     // int to float accepted
-                    it.type == "int" && expectedType == "float" -> ""
+                    inputPipe.type == "int" && expectedType == "float" -> ""
+
+                    // options to text accepted
+                    inputPipe.type == IO__TYPE_OPTIONS && expectedType == IO__TYPE_TEXT -> ""
 
                     // Non-array to single-element array accepted
-                    expectedType.endsWith("[]") && it.type == expectedType.dropLast(2) -> {
-                        inputs[inputKey] = AggregatePipe(listOf(it))
+                    expectedType.endsWith("[]") && inputPipe.type == expectedType.dropLast(2) -> {
+                        inputs[inputKey] = AggregatePipe(listOf(inputPipe))
                         ""
                     }
 
-                    // Everything else refused
-                    else -> {
-                        val description = readIODescription(INPUTS, inputKey)
-                        val label = description?.get(LABEL) as? String?
-                        var displayName = if (label != null) "\"$label\" ($inputKey)" else inputKey
+                    // Accept object type conversions if required fields are there
+                    // This covers for example location chooser objects
+                    ObjectInputDefinition.fromDef(expectedType)?.let { expected ->
+                        ObjectInputDefinition.fromDef(inputPipe.type)?.let { actual ->
+                            expected.accepts(actual.requiredProperties)
+                        }
+                    } == true -> ""
 
-                        "Wrong type for input $displayName: expected \"$expectedType\" but \"${it.type}\" was received.\n"
+                    else -> {
+                        // Everything else refused
+                        val description = readIODescription(INPUTS, inputKey)
+                        val label = description?.get(IO__LABEL) as? String?
+                        val displayName = if (label != null) "\"$label\" ($inputKey)" else inputKey
+
+                        "Wrong type for input $displayName: expected \"$expectedType\" but \"${inputPipe.type}\" was received.\n"
                     }
                 }
-            } ?: "Missing key $inputKey\n\tYAML spec: ${inputsDefinition.keys}\n\tReceived:  ${inputs.keys}\n"
+            } ?: "Missing key $inputKey\n\tYAML spec: ${inputDefinitions.keys}\n\tReceived:  ${inputs.keys}\n"
         }
 
         return errorMessages
@@ -77,19 +96,22 @@ abstract class YMLStep(
 
     override fun onInputsReceived(resolvedInputs: Map<String, Any?>) {
         // Now that we know the inputs are valid, record the id
-        context = RunContext(yamlFile, resolvedInputs)
+        context = RunContext(yamlFile, resolvedInputs, serverContext)
 
         try { // Validation
-            inputs.filter { (_, pipe) -> pipe.type == TYPE_OPTIONS }.forEach { (key, _) ->
-                val options = readIODescription(INPUTS, key)?.get(TYPE_OPTIONS) as? List<*>
-                    ?: throw RuntimeException("$yamlFile: No options found for input parameter $key.")
+            // Check that the selected option is one of the defined options
+            inputs.filter { (_, pipe) -> pipe.type == IO__TYPE_OPTIONS }.forEach { (key, _) ->
+                if(inputDefinitions[key]?.type != IO__TYPE_TEXT) { // Ignore options to text conversion
+                    val options = readIODescription(INPUTS, key)?.get(IO__TYPE_OPTIONS) as? List<*>
+                        ?: throw RuntimeException("$yamlFile: No options found for input parameter $key.")
 
-                if (!options.contains(resolvedInputs[key])) {
-                    throw RuntimeException("$yamlFile: Received value ${resolvedInputs[key]} not in options $options.")
+                    if (!options.contains(resolvedInputs[key])) {
+                        throw RuntimeException("$yamlFile: Received value ${resolvedInputs[key]} as ${resolvedInputs[key]?.javaClass?.simpleName} not in options $options as ${options.first()?.javaClass?.simpleName}.")
+                    }
                 }
             }
         } catch (e:RuntimeException) {
-            record(mapOf(ScriptRun.ERROR_KEY to (e.message ?: e.toString())))
+            record(mapOf(Run.ERROR_KEY to (e.message ?: e.toString())))
             throw e
         }
     }
@@ -131,18 +153,26 @@ abstract class YMLStep(
     }
 
     override fun toString(): String {
-        return "${javaClass.simpleName} (id=$id, name=\"${yamlParsed[NAME]}\", file=${yamlFile.relativeTo(RunContext.scriptRoot)})"
+        return "${javaClass.simpleName} (id=$id, name=\"${yamlParsed[NAME]}\", file=${yamlFile.relativeTo(ServerContext.scriptsRoot)})"
     }
 
     companion object {
 
+        data class IODefinition(val type: String, private val definition: Map<*, *>) {
+            val properties
+                get() = (definition[IO__PROPERTIES] as? Iterable<*>)?.let { properties ->
+                    properties.map { it.toString() }
+                }
+        }
+
+
         /**
          * @return Map of input name to type
          */
-        private fun readInputs(yamlParsed: Map<String, Any>, logger: Logger): Map<String, String> {
-            val inputs = mutableMapOf<String, String>()
-            readIO(yamlParsed, INPUTS, logger) { key, type ->
-                inputs[key] = type
+        private fun readInputTypes(yamlParsed: Map<String, Any>, logger: Logger): Map<String, IODefinition> {
+            val inputs = mutableMapOf<String, IODefinition>()
+            readIO(yamlParsed, INPUTS, logger) { key, type, definition ->
+                inputs[key] = IODefinition(type, definition)
             }
             return inputs
         }
@@ -152,7 +182,7 @@ abstract class YMLStep(
          */
         private fun readOutputs(yamlParsed: Map<String, Any>, logger: Logger): Map<String, Output> {
             val outputs = mutableMapOf<String, Output>()
-            readIO(yamlParsed, OUTPUTS, logger) { key, type ->
+            readIO(yamlParsed, OUTPUTS, logger) { key, type, definition ->
                 outputs[key] = Output(type)
             }
             return outputs
@@ -165,18 +195,18 @@ abstract class YMLStep(
             yamlParsed: Map<String, Any>,
             section: String,
             logger: Logger,
-            toExecute: (String, String) -> Unit,
+            toExecute: (String, String, Map<*, *>) -> Unit,
         ) {
             yamlParsed[section]?.let {
                 if (it is Map<*, *>) {
-                    it.forEach { (key, description) ->
+                    it.forEach { (key, definition) ->
                         key?.let {
-                            if (description is Map<*, *>) {
-                                description[TYPE]?.let { type ->
-                                    toExecute(key.toString(), type.toString())
-                                } ?: logger.error("Invalid type")
+                            if (definition is Map<*, *>) {
+                                definition[IO__TYPE]?.let { type ->
+                                    toExecute(key.toString(), type.toString(), definition)
+                                } ?: logger.error("Invalid type for input $key")
                             } else {
-                                logger.error("$section description is not a map")
+                                logger.error("description of $section is not a map")
                             }
                         } ?: logger.error("Invalid key")
                     }

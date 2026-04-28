@@ -5,12 +5,20 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 import com.google.gson.stream.MalformedJsonException
+import org.eclipse.jgit.revwalk.RevWalk
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
-import org.geobon.utils.runToText
-import org.geobon.utils.toMD5
+import org.geobon.utils.run
+import org.geobon.utils.toSHA256
 import org.json.JSONObject
 import java.io.File
+import java.text.Normalizer
 import kotlin.math.floor
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+
 
 val outputRoot = File(System.getenv("OUTPUT_LOCATION"))
 
@@ -18,31 +26,33 @@ val outputRoot = File(System.getenv("OUTPUT_LOCATION"))
  * @param runId A unique string identifier representing a run of this step with these specific parameters.
  *           i.e. Calling the same script with the same param would result in the same ID.
  */
-data class RunContext(val runId: String, val inputs: String?) {
-    constructor(descriptionFile: File, inputs: String?) : this(
+open class RunContext(val runId: String, val inputs: Map<String, Any?>, val serverContext: ServerContext) {
+    constructor(descriptionFile: File, inputs: Map<String, Any?>, serverContext: ServerContext) : this(
         File(
             // Unique to this script
-            descriptionFile.relativeTo(scriptRoot).path.removeSuffix(".yml")
+            descriptionFile.relativeTo(scriptsRoot).path.removeSuffix(".yml")
                 .replace("../", ""), // This replacement is to accommodate script-stubs
             // Unique to these params
-            if (inputs.isNullOrEmpty()) "no_params" else inputsToMd5(inputs)
+            if (inputs.isEmpty()) "no_params" else inputsToHash(inputs)
         ).path,
-        inputs
-    )
-
-    constructor(descriptionFile: File, inputMap: Map<String, Any?>) : this(
-        descriptionFile,
-        if (inputMap.isEmpty()) null else JSONObject(preserveNulls(inputMap)).toString()
+        inputs,
+        serverContext
     )
 
     val outputFolder
         get() = File(outputRoot, runId)
+
+    val outputFolderEscaped
+        get() = outputFolder.absolutePath.replace(" ", "\\ ")
 
     val inputFile: File
         get() = File(outputFolder, "input.json")
 
     val resultFile: File
         get() = File(outputFolder, "output.json")
+
+    val logFile: File
+        get() = File(outputFolder, "logs.txt")
 
     fun getEnvironment(container: Containers): Map<String, Any?> {
         val environment = mapOf(
@@ -53,21 +63,24 @@ data class RunContext(val runId: String, val inputs: String?) {
                 "environment" to container.environment,
                 "version" to container.version
             ),
-            "dependencies" to "cat ${outputFolder.absolutePath}/dependencies.txt".runToText(showErrors = false)
+            "dependencies" to "cat ${outputFolder.absolutePath}/dependencies.txt".run(showErrors = false)
         )
         return environment
     }
 
-    fun createEnvironmentFile(container: Containers): Unit {
+    fun createEnvironmentFile(container: Containers) {
         val environment = getEnvironment(container)
         File("${outputFolder.absolutePath}/environment.json").writeText(JSONObject(environment).toString(2))
     }
-    companion object {
-        val scriptRoot
-            get() = File(System.getenv("SCRIPT_LOCATION"))
 
-        val pipelineRoot
-            get() = File(System.getenv("PIPELINES_LOCATION"))
+    fun createInputFile() {
+        if (!inputs.isEmpty()) {
+            val inputAsText = JSONObject(preserveNulls(inputs)).toString()
+            inputFile.writeText(inputAsText)
+        }
+    }
+
+    companion object {
 
         private fun preserveNulls(inputMap: Map<String, Any?>) : Map<String, Any> {
             return inputMap.mapValues { it.value ?: JSONObject.NULL }
@@ -96,37 +109,75 @@ data class RunContext(val runId: String, val inputs: String?) {
             }
             .create()
 
+        @OptIn(ExperimentalTime::class)
         fun getGitInfo(): Map<String, String?> {
-            val gitBinPath = "/usr/bin/git"
-            val gitDir = System.getenv("GIT_LOCATION")
-            val gitDirOpt = "--git-dir=$gitDir"
-            val gitCmd = "$gitBinPath $gitDirOpt"
+            val gitPath = System.getenv("GIT_LOCATION")
+            if(gitPath == null)
+                return mapOf("error" to "Git folder not defined.")
 
-            val gitCommitIDCommand = "$gitCmd log --format=%h -1"
-            val commit = "commit" to gitCommitIDCommand.runToText(showErrors = false)
+            val gitDir = File(gitPath)
+            if(!gitDir.isDirectory) {
+                return mapOf("error" to "Invalid .git directory path $gitPath")
+            }
 
-            val gitCurrentBranchCommand =  "$gitCmd  branch --show-current"
-            val branch = "branch" to gitCurrentBranchCommand.runToText(showErrors = false)
+            val builder = FileRepositoryBuilder()
+            val repository = builder.setGitDir(gitDir)
+                .readEnvironment() // scan environment GIT_* variables
+                .findGitDir() // scan up the file system tree
+                .build()
 
-            val gitTimeStampCommand = "$gitCmd log --format=%cd -1"
-            val timestamp = "timestamp" to gitTimeStampCommand.runToText(showErrors = false)
+            return repository?.use {
+                val branch = try {
+                    repository.branch
+                } catch (_: Throwable) {
+                    "Failed to read branch"
+                }
 
+                val head = repository.resolve("HEAD")
+                val commitSha = head?.name
+                    ?: "Failed to get commit sha1"
 
-            return mapOf(commit, branch, timestamp)
+                val timestamp = RevWalk(repository).use { walk ->
+                    Instant.fromEpochSeconds(walk.parseCommit(head).commitTime.toLong()).toString()
+                }
+
+                mapOf("branch" to branch, "commit" to commitSha, "timestamp" to timestamp)
+            } ?: mapOf("error" to "Could not read repository")
         }
 
         /**
          * Makes sure the file gives the same hash, regardless of the key order.
          */
-        fun inputsToMd5(jsonString: String): String {
-            val sorted = gson.fromJson<Map<String, Any>>(
+        fun inputsToHash(jsonString: String): String {
+            val inputs = gson.fromJson<Map<String, Any>>(
                 jsonString,
                 object : TypeToken<Map<String, Any>>() {}.type
-            ).toSortedMap()
-
-            return gson.toJson(sorted).toMD5()
+            )
+            return inputsToHash(inputs)
         }
 
+        /**
+         * Makes sure the file gives the same hash, regardless of the key order.
+         */
+        fun inputsToHash(inputs: Map<String, Any?>): String {
+            return sortKeysRecursively(inputs).toString().toSHA256(21)
+        }
 
+        fun sortKeysRecursively(obj: Any?): Any? = when (obj) {
+            // Sorting maps, which have no ordering by JSON spec and cannot be otherwise compared as string
+            is Map<*, *> -> obj
+                .mapKeys { it.key.toString() }
+                .mapValues { sortKeysRecursively(it.value) }
+                .toSortedMap()
+
+            // NOT sorting the lists.
+            // They don't have the same problem as the objects that are rendered in an arbitrary order,
+            // and their order does matter in most cases (e.g. bounding boxes).
+            is List<*> -> obj.map { sortKeysRecursively(it) }
+
+            is String -> Normalizer.normalize(obj, Normalizer.Form.NFC)
+
+            else -> obj
+        }
     }
 }

@@ -5,6 +5,8 @@ GREEN="\033[32m"
 YELLOW="\033[33m"
 ENDCOLOR="\033[0m"
 
+COPYRIGHT_RANGE="2021-2026"
+
 # Checking for symlink development setup
 [[ -L ".server" || -L "./pipeline-repo/.server" ]]
 symlink=$?
@@ -59,9 +61,10 @@ function help {
     echo "                         This is useful in development switching from prod to dev server,"
     echo "                         in cases when we get the following error:"
     echo "                         \"The container name ... is already in use by container ...\""
+    echo "    version              Display the current version of the server"
+    echo "    licence              Display the licence information"
     echo "    command [ARGS...]    Run an arbitrary docker compose command,"
     echo "                         such as (pull|run|up|down|build|logs)"
-    echo
 }
 
 # Must be called once before command function can be called
@@ -103,16 +106,11 @@ function prepareCommands {
         export MY_UID="$(id -u)"
     fi
 
-    # Apple M2 chip check, see https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/issues/85
     composeFiles="-f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml"
-    macCPU=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
-    if ! [[ -z "$macCPU" ]]; then
-        # This is a Mac, check chip type
-        if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
-            echo "Apple M* chip detected"
-            composeFiles+=" -f .server/compose.apple.yml"
-        fi
-    fi
+    # macCPU=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
+    # if ! [[ -z "$macCPU" ]]; then
+    #     # This is a Mac, here we could do some specific things if needed
+    # fi
 }
 
 # Run your docker commands on the server manually.
@@ -184,7 +182,6 @@ function checkout {
     git checkout $branch -- .prod-paths.env ; assertSuccess
     git checkout $branch -- compose.yml ; assertSuccess
     git checkout $branch -- compose.prod.yml ; assertSuccess
-    git checkout $branch -- compose.apple.yml; assertSuccess
     git checkout $branch -- version.txt; ## Don't assert. Only informative, plus hasn't always been there.
 
     git checkout $branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
@@ -209,16 +206,36 @@ function checkForUpdates {
 
     check_image_update() {
         local image="$1"
+        #local logFile="$(whoami)_$(basename "$image" | tr ':' '_').log"
+        #rm -f $logFile
+
         # Get the local digest in the format sha256:<hash>
-        local localDigest=$(docker image inspect --format='{{index .RepoDigests 0}}' "$image" 2>/dev/null | cut -d '@' -f2)
+        #echo docker image inspect "$image" 2>/dev/null >> $logFile
+        local localDigest=$(docker image inspect --format='{{index .Id}}' "$image" 2>/dev/null | cut -d '@' -f2)
+        #echo "Local digest: $localDigest" >> $logFile
+        #echo "Local inspect: " $(docker image inspect "$image" 2>/dev/null | cut -d '@' -f2) >> $logFile
         if [[ -z "$localDigest" ]]; then
+            #echo "Not available locally" >> $logFile
             echo "$image" # Not available locally
             return
         fi
 
         local remoteDigest=$(docker manifest inspect -v "$image")
+        #echo "Remote digest: $remoteDigest" >> $logFile
         if ! echo "$remoteDigest" | grep -q "$localDigest"; then
+            #echo "Local digest does not match remote digest for $image" >> $logFile
             echo "$image"
+        #else
+            #echo "Local digest matches: $image up to date" >> $logFile
+        fi
+
+        # Make sure the current container uses the same image (in case we switch tags with compose.env.yml)
+        local container=$(docker container ls -a --format "table {{.Image}}" | grep "^$image$")
+        if [[ -z "$container" ]]; then
+            #echo "No container exists for $image" >> $logFile
+            echo "$image"
+        #else
+            #echo "Container exists for $image" >> $logFile
         fi
     }
 
@@ -267,10 +284,10 @@ function up {
     containersToDiscard=""
 
     # Installing or updating
-    docker image ls | grep ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/ 2> /dev/null 1>&2
+    docker image ls --format '{{.Repository}}' | grep ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/ 2> /dev/null 1>&2
     if [[ $? -eq 1 ]] ; then
         # Not installed, or legacy installation
-        docker image ls | grep geobon/bon-in-a-box 2> /dev/null 1>&2
+        docker image ls --format '{{.Repository}}' | grep geobon/bon-in-a-box 2> /dev/null 1>&2
         if [[ $? -eq 0 ]] ; then
             echo -e "${YELLOW}Docker Hub containers found: cleaning up before installing the new version.${ENDCOLOR}"
             echo -e "${YELLOW}Please be patient while we save some disk space: this may take a while.${ENDCOLOR}"
@@ -336,9 +353,10 @@ function up {
             if [[ -n "$containersToDiscard" ]]; then
                 echo -e "${YELLOW}This update will discard the following runner containers: ${ENDCOLOR}"
                 for container in $containersToDiscard; do
-                    echo -e "${YELLOW} - $container${ENDCOLOR}"
+                    local containerNoTag=$(echo $container | cut -d':' -f1)
+                    echo -e "${YELLOW} - $containerNoTag${ENDCOLOR}"
                 done
-                echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
+                echo -e "${YELLOW}This means that environments and dependencies installed at runtime in these containers will need to be reinstalled.${ENDCOLOR}"
             fi
 
             if [[ " $@ " == *" -y "* || " $@ " == *" --yes "* ]]; then
@@ -365,9 +383,9 @@ function up {
     returnCode=0 # 0=true in bash
     for service in $savedContainerServices; do
         flag="--no-recreate" # By default, we keep runners unless they are updated
-        if [[ $containersToDiscard == "*$service*" ]]; then
+        if [[ $containersToDiscard == *"$service"* ]]; then
             echo "  Discarding $service runner"
-            flag=""
+            flag="--force-recreate"
         fi
 
         lastOutput=$(command up -d $flag $service 2>&1); lastReturnCode=$?;
@@ -406,7 +424,7 @@ function clean {
     output=$(docker container rm \
         biab-gateway \
         biab-script-server \
-        biab-tiler \
+        biab-python-api \
         biab-runner-conda \
         biab-runner-julia 2>&1)
 
@@ -414,6 +432,40 @@ function clean {
         echo -e "${RED}Cannot clean while BON in a Box is running.${ENDCOLOR}"
         exit 1
     fi
+}
+
+function version {
+    if [[ -f version.txt ]]; then
+        cat version.txt
+        echo ""
+    else
+        echo -e "${RED}Version file not found.${ENDCOLOR}"
+    fi
+    echo ""
+    echo "More detailed version information is available in the info tab"
+    echo "of the BON in a Box web interface."
+    echo ""
+    echo "Copyright (C) ${COPYRIGHT_RANGE}  McGill University"
+    echo "License: GPL-3.0-or-later"
+    echo "This is free software; there is NO WARRANTY."
+}
+
+function licence {
+    echo "BON in a Box Pipeline Engine"
+    echo "Copyright (C) ${COPYRIGHT_RANGE}  McGill University"
+    echo ""
+    echo "This program is free software: you can redistribute it and/or modify"
+    echo "it under the terms of the GNU General Public License as published by"
+    echo "the Free Software Foundation, either version 3 of the License, or"
+    echo "(at your option) any later version."
+    echo ""
+    echo "This program is distributed in the hope that it will be useful,"
+    echo "but WITHOUT ANY WARRANTY; without even the implied warranty of"
+    echo "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the"
+    echo "GNU General Public License for more details."
+    echo ""
+    echo "You should have received a copy of the GNU General Public License"
+    echo "along with this program.  If not, see <https://www.gnu.org/licenses/>."
 }
 
 case "$1" in
@@ -452,6 +504,12 @@ case "$1" in
         prepareCommands
         clean
         echo -e "${GREEN}Clean complete.${ENDCOLOR}"
+        ;;
+    version)
+        version
+        ;;
+    licence)
+        licence
         ;;
     *)
         help

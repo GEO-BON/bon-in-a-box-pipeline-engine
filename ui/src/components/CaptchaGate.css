@@ -1,0 +1,54 @@
+
+.captcha-gate-screen {
+  display: flex;
+  justify-content: start;
+  flex-direction: column;
+  color: whitesmoke;
+}
+
+.captcha-gate-screen.large {
+  height: 100vh;
+  align-items: center;
+  padding: 1em 0em;
+}
+
+.captcha-gate-screen .title {
+  font-weight: bold;
+}
+
+.captcha-gate-screen.large .title {
+  font-size: 2em;
+  margin-block-start: 0.67em;
+  margin-block-end: 0.67em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  unicode-bidi: isolate;
+}
+
+.captcha-gate-screen.small {
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+}
+
+.captcha-gate-screen.small .MuiCircularProgress-root {
+  flex: 0 0 auto;
+}
+
+.captcha-gate-screen.small .captcha-gate-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 auto;
+  opacity: 0.8;
+}
+
+.captcha-gate-screen.small p {
+  margin: 0;
+}
+
+.captcha-gate-screen .MuiButtonBase-root {
+  width: fit-content;
+  margin-left: 0;
+}
+

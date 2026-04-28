@@ -422,6 +422,10 @@ img#greenSquares {
   margin: 0;
 }
 
+.MuiChip-label {
+  user-select: none;
+}
+
 .outputContent .stepDescription {
   font-size: small;
   background: #444;
@@ -518,7 +522,13 @@ img#greenSquares {
   border-left: 0.4em solid #115ca2;
 }
 
-.outputTitle .clickable {
+.inlinePreview .file-download {
+  height: 1.6rem;
+  padding-top: 0.1rem;
+  text-decoration: none;
+}
+
+.outputTitle {
   display: flex;
   align-items: center;
   width: 100%;
@@ -695,6 +705,10 @@ textarea.autoResizeWidth {
   color: #444;
 }
 
+.yaml {
+  font-family: monospace;
+}
+
 .gray,
 .gray h3 {
   color: #aaaaaa;
@@ -736,6 +750,10 @@ textarea.autoResizeWidth {
   padding: 10px;
 }
 
+.inputsTop{
+  max-width: 100%;
+}
+
 .inputsTop h3,
 .inputsTop h3 button span {
   color: #fff;
@@ -744,11 +762,12 @@ textarea.autoResizeWidth {
 }
 
 .inputsTop .MuiAccordion-root.Mui-expanded {
-  width: 850px;
+  width: 100%;
+  max-width: 900px;
 }
 
 .inputsTop .MuiAccordion-root {
-  width: 250px;
+  max-width: 250px;
 }
 
 .inputsTop .MuiAccordion-root {
@@ -922,7 +941,7 @@ h2.MuiDialogTitle-root {
     margin-bottom: 10px;
   }
 
-  .outputTitle .clickable {
+  .outputTitle {
     flex-wrap: wrap
   }
 

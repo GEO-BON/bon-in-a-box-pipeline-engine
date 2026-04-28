@@ -2,19 +2,17 @@
 import { useEffect, useState, lazy, useReducer, Suspense } from "react";
 import Grid from "@mui/material/Grid";
 import CropIcon from "@mui/icons-material/Crop";
-const MapOpenLayers = lazy(() => import('./MapOpenLayers'));
+const MapOpenLayers = lazy(() => import("./MapOpenLayers"));
 import CountryRegionMenu from "./CountryRegionMenu";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
-import yaml from "js-yaml";
 import { CustomButtonGreen } from "../../CustomMUI";
-import ReactMarkdown from "react-markdown";
-import Alert from "@mui/material/Alert";
 import { defaultCRS, defaultCountry, defaultRegion } from "./utils";
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import Modal from "@mui/material/Modal";
 import { chooserReducer } from "./chooserReducer";
 import { Spinner } from "../../Spinner";
+import CRSDescription from "./CRSDescription";
 
 export default function Choosers({
   inputId,
@@ -23,8 +21,6 @@ export default function Choosers({
     label: "",
     type: "",
   },
-  onChange = () => {},
-  descriptionCell = true,
   leftLabel = true,
   updateValue,
   value = null,
@@ -33,108 +29,79 @@ export default function Choosers({
   const [openModal, setOpenModal] = useState(false);
 
   const type = inputDescription.type;
-  return (
-    <>
-      {type === "bboxCRS" && (
-        <tr>
-          <td>
-            {leftLabel && inputDescription.label && (
-              <>
-                <strong>{inputDescription.label}</strong>
-                {": "}
-              </>
-            )}
-            {value && !isCompact && (
-              <pre style={{ maxWidth: "500px", overflowX: "scroll" }}>
-                {yaml.dump(value)}
-              </pre>
-            )}
-            <br />
-          </td>
-          <td>
-            <CustomButtonGreen
-              variant="contained"
-              endIcon={<CropFreeIcon />}
-              onClick={() => {
-                setOpenModal(true);
-              }}
-              onClose={() => {
-                setOpenModal(false);
-              }}
-              className="locationChooserButton"
-            >
-              {`Choose ${inputDescription.label}`}
-            </CustomButtonGreen>
-            <Modal
-              key={`modal-chooser`}
-              open={openModal}
-              onClose={() => {
-                setOpenModal(false);
-              }}
-              aria-labelledby="modal-modal-title"
-              aria-describedby="modal-modal-description"
-            >
-              <>
-                {openModal && (
-                  <Chooser
-                    key={`choosers-modal-${inputId}`}
-                    {...{
-                      setOpenModal,
-                      inputId,
-                      inputDescription,
-                      value,
-                      updateValue,
-                      onChange,
-                    }}
-                  />
-                )}
-              </>
-            </Modal>
-          </td>
-        </tr>
-      )}
-      {type !== "bboxCRS" && (
-        <tr>
-          <td>
-            <Chooser
-              key={`choosers-modal-${inputId}`}
-              {...{
-                setOpenModal,
-                inputId,
-                inputDescription,
-                value,
-                updateValue,
-                onChange,
-              }}
-            />
-          </td>
-          {descriptionCell && (
-            <td className="descriptionCell">
-              {inputDescription.description ? (
-                <ReactMarkdown
-                  className="reactMarkdown"
-                  children={inputDescription.description}
+
+  const label = leftLabel && inputDescription.label && (
+    <h4>
+      {inputDescription.label}
+    </h4>
+  )
+
+    if (type === "bboxCRS") {
+      return (
+        <div className="chooserFieldBody">
+          {label}
+          <CustomButtonGreen
+            variant="contained"
+            endIcon={<CropFreeIcon />}
+            onClick={() => {
+              setOpenModal(true);
+            }}
+            onClose={() => {
+              setOpenModal(false);
+            }}
+            className="locationChooserButton"
+            style={{ marginBottom: "1rem", fontSize: "1rem", width: !isCompact && "500px" }}
+          >
+            {`Choose ${inputDescription.label}`}
+          </CustomButtonGreen>
+          {value && !isCompact && <CRSDescription bboxCRS={value} />}
+          <Modal
+            key={`modal-chooser-div-${inputId}`}
+            open={openModal}
+            onClose={() => {
+              setOpenModal(false);
+            }}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <>
+              {openModal && (
+                <Chooser
+                  key={`choosers-modal-div-${inputId}`}
+                  {...{
+                    setOpenModal,
+                    inputDescription,
+                    value,
+                    updateValue,
+                  }}
                 />
-              ) : (
-                <Alert severity="warning">
-                  Missing description for input "{inputId}"
-                </Alert>
               )}
-            </td>
-          )}
-        </tr>
-      )}
-    </>
-  );
+            </>
+          </Modal>
+        </div>
+      );
+    }
+    return (
+      <div className="chooserFieldBody">
+        {label}
+        <Chooser
+          key={`choosers-div-${inputId}`}
+          {...{
+            setOpenModal,
+            inputDescription,
+            value,
+            updateValue,
+          }}
+        />
+      </div>
+    );
 }
 
-export function Chooser({
+function Chooser({
   setOpenModal,
-  inputId,
   inputDescription,
   value,
   updateValue = () => {},
-  onChange,
 }) {
   const [clearFeatures, setClearFeatures] = useState(0);
   const [digitize, setDigitize] = useState(false);
@@ -156,10 +123,11 @@ export function Chooser({
     "bboxCRS",
   ].includes(type);
   const showRegion = ["countryRegion", "countryRegionCRS", "bboxCRS"].includes(
-    type
+    type,
   );
   const showCRS = ["countryRegionCRS", "bboxCRS", "CRS"].includes(type);
   const [oldValues, setOldValues] = useState({});
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (value) {
@@ -235,8 +203,9 @@ export function Chooser({
       }}
     >
       <Grid container spacing={0} sx={{ height: "100%" }}>
-        <Grid className="inputGrid"
-          size={{xs:(showMap ? 3 : 12)}}
+        <Grid
+          className="inputGrid"
+          size={{ xs: showMap ? 3 : 12 }}
           sx={{
             padding: "10px",
             height: showMap ? "100%" : "auto",
@@ -287,6 +256,7 @@ export function Chooser({
                 states,
                 dispatch,
                 value,
+                setMessage,
               }}
             />
           )}
@@ -330,6 +300,8 @@ export function Chooser({
                   clearFeatures,
                   digitize,
                   setDigitize,
+                  message,
+                  setMessage,
                 }}
               />
             </Suspense>

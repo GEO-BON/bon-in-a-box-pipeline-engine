@@ -26,6 +26,7 @@ import {
 } from "./StepDescription";
 import { getScript } from "../utils/IOId";
 import { fetchStepDescriptionAsync } from "./PipelineEditor/StepDescriptionStore";
+import downloadImg from "../img/fa-file-arrow-down.svg";
 
 export function PipelineResults({
   pipelineMetadata,
@@ -94,21 +95,19 @@ export function PipelineResults({
                       pipelineOutputResults[breadcrumbs][outputId];
 
                     // If not in outputs, check if it was an input marked as output
-                    if (!value) {
+                    if (value === null || value === undefined) {
                       value = inputFileContent[breadcrumbs];
                     }
 
 
-                    if (!value) {
+                    if (value === null || value === undefined) {
                       let noValueStatus = null;
                       if (/pipeline@\d+|default_output/.test(ioId)) {
                         noValueStatus = <span>N/A</span>;
                       } else if (runningScripts.size > 0) {
                         noValueStatus = <InlineSpinner />;
                       } else {
-                        noValueStatus = <Alert severity="warning">
-                                  See detailed results
-                                </Alert>;
+                        noValueStatus = <span>No output</span>;
                       }
                       return (
                         <div key={ioId} className="outputTitle">
@@ -196,6 +195,10 @@ export function DelayedResult({
   const [running, setRunning] = useState(false);
   const [skippedMessage, setSkippedMessage] = useState();
 
+  // Allows to poll results and logs one last time after completion.
+  // Necessary to get the very last logs in some cases, and error messages added by server after the output was written by script.
+  const [pollingResults, setPollingResults] = useState(false);
+
   const script = getScript(breadcrumbs);
 
   useEffect(() => {
@@ -208,7 +211,7 @@ export function DelayedResult({
       nowRunning ? newSet.add(folder) : newSet.delete(folder);
       return newSet;
     });
-  }, [setRunningScripts, folder, outputData]);
+  }, [setRunning, setRunningScripts, folder, outputData, pollingResults]);
 
   useEffect(() => {
     if (folder) {
@@ -280,6 +283,10 @@ export function DelayedResult({
 
                   return results;
                 });
+
+                if(!running && pollingResults) {
+                  setPollingResults(false) // Last "extra" polling done
+                }
               })
               .catch(e => {
                 console.error(e)
@@ -294,6 +301,7 @@ export function DelayedResult({
 
           // Script not done yet: wait for next attempt
           if (response.status === 404) {
+            setPollingResults(true)
             return Promise.resolve(null);
           }
 
@@ -308,7 +316,7 @@ export function DelayedResult({
 
       // Will start when folder has value, and continue the until resultData also has a value
     },
-    running ? 1000 : null
+    running || pollingResults ? 1000 : null
   );
 
   useEffect(() => {
@@ -332,7 +340,15 @@ export function DelayedResult({
   if (folder && scriptMetadata) {
     if (inputData) {
       inputsContent = (
-        <FoldableOutput title="Inputs" className="stepInputs">
+        <FoldableOutput
+          title="Inputs"
+          className="stepInputs"
+          inlineExpanded={
+            <a href={`/output/${folder}/input.json`} title="Download input file" download>
+              <img alt="Downlad input file" src={downloadImg} className="file-download" />
+            </a>
+          }
+        >
           <StepResult
             data={inputData}
             sectionMetadata={scriptMetadata.inputs}
@@ -391,7 +407,7 @@ export function DelayedResult({
       {outputsContent}
       {environmentContent}
       {folder && !skippedMessage && (
-        <LogViewer address={logsAddress} autoUpdate={!outputData} />
+        <LogViewer address={logsAddress} autoUpdate={pollingResults} />
       )}
     </FoldableOutputWithContext>
   );

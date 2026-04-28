@@ -17,7 +17,7 @@ echo "Checking for duplicate lines inside each yml file..."
 RESULTS=$(find . -name "*.yml" -exec sh -c "echo {}; \
 grep -E \"description:\s+\w+
 text:
-doi:\" '{}' \
+link:\" '{}' \
   | sort \
   | uniq -d \
   | awk '{print \"${RED}\" \"[DUPLICATE] \" \$0 \"${ENDCOLOR}\"}'" \;)

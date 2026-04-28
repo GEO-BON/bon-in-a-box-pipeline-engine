@@ -1,7 +1,7 @@
 FROM gradle:9.0-jdk21
 
 #INSTALL DOCKER CLI
-ENV DOCKER_VERSION=20.10.9
+ENV DOCKER_VERSION=29.1.2
 RUN curl -sfL -o docker.tgz "https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz" && \
   tar -xzf docker.tgz docker/docker --strip=1 && \
   mv docker /usr/local/bin && \
@@ -14,7 +14,8 @@ RUN chmod 755 /usr/local/bin/docker
 
 RUN set -ex; \
     apt-get update; \
-    apt-get install -y --no-install-recommends python3 libc6-dev; \
-    apt-get clean all;
+    apt-get install -y --no-install-recommends rsync; \
+    apt-get clean all; \
+    rm -rf /var/lib/apt/lists/*
 
 RUN echo "dev" > /version.txt

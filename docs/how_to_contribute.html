@@ -312,9 +312,9 @@ author:
 <p>There are several different types of user inputs that can be specified in the YAML file:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 33%">
-<col style="width: 33%">
-<col style="width: 33%">
+<col style="width: 23%">
+<col style="width: 19%">
+<col style="width: 56%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -377,9 +377,9 @@ author:
 <p>The user inputs can also be file types if you want to upload a file or connect the script to a previous one that outputs a specific file type. There are several file types that you can specify:</p>
 <table class="caption-top table">
 <colgroup>
+<col style="width: 13%">
 <col style="width: 25%">
-<col style="width: 38%">
-<col style="width: 36%">
+<col style="width: 59%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -441,9 +441,9 @@ author:
 <p>The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying ‘country’ as input type will create a dropdown menu with a standardized list of countries from GeoNames. Selecting ‘bboxCRS’ will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 25%">
-<col style="width: 38%">
-<col style="width: 36%">
+<col style="width: 6%">
+<col style="width: 85%">
+<col style="width: 7%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -488,9 +488,9 @@ author:
 <p>There are also several types of outputs that can be created</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 16%">
-<col style="width: 43%">
-<col style="width: 40%">
+<col style="width: 18%">
+<col style="width: 41%">
+<col style="width: 38%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -710,7 +710,7 @@ outputs: # 1 to many
 
 references: # 0 to many
   - text: # plain text reference
-    doi: # link
+    link: # full link to the resource (ex. https://doi.org/...)
 
 conda: # Optional, only needed if your script has specific package dependencies
   channels: # programs that you need
@@ -773,7 +773,7 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p>When the inputs were entered through <a href="./selectors.html">preset selectors</a>, the values associated with the selected options are available as a list with values <a href="./selectors.html">described here</a>. For example, to access the bounding box of an selector with name study_area_bbox of type <code>BboxCRS</code>. The bounding box can be accessed through:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>bbox <span class="ot">&lt;-</span> input<span class="sc">$</span>study_area_bbox<span class="sc">$</span>bbox</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>and the ID of the coordinate reference system of the bounding box, made of the authority and code:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>crs_id <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input<span class="sc">$</span>study_area_bbox<span class="sc">$</span>CRS<span class="sc">$</span>authority,input<span class="sc">$</span>study_area_bbox<span class="sc">$</span>CRS<span class="sc">$</span>code) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>crs_id <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input<span class="sc">$</span>study_area_bbox<span class="sc">$</span>CRS<span class="sc">$</span>authority,input<span class="sc">$</span>study_area_bbox<span class="sc">$</span>CRS<span class="sc">$</span>code)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -960,6 +960,40 @@ conda: # Optional, only needed if your script has specific package dependencies
 <p><img src="https://user-images.GitHubusercontent.com/6223744/218197468-142dcdfb-447f-4076-b6c5-59e8e448b32e.png" height="61"></p>
 <p>The node will change as shown below, and the details will appear on the right pane, along with the other user inputs.</p>
 <p><img src="https://user-images.GitHubusercontent.com/6223744/218197580-d5e21247-0492-40d7-b527-add323abd6b4.png" height="51"></p>
+<section id="input-type-conversions" class="level4">
+<h4 class="anchored" data-anchor-id="input-type-conversions">Input type conversions</h4>
+<p>In most cases, an output can only receive a value of the exact same type. This means that if you plug an output of type “text/csv” to an input of type “float”, the system will display an error when saving the pipeline. However, there are exceptions where type conversions are allowed:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 13%">
+<col style="width: 77%">
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><h1 id="source-type">Source type</h1></td>
+<td><h1 id="target-type">Target type</h1></td>
+<td><h1 id="example">Example</h1></td>
+</tr>
+<tr class="even">
+<td>Any type</td>
+<td>An array of that type</td>
+<td><p>When an array of GeoTIFFs is expected, a single GeoTIFF which is automatically wrapped in a single-element array.</p>
+<p><code>layer.tiff</code> becomes <code>[layer.tiff]</code></p></td>
+</tr>
+<tr class="odd">
+<td>int</td>
+<td>float</td>
+<td>A buffer in kilometers received as an int by one script and as a float by another can share the same user input. <code>1</code> becomes <code>1.0</code></td>
+</tr>
+<tr class="even">
+<td>options</td>
+<td>text</td>
+<td>A script receiving a link to any geospatial collection on a STAC as a string can be restricted at pipeline level to a few selected options.</td>
+</tr>
+</tbody>
+</table>
+</section>
 </section>
 <section id="pipeline-inputs-and-outputs" class="level3">
 <h3 class="anchored" data-anchor-id="pipeline-inputs-and-outputs">Pipeline inputs and outputs</h3>

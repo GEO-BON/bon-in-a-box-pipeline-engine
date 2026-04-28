@@ -92,10 +92,11 @@ function CsvToMap({ url, delimiter }) {
           setError("No coordinates found in this CSV file.");
           return
         }
-        setData(result);  
+        setData(result);
       })
       .catch((error) => {
         setError(error);
+        console.error(error);
       });
   }, [url]);
 

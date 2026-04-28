@@ -1,7 +1,6 @@
 package org.geobon.server.plugins
 
-import org.geobon.utils.runToText
-import org.json.JSONObject
+import org.geobon.utils.run
 
 enum class Containers(
     val containerName: String,
@@ -16,6 +15,12 @@ enum class Containers(
     SCRIPT_SERVER("biab-script-server"),
 
     /**
+     * Script server container hosts the server but can also run scripts that
+     * don't require a specific environment (such as shell scripts).
+     */
+    PYTHON_API_SERVER("biab-python-api", envCommand = """bash -c "echo \${"$"}TITILER_VERSION";"""),
+
+    /**
      * Runner for Julia scripts
      */
     JULIA("biab-runner-julia", envCommand = "julia --version"),
@@ -28,12 +33,7 @@ enum class Containers(
     /**
      * NGINX proxy (dev+prod) and client UI (prod).
      */
-    UI("biab-gateway", "bash -c '[ -f /version.txt ] && cat /version.txt || echo \"dev\"'"),
-
-    /**
-     * Tiling server used to serve GeoTIFF content.
-     */
-    TILER("biab-tiler", "docker inspect --type=image -f '{{ .Created }}' ghcr.io/developmentseed/titiler");
+    UI("biab-gateway", "bash -c '[ -f /version.txt ] && cat /version.txt || echo \"dev\"'");
 
 
     private val dockerCommand: String
@@ -41,19 +41,26 @@ enum class Containers(
 
     val dockerCommandList: List<String> by lazy {
         when (this) {
-            SCRIPT_SERVER, TILER -> emptyList()
+            SCRIPT_SERVER -> emptyList()
             else -> listOf("docker", "exec", "-i", containerName)
         }
     }
 
 
     val version: String by lazy {
-        val result = (dockerCommand + versionCommand).runToText(showErrors = false)
+        val result = (dockerCommand + versionCommand).run(showErrors = false)
         if (result.isNullOrBlank()) "offline" else result
     }
 
     val environment: String by lazy {
-        (dockerCommand + envCommand).runToText(showErrors = false) ?: ""
+        (dockerCommand + envCommand).run(showErrors = false) ?: ""
+    }
+
+    val imageName: String by lazy {
+        "docker inspect --format '{{.Config.Image}}' $containerName"
+            .run(showErrors = false)
+            ?.trim()
+            ?: ""
     }
 
     /**
@@ -69,11 +76,9 @@ enum class Containers(
             val versions = mapOf(
                 "UI" to UI.version,
                 "Script server" to SCRIPT_SERVER.version,
+                "Python API server" to mapOf("container version" to PYTHON_API_SERVER.version, "TiTiler" to PYTHON_API_SERVER.environment),
                 "Conda runner" to mapOf("container version" to CONDA.version, "environment" to CONDA.environment.replaceFirst("\n", " ")),
-                "Julia runner" to mapOf("container version" to JULIA.version, "environment" to JULIA.environment),
-                "TiTiler" to TILER.version.let {
-                    val end = it.lastIndexOf(':'); if (end == -1) it; else it.substring(0, end).replace('T', ' ')
-                }.trimEnd()
+                "Julia runner" to mapOf("container version" to JULIA.version, "environment" to JULIA.environment)
             )
             return versions
         }

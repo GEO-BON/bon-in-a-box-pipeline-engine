@@ -10,6 +10,10 @@ services:
     #   context: ./script-server/
     #   dockerfile: Dockerfile.prod
 
+  python-api:
+    image: ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/python-api:${DOCKER_SUFFIX}
+    # build: ./python-api/
+
   gateway:
     image: ghcr.io/geo-bon/bon-in-a-box-pipeline-engine/gateway:${DOCKER_SUFFIX}
     # build:
