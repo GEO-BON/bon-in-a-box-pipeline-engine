@@ -7,7 +7,7 @@ open class RemoteSetup(
 ) {
     fun statusMap(): Map<String, String?> {
         return mapOf(
-            "state" to state.toString(),
+            "state" to state.name,
             "image" to image,
             "message" to message
         )

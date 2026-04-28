@@ -91,7 +91,7 @@ class K8sConnection {
 				println("Missing mount points ${missingMounts.map { it.name }}") // TEMP
 				clusterStatus = RemoteSetup(
 					state = RemoteSetupState.NOT_CONFIGURED,
-					message = "Check runner.env config, missing mount root for the following volumes: ${missingMounts.map { it.name }}"
+					message = "Configuration in runner.env file is missing mount root for the following volumes: ${missingMounts.map { it.name }}"
 				)
 			} else {
 				println("Kubernetes client configured with namespace '$namespace'") // TEMP
@@ -194,27 +194,16 @@ class K8sConnection {
 	}
 
 	fun statusMap(): Map<String, Map<String, String?>> {
-		return if (!configured) {
-			mapOf(
-				"Configuration" to mapOf(
-					"state" to clusterStatus.toString(),
-					"message" to clusterStatus.message
-				)
-			)
-		} else {
-			val map = linkedMapOf<String, Map<String, String?>>()
-			map["Configuration"] = mapOf(
-				"state" to clusterStatus.state.toString(),
-				"namespace" to namespace,
-				"message" to clusterStatus.message
-			)
+		val map = linkedMapOf<String, Map<String, String?>>()
+		map["Configuration"] = clusterStatus.statusMap()
 
+		if(configured) {
 			workersStatus.toSortedMap().forEach { (workerName, status) ->
 				map[workerName] = status.statusMap()
 			}
-
-			map
 		}
+
+		return map
 	}
 
 	fun buildJob(jobName: String, scriptCommand: String, scriptType: ScriptType): V1Job {
