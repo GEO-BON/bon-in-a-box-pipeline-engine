@@ -2,6 +2,7 @@ import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import gplImg from "../../img/gplv3-127x51.png";
 import Versions from "./Versions";
 import HPCStatus from "./HPCStatus";
+import K8sStatus from "./K8sStatus";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -30,6 +31,16 @@ export default function InfoPage() {
         Make sure to review the attribution guidelines for pipelines and scripts.
       </p>
 
+      <h2>Server versions</h2>
+      <Versions />
+
+      <h2>Cloud-scaling Status</h2>
+      <p>
+        BON in a Box instances can run their jobs on a Kubernetes (K8s) cluster when configured in runner.env.
+        If configured, all script runs will be sent to the K8s workers.
+      </p>
+      <K8sStatus />
+
       <h2>HPC Status</h2>
       <p>
         BON in a Box instances can delegate jobs to a High Performance Computer (HPC) when configured in runner.env.
@@ -37,8 +48,6 @@ export default function InfoPage() {
       </p>
       <HPCStatus />
 
-      <h2>Server versions</h2>
-      <Versions />
     </>
   );
 }
