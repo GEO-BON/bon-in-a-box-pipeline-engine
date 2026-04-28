@@ -69,7 +69,7 @@ class InfoInputsValueExample {
         }
 
         try {
-            if (typeof instance === "[InfoInputsValueExampleOneOfInner]") {
+            if (instance instanceof [InfoInputsValueExampleOneOfInner]) {
                 this.actualInstance = instance;
             } else {
                 // plain JS object
