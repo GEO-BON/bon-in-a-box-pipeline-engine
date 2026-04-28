@@ -179,12 +179,14 @@ class K8sConnection {
 				)
 			}
 		} catch (ex: ApiException) {
+			ex.printStackTrace() // TEMP
 			clusterStatus = RemoteSetup(
 				state = RemoteSetupState.ERROR,
-				message = "Kubernetes API error (${ex.code}): ${ex.responseBody ?: ex.message}"
+				message = "Kubernetes API error (${ex.code}): ${ex.message}"
 			)
 			workersStatus = mutableMapOf()
 		} catch (ex: Exception) {
+			ex.printStackTrace() // TEMP
 			clusterStatus = RemoteSetup(
 				state = RemoteSetupState.ERROR,
 				message = "Could not read Kubernetes status: ${ex.message}"
