@@ -9,7 +9,7 @@ on:
       - ".github/scriptValidationSchema.yml"
       - ".github/pipelineValidationSchema.yml"
       - ".github/validateCerberusSchema.py"
-      - ".github/findDuplicateDescriptions.sh"
+      - ".github/findDuplicateDescriptions.py"
       - ".github/findDuplicateIds.sh"
 
 jobs:
@@ -60,11 +60,11 @@ jobs:
         filter_extensions: .yml
     - name: Find duplicate lines inside step YML file (test files)
       working-directory: script-server/src/test/resources/scripts/
-      run:  $GITHUB_WORKSPACE/.github/findDuplicateDescriptions.sh
+      run:  $GITHUB_WORKSPACE/.github/findDuplicateDescriptions.py
       shell: bash
     - name: Find duplicate lines inside step YML file (stubs)
       working-directory: script-stubs
-      run:  $GITHUB_WORKSPACE/.github/findDuplicateDescriptions.sh
+      run:  $GITHUB_WORKSPACE/.github/findDuplicateDescriptions.py
       shell: bash
 
   run-pipeline-validation:

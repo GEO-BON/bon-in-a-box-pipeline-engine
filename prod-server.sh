@@ -128,7 +128,7 @@ function validate {
 
     echo "Checking for duplicate descriptions in scripts..."
     cd scripts ; assertSuccess
-    ../.server/.github/findDuplicateDescriptions.sh ; flagErrors
+    ../.server/.github/findDuplicateDescriptions.py ; flagErrors
     cd ..
 
     echo "Validating script metadata against schema..."
@@ -184,7 +184,7 @@ function checkout {
     git checkout $branch -- compose.prod.yml ; assertSuccess
     git checkout $branch -- version.txt; ## Don't assert. Only informative, plus hasn't always been there.
 
-    git checkout $branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
+    git checkout $branch -- .github/findDuplicateDescriptions.py ; assertSuccess
     git checkout $branch -- .github/findDuplicateIds.sh ; assertSuccess
     git checkout $branch -- .github/scriptValidationSchema.yml ; assertSuccess
     git checkout $branch -- .github/pipelineValidationSchema.yml ; assertSuccess
