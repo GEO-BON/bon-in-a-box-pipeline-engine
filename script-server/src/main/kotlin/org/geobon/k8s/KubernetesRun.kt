@@ -72,6 +72,8 @@ class KubernetesRun(
             error = true
             outputs = readOutputs() ?: mutableMapOf()
 
+            ex.printStackTrace()
+
             when (ex) {
                 // TODO : CancellationException? API stop current task...
                 is TimeoutException -> {
@@ -81,8 +83,7 @@ class KubernetesRun(
                 }
 
                 is ApiException -> {
-                    val message = "Kubernetes API error (${ex.code}): ${ex.responseBody ?: ex.message}"
-                    outputs[ERROR_KEY] = message.also { log(logger::warn, it) }
+                    outputs[ERROR_KEY] = ex.toFormattedString().also { log(logger::warn, it) }
                 }
 
                 else -> {

@@ -88,13 +88,12 @@ class K8sConnection {
 
 			val missingMounts = Mount.entries.filter { it.hostRoot.isBlank() }
 			if(missingMounts.isNotEmpty()) {
-				println("Missing mount points ${missingMounts.map { it.name }}") // TEMP
 				clusterStatus = RemoteSetup(
 					state = RemoteSetupState.NOT_CONFIGURED,
 					message = "Configuration in runner.env file is missing mount root for the following volumes: ${missingMounts.map { it.name }}"
 				)
 			} else {
-				println("Kubernetes client configured with namespace '$namespace'") // TEMP
+				println("Kubernetes client configured with namespace '$namespace'")
 				clusterStatus = RemoteSetup(state = RemoteSetupState.CONFIGURED)
 
 				if (autoConnect) {
@@ -127,7 +126,7 @@ class K8sConnection {
 			return
 		}
 
-		println("Refreshing Kubernetes cluster status...") // TEMP
+		println("Refreshing Kubernetes cluster status...")
 
 		try {
 			val nodes = createCoreApi().listNode().execute().items.orEmpty()
@@ -179,14 +178,12 @@ class K8sConnection {
 				)
 			}
 		} catch (ex: ApiException) {
-			ex.printStackTrace() // TEMP
 			clusterStatus = RemoteSetup(
 				state = RemoteSetupState.ERROR,
-				message = "Kubernetes API error (${ex.code}): ${ex.message}"
+				message = ex.toFormattedString()
 			)
 			workersStatus = mutableMapOf()
 		} catch (ex: Exception) {
-			ex.printStackTrace() // TEMP
 			clusterStatus = RemoteSetup(
 				state = RemoteSetupState.ERROR,
 				message = "Could not read Kubernetes status: ${ex.message}"
