@@ -10,6 +10,7 @@ import io.kubernetes.client.util.Config
 import org.geobon.script.ScriptType
 import org.geobon.server.RemoteSetup
 import org.geobon.server.RemoteSetupState
+import org.geobon.utils.bytes
 
 class K8sConnection {
 
@@ -141,27 +142,24 @@ class K8sConnection {
 				val isReady = readyCondition?.status == "True"
 				val isSchedulable = node.spec?.unschedulable != true
 
-				val state = if (isReady && isSchedulable) {
-					RemoteSetupState.READY
+				val message:String?
+				val state: RemoteSetupState
+				if (!isReady) {
+					state = RemoteSetupState.PREPARING
+					message = "Node not Ready"
+				} else if(!isSchedulable) {
+					state = RemoteSetupState.ERROR
+					message = "Node unschedulable"
 				} else {
-					RemoteSetupState.ERROR
-				}
-
-				val reason = if (state == RemoteSetupState.READY) {
-					null
-				} else {
-					buildString {
-						if (!isReady) {
-							append("Node not Ready")
-						}
-						if (!isSchedulable) {
-							if (isNotEmpty()) append("; ")
-							append("Node unschedulable")
-						}
+					state = RemoteSetupState.READY
+					message = node.status?.capacity?.entries?.joinToString { (key, value) ->
+						"$key: " +
+								if (value.format == Quantity.Format.BINARY_SI) value.number.bytes.toString()
+								else value.number
 					}
 				}
 
-				name to RemoteSetup(state = state, message = reason)
+				name to RemoteSetup(state = state, message = message)
 			}.toMutableMap()
 
 			clusterStatus = if (workersStatus.isEmpty()) {
