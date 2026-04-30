@@ -4,6 +4,8 @@ import org.geobon.utils.DataSize.Companion.GIB
 import org.geobon.utils.DataSize.Companion.KIB
 import org.geobon.utils.DataSize.Companion.MIB
 import org.geobon.utils.DataSize.Companion.TIB
+import kotlin.math.pow
+import kotlin.math.round
 
 @JvmInline
 value class DataSize(val bytes: Long) : Comparable<DataSize> {
@@ -23,14 +25,21 @@ value class DataSize(val bytes: Long) : Comparable<DataSize> {
     operator fun div(divisor: Long): DataSize =
         DataSize(this.bytes / divisor)
 
-    override fun toString(): String {
+    override fun toString(): String = toString(-1)
+
+    fun toString(decimals: Int = -1): String {
         if (bytes < KIB) return "$bytes B"
 
-        val (value, unit) = when {
+        var (value, unit) = when {
             bytes >= TIB -> bytes.toDouble() / TIB to "TiB"
             bytes >= GIB -> bytes.toDouble() / GIB to "GiB"
             bytes >= MIB -> bytes.toDouble() / MIB to "MiB"
-            else         -> bytes.toDouble() / KIB to "KiB"
+            else -> bytes.toDouble() / KIB to "KiB"
+        }
+
+        if (decimals >= 0) {
+            val factor = 10.0.pow(decimals)
+            value = round(value * factor) / factor
         }
 
         return "${format(value)} $unit"

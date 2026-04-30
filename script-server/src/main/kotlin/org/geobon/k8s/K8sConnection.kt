@@ -154,7 +154,7 @@ class K8sConnection {
 					state = RemoteSetupState.READY
 					message = node.status?.capacity?.entries?.joinToString { (key, value) ->
 						"$key: " +
-								if (value.format == Quantity.Format.BINARY_SI) value.number.bytes.toString()
+								if (value.format == Quantity.Format.BINARY_SI) value.number.bytes.toString(2)
 								else value.number
 					}
 				}
