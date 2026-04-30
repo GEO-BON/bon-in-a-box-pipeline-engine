@@ -51,7 +51,7 @@ class K8sConnection {
 		);
 
 		val mountName: String
-			get() = this.name.lowercase()
+			get() = this.name.lowercase().replace('_', '-')
 
 		val asVolume: V1Volume
 			get() = V1Volume()
@@ -152,7 +152,7 @@ class K8sConnection {
 					message = "Node unschedulable"
 				} else {
 					state = RemoteSetupState.READY
-					message = node.status?.capacity?.entries?.joinToString { (key, value) ->
+					message = node.status?.capacity?.entries?.joinToString("\n") { (key, value) ->
 						"$key: " +
 								if (value.format == Quantity.Format.BINARY_SI) value.number.bytes.toString(2)
 								else value.number
