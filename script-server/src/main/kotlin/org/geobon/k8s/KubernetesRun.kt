@@ -33,6 +33,7 @@ class KubernetesRun(
 
     companion object {
         private val POLL_INTERVAL = 2.seconds
+        private val JOB_APPEARANCE_GRACE = 10.seconds
     }
 
     private val connection = context.serverContext.k8s ?: K8sConnection() // TODO: don't instantiate here
@@ -55,7 +56,11 @@ class KubernetesRun(
             val api = connection.createBatchApi()
 
             log(logger::info, "Submitting Kubernetes job '$jobName' in namespace '$namespace'...")
-            api.createNamespacedJob(namespace, job)
+            val created = api.createNamespacedJob(namespace, job).execute()
+            log(
+                logger::debug,
+                "Kubernetes job created: name='${created.metadata?.name}', uid='${created.metadata?.uid}'"
+            )
 
             waitForJobCompletion(api, namespace, jobName, timeout)
 
@@ -110,8 +115,23 @@ class KubernetesRun(
     ) {
         val started = TimeSource.Monotonic.markNow()
         while (true) {
-            val job = api.readNamespacedJobStatus(jobName, namespace)
-            val status = job.execute().status
+            val status = try {
+                api.readNamespacedJobStatus(jobName, namespace).execute().status
+            } catch (ex: ApiException) {
+                if (ex.code == 404 && started.elapsedNow() <= JOB_APPEARANCE_GRACE) {
+                    log(logger::debug, "Job '$jobName' not yet visible in namespace '$namespace'. Retrying...")
+                    delay(POLL_INTERVAL)
+                    continue
+                }
+                if (ex.code == 404) {
+                    throw RuntimeException(
+                        "Kubernetes job '$jobName' was not found in namespace '$namespace' while waiting for completion. " +
+                                "It may have been deleted by a cleanup policy.",
+                        ex
+                    )
+                }
+                throw ex
+            }
 
             if ((status?.succeeded ?: 0) > 0) {
                 log(logger::info, "Kubernetes job '$jobName' completed successfully.")
