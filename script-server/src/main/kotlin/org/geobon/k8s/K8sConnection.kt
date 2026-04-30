@@ -261,6 +261,46 @@ class K8sConnection {
 			)
 	}
 
+	fun describeJobPods(namespace: String, jobName: String) : String {
+		return runCatching {
+			val pods = createCoreApi().listNamespacedPod(namespace)
+				.labelSelector("job-name=$jobName")
+				.execute()
+				.items
+				.orEmpty()
+
+			if (pods.isEmpty()) {
+				"no pods found for label job-name=$jobName"
+			} else {
+				pods.joinToString(separator = " | ") { pod ->
+					val podName = pod.metadata?.name ?: "unknown"
+					val phase = pod.status?.phase ?: "unknown"
+					val node = pod.spec?.nodeName ?: "<not-scheduled>"
+
+					val waiting = pod.status?.containerStatuses
+						.orEmpty()
+						.mapNotNull { it.state?.waiting?.let { w -> "${it.name}:waiting(${w.reason ?: "unknown"})" } }
+					val terminated = pod.status?.containerStatuses
+						.orEmpty()
+						.mapNotNull { it.state?.terminated?.let { t -> "${it.name}:terminated(${t.reason ?: "unknown"},exit=${t.exitCode})" } }
+
+					val containerSummary = (waiting + terminated)
+						.ifEmpty { listOf("containers=running-or-pending") }
+						.joinToString(",")
+
+					"""
+						$podName
+							phase=$phase
+							node=$node
+							$containerSummary
+					""".trimIndent()
+				}
+			}
+		}.getOrElse { ex ->
+			"pod inspection failed: ${ex.message ?: ex.javaClass.name}"
+		}
+	}
+
 	fun toMountedPath(path: String, mount: Mount): String {
 		return path.replace(
 			mount.hostRoot.trimEnd('/'),

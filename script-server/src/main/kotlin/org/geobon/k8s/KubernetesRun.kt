@@ -2,6 +2,7 @@ package org.geobon.k8s
 
 import io.kubernetes.client.openapi.ApiException
 import io.kubernetes.client.openapi.apis.BatchV1Api
+import io.kubernetes.client.openapi.apis.CoreV1Api
 import kotlinx.coroutines.delay
 import org.geobon.pipeline.RunContext
 import org.geobon.script.Run
@@ -93,7 +94,9 @@ class KubernetesRun(
 
                 else -> {
                     val message = "An error occurred when running the script: ${ex.message}"
+
                     outputs[ERROR_KEY] = message.also { log(logger::warn, it) }
+                    logger.warn(ex) //TEMP
                     logger.warn(ex.stackTraceToString())
                 }
             }
@@ -144,6 +147,14 @@ class KubernetesRun(
 
             if (started.elapsedNow() > timeout) {
                 throw TimeoutException("Timeout occurred after $timeout")
+            }
+
+            val podStatus = connection.describeJobPods( namespace, jobName)
+            log(logger::debug, "Waiting for Kubernetes job '$jobName' to complete...\n$status")
+            log(logger::debug, "Job '$jobName' pod state: $podStatus")
+
+            if ((status?.active ?: 0) > 0 && podStatus.startsWith("no pods found")) {
+                log(logger::warn, "Job '$jobName' is active but has no pods yet. Check scheduler/events in namespace '$namespace'.")
             }
 
             delay(POLL_INTERVAL)
