@@ -222,8 +222,7 @@ class K8sConnection {
 		val container = V1Container()
 			.name(containerName)
 			.image(image)
-			.command(listOf("/bin/sh", "-c"))
-			.args(listOf(scriptCommand))
+			.command(listOf("/bin/bash", "-c", scriptCommand))
 			.resources(
 				V1ResourceRequirements()
 					.putRequestsItem("memory", Quantity("256Mi"))
