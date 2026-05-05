@@ -134,7 +134,7 @@ function validate {
     echo "Validating script metadata against schema..."
     docker run --rm --name biab-yaml-validator -v $(pwd)/scripts:"/scripts" \
         -v $(pwd)/.server/.github/:"/.github" \
-        navikt/yaml-validator:v4 \
+        ghcr.io/navikt/yaml-validator/yaml-validator:v4 \
         ".github/scriptValidationSchema.yml" "scripts/" "no" ".yml"
     flagErrors
 
