@@ -88,6 +88,7 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ${PIPELINE_REPO_PATH}/output:/static/output:ro
       - ${PIPELINE_REPO_PATH}/userdata:/static/userdata:ro
+      - ${PIPELINE_REPO_PATH}/scripts:/static/scripts:ro
     depends_on:
       - script-server
       - python-api
