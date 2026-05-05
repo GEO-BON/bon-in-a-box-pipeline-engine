@@ -11,6 +11,7 @@ on:
       - "viewer/**"
       - "Dockerfile.gateway.prod"
       - ".github/workflows/docker_ui.yml"
+      - "http-proxy/**"
 
 env:
   REGISTRY: ghcr.io
