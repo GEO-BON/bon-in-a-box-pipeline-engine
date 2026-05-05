@@ -48,18 +48,20 @@ jobs:
       run: |
         docker run --rm --name biab-yaml-validator-test \
           -v "$GITHUB_WORKSPACE:/workspace" \
+          -w /workspace \
           ghcr.io/navikt/yaml-validator/yaml-validator:v4 \
-          "/workspace/.github/scriptValidationSchema.yml" \
-          "/workspace/script-server/src/test/resources/scripts/" \
+          ".github/scriptValidationSchema.yml" \
+          "script-server/src/test/resources/scripts/" \
           "no" \
           ".yml"
     - name: YML syntax validation (stubs)
       run: |
         docker run --rm --name biab-yaml-validator-stubs \
           -v "$GITHUB_WORKSPACE:/workspace" \
+          -w /workspace \
           ghcr.io/navikt/yaml-validator/yaml-validator:v4 \
-          "/workspace/.github/scriptValidationSchema.yml" \
-          "/workspace/script-stubs" \
+          ".github/scriptValidationSchema.yml" \
+          "script-stubs" \
           "no" \
           ".yml"
     - name: Find duplicate lines inside step YML file (test files)
