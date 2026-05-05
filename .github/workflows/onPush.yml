@@ -45,19 +45,23 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: YML syntax validation (test files)
-      uses: navikt/yaml-validator@v4
-      with:
-        schema_path: .github/scriptValidationSchema.yml
-        document_path: script-server/src/test/resources/scripts/
-        validate_file_extension: no
-        filter_extensions: .yml
+      run: |
+        docker run --rm --name biab-yaml-validator-test \
+          -v "$GITHUB_WORKSPACE:/workspace" \
+          ghcr.io/navikt/yaml-validator/yaml-validator:v4 \
+          "/workspace/.github/scriptValidationSchema.yml" \
+          "/workspace/script-server/src/test/resources/scripts/" \
+          "no" \
+          ".yml"
     - name: YML syntax validation (stubs)
-      uses: navikt/yaml-validator@v4
-      with:
-        schema_path: .github/scriptValidationSchema.yml
-        document_path: script-stubs
-        validate_file_extension: no
-        filter_extensions: .yml
+      run: |
+        docker run --rm --name biab-yaml-validator-stubs \
+          -v "$GITHUB_WORKSPACE:/workspace" \
+          ghcr.io/navikt/yaml-validator/yaml-validator:v4 \
+          "/workspace/.github/scriptValidationSchema.yml" \
+          "/workspace/script-stubs" \
+          "no" \
+          ".yml"
     - name: Find duplicate lines inside step YML file (test files)
       working-directory: script-server/src/test/resources/scripts/
       run:  $GITHUB_WORKSPACE/.github/findDuplicateDescriptions.py
