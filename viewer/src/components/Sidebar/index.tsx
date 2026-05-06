@@ -221,7 +221,9 @@ export default function Sidebar(props: any) {
           return a.weight - b.weight;
         });
       }
-      sortable.map((pd: any) => {
+      sortable
+      .filter((pd: any) => pd.outputs !== "undefined")
+      .map((pd: any) => {
         if (pd) {
           return pips.push(
             <PipelineOutput
