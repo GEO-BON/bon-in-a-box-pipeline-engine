@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "org.geobon"
-version = "1.1.5"
+version = "1.2.0"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 }
@@ -25,6 +25,7 @@ ktor {
 repositories {
     mavenCentral()
     maven("https://s01.oss.sonatype.org/content/repositories/releases")
+    maven("https://jitpack.io")
 }
 
 tasks.test {
@@ -59,21 +60,29 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-gson-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
-    implementation("ch.qos.logback:logback-classic:1.5.18")
     implementation("io.ktor:ktor-server-config-yaml:$ktorVersion")
 
-    // Source: https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.5.0.202512021534-r")
+    // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+    implementation("ch.qos.logback:logback-classic:1.5.32")
+
+    // https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.6.0.202603022253-r")
 
     // https://mvnrepository.com/artifact/org.json/json
-    implementation("org.json:json:20250107")
+    implementation("org.json:json:20251224")
 
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
-    implementation("org.yaml:snakeyaml:2.5")
+    implementation("org.yaml:snakeyaml:2.6")
+
+    // https://github.com/vishna/watchservice-ktx?tab=readme-ov-file
+    implementation("com.github.vishna:watchservice-ktx:master-SNAPSHOT")
+
+
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
-    testImplementation("io.mockk:mockk:1.14.5")
+    testImplementation("io.mockk:mockk:1.14.9")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
-    testImplementation("io.kotest:kotest-runner-junit5:6.0.3")
+    // https://mvnrepository.com/artifact/io.kotest/kotest-runner-junit5
+    testImplementation("io.kotest:kotest-runner-junit5:6.1.10")
 }

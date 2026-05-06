@@ -10,6 +10,7 @@ import { Item } from "../styles";
 import _ from "underscore";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import Markdown from "markdown-to-jsx";
+import "../sidebar.css";
 
 export function PipelineOutput(props: any) {
   const {
@@ -23,15 +24,19 @@ export function PipelineOutput(props: any) {
   } = props;
 
   const [selectedItem, setSelectedPaperItem] = useState("");
-  let outs: any = "";
+  let arrayOutputs: any = null;
   if (Array.isArray(outputObj.outputs)) {
-    outs = outputObj.outputs;
+    arrayOutputs = outputObj.outputs;
+
+  } else if (outputObj.type.includes("[]")) {
+    arrayOutputs = outputObj.outputs.split(",").map((url: any) => {
+      return { ...outputObj, url: url };
+    });
   }
-  if (outputObj.outputs.includes(",") && outputObj.type.includes("[]")) {
-    outs = outputObj.outputs.split(",");
-  }
-  if (outs.length === 1) {
-    outs = outs[0];
+
+  // Fold array of 1 into single value
+  if (Array.isArray(arrayOutputs) && arrayOutputs.length === 1) {
+    arrayOutputs = arrayOutputs[0];
   }
 
   const handleSelect = (value: string) => {
@@ -56,13 +61,13 @@ export function PipelineOutput(props: any) {
           <Typography color="primary.light" sx={{ fontWeight: 600 }}>
             {`${outputObj?.label[0].toUpperCase()}${outputObj.label.slice(1)}`}
           </Typography>
-          <Typography color="primary.light" fontSize={11}>
+          <div className="markdown" style={{fontSize: 11}}>
             <Markdown>
               {outputObj?.description[0].toUpperCase() +
                 outputObj.description.slice(1)}
             </Markdown>
-          </Typography>
-          {Array.isArray(outs) && outputObj?.type?.includes("tif") && (
+          </div>
+          {Array.isArray(arrayOutputs) && outputObj?.type?.includes("tif") && (
             <FormControl
               variant="standard"
               sx={{
@@ -80,8 +85,8 @@ export function PipelineOutput(props: any) {
                 onChange={(event: any) => handleSelect(event.target.value)}
                 label="Layer"
               >
-                {outs.map((o: any) => (
-                  <CustomMenuItem key={`it-${o}`} value={o}>
+                {arrayOutputs.map((o: any) => (
+                  <CustomMenuItem key={`it-${o.url}`} value={o}>
                     {o?.description}
                   </CustomMenuItem>
                 ))}
@@ -108,17 +113,17 @@ export function PipelineOutput(props: any) {
               )}
             </FormControl>
           )}
-          {!Array.isArray(outs) &&
+          {!Array.isArray(arrayOutputs) &&
             "type" in outputObj &&
             outputObj?.type?.includes("tif") && (
               <>
                 <CustomButtonGreen
-                  key={`but-${outs.band_id}`}
+                  key={`but-${arrayOutputs.band_id}`}
                   onClick={(event: any) => {
                     handleClick(
                       event,
-                      { url: outs.url, band_id: outs.band_id },
-                      outs.type
+                      { url: arrayOutputs.url, band_id: arrayOutputs.band_id },
+                      arrayOutputs.type
                     );
                   }}
                 >
@@ -129,14 +134,14 @@ export function PipelineOutput(props: any) {
                     sx={{
                       display: "inline",
                     }}
-                    onClick={() => generateStats(outs)}
+                    onClick={() => generateStats(arrayOutputs)}
                   >
                     <BarChartIcon />
                   </CustomButton>
                 )}
               </>
             )}
-          {!Array.isArray(outs) &&
+          {!Array.isArray(arrayOutputs) &&
             (outputObj?.type?.includes("value") ||
               outputObj?.type?.includes("tsv") ||
               outputObj?.type?.includes("csv")) &&
@@ -169,7 +174,7 @@ export function PipelineOutput(props: any) {
                 </CustomButtonGreen>
               </>
             )}
-          {Array.isArray(outs) &&
+          {Array.isArray(arrayOutputs) &&
             (outputObj?.type?.includes("value") ||
               outputObj?.type?.includes("tsv") ||
               outputObj?.type?.includes("csv")) &&
@@ -191,8 +196,8 @@ export function PipelineOutput(props: any) {
                   onChange={(event: any) => handleSelect(event.target.value)}
                   label="Table"
                 >
-                  {outs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o}`} value={o}>
+                  {arrayOutputs.map((o: any) => (
+                    <CustomMenuItem key={`it-${o.url}`} value={o}>
                       {o.split("/").pop()}
                     </CustomMenuItem>
                   ))}
@@ -209,15 +214,8 @@ export function PipelineOutput(props: any) {
                 </Grid>
               </FormControl>
             )}
-          {!Array.isArray(outs) &&
-            [
-              "image/png",
-              "image/jpeg",
-              "image/jpg",
-              "image/svg",
-              "image/gif",
-              "image/bmp",
-            ].includes(outputObj?.type) &&
+          {!Array.isArray(arrayOutputs) &&
+            outputObj?.type.startsWith("image/") &&
             "type" in outputObj && (
               <CustomButtonGreen
                 key={`but-${outputObj.outputs}`}
@@ -228,7 +226,7 @@ export function PipelineOutput(props: any) {
                 See image
               </CustomButtonGreen>
             )}
-          {Array.isArray(outs) &&
+          {Array.isArray(arrayOutputs) &&
             [
               "image/png[]",
               "image/jpeg[]",
@@ -255,8 +253,8 @@ export function PipelineOutput(props: any) {
                   onChange={(event: any) => handleSelect(event.target.value)}
                   label="Layer"
                 >
-                  {outs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o}`} value={o}>
+                  {arrayOutputs.map((o: any) => (
+                    <CustomMenuItem key={`it-${o.url}`} value={o}>
                       {o.split("/").pop()}
                     </CustomMenuItem>
                   ))}
@@ -280,7 +278,7 @@ export function PipelineOutput(props: any) {
             outputObj.type == "text[]") && (
             <Typography color="secondary.light">{outputObj.outputs}</Typography>
           )}
-          {!Array.isArray(outs) &&
+          {!Array.isArray(arrayOutputs) &&
             (outputObj?.type?.includes("int") ||
               outputObj?.type?.includes("float")) &&
             "type" in outputObj && (
@@ -288,7 +286,7 @@ export function PipelineOutput(props: any) {
                 {outputObj.outputs}
               </Typography>
             )}
-          {!Array.isArray(outs) &&
+          {!Array.isArray(arrayOutputs) &&
             outputObj?.type?.includes("geo+json") &&
             "type" in outputObj && (
               <>
@@ -302,7 +300,7 @@ export function PipelineOutput(props: any) {
                 </CustomButtonGreen>
               </>
             )}
-          {!Array.isArray(outs) &&
+          {!Array.isArray(arrayOutputs) &&
             outputObj?.type?.includes("geopackage") &&
             "type" in outputObj && (
               <>
@@ -316,7 +314,7 @@ export function PipelineOutput(props: any) {
                 </CustomButtonGreen>
               </>
             )}
-          {Array.isArray(outs) &&
+          {Array.isArray(arrayOutputs) &&
             outputObj?.type?.includes("geopackage") &&
             "type" in outputObj && (
               <FormControl
@@ -336,8 +334,8 @@ export function PipelineOutput(props: any) {
                   onChange={(event: any) => handleSelect(event.target.value)}
                   label="Layer"
                 >
-                  {outs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o}`} value={o}>
+                  {arrayOutputs.map((o: any) => (
+                    <CustomMenuItem key={`it-${o.url}`} value={o}>
                       {o.split("/").pop()}
                     </CustomMenuItem>
                   ))}
@@ -354,7 +352,7 @@ export function PipelineOutput(props: any) {
                 </Grid>
               </FormControl>
             )}
-          {!Array.isArray(outs) &&
+          {!Array.isArray(arrayOutputs) &&
             outputObj?.type?.includes("json") &&
             !outputObj?.type?.includes("geo+json") &&
             "type" in outputObj && (
@@ -367,7 +365,7 @@ export function PipelineOutput(props: any) {
                 See results
               </CustomButtonGreen>
             )}
-          {!Array.isArray(outs) &&
+          {!Array.isArray(arrayOutputs) &&
             outputObj?.type?.includes("text/html") &&
             "type" in outputObj && (
               <CustomButtonGreen key={`but-${outputObj.outputs}`}>

@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
-import _ from "underscore";
+import { useEffect } from "react";
 import L from "leaflet";
 
 /**

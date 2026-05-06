@@ -5,7 +5,7 @@ const Editor = lazy(() => import('@monaco-editor/react'));
 // TODO: Try this for code validation: https://github.com/suren-atoyan/monaco-react/issues/228#issuecomment-1159365104
 
 const emptyMetadata = `name: # short name, such as My Script
-description: # Targetted to those who will interpret pipeline results and edit pipelines.
+description: # Targeted to those who will interpret pipeline results and edit pipelines.
 author: # 1 to many
   - name: # Full name
     email: # Optional, email address of the author. This will be publicly available.

@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { TileLayer, useMap } from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
 import { createRangeLegendControl } from "./Legend"
-import L from 'leaflet';
+import L from "leaflet";
 import { extractLegend } from "../../utils/ColorMapping";
 
 // const TILER_URL = 'https://titiler.xyz/cog' // A generic tiler available on the web
@@ -29,14 +29,14 @@ function fetchStats(url) {
 }
 
 function fetchBounds(url) {
-  return fetch(`${TILER_URL}/cog/bounds?url=${url}`)
+  return fetch(`${TILER_URL}/cog/info.geojson?url=${url}`)
     .then(response => {
       if (!response.ok) return Promise.reject('Failed to get bounds')
       return response.json()
     })
     .then(json => {
-      if (!json.bounds) return Promise.reject('Bounds result is empty')
-      return json.bounds
+      if (!json.bbox) return Promise.reject('Bounds result is empty')
+      return json.bbox
     })
 }
 
@@ -51,15 +51,17 @@ export default function TiTilerLayer({ url, range, setError }) {
     const addLayer = (min, max) => {
       fetchBounds(url)
         .then(bounds => {
-          let corner1 = L.latLng(bounds[1], bounds[0])
-          let corner2 = L.latLng(bounds[3], bounds[2])
+          const [minX, minY, maxX, maxY] = bounds;
+          
+          let corner1 = L.latLng(minY, minX)
+          let corner2 = L.latLng(maxY, maxX)
           let leafletBounds = L.latLngBounds(corner1, corner2)
           setBounds(leafletBounds)
           map.fitBounds(leafletBounds)
         })
         .catch(error => setError(error.message))
         .finally(() => { // Ideally we have bounds first so we don't fetch tiles outside, but it's not mandatory.
-          const tiler = `${TILER_URL}/cog/tiles/{z}/{x}/{y}`;
+          const tiler = `${TILER_URL}/cog/tiles/WebMercatorQuad/{z}/{x}/{y}`;
           const rescale = `${min},${max}`;
           const params = new URLSearchParams({
             /*assets: selectedLayerAssetName,*/
@@ -89,6 +91,6 @@ export default function TiTilerLayer({ url, range, setError }) {
     };
   }, [url, map, range, setError])
 
-  return tileLayerUrl && 
+  return tileLayerUrl &&
     <TileLayer key={tileLayerUrl /*https://stackoverflow.com/a/72552510/3519951*/} url={tileLayerUrl} opacity={0.7} bounds={bounds} />
 }

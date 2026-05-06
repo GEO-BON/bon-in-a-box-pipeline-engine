@@ -1,12 +1,12 @@
 import ReactMarkdown from 'react-markdown';
-import { LifecycleDescription } from './Lifecycle';
+import { LifecycleChip, LifecycleMessage } from './Lifecycle';
 import { HoverCard } from './HoverCard';
 import Typography from "@mui/material/Typography";
 import LinkedinLogo from "../img/LinkedIn_icon.svg";
 import ResearchGateLogo from "../img/ResearchGate_icon.svg";
 import OrcIDLogo from "../img/ORCID_ID_green.svg";
 import { isEmptyObject } from '../utils/isEmptyObject';
-import { Alert } from '@mui/material';
+import { Alert, Chip } from '@mui/material';
 
 export function StepDescription({ descriptionFile, metadata }) {
     return <>
@@ -96,8 +96,25 @@ export function GeneralDescription({ ymlPath, metadata }) {
 
     const codeLink = getCodeUrl(ymlPath, metadata.script)
 
+    const hpcMessage = metadata.hpc &&
+        `HPC enabled: Uses ${metadata.hpc["cpus-per-task"]} core${metadata.hpc["cpus-per-task"] > 1 ? "s" : ""
+        } for a maximum time of ${metadata.hpc.time}, capped to ${metadata.hpc.mem} of memory.`
+
     return <div className='stepDescription'>
-        <LifecycleDescription lifecycle={metadata.lifecycle} />
+        <div style={{ marginBottom: "20px" }}>
+            <LifecycleChip lifecycle={metadata.lifecycle} />
+            {metadata.hpc &&
+                <Chip label="HPC" size="small" title={hpcMessage} style={{
+                    marginBottom: '8px',
+                    border: '1px solid black',
+                    background: 'white',
+                    color: 'black'
+                }} />
+            }
+            {metadata.lifecycle?.message &&
+                <LifecycleMessage status={metadata.lifecycle.status} message={metadata.lifecycle.message} />
+            }
+        </div>
         {metadata.author &&
             <div>
                 <i>{generatePersonList(metadata.author)}</i>
@@ -109,11 +126,12 @@ export function GeneralDescription({ ymlPath, metadata }) {
                 <i>{generatePersonList(metadata.reviewer)}</i>
             </small></div>
         }
-        {metadata.description && <ReactMarkdown className="reactMarkdown" children={metadata.description} />}
+        {metadata.description && <div className="reactMarkdown"><ReactMarkdown children={metadata.description} /></div>}
         {codeLink && <p>
                 Code: <a href={codeLink} target="_blank">{codeLink.substring(codeLink.search(/(scripts|pipelines)\//))}</a>
             </p>
         }
+        {hpcMessage && <p>{hpcMessage}</p>}
         {metadata.external_link &&
             <p>See&nbsp;
                 <a href={metadata.external_link} target="_blank">{metadata.external_link}</a>
@@ -224,7 +242,7 @@ function jsonToYaml(jsonObj, indent = 0, lineWidth = 80) {
         return <div key={key}>
             {'  '.repeat(indent) + key + ': '}
             {key === 'description'
-                ? <>|<ReactMarkdown className='ioDescription' children={jsonObj[key]} /></>
+                ? <div className='ioDescription'>|<ReactMarkdown children={jsonObj[key]} /></div>
                 : valuetoYaml(jsonObj[key], indent, lineWidth)}
         </div>
     })

@@ -107,9 +107,7 @@ export function PipelineResults({
                       } else if (runningScripts.size > 0) {
                         noValueStatus = <InlineSpinner />;
                       } else {
-                        noValueStatus = <Alert severity="warning">
-                                  See detailed results
-                                </Alert>;
+                        noValueStatus = <span>No output</span>;
                       }
                       return (
                         <div key={ioId} className="outputTitle">
@@ -197,6 +195,10 @@ export function DelayedResult({
   const [running, setRunning] = useState(false);
   const [skippedMessage, setSkippedMessage] = useState();
 
+  // Allows to poll results and logs one last time after completion.
+  // Necessary to get the very last logs in some cases, and error messages added by server after the output was written by script.
+  const [pollingResults, setPollingResults] = useState(false);
+
   const script = getScript(breadcrumbs);
 
   useEffect(() => {
@@ -209,7 +211,7 @@ export function DelayedResult({
       nowRunning ? newSet.add(folder) : newSet.delete(folder);
       return newSet;
     });
-  }, [setRunningScripts, folder, outputData]);
+  }, [setRunning, setRunningScripts, folder, outputData, pollingResults]);
 
   useEffect(() => {
     if (folder) {
@@ -281,6 +283,10 @@ export function DelayedResult({
 
                   return results;
                 });
+
+                if(!running && pollingResults) {
+                  setPollingResults(false) // Last "extra" polling done
+                }
               })
               .catch(e => {
                 console.error(e)
@@ -295,6 +301,7 @@ export function DelayedResult({
 
           // Script not done yet: wait for next attempt
           if (response.status === 404) {
+            setPollingResults(true)
             return Promise.resolve(null);
           }
 
@@ -309,7 +316,7 @@ export function DelayedResult({
 
       // Will start when folder has value, and continue the until resultData also has a value
     },
-    running ? 1000 : null
+    running || pollingResults ? 1000 : null
   );
 
   useEffect(() => {
@@ -400,7 +407,7 @@ export function DelayedResult({
       {outputsContent}
       {environmentContent}
       {folder && !skippedMessage && (
-        <LogViewer address={logsAddress} autoUpdate={!outputData} />
+        <LogViewer address={logsAddress} autoUpdate={pollingResults} />
       )}
     </FoldableOutputWithContext>
   );

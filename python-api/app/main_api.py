@@ -29,18 +29,18 @@ countries_parquet = "https://data.fieldmaps.io/adm0/osm/intl/adm0_polygons.parqu
 regions_parquet = "https://data.fieldmaps.io/edge-matched/humanitarian/intl/adm1_polygons.parquet"
 
 if not os.path.exists("/app/countries.json"):
-    print("Generating countries.json...")
+    print("Generating countries.json...", flush=True)
     countries=ddb.sql("SELECT adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % countries_parquet).df()
     with open('/app/countries.json', 'w') as f:
-        json.dump(countries.to_dict(orient='records'), f)
-    print("done")
+        json.dump(countries.to_dict(orient='records'), f, indent=4)
+    print("done", flush=True)
 
 if not os.path.exists("/app/regions.json"):
-    print("Generating regions.json...")
+    print("Generating regions.json...", flush=True)
     regions=ddb.sql("SELECT adm1_src, adm1_name, adm0_src, adm0_name, geometry_bbox FROM read_parquet('%s')" % regions_parquet).df()
     with open('/app/regions.json', 'w') as f:
         json.dump(regions.to_dict(orient='records'), f)
-    print("done")
+    print("done", flush=True)
 
 @app.get("/region")
 def read_root():

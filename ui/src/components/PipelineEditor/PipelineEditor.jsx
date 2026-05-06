@@ -1106,24 +1106,25 @@ export default function PipelineEditor(props) {
         <p><strong>A computer is recommended for pipeline edition.</strong></p>
         <p>A phone can be used horizontally to preview a pipeline.</p>
       </div>
-
       <Dialog
         open={modal === 'saveAs'}
         onClose={() => hideModal('saveAs')}
-        PaperProps={{
-          component: 'form',
-          onSubmit: (event) => {
-            event.preventDefault();
-            const formData = new FormData(event.currentTarget);
+        slotProps={{
+          paper: {
+            component: 'form',
+            onSubmit: (event) => {
+              event.preventDefault();
+              const formData = new FormData(event.currentTarget);
 
-            hideModal('saveAs')
-            let fileName = formData.get('fileName')
-            if (!fileName.endsWith('.json')) {
-              fileName += '.json'
-            }
-            setCurrentFileName(fileName)
-            saveFileToServer(fileName)
-          },
+              hideModal('saveAs')
+              let fileName = formData.get('fileName')
+              if (!fileName.endsWith('.json')) {
+                fileName += '.json'
+              }
+              setCurrentFileName(fileName)
+              saveFileToServer(fileName)
+            },
+          }
         }}
       >
         <DialogTitle>Save to server</DialogTitle>

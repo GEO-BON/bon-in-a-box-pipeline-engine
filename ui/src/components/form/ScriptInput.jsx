@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import Checkbox from "@mui/material/Checkbox";
+import Switch from "@mui/material/Switch";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
@@ -39,7 +39,7 @@ export default function ScriptInput({
   onValueUpdated,
   cols,
   label,
-  size = "medium",
+  size = "small",
   keepWidth,
   ...passedProps
 }) {
@@ -73,7 +73,7 @@ export default function ScriptInput({
 
       return (
         <Autocomplete
-          label={label}
+          label=""
           size={size}
           multiple={multiple}
           filterSelectedOptions={multiple}
@@ -82,7 +82,7 @@ export default function ScriptInput({
             <TextField
               {...params}
               fullWidth={false}
-              label={label}
+              label=""
               size={size}
               sx={
                 small
@@ -91,6 +91,7 @@ export default function ScriptInput({
                       fontFamily: "Roboto",
                       width: "100%",
                       minWidth: 220,
+                      maxWidth: 500,
                       "& .MuiAutocomplete-inputRoot": {
                         paddingTop: "0 !important",
                         paddingBottom: "0 !important",
@@ -99,7 +100,7 @@ export default function ScriptInput({
                     }
                   : {
                       width: "100%",
-                      maxWidth: 328,
+                      maxWidth: 500,
                       "& .MuiOutlinedInput-notchedOutline": {
                         borderColor: "var(--biab-green-trans-main)",
                       },
@@ -150,7 +151,7 @@ export default function ScriptInput({
         multiline
         variant="outlined"
         size={size}
-        label={label}
+        label=""
         {...passedProps}
         value={joinIfArray(fieldValue) || ""}
         onChange={(e) => setFieldValue(e.target.value)}
@@ -159,7 +160,7 @@ export default function ScriptInput({
         onBlur={onUpdateArray}
         slotProps={{ input: { style: small ? smallPadding() : null } }}
         onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
-        sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
+        sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
       />
     );
   }
@@ -172,8 +173,7 @@ export default function ScriptInput({
         <FormGroup size={size}>
           <FormControlLabel
             control={
-              <Checkbox
-                type="checkbox"
+              <Switch
                 size={size}
                 {...passedProps}
                 checked={booleanValue}
@@ -183,8 +183,7 @@ export default function ScriptInput({
                 }}
               />
             }
-            label={label}
-            sx={{ fontFamily: "Roboto" }}
+            label=""
           />
         </FormGroup>
       );
@@ -193,7 +192,7 @@ export default function ScriptInput({
       return (
         <TextField
           type="number"
-          label={label}
+          label=""
           variant="outlined"
           size={size}
           {...passedProps}
@@ -206,7 +205,7 @@ export default function ScriptInput({
           slotProps={{
             htmlInput: { style: small ? smallPaddingNumeric() : null },
           }}
-          sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
+          sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
         />
       );
 
@@ -216,7 +215,7 @@ export default function ScriptInput({
           type="number"
           variant="outlined"
           size={size}
-          label={label}
+          label=""
           step="any"
           {...passedProps}
           value={fieldValue || ""}
@@ -231,7 +230,7 @@ export default function ScriptInput({
           slotProps={{
             htmlInput: { style: small ? smallPaddingNumeric() : null },
           }}
-          sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
+          sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
         />
       );
 
@@ -240,12 +239,12 @@ export default function ScriptInput({
     case "CRS":
     case "countryRegion":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} descriptionCell={false} value={value} updateValue={(value) => { onValueUpdated(value) }} />
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} value={value} updateValue={(value) => { onValueUpdated(value) }} />
       );
 
     case "bboxCRS":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={true} descriptionCell={false}/>
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={size=='small'}/>
       );
 
     default:
@@ -268,14 +267,14 @@ export default function ScriptInput({
       if (type.includes("/") /* assume MIME type, files have no line breaks */) {
         return <TextField
           type="text"
-          label={label}
+          label=""
           size={size}
           {...props}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.ctrlKey) updateValue(e);
           }}
           slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
-          sx={{ width: "100%", maxWidth: small ? 220 : 328 }}
+          sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
         />
       }
 
@@ -283,7 +282,6 @@ export default function ScriptInput({
       props.onKeyDown = (e) => e.ctrlKey && updateValue(e);
       return (
         <>
-          {!small && <label className="textareaLabel" for={props.id}>{label}</label>}
           <AutoResizeTextArea
             size={size}
             cols={cols}

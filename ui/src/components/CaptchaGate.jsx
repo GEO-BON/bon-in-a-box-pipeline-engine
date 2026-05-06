@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { CustomButtonGreen } from "./CustomMUI";
+import CircularProgress from "@mui/material/CircularProgress";
+import "./CaptchaGate.css";
+import { Alert, AlertTitle } from "@mui/material";
 
 const humanVarName = "h"
 const clientKeyVarName = "ck"
@@ -20,7 +23,7 @@ function hideRecaptchaBadge() {
   if (badge) badge.style.visibility = "hidden";
 };
 
-export default function CaptchaGate({ children }) {
+export default function CaptchaGate({ children, size }) {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [clientKey, setClientKey] = useState(
@@ -157,18 +160,12 @@ export default function CaptchaGate({ children }) {
   switch (state) {
     case States.LOADING:
       return (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "start",
-            alignItems: "center",
-            height: "100vh",
-            flexDirection: "column",
-            color: "whitesmoke"
-          }}
-        >
-          <h1>Verifying access...</h1>
-          <p>This process is automatic. Please wait.</p>
+        <div className={"captcha-gate-screen " + size}>
+          {size === "small" && <CircularProgress />}
+          <div className="captcha-gate-text">
+            <p className="title">Verifying access...</p>
+            <p>This process is automatic. Please wait.</p>
+          </div>
         </div>
       );
 
@@ -177,27 +174,22 @@ export default function CaptchaGate({ children }) {
 
     case States.ERROR:
       return (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "start",
-            alignItems: "center",
-            height: "100vh",
-            flexDirection: "column",
-            color: "whitesmoke"
-          }}
-        >
-          <h1>Verification Error</h1>
-          <p>{errorMessage}</p>
-          <CustomButtonGreen
-            onClick={() => {
-              setState(States.LOADING);
-              setErrorMessage("");
-              window.location.reload();
-            }}
-          >
-            Retry
-          </CustomButtonGreen>
+        <div className={"captcha-gate-screen " + size}>
+          <div className="captcha-gate-text" style={{width: '100%'}}>
+            <Alert severity="error">
+              <AlertTitle>Verification Error</AlertTitle>
+              {errorMessage}
+            </Alert>
+            <CustomButtonGreen
+              onClick={() => {
+                setState(States.LOADING);
+                setErrorMessage("");
+                window.location.reload();
+              }}
+            >
+              Retry
+            </CustomButtonGreen>
+          </div>
         </div>
       );
   }

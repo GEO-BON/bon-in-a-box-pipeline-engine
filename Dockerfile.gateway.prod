@@ -1,5 +1,5 @@
 ## UI build
-FROM node:current-alpine3.18 AS builder-ui
+FROM node:current-alpine3.22 AS builder-ui
 
 WORKDIR /app
 ENV PATH=/app/node_modules/.bin:$PATH
@@ -8,17 +8,17 @@ ENV PATH=/app/node_modules/.bin:$PATH
 COPY ui/package.json ui/package-lock.jso[n] ./
 RUN npm ci
 
-# add BON in a Box script service
+# Add BON in a Box script service
 COPY ui/BonInABoxScriptService ./BonInABoxScriptService
 RUN cd BonInABoxScriptService; npm run build; cd ..; \
     npm install ./BonInABoxScriptService;
 
-# add app
+# Add app
 COPY ui ./
 RUN npm run build
 
 ## Viewer build
-FROM node:current-alpine3.18 AS builder-viewer
+FROM node:25-alpine3.23 AS builder-viewer
 
 WORKDIR /app
 ENV PATH=/app/node_modules/.bin:$PATH
@@ -43,5 +43,9 @@ CMD ["nginx", "-g", "daemon off;"]
 # Temp switch to root user and back to write version file
 USER root
 ARG BIAB_VERSION
-RUN echo $BIAB_VERSION "($(date +'%Y-%m-%d %R'))" > /version.txt
+RUN echo $BIAB_VERSION > /version.txt
+
+ARG TARGETPLATFORM
+RUN echo "Architecture: ${TARGETPLATFORM}" >> /version.txt
+
 USER nginx

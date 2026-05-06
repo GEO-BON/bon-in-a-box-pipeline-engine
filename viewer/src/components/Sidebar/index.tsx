@@ -8,7 +8,7 @@ import {
   Link,
 } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import CustomTable from "../CustomTable";
 import CsvToGeojson, { CsvToMapArray } from "../../helpers/csv_processing";
 import { Item } from "./styles";
@@ -17,23 +17,19 @@ import _ from "underscore";
 import { PipelineOutput } from "./PipelineOutput";
 
 import type { FeatureCollection } from "geojson";
-import { url } from "inspector";
 import YAML from "yaml";
 import axios from "axios";
 import Markdown from "markdown-to-jsx";
+import "./sidebar.css";
 
 export default function Sidebar(props: any) {
   const {
-    t = (text: string) => text,
     setSelectedLayer,
     pipelineData,
     setPipelineRunId,
-    geojson,
-    setGeojson,
     setGeojsonOutput,
     setGeoPackage,
     generateStats,
-    map,
   } = props;
 
   interface Params {
@@ -44,11 +40,9 @@ export default function Sidebar(props: any) {
     features: [],
   };
 
-  const navigate = useNavigate();
   const { pipeline_run_id } = useParams<keyof Params>() as Params;
   const containerRef = useRef<HTMLInputElement>(null);
   const [pips, setPips] = useState([]);
-  const { pathname } = useLocation();
   const [outputType, setOutputType] = useState("");
   const [selectedOutput, setSelectedOutput] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -190,6 +184,7 @@ export default function Sidebar(props: any) {
           let divider = i < arr.length - 1 ? <>, </> : "";
           let name = (
             <Typography
+              key={a.name}
               fontSize={11}
               color="primary.contrastText"
               sx={{ display: "inline" }}
@@ -201,13 +196,13 @@ export default function Sidebar(props: any) {
 
           if (a.identifier) {
             return (
-              <Link target="_blank" href={`${a.identifier}`}>
+              <Link key={a.name} target="_blank" href={`${a.identifier}`}>
                 {name}
               </Link>
             );
           } else if (a.email) {
             return (
-              <Link target="_blank" href={`mailto:${a.email}`}>
+              <Link key={a.name} target="_blank" href={`mailto:${a.email}`}>
                 {name}
               </Link>
             );
@@ -246,19 +241,6 @@ export default function Sidebar(props: any) {
       setPips(pips);
     }
   }, [pipelineData.pipeline_outputs]);
-
-  const drawPolygon = () => {
-    const el = document.getElementsByClassName("leaflet-draw-draw-polygon");
-    if (el[0] instanceof HTMLElement) {
-      el[0].click();
-    }
-  };
-  const drawRectangle = () => {
-    const el = document.getElementsByClassName("leaflet-draw-draw-rectangle");
-    if (el[0] instanceof HTMLElement) {
-      el[0].click();
-    }
-  };
 
   const modalClose = () => {
     setOpenModal(false);
@@ -316,10 +298,10 @@ export default function Sidebar(props: any) {
               justifyContent="flex-end"
               alignItems="center"
             >
-              <Grid item sm={2}>
+              <Grid size={{ sm: 2 }}>
                 <img src="/viewer/logo.png" style={{ width: "100%" }} />
               </Grid>
-              <Grid item sm={10}>
+              <Grid size={{ sm: 10 }}>
                 <Typography variant="h5" color="primary.light">
                   Results Viewer
                 </Typography>
@@ -356,12 +338,13 @@ export default function Sidebar(props: any) {
                       },
                     }}
                   >
-                    <Typography color="primary.contrastText" fontSize={14}>
-                      <Markdown>{pipelineDescription}</Markdown>
-                    </Typography>
+                    <div className="markdown">
+                      <Markdown style={{fontSize: 14}}>{pipelineDescription}</Markdown>
+                    </div>
                     <Typography color="primary.contrastText" fontSize={11}>
-                      By: {pipelineAuthors}
+                      Pipeline authors:&nbsp;
                     </Typography>
+                    {pipelineAuthors}
                   </Box>
                 </Paper>
               </Box>

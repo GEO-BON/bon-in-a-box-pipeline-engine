@@ -1,4 +1,4 @@
-FROM node:current-alpine3.18
+FROM node:current-alpine3.22
 RUN npm install -g babel-cli
 
-RUN echo "dev" > /version.txt 
+RUN echo "dev" > /version.txt

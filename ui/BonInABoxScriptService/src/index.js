@@ -13,9 +13,11 @@
 
 
 import ApiClient from './ApiClient';
+import GetHPCStatus200ResponseValue from './model/GetHPCStatus200ResponseValue';
 import GetHistory200ResponseInner from './model/GetHistory200ResponseInner';
 import Info from './model/Info';
 import InfoAuthorInner from './model/InfoAuthorInner';
+import InfoHpc from './model/InfoHpc';
 import InfoInputsValue from './model/InfoInputsValue';
 import InfoInputsValueExample from './model/InfoInputsValueExample';
 import InfoInputsValueExampleOneOfInner from './model/InfoInputsValueExampleOneOfInner';
@@ -66,6 +68,12 @@ export {
     ApiClient,
 
     /**
+     * The GetHPCStatus200ResponseValue model constructor.
+     * @property {module:model/GetHPCStatus200ResponseValue}
+     */
+    GetHPCStatus200ResponseValue,
+
+    /**
      * The GetHistory200ResponseInner model constructor.
      * @property {module:model/GetHistory200ResponseInner}
      */
@@ -82,6 +90,12 @@ export {
      * @property {module:model/InfoAuthorInner}
      */
     InfoAuthorInner,
+
+    /**
+     * The InfoHpc model constructor.
+     * @property {module:model/InfoHpc}
+     */
+    InfoHpc,
 
     /**
      * The InfoInputsValue model constructor.
