@@ -61,5 +61,17 @@ export function LogViewer({ address, autoUpdate }) {
     }
   }, [logs, logsAutoScroll]);
 
-  return logs && <pre ref={logsRef} className='logs'>{logs}<span ref={logsEndRef} /></pre>;
+  return logs && <pre
+    // Make ctrl + a select the logs only, not the whole page,
+    contenteditable="true"
+    spellcheck="false"
+    ref={logsRef}
+    className='logs'
+    beforeinput={(e) => {
+      // but prevent user from editing the logs
+      e.preventDefault();
+    }}
+  >
+    {logs}<span ref={logsEndRef} />
+  </pre>;
 }
