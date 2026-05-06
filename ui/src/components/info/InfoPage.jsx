@@ -2,13 +2,14 @@ import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import gplImg from "../../img/gplv3-127x51.png";
 import Versions from "./Versions";
 import HPCStatus from "./HPCStatus";
-
+import { PageTitle } from "../../Layout";
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export default function InfoPage() {
 
   return (
     <>
+      <PageTitle title="Info" />
       <h2>License</h2>
       <table>
         <tbody>

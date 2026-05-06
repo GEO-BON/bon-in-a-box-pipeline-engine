@@ -261,109 +261,112 @@ export default function Sidebar(props: any) {
   }, []);
 
   return (
-    <Box
-      sx={{
-        width: "30vw",
-        background: "#333",
-        zIndex: 999,
-        position: "fixed",
-        top: 0,
-        left: 0,
-        height: "100vh",
-        border: "2px solid #444",
-        overflowY: "scroll",
-        overflowX: "hidden",
-        "&::-webkit-scrollbar": {
-          background: "#222",
-          width: "10px",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          background: "#444",
-          borderRadius: "3px",
-        },
-      }}
-      draggable
-      ref={containerRef}
-    >
-      <Grid sx={{ marginLeft: "15px" }}>
-        <Stack
-          spacing={{ xs: 1, sm: 1, md: 2 }}
-          sx={{ width: "100%", background: "none", border: "0px" }}
-        >
-          <Item sx={{ background: "none", border: "0px" }}>
-            <Grid
-              container
-              spacing={2}
-              direction="row"
-              justifyContent="flex-end"
-              alignItems="center"
-            >
-              <Grid size={{ sm: 2 }}>
-                <img src="/viewer/logo.png" style={{ width: "100%" }} />
-              </Grid>
-              <Grid size={{ sm: 10 }}>
-                <Typography variant="h5" color="primary.light">
-                  Results Viewer
-                </Typography>
-              </Grid>
-            </Grid>
-            <Box>
-              <Typography color="secondary.light">
-                Explore results from a BON in a Box analysis pipeline
-              </Typography>
-            </Box>
-            {pipelineTitle && (
-              <Box>
-                <Paper
-                  sx={{
-                    padding: "15px",
-                    margin: "10px 30px 10px 0px",
-                    border: "1.5px solid #222",
-                  }}
-                  elevation={5}
-                >
-                  {pipelineTitle}
-
-                  <Box
-                    sx={{
-                      maxHeight: "200px",
-                      overflowY: "auto",
-                      "&::-webkit-scrollbar": {
-                        background: "#444",
-                        width: "10px",
-                      },
-                      "&::-webkit-scrollbar-thumb": {
-                        background: "#666",
-                        borderRadius: "3px",
-                      },
-                    }}
-                  >
-                    <div className="markdown">
-                      <Markdown style={{fontSize: 14}}>{pipelineDescription}</Markdown>
-                    </div>
-                    <Typography color="primary.contrastText" fontSize={11}>
-                      Pipeline authors:&nbsp;
-                    </Typography>
-                    {pipelineAuthors}
-                  </Box>
-                </Paper>
-              </Box>
-            )}
-            <Box>{pips}</Box>
-          </Item>
-        </Stack>
-      </Grid>
-      <Modal
-        open={openModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        onClose={modalClose}
-        sx={{ width: "60vw", height: "80vh", margin: "auto" }}
+    <>
+      <title>{ pipelineData?.name ? pipelineData.name : "" }</title>
+      <Box
+        sx={{
+          width: "30vw",
+          background: "#333",
+          zIndex: 999,
+          position: "fixed",
+          top: 0,
+          left: 0,
+          height: "100vh",
+          border: "2px solid #444",
+          overflowY: "scroll",
+          overflowX: "hidden",
+          "&::-webkit-scrollbar": {
+            background: "#222",
+            width: "10px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "#444",
+            borderRadius: "3px",
+          },
+        }}
+        draggable
+        ref={containerRef}
       >
-        <Box sx={{ width: "60vw", height: "80vh", margin: "auto" }}>
-          {modalContent}
-        </Box>
-      </Modal>
-    </Box>
+        <Grid sx={{ marginLeft: "15px" }}>
+          <Stack
+            spacing={{ xs: 1, sm: 1, md: 2 }}
+            sx={{ width: "100%", background: "none", border: "0px" }}
+          >
+            <Item sx={{ background: "none", border: "0px" }}>
+              <Grid
+                container
+                spacing={2}
+                direction="row"
+                justifyContent="flex-end"
+                alignItems="center"
+              >
+                <Grid size={{ sm: 2 }}>
+                  <img src="/viewer/logo.png" style={{ width: "100%" }} />
+                </Grid>
+                <Grid size={{ sm: 10 }}>
+                  <Typography variant="h5" color="primary.light">
+                    Results Viewer
+                  </Typography>
+                </Grid>
+              </Grid>
+              <Box>
+                <Typography color="secondary.light">
+                  Explore results from a BON in a Box analysis pipeline
+                </Typography>
+              </Box>
+              {pipelineTitle && (
+                <Box>
+                  <Paper
+                    sx={{
+                      padding: "15px",
+                      margin: "10px 30px 10px 0px",
+                      border: "1.5px solid #222",
+                    }}
+                    elevation={5}
+                  >
+                    {pipelineTitle}
+
+                    <Box
+                      sx={{
+                        maxHeight: "200px",
+                        overflowY: "auto",
+                        "&::-webkit-scrollbar": {
+                          background: "#444",
+                          width: "10px",
+                        },
+                        "&::-webkit-scrollbar-thumb": {
+                          background: "#666",
+                          borderRadius: "3px",
+                        },
+                      }}
+                    >
+                      <div className="markdown">
+                        <Markdown style={{fontSize: 14}}>{pipelineDescription}</Markdown>
+                      </div>
+                      <Typography color="primary.contrastText" fontSize={11}>
+                        Pipeline authors:&nbsp;
+                      </Typography>
+                      {pipelineAuthors}
+                    </Box>
+                  </Paper>
+                </Box>
+              )}
+              <Box>{pips}</Box>
+            </Item>
+          </Stack>
+        </Grid>
+        <Modal
+          open={openModal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          onClose={modalClose}
+          sx={{ width: "60vw", height: "80vh", margin: "auto" }}
+        >
+          <Box sx={{ width: "60vw", height: "80vh", margin: "auto" }}>
+            {modalContent}
+          </Box>
+        </Modal>
+      </Box>
+    </>
   );
 }

@@ -51,6 +51,7 @@ import sleep from "../../utils/Sleep";
 import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
+import { PageTitle } from "../../Layout";
 
 import yaml, { YAMLException } from "js-yaml";
 import _lang from "lodash/lang";
@@ -1092,257 +1093,260 @@ export default function PipelineEditor(props) {
   }, [metadata]);
 
   return (
-    <div id="editorLayout">
-      <h2 className="pipelineTitle">
-        {title}
-      </h2>
-      <div className="narrowWarning">
-        <p>The pipeline engine cannot be used on a narrow display.</p>
-        <p><strong>A computer is recommended for pipeline edition.</strong></p>
-        <p>A phone can be used horizontally to preview a pipeline.</p>
-      </div>
-      <Dialog
-        open={modal === 'saveAs'}
-        onClose={() => hideModal('saveAs')}
-        slotProps={{
-          paper: {
-            component: 'form',
-            onSubmit: (event) => {
-              event.preventDefault();
-              const formData = new FormData(event.currentTarget);
+    <>
+      <PageTitle title="Pipeline Editor" />
+      <div id="editorLayout">
+        <h2 className="pipelineTitle">
+          {title}
+        </h2>
+        <div className="narrowWarning">
+          <p>The pipeline engine cannot be used on a narrow display.</p>
+          <p><strong>A computer is recommended for pipeline edition.</strong></p>
+          <p>A phone can be used horizontally to preview a pipeline.</p>
+        </div>
+        <Dialog
+          open={modal === 'saveAs'}
+          onClose={() => hideModal('saveAs')}
+          slotProps={{
+            paper: {
+              component: 'form',
+              onSubmit: (event) => {
+                event.preventDefault();
+                const formData = new FormData(event.currentTarget);
 
-              hideModal('saveAs')
-              let fileName = formData.get('fileName')
-              if (!fileName.endsWith('.json')) {
-                fileName += '.json'
-              }
-              setCurrentFileName(fileName)
-              saveFileToServer(fileName)
-            },
-          }
-        }}
-      >
-        <DialogTitle>Save to server</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="File name"
-            type="text"
-            defaultValue={currentFileName}
-            id="fileName"
-            name="fileName"
-            autoFocus
-            required
-            variant="standard"
-            sx={{
-              width: '400px'
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => hideModal('saveAs')}>Cancel</Button>
-          <Button type="submit">Save</Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={modal === 'saveError'}
-        onClose={() => hideModal('saveError')}
-      >
-        <DialogTitle>Error saving the pipeline</DialogTitle>
-        <DialogContent>
-          <Alert severity="error" style={{ whiteSpace: "pre-wrap" }}>
-            {alertMessage}
-          </Alert>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={(_) => { hideModal('saveError'); onSave() }}>Save to clipboard</Button>
-          <Button onClick={(_) => hideModal('saveError')}>Dismiss</Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={modal === 'clear'}
-        onClose={() => hideModal('clear')}
-      >
-        <DialogTitle>Are you sure you want to clear the pipeline editor?</DialogTitle>
-        <DialogActions>
-          <Button onClick={() => {clearPipelineEditor()}}>Clear canvas</Button>
-          <Button onClick={() => hideModal('clear')}>Keep changes</Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={modal === 'overwrite'}
-        onClose={() => hideModal('overwrite')}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">This file name already exists.</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Do you want to continue and overwrite the existing file?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModal('saveAs')}>Cancel</Button>
-          <Button onClick={() => { hideModal('overwrite'); onSave(currentFileName) }} autoFocus>
-            Overwrite
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={modal === 'leavePage'}
-        onClose={handleLeavePageModalClose}
-      >
-        <DialogTitle>Leaving the editor</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            There are unsaved modifications that will be lost when leaving the page.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleLeavePageModalClose}>Stay</Button>
-          <Button onClick={blocker.proceed}>Leave</Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={(modal ?? false) &&
-          (modal === "unsavedLoadFromFile" || modal.startsWith("unsavedLoadFromServer:"))}
-        onClose={hideCurrentModal}
-      >
-        <DialogTitle>Unsaved changes</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            There are unsaved modifications that will be lost when loading the new pipeline.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={hideCurrentModal}>Stay</Button>
-          <Button onClick={() => {
-            hideCurrentModal();
-            if (modal === "unsavedLoadFromFile") inputFile.current.click()
-            else loadFromServer(modal.substring("unsavedLoadFromServer:".length))
-          }}>
-            Leave
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {modal === "alert" && // when in open={...}, there was a flash frame while closing.
-        <Dialog open={true} onClose={clearAlert}>
-          <Alert severity={alertSeverity} id="alert-dialog-description" style={{ whiteSpace: "pre-wrap" }}>
-            <AlertTitle>{alertTitle}</AlertTitle>
-            {alertMessage}
-          </Alert>
+                hideModal('saveAs')
+                let fileName = formData.get('fileName')
+                if (!fileName.endsWith('.json')) {
+                  fileName += '.json'
+                }
+                setCurrentFileName(fileName)
+                saveFileToServer(fileName)
+              },
+            }
+          }}
+        >
+          <DialogTitle>Save to server</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="File name"
+              type="text"
+              defaultValue={currentFileName}
+              id="fileName"
+              name="fileName"
+              autoFocus
+              required
+              variant="standard"
+              sx={{
+                width: '400px'
+              }}
+            />
+          </DialogContent>
           <DialogActions>
-            <Button onClick={clearAlert}>OK</Button>
+            <Button onClick={() => hideModal('saveAs')}>Cancel</Button>
+            <Button type="submit">Save</Button>
           </DialogActions>
         </Dialog>
-      }
+
+        <Dialog
+          open={modal === 'saveError'}
+          onClose={() => hideModal('saveError')}
+        >
+          <DialogTitle>Error saving the pipeline</DialogTitle>
+          <DialogContent>
+            <Alert severity="error" style={{ whiteSpace: "pre-wrap" }}>
+              {alertMessage}
+            </Alert>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={(_) => { hideModal('saveError'); onSave() }}>Save to clipboard</Button>
+            <Button onClick={(_) => hideModal('saveError')}>Dismiss</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={modal === 'clear'}
+          onClose={() => hideModal('clear')}
+        >
+          <DialogTitle>Are you sure you want to clear the pipeline editor?</DialogTitle>
+          <DialogActions>
+            <Button onClick={() => {clearPipelineEditor()}}>Clear canvas</Button>
+            <Button onClick={() => hideModal('clear')}>Keep changes</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={modal === 'overwrite'}
+          onClose={() => hideModal('overwrite')}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">This file name already exists.</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Do you want to continue and overwrite the existing file?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setModal('saveAs')}>Cancel</Button>
+            <Button onClick={() => { hideModal('overwrite'); onSave(currentFileName) }} autoFocus>
+              Overwrite
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={modal === 'leavePage'}
+          onClose={handleLeavePageModalClose}
+        >
+          <DialogTitle>Leaving the editor</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              There are unsaved modifications that will be lost when leaving the page.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleLeavePageModalClose}>Stay</Button>
+            <Button onClick={blocker.proceed}>Leave</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={(modal ?? false) &&
+            (modal === "unsavedLoadFromFile" || modal.startsWith("unsavedLoadFromServer:"))}
+          onClose={hideCurrentModal}
+        >
+          <DialogTitle>Unsaved changes</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              There are unsaved modifications that will be lost when loading the new pipeline.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={hideCurrentModal}>Stay</Button>
+            <Button onClick={() => {
+              hideCurrentModal();
+              if (modal === "unsavedLoadFromFile") inputFile.current.click()
+              else loadFromServer(modal.substring("unsavedLoadFromServer:".length))
+            }}>
+              Leave
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {modal === "alert" && // when in open={...}, there was a flash frame while closing.
+          <Dialog open={true} onClose={clearAlert}>
+            <Alert severity={alertSeverity} id="alert-dialog-description" style={{ whiteSpace: "pre-wrap" }}>
+              <AlertTitle>{alertTitle}</AlertTitle>
+              {alertMessage}
+            </Alert>
+            <DialogActions>
+              <Button onClick={clearAlert}>OK</Button>
+            </DialogActions>
+          </Dialog>
+        }
 
 
-      <Snackbar open={modal === 'saveSuccess'}
-        autoHideDuration={3000} onClose={() => hideModal('saveSuccess')}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert severity="success">Pipeline saved to server</Alert>
-      </Snackbar>
+        <Snackbar open={modal === 'saveSuccess'}
+          autoHideDuration={3000} onClose={() => hideModal('saveSuccess')}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        >
+          <Alert severity="success">Pipeline saved to server</Alert>
+        </Snackbar>
 
 
-      <div className="dndflow">
-        <ReactFlowProvider>
-          <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              nodeTypes={customNodeTypes}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              onInit={setReactFlowInstance}
-              onDrop={onDrop}
-              onDragOver={onDragOver}
-              onSelectionChange={onSelectionChange}
-              onNodesDelete={onNodesDelete}
-              deleteKeyCode={['Backspace', 'Delete']}
-              onMouseDownCapture={onPopupMenuHide}
-            >
-              {toolTip && <div className="tooltip">{toolTip}</div>}
+        <div className="dndflow">
+          <ReactFlowProvider>
+            <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                nodeTypes={customNodeTypes}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                onInit={setReactFlowInstance}
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                onSelectionChange={onSelectionChange}
+                onNodesDelete={onNodesDelete}
+                deleteKeyCode={['Backspace', 'Delete']}
+                onMouseDownCapture={onPopupMenuHide}
+              >
+                {toolTip && <div className="tooltip">{toolTip}</div>}
 
-              <div className="save__controls">
-                <button onClick={() => onLayout()}>Layout</button>
-                <input
-                  type="file"
-                  id="file"
-                  ref={inputFile}
-                  accept="application/json"
-                  onChange={onLoadFromFile}
-                  style={{ display: "none" }}
+                <div className="save__controls">
+                  <button onClick={() => onLayout()}>Layout</button>
+                  <input
+                    type="file"
+                    id="file"
+                    ref={inputFile}
+                    accept="application/json"
+                    onChange={onLoadFromFile}
+                    style={{ display: "none" }}
+                  />
+                  <button id="loadFromFileBtn" onClick={onLoadFromFileBtnClick}>Load from file</button>
+                  <button onClick={onLoadFromServerBtnClick}>
+                    Load from server
+                  </button>
+                  <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
+                  <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
+                  <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
+                </div>
+
+                <Controls />
+
+                <IOListPane
+                  inputList={inputList}
+                  setInputList={setInputList}
+                  outputList={outputList}
+                  setOutputList={setOutputList}
+                  selectedNodes={selectedNodes}
+                  editSession={editSession}
                 />
-                <button id="loadFromFileBtn" onClick={onLoadFromFileBtnClick}>Load from file</button>
-                <button onClick={onLoadFromServerBtnClick}>
-                  Load from server
-                </button>
-                <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
-                <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
-                <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
-              </div>
 
-              <Controls />
+                <MetadataPane metadata={metadata} setMetadata={setMetadata} metadataError={metadataError} />
+                <MiniMap
+                  nodeStrokeColor={(n) => {
+                    switch (n.type) {
+                      case "constant":
+                        return "#0041d0";
+                      case "userInput":
+                        return "#36eb5a";
+                      case "output":
+                        return "#ff0072";
+                      default:
+                        return "black";
+                    }
+                  }}
+                  nodeColor={(n) => {
+                    switch (n.type) {
+                      case "constant":
+                        return "#0041d0";
+                      case "userInput":
+                        return "#36eb5a";
+                      case "output":
+                        return "#ff0072";
+                      default:
+                        return "white";
+                    }
+                  }}
+                />
 
-              <IOListPane
-                inputList={inputList}
-                setInputList={setInputList}
-                outputList={outputList}
-                setOutputList={setOutputList}
-                selectedNodes={selectedNodes}
-                editSession={editSession}
-              />
+                <div className="react-flow__attribution bottom left previewMode">
+                    Currently in <strong>preview mode</strong>. Use a larger screen to edit.
+                </div>
+              </ReactFlow>
+            </div>
+          </ReactFlowProvider>
+        </div>
 
-              <MetadataPane metadata={metadata} setMetadata={setMetadata} metadataError={metadataError} />
-              <MiniMap
-                nodeStrokeColor={(n) => {
-                  switch (n.type) {
-                    case "constant":
-                      return "#0041d0";
-                    case "userInput":
-                      return "#36eb5a";
-                    case "output":
-                      return "#ff0072";
-                    default:
-                      return "black";
-                  }
-                }}
-                nodeColor={(n) => {
-                  switch (n.type) {
-                    case "constant":
-                      return "#0041d0";
-                    case "userInput":
-                      return "#36eb5a";
-                    case "output":
-                      return "#ff0072";
-                    default:
-                      return "white";
-                  }
-                }}
-              />
-
-              <div className="react-flow__attribution bottom left previewMode">
-                  Currently in <strong>preview mode</strong>. Use a larger screen to edit.
-              </div>
-            </ReactFlow>
-          </div>
-        </ReactFlowProvider>
+        <PopupMenu
+          x={popupMenuPos.x}
+          y={popupMenuPos.y}
+          optionMapping={popupMenuOptions}
+          onPopupMenuHide={onPopupMenuHide}
+        />
       </div>
-
-      <PopupMenu
-        x={popupMenuPos.x}
-        y={popupMenuPos.y}
-        optionMapping={popupMenuOptions}
-        onPopupMenuHide={onPopupMenuHide}
-      />
-    </div>
+    </>
   );
 }
