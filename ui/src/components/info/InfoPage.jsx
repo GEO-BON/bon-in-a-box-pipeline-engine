@@ -54,9 +54,7 @@ export default function InfoPage() {
       <HPCStatus />
 
       <h2>Server versions</h2>
-      <div style={{ paddingBottom: '40px' }}>
-        <Versions />
-      </div>
+      <Versions />
     </>
   );
 }
