@@ -311,7 +311,7 @@ For more information, refer to the [conda documentation](https://docs.conda.io/p
 
 If you need a package that is not available in conda, such as one downloaded from GitHub, install the package directly in the script. Do not add these packages to the conda portion of the yml file because conda will not be able to recognize them.
 
-**In R,** concurrent installation of packages can be problematic (for example when running the same script multiple times in parallel). For this language only, we provide a function, \`biab_ensure_package(...)\` that monitors the R locking mechanism to hold back the concurrent scripts during installation. Below is an example usage:\
+**In R,** concurrent installation of packages can be problematic (for example when running the same script multiple times in parallel). For this language only, you must use the function \`biab_ensure_package(...)\` that monitors the R locking mechanism to hold back the concurrent scripts during installation. Below is an example usage:\
 
 ``` R
 biab_ensure_package(
