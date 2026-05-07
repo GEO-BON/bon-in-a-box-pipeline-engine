@@ -222,7 +222,7 @@ export default function Sidebar(props: any) {
         });
       }
       sortable
-      .filter((pd: any) => pd.outputs !== "undefined")
+      .filter((pd: any) => pd.outputs !== "undefined" && pd.outputs !== undefined && pd.outputs !== null)
       .map((pd: any) => {
         if (pd) {
           return pips.push(
