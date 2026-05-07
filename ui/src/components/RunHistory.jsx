@@ -25,7 +25,6 @@ import { CustomButtonGreen, CustomButtonGrey } from "./CustomMUI";
 import { Alert } from "@mui/material";
 import Warning from "@mui/icons-material/Warning";
 import yaml from "js-yaml";
-import { PageTitle } from "../Layout";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -88,13 +87,7 @@ export default function RunHistory() {
     });
   }, [start, limit]);
 
-  return (
-    <>
-      <PageTitle title="History" />
-      {runHistory ? runHistory : <Spinner variant="light" />}
-    </>
-
-  );
+  return runHistory ? runHistory : <Spinner variant="light" />;
 }
 
 export const LastNRuns = ({n}) => {

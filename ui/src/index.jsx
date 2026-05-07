@@ -42,7 +42,15 @@ function NotFound() {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout right={<HomePage />} />,
+    element: (
+      <Layout right={
+        <>
+          <PageTitle title="Home" />
+          <HomePage />
+        </>
+        }
+      />
+    ),
   },
   {
     path: "script-form/:pipeline?/:runHash?",
@@ -74,11 +82,27 @@ const router = createBrowserRouter([
   },
   {
     path: "history",
-    element: <Layout right={<RunHistory />} />,
+    element: (
+      <Layout right={
+        <>
+          <PageTitle title="History" />
+          <RunHistory />
+        </>
+        }
+      />
+    ),
   },
   {
     path: "info",
-    element: <Layout right={<InfoPage />} />,
+    element: (
+      <Layout right={
+        <>
+          <PageTitle title="Info" />
+          <InfoPage />
+        </>
+        }
+      />
+    ),
   },
   {
     path: "*",
