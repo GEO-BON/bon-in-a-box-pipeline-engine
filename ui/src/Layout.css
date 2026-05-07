@@ -610,6 +610,7 @@ input[type="number"].input-float {
 
 .logs {
   border: 2px solid #87cefa45;
+  outline: none;
   height: 30em;
   overflow: auto;
   padding: 0.5em;
