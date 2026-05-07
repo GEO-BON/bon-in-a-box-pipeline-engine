@@ -63,18 +63,14 @@ export function LogViewer({ address, autoUpdate }) {
 
   return logs && <pre
     // Make ctrl + a select the logs only, not the whole page,
-    contenteditable="true"
-    spellcheck="false"
+    contentEditable="true"
+    suppressContentEditableWarning={true}
+    spellCheck="false"
     ref={logsRef}
     className='logs'
-    onInput={(e) => {
-      // but prevent user from editing the logs
+    onBeforeInput={(e) => {
+      // Prevent user from editing the logs (including copy-paste)
       e.preventDefault();
-
-      // and update the logs content to the original logs (without user edits)
-      if (logsRef.current) {
-        logsRef.current.textContent = logs;
-      }
     }}
   >
     {logs}<span ref={logsEndRef} />
