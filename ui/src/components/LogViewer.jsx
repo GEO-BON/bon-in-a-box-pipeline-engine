@@ -67,9 +67,14 @@ export function LogViewer({ address, autoUpdate }) {
     spellcheck="false"
     ref={logsRef}
     className='logs'
-    beforeinput={(e) => {
+    onInput={(e) => {
       // but prevent user from editing the logs
       e.preventDefault();
+
+      // and update the logs content to the original logs (without user edits)
+      if (logsRef.current) {
+        logsRef.current.textContent = logs;
+      }
     }}
   >
     {logs}<span ref={logsEndRef} />
