@@ -262,7 +262,7 @@ export default function Sidebar(props: any) {
 
   return (
     <>
-      <title>{ pipelineData?.name ? pipelineData.name : "" }</title>
+      <title>{ pipelineData?.name ? pipelineData.name : "Results Viewer" }</title>
       <Box
         sx={{
           width: "30vw",
