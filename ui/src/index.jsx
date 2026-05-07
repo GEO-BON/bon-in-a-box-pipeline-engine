@@ -15,7 +15,7 @@ import {
 import HomePage from "./components/HomePage";
 import { PipelinePage } from "./components/PipelinePage";
 import StepChooser from "./components/PipelineEditor/StepChooser";
-import { Layout } from "./Layout";
+import { Layout, PageTitle } from "./Layout";
 import InfoPage from "./components/info/InfoPage";
 import RunHistory from "./components/RunHistory";
 import { Spinner } from "./components/Spinner";
@@ -62,9 +62,12 @@ const router = createBrowserRouter([
       <Layout
         left={<StepChooser />}
         right={
-          <Suspense fallback={<Spinner />}>
-            <PipelineEditor />
-          </Suspense>
+          <>
+            <PageTitle title="Pipeline Editor" />
+            <Suspense fallback={<Spinner />}>
+              <PipelineEditor />
+            </Suspense>
+          </>
         }
       />
     ),
