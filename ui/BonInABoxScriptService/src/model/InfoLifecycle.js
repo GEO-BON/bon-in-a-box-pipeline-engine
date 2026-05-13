@@ -122,6 +122,12 @@ InfoLifecycle['StatusEnum'] = {
     "reviewed": "reviewed",
 
     /**
+     * value: "core"
+     * @const
+     */
+    "core": "core",
+
+    /**
      * value: "deprecated"
      * @const
      */

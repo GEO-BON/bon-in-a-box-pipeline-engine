@@ -23,6 +23,7 @@ suspend fun handleHistoryCall(
     call: ApplicationCall,
     start: String?,
     limit: String?,
+    keyword: String?,
     runningPipelines: MutableMap<String, Pipeline>
 ) {
     // Pair of pipeline output folder file to isRunning
@@ -45,7 +46,19 @@ suspend fun handleHistoryCall(
             }
     }
 
-    val all = running + completed
+    var all = running + completed
+
+    if (keyword != null) {
+        all = all.filter { (path, _) ->
+            val runId = path.relativeTo(outputRoot).path.replace('/', FILE_SEPARATOR)
+            val inputKeys = File(path, "input.json").let {
+                if (it.isFile) JSONObject(it.readText()).keys().asSequence().toList()
+                else emptyList()
+            }
+            runId.contains(keyword, ignoreCase = true) || inputKeys.any { key -> key.contains(keyword, ignoreCase = true) }
+        }.toMutableList()
+    }
+
     val numberOfPipelines = all.size
     logger.debug("Found $numberOfPipelines in $timeTaken ms")
     if (numberOfPipelines == 0) {

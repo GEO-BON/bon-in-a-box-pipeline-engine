@@ -1,3 +1,5 @@
+import "./PipelineEditor/StepChooser.css";
+
 import { useEffect, useState } from "react";
 import { Spinner } from "./Spinner";
 import { HttpError } from "./HttpErrors";
@@ -31,12 +33,10 @@ export const api = new BonInABoxScriptService.DefaultApi();
 export default function RunHistory() {
   let [runHistory, setRunHistory] = useState(null);
   let [start, setStart] = useState(0);
+  let [keyword, setKeyword] = useState("");
   let limit = 30;
   useEffect(() => {
-    api.getHistory({ start, limit }, (error, _, response) => {
-      document
-        .getElementById("pageTop")
-        ?.scrollIntoView({ behavior: "smooth" });
+    api.getHistory({ start, limit, keyword: keyword || undefined}, (error, _, response) => {
       if (error) {
         setRunHistory(
           <Box sx={{ padding: "50px" }}>
@@ -51,7 +51,9 @@ export default function RunHistory() {
         setRunHistory(
           <Box sx={{ padding: "50px" }}>
             <h1>Previous runs</h1>
-            <Alert severity="info">There are no runs in history.</Alert>
+            <Alert severity="info">
+              { keyword? "No runs match your search." : "There are no runs in history."}
+            </Alert>
           </Box>
         );
       } else if (response && response.body.length > 0) {
@@ -61,7 +63,7 @@ export default function RunHistory() {
           return bb - aa;
         });
         setRunHistory(
-          <div id="pageTop" style={{ padding: "20px" }}>
+          <div id="pageTop">
             <h1>Previous runs</h1>
             <Grid container spacing={2}>
               {runs.map((res, i) => (
@@ -85,9 +87,31 @@ export default function RunHistory() {
         );
       }
     });
-  }, [start, limit]);
+  }, [start, limit, keyword]);
 
-  return runHistory ? runHistory : <Spinner variant="light" />;
+  useEffect(() => {
+    setStart(0);
+  }, [keyword]);
+
+  useEffect(() => {
+    document
+        .getElementById("pageTop")
+        ?.scrollIntoView({ behavior: "smooth" });
+  }, [start]);
+
+  return (
+    <>
+      <div className="search-container" style={{ paddingTop: "30px" }}>
+        <input
+            type="search"
+            placeholder="Search history..."
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+        />
+      </div>
+      {runHistory ? runHistory : <Spinner variant="light" />}
+    </>
+  );
 }
 
 export const LastNRuns = ({n}) => {
