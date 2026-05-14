@@ -28,7 +28,7 @@ suspend fun handleHistoryCall(
 ) {
     // Pair of pipeline output folder file to isRunning
     val running = mutableListOf<Pair<File, Boolean>>()
-    val completed = mutableListOf<Pair<File, Boolean>>()
+    val finished = mutableListOf<Pair<File, Boolean>>()
     var timeTaken = measureTimeMillis {
         // Find running pipelines
         runningPipelines.keys.forEach { runId ->
@@ -36,26 +36,27 @@ suspend fun handleHistoryCall(
             running.add(Pair(pipelineOutputFolder, true))
         }
 
-        // Find completed pipelines
+        // Find finished pipelines
         findFilesInFolderByDate(outputRoot, "pipelineOutput.json")
             .forEach { found ->
                 val outputFolder = found.parentFile
                 if (running.find { pair -> pair.first == outputFolder } == null) {
-                    completed.add(Pair(found.parentFile, false))
+                    finished.add(Pair(found.parentFile, false))
                 }
             }
     }
 
-    var all = running + completed
+    var all = running + finished
 
     if (keyword != null) {
         all = all.filter { (path, _) ->
             val runId = path.relativeTo(outputRoot).path.replace('/', FILE_SEPARATOR)
-            val inputKeys = File(path, "input.json").let {
-                if (it.isFile) JSONObject(it.readText()).keys().asSequence().toList()
-                else emptyList()
-            }
-            runId.contains(keyword, ignoreCase = true) || inputKeys.any { key -> key.contains(keyword, ignoreCase = true) }
+            runId.contains(keyword, ignoreCase = true) ||
+                File(path, "input.json").let {
+                    if (it.isFile) it.useLines { lines ->
+                        lines.any { line -> line.contains(keyword, ignoreCase = true) }
+                    } else false
+                }
         }.toMutableList()
     }
 
