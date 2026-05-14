@@ -1,6 +1,6 @@
 import "./PipelineEditor/StepChooser.css";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Spinner } from "./Spinner";
 import { HttpError } from "./HttpErrors";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
@@ -27,6 +27,7 @@ import { CustomButtonGreen, CustomButtonGrey } from "./CustomMUI";
 import { Alert } from "@mui/material";
 import Warning from "@mui/icons-material/Warning";
 import yaml from "js-yaml";
+import debounce from "lodash.debounce";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -34,7 +35,17 @@ export default function RunHistory() {
   let [runHistory, setRunHistory] = useState(null);
   let [start, setStart] = useState(0);
   let [keyword, setKeyword] = useState("");
+  let [inputValue, setInputValue] = useState("");
   let limit = 30;
+
+  const debouncedSetKeyword = useCallback(
+    debounce((value) => {
+        setKeyword(value);
+    }, 200),
+    []
+  );
+
+
   useEffect(() => {
     api.getHistory({ start, limit, keyword: keyword || undefined}, (error, _, response) => {
       if (error) {
@@ -103,10 +114,13 @@ export default function RunHistory() {
     <>
       <div className="search-container" style={{ paddingTop: "30px" }}>
         <input
-            type="search"
-            placeholder="Search history..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
+          type="search"
+          placeholder="Search history..."
+          value={inputValue}
+          onChange={(e) => {
+              setInputValue(e.target.value);
+              debouncedSetKeyword(e.target.value);
+          }}
         />
       </div>
       {runHistory ? runHistory : <Spinner variant="light" />}
