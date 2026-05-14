@@ -252,5 +252,45 @@ class HistoryTest {
             println(response)
         }
     }
+    @Test
+    fun givenHistory_whenSearchingOrFiltering_getMatchingResults() = testApplication {
+        application { scriptModule() }
 
+        for (i in 1000..1002) {
+            client.post("/pipeline/helloWorld.json/run") {
+                setBody("{\"helloWorld>helloPython.yml@0|some_int\":$i}")
+            }.apply { assertEquals(HttpStatusCode.OK, status) }
+        }
+
+        for (i in 1000..1002) {
+            client.post("/script/helloWorld>helloPython.yml/run") {
+                setBody("{\"some_int\":$i}")
+            }.apply { assertEquals(HttpStatusCode.OK, status) }
+        }
+
+        client.post("/pipeline/0in1out_1step.json/run") {
+            setBody("{}")
+        }.apply { assertEquals(HttpStatusCode.OK, status) }
+
+        client.get("/api/history?keyword=helloPython").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(6, responseArray.length(), "All pipeline and script runs should be returned")
+            assertFalse(response.contains("0in1out_1step"))
+        }
+
+        client.get("/api/history?keyword=1000").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(2, responseArray.length(), "2 runs with 1000 as input should be returned")
+            assertFalse(response.contains("0in1out_1step"))
+        }
+
+        client.get("/api/history?keyword=nonexistent").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals("[]", bodyAsText())
+        }
+    }
 }
