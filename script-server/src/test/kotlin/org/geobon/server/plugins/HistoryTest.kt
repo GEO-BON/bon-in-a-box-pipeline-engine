@@ -276,7 +276,7 @@ class HistoryTest {
             assertEquals(HttpStatusCode.OK, status)
             val response = bodyAsText()
             val responseArray = JSONArray(response)
-            assertEquals(3, responseArray.length(), "All pipeline and script runs should be returned")
+            assertEquals(6, responseArray.length(), "All pipeline and script runs should be returned")
             assertFalse(response.contains("0in1out_1step"))
         }
 
