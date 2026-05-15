@@ -68,9 +68,19 @@ export function LogViewer({ address, autoUpdate }) {
     spellCheck="false"
     ref={logsRef}
     className='logs'
-    onBeforeInput={(e) => {
-      // Prevent user from editing the logs (including copy-paste)
+    onBeforeInput={e => e.preventDefault()} // This prevents typing letters normally
+    onPasteCapture={e => e.preventDefault()} // Prevents paste
+    onCutCapture={e => { // Copy to clipboard instead of cut
       e.preventDefault();
+      const selection = window.getSelection();
+      const range = selection.getRangeAt(0);
+      const selectedText = range.toString();
+      navigator.clipboard.writeText(selectedText);
+    }}
+    onKeyDownCapture={e => { // Prevent delete and backspace
+      if (e.key === "Backspace" || e.key === "Delete") {
+        e.preventDefault();
+      }
     }}
   >
     {logs}<span ref={logsEndRef} />
