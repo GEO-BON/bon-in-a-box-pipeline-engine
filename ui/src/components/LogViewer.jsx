@@ -61,5 +61,28 @@ export function LogViewer({ address, autoUpdate }) {
     }
   }, [logs, logsAutoScroll]);
 
-  return logs && <pre ref={logsRef} className='logs'>{logs}<span ref={logsEndRef} /></pre>;
+  return logs && <pre
+    // Make ctrl + a select the logs only, not the whole page,
+    contentEditable="true"
+    suppressContentEditableWarning={true}
+    spellCheck="false"
+    ref={logsRef}
+    className='logs'
+    onBeforeInput={e => e.preventDefault()} // This prevents typing letters normally
+    onPasteCapture={e => e.preventDefault()} // Prevents paste
+    onCutCapture={e => { // Copy to clipboard instead of cut
+      e.preventDefault();
+      const selection = window.getSelection();
+      const range = selection.getRangeAt(0);
+      const selectedText = range.toString();
+      navigator.clipboard.writeText(selectedText);
+    }}
+    onKeyDownCapture={e => { // Prevent delete and backspace
+      if (e.key === "Backspace" || e.key === "Delete") {
+        e.preventDefault();
+      }
+    }}
+  >
+    {logs}<span ref={logsEndRef} />
+  </pre>;
 }

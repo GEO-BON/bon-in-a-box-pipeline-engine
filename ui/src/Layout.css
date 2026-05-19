@@ -571,6 +571,15 @@ td {
   padding: 3px 5px;
 }
 
+cite {
+  display: block;
+  border-left: 3px solid #bbb;
+  color: #bbb;
+  font-size: small;
+  padding-left: 8px;
+  font-style: normal;
+}
+
 /**
  * Hiding arrows in float input type=number
  * see https://www.w3schools.com/howto/howto_css_hide_arrow_number.asp
@@ -601,6 +610,7 @@ input[type="number"].input-float {
 
 .logs {
   border: 2px solid #87cefa45;
+  outline: none;
   height: 30em;
   overflow: auto;
   padding: 0.5em;
