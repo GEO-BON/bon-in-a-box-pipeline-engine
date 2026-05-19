@@ -24,6 +24,7 @@ suspend fun handleHistoryCall(
     start: String?,
     limit: String?,
     keyword: String?,
+    filterStatus: String?,
     runningPipelines: MutableMap<String, Pipeline>
 ) {
     // Pair of pipeline output folder file to isRunning
@@ -48,8 +49,22 @@ suspend fun handleHistoryCall(
 
     var all = running + finished
 
+    var filtered = if (filterStatus != null) {
+        if (filterStatus == "running") {
+            running
+        } else if (filterStatus == "all") {
+            all
+        } else {
+            finished.filter { (path, _) ->
+                getCompletionStatus(File(path, "pipelineOutput.json")) == filterStatus
+            }
+        }
+    } else {
+        all
+    }
+
     if (keyword != null) {
-        all = all.filter { (path, _) ->
+        filtered = filtered.filter { (path, _) ->
             val runId = path.relativeTo(outputRoot).path.replace('/', FILE_SEPARATOR)
             runId.contains(keyword, ignoreCase = true) ||
                 File(path, "input.json").let {
@@ -60,7 +75,7 @@ suspend fun handleHistoryCall(
         }.toMutableList()
     }
 
-    val numberOfPipelines = all.size
+    val numberOfPipelines = filtered.size
     logger.debug("Found $numberOfPipelines in $timeTaken ms")
     if (numberOfPipelines == 0) {
         call.respondText("[]", ContentType.Application.Json, HttpStatusCode.OK)
@@ -77,7 +92,7 @@ suspend fun handleHistoryCall(
     val endIndex = startIndex + limitNumber
 
     val history = JSONArray()
-    val foldersToRead = all.subList(startIndex, min(endIndex, numberOfPipelines))
+    val foldersToRead = filtered.subList(startIndex, min(endIndex, numberOfPipelines))
     timeTaken = measureTimeMillis {
         foldersToRead.forEach { (path, isRunning) ->
             history.put(getHistoryFromFolder(path, isRunning))

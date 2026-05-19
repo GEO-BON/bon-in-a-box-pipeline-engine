@@ -253,7 +253,7 @@ class HistoryTest {
         }
     }
     @Test
-    fun givenHistory_whenSearchingOrFiltering_getMatchingResults() = testApplication {
+    fun givenHistory_whenSearching_getMatchingResults() = testApplication {
         application { scriptModule() }
 
         for (i in 1000..1002) {
@@ -291,6 +291,46 @@ class HistoryTest {
         client.get("/api/history?keyword=nonexistent").apply {
             assertEquals(HttpStatusCode.OK, status)
             assertEquals("[]", bodyAsText())
+        }
+    }
+
+    @Test
+    fun givenHistory_whenFiltering_getMatchingResults() = testApplication {
+        application { scriptModule() }
+
+        client.post("/pipeline/assertNull.json/run") {
+            setBody("""{"assertNull.yml@0|input": 1}""")
+        }.apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+
+        for (i in 0..2) {
+            client.post("/pipeline/helloWorld.json/run") {
+                setBody("{\"helloWorld>helloPython.yml@0|some_int\":$i}")
+            }.apply { assertEquals(HttpStatusCode.OK, status) }
+        }
+
+        client.get("/api/history?filterStatus=all").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(4, responseArray.length(), "Should display all 4 runs regardless of status.")
+        }
+
+        client.get("/api/history?filterStatus=completed").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(3, responseArray.length(), "Should display all 3 runs that have completed.")
+            assertContains(response, """"status":"completed"""")
+        }
+
+        client.get("/api/history?filterStatus=error").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(1, responseArray.length(), "Should display the one run that has an error.")
+            assertContains(response, """"status":"error"""")
         }
     }
 }

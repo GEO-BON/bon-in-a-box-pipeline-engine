@@ -118,7 +118,8 @@ fun Application.configureRouting() {
             val start = call.request.queryParameters["start"]
             val limit = call.request.queryParameters["limit"]
             val keyword = call.request.queryParameters["keyword"]
-            handleHistoryCall(call, start, limit, keyword, runningPipelines)
+            val filterStatus = call.request.queryParameters["filterStatus"]
+            handleHistoryCall(call, start, limit, keyword, filterStatus, runningPipelines)
         }
 
         get("/script/{scriptPath}/info") {
