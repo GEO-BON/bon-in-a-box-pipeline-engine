@@ -43,13 +43,7 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <Layout right={
-        <>
-          <PageTitle title="Home" />
-          <HomePage />
-        </>
-        }
-      />
+      <Layout right={<HomePage />} />
     ),
   },
   {
