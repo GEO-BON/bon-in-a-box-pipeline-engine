@@ -67,6 +67,7 @@ export default function FilterMenu({ onChange }) {
             backgroundColor: "#fff",
             color: "var(--biab-green-main)",
           }),
+          marginRight: "0px"
         }}
       >
         Filter
