@@ -1,6 +1,5 @@
-import "react-flow-renderer/dist/style.css";
 import { getErrorString } from "../HttpErrors";
-import "react-flow-renderer/dist/theme-default.css";
+import '@xyflow/react/dist/base.css';
 import "./Editor.css";
 import {
   TextField,
@@ -17,7 +16,8 @@ import {
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useBlocker } from "react-router-dom";
-import ReactFlow, {
+import {
+  ReactFlow,
   ReactFlowProvider,
   addEdge,
   useNodesState,
@@ -26,7 +26,7 @@ import ReactFlow, {
   Controls,
   MiniMap,
   Position,
-} from "react-flow-renderer/nocss";
+} from "@xyflow/react";
 
 import IONode from "./IONode";
 import ConstantNode from "./ConstantNode";
@@ -640,7 +640,7 @@ export default function PipelineEditor(props) {
       delete node.selected;
       delete node.dragging;
       delete node.positionAbsolute;
-      delete node.width;
+      delete node.measured;
       delete node.height;
       if (node.type === "userInput" || node.type === "constant")
         delete node.data.label;
@@ -1268,6 +1268,7 @@ export default function PipelineEditor(props) {
               onNodesDelete={onNodesDelete}
               deleteKeyCode={['Backspace', 'Delete']}
               onMouseDownCapture={onPopupMenuHide}
+              reconnectRadius="100"
             >
               {toolTip && <div className="tooltip">{toolTip}</div>}
 

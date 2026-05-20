@@ -1,9 +1,9 @@
-import { getConnectedEdges } from 'react-flow-renderer/nocss';
+import { getConnectedEdges } from '@xyflow/react';
 
 /**
- * 
- * @param {Node[]} selectedNodes 
- * @param {Edge[]} allEdges 
+ *
+ * @param {Node[]} selectedNodes
+ * @param {Edge[]} allEdges
  * @returns the edges, with added style for edges connected to the selected node.
  */
 export const highlightConnectedEdges = (selectedNodes, allEdges) => {
