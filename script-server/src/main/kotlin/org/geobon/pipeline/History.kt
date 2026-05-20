@@ -24,7 +24,7 @@ suspend fun handleHistoryCall(
     start: String?,
     limit: String?,
     keyword: String?,
-    filterStatus: String?,
+    filterStatus: List<String>?,
     runningPipelines: MutableMap<String, Pipeline>
 ) {
     // Pair of pipeline output folder file to isRunning
@@ -49,18 +49,23 @@ suspend fun handleHistoryCall(
 
     var all = running + finished
 
-    var filtered = if (filterStatus != null) {
-        if (filterStatus == "running") {
-            running
-        } else if (filterStatus == "all") {
-            all
+    var filtered = if (!filterStatus.isNullOrEmpty() && !filterStatus.contains("all")) {
+        if (filterStatus.contains("none")) {
+            emptyList()
         } else {
-            finished.filter { (path, _) ->
-                getCompletionStatus(File(path, "pipelineOutput.json")) == filterStatus
-            }
+            val includeRunning = filterStatus.contains("running")
+            val finishedStatuses = filterStatus.filter { it != "running" }
+
+            val runningResults = if (includeRunning) running else emptyList()
+            val finishedResults = if (finishedStatuses.isNotEmpty()) {
+                finished.filter { (path, _) ->
+                    getCompletionStatus(File(path, "pipelineOutput.json")) in finishedStatuses
+                }
+            } else emptyList()
+            (runningResults + finishedResults).toMutableList()
         }
     } else {
-        all
+        all.toMutableList()
     }
 
     if (keyword != null) {

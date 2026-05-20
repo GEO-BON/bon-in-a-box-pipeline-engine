@@ -122,7 +122,7 @@ export default class DefaultApi {
      * @param {Number} [start] Start index for pagination
      * @param {Number} [limit] Limit the number of results
      * @param {String} [keyword] Filter search based on keyword. This applies to the script/pipeline names and their inputs.
-     * @param {module:model/String} [filterStatus] Filter option based on pipeline status.
+     * @param {Array.<module:model/String>} [filterStatus] Filter option based on pipeline status.
      * @param {module:api/DefaultApi~getHistoryCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/GetHistory200ResponseInner>}
      */
@@ -136,7 +136,7 @@ export default class DefaultApi {
         'start': opts['start'],
         'limit': opts['limit'],
         'keyword': opts['keyword'],
-        'filterStatus': opts['filterStatus']
+        'filterStatus': this.apiClient.buildCollectionParam(opts['filterStatus'], 'multi')
       };
       let headerParams = {
       };

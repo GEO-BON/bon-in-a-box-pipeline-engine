@@ -63,8 +63,10 @@ paths:
           description: Filter option based on pipeline status.
           required: false
           schema:
-            type: string
-            enum: [all, running, error, cancelled, completed]
+            type: array
+            items:
+              type: string
+              enum: [all, running, error, cancelled, completed]
       responses:
         "200":
           description: |

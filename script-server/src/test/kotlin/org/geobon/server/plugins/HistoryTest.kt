@@ -332,5 +332,28 @@ class HistoryTest {
             assertEquals(1, responseArray.length(), "Should display the one run that has an error.")
             assertContains(response, """"status":"error"""")
         }
+
+        client.get("/api/history?filterStatus=none").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(0, responseArray.length(), "Should display nothing.")
+        }
+
+        client.get("/api/history?filterStatus=error&filterStatus=completed").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(4, responseArray.length(), "Should display both the runs that have status complete and status error.")
+            assertContains(response, """"status":"error"""")
+            assertContains(response, """"status":"completed"""")
+        }
+
+        client.get("/api/history").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(4, responseArray.length(), "Should display all runs by default.")
+        }
     }
 }
