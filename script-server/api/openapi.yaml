@@ -66,7 +66,7 @@ paths:
             type: array
             items:
               type: string
-              enum: [all, running, error, cancelled, completed]
+              enum: [all, none, running, error, cancelled, completed]
       responses:
         "200":
           description: |
