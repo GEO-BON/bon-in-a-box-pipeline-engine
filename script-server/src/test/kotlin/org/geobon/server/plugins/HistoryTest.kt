@@ -299,7 +299,7 @@ class HistoryTest {
         application { scriptModule() }
 
         client.post("/pipeline/assertNull.json/run") {
-            setBody("""{"assertNull.yml@0|input": 1}""")
+            setBody("""{"assertNull.yml@0|input": hello}""")
         }.apply {
             assertEquals(HttpStatusCode.OK, status)
         }
