@@ -60,7 +60,7 @@ paths:
             type: string
         - name: filterStatus
           in: query
-          description: Filter option based on pipeline status.
+          description: Filter option based on pipeline status. The default value is "all" when null.
           required: false
           schema:
             type: array

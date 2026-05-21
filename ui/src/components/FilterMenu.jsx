@@ -24,6 +24,7 @@ export default function FilterMenu({ onChange }) {
   };
 
   const handleClose = () => {
+    onChange?.(filters);
     setAnchorEl(null);
   };
 
