@@ -47,37 +47,38 @@ suspend fun handleHistoryCall(
             }
     }
 
-    var all = running + finished
-
-    var filtered = if (!filterStatus.isNullOrEmpty() && !filterStatus.contains("all")) {
-        if (filterStatus.contains("none")) {
-            emptyList()
-        } else {
-            val includeRunning = filterStatus.contains("running")
-            val finishedStatuses = filterStatus.filter { it != "running" }
-
-            val runningResults = if (includeRunning) running else emptyList()
-            val finishedResults = if (finishedStatuses.isNotEmpty()) {
-                finished.filter { (path, _) ->
-                    getCompletionStatus(File(path, "pipelineOutput.json")) in finishedStatuses
-                }
-            } else emptyList()
-            (runningResults + finishedResults).toMutableList()
-        }
+    // Filter by status
+    var filtered = if (filterStatus.isNullOrEmpty() || filterStatus.contains("all")) {
+        running + finished
+    } else if (filterStatus.contains("none")) {
+        emptyList()
     } else {
-        all.toMutableList()
+        val includeRunning = filterStatus.contains("running")
+        val runningResults = if (includeRunning) running else emptyList()
+
+        val finishedStatuses = filterStatus.filter { it != "running" }
+        val finishedResults = if (finishedStatuses.isNotEmpty()) {
+            finished.filter { (path, _) ->
+                getCompletionStatus(File(path, "pipelineOutput.json")) in finishedStatuses
+            }
+        } else emptyList()
+        (runningResults + finishedResults)
     }
 
-    if (keyword != null) {
+    // Filter by keyword
+    if (!keyword.isNullOrEmpty()) {
         filtered = filtered.filter { (path, _) ->
-            val runId = path.relativeTo(outputRoot).path.replace('/', FILE_SEPARATOR)
-            runId.contains(keyword, ignoreCase = true) ||
-                File(path, "input.json").let {
-                    if (it.isFile) it.useLines { lines ->
+            if(path.path.contains(keyword, ignoreCase = true))
+                return@filter true
+
+            File(path, "input.json").let { inputFile ->
+                if (inputFile.isFile) {
+                    inputFile.useLines { lines ->
                         lines.any { line -> line.contains(keyword, ignoreCase = true) }
-                    } else false
-                }
-        }.toMutableList()
+                    }
+                } else false
+            }
+        }
     }
 
     val numberOfPipelines = filtered.size
