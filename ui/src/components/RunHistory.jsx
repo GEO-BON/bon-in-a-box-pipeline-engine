@@ -62,20 +62,12 @@ export default function RunHistory() {
   };
 
   useEffect(() => {
-    let request = {
+    api.getHistory({
       start,
       limit,
-    }
-
-    if(keyword) {
-      request.keyword = keyword.trim();
-    }
-
-    if(filterStatus) {
-      request.filterStatus = filterStatus.length === 0 ? ["none"] : filterStatus;
-    }
-
-    api.getHistory(request,
+      keyword: keyword || undefined,
+      filterStatus: filterStatus === null? undefined : filterStatus.length === 0 ? ["none"] : filterStatus
+    },
       (error, _, response) => {
         if (error) {
           setRunHistory(
