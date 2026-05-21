@@ -106,14 +106,14 @@ export default function Sidebar(props: any) {
       setModalContent(
         <Grid
           sx={{
-            background: `url("${output}")`,
             backgroundColor: "#444",
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
-            width: "60vw",
-            height: "80vh",
+            padding: "20px",
           }}
-        ></Grid>
+        >
+          <img src={output} alt="output image" style={{ maxWidth: "60vw", maxHeight: "80vh" }} />
+        </Grid>
       );
       setOpenModal(true);
     } else if (type.includes("json") && !type.includes("geojson")) {
@@ -362,9 +362,9 @@ export default function Sidebar(props: any) {
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
           onClose={modalClose}
-          sx={{ width: "60vw", height: "80vh", margin: "auto" }}
+          sx={{ width: "fit-content", height: "fit-content",  margin: "auto" }}
         >
-          <Box sx={{ width: "60vw", height: "80vh", margin: "auto" }}>
+          <Box sx={{ margin: "auto" }}>
             {modalContent}
           </Box>
         </Modal>
