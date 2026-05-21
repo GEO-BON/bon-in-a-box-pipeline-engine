@@ -115,7 +115,7 @@ export function PipelineOutput(props: any) {
           )}
           {!Array.isArray(arrayOutputs) &&
             "type" in outputObj &&
-            outputObj?.type?.includes("tif") && (
+            outputObj?.type?.includes("geotiff") && (
               <>
                 <CustomButtonGreen
                   key={`but-${arrayOutputs.band_id}`}
@@ -129,16 +129,14 @@ export function PipelineOutput(props: any) {
                 >
                   See on map
                 </CustomButtonGreen>
-                {outputObj?.type?.includes("tif") && (
-                  <CustomButton
-                    sx={{
-                      display: "inline",
-                    }}
-                    onClick={() => generateStats(arrayOutputs)}
-                  >
-                    <BarChartIcon />
-                  </CustomButton>
-                )}
+                <CustomButton
+                  sx={{
+                    display: "inline",
+                  }}
+                  onClick={() => generateStats(arrayOutputs)}
+                >
+                  <BarChartIcon />
+                </CustomButton>
               </>
             )}
           {!Array.isArray(arrayOutputs) &&
@@ -216,6 +214,7 @@ export function PipelineOutput(props: any) {
             )}
           {!Array.isArray(arrayOutputs) &&
             outputObj?.type.startsWith("image/") &&
+            ! outputObj?.type?.includes("geotiff") &&
             "type" in outputObj && (
               <CustomButtonGreen
                 key={`but-${outputObj.outputs}`}
