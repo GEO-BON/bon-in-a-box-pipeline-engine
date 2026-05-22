@@ -11,10 +11,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.text.SimpleDateFormat
-import kotlin.collections.plus
-import kotlin.math.min
 import kotlin.system.measureTimeMillis
-import kotlin.text.contains
 
 private val logger: Logger = LoggerFactory.getLogger("History")
 
@@ -60,7 +57,7 @@ suspend fun handleHistoryCall(
     var runs = running + finished
 
     // Sanitize keyword filter
-    // TODO split keywords by spaces (+ ignore punctuation?)
+    // TODO split keywords by spaces (+ ignore punctuation?) for OR check
 
     // Sanitize status filter
     val filterRunStatus = if (statusFilter.isNullOrEmpty() || statusFilter.contains("all")) {
@@ -96,20 +93,33 @@ suspend fun handleHistoryCall(
     val endIndex = startIndex + limitNumber
 
     val history = JSONArray()
-    val foldersToRead = runs.subList(startIndex, min(endIndex, numberOfPipelines))
+    var resultIndex = 0
     timeTaken = measureTimeMillis {
-        foldersToRead.forEach { (path, isRunning) ->
+        runs.forEach { (path, isRunning) ->
             getHistoryResult(path, isRunning, keywordFilter, filterRunStatus)?.let {
-                history.put(it)
+                if (resultIndex in startIndex..<endIndex)
+                    history.put(it)
+
+                resultIndex++
+                // Here we let it continue to find one extra result,
+                // this allows us to know if there is another page left (see "PartialContent" below).
+                if(resultIndex > endIndex)
+                    return@measureTimeMillis
             }
         }
     }
-    logger.debug("Read history for ${foldersToRead.size} pipelines in $timeTaken ms")
+    logger.debug("Read history for ${resultIndex + 1} pipelines in $timeTaken ms.")
+    logger.debug("Kept ${history.length()} after filtering.")
 
     call.respondText(
         history.toString(),
         ContentType.Application.Json,
-        if (endIndex < numberOfPipelines) HttpStatusCode.PartialContent else HttpStatusCode.OK
+        if (limitNumber < resultIndex - startIndex)
+            HttpStatusCode.PartialContent
+        else if (resultIndex > 0 && history.isEmpty) // Results found but not in range
+            HttpStatusCode.RequestedRangeNotSatisfiable
+        else
+            HttpStatusCode.OK
     )
 }
 
