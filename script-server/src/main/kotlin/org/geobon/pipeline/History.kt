@@ -11,8 +11,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.text.SimpleDateFormat
+import kotlin.collections.plus
 import kotlin.math.min
 import kotlin.system.measureTimeMillis
+import kotlin.text.contains
 
 private val logger: Logger = LoggerFactory.getLogger("History")
 
@@ -31,8 +33,8 @@ suspend fun handleHistoryCall(
     call: ApplicationCall,
     start: String?,
     limit: String?,
-    keyword: String?,
-    filterStatus: List<String>?,
+    keywordFilter: String?,
+    statusFilter: List<String>?,
     runningPipelines: MutableMap<String, Pipeline>
 ) {
     // Pair of pipeline output folder file to isRunning
@@ -55,42 +57,29 @@ suspend fun handleHistoryCall(
             }
     }
 
-    // Filter by status
-    var filtered = if (filterStatus.isNullOrEmpty() || filterStatus.contains("all")) {
-        running + finished
-    } else if (filterStatus.contains("none")) {
-        emptyList()
+    var runs = running + finished
+
+    // Sanitize keyword filter
+    // TODO split keywords by spaces (+ ignore punctuation?)
+
+    // Sanitize status filter
+    val filterRunStatus = if (statusFilter.isNullOrEmpty() || statusFilter.contains("all")) {
+        null
+    } else if (statusFilter.contains("none")) {
+        runs = emptyList()
+        null
     } else {
-        val includeRunning = filterStatus.contains(RunStatus.RUNNING.toString())
-        val runningResults = if (includeRunning) running else emptyList()
-
-        val finishedStatuses = filterStatus.filter { it != RunStatus.RUNNING.toString() }
-        val finishedResults = if (finishedStatuses.isNotEmpty()) {
-            finished.filter { (path, _) ->
-                getCompletionStatus(File(path, "pipelineOutput.json")).toString() in finishedStatuses
-            }
-        } else emptyList()
-        (runningResults + finishedResults)
-    }
-
-
-    // Filter by keyword
-    if (!keyword.isNullOrEmpty()) {
-        filtered = filtered.filter { (path, _) ->
-            if(path.path.contains(keyword, ignoreCase = true))
-                return@filter true
-
-            File(path, "input.json").let { inputFile ->
-                if (inputFile.isFile) {
-                    inputFile.useLines { lines ->
-                        lines.any { line -> line.contains(keyword, ignoreCase = true) }
-                    }
-                } else false
+        statusFilter.mapNotNull {
+            try {
+                RunStatus.valueOf(it.uppercase())
+            } catch (_: IllegalArgumentException) {
+                logger.warn("Unknown run status '$it'")
+                null
             }
         }
     }
 
-    val numberOfPipelines = filtered.size
+    val numberOfPipelines = runs.size
     logger.debug("Found $numberOfPipelines in $timeTaken ms")
     if (numberOfPipelines == 0) {
         call.respondText("[]", ContentType.Application.Json, HttpStatusCode.OK)
@@ -107,10 +96,12 @@ suspend fun handleHistoryCall(
     val endIndex = startIndex + limitNumber
 
     val history = JSONArray()
-    val foldersToRead = filtered.subList(startIndex, min(endIndex, numberOfPipelines))
+    val foldersToRead = runs.subList(startIndex, min(endIndex, numberOfPipelines))
     timeTaken = measureTimeMillis {
         foldersToRead.forEach { (path, isRunning) ->
-            history.put(getHistoryFromFolder(path, isRunning))
+            getHistoryResult(path, isRunning, keywordFilter, filterRunStatus)?.let {
+                history.put(it)
+            }
         }
     }
     logger.debug("Read history for ${foldersToRead.size} pipelines in $timeTaken ms")
@@ -122,25 +113,46 @@ suspend fun handleHistoryCall(
     )
 }
 
-private fun getHistoryFromFolder(runFolder: File, isRunning: Boolean): JSONObject {
+private fun getHistoryResult(
+    runFolder: File,
+    isRunning: Boolean,
+    keywordFilter: String?,
+    runStatusFilter: List<RunStatus>?
+): JSONObject? {
     val run = JSONObject()
     val runId = runFolder.relativeTo(outputRoot).path.replace('/', FILE_SEPARATOR)
     run.put("runId", runId)
 
+    var inputFileText:String? = null
     val inputFile = File(runFolder, "input.json")
     if (inputFile.isFile) {
         run.put("startTime", dateFormat.format(inputFile.lastModified()))
-        run.put("inputs", JSONObject(inputFile.readText()))
+        inputFileText = inputFile.readText()
+        run.put("inputs", JSONObject(inputFileText))
     }
 
-    run.put(
-        "status",
-        if (isRunning)
-            RunStatus.RUNNING.toString()
-        else
-            getCompletionStatus(File(runFolder, "pipelineOutput.json")).toString()
-    )
+    // Apply keyword filter
+    if (!keywordFilter.isNullOrEmpty()) {
+        // First check the run ID
+        if(!runId.contains(keywordFilter, ignoreCase = true)) {
+            // Then check the input file content
+            // TODO "OR" check
+            if(inputFileText?.contains(keywordFilter) != true) {
+                return null // Does not match filters
+            }
+        }
+    }
 
+    val status = if (isRunning)
+        RunStatus.RUNNING
+    else
+        getCompletionStatus(File(runFolder, "pipelineOutput.json"))
+
+    // Apply status filter
+    if (runStatusFilter != null && !runStatusFilter.contains(status))
+        return null
+
+    run.put("status", status.toString())
     run.put(
         "type",
 
