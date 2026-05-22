@@ -19,6 +19,14 @@ private val logger: Logger = LoggerFactory.getLogger("History")
 // Date format definition https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
 private val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
 
+enum class RunStatus {
+    RUNNING, COMPLETED, ERROR, CANCELLED;
+
+    override fun toString(): String {
+        return this.name.lowercase()
+    }
+}
+
 suspend fun handleHistoryCall(
     call: ApplicationCall,
     start: String?,
@@ -53,17 +61,18 @@ suspend fun handleHistoryCall(
     } else if (filterStatus.contains("none")) {
         emptyList()
     } else {
-        val includeRunning = filterStatus.contains("running")
+        val includeRunning = filterStatus.contains(RunStatus.RUNNING.toString())
         val runningResults = if (includeRunning) running else emptyList()
 
-        val finishedStatuses = filterStatus.filter { it != "running" }
+        val finishedStatuses = filterStatus.filter { it != RunStatus.RUNNING.toString() }
         val finishedResults = if (finishedStatuses.isNotEmpty()) {
             finished.filter { (path, _) ->
-                getCompletionStatus(File(path, "pipelineOutput.json")) in finishedStatuses
+                getCompletionStatus(File(path, "pipelineOutput.json")).toString() in finishedStatuses
             }
         } else emptyList()
         (runningResults + finishedResults)
     }
+
 
     // Filter by keyword
     if (!keyword.isNullOrEmpty()) {
@@ -126,7 +135,10 @@ private fun getHistoryFromFolder(runFolder: File, isRunning: Boolean): JSONObjec
 
     run.put(
         "status",
-        if (isRunning) "running" else getCompletionStatus(File(runFolder, "pipelineOutput.json"))
+        if (isRunning)
+            RunStatus.RUNNING.toString()
+        else
+            getCompletionStatus(File(runFolder, "pipelineOutput.json")).toString()
     )
 
     run.put(
@@ -140,12 +152,12 @@ private fun getHistoryFromFolder(runFolder: File, isRunning: Boolean): JSONObjec
     return run
 }
 
-private fun getCompletionStatus(pipelineOutputs: File): String {
+private fun getCompletionStatus(pipelineOutputs: File): RunStatus {
     val outputValues = JSONObject(pipelineOutputs.readText()).toMap().values
-    return if (outputValues.contains("cancelled")) {
-        "cancelled"
+    return if (outputValues.contains(RunStatus.CANCELLED.toString())) {
+        RunStatus.CANCELLED
     } else if (outputValues.contains("aborted")) {
-        "error"
+        RunStatus.ERROR
     } else {
         outputValues.forEach { outputPath ->
             (outputPath as? String)?.let {
@@ -154,20 +166,20 @@ private fun getCompletionStatus(pipelineOutputs: File): String {
                     val outputFile = File(outputDir, "output.json")
                     if(!outputFile.exists()) {
                         logger.error("getCompletionStatus encountered a running pipeline $pipelineOutputs")
-                        return "running"
+                        return RunStatus.RUNNING
                     }
 
                     val outputText = outputFile.readText()
                     if (outputText.contains("\"error\":")) {
                         if (outputText.contains("\"Cancelled by user\"")) {
-                            return "cancelled"
+                            return RunStatus.CANCELLED
                         }
-                        return "error"
+                        return RunStatus.ERROR
                     }
                 }
             }
         }
 
-        "completed"
+        RunStatus.COMPLETED
     }
 }
