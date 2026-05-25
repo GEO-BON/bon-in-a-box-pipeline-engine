@@ -57,12 +57,13 @@ suspend fun handleHistoryCall(
     var runs = running + finished
 
     // Sanitize keyword filter
-    val filterByKeyword = if (keywordFilter.isNullOrEmpty()) {
+    val keywordFilterArray = if (keywordFilter.isNullOrEmpty()) {
         null
     } else {
         keywordFilter
-            .replace("[^A-Za-z0-9 ]".toRegex(), "")
-            .split(" ")
+            .replace("""[^\w ]""".toRegex(), "")
+            .split("""\s+""".toRegex())
+            .filter { it.isNotBlank() }
     }
 
     // Sanitize status filter
@@ -102,7 +103,7 @@ suspend fun handleHistoryCall(
     var resultIndex = 0
     timeTaken = measureTimeMillis {
         runs.forEach { (path, isRunning) ->
-            getHistoryResult(path, isRunning, filterByKeyword, filterRunStatus)?.let {
+            getHistoryResult(path, isRunning, keywordFilterArray, filterRunStatus)?.let {
                 if (resultIndex in startIndex..<endIndex)
                     history.put(it)
 
