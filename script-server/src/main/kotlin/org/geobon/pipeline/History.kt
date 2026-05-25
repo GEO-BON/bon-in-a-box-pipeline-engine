@@ -61,7 +61,7 @@ suspend fun handleHistoryCall(
         null
     } else {
         keywordFilter
-            .replace("""[^\w ]""".toRegex(), "")
+            .replace("""[^\w ]""".toRegex(), " ")
             .split("""\s+""".toRegex())
             .filter { it.isNotBlank() }
     }
