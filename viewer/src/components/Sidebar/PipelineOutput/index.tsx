@@ -194,11 +194,12 @@ export function PipelineOutput(props: any) {
                   onChange={(event: any) => handleSelect(event.target.value)}
                   label="Table"
                 >
-                  {arrayOutputs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o.url}`} value={o}>
-                      {o.split("/").pop()}
+                  {arrayOutputs.map((o: any) => {
+                    let url = o.url ? o.url : o;
+                    return <CustomMenuItem key={`it-${url}`} value={url}>
+                      {url.split("/").pop()}
                     </CustomMenuItem>
-                  ))}
+                  })}
                 </CustomSelect>
                 <Grid container sx={{ alignItems: "center" }}>
                   <CustomButtonGreen
@@ -252,11 +253,12 @@ export function PipelineOutput(props: any) {
                   onChange={(event: any) => handleSelect(event.target.value)}
                   label="Layer"
                 >
-                  {arrayOutputs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o.url}`} value={o}>
-                      {o.split("/").pop()}
+                  {arrayOutputs.map((o: any) => {
+                    let url = o.url ? o.url : o;
+                    return <CustomMenuItem key={`it-${url}`} value={url}>
+                      {url.split("/").pop()}
                     </CustomMenuItem>
-                  ))}
+                  })}
                 </CustomSelect>
                 <Grid container sx={{ alignItems: "center" }}>
                   <CustomButtonGreen
@@ -333,11 +335,12 @@ export function PipelineOutput(props: any) {
                   onChange={(event: any) => handleSelect(event.target.value)}
                   label="Layer"
                 >
-                  {arrayOutputs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o.url}`} value={o}>
-                      {o.split("/").pop()}
+                  {arrayOutputs.map((o: any) => {
+                    let url = o.url ? o.url : o;
+                    return <CustomMenuItem key={`it-${url}`} value={url}>
+                      {url.split("/").pop()}
                     </CustomMenuItem>
-                  ))}
+                  })}
                 </CustomSelect>
                 <Grid container sx={{ alignItems: "center" }}>
                   <CustomButtonGreen
