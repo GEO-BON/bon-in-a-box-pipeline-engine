@@ -18,6 +18,8 @@ Name | Type | Description | Notes
 
 * `reviewed` (value: `"reviewed"`)
 
+* `core` (value: `"core"`)
+
 * `deprecated` (value: `"deprecated"`)
 
 * `example` (value: `"example"`)

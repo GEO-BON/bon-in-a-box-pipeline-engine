@@ -114,7 +114,9 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let opts = {
   'start': 56, // Number | Start index for pagination
-  'limit': 56 // Number | Limit the number of results
+  'limit': 56, // Number | Limit the number of results
+  'keyword': "keyword_example", // String | Filter search based on keyword. This applies to the script/pipeline names and their inputs.
+  'filterStatus': ["null"] // [String] | Filter option based on pipeline status.
 };
 apiInstance.getHistory(opts, (error, data, response) => {
   if (error) {
@@ -132,6 +134,8 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **start** | **Number**| Start index for pagination | [optional]
  **limit** | **Number**| Limit the number of results | [optional]
+ **keyword** | **String**| Filter search based on keyword. This applies to the script/pipeline names and their inputs. | [optional]
+ **filterStatus** | [**[String]**](String.md)| Filter option based on pipeline status. | [optional]
 
 ### Return type
 
@@ -353,7 +357,7 @@ apiInstance.getRegionGeometry(id, opts, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**| ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes | 
+ **id** | **String**| ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes |
  **type** | **String**| Type of region to get the geometry for (country or region) | [optional] [default to &#39;country&#39;]
 
 ### Return type
