@@ -57,7 +57,13 @@ suspend fun handleHistoryCall(
     var runs = running + finished
 
     // Sanitize keyword filter
-    // TODO split keywords by spaces (+ ignore punctuation?) for OR check
+    val filterByKeyword = if (keywordFilter.isNullOrEmpty()) {
+        null
+    } else {
+        keywordFilter
+            .replace("[^A-Za-z0-9 ]".toRegex(), "")
+            .split(" ")
+    }
 
     // Sanitize status filter
     val filterRunStatus = if (statusFilter.isNullOrEmpty() || statusFilter.contains("all")) {
@@ -96,7 +102,7 @@ suspend fun handleHistoryCall(
     var resultIndex = 0
     timeTaken = measureTimeMillis {
         runs.forEach { (path, isRunning) ->
-            getHistoryResult(path, isRunning, keywordFilter, filterRunStatus)?.let {
+            getHistoryResult(path, isRunning, filterByKeyword, filterRunStatus)?.let {
                 if (resultIndex in startIndex..<endIndex)
                     history.put(it)
 
@@ -126,7 +132,7 @@ suspend fun handleHistoryCall(
 private fun getHistoryResult(
     runFolder: File,
     isRunning: Boolean,
-    keywordFilter: String?,
+    keywordFilter: List<String>?,
     runStatusFilter: List<RunStatus>?
 ): JSONObject? {
     val run = JSONObject()
@@ -144,10 +150,9 @@ private fun getHistoryResult(
     // Apply keyword filter
     if (!keywordFilter.isNullOrEmpty()) {
         // First check the run ID
-        if(!runId.contains(keywordFilter, ignoreCase = true)) {
+        if (keywordFilter.none { runId.contains(it, ignoreCase = true) }) {
             // Then check the input file content
-            // TODO "OR" check
-            if(inputFileText?.contains(keywordFilter) != true) {
+            if (keywordFilter.none { inputFileText?.contains(it, ignoreCase = true) == true }) {
                 return null // Does not match filters
             }
         }
