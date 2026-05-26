@@ -91,6 +91,11 @@
   cursor: grabbing;
 }
 
+.react-flow {
+  --xy-selection-background-color-default: #0041d01A;
+  --xy-selection-border-default: 2px dotted #0041d0AA;
+}
+
 .react-flow__node-output {
   border-color: #ff0072 !important;
   padding: 1px 40px;
@@ -220,7 +225,6 @@
   transform: none;
   display: inline-block;
   background-color: #555;
-  border: 1px solid white;
   position: relative;
 }
 

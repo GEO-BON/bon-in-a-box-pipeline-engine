@@ -236,8 +236,8 @@ export default function PipelineEditor(props) {
 
       // Offset from pointer event to canvas
       const position = reactFlowInstance.screenToFlowPosition({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
+        x: event.clientX,
+        y: event.clientY,
       });
 
       // Approx offset so the node appears near the input.
@@ -278,8 +278,8 @@ export default function PipelineEditor(props) {
 
       // Offset from pointer event to canvas
       const position = reactFlowInstance.screenToFlowPosition({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
+        x: event.clientX,
+        y: event.clientY,
       });
 
       // Approx offset so the node appears near the output.
