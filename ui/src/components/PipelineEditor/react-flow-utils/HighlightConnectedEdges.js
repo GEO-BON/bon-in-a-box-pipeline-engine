@@ -14,11 +14,17 @@ export const highlightConnectedEdges = (selectedNodes, allEdges) => {
   }
 
   return allEdges.map((edge) => {
-    edge.style = {
-      ...edge.style,
-      stroke: connectedIds.includes(edge.id) ? '#0000ff' : undefined
-    }
+    const color = connectedIds.includes(edge.id) ? '#0000ff' : '#fcfcfc'
 
-    return edge
+    if (edge.color === '#0000ff') {
+      return edge
+    }
+    return {
+      ...edge,
+      style: {
+        ...edge.style,
+        stroke: color
+      }
+     }
   })
 }
