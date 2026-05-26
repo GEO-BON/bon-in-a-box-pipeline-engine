@@ -7,10 +7,19 @@ import io.kubernetes.client.openapi.apis.BatchV1Api
 import io.kubernetes.client.openapi.apis.CoreV1Api
 import io.kubernetes.client.openapi.models.*
 import io.kubernetes.client.util.Config
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import org.geobon.script.ScriptType
 import org.geobon.server.RemoteSetup
 import org.geobon.server.RemoteSetupState
 import org.geobon.utils.bytes
+import kotlin.time.Duration.Companion.seconds
 
 class K8sConnection {
 
@@ -27,7 +36,7 @@ class K8sConnection {
 	}
 
 	/** Mount configuration for docker containers inside worker nodes. Must match terraform configuration */
-	enum class Mount(val hostRoot: String, val mountRoot: String) {
+	enum class Mount(val hostRoot: String, val mountRoot: String, private val hostPathType: String = "DirectoryOrCreate") {
 		OUTPUT(
 			System.getenv("K8S_SHARED_OUTPUT_HOST_PATH") ?: "/mnt/biab-shared/pipeline-repo/output",
 			"/output"
@@ -47,7 +56,8 @@ class K8sConnection {
 		),
 		RUNNER_ENV(
 			System.getenv("K8S_SHARED_RUNNER_ENV_HOST_PATH") ?: "/mnt/biab-shared/pipeline-repo/runner.env",
-			"/runner.env"
+			"/runner.env",
+			hostPathType = "FileOrCreate"
 		);
 
 		val mountName: String
@@ -59,7 +69,7 @@ class K8sConnection {
 				.hostPath(
 					V1HostPathVolumeSource()
 						.path(hostRoot)
-						.type("Directory")
+						.type(hostPathType)
 				)
 
 		val asVolumeMount: V1VolumeMount
@@ -298,6 +308,85 @@ class K8sConnection {
 			}
 		}.getOrElse { ex ->
 			"pod inspection failed: ${ex.message ?: ex.javaClass.name}"
+		}
+	}
+
+	/**
+	 * Follow logs for all pods belonging to a job until the coroutine is cancelled.
+	 * Each pod is streamed independently with `follow=true` so log lines are emitted as they arrive.
+	 */
+	suspend fun streamJobLogs(
+		namespace: String,
+		jobName: String,
+		onLine: (podName: String, line: String) -> Unit
+	) = supervisorScope {
+		val followers = mutableMapOf<String, kotlinx.coroutines.Job>()
+
+		while (currentCoroutineContext().isActive) {
+			val pods = runCatching {
+				createCoreApi().listNamespacedPod(namespace)
+					.labelSelector("job-name=$jobName")
+					.execute()
+					.items
+					.orEmpty()
+			}.getOrElse {
+				emptyList()
+			}
+
+			val podNames = pods.mapNotNull { it.metadata?.name }.toSet()
+
+			followers.entries.removeIf { (podName, job) ->
+				if (podName !in podNames && !job.isActive) {
+					job.cancel()
+					true
+				} else {
+					false
+				}
+			}
+
+			podNames.forEach { podName ->
+				val follower = followers[podName]
+				if (follower == null || follower.isCompleted) {
+					followers[podName] = launch(Dispatchers.IO) {
+						followPodLogs(createCoreApi(), namespace, podName, onLine)
+					}
+				}
+			}
+
+			delay(1.seconds)
+		}
+	}
+
+	private suspend fun followPodLogs(
+		coreApi: CoreV1Api,
+		namespace: String,
+		podName: String,
+		onLine: (podName: String, line: String) -> Unit
+	) {
+		runCatching {
+			val call = coreApi.readNamespacedPodLog(podName, namespace)
+				.follow(true)
+				.timestamps(true)
+				.buildCall(null)
+
+			call.execute().use { response ->
+				if (!response.isSuccessful) {
+					throw RuntimeException("Unable to stream logs for pod '$podName': HTTP ${response.code}")
+				}
+
+				val source = response.body?.source() ?: return
+				while (currentCoroutineContext().isActive && !source.exhausted()) {
+					currentCoroutineContext().ensureActive()
+					val line = source.readUtf8Line() ?: break
+					if (line.isNotBlank()) {
+						onLine(podName, line)
+					}
+				}
+			}
+		}.onFailure { ex ->
+			if (ex is CancellationException) {
+				throw ex
+			}
 		}
 	}
 

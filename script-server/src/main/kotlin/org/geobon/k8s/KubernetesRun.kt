@@ -3,7 +3,10 @@ package org.geobon.k8s
 import io.kubernetes.client.openapi.ApiException
 import io.kubernetes.client.openapi.apis.BatchV1Api
 import io.kubernetes.client.openapi.apis.CoreV1Api
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.geobon.pipeline.RunContext
 import org.geobon.script.Run
 import org.geobon.script.ScriptType
@@ -96,7 +99,7 @@ class KubernetesRun(
                     val message = "An error occurred when running the script: ${ex.message}"
 
                     outputs[ERROR_KEY] = message.also { log(logger::warn, it) }
-                    logger.warn(ex) //TEMP
+                    //logger.warn(ex) //TEMP
                     logger.warn(ex.stackTraceToString())
                 }
             }
@@ -116,48 +119,60 @@ class KubernetesRun(
         jobName: String,
         timeout: Duration
     ) {
-        val started = TimeSource.Monotonic.markNow()
-        while (true) {
-            val status = try {
-                api.readNamespacedJobStatus(jobName, namespace).execute().status
-            } catch (ex: ApiException) {
-                if (ex.code == 404 && started.elapsedNow() <= JOB_APPEARANCE_GRACE) {
-                    log(logger::debug, "Job '$jobName' not yet visible in namespace '$namespace'. Retrying...")
+        coroutineScope {
+            val started = TimeSource.Monotonic.markNow()
+            val logsJob = launch {
+                connection.streamJobLogs(namespace, jobName) { podName, line ->
+                    log(logger::trace, "[k8s/$podName] $line")
+                }
+            }
+
+            try {
+                while (true) {
+                    val status = try {
+                        api.readNamespacedJobStatus(jobName, namespace).execute().status
+                    } catch (ex: ApiException) {
+                        if (ex.code == 404 && started.elapsedNow() <= JOB_APPEARANCE_GRACE) {
+                            log(logger::debug, "Job '$jobName' not yet visible in namespace '$namespace'. Retrying...")
+                            delay(POLL_INTERVAL)
+                            continue
+                        }
+                        if (ex.code == 404) {
+                            throw RuntimeException(
+                                "Kubernetes job '$jobName' was not found in namespace '$namespace' while waiting for completion. " +
+                                        "It may have been deleted by a cleanup policy.",
+                                ex
+                            )
+                        }
+                        throw ex
+                    }
+
+                    if ((status?.succeeded ?: 0) > 0) {
+                        log(logger::info, "Kubernetes job '$jobName' completed successfully.")
+                        return@coroutineScope
+                    }
+
+                    if ((status?.failed ?: 0) > 0) {
+                        throw RuntimeException("Kubernetes job '$jobName' failed.")
+                    }
+
+                    if (started.elapsedNow() > timeout) {
+                        throw TimeoutException("Timeout occurred after $timeout")
+                    }
+
+                    val podStatus = connection.describeJobPods(namespace, jobName)
+                    log(logger::debug, "Waiting for Kubernetes job '$jobName' to complete...\n$status")
+                    log(logger::debug, "Job '$jobName' pod state: $podStatus")
+
+                    if ((status?.active ?: 0) > 0 && podStatus.startsWith("no pods found")) {
+                        log(logger::warn, "Job '$jobName' is active but has no pods yet. Check scheduler/events in namespace '$namespace'.")
+                    }
+
                     delay(POLL_INTERVAL)
-                    continue
                 }
-                if (ex.code == 404) {
-                    throw RuntimeException(
-                        "Kubernetes job '$jobName' was not found in namespace '$namespace' while waiting for completion. " +
-                                "It may have been deleted by a cleanup policy.",
-                        ex
-                    )
-                }
-                throw ex
+            } finally {
+                logsJob.cancelAndJoin()
             }
-
-            if ((status?.succeeded ?: 0) > 0) {
-                log(logger::info, "Kubernetes job '$jobName' completed successfully.")
-                return
-            }
-
-            if ((status?.failed ?: 0) > 0) {
-                throw RuntimeException("Kubernetes job '$jobName' failed.")
-            }
-
-            if (started.elapsedNow() > timeout) {
-                throw TimeoutException("Timeout occurred after $timeout")
-            }
-
-            val podStatus = connection.describeJobPods( namespace, jobName)
-            log(logger::debug, "Waiting for Kubernetes job '$jobName' to complete...\n$status")
-            log(logger::debug, "Job '$jobName' pod state: $podStatus")
-
-            if ((status?.active ?: 0) > 0 && podStatus.startsWith("no pods found")) {
-                log(logger::warn, "Job '$jobName' is active but has no pods yet. Check scheduler/events in namespace '$namespace'.")
-            }
-
-            delay(POLL_INTERVAL)
         }
     }
 
