@@ -235,7 +235,7 @@ export default function PipelineEditor(props) {
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
 
       // Offset from pointer event to canvas
-      const position = reactFlowInstance.project({
+      const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
@@ -277,7 +277,7 @@ export default function PipelineEditor(props) {
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
 
       // Offset from pointer event to canvas
-      const position = reactFlowInstance.project({
+      const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       });
@@ -348,8 +348,6 @@ export default function PipelineEditor(props) {
         return;
       }
 
-      const position = reactFlowInstance.project({
-        x: event.clientX - reactFlowBounds.left,
       const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
