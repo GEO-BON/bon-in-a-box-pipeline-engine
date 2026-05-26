@@ -350,8 +350,13 @@ export default function PipelineEditor(props) {
 
       const position = reactFlowInstance.project({
         x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
       });
+
+      position.x -= 100
+      position.y -= 20
 
       const newNode = {
         id: getId(),
