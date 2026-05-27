@@ -1,4 +1,4 @@
-import { Handle, Position } from "react-flow-renderer/nocss";
+import { Handle, Position } from "@xyflow/react";
 import ScriptInput from "../form/ScriptInput";
 
 // props content, see https://reactflow.dev/docs/api/nodes/custom-nodes/#passed-prop-types

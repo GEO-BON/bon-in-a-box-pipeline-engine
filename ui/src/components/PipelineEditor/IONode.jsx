@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Handle, Position } from 'react-flow-renderer/nocss';
+import { Handle, Position } from '@xyflow/react';
 import { LifecycleMessage } from '../Lifecycle.jsx';
 import isObject from '../../utils/isObject'
 import ReactMarkdown from 'react-markdown'
