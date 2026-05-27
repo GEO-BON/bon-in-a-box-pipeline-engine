@@ -56,17 +56,38 @@ class KubernetesRun(
             containerForEnv = if (scriptType == ScriptType.JULIA) Containers.JULIA else Containers.CONDA
 
             val command = buildScriptCommand(scriptType)
+            logger.warn("Running Kubernetes job with command: $command") // TEMP
             val job = connection.buildJob(jobName, command, scriptType)
             val api = connection.createBatchApi()
 
-            log(logger::info, "Submitting Kubernetes job '$jobName' in namespace '$namespace'...")
-            val created = api.createNamespacedJob(namespace, job).execute()
-            log(
-                logger::debug,
-                "Kubernetes job created: name='${created.metadata?.name}', uid='${created.metadata?.uid}'"
-            )
+            // Use cached result if the job already succeeded; otherwise replace stale runs.
+            val jobAlreadySucceeded = try {
+                val existingStatus = api.readNamespacedJobStatus(jobName, namespace).execute().status
+                if ((existingStatus?.succeeded ?: 0) > 0) {
+                    log(logger::info, "Kubernetes job '$jobName' already succeeded, using cached result.")
+                    true
+                } else {
+                    api.deleteNamespacedJob(jobName, namespace)
+                        .propagationPolicy("Background")
+                        .execute()
+                    log(logger::debug, "Deleted pre-existing failed Kubernetes job '$jobName'")
+                    false
+                }
+            } catch (ex: ApiException) {
+                if (ex.code != 404) throw ex
+                false
+            }
 
-            waitForJobCompletion(api, namespace, jobName, timeout)
+            if (!jobAlreadySucceeded) {
+                log(logger::info, "Submitting Kubernetes job '$jobName' in namespace '$namespace'...")
+                val created = api.createNamespacedJob(namespace, job).execute()
+                log(
+                    logger::debug,
+                    "Kubernetes job created: name='${created.metadata?.name}', uid='${created.metadata?.uid}'"
+                )
+
+                waitForJobCompletion(api, namespace, jobName, timeout)
+            }
 
             if (resultFile.exists()) {
                 outputs = readOutputs()

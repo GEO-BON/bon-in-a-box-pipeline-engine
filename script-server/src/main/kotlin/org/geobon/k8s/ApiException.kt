@@ -7,11 +7,15 @@ fun ApiException.toFormattedString() : String {
     var formatted = "Kubernetes API error ($code): "
 
     if(!responseBody.isNullOrBlank()) {
-        val json = JSONObject(responseBody)
-        formatted += json.optString("message", "") + "\n"
-        json.remove("code")
-        json.remove("message")
-        formatted += json.toString(2)
+        try {
+            val json = JSONObject(responseBody)
+            formatted += json.optString("message", "") + "\n"
+            json.remove("code")
+            json.remove("message")
+            formatted += json.toString(2)
+        } catch (_: Exception) {
+            formatted += responseBody
+        }
     } else {
         formatted += message
     }

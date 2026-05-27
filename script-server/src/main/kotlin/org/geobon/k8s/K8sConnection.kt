@@ -6,7 +6,9 @@ import io.kubernetes.client.openapi.ApiException
 import io.kubernetes.client.openapi.apis.BatchV1Api
 import io.kubernetes.client.openapi.apis.CoreV1Api
 import io.kubernetes.client.openapi.models.*
+import io.kubernetes.client.util.ClientBuilder
 import io.kubernetes.client.util.Config
+import io.kubernetes.client.util.KubeConfig
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
@@ -19,6 +21,7 @@ import org.geobon.script.ScriptType
 import org.geobon.server.RemoteSetup
 import org.geobon.server.RemoteSetupState
 import org.geobon.utils.bytes
+import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
 class K8sConnection {
@@ -92,7 +95,7 @@ class K8sConnection {
 
 	init {
 		try {
-			client = Config.defaultClient().also { apiClient ->
+			client = createClient().also { apiClient ->
 				// Keep requests without timeout for long-running watch/poll operations.
 				apiClient.readTimeout = 0
 			}
@@ -118,6 +121,36 @@ class K8sConnection {
 				message = "Kubernetes not configured: ${ex.message ?: ex.javaClass.name}"
 			)
 		}
+	}
+
+	private fun createClient(): ApiClient {
+		val kubeConfigFile = resolveKubeConfigFile()
+
+		if (kubeConfigFile != null) {
+			kubeConfigFile.bufferedReader().use { reader ->
+				return ClientBuilder.kubeconfig(KubeConfig.loadKubeConfig(reader)).build()
+			}
+		}
+
+		return Config.defaultClient()
+	}
+
+	private fun resolveKubeConfigFile(): File? {
+		val candidates = buildList {
+			System.getenv("K8S_CONFIG_PATH")?.takeIf { it.isNotBlank() }?.let(::add)
+			System.getenv("KUBECONFIG")
+				?.split(File.pathSeparator)
+				?.map(String::trim)
+				?.filter(String::isNotEmpty)
+				?.let(::addAll)
+			System.getProperty("user.home")?.let { add("$it/.kube/config") }
+			add("/home/gradle/.kube/config")
+		}
+
+		return candidates
+			.distinct()
+			.map(::File)
+			.firstOrNull { it.isFile && it.canRead() }
 	}
 
 	fun createBatchApi(): BatchV1Api {
