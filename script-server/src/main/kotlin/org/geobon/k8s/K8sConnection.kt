@@ -20,6 +20,7 @@ import kotlinx.coroutines.supervisorScope
 import org.geobon.script.ScriptType
 import org.geobon.server.RemoteSetup
 import org.geobon.server.RemoteSetupState
+import org.geobon.server.ServerContext
 import org.geobon.utils.bytes
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
@@ -52,6 +53,10 @@ class K8sConnection {
 			System.getenv("K8S_SHARED_SCRIPT_STUBS_HOST_PATH")
 				?: "/mnt/biab-shared/pipeline-repo/.server/script-stubs",
 			"/script-stubs"
+		),
+		PIPELINES(
+			System.getenv("K8S_SHARED_PIPELINES_HOST_PATH") ?: "/mnt/biab-shared/pipeline-repo/pipelines",
+			"/pipelines"
 		),
 		USERDATA(
 			System.getenv("K8S_SHARED_USERDATA_HOST_PATH") ?: "/mnt/biab-shared/pipeline-repo/userdata",
@@ -262,10 +267,24 @@ class K8sConnection {
 			}
 		}
 
+		val mountedPaths = ServerContext.mountedRootPaths(
+			scriptsRoot = Mount.SCRIPTS.mountRoot,
+			scriptStubsRoot = Mount.SCRIPT_STUBS.mountRoot,
+			pipelinesRoot = Mount.PIPELINES.mountRoot,
+			userDataRoot = Mount.USERDATA.mountRoot
+		)
+
 		val container = V1Container()
 			.name(containerName)
 			.image(image)
 			.command(listOf("/bin/bash", "-c", scriptCommand))
+			.env(
+				mountedPaths.map { (name, value) ->
+					V1EnvVar()
+						.name(name)
+						.value(value)
+				}
+			)
 			.resources(
 				V1ResourceRequirements()
 					.putRequestsItem("memory", Quantity("256Mi"))
