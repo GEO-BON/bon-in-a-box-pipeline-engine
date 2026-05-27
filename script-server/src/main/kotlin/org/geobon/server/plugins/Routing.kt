@@ -76,9 +76,33 @@ fun Application.configureRouting() {
                     extension = "yml"
                 }
 
+                "openEO" -> {
+                    val openEOFile = scriptsRoot.resolve("openEO.yaml")
+                    val udpList = mutableMapOf<String, String>()
+                    if (openEOFile.exists()) {
+                        val yaml = Yaml().load<Map<String, Any>>(openEOFile.readText())
+                        val udps = yaml["UDPs"] as? List<Map<String, String>>
+                        udps?.forEach { udp ->
+                            val name = udp["name"]
+                            val url = udp["url"]
+                            if (name != null && url != null) {
+                                udpList[url] = name
+                            }
+                        }
+                    }
+                    if (udpList.isEmpty()) {
+                        call.respondText(
+                            text = "No UPD files were found on this server.",
+                            status = HttpStatusCode.NotFound
+                        )
+                    }
+                    call.respond(udpList.toSortedMap(String.CASE_INSENSITIVE_ORDER))
+                    return@get
+                }
+
                 else -> {
                     call.respondText(
-                        text = "Invalid type $type. Must be either \"script\" or \"pipeline\".",
+                        text = "Invalid type $type. Must be either \"script\", \"pipeline\" or \"openEO\".",
                         status = HttpStatusCode.BadRequest
                     )
                     return@get
@@ -105,12 +129,10 @@ fun Application.configureRouting() {
                         } catch (_: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
                             null
                         }
-
                         possible[relativePath] = name ?: file.name // Fallback on file name
                     }
                 }
             }
-
             call.respond(possible.toSortedMap(String.CASE_INSENSITIVE_ORDER))
         }
 

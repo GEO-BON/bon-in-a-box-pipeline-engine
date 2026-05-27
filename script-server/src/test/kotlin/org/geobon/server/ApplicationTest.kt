@@ -116,6 +116,21 @@ class ApplicationTest {
     }
 
     @Test
+    fun testUDPFileExtraction() = testApplication {
+        application { scriptModule() }
+        client.get("/openEO/list").apply {
+            assertEquals(HttpStatusCode.OK, status)
+
+            val result = bodyAsText()
+            val jsonResult = JSONObject(result)
+
+            assertEquals(3, jsonResult.length())
+            assertTrue(jsonResult.has("https://somewhere.com/udp1.json"))
+            assertEquals("UDP1", jsonResult.getString("https://somewhere.com/udp1.json"))
+        }
+    }
+
+    @Test
     fun testPipelineWithSubfolder() = testApplication {
         application { scriptModule() }
 

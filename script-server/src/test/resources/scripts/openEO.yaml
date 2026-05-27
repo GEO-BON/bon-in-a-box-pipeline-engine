@@ -1,0 +1,7 @@
+UDPs:
+  - name: UDP1
+    url: https://somewhere.com/udp1.json
+  - name: UDP2
+    url: https://somewhere.com/udp2.json
+  - name: UDP3
+    url: https://somewhere.com/udp3.json
