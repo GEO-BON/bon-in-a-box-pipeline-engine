@@ -266,13 +266,13 @@ class K8sConnection {
 				containerName = "runner-conda"
 			}
 		}
-
-		val mountedPaths = ServerContext.mountedRootPaths(
-			scriptsRoot = Mount.SCRIPTS.mountRoot,
-			scriptStubsRoot = Mount.SCRIPT_STUBS.mountRoot,
-			pipelinesRoot = Mount.PIPELINES.mountRoot,
-			userDataRoot = Mount.USERDATA.mountRoot
+		val mountedPaths = mapOf(
+			"SCRIPT_LOCATION" to Mount.SCRIPTS.mountRoot,
+			"SCRIPT_STUBS_LOCATION" to Mount.SCRIPT_STUBS.mountRoot,
+			"PIPELINES_LOCATION" to Mount.PIPELINES.mountRoot,
+			"USERDATA_LOCATION" to Mount.USERDATA.mountRoot
 		)
+
 
 		val container = V1Container()
 			.name(containerName)

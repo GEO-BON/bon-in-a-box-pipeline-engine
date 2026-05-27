@@ -10,36 +10,19 @@ class ServerContext(
 ) {
 
     companion object {
-        const val SCRIPT_LOCATION_ENV = "SCRIPT_LOCATION"
-        const val SCRIPT_STUBS_LOCATION_ENV = "SCRIPT_STUBS_LOCATION"
-        const val PIPELINES_LOCATION_ENV = "PIPELINES_LOCATION"
-        const val USERDATA_LOCATION_ENV = "USERDATA_LOCATION"
 
         val scriptsRoot
-            get() = File(System.getenv(SCRIPT_LOCATION_ENV))
+            get() = File(System.getenv("SCRIPT_LOCATION"))
 
         val scriptStubsRoot
-            get() = File(System.getenv(SCRIPT_STUBS_LOCATION_ENV))
+            get() = File(System.getenv("SCRIPT_STUBS_LOCATION"))
 
         val pipelinesRoot
-            get() = File(System.getenv(PIPELINES_LOCATION_ENV))
+            get() = File(System.getenv("PIPELINES_LOCATION"))
 
         val userDataRoot
-            get() = File(System.getenv(USERDATA_LOCATION_ENV))
+            get() = File(System.getenv("USERDATA_LOCATION"))
 
-        fun mountedRootPaths(
-            scriptsRoot: String,
-            scriptStubsRoot: String,
-            pipelinesRoot: String,
-            userDataRoot: String
-        ): Map<String, String> {
-            return linkedMapOf(
-                SCRIPT_LOCATION_ENV to scriptsRoot,
-                SCRIPT_STUBS_LOCATION_ENV to scriptStubsRoot,
-                PIPELINES_LOCATION_ENV to pipelinesRoot,
-                USERDATA_LOCATION_ENV to userDataRoot
-            )
-        }
 
     }
 }
