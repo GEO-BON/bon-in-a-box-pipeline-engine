@@ -291,7 +291,7 @@ class K8sConnection {
 					.putRequestsItem("cpu", Quantity("500m"))
 
 					// TODO: Variables selon la job
-					.putLimitsItem("memory", Quantity("4Gi"))
+					.putLimitsItem("memory", Quantity("24Gi"))
 					.putLimitsItem("cpu", Quantity("4"))
 			)
 			.volumeMounts(
