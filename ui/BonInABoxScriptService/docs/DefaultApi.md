@@ -116,7 +116,7 @@ let opts = {
   'start': 56, // Number | Start index for pagination
   'limit': 56, // Number | Limit the number of results
   'keyword': "keyword_example", // String | Filter search based on keyword. This applies to the script/pipeline names and their inputs.
-  'filterStatus': ["null"] // [String] | Filter option based on pipeline status.
+  'filterStatus': ["null"] // [String] | Filter option based on pipeline status. The default value is \"all\" when null.
 };
 apiInstance.getHistory(opts, (error, data, response) => {
   if (error) {
@@ -135,7 +135,7 @@ Name | Type | Description  | Notes
  **start** | **Number**| Start index for pagination | [optional]
  **limit** | **Number**| Limit the number of results | [optional]
  **keyword** | **String**| Filter search based on keyword. This applies to the script/pipeline names and their inputs. | [optional]
- **filterStatus** | [**[String]**](String.md)| Filter option based on pipeline status. | [optional]
+ **filterStatus** | [**[String]**](String.md)| Filter option based on pipeline status. The default value is \&quot;all\&quot; when null. | [optional]
 
 ### Return type
 
@@ -163,7 +163,7 @@ Get metadata about this script or pipeline.
 import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
-let type = "type_example"; // String | Script or pipeline
+let type = "type_example"; // String | Script, pipeline or openEO
 let descriptionPath = "descriptionPath_example"; // String | Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.
 apiInstance.getInfo(type, descriptionPath, (error, data, response) => {
   if (error) {
@@ -179,7 +179,7 @@ apiInstance.getInfo(type, descriptionPath, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline |
+ **type** | **String**| Script, pipeline or openEO |
  **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
 
 ### Return type
@@ -208,7 +208,7 @@ Get a list of available steps of given type and their names.
 import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
-let type = "type_example"; // String | Script or pipeline
+let type = "type_example"; // String | Script, pipeline or openEO
 apiInstance.getListOf(type, (error, data, response) => {
   if (error) {
     console.error(error);
@@ -223,7 +223,7 @@ apiInstance.getListOf(type, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline |
+ **type** | **String**| Script, pipeline or openEO |
 
 ### Return type
 
@@ -251,7 +251,7 @@ Get the output folders of the scripts composing this pipeline
 import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
-let type = "type_example"; // String | Script or pipeline
+let type = "type_example"; // String | Script, pipeline or openEO
 let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
 apiInstance.getOutputFolders(type, id, (error, data, response) => {
   if (error) {
@@ -267,7 +267,7 @@ apiInstance.getOutputFolders(type, id, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline |
+ **type** | **String**| Script, pipeline or openEO |
  **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  |
 
 ### Return type
@@ -546,7 +546,7 @@ Runs the script or pipeline matching &#x60;descriptionPath&#x60;.
 import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
-let type = "type_example"; // String | Script or pipeline
+let type = "type_example"; // String | Script, pipeline or openEO
 let descriptionPath = "descriptionPath_example"; // String | Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.
 let opts = {
   'callback': "callback_example", // String | Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully.
@@ -566,7 +566,7 @@ apiInstance.run(type, descriptionPath, opts, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline |
+ **type** | **String**| Script, pipeline or openEO |
  **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
  **callback** | **String**| Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully. | [optional]
  **body** | **String**| Content of input.json for this run | [optional]
@@ -642,7 +642,7 @@ Stop the specified pipeline run.
 import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
-let type = "type_example"; // String | Script or pipeline
+let type = "type_example"; // String | Script, pipeline or openEO
 let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
 apiInstance.stop(type, id, (error, data, response) => {
   if (error) {
@@ -658,7 +658,7 @@ apiInstance.stop(type, id, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline |
+ **type** | **String**| Script, pipeline or openEO |
  **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  |
 
 ### Return type

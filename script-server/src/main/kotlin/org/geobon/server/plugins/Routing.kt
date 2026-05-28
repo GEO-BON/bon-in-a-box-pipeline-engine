@@ -78,6 +78,7 @@ fun Application.configureRouting() {
 
                 "openEO" -> {
                     val openEOFile = scriptsRoot.resolve("openEO.yaml")
+                    println("Looking for openEO.yaml at: ${openEOFile.absolutePath}")
                     val udpList = mutableMapOf<String, String>()
                     if (openEOFile.exists()) {
                         val yaml = Yaml().load<Map<String, Any>>(openEOFile.readText())
@@ -95,6 +96,7 @@ fun Application.configureRouting() {
                             text = "No UPD files were found on this server.",
                             status = HttpStatusCode.NotFound
                         )
+                        return@get
                     }
                     call.respond(udpList.toSortedMap(String.CASE_INSENSITIVE_ORDER))
                     return@get
@@ -144,13 +146,12 @@ fun Application.configureRouting() {
             handleHistoryCall(call, start, limit, keyword, filterStatus, runningPipelines)
         }
 
-        get("/script/{scriptPath}/info") {
+        get("/{type}/{scriptPath}/info") {
             try {
                 // Put back the slashes and replace extension by .yml
                 val ymlPath = call.parameters["scriptPath"]!!.run {
                     replace(FILE_SEPARATOR, '/').replace(Regex("""\.\w+$"""), ".yml")
                 }
-
                 var scriptFile = File(scriptsRoot, ymlPath)
 
                 if (scriptFile.exists()) {

@@ -25,7 +25,7 @@ import Info from '../model/Info';
 export default class DefaultApi {
 
     /**
-    * Constructs a new DefaultApi. 
+    * Constructs a new DefaultApi.
     * @alias module:api/DefaultApi
     * @class
     * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
@@ -122,7 +122,7 @@ export default class DefaultApi {
      * @param {Number} [start] Start index for pagination
      * @param {Number} [limit] Limit the number of results
      * @param {String} [keyword] Filter search based on keyword. This applies to the script/pipeline names and their inputs.
-     * @param {Array.<module:model/String>} [filterStatus] Filter option based on pipeline status.
+     * @param {Array.<module:model/String>} [filterStatus] Filter option based on pipeline status. The default value is \"all\" when null.
      * @param {module:api/DefaultApi~getHistoryCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/GetHistory200ResponseInner>}
      */
@@ -164,7 +164,7 @@ export default class DefaultApi {
 
     /**
      * Get metadata about this script or pipeline.
-     * @param {module:model/String} type Script or pipeline
+     * @param {module:model/String} type Script, pipeline or openEO
      * @param {String} descriptionPath Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.
      * @param {module:api/DefaultApi~getInfoCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Info}
@@ -212,7 +212,7 @@ export default class DefaultApi {
 
     /**
      * Get a list of available steps of given type and their names.
-     * @param {module:model/String} type Script or pipeline
+     * @param {module:model/String} type Script, pipeline or openEO
      * @param {module:api/DefaultApi~getListOfCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Object.<String, {String: String}>}
      */
@@ -254,8 +254,8 @@ export default class DefaultApi {
 
     /**
      * Get the output folders of the scripts composing this pipeline
-     * @param {module:model/String} type Script or pipeline
-     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
+     * @param {module:model/String} type Script, pipeline or openEO
+     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
      * @param {module:api/DefaultApi~getOutputFoldersCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Object.<String, {String: String}>}
      */
@@ -539,7 +539,7 @@ export default class DefaultApi {
 
     /**
      * Runs the script or pipeline matching `descriptionPath`.
-     * @param {module:model/String} type Script or pipeline
+     * @param {module:model/String} type Script, pipeline or openEO
      * @param {String} descriptionPath Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.
      * @param {Object} opts Optional parameters
      * @param {String} [callback] Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully.
@@ -639,8 +639,8 @@ export default class DefaultApi {
 
     /**
      * Stop the specified pipeline run.
-     * @param {module:model/String} type Script or pipeline
-     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
+     * @param {module:model/String} type Script, pipeline or openEO
+     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
      * @param {module:api/DefaultApi~stopCallback} callback The callback function, accepting three arguments: error, data, response
      */
     stop(type, id, callback) {
