@@ -39,7 +39,7 @@ function activateSubEnvironment {
         fi
     else
         echo "Creating new conda environment $condaEnvName..."
-        flock --verbose /conda-env-yml/ mamba env create -y -f "$condaEnvFileSrc" 2>&1 | tee -a "$logFile"
+        flock --verbose /conda-env-yml/ mamba env create -y -f "$condaEnvFileSrc"
         if [[ $? -eq 0 ]] ; then
             mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
             echo "Created successfully."
