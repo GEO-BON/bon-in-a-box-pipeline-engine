@@ -71,72 +71,77 @@ export const GetScriptOutputs = async (script_run_output_path: string) => {
 export const createPipeline4Display = async (pipeline_run_id: string) => {
   const pipeline_id = pipeline_run_id.split(">").slice(0, -1).join(">");
 
-  return GetPipelineIO(pipeline_id).then((po: any) => {
-    return GetPipelineRunOutputs(pipeline_run_id).then((pro: any) => {
-      return Promise.allSettled(
-        Object.keys(po.outputs).map(async (p: any) => {
-          const script = getBreadcrumbs(p);
-          const output = getScriptOutput(p);
-          if (script in pro) {
-            const script_run_output_path = pro[script];
-            return await GetScriptOutputs(script_run_output_path).then( // TODO: Should not call GetScriptOutputs multiple times, use scriptDescriptionStore from the "ui" folder
-              (out: any) => {
-                return {
-                  ...po.outputs[p],
-                  outputs: `${out[output]}`, // TODO should be out[output] && `${out[output]}` to avoid having "undefined" strings
-                };
-              }
-            );
-          }
-          return await GetPipelineRunInputs(pipeline_run_id).then(
-            (inputs: any) => {
-              if (script in inputs) {
-                let inp = inputs[script];
-                if (Array.isArray(inp)) {
-                  inp = inputs[script].join(",");
-                }
-                return {
-                  ...po.outputs[p],
-                  outputs: inp,
-                };
-              } else {
-                return { outputs: [] };
-              }
+  try {
+    return await GetPipelineIO(pipeline_id).then((po: any) => {
+      return GetPipelineRunOutputs(pipeline_run_id).then((pro: any) => {
+        return Promise.allSettled(
+          Object.keys(po.outputs).map(async (p: any) => {
+            const script = getBreadcrumbs(p);
+            const output = getScriptOutput(p);
+            if (script in pro) {
+              const script_run_output_path = pro[script];
+              return await GetScriptOutputs(script_run_output_path).then(
+                // TODO: Should not call GetScriptOutputs multiple times, use scriptDescriptionStore from the "ui" folder
+                (out: any) => {
+                  return {
+                    ...po.outputs[p],
+                    outputs: `${out[output]}`, // TODO should be out[output] && `${out[output]}` to avoid having "undefined" strings
+                  };
+                },
+              );
             }
-          );
-        })
-      ).then((prom: any) => {
-        let desc: any = {
-          name: "",
-          author: "",
-          description: "",
-          external_link: "",
-          pipeline_outputs: [],
-          pipeline_inputs_desc: po.inputs,
-        };
-        if (po.description) {
-          desc = {
-            name: po.name,
-            author: po.author,
-            description: po.description,
-            external_link: po.external_link,
+            return await GetPipelineRunInputs(pipeline_run_id).then(
+              (inputs: any) => {
+                if (script in inputs) {
+                  let inp = inputs[script];
+                  if (Array.isArray(inp)) {
+                    inp = inputs[script].join(",");
+                  }
+                  return {
+                    ...po.outputs[p],
+                    outputs: inp,
+                  };
+                } else {
+                  return { outputs: [] };
+                }
+              },
+            );
+          }),
+        ).then((prom: any) => {
+          let desc: any = {
+            name: "",
+            author: "",
+            description: "",
+            external_link: "",
             pipeline_outputs: [],
             pipeline_inputs_desc: po.inputs,
           };
-        }
-        return Promise.allSettled(
-          prom.map(async (f: any) => {
-            return await preprocess(f.value).then((v) => {
-              return v;
-            });
-          })
-        ).then((pr: any) => {
-          desc.pipeline_outputs = pr.map((p: any) => p.value);
-          return desc;
+          if (po.description) {
+            desc = {
+              name: po.name,
+              author: po.author,
+              description: po.description,
+              external_link: po.external_link,
+              pipeline_outputs: [],
+              pipeline_inputs_desc: po.inputs,
+            };
+          }
+          return Promise.allSettled(
+            prom.map(async (f: any) => {
+              return await preprocess(f.value).then((v) => {
+                return v;
+              });
+            }),
+          ).then((pr: any) => {
+            desc.pipeline_outputs = pr.map((p: any) => p.value);
+            return desc;
+          });
         });
       });
     });
-  });
+  } catch (error) {
+    throw new Error("Problem loading pipeline output");
+  }
 };
 
 export const GetJSON = async (path: string) => {
@@ -171,7 +176,7 @@ const preprocess = async (value: any) => {
           });
           return outs;
         });
-      })
+      }),
     );
     return { ...value, outputs: out.flat() };
   }
