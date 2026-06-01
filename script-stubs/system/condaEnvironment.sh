@@ -2,6 +2,7 @@
 outputFolder=$1
 condaEnvName=$2
 condaEnvYml=$3
+condaPackDir=$4
 
 logFile="$outputFolder/logs.txt"
 pidFile="$outputFolder/.pid"
@@ -60,6 +61,28 @@ function activateSubEnvironment {
         echo "Activation failed, will attempt creating..."
         flock --verbose /conda-env-yml/ mamba env create -y -f $condaEnvFile
         mamba activate $condaEnvName ; assertSuccess
+    fi
+}
+
+function checkCondaPack {
+    # Load conda-pack environment if a folder was supplied and is available.
+    if [[ -n "$condaPackDir" ]]; then
+        echo "Installing conda-pack from $condaPackDir..."
+        mamba install -n pack -y -c conda-forge conda-pack ; assertSuccess
+        mamba activate pack ; assertSuccess
+        # ...
+        mamba deactivate # pack
+    fi
+}
+
+function condaPack {
+    # Conda-pack the environment if a folder was supplied.
+    if [[ -n "$condaPackDir" ]]; then
+        mamba install -n pack -y -c conda-forge conda-pack ; assertSuccess
+        mamba activate pack ; assertSuccess
+        conda-pack -n $condaEnvName -o $condaPackDir/$condaEnvName.tar.gz ; assertSuccess
+        echo "Conda environment packed to $condaPackDir/$condaEnvName.tar.gz"
+        mamba deactivate # pack
     fi
 }
 
