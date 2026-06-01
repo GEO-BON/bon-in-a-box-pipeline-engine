@@ -22,12 +22,12 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import java.io.FileNotFoundException
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-
 
 /**
  * Used to transport paths through path param.
@@ -78,19 +78,18 @@ fun Application.configureRouting() {
 
                 "openEO" -> {
                     val openEOFile = scriptsRoot.resolve("openEO.yaml")
-                    println("Looking for openEO.yaml at: ${openEOFile.absolutePath}")
                     val udpList = mutableMapOf<String, String>()
                     if (openEOFile.exists()) {
                         val yaml = Yaml().load<Map<String, Any>>(openEOFile.readText())
-                        val udps = yaml["UDPs"] as? List<Map<String, String>>
-                        udps?.forEach { udp ->
-                            val name = udp["name"]
-                            val url = udp["url"]
-                            if (name != null && url != null) {
-                                udpList[url] = name
+                        val udps = yaml["UDPs"] as? Map<String, Map<String, String>>
+                        udps?.forEach { (key, value) ->
+                            val name = value["name"] as? String
+                            if (name != null) {
+                                udpList[key] = name
                             }
                         }
                     }
+
                     if (udpList.isEmpty()) {
                         call.respondText(
                             text = "No UPD files were found on this server.",
@@ -146,52 +145,26 @@ fun Application.configureRouting() {
             handleHistoryCall(call, start, limit, keyword, filterStatus, runningPipelines)
         }
 
-        get("/{type}/{scriptPath}/info") {
+        get("/{type}/{descriptionPath}/info") {
             try {
-                // Put back the slashes and replace extension by .yml
-                val ymlPath = call.parameters["scriptPath"]!!.run {
-                    replace(FILE_SEPARATOR, '/').replace(Regex("""\.\w+$"""), ".yml")
-                }
-                var scriptFile = File(scriptsRoot, ymlPath)
-
-                if (scriptFile.exists()) {
-                    call.respond(Yaml().load(scriptFile.readText()) as Map<String, Any>)
-                } else {
-                    scriptFile = File(scriptStubsRoot, ymlPath)
-                    if (scriptFile.exists()) {
-                        call.respond(Yaml().load(scriptFile.readText()) as Map<String, Any>)
-                    } else {
-                        call.respondText(text = "$scriptFile does not exist", status = HttpStatusCode.NotFound)
-                        logger.debug("404: getInfo ${call.parameters["scriptPath"]} ${scriptFile.absolutePath}")
-                    }
-                }
-            } catch (ex: Exception) {
-                call.respondText(text = ex.message!!, status = HttpStatusCode.InternalServerError)
-                ex.printStackTrace()
-            }
-        }
-
-        get("/pipeline/{descriptionPath}/info") {
-            try {
-                // Put back the slashes before reading
-                val descriptionFile =
-                    File(pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
-                if (descriptionFile.exists()) {
-                    val descriptionJSON = JSONObject(descriptionFile.readText())
-                    val metadataJSON = JSONObject()
-                    metadataJSON.putOpt(INPUTS, descriptionJSON.get(INPUTS))
-                    metadataJSON.putOpt(OUTPUTS, descriptionJSON.get(OUTPUTS))
-                    descriptionJSON.optJSONObject(METADATA)?.let { metadata ->
-                        metadata.keys().forEach { key ->
-                            metadataJSON.putOpt(key, metadata.get(key))
-                        }
+                val type = call.parameters["type"]
+                val descriptionPath = call.parameters["descriptionPath"] ?: return@get
+                when (type) {
+                    "script" -> {
+                        call.respond(YMLStep.getScriptDescription(descriptionPath))
                     }
 
-                    call.respondText(metadataJSON.toString(), ContentType.Application.Json)
-                } else {
-                    call.respondText(text = "$descriptionFile does not exist", status = HttpStatusCode.NotFound)
-                    logger.debug("404: getListOf ${call.parameters["descriptionPath"]}")
+                    "pipeline" -> {
+                        call.respondText(Pipeline.getPipelineDescription(descriptionPath).toString(), ContentType.Application.Json)
+                    }
+
+                    "openEO" -> {
+                        call.respond(getOpenEODescription(descriptionPath))
+                    }
                 }
+            } catch (error: FileNotFoundException) {
+                call.respondText(text = "Requested files not found.", status = HttpStatusCode.NotFound)
+
             } catch (ex: Exception) {
                 call.respondText(text = ex.message!!, status = HttpStatusCode.InternalServerError)
                 ex.printStackTrace()

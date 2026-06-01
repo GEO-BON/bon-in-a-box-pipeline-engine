@@ -9,6 +9,7 @@ object Description {
     const val SCRIPT = "script"
     const val NAME = "name"
     const val TIMEOUT = "timeout"
+    const val EXTERNAL_LINK = "external_link"
 
     const val INPUTS = "inputs"
     const val OUTPUTS = "outputs"

@@ -9,6 +9,7 @@ import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.FileNotFoundException
 
 open class Pipeline (
     override val id: StepId,
@@ -422,6 +423,28 @@ open class Pipeline (
                 }
             }
         }
-    }
 
+        fun getPipelineDescription(path: String): JSONObject {
+            val descriptionFile =
+                File(ServerContext.pipelinesRoot, path.replace('>', '/'))
+
+            if (descriptionFile.exists()) {
+                val descriptionJSON = JSONObject(descriptionFile.readText())
+                val metadataJSON = JSONObject()
+                metadataJSON.putOpt(INPUTS, descriptionJSON.get(INPUTS))
+                metadataJSON.putOpt(OUTPUTS, descriptionJSON.get(OUTPUTS))
+
+                descriptionJSON.optJSONObject(METADATA)?.let { metadata ->
+                    metadata.keys().forEach { key ->
+                        metadataJSON.putOpt(key, metadata.get(key))
+                    }
+                }
+
+                return metadataJSON
+
+            } else {
+                throw FileNotFoundException("$descriptionFile does not exist.")
+            }
+        }
+    }
 }

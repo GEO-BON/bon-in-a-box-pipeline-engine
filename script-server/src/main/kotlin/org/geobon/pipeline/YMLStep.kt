@@ -15,6 +15,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import java.io.FileNotFoundException
 
 
 abstract class YMLStep(
@@ -164,7 +165,22 @@ abstract class YMLStep(
                     properties.map { it.toString() }
                 }
         }
+        /**
+         * @return Load description of script
+         */
+        fun getScriptDescription(path: String): Map<String, Any> {
+            val ymlPath = path.replace('>', '/').replace(Regex("""\.\w+$"""), ".yml")
+            var scriptFile = File(ServerContext.scriptsRoot, ymlPath)
 
+            if (!scriptFile.exists()) {
+                scriptFile = File(ServerContext.scriptStubsRoot, ymlPath)
+
+                if (!scriptFile.exists()) {
+                    throw FileNotFoundException("$scriptFile does not exist.")
+                }
+            }
+            return Yaml().load(scriptFile.readText())
+        }
 
         /**
          * @return Map of input name to type
