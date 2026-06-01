@@ -69,8 +69,8 @@ if [[ "$condaEnvName" == "pythonbase" || "$condaEnvName" == "rbase" ]]; then
     activateBaseEnvironment
 else
     # A first lock on the sub-environment
-    # Case: if another environment is updating, we want to wait to
-    # find the environment ready, hence avoid entering the update
+    # Case: if another step is updating the same environment, we want to wait
+    # for the environment to be ready, hence avoid entering the update
     # condition and updating twice.
     #
     # A second lock on the whole folder happens inside the activateSubEnvironment
