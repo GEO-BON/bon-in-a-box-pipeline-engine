@@ -68,21 +68,19 @@ function checkCondaPack {
     # Load conda-pack environment if a folder was supplied and is available.
     if [[ -n "$condaPackDir" ]]; then
         echo "Installing conda-pack from $condaPackDir..."
-        mamba install -n pack -y -c conda-forge conda-pack ; assertSuccess
-        mamba activate pack ; assertSuccess
+        mamba activate base ; assertSuccess
         # ...
-        mamba deactivate # pack
+        mamba deactivate # base
     fi
 }
 
 function condaPack {
     # Conda-pack the environment if a folder was supplied.
     if [[ -n "$condaPackDir" ]]; then
-        mamba install -n pack -y -c conda-forge conda-pack ; assertSuccess
-        mamba activate pack ; assertSuccess
+        mamba activate base ; assertSuccess
         conda-pack -n $condaEnvName -o $condaPackDir/$condaEnvName.tar.gz ; assertSuccess
         echo "Conda environment packed to $condaPackDir/$condaEnvName.tar.gz"
-        mamba deactivate # pack
+        mamba deactivate # base
     fi
 }
 
