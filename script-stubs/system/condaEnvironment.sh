@@ -64,22 +64,35 @@ function activateSubEnvironment {
     fi
 }
 
-function checkCondaPack {
+function unpackEnvironment {
     # Load conda-pack environment if a folder was supplied and is available.
     if [[ -n "$condaPackDir" ]]; then
-        echo "Installing conda-pack from $condaPackDir..."
-        mamba activate base ; assertSuccess
-        # ...
-        mamba deactivate # base
+        zip=$condaPackDir/$condaEnvName.tar.gz
+        if [[ -f "$zip" ]]; then
+            echo "Installing environment using conda-pack from $zip..."
+            targetDir="$condaPackDir/$condaEnvName"
+            mkdir -p $targetDir ; assertSuccess
+            tar -xzf $zip -C $targetDir ; assertSuccess
+
+            mamba activate base ; assertSuccess
+            $targetDir/bin/conda-unpack ; assertSuccess
+            mamba deactivate # base
+            source $targetDir/bin/activate ; assertSuccess
+            echo "Conda environment ready."
+            exit 0
+        fi
     fi
 }
 
-function condaPack {
+function packEnvironment {
     # Conda-pack the environment if a folder was supplied.
     if [[ -n "$condaPackDir" ]]; then
+        zip=$condaPackDir/$condaEnvName.tar.gz
+
+        echo "Packing conda environment $condaEnvName."
         mamba activate base ; assertSuccess
-        conda-pack -n $condaEnvName -o $condaPackDir/$condaEnvName.tar.gz ; assertSuccess
-        echo "Conda environment packed to $condaPackDir/$condaEnvName.tar.gz"
+        conda-pack --n-threads -1 --quiet -n $condaEnvName -o $zip ; assertSuccess
+        echo "Conda environment packed to $zip using conda-pack."
         mamba deactivate # base
     fi
 }
@@ -89,6 +102,8 @@ source /.bashrc
 if [[ "$condaEnvName" == "pythonbase" || "$condaEnvName" == "rbase" ]]; then
     activateBaseEnvironment
 else
+    unpackEnvironment
+
     # A first lock on the sub-environment
     # Case: if another step is updating the same environment, we want to wait
     # for the environment to be ready, hence avoid entering the update
@@ -105,5 +120,7 @@ else
     activateSubEnvironment
 
     exec {lockfd}>&-
+
+    packEnvironment
 fi
 echo "Conda environment ready."
