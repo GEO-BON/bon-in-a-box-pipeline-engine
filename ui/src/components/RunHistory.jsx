@@ -49,7 +49,7 @@ export default function RunHistory() {
   const debouncedSetKeyword = useCallback(
     debounce((value) => {
       setKeyword(value);
-    }, 200),
+    }, 300),
     []
   );
 
