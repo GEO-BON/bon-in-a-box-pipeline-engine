@@ -126,14 +126,14 @@ class ApplicationTest {
             val jsonResult = JSONObject(result)
 
             assertEquals(3, jsonResult.length())
-            assertTrue(jsonResult.has("UDP1"))
-            assertEquals("udp1", jsonResult.getString("UDP1"))
+            assertTrue(jsonResult.has("UDP2.udp"))
+            assertEquals("udp1", jsonResult.getString("UDP1.udp"))
         }
     }
 
     fun `given openEO getting info_then info returned`() = testApplication {
         application { scriptModule() }
-        client.get("openEO/UDP1/info").apply {
+        client.get("openEO/UDP1.udp/info").apply {
             assertEquals(HttpStatusCode.OK, status)
 
             val result = bodyAsText()

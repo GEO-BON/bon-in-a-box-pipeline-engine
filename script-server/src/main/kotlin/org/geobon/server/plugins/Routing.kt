@@ -77,7 +77,7 @@ fun Application.configureRouting() {
                 }
 
                 "openEO" -> {
-                    val openEOFile = scriptsRoot.resolve("openEO.yaml")
+                    val openEOFile = scriptsRoot.resolve("externalScripts.yaml")
                     val udpList = mutableMapOf<String, String>()
                     if (openEOFile.exists()) {
                         val yaml = Yaml().load<Map<String, Any>>(openEOFile.readText())

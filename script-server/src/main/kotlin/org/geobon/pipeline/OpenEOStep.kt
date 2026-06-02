@@ -6,7 +6,7 @@ import java.io.FileNotFoundException
 import org.yaml.snakeyaml.Yaml
 
 fun getOpenEODescription(key: String): Map<String, Any> {
-    val file = File(ServerContext.scriptsRoot, "openEO.yaml")
+    val file = File(ServerContext.scriptsRoot, "externalScripts.yaml")
 
     if (!file.exists()) {
         throw FileNotFoundException("$file does not exist.")
@@ -15,7 +15,7 @@ fun getOpenEODescription(key: String): Map<String, Any> {
     val yaml = Yaml().load(file.readText()) as Map<String, Any>
 
     val udps = yaml["UDPs"] as? Map<String, Map<String, String>>
-        ?: throw RuntimeException("openEO.yaml does not contain any urls.")
+        ?: throw RuntimeException("$file does not contain any urls.")
 
     val udp = udps[key]
         ?: throw RuntimeException("UDP $key not found.")
