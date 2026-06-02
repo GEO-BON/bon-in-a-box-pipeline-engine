@@ -125,8 +125,23 @@ class ApplicationTest {
             val jsonResult = JSONObject(result)
 
             assertEquals(3, jsonResult.length())
-            assertTrue(jsonResult.has("https://somewhere.com/udp1.json"))
-            assertEquals("UDP1", jsonResult.getString("https://somewhere.com/udp1.json"))
+            assertTrue(jsonResult.has("UDP1"))
+            assertEquals("udp1", jsonResult.getString("UDP1"))
+        }
+    }
+
+    fun `given openEO getting info_then info returned`() = testApplication {
+        application { scriptModule() }
+        client.get("openEO/openEO.yaml/info").apply {
+            assertEquals(HttpStatusCode.OK, status)
+
+            val result = bodyAsText()
+            val jsonArray = JSONArray(result)
+            val udp1 = jsonArray.getJSONObject(0)
+
+            assertEquals(1, jsonArray.length())
+            assertEquals("udp1", udp1.getString("label"))
+            assertEquals("https://somewhere.com/udp1.json", udp1.getString("external_link"))
         }
     }
 
