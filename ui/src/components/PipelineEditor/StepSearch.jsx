@@ -19,9 +19,13 @@ export function SearchResultStep({ result, selectedStep, ...props }) {
       title="Click for info, drag and drop to add to pipeline."
       className={
         "dndnode search-result"
-         + (descriptionFile === selectedStep ? " selected" : "")
-         + (isDeprecated ? " deprecated" : "")
-         + (type === "pipeline" ? " pipeline-step" : " script-step")
+        + (descriptionFile === selectedStep ? " selected" : "")
+        + (isDeprecated ? " deprecated" : "")
+        + (type === "pipeline"
+          ? " pipeline-step"
+          : type === "openEO"
+            ? " openEO-step"
+            :" script-step")
       }
       {...props}
     >
@@ -144,9 +148,9 @@ function sortResults(arr) {
 //   metadata: object,
 //   titleHighlighted: JSX element,
 //   metadataExcerpt: JSX element,
-//   type: "pipeline" | "script"
+//   type: "pipeline" | "script" | "openEO"
 // }
-export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles) {
+export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles, udpFiles) {
   let results = [];
   if (searchKeywords.length === 0) {
     return results;
@@ -171,6 +175,18 @@ export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles)
       const result = scoreResult(searchKeywords, descriptionFile, stepName, metadata);
       if (result.score > 0) {
         result.type = "script";
+        results.push(result);
+      }
+    });
+  }
+
+  //Process openEO files
+  if (udpFiles && !isValidElement(udpFiles)) {
+    Object.entries(udpFiles).forEach(([descriptionFile, stepName]) => {
+      const metadata = getStepDescription(descriptionFile);
+      const result = scoreResult(searchKeywords, descriptionFile, stepName, metadata);
+      if (result.score > 0) {
+        result.type = "openEO";
         results.push(result);
       }
     });
