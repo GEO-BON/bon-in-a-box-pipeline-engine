@@ -133,16 +133,15 @@ class ApplicationTest {
 
     fun `given openEO getting info_then info returned`() = testApplication {
         application { scriptModule() }
-        client.get("openEO/openEO.yaml/info").apply {
+        client.get("openEO/UDP1/info").apply {
             assertEquals(HttpStatusCode.OK, status)
 
             val result = bodyAsText()
-            val jsonArray = JSONArray(result)
-            val udp1 = jsonArray.getJSONObject(0)
+            val jsonResult = JSONObject(result)
 
-            assertEquals(1, jsonArray.length())
-            assertEquals("udp1", udp1.getString("label"))
-            assertEquals("https://somewhere.com/udp1.json", udp1.getString("external_link"))
+            assertEquals(1, jsonResult.length())
+            assertEquals("udp1", jsonResult.getString("label"))
+            assertEquals("https://somewhere.com/udp1.json", jsonResult.getString("external_link"))
         }
     }
 
