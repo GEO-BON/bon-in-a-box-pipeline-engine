@@ -313,13 +313,18 @@ export default function StepChooser(_) {
             {udpFiles && (
               <div key="openEO">
                 <h3>openEO</h3>
-                {isValidElement(udpFiles) && udpFiles.type === HttpError ? udpFiles : renderTree(
-                  [],
-                  Object.entries(udpFiles).map((entry) => [
-                    entry[0].split(">"),
-                    entry[1],
-                  ])
-                )}
+                {isValidElement(udpFiles) && udpFiles.type === HttpError ? udpFiles :
+                  Object.entries(udpFiles).map(([fileName, stepName]) => (
+                    <PipelineStep
+                      key={fileName}
+                      descriptionFile={fileName}
+                      fileName={fileName}
+                      selectedStep={selectedStep}
+                      stepName={stepName}
+                      onStepClick={onStepClick}
+                    />
+                  ))
+                }
               </div>
             )}
           </>
