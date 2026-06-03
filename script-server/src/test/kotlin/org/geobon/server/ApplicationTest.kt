@@ -140,7 +140,7 @@ class ApplicationTest {
             val jsonResult = JSONObject(result)
 
             assertEquals(1, jsonResult.length())
-            assertEquals("udp1", jsonResult.getString("label"))
+            assertEquals("udp1", jsonResult.getString("name"))
             assertEquals("https://somewhere.com/udp1.json", jsonResult.getString("external_link"))
         }
     }

@@ -21,7 +21,7 @@ fun getOpenEODescription(key: String): Map<String, Any> {
         ?: throw RuntimeException("UDP $key not found.")
 
     return mapOf(
-        "label" to (udp["name"] ?: ""),
+        "name" to (udp["name"] ?: ""),
         "external_link" to (udp["url"] ?: "")
     )
 }

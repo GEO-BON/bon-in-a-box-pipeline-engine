@@ -34,13 +34,29 @@ export default function IONode({ id, data }) {
 
   if (!metadata) return null
 
-  let stepType = /\.json$/i.test(descriptionFileLocation) ? 'pipeline' :
-  /\.udp$/i.test(descriptionFileLocation) ? 'openEO' :
-  'script';
+  let stepType;
+  const extension = descriptionFileLocation.match(/\.([^.]+)$/)?.[1]?.toLowerCase();
 
-  let pathList = descriptionFileLocation.split('>')
-  if(metadata.name) {
-    pathList[pathList.length -1] = metadata.name
+  switch (extension) {
+    case 'json':
+      stepType = 'pipeline';
+      break;
+    case 'udp':
+      stepType = 'openEO';
+      break;
+    default:
+      stepType = 'script';
+  }
+
+  let pathList;
+
+  if (stepType === 'openEO') {
+    pathList = ['openEO', metadata.name];
+  } else {
+    pathList = descriptionFileLocation.split('>');
+    if (metadata.name) {
+      pathList[pathList.length - 1] = metadata.name;
+    }
   }
 
   return <table className={`ioNode ${stepType}`}><tbody>
