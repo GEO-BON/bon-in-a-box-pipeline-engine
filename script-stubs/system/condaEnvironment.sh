@@ -72,16 +72,21 @@ function unpackEnvironment {
             echo "Installing environment using conda-pack from $zip..."
             targetDir="$condaPackDir/$condaEnvName"
             mkdir -p $targetDir ; assertSuccess
+
+            # TODO parallelize? install pigz in image then use --use-compress-program=pigz
             tar -xzf $zip -C $targetDir ; assertSuccess
 
             mamba activate base ; assertSuccess
             $targetDir/bin/conda-unpack ; assertSuccess
             mamba deactivate # base
             source $targetDir/bin/activate ; assertSuccess
-            echo "Conda environment ready."
-            exit 0
+
+            echo "Activated unpacked environment from $targetDir."
+            return 0
         fi
     fi
+
+    return 1
 }
 
 function packEnvironment {
@@ -101,26 +106,30 @@ echo $$ > $pidFile
 source /.bashrc
 if [[ "$condaEnvName" == "pythonbase" || "$condaEnvName" == "rbase" ]]; then
     activateBaseEnvironment
-else
+
+# Attempt to unpack and activate the environment if a conda-pack directory is provided
+else 
     unpackEnvironment
+    if [[ $? -ne 0 ]]; then
+        # A first lock on the sub-environment
+        # Case: if another step is updating the same environment, we want to wait
+        # for the environment to be ready, hence avoid entering the update
+        # condition and updating twice.
+        #
+        # A second lock on the whole folder happens inside the activateSubEnvironment
+        # function to prevent two different sub-environments from doing transactions
+        # at the same time.
+        lockFile="/conda-env-yml/$condaEnvName.lock"
+        exec {lockfd}>>"$lockFile" ; assertSuccess
+        trap 'exec {lockfd}>&- 2>/dev/null || true' EXIT INT TERM HUP
+        flock --verbose -x "$lockfd" ; assertSuccess
 
-    # A first lock on the sub-environment
-    # Case: if another step is updating the same environment, we want to wait
-    # for the environment to be ready, hence avoid entering the update
-    # condition and updating twice.
-    #
-    # A second lock on the whole folder happens inside the activateSubEnvironment
-    # function to prevent two different sub-environments from doing transactions
-    # at the same time.
-    lockFile="/conda-env-yml/$condaEnvName.lock"
-    exec {lockfd}>>"$lockFile" ; assertSuccess
-    trap 'exec {lockfd}>&- 2>/dev/null || true' EXIT INT TERM HUP
-    flock --verbose -x "$lockfd" ; assertSuccess
+        activateSubEnvironment
 
-    activateSubEnvironment
+        exec {lockfd}>&-
 
-    exec {lockfd}>&-
-
-    packEnvironment
+        packEnvironment
+    fi
 fi
+
 echo "Conda environment ready."
