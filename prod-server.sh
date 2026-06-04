@@ -51,7 +51,8 @@ function help {
     echo
     echo "Commands:"
     echo "    help                 Display this help"
-    echo "    checkout [BRANCH]    Checkout config files from given branch of pipeline engine repo."
+    echo "    checkout [REF]       Checkout config files from given branch or tag of pipeline engine repo."
+    echo "                         Use the full ref, such as 'origin/edge' or 'refs/tags/v1.2.1'."
     echo "    up [-y]              Start the server, accessible in http://localhost"
     echo "                         Use -y or --yes to skip confirmation prompts (for automation)"
     echo "    down                 Stops the server"
@@ -176,23 +177,23 @@ function validate {
 }
 
 function checkout {
-    branch=origin/$1 # Mandatory arg 1: branch name of server repo on remote origin
-    echo "Updating server configuration from $branch..."
+    ref=$1 # Mandatory arg 1: branch or tag ref of server repo on remote origin (ex.: 'origin/edge', 'refs/tags/v1.2.1')
+    echo "Updating server configuration from $ref..."
 
-    git checkout $branch -- .prod-paths.env ; assertSuccess
-    git checkout $branch -- compose.yml ; assertSuccess
-    git checkout $branch -- compose.prod.yml ; assertSuccess
-    git checkout $branch -- version.txt; ## Don't assert. Only informative, plus hasn't always been there.
+    git checkout $ref -- .prod-paths.env ; assertSuccess
+    git checkout $ref -- compose.yml ; assertSuccess
+    git checkout $ref -- compose.prod.yml ; assertSuccess
+    git checkout $ref -- version.txt; ## Don't assert. Only informative, plus hasn't always been there.
 
-    git checkout $branch -- .github/findDuplicateDescriptions.py ; assertSuccess
-    git checkout $branch -- .github/findDuplicateIds.sh ; assertSuccess
-    git checkout $branch -- .github/scriptValidationSchema.yml ; assertSuccess
-    git checkout $branch -- .github/pipelineValidationSchema.yml ; assertSuccess
-    git checkout $branch -- .github/validateCerberusSchema.py ; assertSuccess
+    git checkout $ref -- .github/findDuplicateDescriptions.py ; assertSuccess
+    git checkout $ref -- .github/findDuplicateIds.sh ; assertSuccess
+    git checkout $ref -- .github/scriptValidationSchema.yml ; assertSuccess
+    git checkout $ref -- .github/pipelineValidationSchema.yml ; assertSuccess
+    git checkout $ref -- .github/validateCerberusSchema.py ; assertSuccess
 
-    git checkout $branch -- http-proxy/conf.d-prod/ngnix.conf ; assertSuccess
+    git checkout $ref -- http-proxy/conf.d-prod/ngnix.conf ; assertSuccess
 
-    git checkout $branch -- script-stubs ; assertSuccess
+    git checkout $ref -- script-stubs ; assertSuccess
 
     echo -e "${GREEN}Server configuration updated.${ENDCOLOR}"
 }
