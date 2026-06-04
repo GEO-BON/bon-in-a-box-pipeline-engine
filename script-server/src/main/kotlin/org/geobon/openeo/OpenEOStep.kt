@@ -1,4 +1,4 @@
-package org.geobon.pipeline
+package org.geobon.openeo
 
 import org.geobon.server.ServerContext
 import java.io.File
