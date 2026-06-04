@@ -98,7 +98,7 @@ export default function HomePage() {
                             <div className="tooltip-wrapper">
                                 <div className="tooltiptext"
                                     >Are species losing or gaining habitat? <br></br>
-                                    <a href="https://boninabox.geobon.org/indicator?i=SHI" target="_blank">More info</a>      |       <a href="/pipeline-form/SHI_pipeline">Run pipeline</a>
+                                    <a href="https://boninabox.geobon.org/indicator?i=SHI" target="_blank">More info</a>      |       <a href="/pipeline-form/SHI>SHI_GFW">Run pipeline</a>
                                 </div>
                             </div>
                         </div>

@@ -15,7 +15,7 @@ import {
 import HomePage from "./components/HomePage";
 import { PipelinePage } from "./components/PipelinePage";
 import StepChooser from "./components/PipelineEditor/StepChooser";
-import { Layout } from "./Layout";
+import { Layout, PageTitle } from "./Layout";
 import InfoPage from "./components/info/InfoPage";
 import RunHistory from "./components/RunHistory";
 import { Spinner } from "./components/Spinner";
@@ -42,7 +42,9 @@ function NotFound() {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout right={<HomePage />} />,
+    element: (
+      <Layout right={<HomePage />} />
+    ),
   },
   {
     path: "script-form/:pipeline?/:runHash?",
@@ -62,20 +64,39 @@ const router = createBrowserRouter([
       <Layout
         left={<StepChooser />}
         right={
-          <Suspense fallback={<Spinner />}>
-            <PipelineEditor />
-          </Suspense>
+          <>
+            <PageTitle title="Pipeline Editor" />
+            <Suspense fallback={<Spinner />}>
+              <PipelineEditor />
+            </Suspense>
+          </>
         }
       />
     ),
   },
   {
     path: "history",
-    element: <Layout right={<RunHistory />} />,
+    element: (
+      <Layout right={
+        <>
+          <PageTitle title="History" />
+          <RunHistory />
+        </>
+        }
+      />
+    ),
   },
   {
     path: "info",
-    element: <Layout right={<InfoPage />} />,
+    element: (
+      <Layout right={
+        <>
+          <PageTitle title="Info" />
+          <InfoPage />
+        </>
+        }
+      />
+    ),
   },
   {
     path: "*",
