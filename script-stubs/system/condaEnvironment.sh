@@ -3,6 +3,7 @@ outputFolder=$1
 condaEnvName=$2
 condaEnvYml=$3
 condaPackDir=$4
+condaPackURL=$5
 
 pidFile="$outputFolder/.pid"
 
@@ -67,17 +68,30 @@ function unpackEnvironment {
     # Load conda-pack environment if a folder was supplied and is available.
     if [[ -d "$condaPackDir" ]]; then
         zip=$condaPackDir/$condaEnvName.tar.gz
+        targetDir="$condaPackDir/$condaEnvName"
 
-        # TODO: Check for a zip online
-        # TODO: Compare yml file
-
+        # Check for a zip online 
+        url="$condaPackURL$condaEnvName.tar.gz"
+        echo "Checking for environment archive at $url..."
+        # -z flag is used to replace existing zip only if online version is newer one
+        status=$(curl -z $zip -o $zip -s -w "%{http_code}" "$url")
+        if [ "$status" = "304" ]; then
+            echo "    Already up to date."
+        elif [ "$status" = "200" ]; then
+            echo "    New file downloaded."
+            rm -r $targetDir
+        else
+            echo "    Return code: $status"
+        fi
+        
         # Check for a zip locally
         if [[ -f "$zip" ]]; then
             # TODO: Compare yml file
 
             # TODO: Check for an unzipped folder locally
-            targetDir="$condaPackDir/$condaEnvName"
-            if [ ! -d "$targetDir" ]; then
+            if [ -d "$targetDir" ]; then
+                echo "    Already unpacked."
+            else
                 # Unpack
                 echo "Unpacking environment from $zip..."
                 mkdir -p $targetDir ; assertSuccess
@@ -87,13 +101,13 @@ function unpackEnvironment {
             fi
 
             # Activate
-            echo "Installing environment using conda-pack from $targetDir..."
+            echo "Activating environment using conda-pack from $targetDir..."
             mamba activate base ; assertSuccess
             $targetDir/bin/conda-unpack ; assertSuccess
             mamba deactivate # base
             source $targetDir/bin/activate ; assertSuccess
 
-            echo "Activated unpacked environment from $targetDir."
+            echo "    Done."
             return 0
         fi
     fi
