@@ -67,14 +67,27 @@ function unpackEnvironment {
     # Load conda-pack environment if a folder was supplied and is available.
     if [[ -d "$condaPackDir" ]]; then
         zip=$condaPackDir/$condaEnvName.tar.gz
+
+        # TODO: Check for a zip online
+        # TODO: Compare yml file
+
+        # Check for a zip locally
         if [[ -f "$zip" ]]; then
-            echo "Installing environment using conda-pack from $zip..."
+            # TODO: Compare yml file
+
+            # TODO: Check for an unzipped folder locally
             targetDir="$condaPackDir/$condaEnvName"
-            mkdir -p $targetDir ; assertSuccess
+            if [ ! -d "$targetDir" ]; then
+                # Unpack
+                echo "Unpacking environment from $zip..."
+                mkdir -p $targetDir ; assertSuccess
 
-            # TODO parallelize? install pigz in image then use --use-compress-program=pigz
-            tar -xzf $zip -C $targetDir ; assertSuccess
+                # TODO parallelize? install pigz in image then use --use-compress-program=pigz
+                tar -xzf $zip -C $targetDir ; assertSuccess
+            fi
 
+            # Activate
+            echo "Installing environment using conda-pack from $targetDir..."
             mamba activate base ; assertSuccess
             $targetDir/bin/conda-unpack ; assertSuccess
             mamba deactivate # base
