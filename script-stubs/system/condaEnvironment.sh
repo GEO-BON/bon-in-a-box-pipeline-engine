@@ -74,12 +74,12 @@ function unpackEnvironment {
         url="$condaPackURL$condaEnvName.tar.gz"
         echo "Checking for environment archive at $url..."
         # -z flag is used to replace existing zip only if online version is newer one
-        status=$(curl -z $zip -o $zip -s -w "%{http_code}" "$url")
+        status=$(curl -s -z $zip -o $zip -s -w "%{http_code}" "$url")
         if [ "$status" = "304" ]; then
             echo "    Already up to date."
         elif [ "$status" = "200" ]; then
             echo "    New file downloaded."
-            rm -r $targetDir
+            rm -rf $targetDir
         else
             echo "    Return code: $status"
         fi
