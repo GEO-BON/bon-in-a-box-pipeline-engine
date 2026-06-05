@@ -4,7 +4,6 @@ condaEnvName=$2
 condaEnvYml=$3
 condaPackDir=$4
 
-logFile="$outputFolder/logs.txt"
 pidFile="$outputFolder/.pid"
 
 function assertSuccess {
@@ -66,7 +65,7 @@ function activateSubEnvironment {
 
 function unpackEnvironment {
     # Load conda-pack environment if a folder was supplied and is available.
-    if [[ -n "$condaPackDir" ]]; then
+    if [[ -d "$condaPackDir" ]]; then
         zip=$condaPackDir/$condaEnvName.tar.gz
         if [[ -f "$zip" ]]; then
             echo "Installing environment using conda-pack from $zip..."
@@ -87,19 +86,6 @@ function unpackEnvironment {
     fi
 
     return 1
-}
-
-function packEnvironment {
-    # Conda-pack the environment if a folder was supplied.
-    if [[ -n "$condaPackDir" ]]; then
-        zip=$condaPackDir/$condaEnvName.tar.gz
-
-        echo "Packing conda environment $condaEnvName."
-        mamba activate base ; assertSuccess
-        conda-pack --n-threads -1 --quiet -n $condaEnvName -o $zip ; assertSuccess
-        echo "Conda environment packed to $zip using conda-pack."
-        mamba deactivate # base
-    fi
 }
 
 echo $$ > $pidFile
@@ -127,8 +113,6 @@ else
         activateSubEnvironment
 
         exec {lockfd}>&-
-
-        packEnvironment
     fi
 fi
 
