@@ -42,7 +42,7 @@ class OpenEOConversionTest {
         val polarization = inputs["polarization"] as Map<*, *>
         assertEquals("options", polarization["type"])
         assertEquals(listOf("VV", "VH"), polarization["options"])
-        assertEquals("polarization", polarization["label"]) // no schema title, falls back to id
+        assertEquals("polarization", polarization["label"])
     }
 
     @Test
@@ -73,6 +73,6 @@ class OpenEOConversionTest {
         assertEquals(2, coherenceWindowAz["example"])
 
         val burstId = inputs["burst_id"] as Map<*, *>
-        assertEquals("null", burstId["example"]) // default is null in JSON
+        assertEquals("null", burstId["example"])
     }
 }

@@ -117,16 +117,20 @@ fun convertInputsOutputs(processJson: JSONObject): Map<String, Any> {
             subtype == "bounding-box" -> {
                 input["type"] = "bboxCRS"
 
-                val epsgDefault = schema
+                val crsObj = schema
                     ?.optJSONObject("properties")
                     ?.optJSONObject("crs")
+
+                val epsgDefault = crsObj
                     ?.optJSONArray("anyOf")
                     ?.let { anyOf ->
                         (0 until anyOf.length())
                             .map { anyOf.getJSONObject(it) }
                             .firstOrNull { it.optString("subtype") == "epsg-code" }
-                            ?.opt("default")
                     }
+                    ?.opt("default")
+                    ?.takeIf { it != JSONObject.NULL }
+                    ?: crsObj?.opt("default")?.takeIf { it != JSONObject.NULL }
 
                 input["example"] = mutableMapOf<String, Any>().apply {
                     put("bbox", listOf<Any>())
@@ -138,12 +142,14 @@ fun convertInputsOutputs(processJson: JSONObject): Map<String, Any> {
                 input["type"] = "options"
                 val enum = schema.optJSONArray("enum")!!
                 input["options"] = (0 until enum.length()).map { enum.getString(it) }
-                param.opt("default")?.let { input["example"] = it } ?: run { input["example"] = "null" }
+                val default = param.opt("default").takeIf { it != JSONObject.NULL }
+                default?.let { input["example"] = it } ?: run { input["example"] = "null" }
             }
 
             else -> {
                 if (rawType != null) input["type"] = rawType
-                param.opt("default")?.let { input["example"] = it } ?: run { input["example"] = "null" }
+                val default = param.opt("default").takeIf { it != JSONObject.NULL }
+                default?.let { input["example"] = it } ?: run { input["example"] = "null" }
             }
         }
 
