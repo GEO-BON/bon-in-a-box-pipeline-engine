@@ -4,7 +4,8 @@ condaPackDir=$2
 
 # Conda-pack the environment if a folder was supplied.
 if [[ -d "$condaPackDir" ]]; then
-    zip=$condaPackDir/$condaEnvName.tar.gz
+    tar=$condaPackDir/$condaEnvName.tar
+    zip=$tar.gz
 
     if [ -f "$zip" ]; then
         echo "Conda-pack archive $zip already packed."
@@ -13,7 +14,8 @@ if [[ -d "$condaPackDir" ]]; then
 
     echo "Packing conda environment $condaEnvName."
     mamba activate base
-    conda-pack --n-threads -1 --quiet -n $condaEnvName -o $zip
+    conda-pack --n-threads -1 --quiet -n $condaEnvName -o $tar --compress-level 0
+    pigz $tar # parallel compression is much faster than default gzip compression
 
     condaEnvFile="/conda-env-yml/$condaEnvName.yml"
     cp $condaEnvFile $condaPackDir/$condaEnvName.yml

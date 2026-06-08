@@ -89,7 +89,7 @@ function unpackEnvironment {
             # TODO: Compare yml file
 
             # TODO: Check for an unzipped folder locally
-            if [ -d "$targetDir" ]; then
+            if [ -d "$targetDir" ] && [ -f "$targetDir/bin/conda-unpack" ] && [ -f "$targetDir/bin/activate" ]; then
                 echo "    Already unpacked."
             else
                 # Unpack
@@ -97,7 +97,7 @@ function unpackEnvironment {
                 mkdir -p $targetDir ; assertSuccess
 
                 # TODO parallelize? install pigz in image then use --use-compress-program=pigz
-                tar -xzf $zip -C $targetDir ; assertSuccess
+                tar -xf $zip -C $targetDir --use-compress-program=pigz ; assertSuccess
             fi
 
             # Activate
