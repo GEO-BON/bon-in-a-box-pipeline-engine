@@ -3,10 +3,13 @@ package org.geobon.k8s
 import io.kubernetes.client.openapi.ApiException
 import io.kubernetes.client.openapi.apis.BatchV1Api
 import io.kubernetes.client.openapi.apis.CoreV1Api
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.geobon.pipeline.RunContext
 import org.geobon.script.ComputeRequirements
 import org.geobon.script.Run
@@ -101,13 +104,19 @@ class KubernetesRun(
                 log(logger::warn, "Error: output.json file not found")
             }
         }.onFailure { ex ->
+            if (ex is CancellationException) {
+                val cancelledOutputs = readOutputs() ?: mutableMapOf()
+                cancelledOutputs[ERROR_KEY] = "Cancelled by user"
+                resultFile.writeText(RunContext.gson.toJson(cancelledOutputs))
+                throw ex
+            }
+
             error = true
             outputs = readOutputs() ?: mutableMapOf()
 
             ex.printStackTrace()
 
             when (ex) {
-                // TODO : CancellationException? API stop current task...
                 is TimeoutException -> {
                     val event = ex.message ?: ex.javaClass.name
                     log(logger::info, "$event: done.")
@@ -194,7 +203,19 @@ class KubernetesRun(
                     delay(POLL_INTERVAL)
                 }
             } finally {
-                logsJob.cancelAndJoin()
+                withContext(NonCancellable) {
+                    logsJob.cancelAndJoin()
+                    try {
+                        api.deleteNamespacedJob(jobName, namespace)
+                            .propagationPolicy("Background")
+                            .execute()
+                        log(logger::debug, "Deleted Kubernetes job '$jobName'")
+                    } catch (ex: ApiException) {
+                        if (ex.code != 404) {
+                            log(logger::warn, "Failed to delete Kubernetes job '$jobName': ${ex.message}")
+                        }
+                    }
+                }
             }
         }
     }

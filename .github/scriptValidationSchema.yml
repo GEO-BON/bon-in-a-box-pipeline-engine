@@ -221,12 +221,8 @@ compute:
       required: true
       type: integer
     time:
-      oneof:
-        - required: false
-          type: string
-          regex: '^(\d-)?(\d?\d:){0,2}\d?\d$'
-        - required: true
-          type: string
-          regex: '^(\d-)?(\d?\d:){0,2}\d?\d$'
-          dependencies:
-            hpc: true
+      required: false
+      type: string
+      regex: '^(\d-)?(\d?\d:){0,2}\d?\d$'
+      dependencies:
+        hpc: [true]

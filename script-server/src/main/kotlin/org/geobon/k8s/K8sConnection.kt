@@ -290,7 +290,7 @@ class K8sConnection {
 				V1ResourceRequirements()
 					.putRequestsItem("memory", Quantity("256Mi"))
 					.putRequestsItem("cpu", Quantity("500m"))
-					.putLimitsItem("memory", Quantity(computeRequirements?.mem ?: "24Gi"))
+					.putLimitsItem("memory", Quantity(computeRequirements?.mem ?: "4Gi"))
 					.putLimitsItem("cpu", Quantity(computeRequirements?.cpus?.toString() ?: "4"))
 			)
 			.volumeMounts(
@@ -420,19 +420,23 @@ class K8sConnection {
 				.timestamps(true)
 				.buildCall(null)
 
-			call.execute().use { response ->
-				if (!response.isSuccessful) {
-					throw RuntimeException("Unable to stream logs for pod '$podName': HTTP ${response.code}")
-				}
+			try {
+				call.execute().use { response ->
+					if (!response.isSuccessful) {
+						throw RuntimeException("Unable to stream logs for pod '$podName': HTTP ${response.code}")
+					}
 
-				val source = response.body?.source() ?: return
-				while (currentCoroutineContext().isActive && !source.exhausted()) {
-					currentCoroutineContext().ensureActive()
-					val line = source.readUtf8Line() ?: break
-					if (line.isNotBlank()) {
-						onLine(podName, line)
+					val source = response.body?.source() ?: return
+					while (currentCoroutineContext().isActive && !source.exhausted()) {
+						currentCoroutineContext().ensureActive()
+						val line = source.readUtf8Line() ?: break
+						if (line.isNotBlank()) {
+							onLine(podName, line)
+						}
 					}
 				}
+			} finally {
+				call.cancel()
 			}
 		}.onFailure { ex ->
 			if (ex is CancellationException) {
