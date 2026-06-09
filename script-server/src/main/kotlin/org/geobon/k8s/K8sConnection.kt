@@ -17,6 +17,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import org.geobon.script.ComputeRequirements
 import org.geobon.script.ScriptType
 import org.geobon.server.RemoteSetup
 import org.geobon.server.RemoteSetupState
@@ -251,7 +252,7 @@ class K8sConnection {
 		return map
 	}
 
-	fun buildJob(jobName: String, scriptCommand: String, scriptType: ScriptType): V1Job {
+	fun buildJob(jobName: String, scriptCommand: String, scriptType: ScriptType, computeRequirements: ComputeRequirements? = null): V1Job {
 		// TODO: Utiliser org.geobon.utils.run.Containers mais en ajoutant la méthode pour obtenir l'image (voir HPCRun)
 		val image: String
 		val containerName: String
@@ -289,10 +290,8 @@ class K8sConnection {
 				V1ResourceRequirements()
 					.putRequestsItem("memory", Quantity("256Mi"))
 					.putRequestsItem("cpu", Quantity("500m"))
-
-					// TODO: Variables selon la job
-					.putLimitsItem("memory", Quantity("24Gi"))
-					.putLimitsItem("cpu", Quantity("4"))
+					.putLimitsItem("memory", Quantity(computeRequirements?.mem ?: "24Gi"))
+					.putLimitsItem("cpu", Quantity(computeRequirements?.cpus?.toString() ?: "4"))
 			)
 			.volumeMounts(
 				Mount.entries.mapTo(mutableListOf()) { it.asVolumeMount }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.geobon.pipeline.RunContext
+import org.geobon.script.ComputeRequirements
 import org.geobon.script.Run
 import org.geobon.script.ScriptType
 import org.geobon.server.ServerContext
@@ -25,7 +26,8 @@ class KubernetesRun(
     scriptFile: File,
     private val timeout: Duration = DEFAULT_TIMEOUT,
     private val condaEnvName: String? = null,
-    private val condaEnvYml: String? = null
+    private val condaEnvYml: String? = null,
+    private val computeRequirements: ComputeRequirements? = null
 ) : Run(scriptFile, context) {
 
     constructor(
@@ -57,7 +59,7 @@ class KubernetesRun(
 
             val command = buildScriptCommand(scriptType)
             logger.warn("Running Kubernetes job with command: $command") // TEMP
-            val job = connection.buildJob(jobName, command, scriptType)
+            val job = connection.buildJob(jobName, command, scriptType, computeRequirements)
             val api = connection.createBatchApi()
 
             // Use cached result if the job already succeeded; otherwise replace stale runs.

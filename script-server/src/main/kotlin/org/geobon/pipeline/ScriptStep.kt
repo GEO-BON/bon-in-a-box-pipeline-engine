@@ -3,10 +3,11 @@ package org.geobon.pipeline
 import org.geobon.hpc.HPCRequirements
 import org.geobon.hpc.HPCRun
 import org.geobon.k8s.KubernetesRun
+import org.geobon.script.ComputeRequirements
 import org.geobon.script.Description
 import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
-import org.geobon.script.Description.HPC
+import org.geobon.script.Description.COMPUTE
 import org.geobon.script.Description.SCRIPT
 import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.DockerizedRun
@@ -86,22 +87,23 @@ class ScriptStep : YMLStep {
                         }
                     }
 
-                    val hpcSection = yamlParsed[HPC]
-                    if (hpcSection is Map<*, *> && shouldUseHPC()) {
-                        val memory = (hpcSection[Description.HPC__MEMORY] as? String)?.let {
-                            Regex("""(\d+)G""").find(it)?.groups?.get(1)?.value?.toInt() // Get rid of the G
-                        } ?: throw RuntimeException("HPC ${Description.HPC__MEMORY} parameter is not formatted as gigabytes. \nExample: 30G \nGot: ${hpcSection[Description.HPC__MEMORY]}")
+                    val computeSection = yamlParsed[COMPUTE]
+                    val computeRequirements = if (computeSection is Map<*, *>) {
+                        val mem = computeSection[Description.COMPUTE__MEMORY] as? String
+                            ?: throw RuntimeException("compute ${Description.COMPUTE__MEMORY} parameter is not formatted as expected. \nExample: 30G \nGot: ${computeSection[Description.COMPUTE__MEMORY]}")
+                        val cpus = computeSection[Description.COMPUTE__CPUS] as? Int
+                            ?: throw RuntimeException("compute ${Description.COMPUTE__CPUS} parameter should be an int. Got: ${computeSection[Description.COMPUTE__CPUS]}")
+                        ComputeRequirements(mem, cpus)
+                    } else null
 
-                        val cpus = hpcSection[Description.HPC__CPUS] as? Int
-                            ?: throw RuntimeException("HPC ${Description.HPC__CPUS} parameter should be an int. Got: ${hpcSection[Description.HPC__CPUS]}")
-
-                        val durationString = hpcSection[Description.HPC__DURATION]
-                            ?: throw RuntimeException("HPC ${Description.HPC__DURATION} parameter missing.")
+                    if (computeSection is Map<*, *> && computeSection[Description.COMPUTE__HPC] == true && shouldUseHPC()) {
+                        val durationString = computeSection[Description.COMPUTE__DURATION]
+                            ?: throw RuntimeException("compute ${Description.COMPUTE__DURATION} parameter missing.")
 
                         if (durationString !is String) {
                             throw RuntimeException(
                                 """
-                                HPC parameter ${Description.HPC__DURATION} must be expressed as a string, for example "1:30:00".
+                                compute parameter ${Description.COMPUTE__DURATION} must be expressed as a string, for example "1:30:00".
                                 See [SLURM documentation](https://slurm.schedmd.com/sbatch.html#OPT_time) for accepted formats.
                             """.trimIndent()
                             )
@@ -113,8 +115,8 @@ class ScriptStep : YMLStep {
                             scriptFile,
                             inputs,
                             HPCRequirements(
-                                memory,
-                                cpus,
+                                computeRequirements!!.mem,
+                                computeRequirements.cpus,
                                 duration
                             ),
                             condaEnvName,
@@ -126,7 +128,8 @@ class ScriptStep : YMLStep {
                             scriptFile,
                             specificTimeout ?: Run.DEFAULT_TIMEOUT,
                             condaEnvName,
-                            condaEnvYml
+                            condaEnvYml,
+                            computeRequirements
                         )
                     } else {
                         DockerizedRun(

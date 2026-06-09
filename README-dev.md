@@ -311,21 +311,25 @@ stateDiagram-v2
     PREPARING --> ERROR
 ```
 
-### Enabling a script for HPC usage
-A script requires additional metadata in it's .yml description file in order to be sent to a HPC.
-When all of the below fields are present, the script is considered "hpc-enabled".
-For example, the following script would be allowed a maximum of 30G of memory for 1 hour,
-and run with 16 CPUs.
+### Specifying compute requirements
+A script can declare its resource requirements using the `compute` block in its `.yml` description file.
+These requirements are used by both HPC (SLURM) and Kubernetes backends.
 
 ``` yml
-hpc:
-  mem: 30G # Maximum amount of memory allowed before Out Of Memory exception occurs
-  cpus-per-task: 16 #  Number of CPUs for this task
-  time: "01:00:00" # Maximum time allowed before timeout, for syntax see https://slurm.schedmd.com/sbatch.html#OPT_time.
+compute:
+  mem: 30G          # Memory limit: number followed by G (gigabytes) or M (megabytes)
+  cpus-per-task: 16 # Number of CPUs for this task
+  hpc: true         # Optional. Set to true to enable HPC (SLURM) execution (default: false)
+  time: "01:00:00"  # Required when hpc: true. Maximum time before timeout, see https://slurm.schedmd.com/sbatch.html#OPT_time.
 ```
 
+The `mem` and `cpus-per-task` fields are used as resource limits regardless of the backend:
+- On **HPC**, they map to `#SBATCH --mem=` and `#SBATCH --cpus-per-task=`.
+- On **Kubernetes**, they map to container resource limits. When no `compute` block is present, default limits are applied.
+
+Setting `hpc: true` marks the script as HPC-enabled; `time` is required in that case.
 It is recommended to check the documentation of the cluster that will receive the calls,
-to tailor the requested resources to best fit it's compute nodes specification.
+to tailor the requested resources to best fit its compute nodes specification.
 
 ### Flow
 The following diagram shows the states a script run undergoes when being sent to the HPC.
@@ -382,7 +386,7 @@ The current implementation is basic, and has the following limitations:
 - Max 1 HPC-enabled script per pipeline. (In reality, one HPC task must not depend on the results of another, to avoid waiting forever for the batch to be sent.)
 - No UI support for batches in the pipeline editor.
 - Conda is supported, but: it is not possible for two HPC-enabled tasks to verify or edit the conda environment within the apptainer image at the same time. Only one writeable access can be granted to the overlay.
-- Steps are grouped together by batches of max 10 to create a SLURM job. The max memory and CPU are used, and the sum of times.
+- Steps are grouped together by batches of max 10 to create a SLURM job. The max memory, max CPU, and sum of times across the batch are requested.
 - If a batch job fails _before it begins_, it will not be detected. Jobs will remain running untill cancelled manually.
 - Stopping a script through the BON in a Box UI does not cancel the job on the HPC.
 - Batches should be started via API call (for ex. a script sending curl calls). Example:

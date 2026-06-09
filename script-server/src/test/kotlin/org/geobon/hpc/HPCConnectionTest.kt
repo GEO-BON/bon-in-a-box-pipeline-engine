@@ -319,7 +319,7 @@ class HPCConnectionTest {
 
             connection.sendJobs(
                 listOf("command1.sh", "command2.sh"),
-                HPCRequirements(8, 4, 1.hours)
+                HPCRequirements("8G", 4, 1.hours)
             )
 
             val sBatchList = outputRoot.listFiles { _, name -> name.endsWith(".sbatch") }

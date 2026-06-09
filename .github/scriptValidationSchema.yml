@@ -206,10 +206,13 @@ conda:
       required: true
       type: list
 
-hpc:
+compute:
   required: false
   type: dict
   schema:
+    hpc: 
+      required: false
+      type: boolean
     mem:
       required: true
       type: string
@@ -218,6 +221,12 @@ hpc:
       required: true
       type: integer
     time:
-      required: true
-      type: string
-      regex: '^(\d-)?(\d?\d:){0,2}\d?\d$'
+      oneof:
+        - required: false
+          type: string
+          regex: '^(\d-)?(\d?\d:){0,2}\d?\d$'
+        - required: true
+          type: string
+          regex: '^(\d-)?(\d?\d:){0,2}\d?\d$'
+          dependencies:
+            hpc: true

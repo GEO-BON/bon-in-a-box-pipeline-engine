@@ -532,7 +532,7 @@ internal class HPCStepTest {
 
         assertTrue(runSlot.isCaptured)
         val run = runSlot.captured
-        assertEquals(1, run.requirements.memoryG)
+        assertEquals("1G", run.requirements.mem)
         assertEquals(2, run.requirements.cpus)
         assertEquals(1.hours, run.requirements.duration)
     }

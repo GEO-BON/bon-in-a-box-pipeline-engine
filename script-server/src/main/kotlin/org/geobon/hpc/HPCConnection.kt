@@ -402,7 +402,7 @@ class HPCConnection(
         // Exit code 143 for SIGTERM, see https://medium.com/@himanshurahangdale153/list-of-exit-status-codes-in-linux-f4c00c46c9e0
         sBatchFileLocal.writeText("""
             #!/bin/bash
-            #SBATCH --mem=${requirements.memoryG}G
+            #SBATCH --mem=${requirements.mem}
             #SBATCH --cpus-per-task=${requirements.cpus}
             #SBATCH --time=${requirements.duration.toSlurmDuration()}
             #SBATCH --nodes=1
