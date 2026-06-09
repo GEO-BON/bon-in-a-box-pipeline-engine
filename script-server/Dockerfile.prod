@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jre AS base-image
+FROM eclipse-temurin:26-jre AS base-image
 
 #INSTALL DOCKER CLI
 ENV DOCKER_VERSION=29.1.2
@@ -18,7 +18,7 @@ RUN set -ex; \
     apt-get clean all;
 
 ## This image builds the server code
-FROM gradle:9.0-jdk21 AS builder
+FROM gradle:9.5-jdk26 AS builder
 COPY . /home/gradle/project
 WORKDIR /home/gradle/project
 RUN gradle assemble
