@@ -80,7 +80,7 @@ function unpackEnvironment {
         elif [ "$status" = "200" ]; then
             echo "    New file downloaded."
             rm -rf $targetDir
-        elif [ "$status" = "404"]; then
+        elif [ "$status" = "404" ]; then
             echo "    Not found."
         else
             echo "    Return code: $status"
