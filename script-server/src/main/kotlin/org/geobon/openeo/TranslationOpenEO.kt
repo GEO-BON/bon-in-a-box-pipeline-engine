@@ -9,6 +9,10 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+private val logger: Logger = LoggerFactory.getLogger("Server")
 
 fun convertToYaml(udpName: String): String {
     val sourceFile = File(ServerContext.scriptsRoot, "externalScripts.yaml")
@@ -25,7 +29,7 @@ fun convertToYaml(udpName: String): String {
 
     val catalogJson = fetchJson(url)
     val metadata = convertMetadata(catalogJson)
-    val processUrl = metadata["external_link"] as? String
+    val processUrl = metadata["script"] as? String
         ?: throw RuntimeException("No process URL found in catalog for $udpName")
     val processJson = fetchJson(processUrl)
 
@@ -34,51 +38,76 @@ fun convertToYaml(udpName: String): String {
         isPrettyFlow = true
     }
     val outputYaml = Yaml(dumperOptions)
-    return outputYaml.dump(metadata + convertInputsOutputs(processJson))
+    return outputYaml.dump(metadata + convertInputs(processJson))
 }
 
 fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
     val properties = jsonFile.optJSONObject("properties")
     val outputYaml = mutableMapOf<String, Any>()
+    val links = jsonFile.optJSONArray("links")
+    val linkList = links?.let { arr -> (0 until arr.length()).map { arr.getJSONObject(it) } } ?: emptyList()
+
+    val processUrl = linkList
+        .firstOrNull { it.optString("type") == "application/vnd.openeo+json;type=process" }
+        ?.optString("href")
+
+    if (processUrl != null) {
+        outputYaml["script"] = processUrl
+    } else {
+        logger.warn("Process file not found...")
+    }
 
     outputYaml["name"] = jsonFile.getString("id")
 
     properties?.optString("description")?.takeIf { it.isNotEmpty() }
         ?.let { outputYaml["description"] = it }
 
-    properties?.optString("license")?.takeIf { it.isNotEmpty() }
-        ?.let { outputYaml["license"] = it }
-
     val contacts = properties?.optJSONArray("contacts")
     val authors = contacts?.let { arr ->
         (0 until arr.length())
             .map { arr.getJSONObject(it) }
-            .filter { contact ->
-                contact.optJSONArray("roles")?.let { roles ->
-                    (0 until roles.length()).any { roles.getString(it) == "Author" }
-                } == true
+            .map { contact ->
+                val identifier = contact.optJSONArray("links")
+                    ?.let { l -> (0 until l.length()).map { l.getJSONObject(it) } }
+                    ?.firstOrNull()
+                    ?.optString("href")
+                mapOf(
+                    "name" to contact.optString("name").takeIf { it.isNotEmpty() },
+                    "identifier" to identifier
+                )
             }
-            .mapNotNull { it.optString("name").takeIf { n -> n.isNotEmpty() } }
     }
-    if (!authors.isNullOrEmpty()) outputYaml["authors"] = authors
 
-    val links = jsonFile.optJSONArray("links")
-    links?.let { arr ->
-        val linkList = (0 until arr.length()).map { arr.getJSONObject(it) }
-
-        val processUrl = linkList
-            .firstOrNull { it.optString("type") == "application/vnd.openeo+json;type=process" }
-            ?.optString("href")
-        if (processUrl != null) outputYaml["external_link"] = processUrl
-
-        val references = linkList.filter { it.optString("type") != "application/vnd.openeo+json;type=process" }
-        if (references.isNotEmpty()) outputYaml["references"] = references
+    if (!authors.isNullOrEmpty()) {
+        outputYaml["authors"] = authors
+    } else {
+        logger.warn("No authors found in catalog file...")
     }
+
+    properties?.optString("license")?.takeIf { it.isNotEmpty() }
+        ?.let { outputYaml["license"] = it }
+
+    processUrl?.let {
+        outputYaml["external_link"] = "https://algorithm-catalogue.apex.esa.int/apps/" +
+                it.substringAfterLast('/').removeSuffix(".json")
+    }
+
+//    val references = linkList
+//        .filter { it.optString("type") != "application/vnd.openeo+json;type=process" }
+//        .map { link ->
+//            mapOf(
+//                "href" to link.optString("href").takeIf { it.isNotEmpty() },
+//                "rel" to link.optString("rel").takeIf { it.isNotEmpty() },
+//                "type" to link.optString("type").takeIf { it.isNotEmpty() },
+//                "title" to link.optString("title").takeIf { it.isNotEmpty() }
+//            ).filterValues { it != null }
+//        }
+//    if (references.isNotEmpty()) outputYaml["references"] = references
 
     return outputYaml
 }
 
-fun convertInputsOutputs(processJson: JSONObject): Map<String, Any> {
+fun convertInputs(processJson: JSONObject): Map<String, Any> {
     val outputYaml = mutableMapOf<String, Any>()
     val parameters = processJson.optJSONArray("parameters") ?: return outputYaml
 
@@ -96,7 +125,7 @@ fun convertInputsOutputs(processJson: JSONObject): Map<String, Any> {
         } ?: if (schemaObj?.optString("subtype") == "bounding-box") schemaObj else null
 
         if (schemaArr != null && bboxSchema == null) {
-            println("Warning: skipping parameter '$id' — array schema with no bounding-box entry is not supported")
+            logger.warn("Warning: skipping parameter '$id' — array schema with no bounding-box entry is not supported")
             continue
         }
 
@@ -104,11 +133,12 @@ fun convertInputsOutputs(processJson: JSONObject): Map<String, Any> {
         val subtype = bboxSchema?.let { "bounding-box" } ?: schema?.optString("subtype")?.takeIf { it.isNotEmpty() }
         val rawType = schema?.optString("type")?.takeIf { it.isNotEmpty() }
 
-        val input = mutableMapOf<String, Any>()
+        val input = mutableMapOf<String, Any?>()
 
-        schema?.optString("title")?.takeIf { it.isNotEmpty() }
+        schema?.optString("title")
+            ?.takeIf { it.isNotEmpty()}
             ?.let { input["label"] = it }
-            ?: run { input["label"] = id }
+            ?: run { input["label"] = toTitleCase(id) }
 
         param.optString("description").takeIf { it.isNotEmpty() }
             ?.let { input["description"] = it }
@@ -116,26 +146,7 @@ fun convertInputsOutputs(processJson: JSONObject): Map<String, Any> {
         when {
             subtype == "bounding-box" -> {
                 input["type"] = "bboxCRS"
-
-                val crsObj = schema
-                    ?.optJSONObject("properties")
-                    ?.optJSONObject("crs")
-
-                val epsgDefault = crsObj
-                    ?.optJSONArray("anyOf")
-                    ?.let { anyOf ->
-                        (0 until anyOf.length())
-                            .map { anyOf.getJSONObject(it) }
-                            .firstOrNull { it.optString("subtype") == "epsg-code" }
-                    }
-                    ?.opt("default")
-                    ?.takeIf { it != JSONObject.NULL }
-                    ?: crsObj?.opt("default")?.takeIf { it != JSONObject.NULL }
-
-                input["example"] = mutableMapOf<String, Any>().apply {
-                    put("bbox", listOf<Any>())
-                    put("CRS", mapOf("authority" to "EPSG", "code" to (epsgDefault ?: "null")))
-                }
+                input["example"] = null
             }
 
             schema?.optJSONArray("enum") != null -> {
@@ -143,13 +154,30 @@ fun convertInputsOutputs(processJson: JSONObject): Map<String, Any> {
                 val enum = schema.optJSONArray("enum")!!
                 input["options"] = (0 until enum.length()).map { enum.getString(it) }
                 val default = param.opt("default").takeIf { it != JSONObject.NULL }
-                default?.let { input["example"] = it } ?: run { input["example"] = "null" }
+                default?.let { input["example"] = it } ?: run { input["example"] = null }
+            }
+
+            rawType == "array" -> {
+                val itemType = schema
+                    ?.optJSONObject("items")
+                    ?.optJSONArray("anyOf")
+                    ?.let { anyOf ->
+                        (0 until anyOf.length())
+                            .mapNotNull { anyOf.optJSONObject(it)?.optString("type")?.takeIf { t -> t.isNotEmpty() && t != "null" } }
+                            .firstOrNull()
+                    }
+                    ?: schema?.optJSONObject("items")?.optString("type")
+                    ?: throw RuntimeException("Could not determine item type for parameter '$id'")
+
+                input["type"] = "${mapType(itemType)}[]"
+                val default = param.opt("default").takeIf { it != JSONObject.NULL }
+                default?.let { input["example"] = it } ?: run { input["example"] = null }
             }
 
             else -> {
-                if (rawType != null) input["type"] = rawType
+                if (rawType != null) input["type"] = mapType(rawType)
                 val default = param.opt("default").takeIf { it != JSONObject.NULL }
-                default?.let { input["example"] = it } ?: run { input["example"] = "null" }
+                default?.let { input["example"] = it } ?: run { input["example"] = null }
             }
         }
 
@@ -173,4 +201,16 @@ fun fetchJson(url: String): JSONObject {
         throw RuntimeException("Failed to fetch $url: HTTP ${response.statusCode()}")
 
     return JSONObject(response.body())
+}
+
+fun toTitleCase(input: String): String =
+    input.replace('_', ' ')
+        .split(' ')
+        .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+
+fun mapType(type: String): String = when (type) {
+    "integer", "number" -> "int"
+    "string" -> "text"
+    "boolean" -> "boolean"
+    else -> type
 }

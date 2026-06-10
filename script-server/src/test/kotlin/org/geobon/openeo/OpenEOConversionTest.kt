@@ -25,18 +25,18 @@ class OpenEOConversionTest {
     }
 
     @Test
-    fun convertInputsOutputsBasicTest() {
+    fun convertInputsBasicTest() {
         val json = loadTestResource("processExample.json")
-        val result = convertInputsOutputs(json)
+        val result = convertInputs(json)
 
         val inputs = result["inputs"] as Map<*, *>
         assertEquals(8, inputs.size)
     }
 
     @Test
-    fun convertInputsOutputsEnumTest() {
+    fun convertInputsEnumTest() {
         val json = loadTestResource("processExample.json")
-        val result = convertInputsOutputs(json)
+        val result = convertInputs(json)
         val inputs = result["inputs"] as Map<*, *>
 
         val polarization = inputs["polarization"] as Map<*, *>
@@ -46,9 +46,9 @@ class OpenEOConversionTest {
     }
 
     @Test
-    fun convertInputsOutputsBboxTest() {
+    fun convertInputsBboxTest() {
         val json = loadTestResource("processExample.json")
-        val result = convertInputsOutputs(json)
+        val result = convertInputs(json)
         val inputs = result["inputs"] as Map<*, *>
 
         val spatialExtent = inputs["spatial_extent"] as Map<*, *>
@@ -61,9 +61,9 @@ class OpenEOConversionTest {
     }
 
     @Test
-    fun convertInputsOutputsDefaultTest() {
+    fun convertInputsDefaultTest() {
         val json = loadTestResource("processExample.json")
-        val result = convertInputsOutputs(json)
+        val result = convertInputs(json)
         val inputs = result["inputs"] as Map<*, *>
 
         val coherenceWindowRg = inputs["coherence_window_rg"] as Map<*, *>
