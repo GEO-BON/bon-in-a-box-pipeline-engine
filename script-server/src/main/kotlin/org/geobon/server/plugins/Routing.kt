@@ -159,16 +159,6 @@ fun Application.configureRouting() {
                         call.respondText(Pipeline.getPipelineDescription(descriptionPath).toString(), ContentType.Application.Json)
                     }
                     "openEO" -> {
-                        try {
-                            val yaml = convertToYaml(descriptionPath)
-                            val outputFile = File(outputRoot, "$descriptionPath.yaml")
-                            outputFile.parentFile.mkdirs()
-                            outputFile.writeText(yaml)
-                            logger.info("YAML written to ${outputFile.absolutePath}")
-                        } catch (e: Exception) {
-                            logger.error("convertToYaml failed for $descriptionPath: ${e.message}")
-                            e.printStackTrace()
-                        }
                         call.respond(getOpenEODescription(descriptionPath))
                     }
                 }
