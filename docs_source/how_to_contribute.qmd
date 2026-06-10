@@ -534,9 +534,7 @@ and the ID of the coordinate reference system of the bounding box, made of the a
 ``` r
 crs_id <- paste0(input$study_area_bbox$CRS$authority,input$study_area_bbox$CRS$code)
 ```
-:::
 
-::: panel-tabset
 ## Python
 
 A convenience function `biab_inputs` is loaded in Python by default to load the file into a list. Here is an example of how to read the input file in the script and use it's value:
@@ -548,9 +546,7 @@ my_int = data['some_int_input']
 ```
 
 To access selector values in Python, the approach is similar to R. For example, to create the CRS ID from the authority and code:
-:::
 
-:::: panel-tabset
 ``` python
 crs_id = data['study_area_bbox']['CRS']['authority']+':'+str(data['study_area_bbox']['CRS']['code'])
 ```
@@ -571,14 +567,12 @@ number = input_data["number"]
 # do something with number
 ```
 
-::: panel-tabset
 To access selector values in Julia, the approach is similar to R or Python. For example, to create the CRS ID from the authority and code:
-:::
 
 ``` julia
 crs_id = string(input_data["study_area_bbox"]["CRS"]["authority"],":",input_data["study_area_bbox"]["CRS"]["code"])
 ```
-::::
+:::
 
 ### Writing outputs
 

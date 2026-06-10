@@ -57,7 +57,7 @@ export default function Sidebar(props: any) {
 
   const displayOutput = (output: any, type: string) => {
     if (type.includes("geotiff")) {
-      clearOtherLayers("geotiff")
+      clearOtherLayers("geotiff");
       setSelectedLayer(output);
     } else if (type.includes("points/")) {
       let crs = "EPSG:4326";
@@ -84,12 +84,12 @@ export default function Sidebar(props: any) {
         });
       });
     } else if (type.includes("geo+json")) {
-      clearOtherLayers("geo+json")
+      clearOtherLayers("geo+json");
       GetJSON(output).then((res: any) => {
         setGeojsonOutput(res);
       });
     } else if (type.includes("geopackage")) {
-      clearOtherLayers("geopackage")
+      clearOtherLayers("geopackage");
       setGeoPackage(output);
     } else if (
       type.includes("value") ||
@@ -112,8 +112,12 @@ export default function Sidebar(props: any) {
             padding: "20px",
           }}
         >
-          <img src={output} alt="output image" style={{ maxWidth: "60vw", maxHeight: "80vh" }} />
-        </Grid>
+          <img
+            src={output}
+            alt="output image"
+            style={{ maxWidth: "60vw", maxHeight: "80vh" }}
+          />
+        </Grid>,
       );
       setOpenModal(true);
     } else if (type.includes("json") && !type.includes("geojson")) {
@@ -137,29 +141,28 @@ export default function Sidebar(props: any) {
             <Typography sx={{ color: "#aaa", whiteSpace: "pre-wrap" }}>
               {doc.toString()}
             </Typography>
-          </Grid>
+          </Grid>,
         );
         setOpenModal(true);
       });
     }
   };
 
-
-  const clearOtherLayers=(thisLayer:string)=>{
-    if(thisLayer!=='geotiff'){
+  const clearOtherLayers = (thisLayer: string) => {
+    if (thisLayer !== "geotiff") {
       setSelectedLayer({
         url: "",
         band_id: "b1",
         description: "",
       });
     }
-    if(thisLayer!=='geo+json'){
-      setGeojsonOutput(emptyFC)
+    if (thisLayer !== "geo+json") {
+      setGeojsonOutput(emptyFC);
     }
-    if(thisLayer!=='geopackage'){
-      setGeoPackage("")
+    if (thisLayer !== "geopackage") {
+      setGeoPackage("");
     }
-  }
+  };
 
   useEffect(() => {
     const pips: any = [];
@@ -176,7 +179,7 @@ export default function Sidebar(props: any) {
           <Typography color="primary.contrastText" sx={{ fontWeight: "bold" }}>
             {pipelineData.name}
           </Typography>
-        </Link>
+        </Link>,
       );
       setPipelineDescription(pipelineData.description);
       if (pipelineData.author.length > 0) {
@@ -222,24 +225,30 @@ export default function Sidebar(props: any) {
         });
       }
       sortable
-      .filter((pd: any) => pd.outputs !== "undefined" && pd.outputs !== undefined && pd.outputs !== null)
-      .map((pd: any) => {
-        if (pd) {
-          return pips.push(
-            <PipelineOutput
-              key={pd.label}
-              outputObj={pd}
-              displayOutput={displayOutput}
-              setOutputType={setOutputType}
-              outputType={outputType}
-              selectedOutput={selectedOutput}
-              setSelectedOutput={setSelectedOutput}
-              generateStats={generateStats}
-            />
-          );
-        }
-        return false;
-      });
+        .filter(
+          (pd: any) =>
+            pd &&
+            pd.outputs !== "undefined" &&
+            pd.outputs !== undefined &&
+            pd.outputs !== null,
+        )
+        .map((pd: any) => {
+          if (pd) {
+            return pips.push(
+              <PipelineOutput
+                key={pd.label}
+                outputObj={pd}
+                displayOutput={displayOutput}
+                setOutputType={setOutputType}
+                outputType={outputType}
+                selectedOutput={selectedOutput}
+                setSelectedOutput={setSelectedOutput}
+                generateStats={generateStats}
+              />,
+            );
+          }
+          return false;
+        });
       setPips(pips);
     }
   }, [pipelineData.pipeline_outputs]);
@@ -264,7 +273,7 @@ export default function Sidebar(props: any) {
 
   return (
     <>
-      <title>{ pipelineData?.name ? pipelineData.name : "Results Viewer" }</title>
+      <title>{pipelineData?.name ? pipelineData.name : "Results Viewer"}</title>
       <Box
         sx={{
           width: "30vw",
@@ -343,7 +352,9 @@ export default function Sidebar(props: any) {
                       }}
                     >
                       <div className="markdown">
-                        <Markdown style={{fontSize: 14}}>{pipelineDescription}</Markdown>
+                        <Markdown style={{ fontSize: 14 }}>
+                          {pipelineDescription}
+                        </Markdown>
                       </div>
                       <Typography color="primary.contrastText" fontSize={11}>
                         Pipeline authors:&nbsp;
@@ -362,11 +373,9 @@ export default function Sidebar(props: any) {
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
           onClose={modalClose}
-          sx={{ width: "fit-content", height: "fit-content",  margin: "auto" }}
+          sx={{ width: "fit-content", height: "fit-content", margin: "auto" }}
         >
-          <Box sx={{ margin: "auto" }}>
-            {modalContent}
-          </Box>
+          <Box sx={{ margin: "auto" }}>{modalContent}</Box>
         </Modal>
       </Box>
     </>
