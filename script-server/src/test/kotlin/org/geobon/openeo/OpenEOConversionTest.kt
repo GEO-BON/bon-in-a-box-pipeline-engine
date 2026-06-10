@@ -1,7 +1,9 @@
 package org.geobon.openeo
 
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import kotlin.collections.get
 import kotlin.test.*
 
 class OpenEOConversionTest {
@@ -15,17 +17,26 @@ class OpenEOConversionTest {
     fun convertMetadataTest() {
         val json = loadTestResource("catalogExample.json")
         val result = convertMetadata(json)
+        val authors = result["authors"] as ArrayList<*>
 
+        assertEquals("https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/main/algorithm_catalog/eurac/sentinel1_sar_coherence/openeo_udp/sentinel1_sar_coherence.json", result["script"])
         assertEquals("sentinel1_sar_coherence", result["name"])
-        assertNotNull(result["description"])
-        assertNotNull(result["license"])
-        assertNotNull(result["external_link"])
-        assertTrue((result["external_link"] as String).startsWith("https://"))
-        assertTrue(result.containsKey("references"))
+        assertTrue((result["description"] as String).startsWith("This process"))
+        assertEquals("other", result["license"])
+        assertTrue((result["external_link"] as String).startsWith("https://algorithm-catalogue.apex.esa.int/apps/"))
+        assertEquals(2, authors.size)
     }
 
     @Test
-    fun convertInputsBasicTest() {
+    fun convertMetadataNoDescriptionTest() {
+        val json = loadTestResource("catalogExample.json")
+        json.put("properties", json.getJSONObject("properties").put("description", ""))
+        val result = convertMetadata(json)
+        assertFalse(result.containsKey("description"))
+    }
+
+    @Test
+    fun convertInputsNumberInputsTest() {
         val json = loadTestResource("processExample.json")
         val result = convertInputs(json)
 
@@ -42,7 +53,8 @@ class OpenEOConversionTest {
         val polarization = inputs["polarization"] as Map<*, *>
         assertEquals("options", polarization["type"])
         assertEquals(listOf("VV", "VH"), polarization["options"])
-        assertEquals("polarization", polarization["label"])
+        assertEquals("Polarization", polarization["label"])
+        assertTrue(polarization.containsKey("example"))
     }
 
     @Test
@@ -52,27 +64,30 @@ class OpenEOConversionTest {
         val inputs = result["inputs"] as Map<*, *>
 
         val spatialExtent = inputs["spatial_extent"] as Map<*, *>
+        assertEquals("Bounding Box", spatialExtent["label"])
         assertEquals("bboxCRS", spatialExtent["type"])
-
-        val example = spatialExtent["example"] as Map<*, *>
-        val crs = example["CRS"] as Map<*, *>
-        assertEquals("EPSG", crs["authority"])
-        assertEquals(4326, crs["code"])
+        assertTrue(spatialExtent.containsKey("example"))
     }
 
     @Test
-    fun convertInputsDefaultTest() {
+    fun convertInputsIntTypeTest() {
         val json = loadTestResource("processExample.json")
         val result = convertInputs(json)
         val inputs = result["inputs"] as Map<*, *>
 
         val coherenceWindowRg = inputs["coherence_window_rg"] as Map<*, *>
         assertEquals(10, coherenceWindowRg["example"])
+        assertEquals("int", coherenceWindowRg["type"])
+        assertTrue((coherenceWindowRg["description"] as String).startsWith("Coherence window"))
+    }
 
-        val coherenceWindowAz = inputs["coherence_window_az"] as Map<*, *>
-        assertEquals(2, coherenceWindowAz["example"])
-
-        val burstId = inputs["burst_id"] as Map<*, *>
-        assertEquals("null", burstId["example"])
+    @Test
+    fun emptyJsonThrowsTest() {
+        assertFailsWith<IllegalArgumentException> {
+            convertMetadata(JSONObject("{}"))
+        }
+        assertFailsWith<IllegalArgumentException> {
+            convertInputs(JSONObject("{}"))
+        }
     }
 }

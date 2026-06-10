@@ -12,6 +12,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.time.Duration
 
 private val logger: Logger = LoggerFactory.getLogger("Server")
 
@@ -42,6 +43,7 @@ private fun convertFromOpenEo(url: String): Map<String, Any> {
 }
 
 fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
+    if (jsonFile.isEmpty) throw IllegalArgumentException("catalogJson is empty")
     val properties = jsonFile.optJSONObject("properties")
     val outputYaml = mutableMapOf<String, Any>()
     val links = jsonFile.optJSONArray("links")
@@ -57,7 +59,8 @@ fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
         logger.warn("Process file not found...")
     }
 
-    outputYaml["name"] = jsonFile.getString("id")
+    outputYaml["name"] = jsonFile.getString("id").takeIf { it.isNotEmpty() }
+        ?: throw IllegalArgumentException("Missing required field 'id'")
 
     properties?.optString("description")?.takeIf { it.isNotEmpty() }
         ?.let { outputYaml["description"] = it }
@@ -108,6 +111,7 @@ fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
 }
 
 fun convertInputs(processJson: JSONObject): Map<String, Any> {
+    if (processJson.isEmpty) throw IllegalArgumentException("processJson is empty")
     val outputYaml = mutableMapOf<String, Any>()
     val parameters = processJson.optJSONArray("parameters") ?: return outputYaml
 
@@ -146,15 +150,12 @@ fun convertInputs(processJson: JSONObject): Map<String, Any> {
         when {
             subtype == "bounding-box" -> {
                 input["type"] = "bboxCRS"
-                input["example"] = null
             }
 
             schema?.optJSONArray("enum") != null -> {
                 input["type"] = "options"
                 val enum = schema.optJSONArray("enum")!!
                 input["options"] = (0 until enum.length()).map { enum.getString(it) }
-                val default = param.opt("default").takeIf { it != JSONObject.NULL }
-                default?.let { input["example"] = it } ?: run { input["example"] = null }
             }
 
             rawType == "array" -> {
@@ -170,16 +171,14 @@ fun convertInputs(processJson: JSONObject): Map<String, Any> {
                     ?: throw RuntimeException("Could not determine item type for parameter '$id'")
 
                 input["type"] = "${mapType(itemType)}[]"
-                val default = param.opt("default").takeIf { it != JSONObject.NULL }
-                default?.let { input["example"] = it } ?: run { input["example"] = null }
             }
 
             else -> {
                 if (rawType != null) input["type"] = mapType(rawType)
-                val default = param.opt("default").takeIf { it != JSONObject.NULL }
-                default?.let { input["example"] = it } ?: run { input["example"] = null }
             }
         }
+        val default = param.opt("default").takeIf { it != JSONObject.NULL }
+        default?.let { input["example"] = it } ?: run { input["example"] = JSONObject.NULL}
 
         inputs[id] = input
     }
@@ -192,6 +191,7 @@ fun fetchJson(url: String): JSONObject {
     val client = HttpClient.newHttpClient()
     val request = HttpRequest.newBuilder()
         .uri(URI.create(url))
+        .timeout(Duration.ofSeconds(10))
         .GET()
         .build()
 

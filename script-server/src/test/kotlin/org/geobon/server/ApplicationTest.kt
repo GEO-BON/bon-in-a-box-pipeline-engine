@@ -131,20 +131,6 @@ class ApplicationTest {
         }
     }
 
-    fun `given openEO getting info_then info returned`() = testApplication {
-        application { scriptModule() }
-        client.get("openEO/UDP1.udp/info").apply {
-            assertEquals(HttpStatusCode.OK, status)
-
-            val result = bodyAsText()
-            val jsonResult = JSONObject(result)
-
-            assertEquals(1, jsonResult.length())
-            assertEquals("udp1", jsonResult.getString("name"))
-            assertEquals("https://somewhere.com/udp1.json", jsonResult.getString("external_link"))
-        }
-    }
-
     @Test
     fun testPipelineWithSubfolder() = testApplication {
         application { scriptModule() }
