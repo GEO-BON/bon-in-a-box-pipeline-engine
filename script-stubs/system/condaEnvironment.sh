@@ -80,7 +80,6 @@ function unpackEnvironment {
         elif [ "$status" = "200" ]; then
             echo "    New file downloaded."
             mv download $zip
-            rm -rf $targetDir
         else # "download" being the output, it contains a message in this case.
             echo "    Return code: $status, $(head download 2>/dev/null)"
         fi
@@ -88,6 +87,7 @@ function unpackEnvironment {
 
         # Check for a zip locally
         if [[ -f "$zip" ]]; then
+            echo "Local conda-pack environment found."
             # TODO: Compare yml file
 
             # Check for an unzipped folder locally
@@ -95,11 +95,11 @@ function unpackEnvironment {
                 echo "    Already unpacked."
             else
                 # Unpack
-                echo "Unpacking environment from $zip..."
+                echo "    Unpacking..."
+                rm -rf $targetDir
                 mkdir -p $targetDir ; assertSuccess
-
-                # TODO parallelize? install pigz in image then use --use-compress-program=pigz
                 tar -xf $zip -C $targetDir --use-compress-program=pigz ; assertSuccess
+                echo "    Done."
             fi
 
             # Activate
