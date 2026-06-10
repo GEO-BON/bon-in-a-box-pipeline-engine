@@ -70,7 +70,7 @@ function unpackEnvironment {
         zip=$condaPackDir/$condaEnvName.tar.gz
         targetDir="$condaPackDir/$condaEnvName"
 
-        # Check for a zip online 
+        # Check for a zip online
         url="$condaPackURL$condaEnvName.tar.gz"
         echo "Checking for environment archive at $url..."
         # -z flag is used to replace existing zip only if online version is newer one
@@ -83,12 +83,12 @@ function unpackEnvironment {
         else
             echo "    Return code: $status"
         fi
-        
+
         # Check for a zip locally
         if [[ -f "$zip" ]]; then
             # TODO: Compare yml file
 
-            # TODO: Check for an unzipped folder locally
+            # Check for an unzipped folder locally
             if [ -d "$targetDir" ] && [ -f "$targetDir/bin/conda-unpack" ] && [ -f "$targetDir/bin/activate" ]; then
                 echo "    Already unpacked."
             else
@@ -121,7 +121,7 @@ if [[ "$condaEnvName" == "pythonbase" || "$condaEnvName" == "rbase" ]]; then
     activateBaseEnvironment
 
 # Attempt to unpack and activate the environment if a conda-pack directory is provided
-else 
+else
     unpackEnvironment
     if [[ $? -ne 0 ]]; then
         # A first lock on the sub-environment
