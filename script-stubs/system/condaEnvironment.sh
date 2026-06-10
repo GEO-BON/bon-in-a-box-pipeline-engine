@@ -80,10 +80,9 @@ function unpackEnvironment {
         elif [ "$status" = "200" ]; then
             echo "    New file downloaded."
             rm -rf $targetDir
-        elif [ "$status" = "404" ]; then
-            echo "    Not found."
-        else
-            echo "    Return code: $status"
+        else # $zip being the output, it contains a message in this specific case.
+            echo "    Return code: $status, $(head $zip 2>/dev/null)"
+            rm $zip
         fi
 
         # Check for a zip locally
