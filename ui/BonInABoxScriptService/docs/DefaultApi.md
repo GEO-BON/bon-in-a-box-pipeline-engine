@@ -118,7 +118,7 @@ let opts = {
   'start': 56, // Number | Start index for pagination
   'limit': 56, // Number | Limit the number of results
   'keyword': "keyword_example", // String | Filter search based on keyword. This applies to the script/pipeline names and their inputs.
-  'filterStatus': ["null"] // [String] | Filter option based on pipeline status.
+  'filterStatus': ["null"] // [String] | Filter option based on pipeline status. The default value is \"all\" when null.
 };
 apiInstance.getHistory(opts, (error, data, response) => {
   if (error) {
@@ -137,7 +137,7 @@ Name | Type | Description  | Notes
  **start** | **Number**| Start index for pagination | [optional]
  **limit** | **Number**| Limit the number of results | [optional]
  **keyword** | **String**| Filter search based on keyword. This applies to the script/pipeline names and their inputs. | [optional]
- **filterStatus** | [**[String]**](String.md)| Filter option based on pipeline status. | [optional]
+ **filterStatus** | [**[String]**](String.md)| Filter option based on pipeline status. The default value is \&quot;all\&quot; when null. | [optional]
 
 ### Return type
 

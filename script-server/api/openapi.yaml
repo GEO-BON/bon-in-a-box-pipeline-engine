@@ -694,9 +694,14 @@ components:
         timeout:
           type: number
           example: 60
-        hpc:
+        compute:
           type: object
           properties:
+            hpc:
+              type: boolean
+              description: |
+                Whether this script is meant to be run on a HPC.
+                If true, the script will be run on a HPC when configured, otherwise on kubernetes or locally.
             mem:
               type: string
               example: 30G

@@ -122,7 +122,7 @@ export default class DefaultApi {
      * @param {Number} [start] Start index for pagination
      * @param {Number} [limit] Limit the number of results
      * @param {String} [keyword] Filter search based on keyword. This applies to the script/pipeline names and their inputs.
-     * @param {Array.<module:model/String>} [filterStatus] Filter option based on pipeline status.
+     * @param {Array.<module:model/String>} [filterStatus] Filter option based on pipeline status. The default value is \"all\" when null.
      * @param {module:api/DefaultApi~getHistoryCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/GetHistory200ResponseInner>}
      */
