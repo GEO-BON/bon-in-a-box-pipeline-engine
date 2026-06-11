@@ -82,6 +82,17 @@ class OpenEOConversionTest {
     }
 
     @Test
+    fun addOutputsTest() {
+        val result = addOutputs()
+        val outputs = result["outputs"] as Map<*, *>
+        val outputRaster = outputs["output_raster"] as Map<*, *>
+
+        assertEquals(1, outputs.size)
+        assertTrue(outputs.containsKey("output_raster"))
+        assertEquals("image/tiff;application=geotiff", outputRaster["type"])
+    }
+
+    @Test
     fun emptyJsonThrowsTest() {
         assertFailsWith<IllegalArgumentException> {
             convertMetadata(JSONObject("{}"))

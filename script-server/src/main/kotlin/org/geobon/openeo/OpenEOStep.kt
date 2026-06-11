@@ -39,7 +39,7 @@ private fun convertFromOpenEo(url: String): Map<String, Any> {
         ?: throw RuntimeException("No process URL found in catalog")
     val processJson = fetchJson(processUrl)
 
-    return metadata + convertInputs(processJson)
+    return metadata + convertInputs(processJson) + addOutputs()
 }
 
 fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
@@ -184,6 +184,21 @@ fun convertInputs(processJson: JSONObject): Map<String, Any> {
     }
 
     if (inputs.isNotEmpty()) outputYaml["inputs"] = inputs
+    return outputYaml
+}
+
+fun addOutputs(): Map<String, Any> {
+    val outputYaml = mutableMapOf<String, Any>()
+    val outputs = mutableMapOf<String, Any>()
+    val output = mutableMapOf<String, Any>()
+
+    output["label"] = "Output raster"
+    output["description"] = "Output raster of the process, generated from the output datacube."
+    output["type"] = "image/tiff;application=geotiff"
+    outputs["output_raster"] = output
+
+    outputYaml["outputs"] = outputs
+
     return outputYaml
 }
 
