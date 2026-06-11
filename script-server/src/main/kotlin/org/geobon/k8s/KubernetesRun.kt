@@ -51,17 +51,18 @@ class KubernetesRun(
     override suspend fun runScript(): Map<String, Any> {
         var error = false
         var outputs: MutableMap<String, Any>? = null
-        var containerForEnv: Containers = Containers.CONDA
+        val scriptType = ScriptType.fromFile(scriptFile)
+        var containerForEnv: Containers = when (scriptType) {
+            ScriptType.JULIA -> Containers.JULIA
+            else -> Containers.CONDA
+        }
+        log(logger::debug, "Runner: kubernetes job image based on ${containerForEnv.containerName}")
 
         val namespace = connection.namespace
         val jobName = toJobName(context.runId)
 
         runCatching {
-            val scriptType = ScriptType.fromFile(scriptFile)
-            containerForEnv = if (scriptType == ScriptType.JULIA) Containers.JULIA else Containers.CONDA
-
             val command = buildScriptCommand(scriptType)
-            logger.warn("Running Kubernetes job with command: $command") // TEMP
             val job = connection.buildJob(jobName, command, scriptType, computeRequirements)
             val api = connection.createBatchApi()
 
@@ -131,7 +132,6 @@ class KubernetesRun(
                     val message = "An error occurred when running the script: ${ex.message}"
 
                     outputs[ERROR_KEY] = message.also { log(logger::warn, it) }
-                    //logger.warn(ex) //TEMP
                     logger.warn(ex.stackTraceToString())
                 }
             }
@@ -140,7 +140,6 @@ class KubernetesRun(
         }
 
         context.createEnvironmentFile(containerForEnv)
-        log(logger::debug, "Runner: kubernetes job image based on ${containerForEnv.containerName}")
         return flagError(outputs ?: mapOf(), error)
     }
 
@@ -155,10 +154,11 @@ class KubernetesRun(
             val started = TimeSource.Monotonic.markNow()
             val logsJob = launch {
                 connection.streamJobLogs(namespace, jobName) { podName, line ->
-                    log(logger::trace, "[k8s/$podName] $line")
+                    log(logger::trace, "[k8s pod] $line")
                 }
             }
 
+            var lastStatus:String? = null
             try {
                 while (true) {
                     val status = try {
@@ -193,8 +193,12 @@ class KubernetesRun(
                     }
 
                     val podStatus = connection.describeJobPods(namespace, jobName)
-                    log(logger::debug, "Waiting for Kubernetes job '$jobName' to complete...\n$status")
-                    log(logger::debug, "Job '$jobName' pod state: $podStatus")
+                    podStatus.toString().let {
+                        if(lastStatus != it) {
+                            log(logger::debug, "Pod status update: $it")
+                            lastStatus = it
+                        }
+                    }
 
                     if ((status?.active ?: 0) > 0 && podStatus.startsWith("no pods found")) {
                         log(logger::warn, "Job '$jobName' is active but has no pods yet. Check scheduler/events in namespace '$namespace'.")
@@ -274,7 +278,6 @@ class KubernetesRun(
      * > - end with an alphanumeric character
      */
     private fun toJobName(runId: String): String {
-        println("Run name $runId") // TEMP
         val normalized = runId.lowercase(Locale.ROOT)
             .replace("_", "-")
             .replace("/", "-")
@@ -288,6 +291,5 @@ class KubernetesRun(
         val prefixMax = maxLength - suffix.length - 1
         val prefix = normalized.take(prefixMax).trim('-').ifBlank { "run" }
         return "$prefix-$suffix"
-            .also { println("Job name $it") } // TEMP
     }
 }
