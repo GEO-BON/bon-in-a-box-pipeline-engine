@@ -181,15 +181,30 @@
 }
 
 .ioNode .ioNode-folder,
-.ioNode .ioNode-script {
+.ioNode .ioNode-script,
+.ioNode .ioNode-phantom {
   display: block;
 }
 .ioNode .ioNode-folder {
   font-size: 0.6em;
 }
-.ioNode .ioNode-script {
+.ioNode .ioNode-script,
+.ioNode .ioNode-phantom {
   font-weight: 700;
   color: var(--biab-green-main);
+}
+
+.ioNode .ioNode-phantom {
+  padding: '20px';
+  border: '2px dotted red'
+}
+
+.ioNode:has(.ioNode-phantom) {
+  background-color: #acb2c0;
+}
+
+.selected .ioNode:has(.ioNode-phantom) {
+  background-color: rgba(255, 0, 0, 0.2);
 }
 
 .inputs,
