@@ -59,8 +59,8 @@ fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
         logger.warn("Process file not found...")
     }
 
-    outputYaml["name"] = jsonFile.getString("id").takeIf { it.isNotEmpty() }
-        ?: throw IllegalArgumentException("Missing required field 'id'")
+    properties?.optString("title")?.takeIf { it.isNotEmpty() }
+        ?.let { outputYaml["name"] = it }
 
     properties?.optString("description")?.takeIf { it.isNotEmpty() }
         ?.let { outputYaml["description"] = it }

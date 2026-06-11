@@ -20,7 +20,7 @@ class OpenEOConversionTest {
         val authors = result["authors"] as ArrayList<*>
 
         assertEquals("https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/main/algorithm_catalog/eurac/sentinel1_sar_coherence/openeo_udp/sentinel1_sar_coherence.json", result["script"])
-        assertEquals("sentinel1_sar_coherence", result["name"])
+        assertEquals("Sentinel-1 Coherence", result["name"])
         assertTrue((result["description"] as String).startsWith("This process"))
         assertEquals("other", result["license"])
         assertTrue((result["external_link"] as String).startsWith("https://algorithm-catalogue.apex.esa.int/apps/"))
