@@ -25,7 +25,7 @@ import Info from '../model/Info';
 export default class DefaultApi {
 
     /**
-    * Constructs a new DefaultApi.
+    * Constructs a new DefaultApi. 
     * @alias module:api/DefaultApi
     * @class
     * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
@@ -121,6 +121,8 @@ export default class DefaultApi {
      * @param {Object} opts Optional parameters
      * @param {Number} [start] Start index for pagination
      * @param {Number} [limit] Limit the number of results
+     * @param {String} [keyword] Filter search based on keyword. This applies to the script/pipeline names and their inputs.
+     * @param {Array.<module:model/String>} [filterStatus] Filter option based on pipeline status.
      * @param {module:api/DefaultApi~getHistoryCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/GetHistory200ResponseInner>}
      */
@@ -132,7 +134,9 @@ export default class DefaultApi {
       };
       let queryParams = {
         'start': opts['start'],
-        'limit': opts['limit']
+        'limit': opts['limit'],
+        'keyword': opts['keyword'],
+        'filterStatus': this.apiClient.buildCollectionParam(opts['filterStatus'], 'multi')
       };
       let headerParams = {
       };
@@ -287,7 +291,7 @@ export default class DefaultApi {
     /**
      * Get the output folders of the scripts composing this pipeline
      * @param {module:model/String} type Script or pipeline
-     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
+     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
      * @param {module:api/DefaultApi~getOutputFoldersCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Object.<String, {String: String}>}
      */
@@ -707,7 +711,7 @@ export default class DefaultApi {
     /**
      * Stop the specified pipeline run.
      * @param {module:model/String} type Script or pipeline
-     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
+     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
      * @param {module:api/DefaultApi~stopCallback} callback The callback function, accepting three arguments: error, data, response
      */
     stop(type, id, callback) {

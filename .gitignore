@@ -1,5 +1,6 @@
 .env
 .vscode
+.idea
 **/.cache
 **/.config
 **/node_modules

@@ -128,13 +128,13 @@ function validate {
 
     echo "Checking for duplicate descriptions in scripts..."
     cd scripts ; assertSuccess
-    ../.server/.github/findDuplicateDescriptions.sh ; flagErrors
+    ../.server/.github/findDuplicateDescriptions.py ; flagErrors
     cd ..
 
     echo "Validating script metadata against schema..."
     docker run --rm --name biab-yaml-validator -v $(pwd)/scripts:"/scripts" \
         -v $(pwd)/.server/.github/:"/.github" \
-        navikt/yaml-validator:v4 \
+        ghcr.io/navikt/yaml-validator/yaml-validator:v4 \
         ".github/scriptValidationSchema.yml" "scripts/" "no" ".yml"
     flagErrors
 
@@ -184,7 +184,7 @@ function checkout {
     git checkout $branch -- compose.prod.yml ; assertSuccess
     git checkout $branch -- version.txt; ## Don't assert. Only informative, plus hasn't always been there.
 
-    git checkout $branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
+    git checkout $branch -- .github/findDuplicateDescriptions.py ; assertSuccess
     git checkout $branch -- .github/findDuplicateIds.sh ; assertSuccess
     git checkout $branch -- .github/scriptValidationSchema.yml ; assertSuccess
     git checkout $branch -- .github/pipelineValidationSchema.yml ; assertSuccess
@@ -466,6 +466,25 @@ function licence {
     echo ""
     echo "You should have received a copy of the GNU General Public License"
     echo "along with this program.  If not, see <https://www.gnu.org/licenses/>."
+    echo ""
+    echo "--------------------------------------------------------------------------------"
+    echo ""
+    echo "Please use the following citation to reference the BON in a Box pipeline engine:"
+    echo ""
+    echo "    Jory Griffith, Jean-Michel Lord, Michael D Catchen, Maria Isabel Arce-Plata,"
+    echo "    F Guillaume Blanchet, Mathusan Chandramohan, M Camila Diaz-Corzo, Dominique"
+    echo "    Gravel, César Gutiérrez, Isabelle S Helfenstein, Sean Hoban, Jamie M Kass,"
+    echo "    Linda Laikre, Guillaume Larocque, Deborah M Leigh, Brian Leung, Alicia"
+    echo "    Mastretta-Yanes, Katie L Millette, Maria Alejandra Molina Berbeo, Dat Nguyen,"
+    echo "    Kari E Norman, María Helena Olaya-Rodríguez, Simon Pahls, Kaitlyn Pereira, Pedro"
+    echo "    R Peres-Neto, Timothée Poisot, Laura J Pollock, Juan Carlos Rey-Velasco, Victor"
+    echo "    J Rincon-Parra, Claudia Roeoesli, François Rousseu, Lina María Sánchez-Clavijo,"
+    echo "    Meredith C Schuman, Oliver Selmoni, Jessica M da Silva, Erika Suarez-Valencia,"
+    echo "    Thilina D Surasinghe, Eren Turak, Luis Fernando Urbina, Sarah Valentin, Noah"
+    echo "    Wightman, Juan Zuloaga, Maria Cecilia Londoño, Andrew Gonzalez. 2026. BON in a"
+    echo "    Box: An Open and Collaborative Platform for Biodiversity Monitoring, Indicator"
+    echo "    Calculation, and Reporting. BioScience. 76(4):345-358."
+    echo "    https://doi.org/10.1093/biosci/biaf189"
 }
 
 case "$1" in

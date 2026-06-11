@@ -115,7 +115,7 @@ export function PipelineOutput(props: any) {
           )}
           {!Array.isArray(arrayOutputs) &&
             "type" in outputObj &&
-            outputObj?.type?.includes("tif") && (
+            outputObj?.type?.includes("geotiff") && (
               <>
                 <CustomButtonGreen
                   key={`but-${arrayOutputs.band_id}`}
@@ -129,16 +129,14 @@ export function PipelineOutput(props: any) {
                 >
                   See on map
                 </CustomButtonGreen>
-                {outputObj?.type?.includes("tif") && (
-                  <CustomButton
-                    sx={{
-                      display: "inline",
-                    }}
-                    onClick={() => generateStats(arrayOutputs)}
-                  >
-                    <BarChartIcon />
-                  </CustomButton>
-                )}
+                <CustomButton
+                  sx={{
+                    display: "inline",
+                  }}
+                  onClick={() => generateStats(arrayOutputs)}
+                >
+                  <BarChartIcon />
+                </CustomButton>
               </>
             )}
           {!Array.isArray(arrayOutputs) &&
@@ -196,11 +194,12 @@ export function PipelineOutput(props: any) {
                   onChange={(event: any) => handleSelect(event.target.value)}
                   label="Table"
                 >
-                  {arrayOutputs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o.url}`} value={o}>
-                      {o.split("/").pop()}
+                  {arrayOutputs.map((o: any) => {
+                    let url = o.url ? o.url : o;
+                    return <CustomMenuItem key={`it-${url}`} value={url}>
+                      {url.split("/").pop()}
                     </CustomMenuItem>
-                  ))}
+                  })}
                 </CustomSelect>
                 <Grid container sx={{ alignItems: "center" }}>
                   <CustomButtonGreen
@@ -216,6 +215,7 @@ export function PipelineOutput(props: any) {
             )}
           {!Array.isArray(arrayOutputs) &&
             outputObj?.type.startsWith("image/") &&
+            ! outputObj?.type?.includes("geotiff") &&
             "type" in outputObj && (
               <CustomButtonGreen
                 key={`but-${outputObj.outputs}`}
@@ -253,11 +253,12 @@ export function PipelineOutput(props: any) {
                   onChange={(event: any) => handleSelect(event.target.value)}
                   label="Layer"
                 >
-                  {arrayOutputs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o.url}`} value={o}>
-                      {o.split("/").pop()}
+                  {arrayOutputs.map((o: any) => {
+                    let url = o.url ? o.url : o;
+                    return <CustomMenuItem key={`it-${url}`} value={url}>
+                      {url.split("/").pop()}
                     </CustomMenuItem>
-                  ))}
+                  })}
                 </CustomSelect>
                 <Grid container sx={{ alignItems: "center" }}>
                   <CustomButtonGreen
@@ -334,11 +335,12 @@ export function PipelineOutput(props: any) {
                   onChange={(event: any) => handleSelect(event.target.value)}
                   label="Layer"
                 >
-                  {arrayOutputs.map((o: any) => (
-                    <CustomMenuItem key={`it-${o.url}`} value={o}>
-                      {o.split("/").pop()}
+                  {arrayOutputs.map((o: any) => {
+                    let url = o.url ? o.url : o;
+                    return <CustomMenuItem key={`it-${url}`} value={url}>
+                      {url.split("/").pop()}
                     </CustomMenuItem>
-                  ))}
+                  })}
                 </CustomSelect>
                 <Grid container sx={{ alignItems: "center" }}>
                   <CustomButtonGreen

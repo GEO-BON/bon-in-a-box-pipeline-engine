@@ -1,4 +1,4 @@
-FROM gradle:9.0-jdk21
+FROM gradle:9.5-jdk26
 
 #INSTALL DOCKER CLI
 ENV DOCKER_VERSION=29.1.2

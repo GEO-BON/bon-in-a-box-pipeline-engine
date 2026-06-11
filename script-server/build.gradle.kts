@@ -4,11 +4,13 @@ val ktorVersion: String by project
 val kotlinVersion: String by project
 
 plugins {
-    kotlin("jvm") version "2.2.10"
+    // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
+    kotlin("jvm") version "2.4.0"
     id("io.ktor.plugin")
 
     // Better behavior of trimIndent() when it includes variables
-    id("com.bennyhuo.kotlin.trimindent") version "2.2.0-1.1.0"
+    // https://github.com/bennyhuo/kotlin-trim-indent
+    // id("com.bennyhuo.kotlin.trimindent") version "2.2.0-1.1.0"
 }
 
 group = "org.geobon"
@@ -51,6 +53,7 @@ tasks.test {
 }
 
 tasks.register("runValidator", JavaExec::class) {
+    description = "Validates that pipelines are well structured."
     mainClass.set("org.geobon.pipeline.Validator")
     classpath = sourceSets["main"].runtimeClasspath
 }
@@ -63,13 +66,13 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml:$ktorVersion")
 
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
-    implementation("ch.qos.logback:logback-classic:1.5.32")
+    implementation("ch.qos.logback:logback-classic:1.5.34")
 
     // https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
     implementation("org.eclipse.jgit:org.eclipse.jgit:7.6.0.202603022253-r")
 
     // https://mvnrepository.com/artifact/org.json/json
-    implementation("org.json:json:20251224")
+    implementation("org.json:json:20260522")
 
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementation("org.yaml:snakeyaml:2.6")

@@ -116,7 +116,9 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let opts = {
   'start': 56, // Number | Start index for pagination
-  'limit': 56 // Number | Limit the number of results
+  'limit': 56, // Number | Limit the number of results
+  'keyword': "keyword_example", // String | Filter search based on keyword. This applies to the script/pipeline names and their inputs.
+  'filterStatus': ["null"] // [String] | Filter option based on pipeline status.
 };
 apiInstance.getHistory(opts, (error, data, response) => {
   if (error) {
@@ -132,8 +134,10 @@ apiInstance.getHistory(opts, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **start** | **Number**| Start index for pagination | [optional] 
- **limit** | **Number**| Limit the number of results | [optional] 
+ **start** | **Number**| Start index for pagination | [optional]
+ **limit** | **Number**| Limit the number of results | [optional]
+ **keyword** | **String**| Filter search based on keyword. This applies to the script/pipeline names and their inputs. | [optional]
+ **filterStatus** | [**[String]**](String.md)| Filter option based on pipeline status. | [optional]
 
 ### Return type
 
@@ -177,8 +181,8 @@ apiInstance.getInfo(type, descriptionPath, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline | 
- **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. | 
+ **type** | **String**| Script or pipeline |
+ **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
 
 ### Return type
 
@@ -260,7 +264,7 @@ apiInstance.getListOf(type, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline | 
+ **type** | **String**| Script or pipeline |
 
 ### Return type
 
@@ -289,7 +293,7 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script or pipeline
-let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
+let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
 apiInstance.getOutputFolders(type, id, (error, data, response) => {
   if (error) {
     console.error(error);
@@ -304,8 +308,8 @@ apiInstance.getOutputFolders(type, id, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline | 
- **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  | 
+ **type** | **String**| Script or pipeline |
+ **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  |
 
 ### Return type
 
@@ -348,7 +352,7 @@ apiInstance.getPipeline(descriptionPath, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. | 
+ **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
 
 ### Return type
 
@@ -394,7 +398,7 @@ apiInstance.getRegionGeometry(id, opts, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**| ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes | 
+ **id** | **String**| ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes |
  **type** | **String**| Type of region to get the geometry for (country or region) | [optional] [default to &#39;country&#39;]
 
 ### Return type
@@ -438,7 +442,7 @@ apiInstance.getRegionsList(countryIso, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **countryIso** | **String**| ISO3 code of the country to get the regions for (e.g. \&quot;CAN\&quot; for Canada) | 
+ **countryIso** | **String**| ISO3 code of the country to get the regions for (e.g. \&quot;CAN\&quot; for Canada) |
 
 ### Return type
 
@@ -642,10 +646,10 @@ apiInstance.run(type, descriptionPath, opts, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline | 
- **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. | 
- **callback** | **String**| Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully. | [optional] 
- **body** | **String**| Content of input.json for this run | [optional] 
+ **type** | **String**| Script or pipeline |
+ **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
+ **callback** | **String**| Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully. | [optional]
+ **body** | **String**| Content of input.json for this run | [optional]
 
 ### Return type
 
@@ -689,8 +693,8 @@ apiInstance.savePipeline(filename, requestBody, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **filename** | **String**| The name of the JSON file (without extension). | 
- **requestBody** | [**{String: Object}**](Object.md)| Content of pipeline.json to save | 
+ **filename** | **String**| The name of the JSON file (without extension). |
+ **requestBody** | [**{String: Object}**](Object.md)| Content of pipeline.json to save |
 
 ### Return type
 
@@ -719,7 +723,7 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script or pipeline
-let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
+let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
 apiInstance.stop(type, id, (error, data, response) => {
   if (error) {
     console.error(error);
@@ -734,8 +738,8 @@ apiInstance.stop(type, id, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script or pipeline | 
- **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  | 
+ **type** | **String**| Script or pipeline |
+ **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  |
 
 ### Return type
 

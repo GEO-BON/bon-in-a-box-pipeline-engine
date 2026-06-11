@@ -30,6 +30,22 @@ export default function InfoPage() {
         <strong>Pipelines and scripts have their own licenses</strong>, specified in their metadata.<br />
         Make sure to review the attribution guidelines for pipelines and scripts.
       </p>
+      <p>
+        Please use the following citation to reference the BON in a Box pipeline engine:
+      </p>
+      <cite>
+        Jory Griffith, Jean-Michel Lord, Michael D Catchen, Maria Isabel Arce-Plata, F Guillaume Blanchet,
+        Mathusan Chandramohan, M Camila Diaz-Corzo, Dominique Gravel, César Gutiérrez, Isabelle S Helfenstein,
+        Sean Hoban, Jamie M Kass, Linda Laikre, Guillaume Larocque, Deborah M Leigh, Brian Leung,
+        Alicia Mastretta-Yanes, Katie L Millette, Maria Alejandra Molina Berbeo, Dat Nguyen, Kari E Norman,
+        María Helena Olaya-Rodríguez, Simon Pahls, Kaitlyn Pereira, Pedro R Peres-Neto, Timothée Poisot,
+        Laura J Pollock, Juan Carlos Rey-Velasco, Victor J Rincon-Parra, Claudia Roeoesli, François Rousseu,
+        Lina María Sánchez-Clavijo, Meredith C Schuman, Oliver Selmoni, Jessica M da Silva, Erika Suarez-Valencia,
+        Thilina D Surasinghe, Eren Turak, Luis Fernando Urbina, Sarah Valentin, Noah Wightman, Juan Zuloaga,
+        Maria Cecilia Londoño, Andrew Gonzalez. 2026. BON in a Box: An Open and Collaborative Platform for Biodiversity
+        Monitoring, Indicator Calculation, and Reporting. BioScience. 76(4):345-358. <a href="https://academic.oup.com/bioscience/article/76/4/345/8424339">
+        https://doi.org/10.1093/biosci/biaf189</a>
+      </cite>
 
       <h2>Server versions</h2>
       <Versions />

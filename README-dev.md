@@ -107,6 +107,45 @@ gitGraph
 
 3. Manually tag the version and create a release via GitHub. See [releases](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/releases).
 
+### Versionning on the pipelines-result instance
+The `manage_output.py` script helps moving outputs from one instance to another. If the instances share a drive, it becomes even easier. Launch script with no arguments for syntax.
+
+For example, to copy **all** the pipelines of an instance somewhere else, use
+```
+find -name pipelineOutput.json | \
+    xargs -i dirname "{}" | \
+    xargs -P $(nproc) -i ./manage_output.py {} copy /somewhere_else/output _2025-10-16
+```
+
+It becomes much more complicated when diplaying runs that were made with different versions of the repository. In order to display pipeline results that were calculated with old versions of the script, the original metadata of the script must be kept. Create a subfolder in scripts, pipelines and outputs with an identifier (such as a date), then use the prefix option of manage_output.py to insert that prefix into the copied pipeline's paths. _The prefix must match exactly between all three folders._
+
+In the subfolder, the pipeline json files need to be edited. This can be done with a find/replace in folder, followed by this jq command:
+
+Find: "descriptionFile": "<br>
+Replace: "descriptionFile": "_2025-10-16>
+
+``` bash
+prefix='_2025-10-16>'
+
+find . -name '*.json' -print0 |
+xargs -0 -P $(nproc) -I {} sh -c '
+  file="$1"
+  prefix="$2"
+  tmp="$(mktemp)"
+
+  jq --arg prefix "$prefix" "
+    (.inputs, .outputs) |= with_entries(
+      if (.key | startswith(\"pipeline@\")) or (.key | startswith(\$prefix)) then
+        .
+      else
+        .key |= (\$prefix + .)
+      end
+    )
+  " "$file" > "$tmp" && mv "$tmp" "$file"
+' sh "{}" "$prefix"
+```
+
+You can now update the demonstration instance to a new version of the pipeline repo, and add results from that version.
 
 ### Debugging prod servers
 

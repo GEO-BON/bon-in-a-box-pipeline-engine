@@ -52,6 +52,21 @@ paths:
           schema:
             type: integer
             format: int32
+        - name: keyword
+          in: query
+          description: Filter search based on keyword. This applies to the script/pipeline names and their inputs.
+          required: false
+          schema:
+            type: string
+        - name: filterStatus
+          in: query
+          description: Filter option based on pipeline status. The default value is "all" when null.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [all, none, running, error, cancelled, completed]
       responses:
         "200":
           description: |
@@ -618,7 +633,7 @@ components:
           properties:
             status:
               type: string
-              enum: [in_development, in_review, reviewed, deprecated, example]
+              enum: [in_development, in_review, reviewed, core, deprecated, example]
               default: in_development
             message:
               type: string
