@@ -26,13 +26,6 @@ class KubernetesRun(
     private val computeRequirements: ComputeRequirements? = null
 ) : Run(scriptFile, context) {
 
-    constructor(
-        serverContext: ServerContext,
-        scriptFile: File,
-        inputMap: Map<String, Any?>,
-        timeout: Duration = DEFAULT_TIMEOUT
-    ) : this(RunContext(scriptFile, inputMap, serverContext), scriptFile, timeout)
-
     companion object {
         private val POLL_INTERVAL = 2.seconds
         private val JOB_APPEARANCE_GRACE = 10.seconds
@@ -45,7 +38,7 @@ class KubernetesRun(
         var error = false
         var outputs: MutableMap<String, Any>? = null
         val scriptType = ScriptType.fromFile(scriptFile)
-        var containerForEnv: Containers = when (scriptType) {
+        val containerForEnv: Containers = when (scriptType) {
             ScriptType.JULIA -> Containers.JULIA
             else -> Containers.CONDA
         }
@@ -124,7 +117,7 @@ class KubernetesRun(
                 else -> {
                     if((outputs[ERROR_KEY] as? String).isNullOrBlank()) {
                         val message = ex.message ?: "check logs for details."
-                        outputs[ERROR_KEY] = "An error occurred when running the script: ${message}".also { log(logger::warn, it) }
+                        outputs[ERROR_KEY] = "An error occurred when running the script: $message".also { log(logger::warn, it) }
                     }
                 }
             }
@@ -146,7 +139,7 @@ class KubernetesRun(
         coroutineScope {
             val started = TimeSource.Monotonic.markNow()
             val logsJob = launch {
-                connection.streamJobLogs(namespace, jobName) { podName, line ->
+                connection.streamJobLogs(namespace, jobName) { _, line ->
                     log(logger::trace, "[k8s pod] $line")
                 }
             }
@@ -186,12 +179,11 @@ class KubernetesRun(
                     }
 
                     val podStatus = connection.describeJobPods(namespace, jobName)
-                    podStatus.toString().let {
-                        if(lastStatus != it) {
-                            log(logger::debug, "Pod status update: $it")
-                            lastStatus = it
-                        }
+                    if(lastStatus != podStatus) {
+                        log(logger::debug, "Pod status update: $podStatus")
+                        lastStatus = podStatus
                     }
+
 
                     if ((status?.active ?: 0) > 0 && podStatus.startsWith("no pods found")) {
                         log(logger::warn, "Job '$jobName' is active but has no pods yet. Check scheduler/events in namespace '$namespace'.")

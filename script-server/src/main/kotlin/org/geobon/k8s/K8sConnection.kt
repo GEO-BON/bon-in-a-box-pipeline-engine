@@ -29,7 +29,6 @@ class K8sConnection {
 		 */
 		private const val DEFAULT_NAMESPACE = "default"
 
-		// TODO Utiliser l'image du main comme sur HPCRun, ou créer une image avec tout conda pré-compilée
 		private const val RUNNER_CONDA_IMAGE = "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda"
 		private const val RUNNER_JULIA_IMAGE = "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia"
 	}
@@ -126,11 +125,9 @@ class K8sConnection {
 	private fun createClient(): ApiClient {
 		val kubeConfigFile = resolveKubeConfigFile()
 
-		if (kubeConfigFile != null) {
-			kubeConfigFile.bufferedReader().use { reader ->
-				return ClientBuilder.kubeconfig(KubeConfig.loadKubeConfig(reader)).build()
-			}
-		}
+        kubeConfigFile?.bufferedReader()?.use { reader ->
+            return ClientBuilder.kubeconfig(KubeConfig.loadKubeConfig(reader)).build()
+        }
 
 		return Config.defaultClient()
 	}
@@ -173,7 +170,7 @@ class K8sConnection {
 		println("Refreshing Kubernetes cluster status...")
 
 		try {
-			val nodes = createCoreApi().listNode().execute().items.orEmpty()
+			val nodes = createCoreApi().listNode().execute().items
 			val workers = nodes.filterNot { isControlPlaneNode(it.metadata?.labels.orEmpty()) }
 
 			workersStatus = workers.associate { node ->
@@ -329,7 +326,6 @@ class K8sConnection {
 				.labelSelector("job-name=$jobName")
 				.execute()
 				.items
-				.orEmpty()
 
 			if (pods.isEmpty()) {
 				"no pods found for label job-name=$jobName"
@@ -372,7 +368,7 @@ class K8sConnection {
 		jobName: String,
 		onLine: (podName: String, line: String) -> Unit
 	) = supervisorScope {
-		val followers = mutableMapOf<String, kotlinx.coroutines.Job>()
+		val followers = mutableMapOf<String, Job>()
 
 		while (currentCoroutineContext().isActive) {
 			val pods = runCatching {
@@ -380,7 +376,6 @@ class K8sConnection {
 					.labelSelector("job-name=$jobName")
 					.execute()
 					.items
-					.orEmpty()
 			}.getOrElse {
 				emptyList()
 			}
@@ -427,7 +422,7 @@ class K8sConnection {
 						throw RuntimeException("Unable to stream logs for pod '$podName': HTTP ${response.code}")
 					}
 
-					val source = response.body?.source() ?: return
+					val source = response.body.source()
 					while (currentCoroutineContext().isActive && !source.exhausted()) {
 						currentCoroutineContext().ensureActive()
 						val line = source.readUtf8Line() ?: break
@@ -470,11 +465,11 @@ class K8sConnection {
 			}
 		}.getOrNull() ?: System.getenv("UID")?.toLongOrNull()
 
-		return when {
-			uid == null -> throw IllegalStateException("Unable to determine current process UID for Kubernetes job security context")
-			uid == 0L -> throw IllegalStateException("Current process UID is 0 (root); refusing to create a Kubernetes container with runAsNonRoot=true")
-			else -> uid
-		}
+		return when (uid) {
+            null -> throw IllegalStateException("Unable to determine current process UID for Kubernetes job security context")
+            0L -> throw IllegalStateException("Current process UID is 0 (root); refusing to create a Kubernetes container with runAsNonRoot=true")
+            else -> uid
+        }
 	}
 
 }
