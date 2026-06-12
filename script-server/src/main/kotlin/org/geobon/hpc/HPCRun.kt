@@ -142,9 +142,10 @@ class HPCRun(
                 }
 
                 else -> {
-                    log(logger::warn, "An error occurred when running the script: ${ex.message}")
-                    ex.printStackTrace()
-                    output[ERROR_KEY] = ex.message ?: "check logs for details."
+                    if((output[ERROR_KEY] as? String).isNullOrBlank()) {
+                        val message = ex.message ?: "check logs for details."
+                        output[ERROR_KEY] = "An error occurred when running the script: ${message}".also { log(logger::warn, it) }
+                    }
                 }
             }
 

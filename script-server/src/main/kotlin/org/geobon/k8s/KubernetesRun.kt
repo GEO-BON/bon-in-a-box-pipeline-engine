@@ -129,10 +129,10 @@ class KubernetesRun(
                 }
 
                 else -> {
-                    val message = "An error occurred when running the script: ${ex.message}"
-
-                    outputs[ERROR_KEY] = message.also { log(logger::warn, it) }
-                    logger.warn(ex.stackTraceToString())
+                    if((outputs[ERROR_KEY] as? String).isNullOrBlank()) {
+                        val message = ex.message ?: "check logs for details."
+                        outputs[ERROR_KEY] = "An error occurred when running the script: ${message}".also { log(logger::warn, it) }
+                    }
                 }
             }
 
