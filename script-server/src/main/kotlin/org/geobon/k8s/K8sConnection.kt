@@ -28,6 +28,8 @@ import kotlin.time.Duration.Companion.seconds
 
 class K8sConnection {
 
+	private val currentUid: Long by lazy { resolveCurrentUidOrThrow() }
+
 	companion object {
 		/**
 		 *  "default": Kubernetes includes this namespace so that you can start using your new cluster without first creating a namespace.
@@ -278,6 +280,13 @@ class K8sConnection {
 		val container = V1Container()
 			.name(containerName)
 			.image(image)
+			.securityContext(
+				V1SecurityContext()
+					.runAsNonRoot(true)
+					.runAsUser(currentUid)
+					.allowPrivilegeEscalation(false)
+					.privileged(false)
+			)
 			.command(listOf("/bin/bash", "-c", scriptCommand))
 			.env(
 				mountedPaths.map { (name, value) ->
@@ -455,6 +464,25 @@ class K8sConnection {
 	private fun isControlPlaneNode(labels: Map<String, String>): Boolean {
 		return labels.containsKey("node-role.kubernetes.io/control-plane")
 				|| labels.containsKey("node-role.kubernetes.io/master")
+	}
+
+	private fun resolveCurrentUidOrThrow(): Long {
+		val uid = runCatching {
+			File("/proc/self/status").useLines { lines ->
+				lines
+					.firstOrNull { it.startsWith("Uid:") }
+					?.trim()
+					?.split(Regex("\\s+"))
+					?.getOrNull(1)
+					?.toLongOrNull()
+			}
+		}.getOrNull() ?: System.getenv("UID")?.toLongOrNull()
+
+		return when {
+			uid == null -> throw IllegalStateException("Unable to determine current process UID for Kubernetes job security context")
+			uid == 0L -> throw IllegalStateException("Current process UID is 0 (root); refusing to create a Kubernetes container with runAsNonRoot=true")
+			else -> uid
+		}
 	}
 
 }
