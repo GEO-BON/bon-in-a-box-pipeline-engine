@@ -44,7 +44,7 @@ class KubernetesRun(
             ScriptType.JULIA -> Containers.JULIA
             else -> Containers.CONDA
         }
-        log(logger::debug, "Runner: kubernetes job image based on ${containerForEnv.containerName}")
+        log(logger::debug, "Runner: ${containerForEnv.containerName} on Kubernetes")
 
         val namespace = connection.namespace
         val jobName = toJobName(context.runId)
@@ -78,11 +78,11 @@ class KubernetesRun(
             }
 
             if (!jobAlreadySucceeded) {
-                log(logger::info, "Submitting Kubernetes job '$jobName' in namespace '$namespace'...")
+                log(logger::info, "Submitting job '$jobName' in namespace '$namespace'...")
                 val created = api.createNamespacedJob(namespace, job).execute()
                 log(
                     logger::debug,
-                    "Kubernetes job created: name='${created.metadata?.name}', uid='${created.metadata?.uid}'"
+                    "Job created, uid='${created.metadata?.uid}'."
                 )
 
                 waitForJobCompletion(api, coreApi, namespace, jobName, timeout)
@@ -106,7 +106,7 @@ class KubernetesRun(
             when (ex) {
                 is CancellationException -> {
                     outputs[ERROR_KEY] = "Cancelled by user"
-                    log(logger::info, "Run was cancelled by user. Outputs saved without throwing exception.") // TEMP
+                    log(logger::info, "Run was cancelled by user.")
                 }
 
                 is TimeoutException -> {
@@ -146,7 +146,10 @@ class KubernetesRun(
             val started = TimeSource.Monotonic.markNow()
             val logsJob = launch {
                 connection.streamJobLogs(namespace, jobName) { _, line ->
-                    log(logger::trace, "[k8s pod] $line")
+                    log(
+                        logger::trace, // Human-readable time stamp. The date is already at the top of the logs.
+                        Regex("""^\d{4}-\d{2}-\d{2}T(\d{2}:\d{2}:\d{2}\.\d{3})\d+Z""").replace(line, "$1")
+                    )
                 }
             }
 
