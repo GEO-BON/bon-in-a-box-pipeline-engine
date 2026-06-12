@@ -2,6 +2,7 @@ package org.geobon.k8s
 
 import io.kubernetes.client.openapi.ApiException
 import io.kubernetes.client.openapi.apis.BatchV1Api
+import io.kubernetes.client.openapi.apis.CoreV1Api
 import kotlinx.coroutines.*
 import org.geobon.pipeline.RunContext
 import org.geobon.script.ComputeRequirements
@@ -29,6 +30,7 @@ class KubernetesRun(
     companion object {
         private val POLL_INTERVAL = 2.seconds
         private val JOB_APPEARANCE_GRACE = 10.seconds
+        private val JOB_DELETION_TIMEOUT = 30.seconds
     }
 
     private val connection = context.serverContext.k8s ?: K8sConnection() // TODO: don't instantiate here
@@ -51,6 +53,7 @@ class KubernetesRun(
             val command = buildScriptCommand(scriptType)
             val job = connection.buildJob(jobName, command, scriptType, computeRequirements)
             val api = connection.createBatchApi()
+            val coreApi = connection.createCoreApi()
 
             // Use cached result if the job already succeeded; otherwise replace stale runs.
             val jobAlreadySucceeded = try {
@@ -59,10 +62,14 @@ class KubernetesRun(
                     log(logger::info, "Kubernetes job '$jobName' already succeeded, using cached result.")
                     true
                 } else {
-                    api.deleteNamespacedJob(jobName, namespace)
-                        .propagationPolicy("Background")
-                        .execute()
-                    log(logger::debug, "Deleted pre-existing failed Kubernetes job '$jobName'")
+                    log(logger::debug, "Found pre-existing failed Kubernetes job.")
+                    deleteJobAndWait(
+                        api = api,
+                        coreApi = coreApi,
+                        namespace = namespace,
+                        jobName = jobName,
+                        waitForOutput = false
+                    )
                     false
                 }
             } catch (ex: ApiException) {
@@ -78,7 +85,7 @@ class KubernetesRun(
                     "Kubernetes job created: name='${created.metadata?.name}', uid='${created.metadata?.uid}'"
                 )
 
-                waitForJobCompletion(api, namespace, jobName, timeout)
+                waitForJobCompletion(api, coreApi, namespace, jobName, timeout)
             }
 
             if (resultFile.exists()) {
@@ -91,19 +98,17 @@ class KubernetesRun(
                 log(logger::warn, "Error: output.json file not found")
             }
         }.onFailure { ex ->
-            if (ex is CancellationException) {
-                val cancelledOutputs = readOutputs() ?: mutableMapOf()
-                cancelledOutputs[ERROR_KEY] = "Cancelled by user"
-                resultFile.writeText(RunContext.gson.toJson(cancelledOutputs))
-                throw ex
-            }
-
             error = true
             outputs = readOutputs() ?: mutableMapOf()
 
             ex.printStackTrace()
 
             when (ex) {
+                is CancellationException -> {
+                    outputs[ERROR_KEY] = "Cancelled by user"
+                    log(logger::info, "Run was cancelled by user. Outputs saved without throwing exception.") // TEMP
+                }
+
                 is TimeoutException -> {
                     val event = ex.message ?: ex.javaClass.name
                     log(logger::info, "$event: done.")
@@ -132,6 +137,7 @@ class KubernetesRun(
     @OptIn(ExperimentalTime::class)
     private suspend fun waitForJobCompletion(
         api: BatchV1Api,
+        coreApi: CoreV1Api,
         namespace: String,
         jobName: String,
         timeout: Duration
@@ -195,14 +201,15 @@ class KubernetesRun(
                 withContext(NonCancellable) {
                     logsJob.cancelAndJoin()
                     try {
-                        api.deleteNamespacedJob(jobName, namespace)
-                            .propagationPolicy("Background")
-                            .execute()
-                        log(logger::debug, "Deleted Kubernetes job '$jobName'")
-                    } catch (ex: ApiException) {
-                        if (ex.code != 404) {
-                            log(logger::warn, "Failed to delete Kubernetes job '$jobName': ${ex.message}")
-                        }
+                        deleteJobAndWait(
+                            api = api,
+                            coreApi = coreApi,
+                            namespace = namespace,
+                            jobName = jobName,
+                            waitForOutput = true
+                        )
+                    } catch (ex: Exception) {
+                        log(logger::warn, "Failed to delete Kubernetes job '$jobName': ${ex.message}")
                     }
                 }
             }
@@ -247,6 +254,57 @@ class KubernetesRun(
                 "sh $scriptPath $outputPath"
             }
         }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    private suspend fun deleteJobAndWait(
+        api: BatchV1Api,
+        coreApi: CoreV1Api,
+        namespace: String,
+        jobName: String,
+        timeout: Duration = JOB_DELETION_TIMEOUT,
+        waitForOutput: Boolean
+    ) {
+        log(logger::debug, "Deleting Kubernetes job '$jobName'...")
+        api.deleteNamespacedJob(jobName, namespace)
+            .propagationPolicy("Background")
+            .execute()
+
+        val started = TimeSource.Monotonic.markNow()
+        while (started.elapsedNow() <= timeout) {
+            if (waitForOutput) {
+                val outputs = readOutputs()
+                if (outputs != null) {
+                    log(logger::debug, "Job stopped gracefully.")
+                    return
+                }
+            }
+
+            val jobDeleted = try {
+                api.readNamespacedJobStatus(jobName, namespace).execute()
+                false
+            } catch (ex: ApiException) {
+                if (ex.code == 404) {
+                    true
+                } else {
+                    throw ex
+                }
+            }
+
+            val podsDeleted = coreApi.listNamespacedPod(namespace)
+                .labelSelector("job-name=$jobName")
+                .execute()
+                .items?.isEmpty() ?: true
+
+            if (jobDeleted && podsDeleted) {
+                log(logger::debug, "Pod stopped.")
+                return
+            }
+
+            delay(POLL_INTERVAL)
+        }
+
+        throw RuntimeException("Timed out while deleting Kubernetes job '$jobName'")
     }
 
     /**
