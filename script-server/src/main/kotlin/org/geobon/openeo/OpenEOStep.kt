@@ -59,55 +59,59 @@ fun fetchJson(url: String): JSONObject {
 
 fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
     if (jsonFile.isEmpty) throw IllegalArgumentException("catalogJson is empty")
-    val properties = jsonFile.optJSONObject("properties")
-    val outputYaml = mutableMapOf<String, Any>()
-    val links = jsonFile.optJSONArray("links")
-    val linkList = links?.let { arr -> (0 until arr.length()).map { arr.getJSONObject(it) } } ?: emptyList()
 
-    val processUrl = linkList
+    val outputYaml = mutableMapOf<String, Any>()
+    val linksObject = jsonFile.optJSONArray("links")
+    val links = linksObject?.let { arr -> (0 until arr.length()).map { arr.getJSONObject(it) } }
+        ?: emptyList()
+
+    // This mime type represents the actual openEO process graph
+    val processUrl = links
         .firstOrNull { it.optString("type") == "application/vnd.openeo+json;type=process" }
         ?.optString("href")
 
-    if (processUrl != null) {
-        outputYaml["script"] = processUrl
-    } else {
+    if (processUrl.isNullOrBlank())
         logger.warn("Process file not found...")
-    }
-
-    properties?.optString("title")?.takeIf { it.isNotEmpty() }
-        ?.let { outputYaml["name"] = it }
-
-    properties?.optString("description")?.takeIf { it.isNotEmpty() }
-        ?.let { outputYaml["description"] = it }
-
-    val contacts = properties?.optJSONArray("contacts")
-    val authors = contacts?.let { arr ->
-        (0 until arr.length())
-            .map { arr.getJSONObject(it) }
-            .map { contact ->
-                val identifier = contact.optJSONArray("links")
-                    ?.let { l -> (0 until l.length()).map { l.getJSONObject(it) } }
-                    ?.firstOrNull()
-                    ?.optString("href")
-                mapOf(
-                    "name" to contact.optString("name").takeIf { it.isNotEmpty() },
-                    "identifier" to identifier
-                ).filterValues { it != null }
-            }
-    }
-
-    if (!authors.isNullOrEmpty()) {
-        outputYaml["authors"] = authors
-    } else {
-        logger.warn("No authors found in catalog file...")
-    }
-
-    properties?.optString("license")?.takeIf { it.isNotEmpty() }
-        ?.let { outputYaml["license"] = it }
-
-    processUrl?.let {
+    else {
+        // The UDP process graph
+        outputYaml["script"] = processUrl
+        // The APEx catalogue entry
         outputYaml["external_link"] = "https://algorithm-catalogue.apex.esa.int/apps/" +
-                it.substringAfterLast('/').removeSuffix(".json")
+                processUrl.substringAfterLast('/').removeSuffix(".json")
+    }
+
+    val properties = jsonFile.optJSONObject("properties")
+    properties?.let {
+        properties.optString("title").takeIf { it.isNotEmpty() }
+            ?.let { outputYaml["name"] = it }
+
+        properties.optString("description").takeIf { it.isNotEmpty() }
+            ?.let { outputYaml["description"] = it }
+
+        val contacts = properties.optJSONArray("contacts")
+        val authors = contacts?.let { arr ->
+            (0 until arr.length())
+                .map { arr.getJSONObject(it) }
+                .map { contact ->
+                    val identifier = contact.optJSONArray("links")
+                        ?.let { l -> (0 until l.length()).map { l.getJSONObject(it) } }
+                        ?.firstOrNull()
+                        ?.optString("href")
+                    mapOf(
+                        "name" to contact.optString("name").takeIf { it.isNotEmpty() },
+                        "identifier" to identifier
+                    ).filterValues { it != null }
+                }
+        }
+
+        if (!authors.isNullOrEmpty()) {
+            outputYaml["authors"] = authors
+        } else {
+            logger.warn("No authors found in catalog file...")
+        }
+
+        properties.optString("license").takeIf { it.isNotEmpty() }
+            ?.let { outputYaml["license"] = it }
     }
 
 //    val references = linkList
