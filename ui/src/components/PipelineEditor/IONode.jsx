@@ -20,6 +20,10 @@ export default function IONode({ id, data }) {
   }, [descriptionFileLocation])
 
   function showScriptTooltip() {
+    if (!metadata) {
+      data.setToolTip(<span>Script or pipeline not found. Remove or replace this step to avoid errors.</span>);
+      return;
+    }
     data.setToolTip(<div className="reactMarkdown noLink"><ReactMarkdown>{metadata.description}</ReactMarkdown></div>)
   }
 
@@ -32,7 +36,12 @@ export default function IONode({ id, data }) {
       !desc.description ? "Description missing in script's description file" : null;
   }
 
-  if (!metadata) return null
+  if (!metadata) {
+    return <table className='ioNode' onMouseEnter={showScriptTooltip} onMouseLeave={hideTooltip}
+    style={{padding: '10px', border: '2px dotted red'}}>
+      <span className='ioNode-phantom'>{data.descriptionFile}</span>
+      </table>
+  }
 
   let pathList = descriptionFileLocation.split('>')
   if(metadata.name) {
