@@ -21,7 +21,7 @@ export default function IONode({ id, data }) {
 
   function showScriptTooltip() {
     if (!metadata) {
-      data.setToolTip(<span>Script or pipeline not found. Remove this step to avoid errors.</span>);
+      data.setToolTip(<span>Script or pipeline not found. Remove or replace this step to avoid errors.</span>);
       return;
     }
     data.setToolTip(<div className="reactMarkdown noLink"><ReactMarkdown>{metadata.description}</ReactMarkdown></div>)
