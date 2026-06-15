@@ -143,7 +143,7 @@ fun convertInputs(processJson: JSONObject): Map<String, Any> {
 
         val bboxSchema = schemaArr?.let { arr ->
             (0 until arr.length())
-                .map { arr.getJSONObject(it) }
+                .mapNotNull { arr.optJSONObject(it) }
                 .firstOrNull { it.optString("subtype") == "bounding-box" }
         } ?: if (schemaObj?.optString("subtype") == "bounding-box") schemaObj else null
 
