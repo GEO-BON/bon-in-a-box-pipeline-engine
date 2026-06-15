@@ -1,17 +1,16 @@
 package org.geobon.openeo
 
 import org.geobon.server.ServerContext
+import org.json.JSONObject
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileNotFoundException
-import org.yaml.snakeyaml.Yaml
-import org.json.JSONObject
-import org.yaml.snakeyaml.DumperOptions
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.time.Duration
 
 private val logger: Logger = LoggerFactory.getLogger("Server")
@@ -22,9 +21,9 @@ fun getOpenEODescription(key: String): Map<String, Any> {
 
     val yaml = Yaml()
     val source = yaml.load<Map<String, Any>>(sourceFile.readText())
-    val udps = source["UDPs"] as? Map<String, Map<String, Any>>
+    val udps = source["UDPs"] as? Map<*,*>
         ?: throw RuntimeException("No UDPs found in externalScripts.yaml")
-    val udp = udps[key]
+    val udp = udps[key] as? Map<*,*>
         ?: throw RuntimeException("$key not found in UDPs")
     val url = udp["url"] as? String
         ?: throw RuntimeException("No catalog url found for $key")
@@ -40,6 +39,22 @@ private fun convertFromOpenEo(url: String): Map<String, Any> {
     val processJson = fetchJson(processUrl)
 
     return metadata + convertInputs(processJson) + addOutputs()
+}
+
+fun fetchJson(url: String): JSONObject {
+    val client = HttpClient.newHttpClient()
+    val request = HttpRequest.newBuilder()
+        .uri(URI.create(url))
+        .timeout(Duration.ofSeconds(10))
+        .GET()
+        .build()
+
+    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+    if (response.statusCode() != 200)
+        throw RuntimeException("Failed to fetch $url: HTTP ${response.statusCode()}")
+
+    return JSONObject(response.body())
 }
 
 fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
@@ -200,22 +215,6 @@ fun addOutputs(): Map<String, Any> {
     outputYaml["outputs"] = outputs
 
     return outputYaml
-}
-
-fun fetchJson(url: String): JSONObject {
-    val client = HttpClient.newHttpClient()
-    val request = HttpRequest.newBuilder()
-        .uri(URI.create(url))
-        .timeout(Duration.ofSeconds(10))
-        .GET()
-        .build()
-
-    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-
-    if (response.statusCode() != 200)
-        throw RuntimeException("Failed to fetch $url: HTTP ${response.statusCode()}")
-
-    return JSONObject(response.body())
 }
 
 fun toTitleCase(input: String): String =
