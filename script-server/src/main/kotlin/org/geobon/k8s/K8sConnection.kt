@@ -94,6 +94,21 @@ class K8sConnection {
 
 	init {
 		try {
+			val requiredEnvVars = listOf(
+				"K8S_CONFIG_PATH",
+				"K8S_SHARED_OUTPUT_HOST_PATH",
+				"K8S_SHARED_SCRIPTS_HOST_PATH",
+				"K8S_SHARED_SCRIPT_STUBS_HOST_PATH",
+				"K8S_SHARED_USERDATA_HOST_PATH",
+				"K8S_SHARED_RUNNER_ENV_HOST_PATH",
+			)
+
+			val missingEnvVars = requiredEnvVars.filter { System.getenv(it).isNullOrBlank() }
+			if(missingEnvVars.isNotEmpty()) {
+				throw RuntimeException("missing required environment variables " +
+						"${missingEnvVars.joinToString(",\n", "\n")}.")
+			}
+
 			client = createClient().also { apiClient ->
 				// Keep requests without timeout for long-running watch/poll operations.
 				apiClient.readTimeout = 0
