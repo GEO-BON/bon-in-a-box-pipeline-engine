@@ -21,7 +21,7 @@ fun getOpenEODescription(key: String): Map<String, Any> {
 
     val yaml = Yaml()
     val source = yaml.load<Map<String, Any>>(sourceFile.readText())
-    val udps = source["UDPs"] as? Map<*,*>
+    val udps = source["CDSE"] as? Map<*,*>
         ?: throw RuntimeException("No UDPs found in externalScripts.yaml")
     val udp = udps[key] as? Map<*,*>
         ?: throw RuntimeException("$key not found in UDPs")

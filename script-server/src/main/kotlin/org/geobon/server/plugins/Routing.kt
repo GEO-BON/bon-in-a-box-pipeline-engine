@@ -82,7 +82,7 @@ fun Application.configureRouting() {
                     val udpList = mutableMapOf<String, String>()
                     if (openEOFile.exists()) {
                         val yaml = Yaml().load<Map<String, Any>>(openEOFile.readText())
-                        val udps = yaml["UDPs"] as? Map<*, *>
+                        val udps = yaml["CDSE"] as? Map<*, *>
                         udps?.forEach { (key, value) ->
                             if(key is String && value is  Map<*,*>) {
                                 val name = value["name"]
