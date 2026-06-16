@@ -166,14 +166,15 @@ abstract class YMLStep(
                 }
         }
         /**
-         * @return Load description of script
+         * @param relativePath the relative path to the .yml description file
+         * @return the pipeline metadata as a deep map.
+         * @see org.geobon.script.Description for return value structure
          */
-        fun getScriptDescription(path: String): Map<String, Any> {
-            val ymlPath = path.replace('>', '/').replace(Regex("""\.\w+$"""), ".yml")
-            var scriptFile = File(ServerContext.scriptsRoot, ymlPath)
+        fun getScriptDescription(relativePath: String): Map<String, Any> {
+            var scriptFile = File(ServerContext.scriptsRoot, relativePath)
 
             if (!scriptFile.exists()) {
-                scriptFile = File(ServerContext.scriptStubsRoot, ymlPath)
+                scriptFile = File(ServerContext.scriptStubsRoot, relativePath)
 
                 if (!scriptFile.exists()) {
                     throw FileNotFoundException("$scriptFile does not exist.")

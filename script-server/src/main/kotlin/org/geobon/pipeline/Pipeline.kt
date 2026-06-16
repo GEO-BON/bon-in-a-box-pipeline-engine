@@ -424,9 +424,14 @@ open class Pipeline (
             }
         }
 
-        fun getPipelineDescription(path: String): JSONObject {
+        /**
+         * @param relativePath relative path to the JSON file
+         * @return the pipeline metadata as a JSONObject
+         * @see org.geobon.script.Description for return value structure
+         */
+        fun getPipelineDescription(relativePath: String): JSONObject {
             val descriptionFile =
-                File(ServerContext.pipelinesRoot, path.replace('>', '/'))
+                File(pipelinesRoot, relativePath)
 
             if (descriptionFile.exists()) {
                 val descriptionJSON = JSONObject(descriptionFile.readText())

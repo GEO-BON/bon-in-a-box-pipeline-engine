@@ -155,11 +155,15 @@ fun Application.configureRouting() {
                 val descriptionPath = call.parameters["descriptionPath"] ?: return@get
                 when (type) {
                     "script" -> {
-                        call.respond(YMLStep.getScriptDescription(descriptionPath))
+                        val ymlPath = descriptionPath
+                            .replace('>', '/')
+                            .replace(Regex("""\.\w+$"""), ".yml")
+                        call.respond(YMLStep.getScriptDescription(ymlPath))
                     }
 
                     "pipeline" -> {
-                        call.respondText(Pipeline.getPipelineDescription(descriptionPath).toString(), ContentType.Application.Json)
+                        val jsonPath = descriptionPath.replace('>', '/')
+                        call.respondText(Pipeline.getPipelineDescription(jsonPath).toString(), ContentType.Application.Json)
                     }
                     "openEO" -> {
                         call.respond(getOpenEODescription(descriptionPath))
