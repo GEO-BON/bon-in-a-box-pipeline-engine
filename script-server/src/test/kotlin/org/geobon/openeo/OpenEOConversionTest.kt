@@ -25,6 +25,8 @@ class OpenEOConversionTest {
         assertEquals("other", result["license"])
         assertTrue((result["external_link"] as String).startsWith("https://algorithm-catalogue.apex.esa.int/apps/"))
         assertEquals(2, authors.size)
+        assertEquals("Emile Sonneveld", (authors[0] as Map<*,*>)["name"])
+        assertEquals("https://github.com/EmileSonneveld/", (authors[0] as Map<*,*>)["identifier"])
     }
 
     @Test
