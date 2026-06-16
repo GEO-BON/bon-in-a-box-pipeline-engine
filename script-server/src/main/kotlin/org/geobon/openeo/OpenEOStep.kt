@@ -178,16 +178,14 @@ fun convertInputs(processJson: JSONObject): Map<String, Any> {
             }
 
             rawType == "array" -> {
-                val itemType = schema
-                    ?.optJSONObject("items")
-                    ?.optJSONArray("anyOf")
-                    ?.let { anyOf ->
-                        (0 until anyOf.length())
-                            .mapNotNull { anyOf.optJSONObject(it)?.optString("type")?.takeIf { t -> t.isNotEmpty() && t != "null" } }
-                            .firstOrNull()
-                    }
-                    ?: schema?.optJSONObject("items")?.optString("type")
-                    ?: throw RuntimeException("Could not determine item type for parameter '$id'")
+                val itemType = schema.optJSONObject("items")?.let { items ->
+                    items.optJSONArray("anyOf")?.let { anyOf ->
+                        (0 until anyOf.length()).firstNotNullOfOrNull {
+                            anyOf.optJSONObject(it)?.optString("type")
+                                ?.takeIf { t -> t.isNotEmpty() && t != "null" }
+                        }
+                    } ?: items.optString("type")
+                } ?: throw RuntimeException("Could not determine item type for parameter '$id'")
 
                 input["type"] = "${mapType(itemType)}[]"
             }
@@ -207,17 +205,17 @@ fun convertInputs(processJson: JSONObject): Map<String, Any> {
 }
 
 fun addOutputs(): Map<String, Any> {
-    val outputYaml = mutableMapOf<String, Any>()
-    val outputs = mutableMapOf<String, Any>()
     val output = mutableMapOf<String, Any>()
-
     output["label"] = "Output raster"
     output["description"] = "Output raster of the process, generated from the output datacube."
     output["type"] = "image/tiff;application=geotiff"
+
+    // For openEO steps there is always a single output.
+    val outputs = mutableMapOf<String, Any>()
     outputs["output_raster"] = output
 
+    val outputYaml = mutableMapOf<String, Any>()
     outputYaml["outputs"] = outputs
-
     return outputYaml
 }
 
