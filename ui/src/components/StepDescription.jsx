@@ -199,6 +199,9 @@ function getCodeUrl(ymlPath, scriptFileName) {
         return null
     }
 
+    if(scriptFileName.startsWith("http://") || scriptFileName.startsWith("https://"))
+        return scriptFileName
+
     return 'https://github.com/GEO-BON/biab-2.0/tree/main/scripts/' + removeLastSlash(ymlPath.replaceAll('>', '/')) + scriptFileName
 }
 
