@@ -392,7 +392,7 @@ conda: # Optional, only needed if you need packages not in the central environme
     - r-sf
     - r-terra
 compute: # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.
-  hpc: false # Send to a HPC cluster, if available
+  hpc: false # Optional, send to a HPC cluster if available. Defaults to false.
   mem: 4Gi # Hard cap for the memory usage, default 4Gi.
   cpus-per-task: 4 # Number of CPU  allocated, default 4.
   time: "02:00:00" # Only when "hpc: true", maximum time allowed before the job is interrupted.
@@ -440,6 +440,12 @@ conda: # Optional, only needed if your script has specific package dependencies
     - # list here
   dependencies: # any packages that are dependent on a specfic version
     - # list here
+
+compute: # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.
+  hpc: false # Optional, send to a HPC cluster if available. Defaults to false.
+  mem: 4Gi # Hard cap for the memory usage, default 4Gi.
+  cpus-per-task: 4 # Number of CPU  allocated, default 4.
+  time: "02:00:00" # Only when "hpc: true", maximum time allowed before the job is interrupted.
 ```
 
 See [example](https://GitHub.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/helloR.R)
