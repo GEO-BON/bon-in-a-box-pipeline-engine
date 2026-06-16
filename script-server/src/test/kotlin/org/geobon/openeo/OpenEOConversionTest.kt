@@ -1,5 +1,7 @@
 package org.geobon.openeo
 
+import io.kotest.matchers.string.Diff
+import io.ktor.http.parameters
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -42,6 +44,15 @@ class OpenEOConversionTest {
 
         val inputs = result["inputs"] as Map<*, *>
         assertEquals(8, inputs.size)
+    }
+
+    @Test
+    fun convertInputsNoParameters() {
+        val json = loadTestResource("processExample.json")
+        json.remove("parameters")
+        val result = convertInputs(json)
+
+        assertTrue(result.isEmpty())
     }
 
     @Test

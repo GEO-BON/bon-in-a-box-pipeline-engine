@@ -136,7 +136,8 @@ fun convertInputs(processJson: JSONObject): Map<String, Any> {
 
     val inputs = mutableMapOf<String, Any>()
     for (i in 0 until parameters.length()) {
-        val param = parameters.getJSONObject(i)
+        val param = parameters.optJSONObject(i)
+            ?: throw RuntimeException("Parameter at index $i is not a JSON object.")
         val id = param.getString("name")
         val schemaObj = param.optJSONObject("schema")
         val schemaArr = param.optJSONArray("schema")
