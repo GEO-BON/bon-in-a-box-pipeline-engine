@@ -44,6 +44,7 @@ export default function IONode({ id, data }) {
     case 'udp':
       stepType = 'openEO';
       break;
+    case 'yml':
     default:
       stepType = 'script';
   }
