@@ -82,11 +82,13 @@ fun Application.configureRouting() {
                     val udpList = mutableMapOf<String, String>()
                     if (openEOFile.exists()) {
                         val yaml = Yaml().load<Map<String, Any>>(openEOFile.readText())
-                        val udps = yaml["UDPs"] as? Map<String, Map<String, String>>
+                        val udps = yaml["UDPs"] as? Map<*, *>
                         udps?.forEach { (key, value) ->
-                            val name = value["name"] as? String
-                            if (name != null) {
-                                udpList[key] = name
+                            if(key is String && value is  Map<*,*>) {
+                                val name = value["name"]
+                                if (name is String) {
+                                    udpList[key] = name
+                                }
                             }
                         }
                     }
@@ -96,9 +98,10 @@ fun Application.configureRouting() {
                             text = "No UPD files were found on this server.",
                             status = HttpStatusCode.NotFound
                         )
-                        return@get
+                    } else {
+                        call.respond(udpList.toSortedMap(String.CASE_INSENSITIVE_ORDER))
                     }
-                    call.respond(udpList.toSortedMap(String.CASE_INSENSITIVE_ORDER))
+
                     return@get
                 }
 
@@ -162,7 +165,7 @@ fun Application.configureRouting() {
                         call.respond(getOpenEODescription(descriptionPath))
                     }
                 }
-            } catch (error: FileNotFoundException) {
+            } catch (_: FileNotFoundException) {
                 call.respondText(text = "Requested files not found.", status = HttpStatusCode.NotFound)
 
             } catch (ex: Exception) {
@@ -329,7 +332,7 @@ fun Application.configureRouting() {
                 val requestBody = call.receive<String>()
                 val requestJSON = try {
                     JSONObject(requestBody)
-                } catch (e: JSONException) {
+                } catch (_: JSONException) {
                     call.respond(
                         HttpStatusCode.BadRequest,
                         gson.toJson(mapOf("success" to false, "error" to "Invalid JSON"))
