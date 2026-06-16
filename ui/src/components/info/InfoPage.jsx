@@ -63,7 +63,7 @@ export default function InfoPage() {
         Only the scripts that are marked as supporting HPC in their metadata will be sent.
       </p>
       <HPCStatus />
-
+      <div style={{ height: '40px' }}></div>
     </>
   );
 }
