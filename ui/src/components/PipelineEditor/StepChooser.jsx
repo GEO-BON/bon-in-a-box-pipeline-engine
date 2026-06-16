@@ -99,8 +99,8 @@ export default function StepChooser(_) {
 
     api.getListOf("openEO", (error, udpList, response) => {
       if (error) {
-        console.error(error);
-        setUdpFiles(<HttpError httpError={error} response={response} context="unable ot get list of UDP files" />)
+        console.warn("No UPDs found, hiding openEO branch");
+        setUdpFiles(null)
       } else {
         setUdpFiles(udpList);
       }
@@ -310,7 +310,7 @@ export default function StepChooser(_) {
               </div>
             )}
 
-            {udpFiles && (
+            {udpFiles && Object.keys(udpFiles).length > 0 && (
               <div key="openEO">
                 <h3>openEO</h3>
                 {isValidElement(udpFiles) && udpFiles.type === HttpError ? udpFiles :
