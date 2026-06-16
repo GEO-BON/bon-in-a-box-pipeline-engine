@@ -1,4 +1,4 @@
-UDPs:
+CDSE:
   UDP1.udp:
     name: udp1
     url: https://somewhere.com/udp1.json
