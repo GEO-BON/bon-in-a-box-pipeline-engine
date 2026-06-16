@@ -113,7 +113,7 @@ fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
         }
 
         if (!authors.isNullOrEmpty()) {
-            outputYaml["authors"] = authors
+            outputYaml["author"] = authors
         } else {
             logger.warn("No authors found in catalog file...")
         }
