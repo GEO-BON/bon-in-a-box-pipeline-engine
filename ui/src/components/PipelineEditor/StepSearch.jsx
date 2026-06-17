@@ -151,52 +151,36 @@ function sortResults(arr) {
 //   type: "pipeline" | "script" | "openEO"
 // }
 export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles, udpFiles) {
-  let results = [];
   if (searchKeywords.length === 0) {
-    return results;
+    return [];
   }
 
-  // Process pipelines
-  if (pipelineFiles && !isValidElement(pipelineFiles)) {
-    Object.entries(pipelineFiles).forEach(([descriptionFile, stepName]) => {
-      const metadata = getStepDescription(descriptionFile);
-      const result = scoreResult(searchKeywords, descriptionFile, stepName, metadata);
-      if (result.score > 0) {
-        result.type = "pipeline";
-        results.push(result);
-      }
-    });
-  }
+  // Process pipelines, scripts and openEO
+  let pipelines = filterAndRankType(searchKeywords, "pipeline", pipelineFiles);
+  let scripts = filterAndRankType(searchKeywords, "script", scriptFiles);
+  let openEO = filterAndRankType(searchKeywords, "openEO", udpFiles);
 
-  // Process scripts
-  if (scriptFiles && !isValidElement(scriptFiles)) {
-    Object.entries(scriptFiles).forEach(([descriptionFile, stepName]) => {
-      const metadata = getStepDescription(descriptionFile);
-      const result = scoreResult(searchKeywords, descriptionFile, stepName, metadata);
-      if (result.score > 0) {
-        result.type = "script";
-        results.push(result);
-      }
-    });
-  }
-
-  //Process openEO files
-  if (udpFiles && !isValidElement(udpFiles)) {
-    Object.entries(udpFiles).forEach(([descriptionFile, stepName]) => {
-      const metadata = getStepDescription(descriptionFile);
-      const result = scoreResult(searchKeywords, descriptionFile, stepName, metadata);
-      if (result.score > 0) {
-        result.type = "openEO";
-        results.push(result);
-      }
-    });
-  }
-
-  // Sort, then remove sorting properties
+  // Combine, sort, then remove sorting properties
+  let results = pipelines.concat(scripts, openEO)
   results = sortResults(results)
   results.forEach(result => {
     delete result.score
     delete result.stepName
   });
   return results;
-};
+}
+
+function filterAndRankType(searchKeywords, type, files) {
+  let results = [];
+  if (files && !isValidElement(files)) {
+    Object.entries(files).forEach(([descriptionFile, stepName]) => {
+      const metadata = getStepDescription(descriptionFile);
+      const result = scoreResult(searchKeywords, descriptionFile, stepName, metadata);
+      if (result.score > 0) {
+        result.type = type;
+        results.push(result);
+      }
+    });
+  }
+  return results;
+}
