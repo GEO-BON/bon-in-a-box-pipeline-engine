@@ -127,7 +127,7 @@ export function GeneralDescription({ ymlPath, metadata }) {
             </small></div>
         }
         {metadata.description && <div className="reactMarkdown"><ReactMarkdown children={metadata.description} /></div>}
-        {codeLink && <p>
+        {codeLink && <p style={{wordBreak: 'break-all'}}>
                 Code: <a href={codeLink} target="_blank">{codeLink.substring(codeLink.search(/(scripts|pipelines)\//))}</a>
             </p>
         }
