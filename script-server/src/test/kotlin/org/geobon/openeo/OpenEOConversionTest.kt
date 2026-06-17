@@ -19,7 +19,7 @@ class OpenEOConversionTest {
     fun convertMetadataTest() {
         val json = loadTestResource("catalogExample.json")
         val result = convertMetadata(json)
-        val authors = result["authors"] as ArrayList<*>
+        val authors = result["author"] as ArrayList<*>
 
         assertEquals("https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/main/algorithm_catalog/eurac/sentinel1_sar_coherence/openeo_udp/sentinel1_sar_coherence.json", result["script"])
         assertEquals("Sentinel-1 Coherence", result["name"])
