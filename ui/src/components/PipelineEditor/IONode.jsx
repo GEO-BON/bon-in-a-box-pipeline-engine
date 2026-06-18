@@ -50,10 +50,10 @@ export default function IONode({ id, data }) {
   }
 
   if (!metadata) {
-    return <table className='ioNode' onMouseEnter={showScriptTooltip} onMouseLeave={hideTooltip}
-    style={{padding: '10px', border: '2px dotted red'}}>
+    return <div className='ioNode' onMouseEnter={showScriptTooltip} onMouseLeave={hideTooltip}
+      style={{ padding: '10px', border: '2px dotted red' }}>
       <span className='ioNode-phantom'>{data.descriptionFile}</span>
-      </table>
+    </div>
   }
 
   let pathList = descriptionFileLocation.split('>')
