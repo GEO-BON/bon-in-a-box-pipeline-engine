@@ -27,6 +27,11 @@
 .tooltip .reactMarkdown {
   padding: 0px;
   margin: 0px;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .noLink a {

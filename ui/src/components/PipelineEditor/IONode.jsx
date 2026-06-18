@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { LifecycleMessage } from '../Lifecycle.jsx';
 import isObject from '../../utils/isObject'
 import ReactMarkdown from 'react-markdown'
-
+import { PopupContentContext } from '../../Layout.jsx';
 import { fetchStepDescription } from './StepDescriptionStore'
+import { StepDescription } from '../StepDescription.jsx';
 
 // props content, see https://reactflow.dev/docs/api/nodes/custom-nodes/#passed-prop-types
 export default function IONode({ id, data }) {
   const [descriptionFileLocation] = useState(data.descriptionFile);
   const [metadata, setMetadata] = useState(null);
+  const { setPopupContent } = useContext(PopupContentContext)
 
   useEffect(() => {
     if (descriptionFileLocation) {
@@ -24,7 +26,12 @@ export default function IONode({ id, data }) {
       data.setToolTip(<span>Script or pipeline not found. Remove or replace this step to avoid errors.</span>);
       return;
     }
-    data.setToolTip(<div className="reactMarkdown noLink"><ReactMarkdown>{metadata.description}</ReactMarkdown></div>)
+    data.setToolTip(
+      <div className="reactMarkdown noLink">
+        <ReactMarkdown disallowedElements={['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'img']}>
+          {metadata.description}
+        </ReactMarkdown>
+      </div>)
   }
 
   function hideTooltip() {
@@ -49,7 +56,15 @@ export default function IONode({ id, data }) {
   }
 
   let stepType = /\.json$/i.test(descriptionFileLocation) ? 'pipeline' : 'script'
-  return <table className={`ioNode ${stepType}`}><tbody>
+  return <>
+  <table className={`ioNode ${stepType}`} onDoubleClick={() =>
+    setPopupContent(
+      <StepDescription
+        descriptionFile={descriptionFileLocation}
+        metadata={metadata}
+      />
+  )}>
+    <tbody>
     <tr>
       <td className='inputs'>
         {metadata.inputs && Object.entries(metadata.inputs).map(([inputName, desc]) => {
@@ -83,7 +98,9 @@ export default function IONode({ id, data }) {
         })}
       </td>
     </tr>
-  </tbody></table>
+    </tbody>
+  </table>
+  </>
 }
 
 function ScriptIO({children, desc, setToolTip, onDoubleClick, warning}) {
