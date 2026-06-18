@@ -60,7 +60,6 @@ function generatePersonList(list) {
 
         let hoverCardDisplay = <>
             <div className="popover-heading">
-                <p>HIIIIIII</p>
                 <h3>{person.name}</h3>
                 {identifierLogo && <IdentifierLogo src={identifierLogo} href={person.identifier} />}
             </div>
