@@ -38,6 +38,12 @@ export default function IONode({ id, data }) {
     data.setToolTip(null)
   }
 
+  useEffect(() => {
+    return () => {
+      data.setToolTip(null);
+    }
+  }, [])
+
   function checkForWarning(desc) {
     return !desc.label ? "Label missing in script's description file" :
       !desc.description ? "Description missing in script's description file" : null;
