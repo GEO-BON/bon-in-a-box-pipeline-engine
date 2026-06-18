@@ -122,7 +122,7 @@ export default class DefaultApi {
      * @param {Number} [start] Start index for pagination
      * @param {Number} [limit] Limit the number of results
      * @param {String} [keyword] Filter search based on keyword. This applies to the script/pipeline names and their inputs.
-     * @param {Array.<module:model/String>} [filterStatus] Filter option based on pipeline status.
+     * @param {Array.<module:model/String>} [filterStatus] Filter option based on pipeline status. The default value is \"all\" when null.
      * @param {module:api/DefaultApi~getHistoryCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/GetHistory200ResponseInner>}
      */
@@ -197,6 +197,42 @@ export default class DefaultApi {
       let returnType = Info;
       return this.apiClient.callApi(
         '/{type}/{descriptionPath}/info', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the getK8sStatus operation.
+     * @callback module:api/DefaultApi~getK8sStatusCallback
+     * @param {String} error Error message, if any.
+     * @param {Object.<String, module:model/{String: GetHPCStatus200ResponseValue}>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get status of Kubernetes cluster workers.
+     * @param {module:api/DefaultApi~getK8sStatusCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Object.<String, module:model/{String: GetHPCStatus200ResponseValue}>}
+     */
+    getK8sStatus(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = {'String': GetHPCStatus200ResponseValue};
+      return this.apiClient.callApi(
+        '/api/k8s/status', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -524,6 +560,41 @@ export default class DefaultApi {
       let returnType = null;
       return this.apiClient.callApi(
         '/hpc/prepare', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
+     * Callback function to receive the result of the prepareK8s operation.
+     * @callback module:api/DefaultApi~prepareK8sCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Refresh and validate Kubernetes worker readiness for BON in a Box tasks.
+     * @param {module:api/DefaultApi~prepareK8sCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    prepareK8s(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = [];
+      let returnType = null;
+      return this.apiClient.callApi(
+        '/api/k8s/prepare', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );

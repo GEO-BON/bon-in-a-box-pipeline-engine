@@ -9,6 +9,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
 import org.geobon.hpc.HPC
+import org.geobon.k8s.K8sConnection
 import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
@@ -43,7 +44,8 @@ private val logger: Logger = LoggerFactory.getLogger("Server")
 fun Application.configureRouting() {
 
     val hpc = HPC()
-    val serverContext = ServerContext(hpc)
+    val k8s = K8sConnection()
+    val serverContext = ServerContext(hpc, k8s)
 
     routing {
         get("/api/systemStatus") {
@@ -308,6 +310,24 @@ fun Application.configureRouting() {
             }
 
             // We respond OK immediately when started, status API can be checked for progress.
+            call.respond(HttpStatusCode.OK)
+        }
+
+        get("/api/k8s/status") {
+            k8s.refreshStatus()
+            call.respond(k8s.statusMap())
+        }
+
+        get("/api/k8s/prepare") {
+            if (!k8s.configured) {
+                call.respond(HttpStatusCode.ServiceUnavailable, "Kubernetes not configured on this server")
+                return@get
+            }
+
+            launch {
+                k8s.refreshStatus()
+            }
+
             call.respond(HttpStatusCode.OK)
         }
 

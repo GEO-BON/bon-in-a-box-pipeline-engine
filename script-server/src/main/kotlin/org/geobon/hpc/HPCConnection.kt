@@ -3,6 +3,8 @@ package org.geobon.hpc
 import kotlinx.coroutines.*
 import org.geobon.pipeline.outputRoot
 import org.geobon.script.ScriptType
+import org.geobon.server.RemoteSetup
+import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
@@ -400,7 +402,7 @@ class HPCConnection(
         // Exit code 143 for SIGTERM, see https://medium.com/@himanshurahangdale153/list-of-exit-status-codes-in-linux-f4c00c46c9e0
         sBatchFileLocal.writeText("""
             #!/bin/bash
-            #SBATCH --mem=${requirements.memoryG}G
+            #SBATCH --mem=${requirements.mem}
             #SBATCH --cpus-per-task=${requirements.cpus}
             #SBATCH --time=${requirements.duration.toSlurmDuration()}
             #SBATCH --nodes=1

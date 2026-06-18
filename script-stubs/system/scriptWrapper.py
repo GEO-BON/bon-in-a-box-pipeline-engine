@@ -53,7 +53,8 @@ if __name__ == "__main__":
 		if biab_output_list:
 			print("Writing outputs to BON in a Box...", flush=True)
 			with open(output_folder + "/output.json", "w") as outfile:
-				outfile.write(json.dumps(biab_output_list, indent = 2))
+				json.dump(biab_output_list, outfile, indent = 2)
+				outfile.flush()
 
 		# Capture dependencies for this run
 		print("Writing dependencies to file...", flush=True)
