@@ -1,5 +1,7 @@
 package org.geobon.openeo
 
+import org.geobon.script.Description.EXTERNAL_LINK
+import org.geobon.script.Description.SCRIPT
 import org.geobon.server.ServerContext
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -90,9 +92,9 @@ fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
         logger.warn("Process file not found...")
     else {
         // The UDP process graph
-        outputYaml["script"] = processUrl
+        outputYaml[SCRIPT] = processUrl
         // The APEx catalogue entry
-        outputYaml["external_link"] = "https://algorithm-catalogue.apex.esa.int/apps/" +
+        outputYaml[EXTERNAL_LINK] = "https://algorithm-catalogue.apex.esa.int/apps/" +
                 processUrl.substringAfterLast('/').removeSuffix(".json")
     }
 
@@ -211,8 +213,8 @@ fun convertInputs(processJson: JSONObject): Map<String, Any> {
                 if (rawType != null) input["type"] = mapType(rawType)
             }
         }
-        val default = param.opt("default").takeIf { it != JSONObject.NULL }
-        default?.let { input["example"] = it } ?: run { input["example"] = JSONObject.NULL}
+
+        input["example"] = param.opt("default") ?: JSONObject.NULL
 
         inputs[id] = input
     }

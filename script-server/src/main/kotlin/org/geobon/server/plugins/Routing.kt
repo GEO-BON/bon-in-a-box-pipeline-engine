@@ -166,7 +166,10 @@ fun Application.configureRouting() {
                         call.respondText(Pipeline.getPipelineDescription(jsonPath).toString(), ContentType.Application.Json)
                     }
                     "openEO" -> {
-                        call.respond(getOpenEODescription(descriptionPath))
+                        call.respondText(
+                            JSONObject(getOpenEODescription(descriptionPath)).toString(),
+                            ContentType.Application.Json
+                        )
                     }
                 }
             } catch (_: FileNotFoundException) {
