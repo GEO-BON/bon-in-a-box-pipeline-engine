@@ -37,6 +37,17 @@ export function Layout(props) {
     document.title = title;
   }, [title]);
 
+  useEffect(() => {
+    if(popupContent) {
+      const handleKeyDown = (e) => {
+        if (e.key === "Escape") setPopupContent(null);
+      };
+
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [popupContent, setPopupContent]);
+
   return (
     <PopupContentContext.Provider value={{popupContent, setPopupContent}}>
       <TitleContext.Provider value={{ title, setTitle }}>
