@@ -11,12 +11,17 @@ import { StepDescription } from '../StepDescription.jsx';
 export default function IONode({ id, data }) {
   const [descriptionFileLocation] = useState(data.descriptionFile);
   const [metadata, setMetadata] = useState(null);
+  const [missing, setMissing] = useState(false);
   const { setPopupContent } = useContext(PopupContentContext)
 
   useEffect(() => {
     if (descriptionFileLocation) {
       fetchStepDescription(descriptionFileLocation, (newMetadata) => {
-        setMetadata(newMetadata)
+        if(!newMetadata) {
+          setMissing(true)
+        } else {
+          setMetadata(newMetadata)
+        }
       })
     }
   }, [descriptionFileLocation])
@@ -49,12 +54,15 @@ export default function IONode({ id, data }) {
       !desc.description ? "Description missing in script's description file" : null;
   }
 
-  if (!metadata) {
+  if (missing) {
     return <div className='ioNode' onMouseEnter={showScriptTooltip} onMouseLeave={hideTooltip}
       style={{ padding: '10px', border: '2px dotted red' }}>
       <span className='ioNode-phantom'>{data.descriptionFile}</span>
     </div>
   }
+
+  if(!metadata)
+    return null // currently loading
 
   let pathList = descriptionFileLocation.split('>')
   if(metadata.name) {
