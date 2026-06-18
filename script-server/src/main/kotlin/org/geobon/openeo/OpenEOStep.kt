@@ -33,6 +33,12 @@ fun getOpenEODescription(key: String): Map<String, Any> {
     // Use shorter name from UDP list if different from the one in the catalog,
     // preserve the original name in the description
     val name = udp["name"] as? String
+    var message = ""
+    if (System.getenv("CDSE_CLIENT_ID").isNullOrBlank() || System.getenv("CDSE_CLIENT_SECRET").isNullOrBlank()) {
+        message = " Please add your CDSE credentials to your runner.env file to run this script."
+    }
+    outputFile["description"] =
+        "${outputFile["description"]}\n\n" + "This script runs on openEO." + message
     if (name != null && outputFile["name"] != name) {
         outputFile["description"] = "### ${outputFile["name"]}\n\n${outputFile["description"]}"
         outputFile["name"] = name
