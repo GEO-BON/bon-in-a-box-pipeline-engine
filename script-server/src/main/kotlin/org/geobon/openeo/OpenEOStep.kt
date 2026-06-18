@@ -29,8 +29,10 @@ fun getOpenEODescription(key: String): Map<String, Any> {
         ?: throw RuntimeException("No catalog url found for $key")
 
     val outputFile = convertFromOpenEo(url).toMutableMap()
-    val name = udp["name"] as? String
 
+    // Use shorter name from UDP list if different from the one in the catalog,
+    // preserve the original name in the description
+    val name = udp["name"] as? String
     if (name != null && outputFile["name"] != name) {
         outputFile["description"] = "### ${outputFile["name"]}\n\n${outputFile["description"]}"
         outputFile["name"] = name
