@@ -125,19 +125,30 @@ Accepting the updates are generally recommended, unless:
 
 ## Deploying BON in a Box on a server {#deploying-the-servers-remotely}
 
-Installation steps on a server are the same as installing on a Linux computer, but some additional configurations need to be changed:
+Installation steps on a server are the same as installing on a Linux computer, but some additional configurations need to be changed.
 
--   In `runner.env`, choose the appropriate `HTTP_ADDRESS` and `HTTP_PORT` for your server configuration. In a typical installation, use 0.0.0.0 as an HTTP address and default port (80).
+In `runner.env`:
 
--   In `runner.env`, select the "partial" cache cleaning mode. This will allow for calculated results to be long-lived on the server, as long as they are not run again with a new version of the script. The results in the output folder are always accessible by URL.
+-   Choose the appropriate `HTTP_ADDRESS` and `HTTP_PORT` for your server configuration. In a typical installation, use 0.0.0.0 as an HTTP address and default port (80).
+
+-   Set `SCRIPT_SERVER_CACHE_CLEANER=partial`. This will allow for calculated results to be long-lived on the server, as long as they are not run again with a new version of the script. The results in the output folder are always accessible by URL.
+
+-   To prevent users to modify the pipelines, set `SAVE_PIPELINE_TO_SERVER=deny`
+
+-   It is recommended to use a captcha on public-facing servers. Add your keys for Google's repatcha.
 
 -   In the case where a server is used for demonstration purposes only, set environment variable `BLOCK_RUNS=true`
+
+-   Configure the "Cloud-scaling" section if you have access to a kubernetes cluster. This is still experimental.
+
+-   Connecting to a High-Performance Computer (HPC) is still experimental. Refer to the [developer documentation](README-dev.html#setting-up-drac-cluster-connection) for guidance and limitations.
+
+Server setup:
 
 -   The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.
 
 -   By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy (documentation [here](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)) and activate https with certbot (documentation [here](https://certbot.eff.org/)).
 
--   Connecting to a High-Performance Computer (HPC) is still experimental. Refer to the [developer documentation](README-dev.html#setting-up-drac-cluster-connection).
 
 # Troubleshooting
 
