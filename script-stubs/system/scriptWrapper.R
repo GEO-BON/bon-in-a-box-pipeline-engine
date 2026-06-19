@@ -122,7 +122,6 @@ tryCatch(
                     cat("Suppressed: ignoring SIGPIPE signal\n");
                 } else {
                     exitCode <<- 1
-                    cat("Switched exit code to 1\n")
                     if (is.null(biab_output_list[["error"]])) {
                         biab_output_list[["error"]] <<- conditionMessage(e)
                         cat("Caught error, stack trace:\n")
