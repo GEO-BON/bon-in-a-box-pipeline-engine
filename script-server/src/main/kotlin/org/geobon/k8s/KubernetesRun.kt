@@ -9,6 +9,8 @@ import org.geobon.script.ComputeRequirements
 import org.geobon.script.Run
 import org.geobon.script.ScriptType
 import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.condaPackDir
+import org.geobon.server.ServerContext.Companion.condaPackURL
 import org.geobon.server.plugins.Containers
 import java.io.File
 import java.util.*
@@ -230,19 +232,32 @@ class KubernetesRun(
 
         val escapedOutputPath = outputPath.replace(" ", "\\ ")
         val condaEnvScript = "$scriptStubsPath/system/condaEnvironment.sh"
+        val condaPackScript = "$scriptStubsPath/system/condaPackEnvironment.sh"
+
+        val condaUnpackArgs =
+            if (condaPackDir != null) """ "$condaPackDir" "$condaPackURL" """
+            else ""
+
+        val condaPackCmd =
+            if (condaPackDir != null) "scriptExitCode=\$?; " +
+                    """source $condaPackScript "$condaEnvName" "$condaPackDir" ; """ +
+                    "exit \$scriptExitCode"
+            else ""
 
         return when (scriptType) {
             ScriptType.R -> {
                 """
-                    source $condaEnvScript $escapedOutputPath ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
-                    Rscript $scriptStubsPath/system/scriptWrapper.R $outputPath $scriptPath
+                    source $condaEnvScript $escapedOutputPath ${condaEnvName ?: "rbase"} "$condaEnvYml" $condaUnpackArgs ;
+                    Rscript $scriptStubsPath/system/scriptWrapper.R $outputPath $scriptPath ;
+                    $condaPackCmd
                 """.trimIndent()
             }
 
             ScriptType.PYTHON -> {
                 """
-                    source $condaEnvScript $escapedOutputPath ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
-                    python3 $scriptStubsPath/system/scriptWrapper.py $escapedOutputPath $scriptPath
+                    source $condaEnvScript $escapedOutputPath ${condaEnvName ?: "pythonbase"} "$condaEnvYml" $condaUnpackArgs ;
+                    python3 $scriptStubsPath/system/scriptWrapper.py $escapedOutputPath $scriptPath ;
+                    $condaPackCmd
                 """.trimIndent()
             }
 
