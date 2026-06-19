@@ -5,6 +5,8 @@ condaPackDir=$2
 # Conda-pack the environment if a folder was supplied.
 if [[ -d "$condaPackDir" ]]; then
     if mamba env list | grep -q "\b$condaEnvName\b"; then
+        # TODO Check if the .yml dependencies have changed since the last pack.
+        
         tar=$condaPackDir/$condaEnvName.tar
         zip=$tar.gz
 
