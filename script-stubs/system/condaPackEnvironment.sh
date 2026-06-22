@@ -12,22 +12,21 @@ if [[ -d "$condaPackDir" ]]; then
 
         if [ -f "$zip" ]; then
             echo "Conda-pack archive $zip already packed."
-            exit 0
-        fi
-
-        echo "Packing conda environment $condaEnvName."
-        mamba activate base
-        conda-pack --n-threads -1 --quiet -n $condaEnvName -o $tar --compress-level 0
-        if [ $? -ne 0 ]; then
-            echo "Error packing conda environment $condaEnvName."
         else 
-            pigz $tar # parallel compression is much faster than default gzip compression
+            echo "Packing conda environment $condaEnvName."
+            mamba activate base
+            conda-pack --n-threads -1 --quiet -n $condaEnvName -o $tar --compress-level 0
+            if [ $? -ne 0 ]; then
+                echo "Error packing conda environment $condaEnvName."
+            else 
+                pigz $tar # parallel compression is much faster than default gzip compression
 
-            condaEnvFile="/conda-env-yml/$condaEnvName.yml"
-            cp $condaEnvFile $condaPackDir/$condaEnvName.yml
+                condaEnvFile="/conda-env-yml/$condaEnvName.yml"
+                cp $condaEnvFile $condaPackDir/$condaEnvName.yml
 
-            echo "Conda environment packed to $zip using conda-pack!"
-            mamba deactivate # base
+                echo "Conda environment packed to $zip using conda-pack!"
+                mamba deactivate # base
+            fi
         fi
     fi
 fi

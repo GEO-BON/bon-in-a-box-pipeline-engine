@@ -23,7 +23,7 @@ function activateSubEnvironment {
     n=$RANDOM
     condaEnvFile="/conda-env-yml/$condaEnvName.yml"
     condaEnvFileSrc="/conda-env-yml/$condaEnvName.$n.yml"
-    echo "$condaEnvYml" > "$condaEnvFileSrc" ; assertSuccess
+    printf "$condaEnvYml\n" > "$condaEnvFileSrc" ; assertSuccess
 
     mamba env list | grep " $condaEnvName "
     if [[ $? -eq 0 ]] ; then
