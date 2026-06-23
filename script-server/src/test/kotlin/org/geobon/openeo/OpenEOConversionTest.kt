@@ -34,7 +34,7 @@ class OpenEOConversionTest {
     @Test
     fun convertMetadataNoDescriptionTest() {
         val json = loadTestResource("catalogExample.json")
-        json.put("properties", json.getJSONObject("properties").put("description", ""))
+        json.put("properties", json.getJSONObject("properties").remove("description"))
         val result = convertMetadata(json)
         assertFalse(result.containsKey("description"))
     }
