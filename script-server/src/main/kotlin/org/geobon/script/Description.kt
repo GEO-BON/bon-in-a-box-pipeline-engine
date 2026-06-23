@@ -10,6 +10,9 @@ object Description {
     const val NAME = "name"
     const val TIMEOUT = "timeout"
     const val EXTERNAL_LINK = "external_link"
+    const val DESCRIPTION = "description"
+    const val AUTHOR = "author"
+    const val LICENSE = "license"
 
     const val INPUTS = "inputs"
     const val OUTPUTS = "outputs"
@@ -19,6 +22,7 @@ object Description {
     const val IO__LABEL = "label"
     const val IO__EXAMPLE = "example"
     const val IO__PROPERTIES = "properties"
+    const val IO__DESCRIPTION = "description"
 
     const val CONDA = "conda"
     const val CONDA__NAME = "name"
