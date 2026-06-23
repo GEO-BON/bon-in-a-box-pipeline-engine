@@ -135,11 +135,11 @@ fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
 
     val properties = jsonFile.optJSONObject(APEX__PROPERTIES)
     properties?.let {
-        properties.optString(APEX__TITLE).takeIf { it.isNotEmpty() }
-            ?.let { outputYaml[NAME] = it }
+        properties.opt(APEX__TITLE)
+            ?.let { outputYaml[NAME] = it.toString() }
 
-        properties.optString(APEX__DESCRIPTION).takeIf { it.isNotEmpty() }
-            ?.let { outputYaml[DESCRIPTION] = it }
+        properties.opt(APEX__DESCRIPTION)
+            ?.let { outputYaml[DESCRIPTION] = it.toString() }
 
         val contacts = properties.optJSONArray(APEX__CONTACTS)
         val authors = contacts?.let { arr ->
@@ -163,8 +163,8 @@ fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
             logger.warn("No authors found in catalog file...")
         }
 
-        properties.optString(APEX__LICENSE).takeIf { it.isNotEmpty() }
-            ?.let { outputYaml[LICENSE] = it }
+        properties.opt(APEX__LICENSE)
+            ?.let { outputYaml[LICENSE] = it.toString() }
     }
 
 //    val references = linkList
@@ -212,13 +212,12 @@ fun convertInputs(processJson: JSONObject): Map<String, Any> {
 
         val input = mutableMapOf<String, Any?>()
 
-        schema?.optString(UDP__INPUT__TITLE)
-            ?.takeIf { it.isNotEmpty()}
-            ?.let { input[IO__LABEL] = it }
+        schema?.opt(UDP__INPUT__TITLE)
+            ?.let { input[IO__LABEL] = it.toString() }
             ?: run { input[IO__LABEL] = toTitleCase(id) }
 
-        param.optString(DESCRIPTION).takeIf { it.isNotEmpty() }
-            ?.let { input[DESCRIPTION] = it }
+        param.opt(DESCRIPTION)
+            ?.let { input[DESCRIPTION] = it.toString() }
 
         when {
             subtype == UDP__INPUT__BOUNDING_BOX -> {
