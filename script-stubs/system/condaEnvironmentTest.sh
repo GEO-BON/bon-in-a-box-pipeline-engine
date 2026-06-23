@@ -31,15 +31,11 @@ function init {
         --name conda-env-test \
         $IMAGE \
         /bin/bash -c "source /test-folder/condaEnvironmentTest.sh test"
+    exitCode=$?
 
-    if [[ $? -ne 0 ]] ; then
-        echo -e "${RED}Some tests failed.${ENDCOLOR}"
-        exit 1
-    fi
-
-    echo -e "${GREEN}All tests passed!${ENDCOLOR}"
     echo "Cleaning up test folders..."
     rm -rf test-resources test-output
+    exit $exitCode
 }
 
 function verifyPackage {
@@ -119,6 +115,12 @@ function runTests {
 
     echo "Removing test environment..."
     mamba env remove -y -n test1 > /dev/null 2>&1
+
+    if [[ $failures -eq 0 ]]; then
+        echo -e "${GREEN}All tests passed!${ENDCOLOR}"
+    else
+        echo -e "${RED}$failures test(s) failed.${ENDCOLOR}"
+    fi
 
     exit $failures
 }
