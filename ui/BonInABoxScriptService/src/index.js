@@ -17,13 +17,12 @@ import GetHPCStatus200ResponseValue from './model/GetHPCStatus200ResponseValue';
 import GetHistory200ResponseInner from './model/GetHistory200ResponseInner';
 import Info from './model/Info';
 import InfoAuthorInner from './model/InfoAuthorInner';
-import InfoHpc from './model/InfoHpc';
+import InfoCompute from './model/InfoCompute';
 import InfoInputsValue from './model/InfoInputsValue';
 import InfoInputsValueExample from './model/InfoInputsValueExample';
 import InfoInputsValueExampleOneOfInner from './model/InfoInputsValueExampleOneOfInner';
 import InfoLifecycle from './model/InfoLifecycle';
 import InfoOutputsValue from './model/InfoOutputsValue';
-import InfoOutputsValueExample from './model/InfoOutputsValueExample';
 import InfoReferencesInner from './model/InfoReferencesInner';
 import InfoReviewerInner from './model/InfoReviewerInner';
 import DefaultApi from './api/DefaultApi';
@@ -92,10 +91,10 @@ export {
     InfoAuthorInner,
 
     /**
-     * The InfoHpc model constructor.
-     * @property {module:model/InfoHpc}
+     * The InfoCompute model constructor.
+     * @property {module:model/InfoCompute}
      */
-    InfoHpc,
+    InfoCompute,
 
     /**
      * The InfoInputsValue model constructor.
@@ -126,12 +125,6 @@ export {
      * @property {module:model/InfoOutputsValue}
      */
     InfoOutputsValue,
-
-    /**
-     * The InfoOutputsValueExample model constructor.
-     * @property {module:model/InfoOutputsValueExample}
-     */
-    InfoOutputsValueExample,
 
     /**
      * The InfoReferencesInner model constructor.

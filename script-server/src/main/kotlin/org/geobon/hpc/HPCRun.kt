@@ -9,6 +9,7 @@ import org.geobon.pipeline.RunContext
 import org.geobon.pipeline.outputRoot
 import org.geobon.script.Run
 import org.geobon.script.ScriptType
+import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.ServerContext.Companion.userDataRoot
@@ -43,7 +44,7 @@ class HPCRun(
                 val durationMinutes = 10
                 val durationSeconds = durationMinutes * 60
                 for(i in 0..durationSeconds) {
-                    delay(1000) // 1 second
+                    delay(1.seconds)
                     if(hpcConnection.statusFor(scriptType) == RemoteSetupState.READY) {
                         log(logger::debug, "HPC is now ready, waited ${i.seconds}.")
                         break
@@ -141,9 +142,10 @@ class HPCRun(
                 }
 
                 else -> {
-                    log(logger::warn, "An error occurred when running the script: ${ex.message}")
-                    ex.printStackTrace()
-                    output[ERROR_KEY] = ex.message ?: "check logs for details."
+                    if((output[ERROR_KEY] as? String).isNullOrBlank()) {
+                        val message = ex.message ?: "check logs for details."
+                        output[ERROR_KEY] = "An error occurred when running the script: $message".also { log(logger::warn, it) }
+                    }
                 }
             }
 

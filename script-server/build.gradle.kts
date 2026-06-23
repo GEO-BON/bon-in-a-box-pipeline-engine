@@ -80,6 +80,8 @@ dependencies {
     // https://github.com/vishna/watchservice-ktx?tab=readme-ov-file
     implementation("com.github.vishna:watchservice-ktx:master-SNAPSHOT")
 
+    // Source: https://mvnrepository.com/artifact/io.kubernetes/client-java
+    implementation("io.kubernetes:client-java:26.0.0")
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")

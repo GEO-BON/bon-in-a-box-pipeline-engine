@@ -1,6 +1,4 @@
-package org.geobon.hpc
-
-import org.geobon.server.plugins.Containers
+package org.geobon.server
 
 open class RemoteSetup(
     var state: RemoteSetupState = RemoteSetupState.NOT_CONFIGURED,
@@ -9,7 +7,7 @@ open class RemoteSetup(
 ) {
     fun statusMap(): Map<String, String?> {
         return mapOf(
-            "state" to state.toString(),
+            "state" to state.name,
             "image" to image,
             "message" to message
         )
@@ -19,13 +17,3 @@ open class RemoteSetup(
 enum class RemoteSetupState {
     NOT_CONFIGURED, CONFIGURED, PREPARING, READY, ERROR
 }
-
-
-class ApptainerImage (
-    val container: Containers,
-    state: RemoteSetupState = RemoteSetupState.NOT_CONFIGURED,
-    image: String? = null,
-    message: String? = null,
-    var imagePath: String? = null,
-    var overlayPath: String? = null
-): RemoteSetup(state, image, message)

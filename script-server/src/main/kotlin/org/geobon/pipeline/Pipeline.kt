@@ -119,7 +119,6 @@ open class Pipeline (
     }
 
     override suspend fun execute() {
-        logger.info("TEMP Starting pipeline $this")
         coroutineScope {
             finalSteps.forEach { launch { it.execute() } }
         } // exits when all final steps have their results
