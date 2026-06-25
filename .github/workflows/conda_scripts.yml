@@ -1,0 +1,17 @@
+name: Conda and conda-pack scripts tests
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "script-stubs/system/conda*"
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run conda scripts tests
+      working-directory: script-stubs/system
+      run: condaEnvironmentTest.sh
+      shell: bash
