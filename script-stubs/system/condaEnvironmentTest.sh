@@ -28,7 +28,7 @@ function init {
         -u $MY_UID:$DOCKER_GID \
         -v $(pwd):/test-folder:rw \
         -v $(pwd)/test-resources/runner.env:/runner.env:ro \
-        -w test-folder \
+        -w /test-folder \
         --name conda-env-test \
         $IMAGE \
         /bin/bash -c "source /test-folder/condaEnvironmentTest.sh test"
@@ -50,9 +50,9 @@ function test1 {
     source condaEnvironment.sh \
         test-output \
         test1 \
-        "channels: [conda-forge]\ndependencies: [ca-certificates]\nname: test1"
+        "channels: [conda-forge]\ndependencies: [xz]\nname: test1"
     assertSuccess
-    verifyPackage test1 ca-certificates ; assertSuccess
+    verifyPackage test1 xz ; assertSuccess
     echo -e "${GREEN}T1. Success!${ENDCOLOR}"
 }
 
@@ -73,25 +73,33 @@ function test2 {
 
 function test3 {
     echo "T3. Not using the packed env if yml file different..."
+    mamba env remove -y -n test1 > /dev/null 2>&1
     source condaEnvironment.sh \
         test-output \
         test1 \
-        "channels: [conda-forge]\ndependencies: [xz]\nname: test1" \
+        "channels: [conda-forge]\ndependencies: [ca-certificates]\nname: test1" \
         test-output
     assertSuccess
-    verifyPackage test1 xz ; assertSuccess
+    verifyPackage test1 ca-certificates ; assertSuccess
     echo -e "${GREEN}T3. Success!${ENDCOLOR}"
 }
 
 function test4 {
     echo "T4. Using conda-packed env..."
+    which xz
+    if [[ $? -eq 0 ]]; then
+        echo -e "${RED}FAILED: xz should not be available in the base environment before the test.${ENDCOLOR}"
+        exit 1
+    fi
+
+    mamba env remove -y -n test1 > /dev/null 2>&1
     source condaEnvironment.sh \
         test-output \
         test1 \
         "channels: [conda-forge]\ndependencies: [xz]\nname: test1" \
         test-output
     assertSuccess
-    verifyPackage test1 xz ; assertSuccess
+    which xz ; assertSuccess
     if [ ! -d "test-output/test1" ]; then
         echo -e "${RED}FAILED: Conda-packed environment test-output/test1 not found.${ENDCOLOR}"
         exit 1
