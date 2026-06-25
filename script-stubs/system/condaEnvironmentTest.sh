@@ -28,6 +28,7 @@ function init {
         -u $MY_UID:$DOCKER_GID \
         -v $(pwd):/test-folder:rw \
         -v $(pwd)/test-resources/runner.env:/runner.env:ro \
+        -w test-folder \
         --name conda-env-test \
         $IMAGE \
         /bin/bash -c "source /test-folder/condaEnvironmentTest.sh test"
@@ -100,7 +101,6 @@ function test4 {
 
 function runTests {
     echo "Running conda environment tests..."
-    cd /test-folder
     rm -rf test-output/*
 
     failures=0
