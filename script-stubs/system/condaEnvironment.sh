@@ -124,25 +124,25 @@ if [[ "$condaEnvName" == "pythonbase" || "$condaEnvName" == "rbase" ]]; then
 
 # Attempt to unpack and activate the environment if a conda-pack directory is provided
 else
+    # A first lock on the sub-environment
+    # Case: if another step is updating the same environment, we want to wait
+    # for the environment to be ready, hence avoid entering the update
+    # condition and updating twice.
+    #
+    # A second lock on the whole folder happens inside the activateSubEnvironment
+    # function to prevent two different sub-environments from doing transactions
+    # at the same time.
+    lockFile="/conda-env-yml/$condaEnvName.lock"
+    exec {lockfd}>>"$lockFile" ; assertSuccess
+    trap 'exec {lockfd}>&- 2>/dev/null || true' EXIT INT TERM HUP
+    flock --verbose -x "$lockfd" ; assertSuccess
+
     unpackEnvironment
     if [[ $? -ne 0 ]]; then
-        # A first lock on the sub-environment
-        # Case: if another step is updating the same environment, we want to wait
-        # for the environment to be ready, hence avoid entering the update
-        # condition and updating twice.
-        #
-        # A second lock on the whole folder happens inside the activateSubEnvironment
-        # function to prevent two different sub-environments from doing transactions
-        # at the same time.
-        lockFile="/conda-env-yml/$condaEnvName.lock"
-        exec {lockfd}>>"$lockFile" ; assertSuccess
-        trap 'exec {lockfd}>&- 2>/dev/null || true' EXIT INT TERM HUP
-        flock --verbose -x "$lockfd" ; assertSuccess
-
         activateSubEnvironment
-
-        exec {lockfd}>&-
     fi
+
+    exec {lockfd}>&-
 fi
 
 echo "Conda environment ready."
