@@ -32,7 +32,7 @@ function activateSubEnvironment {
             rm "$condaEnvFileSrc" ; assertSuccess
         else
             echo "Updating existing conda environment $condaEnvName..."
-            flock --verbose /conda-env-yml/ mamba env update -y -f "$condaEnvFileSrc"
+            flock --verbose /conda-env-yml/ mamba env update -y -f "$condaEnvFileSrc" ; assertSuccess
             if [[ $? -eq 0 ]] ; then
                 mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
                 echo "Updated successfully."
@@ -40,7 +40,7 @@ function activateSubEnvironment {
         fi
     else
         echo "Creating new conda environment $condaEnvName..."
-        flock --verbose /conda-env-yml/ mamba env create -y -f "$condaEnvFileSrc"
+        flock --verbose /conda-env-yml/ mamba env create -y -f "$condaEnvFileSrc" ; assertSuccess
         if [[ $? -eq 0 ]] ; then
             mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
             echo "Created successfully."
@@ -59,7 +59,7 @@ function activateSubEnvironment {
         echo "$condaEnvName activated"
     else
         echo "Activation failed, will attempt creating..."
-        flock --verbose /conda-env-yml/ mamba env create -y -f $condaEnvFile
+        flock --verbose /conda-env-yml/ mamba env create -y -f $condaEnvFile ; assertSuccess
         mamba activate $condaEnvName ; assertSuccess
     fi
 }
