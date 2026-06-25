@@ -131,7 +131,7 @@ export function GeneralDescription({ ymlPath, metadata }) {
             </small></div>
         }
         {metadata.description && <div className="reactMarkdown"><ReactMarkdown children={metadata.description} /></div>}
-        {codeLink && <p>
+        {codeLink && <p style={{wordBreak: 'break-all'}}>
                 Code: <a href={codeLink} target="_blank">{codeLink.substring(codeLink.search(/(scripts|pipelines)\//))}</a>
             </p>
         }
@@ -202,6 +202,9 @@ function getCodeUrl(ymlPath, scriptFileName) {
     if (!ymlPath || !scriptFileName || scriptFileName.endsWith(".kt")) {
         return null
     }
+
+    if(scriptFileName.startsWith("http://") || scriptFileName.startsWith("https://"))
+        return scriptFileName
 
     return 'https://github.com/GEO-BON/biab-2.0/tree/main/scripts/' + removeLastSlash(ymlPath.replaceAll('>', '/')) + scriptFileName
 }

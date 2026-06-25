@@ -586,13 +586,13 @@ components:
     stepType:
       name: type
       in: path
-      description: Script or pipeline
+      description: Script, pipeline or openEO
       required: true
       style: simple
       explode: false
       schema:
         type: string
-        enum: [script, pipeline]
+        enum: [script, pipeline, openEO]
     descriptionPath:
       name: descriptionPath
       in: path

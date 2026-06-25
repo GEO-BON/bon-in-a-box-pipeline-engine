@@ -17,6 +17,8 @@ aside.stepChooser .description {
 .dndnode {
     min-height: 20px;
     padding: 4px;
+    padding-left: 14px;
+    padding-right: 14px;
     border: 1px solid #83829b;
     border-radius: 4px;
     margin-bottom: 10px;
