@@ -1,11 +1,26 @@
 #!/bin/bash
 outputFolder=$1
 condaEnvName=$2
+
+# Raw content of the yml file
 condaEnvYml=$3
+
+# Optional, if provided, the directory where conda-pack environments are stored (read-write).
 condaPackDir=$4
+
+# Optional, if provided, the URL where conda-pack environments are stored (read-only).
 condaPackURL=$5
 
 pidFile="$outputFolder/.pid"
+
+# Permanent file (container life span) where we save the dependencies
+# that were last used to update the conda environment.
+condaEnvFile="/conda-env-yml/$condaEnvName.yml"
+
+# Temporary file that we use to compare the new yml file with the previous one.
+n=$RANDOM
+tmpDir="/tmp/conda-env-yml"
+condaEnvFileNew="$tmpDir/$condaEnvName.$n.yml"
 
 function assertSuccess {
     if [[ $? -ne 0 ]] ; then
@@ -20,37 +35,35 @@ function activateBaseEnvironment {
 function activateSubEnvironment {
     set -o pipefail
 
-    n=$RANDOM
-    condaEnvFile="/conda-env-yml/$condaEnvName.yml"
-    condaEnvFileSrc="/conda-env-yml/$condaEnvName.$n.yml"
-    printf "$condaEnvYml\n" > "$condaEnvFileSrc" ; assertSuccess
+    mkdir -p "$tmpDir"
+    printf "$condaEnvYml\n" > "$condaEnvFileNew" ; assertSuccess
 
     mamba env list | grep " $condaEnvName "
     if [[ $? -eq 0 ]] ; then
-        if cmp -s "$condaEnvFile" "$condaEnvFileSrc"; then
+        if cmp -s "$condaEnvFile" "$condaEnvFileNew"; then
             echo "Conda environment $condaEnvName exists with the same dependencies."
-            rm "$condaEnvFileSrc" ; assertSuccess
+            rm "$condaEnvFileNew" ; assertSuccess
         else
             echo "Updating existing conda environment $condaEnvName..."
-            flock --verbose /conda-env-yml/ mamba env update -y -f "$condaEnvFileSrc" ; assertSuccess
+            flock --verbose /conda-env-yml/ mamba env update -y -f "$condaEnvFileNew" ; assertSuccess
             if [[ $? -eq 0 ]] ; then
-                mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
+                mv "$condaEnvFileNew" "$condaEnvFile" ; assertSuccess
                 echo "Updated successfully."
             fi
         fi
     else
         echo "Creating new conda environment $condaEnvName..."
-        flock --verbose /conda-env-yml/ mamba env create -y -f "$condaEnvFileSrc" ; assertSuccess
+        flock --verbose /conda-env-yml/ mamba env create -y -f "$condaEnvFileNew" ; assertSuccess
         if [[ $? -eq 0 ]] ; then
-            mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
+            mv "$condaEnvFileNew" "$condaEnvFile" ; assertSuccess
             echo "Created successfully."
         fi
     fi
 
-    if [ -f "$condaEnvFileSrc" ]; then
+    if [ -f "$condaEnvFileNew" ]; then
         echo "Cleaning up after failure..."
         mamba remove -qy -n $condaEnvName --all > /dev/null 2>&1
-        rm "$condaEnvFileSrc" 2> /dev/null
+        rm "$condaEnvFileNew" 2> /dev/null
         echo -e "FAILED" ; exit 1
     fi
 
