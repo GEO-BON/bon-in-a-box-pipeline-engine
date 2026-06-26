@@ -1,32 +1,44 @@
 #!/bin/bash
+# Conda-pack the environment if a folder was supplied.
+
 condaEnvName=$1
 condaPackDir=$2
 
-# Conda-pack the environment if a folder was supplied.
+function packEnvironment {
+    echo "Packing conda environment $condaEnvName..."
+    mamba activate base
+    conda-pack --n-threads -1 --quiet -n $condaEnvName -o $tar --compress-level 0
+    if [ $? -ne 0 ]; then
+        echo "    Error packing conda environment $condaEnvName."
+    else 
+        pigz $tar # parallel compression is much faster than default gzip compression
+
+        condaEnvFile="/conda-env-yml/$condaEnvName.yml"
+        cp $condaEnvFile $condaPackDir/$condaEnvName.yml
+
+        echo "    Conda environment packed to $zip using conda-pack!"
+    fi
+    mamba deactivate # base
+}
+
+
 if [[ -d "$condaPackDir" ]]; then
     if mamba env list | grep -q "\b$condaEnvName\b"; then
-        # TODO Check if the .yml dependencies have changed since the last pack.
-        
+        condaEnvFile="/conda-env-yml/$condaEnvName.yml"
+        condaPackEnvFile=$condaPackDir/$condaEnvName.yml
         tar=$condaPackDir/$condaEnvName.tar
         zip=$tar.gz
 
-        if [ -f "$zip" ]; then
-            echo "Conda-pack archive $zip already packed."
-        else 
-            echo "Packing conda environment $condaEnvName."
-            mamba activate base
-            conda-pack --n-threads -1 --quiet -n $condaEnvName -o $tar --compress-level 0
-            if [ $? -ne 0 ]; then
-                echo "Error packing conda environment $condaEnvName."
-            else 
-                pigz $tar # parallel compression is much faster than default gzip compression
-
-                condaEnvFile="/conda-env-yml/$condaEnvName.yml"
-                cp $condaEnvFile $condaPackDir/$condaEnvName.yml
-
-                echo "Conda environment packed to $zip using conda-pack!"
-                mamba deactivate # base
+        if [[ -f $condaPackEnvFile && -f "$zip" ]]; then
+            if cmp -s "$condaPackEnvFile" "$condaEnvFile"; then
+                echo "Conda-pack archive $zip already packed."
+            else
+                echo "Environment change detected."
+                rm -f "$zip" "$condaPackEnvFile"
+                packEnvironment
             fi
+        else
+            packEnvironment
         fi
     fi
 fi

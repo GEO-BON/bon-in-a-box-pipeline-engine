@@ -51,7 +51,7 @@ function prepareSubEnvironment {
             activateSubEnvironment
 
         elif useCondaPack; then
-            rm "$condaEnvFileNew" ; assertSuccess
+            mv "$condaEnvFileNew" "$condaEnvFile" ; assertSuccess
 
         else
             echo "Updating existing conda environment $condaEnvName..."
@@ -66,7 +66,7 @@ function prepareSubEnvironment {
 
     # the environement does not exist
     elif useCondaPack; then
-        rm "$condaEnvFileNew" ; assertSuccess
+        mv "$condaEnvFileNew" "$condaEnvFile" ; assertSuccess
 
     else
         echo "Creating new conda environment $condaEnvName..."
@@ -117,31 +117,38 @@ function useCondaPack {
                 fi
             else
                 echo "    Local conda-pack yml file is outdated."
+                rm -rf "$condaPackZip" "$condaPackDir/$condaEnvName" "$condaEnvFilePacked" ; assertSuccess
             fi
         else
             echo "    No local conda-pack yml file found."
         fi
 
-        # Check for a yml file online
-        remotePackYml="$tmpDir/$condaEnvName.remote.yml"
-        rm -f $remotePackYml
-        tryUrl="$condaPackURL$condaEnvName.yml"
-        echo "    Trying $tryUrl..."
-        status=$(curl -s -o $remotePackYml -w "%{http_code}" "$tryUrl")
-        if [[ "$status" = "200" ]]; then
-            echo "    Remote conda-pack environment found, comparing..."
-            if cmp -s "$remotePackYml" "$condaEnvFileNew"; then
-                echo "    Remote conda-pack description corresponds to the target environment."
-                if getRemotePack; then
-                    useLocalPack
-                    return $?
+        # Check for a yml file online only if url is provided
+        if [[ -n "$condaPackURL" ]]; then
+            remotePackYml="$tmpDir/$condaEnvName.remote.yml"
+            rm -f $remotePackYml
+            tryUrl="$condaPackURL$condaEnvName.yml"
+            echo "    Trying $tryUrl..."
+            status=$(curl -s -o $remotePackYml -w "%{http_code}" "$tryUrl")
+            if [[ "$status" = "200" ]]; then
+                echo "    Remote conda-pack environment found, comparing..."
+                if cmp -s "$remotePackYml" "$condaEnvFileNew"; then
+                    echo "    Remote conda-pack description corresponds to the target environment."
+                    if getRemotePack; then
+                        if useLocalPack; then
+                            mv $remotePackYml $condaEnvFilePacked ; assertSuccess
+                            return 0
+                        else
+                            echo "    Remote conda-pack environment not usable."
+                        fi
+                    fi
+                else
+                    echo "    No corresponding conda-pack environment found."
                 fi
             else
-                echo "    No corresponding conda-pack environment found."
+                echo "    No remote conda-pack environment found: $status, $(head $remotePackYml 2>/dev/null)."
+                rm -f $remotePackYml
             fi
-        else
-            echo "    No remote conda-pack environment found: $status, $(head $remotePackYml 2>/dev/null)."
-            rm -f $remotePackYml
         fi
     fi
 
