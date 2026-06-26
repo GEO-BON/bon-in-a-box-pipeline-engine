@@ -51,7 +51,8 @@ function test1 {
     source condaEnvironment.sh \
         test-output/A \
         testSuiteA \
-        "channels: [conda-forge]\ndependencies: [xz]\nname: testSuiteA"
+        "channels: [conda-forge]\ndependencies: [xz]\nname: testSuiteA" \
+        test-output/A
     assertSuccess
     verifyPackage testSuiteA xz ; assertSuccess
     echo -e "${GREEN}T1. Success!${ENDCOLOR}"
@@ -241,6 +242,44 @@ function test8 {
     echo -e "${GREEN}T8. Success!${ENDCOLOR}"
 }
 
+function test9 {
+    echo "T9.  Test environment creation without conda-pack..." 
+    source condaEnvironment.sh \
+        test-output/C \
+        testSuiteC \
+        "channels: [conda-forge]\ndependencies: [xz]\nname: testSuiteC"
+    assertSuccess
+    verifyPackage testSuiteC xz ; assertSuccess
+
+    # check that no conda-pack stuff was created
+    ls test-output/C/testSuiteC.tar.gz > /dev/null 2>&1
+    if [[ $? -eq 0 ]]; then
+        echo -e "${RED}FAILED: Conda-pack archive should not have been created.${ENDCOLOR}"
+        exit 1
+    fi
+
+    ls test-output/C/testSuiteC.yml > /dev/null 2>&1
+    if [[ $? -eq 0 ]]; then
+        echo -e "${RED}FAILED: Conda-pack definition should not have been created.${ENDCOLOR}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}T9. Success!${ENDCOLOR}"
+}
+
+function test10 {
+    echo "T10.  Test environment modification without conda-pack..." 
+    source condaEnvironment.sh \
+        test-output/C \
+        testSuiteC \
+        "channels: [conda-forge]\ndependencies: [xz, ca-certificates]\nname: testSuiteC"
+    assertSuccess
+    verifyPackage testSuiteC xz ; assertSuccess
+    verifyPackage testSuiteC ca-certificates ; assertSuccess
+
+    echo -e "${GREEN}T10. Success!${ENDCOLOR}"
+}
+
 function runTests {
     echo "Running conda environment tests..."
     rm -rf test-output/*
@@ -256,6 +295,13 @@ function runTests {
     # Suite B, with a remote conda-pack URL
     mkdir -p test-output/B
     for i in {6..8}; do
+        bash -c "source /.bashrc; ./condaEnvironmentTest.sh $i"
+        failures=$((failures + $?))
+    done
+
+    # Suite C, where conda pack is not used at all
+    mkdir -p test-output/C
+    for i in {9..10}; do
         bash -c "source /.bashrc; ./condaEnvironmentTest.sh $i"
         failures=$((failures + $?))
     done
