@@ -12,8 +12,12 @@ condaPackDir=$4
 condaPackZip=$condaPackDir/$condaEnvName.tar.gz
 condaPackExtracted="$condaPackDir/$condaEnvName"
 
+
 # Optional, if provided, the URL where conda-pack environments are stored (read-only).
 condaPackURL=$5
+
+echo "$condaPackDir with $condaPackURL"
+
 
 pidFile="$outputFolder/.pid"
 
@@ -110,7 +114,6 @@ function useCondaPack {
             if cmp -s "$condaEnvFilePacked" "$condaEnvFileNew"; then
                 echo "    Local conda-pack yml file is up to date."
                 if useLocalPack; then
-                    echo "    Local conda-pack environment used."
                     return 0
                 else
                     echo "    Local conda-pack environment not usable."
