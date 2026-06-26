@@ -91,13 +91,15 @@ export default function IONode({ id, data }) {
   }
 
   return <>
-  <table className={`ioNode ${stepType}`} onDoubleClick={() =>
+  <table className={`ioNode ${stepType}`} onDoubleClick={(e) => {
+    if (e.target.closest('td.inputs, td.outputs')) return;
     setPopupContent(
       <StepDescription
         descriptionFile={descriptionFileLocation}
         metadata={metadata}
       />
-  )}>
+    )}
+  }>
     <tbody>
     <tr>
       <td className='inputs'>
