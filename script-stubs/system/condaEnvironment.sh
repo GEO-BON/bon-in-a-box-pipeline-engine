@@ -125,13 +125,14 @@ function useCondaPack {
         # Check for a yml file online
         remotePackYml="$tmpDir/$condaEnvName.remote.yml"
         rm -f $remotePackYml
-        curl -s -o $remotePackYml "$condaPackURL$condaEnvName.yml"
-        if [[ -f "$remotePackYml" ]]; then
+        tryUrl="$condaPackURL$condaEnvName.yml"
+        echo "    Trying $tryUrl..."
+        status=$(curl -s -o $remotePackYml -w "%{http_code}" "$tryUrl")
+        if [[ "$status" = "200" ]]; then
             echo "    Remote conda-pack environment found, comparing..."
             if cmp -s "$remotePackYml" "$condaEnvFileNew"; then
-                echo "    Remote conda-pack yml file corresponds to the target environment."
+                echo "    Remote conda-pack description corresponds to the target environment."
                 if getRemotePack; then
-                    echo "    Remote conda-pack environment downloaded."
                     useLocalPack
                     return $?
                 fi
@@ -139,7 +140,8 @@ function useCondaPack {
                 echo "    No corresponding conda-pack environment found."
             fi
         else
-            echo "    No remote conda-pack environment found."
+            echo "    No remote conda-pack environment found: $status, $(head $remotePackYml 2>/dev/null)."
+            rm -f $remotePackYml
         fi
     fi
 
@@ -148,14 +150,14 @@ function useCondaPack {
 
 function getRemotePack {
     url="$condaPackURL$condaEnvName.tar.gz"
-    echo "Checking for environment archive at $url..."
+    echo "Fetching environment archive at $url..."
     # -z flag is used to replace existing zip only if online version is newer one
-    status=$(curl -s -z $condaPackZip -o download -s -w "%{http_code}" "$url")
+    status=$(curl -s -z $condaPackZip -o download -w "%{http_code}" "$url")
     if [ "$status" = "304" ]; then
         echo "    Already up to date."
         return 0
     elif [ "$status" = "200" ]; then
-        echo "    New file downloaded."
+        echo "    Remote conda-pack environment downloaded."
         mv download $condaPackZip
         return 0
     else # "download" being the output, it contains a message in this case.
@@ -170,14 +172,13 @@ function useLocalPack {
     # Check for a zip locally
     packYml="$condaPackDir/$condaEnvName.yml"
     if [[ -f "$condaPackZip" ]]; then
-        echo "Local conda-pack environment found."
 
         # Check for an unzipped folder locally
         if [ -d "$condaPackExtracted" ] && [ -f "$condaPackExtracted/bin/conda-unpack" ] && [ -f "$condaPackExtracted/bin/activate" ]; then
             echo "    Already unpacked."
         else
             # Unpack
-            echo "    Unpacking..."
+            echo "Unpacking conda-pack environment at $condaPackZip"
             rm -rf $condaPackExtracted
             mkdir -p $condaPackExtracted || return 1
             tar -xf $condaPackZip -C $condaPackExtracted --use-compress-program=pigz || return 1
@@ -185,7 +186,7 @@ function useLocalPack {
         fi
 
         # Activate
-        echo "Activating environment using conda-pack from $condaPackExtracted..."
+        echo "Activating extracted environment from $condaPackExtracted..."
         mamba activate base || return 1
         $condaPackExtracted/bin/conda-unpack || return 1
         mamba deactivate # base
