@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "script-stubs/system/conda*"
+      - ".github/workflows/conda_scripts.yml"
 
 jobs:
   run-tests:
