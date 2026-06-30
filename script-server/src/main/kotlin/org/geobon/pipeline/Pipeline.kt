@@ -1,6 +1,7 @@
 package org.geobon.pipeline
 
 import kotlinx.coroutines.*
+import org.geobon.openeo.OpenEOStep
 import org.geobon.script.Description.IO__LABEL
 import org.geobon.script.Description.IO__TYPE
 import org.geobon.server.ServerContext
@@ -252,6 +253,7 @@ open class Pipeline (
                                 // resulting in a security breach.
                                 // TODO: This will be needed for openEO steps, so keeping this comment as an example:
                                 //scriptFile == "pipeline/AssignId.yml" -> AssignId(serverContext, innerStepId)
+                                scriptFile.endsWith(".udp") -> OpenEOStep(scriptFile, innerStepId, serverContext)
 
                                 // Regular script steps
                                 else -> ScriptStep(scriptFile, innerStepId, serverContext)
