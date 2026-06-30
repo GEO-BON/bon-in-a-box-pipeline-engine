@@ -121,7 +121,7 @@ tryCatch(
                 if(grepl("ignoring SIGPIPE signal",e$message)) {
                     cat("Suppressed: ignoring SIGPIPE signal\n");
                 } else {
-                    exitCode <- 1
+                    exitCode <<- 1
                     if (is.null(biab_output_list[["error"]])) {
                         biab_output_list[["error"]] <<- conditionMessage(e)
                         cat("Caught error, stack trace:\n")
@@ -134,7 +134,10 @@ tryCatch(
     interrupt = function(i) {
         cat("R wrapper caught interrupt\n");
         biab_output_list[["error"]] <<- "Cancelled"
-        exitCode <- 130
+        exitCode <<- 130
+    },
+    error = function(e) {
+        # Error already handled in withCallingHandlers
     }
 )
 
