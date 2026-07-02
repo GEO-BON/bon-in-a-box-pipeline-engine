@@ -44,7 +44,10 @@ fun assertMultilineEquals(expected: String, actual: String) {
                 sb.appendLine("$DIM  ${afterIdx + 1}: $ctx$RESET")
             }
 
-            fail(sb.toString())
+            sb.appendLine("Full string received:")
+            sb.appendLine("$DIM$actual$RESET")
+            println(sb.toString())
+            fail("Lines differ, check diff above.")
         }
     }
 }

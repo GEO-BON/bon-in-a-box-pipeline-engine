@@ -21,7 +21,6 @@ object Description {
     const val IO__TYPE_TEXT = "text"
     const val IO__LABEL = "label"
     const val IO__EXAMPLE = "example"
-    const val IO__PROPERTIES = "properties"
     const val IO__DESCRIPTION = "description"
 
     const val CONDA = "conda"

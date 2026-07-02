@@ -1,8 +1,9 @@
 package org.geobon.pipeline
 
 import org.geobon.script.Description.INPUTS
+import org.geobon.script.Description.IO__DESCRIPTION
+import org.geobon.script.Description.IO__EXAMPLE
 import org.geobon.script.Description.IO__LABEL
-import org.geobon.script.Description.IO__PROPERTIES
 import org.geobon.script.Description.IO__TYPE
 import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
@@ -160,9 +161,12 @@ abstract class YMLStep(
     companion object {
 
         data class IODefinition(val type: String, private val definition: Map<*, *>) {
-            val properties
-                get() = (definition[IO__PROPERTIES] as? Iterable<*>)?.let { properties ->
-                    properties.map { it.toString() }
+            val label get() = definition[IO__LABEL].toString()
+            val description get() = definition[IO__DESCRIPTION].toString()
+            val example get() = definition[IO__EXAMPLE].toString()
+            val options
+                get() = (definition[IO__TYPE_OPTIONS] as? Iterable<*>)?.let { options ->
+                    options.map { it.toString() }
                 }
         }
         /**
