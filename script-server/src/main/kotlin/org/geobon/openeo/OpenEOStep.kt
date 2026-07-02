@@ -42,10 +42,12 @@ import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
 import org.geobon.script.Description.SCRIPT
 import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileNotFoundException
@@ -65,21 +67,33 @@ class OpenEOStep: ScriptStep {
 
     init {
         // Fetching wrapper script to run openEO
-        scriptFile = File(ServerContext.scriptStubsRoot, "openEOWrapper.py")
-        inputs["url"] = ConstantPipe("text",  yamlParsed[SCRIPT].toString())
+        scriptFile = File(scriptStubsRoot, "openEOWrapper.py")
+    }
+
+    override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
+        val inputsWithUrl = resolvedInputs.toMutableMap()
+        inputsWithUrl["url"] = ConstantPipe("text",  yamlParsed[SCRIPT].toString())
+        return super.execute(inputsWithUrl)
     }
 
     companion object {
 
         private val logger: Logger = LoggerFactory.getLogger("Server")
-        private val openEOFolder = File(scriptsRoot, "openEO")
+        private val openEOFolder = File(scriptStubsRoot, "openEO")
 
         fun updateYaml(udpKey: String): File {
             // TODO: at which frequency do we force yaml update?
+            val options = DumperOptions()
+            options.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
             val yamlFile = File(openEOFolder, "$udpKey.yml")
             if (!yamlFile.exists()) {
                 yamlFile.parentFile.mkdirs()
-                yamlFile.writeText(Yaml().dump(getOpenEODescription(udpKey)))
+
+                try {
+                    yamlFile.writeText(Yaml(options).dump(getOpenEODescription(udpKey)))
+                } catch (e: Exception) {
+                    logger.error("Error: ${e.message}")
+                }
             }
             return yamlFile
         }
@@ -280,8 +294,12 @@ class OpenEOStep: ScriptStep {
                         if (rawType != null) input[IO__TYPE] = mapType(rawType)
                     }
                 }
-
-                input[IO__EXAMPLE] = param.opt("default") ?: JSONObject.NULL
+                val example = param.opt("default")
+                if (example == JSONObject.NULL) {
+                    input[IO__EXAMPLE] = null
+                } else {
+                    input[IO__EXAMPLE] = example
+                }
 
                 inputs[id] = input
             }
