@@ -41,7 +41,7 @@ class ScriptStep : YMLStep {
      */
     constructor(
         fileName: String,
-        stepId: StepId,
+        stepId: StepId = StepId("testStep", "nodeId"),
         serverContext: ServerContext = ServerContext(),
         inputs: MutableMap<String, Pipe> = mutableMapOf()
     ) : this(
