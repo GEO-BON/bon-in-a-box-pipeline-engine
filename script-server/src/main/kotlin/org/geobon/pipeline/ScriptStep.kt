@@ -34,8 +34,6 @@ class ScriptStep : YMLStep {
         serverContext.hpc?.register(this)
     }
 
-    private val scriptFile: File = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
-
     /**
      * Used for a lighter test syntax
      */
@@ -50,6 +48,26 @@ class ScriptStep : YMLStep {
         stepId,
         inputs
     )
+
+    val scriptFile: File = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
+
+    val condaEnvName by lazy {
+        yamlParsed[CONDA]?.let { // We only define the env name if there is a conda section
+            yamlFile.relativeTo(scriptsRoot).path
+                .replace("/", "__").replace(' ', '_').removeSuffix(".yml")
+        }
+    }
+    val condaEnvYml by lazy {
+        yamlParsed[CONDA]?.let { condaSection ->
+            try {
+                @Suppress("UNCHECKED_CAST")
+                (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName.toString()
+                Yaml().dump(condaSection)
+            } catch (_: Exception) {
+                null
+            }
+        }
+    }
 
     override fun validateStep(): String {
         if (!yamlFile.exists())
@@ -73,19 +91,7 @@ class ScriptStep : YMLStep {
                     runOwner = true
 
                     // Optional specific conda environment for this script
-                    var condaEnvName: String? = null
-                    val condaEnvYml = yamlParsed[CONDA]?.let { condaSection ->
-                        try {
-                            condaEnvName = yamlFile.relativeTo(scriptsRoot).path
-                                .replace("/", "__").replace(' ', '_').removeSuffix(".yml")
 
-                            @Suppress("UNCHECKED_CAST")
-                            (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName
-                            Yaml().dump(condaSection)
-                        } catch (_: Exception) {
-                            null
-                        }
-                    }
 
                     val computeSection = yamlParsed[COMPUTE]
                     val computeRequirements = if (computeSection is Map<*, *>) {
