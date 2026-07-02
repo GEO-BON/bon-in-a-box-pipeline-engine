@@ -10,7 +10,7 @@ import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
 import org.geobon.hpc.HPC
 import org.geobon.k8s.K8sConnection
-import org.geobon.openeo.getOpenEODescription
+import org.geobon.openeo.OpenEOStep.Companion.getOpenEODescription
 import org.geobon.pipeline.*
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
