@@ -68,9 +68,32 @@ class CWLFactory {
         private fun toCWL(key: String, definition: IODefinition, requiredProperties: JSONObject): String {
             val sb = StringBuilder()
 
+            // Creating a CWL "record" for the input objects.
             requiredProperties.keys().forEach { subKey ->
                 requiredProperties.optJSONObject(subKey)?.let { section ->
-                    sb.append(toCWL("${key}_${subKey}", definition, section))
+                    sb.appendLine(
+                        """
+                          ${key}_${subKey}:
+                            label: ${definition.label}
+                            doc: ${definition.description}
+                            type:
+                              type: record
+                              name: $subKey
+                              fields:
+                        """.replaceIndent(" ".repeat(2))
+                    )
+
+                    section.keys().forEach { fieldKey ->
+                        section.optString(fieldKey)?.let { fieldType ->
+                            sb.appendLine(
+                                """
+                                    - name: $fieldKey
+                                      type: ${toCWLType(fieldType)}?
+                                """.replaceIndent(" ".repeat(8))
+                            )
+                        }
+                    }
+                    sb.appendLine()
 
                 } ?: requiredProperties.optString(subKey)?.let { propertyType ->
                     sb.append(
