@@ -99,7 +99,7 @@ class CWLFactory {
             return when (biabRawType) {
                 IO__TYPE_TEXT -> CWL__IO__TYPE_STRING
                 IO__TYPE_OPTIONS -> CWL__IO__TYPE_ENUM
-                else -> biabType
+                else -> biabRawType
             } + arraySuffix
         }
     }
