@@ -1,14 +1,13 @@
 package org.geobon.pipeline
 
 import org.geobon.script.Description.INPUTS
-import org.geobon.script.Description.IO__DESCRIPTION
-import org.geobon.script.Description.IO__EXAMPLE
 import org.geobon.script.Description.IO__LABEL
 import org.geobon.script.Description.IO__TYPE
 import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
+import org.geobon.script.IODefinition
 import org.geobon.script.Run
 import org.geobon.server.ServerContext
 import org.json.JSONObject
@@ -160,15 +159,6 @@ abstract class YMLStep(
 
     companion object {
 
-        data class IODefinition(val type: String, private val definition: Map<*, *>) {
-            val label get() = definition[IO__LABEL].toString()
-            val description get() = definition[IO__DESCRIPTION].toString()
-            val example get() = definition[IO__EXAMPLE].toString()
-            val options
-                get() = (definition[IO__TYPE_OPTIONS] as? Iterable<*>)?.let { options ->
-                    options.map { it.toString() }
-                }
-        }
         /**
          * @param relativePath the relative path to the .yml description file
          * @return the pipeline metadata as a deep map.

@@ -4,9 +4,9 @@ import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_ENUM
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
 import org.geobon.pipeline.ObjectInputDefinition
 import org.geobon.pipeline.ScriptStep
-import org.geobon.pipeline.YMLStep
 import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
+import org.geobon.script.IODefinition
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 
 class CWLFactory {
@@ -40,7 +40,7 @@ class CWLFactory {
             return template
         }
 
-        private fun toCWL(inputDefinitions: Map<String, YMLStep.Companion.IODefinition>): String {
+        private fun toCWL(inputDefinitions: Map<String, IODefinition>): String {
             val sb = StringBuilder()
             inputDefinitions.forEach { (key, value) ->
                 sb.appendLine(toCWL(key, value))
@@ -48,7 +48,7 @@ class CWLFactory {
             return sb.toString()
         }
 
-        private fun toCWL(key: String, definition: YMLStep.Companion.IODefinition): String {
+        private fun toCWL(key: String, definition: IODefinition): String {
             // Location chooser objects need to be exploded in CWL
             ObjectInputDefinition.fromDef(definition.type)?.let {
                 // TODO: multiple
