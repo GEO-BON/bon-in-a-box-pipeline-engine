@@ -30,9 +30,10 @@ abstract class YMLStep(
     /**
      * Context becomes set in onInputsReceived(), once the invocation inputs are known.
      */
-    var context:RunContext? = null
+    var context: RunContext? = null
 
-    val inputDefinitions = readInputTypes(yamlParsed, logger)
+    val inputDefinitions by lazy { readIODefinitions(yamlParsed, INPUTS, logger) }
+    val outputDefinitions by lazy { readIODefinitions(yamlParsed, OUTPUTS, logger) }
 
     override fun getDisplayBreadcrumbs(): String {
         return if (yamlParsed.containsKey(NAME)) "\"${yamlParsed[NAME]}\" (${id.toBreadcrumbs()})"
@@ -103,6 +104,7 @@ abstract class YMLStep(
             // Check that the selected option is one of the defined options
             inputs.filter { (_, pipe) -> pipe.type == IO__TYPE_OPTIONS }.forEach { (key, _) ->
                 if(inputDefinitions[key]?.type != IO__TYPE_TEXT) { // Ignore options to text conversion
+                    // TODO: use inputDefinitions
                     val options = readIODescription(INPUTS, key)?.get(IO__TYPE_OPTIONS) as? List<*>
                         ?: throw RuntimeException("$yamlFile: No options found for input parameter $key.")
 
@@ -180,9 +182,9 @@ abstract class YMLStep(
         /**
          * @return Map of input name to type
          */
-        private fun readInputTypes(yamlParsed: Map<String, Any>, logger: Logger): Map<String, IODefinition> {
+        private fun readIODefinitions(yamlParsed: Map<String, Any>, section: String, logger: Logger): Map<String, IODefinition> {
             val inputs = mutableMapOf<String, IODefinition>()
-            readIO(yamlParsed, INPUTS, logger) { key, type, definition ->
+            readIO(yamlParsed, section, logger) { key, type, definition ->
                 inputs[key] = IODefinition(type, definition)
             }
             return inputs
@@ -193,7 +195,7 @@ abstract class YMLStep(
          */
         private fun readOutputs(yamlParsed: Map<String, Any>, logger: Logger): Map<String, Output> {
             val outputs = mutableMapOf<String, Output>()
-            readIO(yamlParsed, OUTPUTS, logger) { key, type, definition ->
+            readIO(yamlParsed, OUTPUTS, logger) { key, type, _ ->
                 outputs[key] = Output(type)
             }
             return outputs

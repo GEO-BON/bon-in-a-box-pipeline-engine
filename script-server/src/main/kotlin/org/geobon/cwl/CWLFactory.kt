@@ -2,6 +2,7 @@ package org.geobon.cwl
 
 
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_ENUM
+import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_FILE
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
 import org.geobon.pipeline.ObjectInputDefinition
 import org.geobon.pipeline.ScriptStep
@@ -19,14 +20,14 @@ class CWLFactory {
             if (condaEnvYml == null) {
                 condaEnvYml = ""
             } else { // Add indent and quotes
-                condaEnvYml = condaEnvYml.trim().prependIndent(" ".repeat(8))
-                condaEnvYml = "\"\n$condaEnvYml\n${" ".repeat(6)}\""
+                condaEnvYml = condaEnvYml.trim().prependIndent("  ".repeat(4))
+                condaEnvYml = "\"\n$condaEnvYml\n${"  ".repeat(3)}\""
             }
 
             val replacements = mapOf<String, String>(
                 "scriptPath" to step.scriptFile.relativeTo(scriptsRoot).path,
-                "inputs" to toCWL(step.inputDefinitions),
-                "outputs" to "",
+                "inputs" to toCWL(step.inputDefinitions, true),
+                "outputs" to toCWL(step.outputDefinitions, false),
                 "condaEnvName" to (step.condaEnvName ?: ""),
                 "condaEnvYml" to condaEnvYml
             )
@@ -42,30 +43,59 @@ class CWLFactory {
             return template
         }
 
-        private fun toCWL(inputDefinitions: Map<String, IODefinition>): String {
+        private fun toCWL(definitions: Map<String, IODefinition>, isInput: Boolean): String {
             val sb = StringBuilder()
-            inputDefinitions.forEach { (key, value) ->
-                sb.append(toCWL(key, value))
+            definitions.forEach { (key, value) ->
+                sb.append(toCWL(key, value, isInput))
             }
             return sb.toString()
         }
 
-        private fun toCWL(key: String, definition: IODefinition): String {
+        private fun toCWL(key: String, definition: IODefinition, isInput: Boolean): String {
             // Location chooser objects need to be exploded in CWL
             ObjectInputDefinition.fromDef(definition.type)?.let {
-                return toCWL(key, definition, it.requiredProperties)
+                return toCWL(key, definition, it.requiredProperties, isInput)
             }
 
-            return """
+            val type = toCWLType(definition.type)
+
+            val sb = StringBuilder()
+            sb.appendLine(
+                """
                 $key:
-                  type: ${toCWLType(definition.type)}
+                  type: $type
                   label: ${definition.label}
                   doc: ${definition.description}
-                  default: ${definition.example}
-            """.replaceIndent(" ".repeat(2)) + "\n\n"
+            """.replaceIndent("  ")
+            )
+
+            if (isInput) {
+                sb.appendLine("default: ${definition.example}".replaceIndent("  ".repeat(2)))
+            } else {
+                val extractFunction =
+                    if (type.startsWith(CWL__IO__TYPE_FILE)) "extractOutputFile"
+                    else "extractOutput"
+
+                sb.appendLine(
+                    """
+                    outputBinding:
+                      glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
+                      loadContents: true
+                      outputEval: $($extractFunction(self, "$key"))
+                """.replaceIndent("  ".repeat(2))
+                )
+            }
+
+            sb.appendLine()
+            return sb.toString()
         }
 
-        private fun toCWL(key: String, definition: IODefinition, requiredProperties: JSONObject): String {
+        private fun toCWL(
+            key: String,
+            definition: IODefinition,
+            requiredProperties: JSONObject,
+            isInput: Boolean
+        ): String {
             val sb = StringBuilder()
 
             // Creating a CWL "record" for the input objects.
@@ -80,7 +110,7 @@ class CWLFactory {
                               type: record
                               name: $subKey
                               fields:
-                        """.replaceIndent(" ".repeat(2))
+                        """.replaceIndent("  ")
                     )
 
                     section.keys().forEach { fieldKey ->
@@ -89,18 +119,16 @@ class CWLFactory {
                                 """
                                     - name: $fieldKey
                                       type: ${toCWLType(fieldType)}?
-                                """.replaceIndent(" ".repeat(8))
+                                """.replaceIndent("  ".repeat(4))
                             )
                         }
                     }
                     sb.appendLine()
 
                 } ?: requiredProperties.optString(subKey)?.let { propertyType ->
+                    // If no depth, just output as separate IO
                     sb.append(
-                        toCWL(
-                            "${key}_${subKey}",
-                            definition.copy(type = propertyType, example = null)
-                        )
+                        toCWL("${key}_${subKey}", definition.copy(type = propertyType, example = null), isInput)
                     )
                 }
             }
@@ -115,7 +143,7 @@ class CWLFactory {
 
             // All mime types
             if (biabType.contains('/')) {
-                return "File$arraySuffix"
+                return "$CWL__IO__TYPE_FILE$arraySuffix"
             }
 
             // Primitives
