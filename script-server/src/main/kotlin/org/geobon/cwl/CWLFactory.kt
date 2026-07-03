@@ -1,5 +1,6 @@
 package org.geobon.cwl
 
+
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_ENUM
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
 import org.geobon.pipeline.ObjectInputDefinition
@@ -8,6 +9,7 @@ import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.script.IODefinition
 import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.json.JSONObject
 
 class CWLFactory {
     companion object {
@@ -43,7 +45,7 @@ class CWLFactory {
         private fun toCWL(inputDefinitions: Map<String, IODefinition>): String {
             val sb = StringBuilder()
             inputDefinitions.forEach { (key, value) ->
-                sb.appendLine(toCWL(key, value))
+                sb.append(toCWL(key, value))
             }
             return sb.toString()
         }
@@ -51,7 +53,7 @@ class CWLFactory {
         private fun toCWL(key: String, definition: IODefinition): String {
             // Location chooser objects need to be exploded in CWL
             ObjectInputDefinition.fromDef(definition.type)?.let {
-                // TODO: multiple
+                return toCWL(key, definition, it.requiredProperties)
             }
 
             return """
@@ -60,16 +62,36 @@ class CWLFactory {
                   label: ${definition.label}
                   doc: ${definition.description}
                   default: ${definition.example}
-            """.replaceIndent(" ".repeat(2))
+            """.replaceIndent(" ".repeat(2)) + "\n\n"
         }
 
-        private fun toCWLType(biabType:String) : String {
+        private fun toCWL(key: String, definition: IODefinition, requiredProperties: JSONObject): String {
+            val sb = StringBuilder()
+
+            requiredProperties.keys().forEach { subKey ->
+                requiredProperties.optJSONObject(subKey)?.let { section ->
+                    sb.append(toCWL("${key}_${subKey}", definition, section))
+
+                } ?: requiredProperties.optString(subKey)?.let { propertyType ->
+                    sb.append(
+                        toCWL(
+                            "${key}_${subKey}",
+                            definition.copy(type = propertyType, example = null)
+                        )
+                    )
+                }
+            }
+
+            return if (sb.isBlank()) "" else sb.toString()
+        }
+
+        private fun toCWLType(biabType: String): String {
             val arrayIndex = biabType.indexOf("[")
-            val arraySuffix = if(arrayIndex == -1) "" else biabType.substring(arrayIndex)
-            val biabRawType = if(arrayIndex == -1) biabType else biabType.substring(0, arrayIndex)
+            val arraySuffix = if (arrayIndex == -1) "" else biabType.substring(arrayIndex)
+            val biabRawType = if (arrayIndex == -1) biabType else biabType.substring(0, arrayIndex)
 
             // All mime types
-            if(biabType.contains('/')) {
+            if (biabType.contains('/')) {
                 return "File$arraySuffix"
             }
 

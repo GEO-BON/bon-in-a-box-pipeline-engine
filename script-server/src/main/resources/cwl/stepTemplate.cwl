@@ -160,7 +160,6 @@ inputs:
 
 outputs:
 {{outputs}}
-
   logs:
     type: File
     outputBinding:
