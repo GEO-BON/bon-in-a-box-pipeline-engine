@@ -137,7 +137,7 @@ class OpenEOStep: ScriptStep {
                 ?: throw RuntimeException("No process URL found in catalog")
             val processJson = fetchJson(processUrl)
 
-            return metadata + convertInputs(processJson) + addOutputs()
+            return metadata + convertInputs(processJson) + addOutputs() + addCondaEnv()
         }
 
         private fun fetchJson(url: String): JSONObject {
@@ -303,6 +303,10 @@ class OpenEOStep: ScriptStep {
 
                 inputs[id] = input
             }
+            if (inputs.containsKey("epsg") && inputs.containsKey("spatial_extent")) {
+                logger.warn("Removed EPSG output since there is already a spatial extent input.")
+                inputs.remove("epsg")
+            }
 
             if (inputs.isNotEmpty()) outputYaml[INPUTS] = inputs
             return outputYaml
@@ -321,6 +325,16 @@ class OpenEOStep: ScriptStep {
             val outputYaml = mutableMapOf<String, Any>()
             outputYaml[OUTPUTS] = outputs
             return outputYaml
+        }
+
+        private fun addCondaEnv(): Map<String, Any> {
+            val condaEnv = mutableMapOf<String, Any>()
+            condaEnv["channels"] = listOf("conda-forge")
+            condaEnv["dependencies"] = listOf("openeo")
+
+            val condaYaml = mutableMapOf<String, Any>()
+            condaYaml["conda"] = condaEnv
+            return condaYaml
         }
 
         private fun toTitleCase(input: String): String =
