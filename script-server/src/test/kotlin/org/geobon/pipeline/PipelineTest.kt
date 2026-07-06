@@ -226,7 +226,7 @@ internal class PipelineTest {
     fun `given a pipeline passing bbox to country_when validated and ran_then step receives the full object`() = runTest {
         val pipeline = createRootPipeline(
             noHPCContext,
-            "bboxToCountry.json",
+            "locationToCountry.json",
             """
                 {
                   "pipeline@2": {
@@ -285,7 +285,7 @@ internal class PipelineTest {
         try {
             createRootPipeline(
                 noHPCContext,
-                "countryToBbox.json",
+                "countryToLocation.json",
                 """
                     {
                       "pipeline@4": {
@@ -306,7 +306,7 @@ internal class PipelineTest {
             fail("Invalid conversion produced no exception.")
         } catch (ex: RuntimeException) {
             assertContains(ex.message!!, "Wrong type for input ")
-            assertContains(ex.message!!, """expected "bboxCRS" but "country" was received""")
+            assertContains(ex.message!!, """expected "location" but "country" was received""")
         }
     }
 

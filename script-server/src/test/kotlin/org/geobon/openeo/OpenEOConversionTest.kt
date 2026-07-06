@@ -78,7 +78,7 @@ class OpenEOConversionTest {
 
         val spatialExtent = inputs["spatial_extent"] as Map<*, *>
         assertEquals("Bounding Box", spatialExtent["label"])
-        assertEquals("bboxCRS", spatialExtent["type"])
+        assertEquals("crsBbox", spatialExtent["type"])
         assertTrue(spatialExtent.containsKey("example"))
     }
 

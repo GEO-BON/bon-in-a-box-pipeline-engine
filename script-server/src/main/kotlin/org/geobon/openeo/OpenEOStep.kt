@@ -221,7 +221,7 @@ fun convertInputs(processJson: JSONObject): Map<String, Any> {
 
         when {
             subtype == UDP__INPUT__BOUNDING_BOX -> {
-                input[IO__TYPE] = "bboxCRS"
+                input[IO__TYPE] = "crsBbox"
             }
 
             schema?.optJSONArray(UDP__INPUT__ENUM) != null -> {
