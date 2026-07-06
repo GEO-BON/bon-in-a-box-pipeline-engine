@@ -1,13 +1,13 @@
-script: assertBBoxCRS.py
-name: Assert bboxCRS
-description: "Test python script if it receives a bboxCRS object."
+script: assertLocation.py
+name: Assert Location
+description: "Test python script if it receives a location object."
 author:
   - name: Jean-Michel Lord
 inputs:
   some_input:
-    label: Some bboxCRS
-    description: The bboxCRS body to check.
-    type: bboxCRS
+    label: Location
+    description: The location body to check. A location is the full object with country, region, CRS and bbox.
+    type: location
     example:
       CRS:
         CRSBboxWGS84:
@@ -48,8 +48,8 @@ inputs:
 outputs:
   the_same:
     label: Same value
-    description: The same bboxCRS as in the inputs.
-    type: bboxCRS
+    description: The same location as in the inputs.
+    type: location
     example:
       CRS:
         CRSBboxWGS84:

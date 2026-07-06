@@ -16,7 +16,7 @@ inputs:
   bbox_crs:
     label: Bounding box and CRS
     description: Select a bounding box and CRS
-    type: bboxCRS
+    type: crsBBox
     example:
   min_year:
     label: minimum year

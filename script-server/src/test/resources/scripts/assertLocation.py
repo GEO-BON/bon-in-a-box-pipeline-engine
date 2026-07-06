@@ -12,7 +12,7 @@ if not isinstance(some_input, dict) :
 
 print("Yes!")
 
-print("Is valid bboxCRS?")
+print("Is valid location?")
 required_keys = {"country", "region", "CRS", "bbox"}
 
 if not required_keys.issubset(some_input):

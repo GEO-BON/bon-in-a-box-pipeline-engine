@@ -8,7 +8,7 @@ import org.json.JSONObject
  */
 @Suppress("EnumEntryName") // we want their names to match with the incoming types
 enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObject) {
-    /* Location choosers are all parent. Here is the full countryRegionCRSBbox object:
+    /* Location choosers are all subsets of the full "location" object:
       CRS:
         CRSBboxWGS84:
           - -180
@@ -46,7 +46,7 @@ enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObje
         regionID: 97560089B46292059412713
         regionName: Tirol
     */
-    COUNTRY_REGION_CRS_BBOX(LOCATION__TYPE__COUNTRY_REGION_CRS_BBOX, JSONObject().apply {
+    COUNTRY_REGION_CRS_BBOX(LOCATION__TYPE__LOCATION, JSONObject().apply {
         put(LOCATION__COUNTRY, JSONObject().apply {
             put(LOCATION__COUNTRY__ISO3, "text")
             put(LOCATION__COUNTRY__BBOX_WGS84, "int[]")
@@ -95,7 +95,7 @@ enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObje
     }
 }
 
-const val LOCATION__TYPE__COUNTRY_REGION_CRS_BBOX = "countryRegionCRSBbox"
+const val LOCATION__TYPE__LOCATION = "location"
 const val LOCATION__TYPE__CRS_BBOX = "crsBBox"
 const val LOCATION__TYPE__BBOX_CRS = "bboxCRS" // legacy
 const val LOCATION__TYPE__COUNTRY = "country"
