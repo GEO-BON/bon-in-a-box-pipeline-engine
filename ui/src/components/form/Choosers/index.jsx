@@ -12,7 +12,7 @@ import CropFreeIcon from "@mui/icons-material/CropFree";
 import Modal from "@mui/material/Modal";
 import { chooserReducer } from "./chooserReducer";
 import { Spinner } from "../../Spinner";
-import CRSDescription from "./CRSDescription";
+import LocationDescription from "./LocationDescription";
 
 export default function Choosers({
   inputId,
@@ -36,7 +36,7 @@ export default function Choosers({
     </h4>
   )
 
-    if (type === "bboxCRS") {
+    if ("bboxCRS" === type || "crsbbox" === type.toLowerCase() || "location" === type) {
       return (
         <div className="chooserFieldBody">
           {label}
@@ -54,7 +54,7 @@ export default function Choosers({
           >
             {`Choose ${inputDescription.label}`}
           </CustomButtonGreen>
-          {value && !isCompact && <CRSDescription bboxCRS={value} />}
+          {value && !isCompact && <LocationDescription location={value} />}
           <Modal
             key={`modal-chooser-div-${inputId}`}
             open={openModal}
@@ -114,18 +114,22 @@ function Chooser({
   });
 
   const type = inputDescription.type;
-  const showBBox = type === "bboxCRS" ? true : false;
+  const showBBox = ["bboxcrs", "crsbbox", "location"].includes(
+    type.toLowerCase(),
+  );
   const showMap = showBBox;
   const showCountry = [
     "country",
-    "countryRegion",
-    "countryRegionCRS",
-    "bboxCRS",
-  ].includes(type);
-  const showRegion = ["countryRegion", "countryRegionCRS", "bboxCRS"].includes(
-    type,
-  );
-  const showCRS = ["countryRegionCRS", "bboxCRS", "CRS"].includes(type);
+    "countryregion",
+    "countryregioncrs",
+    "bboxcrs",
+    "crsbbox",
+    "location",
+  ].includes(type.toLowerCase);
+  const showRegion = ["countryregion", "countryregioncrs", "bboxcrs", "crsbbox", "location"]
+    .includes(type.toLowerCase());
+  const showCRS = ["countryregioncrs", "bboxcrs", "crsbbox", "location", "crs"]
+    .includes(type.toLowerCase());
   const [oldValues, setOldValues] = useState({});
   const [message, setMessage] = useState("");
 
@@ -139,7 +143,7 @@ function Chooser({
   useEffect(() => {
     if (states.actions.includes("saveInputs")) {
       let inp = {};
-      if (type === "bboxCRS") {
+      if (type === "bboxCRS" /*deprecated*/ || type === "location") {
         if (states.bbox.includes("") || states.bbox.length === 0) {
           inp = null;
         } else {
@@ -148,6 +152,15 @@ function Chooser({
             CRS: states.CRS,
             country: states.country?.ISO3 ? states.country : null,
             region: states.region?.regionName ? states.region : null,
+          };
+        }
+      } else if (type.toLowerCase() === "crsbbox") {
+        if (states.bbox.includes("") || states.bbox.length === 0) {
+          inp = null;
+        } else {
+          inp = {
+            bbox: states.bbox,
+            CRS: states.CRS,
           };
         }
       } else if (type === "country") {
@@ -209,7 +222,10 @@ function Chooser({
           sx={{
             padding: "10px",
             height: showMap ? "100%" : "auto",
-            overflowY: type === "bboxCRS" ? "scroll" : "visible",
+            overflowY: type === "bboxCRS"
+              || type.toLowerCase() === "crsbbox"
+              || type.toLowerCase() === "location" 
+              ? "scroll" : "visible",
           }}
         >
           {showBBox && (

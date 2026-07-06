@@ -597,19 +597,21 @@ ul#popupMenu {
 }
 
 .constant-country .left-gutter,
-.constant-countryRegionCRS .left-gutter,
-.constant-countryRegion .left-gutter,
-.constant-bboxCRS .left-gutter,
+.constant-countryregioncrs .left-gutter,
+.constant-countryregion .left-gutter,
+.constant-bboxcrs .left-gutter, /*deprecated*/
+.constant-crsbbox .left-gutter,
+.constant-location .left-gutter,
 .constant-CRS .left-gutter {
   font-size: 0;
 }
 
 .constant-country .MuiAutocomplete-root,
-.constant-countryRegionCRS .MuiAutocomplete-root,
-.constant-countryRegion .MuiAutocomplete-root,
-.constant-CRS .MuiAutocomplete-root,
-.constant-countryRegionCRS .MuiFormControl-root,
-.constant-CRS .MuiFormControl-root {
+.constant-countryregioncrs .MuiAutocomplete-root,
+.constant-countryregion .MuiAutocomplete-root,
+.constant-crs .MuiAutocomplete-root,
+.constant-countryregioncrs .MuiFormControl-root,
+.constant-crs .MuiFormControl-root {
   width: 100% !important;
 }
 

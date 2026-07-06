@@ -203,7 +203,7 @@ export const SingleIOResult = memo(
 
       if (typeof content === "object") {
         if(ioMetadata && ioMetadata.type && !ioMetadata.type.includes("/")) {
-          if(ioMetadata.type === "bboxCRS") {
+          if("bboxCRS" === ioMetadata.type || "crsbbox" === ioMetadata.type.toLowerCase()) {
             if(content.CRS && content.bbox) {
               const crs = content.CRS
               if(crs.name && crs.authority && crs.code ) {
