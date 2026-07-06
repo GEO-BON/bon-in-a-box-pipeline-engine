@@ -8,7 +8,7 @@ import org.json.JSONObject
  */
 @Suppress("EnumEntryName") // we want their names to match with the incoming types
 enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObject) {
-    /* Location choosers are all parent. Here is the full bboxCRS object:
+    /* Location choosers are all parent. Here is the full countryRegionCRSBbox object:
       CRS:
         CRSBboxWGS84:
           - -180
@@ -46,7 +46,7 @@ enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObje
         regionID: 97560089B46292059412713
         regionName: Tirol
     */
-    BBOX_CRS(LOCATION__TYPE__BBOX_CRS, JSONObject().apply {
+    COUNTRY_REGION_CRS_BBOX(LOCATION__TYPE__COUNTRY_REGION_CRS_BBOX, JSONObject().apply {
         put(LOCATION__COUNTRY, JSONObject().apply {
             put(LOCATION__COUNTRY__ISO3, "text")
             put(LOCATION__COUNTRY__BBOX_WGS84, "int[]")
@@ -69,25 +69,35 @@ enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObje
         })
         put(LOCATION__BBOX, "float[]")
     }),
-    COUNTRY(LOCATION__TYPE__COUNTRY, JSONObject(BBOX_CRS.requiredProperties, LOCATION__COUNTRY)),
+
+    COUNTRY(LOCATION__TYPE__COUNTRY, JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__COUNTRY)),
     COUNTRY_REGION(
         LOCATION__TYPE__COUNTRY_REGION,
-        JSONObject(BBOX_CRS.requiredProperties, LOCATION__COUNTRY, LOCATION__REGION)
+        JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__COUNTRY, LOCATION__REGION)
     ),
-    CRS(LOCATION__TYPE__CRS, JSONObject(BBOX_CRS.requiredProperties, LOCATION__CRS)),
+    CRS(LOCATION__TYPE__CRS, JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__CRS)),
     COUNTRY_REGION_CRS(
         LOCATION__TYPE__COUNTRY_REGION_CRS,
-        JSONObject(BBOX_CRS.requiredProperties, LOCATION__COUNTRY, LOCATION__REGION, LOCATION__CRS)
-    );
+        JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__COUNTRY, LOCATION__REGION, LOCATION__CRS)
+    ),
+    CRS_BBOX(
+        LOCATION__TYPE__CRS_BBOX,
+        JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__CRS, LOCATION__BBOX)
+    ),
+    // Legacy, name was not descriptive of content. TODO: Remove in future version.
+    BBOX_CRS(LOCATION__TYPE__BBOX_CRS, JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties));
 
     companion object {
         fun fromString(typeStr: String): ObjectInputType? {
-            return ObjectInputType.entries.find { it.typeStr == typeStr }
+            val lowercaseType = typeStr.lowercase()
+            return ObjectInputType.entries.find { it.typeStr.lowercase() == lowercaseType }
         }
     }
 }
 
-const val LOCATION__TYPE__BBOX_CRS = "bboxCRS"
+const val LOCATION__TYPE__COUNTRY_REGION_CRS_BBOX = "countryRegionCRSBbox"
+const val LOCATION__TYPE__CRS_BBOX = "crsBBox"
+const val LOCATION__TYPE__BBOX_CRS = "bboxCRS" // legacy
 const val LOCATION__TYPE__COUNTRY = "country"
 const val LOCATION__TYPE__COUNTRY_REGION = "countryRegion"
 const val LOCATION__TYPE__CRS = "CRS"
