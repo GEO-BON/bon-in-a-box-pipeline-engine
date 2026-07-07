@@ -93,24 +93,29 @@ class CWLFactory {
         private fun toCWL(
             key: String,
             definition: IODefinition,
-            requiredProperties: JSONObject,
+            schema: JSONObject,
             isInput: Boolean
         ): String {
             val sb = StringBuilder()
+            sb.appendLine("""
+              $key:
+                label: ${definition.label}
+                doc: ${definition.description}
+                type:
+                  type: record
+                  name: ${definition.type}
+                  fields:
+            """.replaceIndent("  "))
 
             // Creating a CWL "record" for the input objects.
-            requiredProperties.keys().forEach { subKey ->
-                requiredProperties.optJSONObject(subKey)?.let { section ->
+            schema.keys().forEach { subKey ->
+                schema.optJSONObject(subKey)?.let { section ->
                     sb.appendLine(
                         """
-                          ${key}_${subKey}:
-                            label: ${definition.label}
-                            doc: ${definition.description}
-                            type:
+                            - name: $subKey
                               type: record
-                              name: $subKey
-                              fields:
-                        """.replaceIndent("  ")
+                              fields: 
+                        """.replaceIndent("  ".repeat(3))
                     )
 
                     section.keys().forEach { fieldKey ->
@@ -123,15 +128,20 @@ class CWLFactory {
                             )
                         }
                     }
-                    sb.appendLine()
 
-                } ?: requiredProperties.optString(subKey)?.let { propertyType ->
+
+                } ?: schema.optString(subKey)?.let { propertyType ->
                     // If no depth, just output as separate IO
                     sb.append(
-                        toCWL("${key}_${subKey}", definition.copy(type = propertyType, example = null), isInput)
+                        """
+                            - name: $subKey
+                              type: ${toCWLType(propertyType)}
+                        """.replaceIndent("  ".repeat(3))
                     )
                 }
             }
+            sb.appendLine()
+            sb.appendLine()
 
             return if (sb.isBlank()) "" else sb.toString()
         }
