@@ -125,7 +125,7 @@ function Chooser({
     "bboxcrs",
     "crsbbox",
     "location",
-  ].includes(type.toLowerCase);
+  ].includes(type.toLowerCase());
   const showRegion = ["countryregion", "countryregioncrs", "bboxcrs", "crsbbox", "location"]
     .includes(type.toLowerCase());
   const showCRS = ["countryregioncrs", "bboxcrs", "crsbbox", "location", "crs"]
@@ -224,7 +224,7 @@ function Chooser({
             height: showMap ? "100%" : "auto",
             overflowY: type === "bboxCRS"
               || type.toLowerCase() === "crsbbox"
-              || type.toLowerCase() === "location" 
+              || type.toLowerCase() === "location"
               ? "scroll" : "visible",
           }}
         >
