@@ -112,9 +112,11 @@ class CWLFactory {
                 schema.optJSONObject(subKey)?.let { section ->
                     sb.appendLine(
                         """
-                            - name: $subKey
-                              type: record
-                              fields: 
+                            - name: ${subKey}
+                              type:
+                                name: ${subKey}Definition
+                                type: record
+                                fields: 
                         """.replaceIndent("  ".repeat(3))
                     )
 
@@ -124,7 +126,7 @@ class CWLFactory {
                                 """
                                     - name: $fieldKey
                                       type: ${toCWLType(fieldType)}?
-                                """.replaceIndent("  ".repeat(4))
+                                """.replaceIndent("  ".repeat(5))
                             )
                         }
                     }
