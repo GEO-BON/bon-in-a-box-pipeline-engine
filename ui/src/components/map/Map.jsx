@@ -83,7 +83,6 @@ export default function MapResult({ tiff, range, json, geopackage }) {
       {jsonContent && (
         <GeoJSONLayer
           geojsonOutput={jsonContent}
-          setGeojson={setJsonContent}
         />
       )}
 
