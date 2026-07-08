@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useEffect } from "react";
 import L from "leaflet";
 import { useMap } from "react-leaflet";
 
@@ -6,12 +6,8 @@ import { useMap } from "react-leaflet";
  *
  * @param props
  */
-function GeoJSONLayer({ geojsonOutput, setGeojson }) {
+function GeoJSONLayer({ geojsonOutput }) {
 
-  const emptyFC = {
-    type: "FeatureCollection",
-    features: [],
-  };
   const map = useMap();
   useEffect(() => {
     if (geojsonOutput.features.length !== 0) {
@@ -54,9 +50,6 @@ function GeoJSONLayer({ geojsonOutput, setGeojson }) {
       if (bounds.isValid()) {
         map.fitBounds(bounds);
       }
-    }
-    return () => {
-      setGeojson(emptyFC);
     };
   }, [geojsonOutput, map]);
 

@@ -90,7 +90,6 @@ export default function MapResult({ tiff, range, json, geopackage }) {
       {geopackageContent && (
         <GeoPackageLayer
           geoPackage={geopackageContent}
-          setGeoPackage={setGeopackageContent}
         />
       )}
 

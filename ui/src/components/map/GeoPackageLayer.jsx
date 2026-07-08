@@ -38,16 +38,8 @@ function reprojectGeometry(geom, converter) {
   return { ...geom, coordinates: reprojectCoords(geom.coordinates, converter) };
 }
 
-function GeoPackageLayer({ geoPackage, setGeoPackage }) {
+function GeoPackageLayer({ geoPackage }) {
   const [geoJsonState, setGeoJsonState] = useState(emptyFC);
-
-  // Stable setter: if both old and new state are empty, keep the same reference
-  // to prevent GeoJSONLayer's cleanup from triggering an infinite re-render loop.
-  const setGeojsonStable = useCallback((fc) => {
-    setGeoJsonState((prev) =>
-      prev.features.length === 0 && fc.features.length === 0 ? prev : fc
-    );
-  }, []);
 
   useEffect(() => {
     if (!geoPackage) return;
@@ -112,12 +104,11 @@ function GeoPackageLayer({ geoPackage, setGeoPackage }) {
 
     return () => {
       cancelled = true;
-      setGeoPackage("");
       setGeoJsonState(emptyFC);
     };
   }, [geoPackage]);
 
-  return <GeoJSONLayer geojsonOutput={geoJsonState} setGeojson={setGeojsonStable} />;
+  return <GeoJSONLayer geojsonOutput={geoJsonState} />;
 }
 
 export default GeoPackageLayer;
