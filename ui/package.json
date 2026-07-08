@@ -9,7 +9,6 @@
     "//@monaco-editor/react": "provides the YAML/code editor in the YAML input and pipeline editor's metadata pane.",
     "//@mui": "provides Material components and icons used across UI controls.",
     "//@ngageoint/geopackage": "reads GeoPackage data sources.",
-    "//@ngageoint/leaflet-geopackage": "renders GeoPackage layers on Leaflet maps.",
     "//@testing-library/jest-dom": "Currently unused. Adds DOM assertions for component tests.",
     "//@testing-library/react": "Currently unused. Renders and exercises React components in tests.",
     "//@turf/turf": "performs geospatial calculations and geometry transforms.",
