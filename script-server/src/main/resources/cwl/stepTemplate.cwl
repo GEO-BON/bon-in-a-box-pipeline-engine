@@ -79,16 +79,7 @@ arguments:
     cat > "$OUTPUT_LOCATION/input.json" <<'JSON'
     ${
       return JSON.stringify({
-        taxa: inputs.taxa,
-        bbox_crs: {
-          bbox: inputs.bbox,
-          CRS: {
-            authority: "EPSG",
-            code: inputs.crs_code
-          },
-        },
-        min_year: inputs.min_year,
-        max_year: inputs.max_year,
+{{inputsProperties}}
       }, null, 2);
     }
     JSON

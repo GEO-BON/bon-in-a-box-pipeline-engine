@@ -27,6 +27,7 @@ class CWLFactory {
             val replacements = mapOf<String, String>(
                 "scriptPath" to step.scriptFile.relativeTo(scriptsRoot).path,
                 "inputs" to toCWL(step.inputDefinitions, true),
+                "inputsProperties" to generateInputProperties(step.inputDefinitions.keys),
                 "outputs" to toCWL(step.outputDefinitions, false),
                 "condaEnvName" to (step.condaEnvName ?: ""),
                 "condaEnvYml" to condaEnvYml
@@ -41,6 +42,14 @@ class CWLFactory {
             }
 
             return template
+        }
+
+        private fun generateInputProperties(inputNames: Iterable<String>): String {
+            val sb = StringBuilder()
+            inputNames.forEach {
+                sb.appendLine("        $it: inputs.$it,")
+            }
+            return sb.toString().trimEnd()
         }
 
         private fun toCWL(definitions: Map<String, IODefinition>, isInput: Boolean): String {

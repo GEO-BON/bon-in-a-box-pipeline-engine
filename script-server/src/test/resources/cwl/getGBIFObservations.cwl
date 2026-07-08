@@ -80,13 +80,7 @@ arguments:
     ${
       return JSON.stringify({
         taxa: inputs.taxa,
-        bbox_crs: {
-          bbox: inputs.bbox,
-          CRS: {
-            authority: "EPSG",
-            code: inputs.crs_code
-          },
-        },
+        bbox_crs: inputs.bbox_crs,
         min_year: inputs.min_year,
         max_year: inputs.max_year,
       }, null, 2);
@@ -125,33 +119,48 @@ inputs:
     doc: Comma-separated list of [taxa](https://en.wikipedia.org/wiki/Taxon). Each value could be a species name, order, class, genus, kingdom or family, as long as it is an exact match with the GBIF taxonomic backbone. Individual species can be looked up [on the GBIF website](https://www.gbif.org/species/).
     default: [Acer saccharum, Acer nigrum]
 
-  bbox:
-    type: int[]
-    label: Bounding Box
-    doc: Bounding box for the area of interest, in the format "minLon,minLat,maxLon,maxLat".
-    default:
-      - 2296842
-      - 7275965
-      - 2717150
-      - 7678409
-
-  crs_code:
-    type: int
-    label: CRS code
-    doc: EPSG code of the coordinate reference system for the bounding box.
-    default: 2953
+  bbox_crs:
+    label: Bounding box and CRS
+    doc: Select a bounding box and CRS
+    type:
+      type: record
+      name: crsBBox
+      fields:
+      - name: CRS
+        type:
+          name: CRSDefinition
+          type: record
+          fields: 
+          - name: unit
+            type: string?
+          - name: code
+            type: int?
+          - name: authority
+            type: string?
+          - name: name
+            type: string?
+          - name: CRSBboxWGS84
+            type: int[]?
+          - name: proj4Def
+            type: string?
+          - name: wktDef
+            type: string?
+      - name: bbox
+        type: float[]
 
   min_year:
+    type: int
     label: minimum year
     doc: Min year observations wanted
-    type: int
     default: 2010
 
   max_year:
+    type: int
     label: maximum year
     doc: Max year observations wanted
-    type: int
     default: 2024
+
+
 
   ###################
   # Run environment #
@@ -188,7 +197,7 @@ inputs:
   scriptPath:
     type: string
     doc: Path to the script, relative to scripts root.
-    default: data/getGBIFObservations/getGBIFObservations.py
+    default: forCWL/getGBIFObservations.py
 
   scripts_root:
     type: Directory?
@@ -211,7 +220,7 @@ outputs:
     outputBinding:
       glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
       loadContents: true
-      outputEval: $(parseInt(extractOutput(self, "total_records")))
+      outputEval: $(extractOutput(self, "total_records"))
 
   gbif_doi:
     type: string
@@ -221,6 +230,7 @@ outputs:
       glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
       loadContents: true
       outputEval: $(extractOutput(self, "gbif_doi"))
+
 
   logs:
     type: File
