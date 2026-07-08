@@ -6,8 +6,7 @@ import { useMap } from "react-leaflet";
  *
  * @param props
  */
-function GeoJSONLayer(props) {
-  const { geojsonOutput, setGeojson } = props;
+function GeoJSONLayer({ geojsonOutput, setGeojson }) {
   const emptyFC = {
     type: "FeatureCollection",
     features: [],
