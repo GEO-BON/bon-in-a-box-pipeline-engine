@@ -110,12 +110,15 @@ class CWLFactory {
             sb.appendLine("""
               $key:
                 label: ${definition.label}
-                doc: ${definition.description}
+                doc: >
+            """.replaceIndent("  "))
+            sb.appendLine(definition.description.replaceIndent("  ".repeat(3)))
+            sb.appendLine("""
                 type:
                   type: record
                   name: ${definition.type}
                   fields:
-            """.replaceIndent("  "))
+            """.replaceIndent("  ".repeat(2)))
 
             // Creating a CWL "record" for the input objects.
             schema.keys().forEach { subKey ->
@@ -171,7 +174,7 @@ class CWLFactory {
             // Primitives
             return when (biabRawType) {
                 IO__TYPE_TEXT -> CWL__IO__TYPE_STRING
-                IO__TYPE_OPTIONS -> CWL__IO__TYPE_ENUM
+                IO__TYPE_OPTIONS -> CWL__IO__TYPE_ENUM // TODO need to add the symbols
                 else -> biabRawType
             } + arraySuffix
         }
