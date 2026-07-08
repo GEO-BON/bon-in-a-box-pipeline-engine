@@ -6,41 +6,60 @@ import org.geobon.pipeline.StepId
 import org.geobon.utils.SystemCall
 import org.geobon.utils.assertMultilineEquals
 import org.geobon.utils.noHPCContext
-import org.slf4j.LoggerFactory
 import java.io.File
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
-import kotlin.test.fail
 
 class CWLFactoryTest {
 
 
+
     private val cwlResources = File("src/test/resources/cwl")
-    private val logger = LoggerFactory.getLogger(CWLFactoryTest::class.java)
+
+    private var resultFile:File? = null
+
+    fun validateCWL(cwlFile: File) {
+        // cwl validation: not necessary for the test but very useful when developing!
+        if(SystemCall().run(listOf("which", "cwl-runner")).success) {
+            val validationResult = SystemCall().run(
+                listOf("cwl-runner", "--validate", cwlFile.absolutePath),
+                mergeErrors = true
+            )
+            println(validationResult.output)
+            assertTrue(validationResult.success, "CWL Validation failed")
+        }
+    }
+
+    @AfterTest
+    fun cleanup(){
+//        resultFile?.delete()
+    }
 
     @Test
     fun `test single R script with Conda sub-environment`() {
+        val stepToTest = "getRangeMap"
+        val step = ScriptStep("forCWL/$stepToTest.yml", StepId("step", "0"), noHPCContext)
+        val result = toCWL(step)
 
+        resultFile = File(cwlResources, "${stepToTest}_gen.cwl").also { resultFile ->
+            resultFile.writeText(result)
+            validateCWL(resultFile)
+        }
+
+        val expected = File(cwlResources, "$stepToTest.cwl").readText()
+        assertMultilineEquals(expected, result)
     }
 
     @Test
     fun `test single python script with Conda sub-environment`() {
         val stepToTest = "getGBIFObservations"
-
         val step = ScriptStep("forCWL/$stepToTest.yml", StepId("step", "0"), noHPCContext)
         val result = toCWL(step)
 
-        val resultFile = File(cwlResources, "${stepToTest}_gen.cwl")
-        resultFile.writeText(result)
-
-        // cwl validation: not necessary for the test but very useful when developing!
-        if(SystemCall().run(listOf("which", "cwl-runner")).success) {
-            val validationResult = SystemCall().run(
-                listOf("cwl-runner", "--validate", resultFile.absolutePath),
-                mergeErrors = true
-            )
-            println(validationResult.output)
-            assertTrue(validationResult.success)
+        resultFile = File(cwlResources, "${stepToTest}_gen.cwl").also { resultFile ->
+            resultFile.writeText(result)
+            validateCWL(resultFile)
         }
 
         val expected = File(cwlResources, "$stepToTest.cwl").readText()

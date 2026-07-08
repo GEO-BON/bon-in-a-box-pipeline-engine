@@ -74,9 +74,10 @@ class CWLFactory {
                 $key:
                   type: $type
                   label: ${definition.label}
-                  doc: ${definition.description}
-            """.replaceIndent("  ")
+                  doc: >
+                """.replaceIndent("  ")
             )
+            sb.appendLine(definition.description.replaceIndent("  ".repeat(3)))
 
             if (isInput) {
                 sb.appendLine("default: ${definition.example}".replaceIndent("  ".repeat(2)))
