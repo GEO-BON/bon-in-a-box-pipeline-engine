@@ -70,10 +70,12 @@ class OpenEOStep: ScriptStep {
         scriptFile = File(scriptStubsRoot, "openEOWrapper.py")
     }
 
-    override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
-        val inputsWithUrl = resolvedInputs.toMutableMap()
-        inputsWithUrl["url"] = ConstantPipe("text",  yamlParsed[SCRIPT].toString())
-        return super.execute(inputsWithUrl)
+    private var url = ConstantPipe("text",  yamlParsed[SCRIPT].toString())
+
+    override suspend fun resolveInputs(): Map<String, Any?> {
+        val resolvedInputs = super.resolveInputs().toMutableMap()
+        resolvedInputs["url"] = url.pull()
+        return resolvedInputs
     }
 
     companion object {
@@ -82,7 +84,6 @@ class OpenEOStep: ScriptStep {
         private val openEOFolder = File(scriptStubsRoot, "openEO")
 
         fun updateYaml(udpKey: String): File {
-            // TODO: at which frequency do we force yaml update?
             val options = DumperOptions()
             options.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
             val yamlFile = File(openEOFolder, "$udpKey.yml")
@@ -316,11 +317,11 @@ class OpenEOStep: ScriptStep {
             val output = mutableMapOf<String, Any>()
             output[IO__LABEL] = "Output raster"
             output[IO__DESCRIPTION] = "Output raster of the process, generated from the output datacube."
-            output[IO__TYPE] = "image/tiff;application=geotiff"
+            output[IO__TYPE] = "image/tiff;application=geotiff[]"
 
             // For openEO steps there is always a single output.
             val outputs = mutableMapOf<String, Any>()
-            outputs["output_raster"] = output
+            outputs["output_rasters"] = output
 
             val outputYaml = mutableMapOf<String, Any>()
             outputYaml[OUTPUTS] = outputs

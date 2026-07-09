@@ -10,14 +10,12 @@ if not id or not secret:
 # Reading inputs
 data = biab_inputs()
 
-print(data.keys())
-
 # Extract process id
 if (data['url'] is not None):
     process_id = data['url'].split('/')[-1].removesuffix(".json")
+    process_graph = data['url']
 else:
-    biab_error_stop("Yaml file is missing the process url.")
-
+    biab_error_stop("Missing the process url.")
 # Set up inputs for process call
 inputs = dict(data)
 inputs.pop('url', None)
@@ -41,18 +39,24 @@ connection.authenticate_oidc_client_credentials(
     client_id = id,
     client_secret = secret,
 )
+print("***********************************************")
+print("Running openEO with the following parameters:")
+print(f"Process id: {process_id}")
+print(f"Namespace: {process_graph}")
+print(f"Inputs: {inputs}")
+print("***********************************************")
 
 # Get cube from UDP
 cube = connection.datacube_from_process(
     process_id = process_id,
+    namespace = process_graph,
     **inputs
 )
 
 # Run UDP then reload output as a cube
 print("Starting UDP job to retrieve data cube...", flush=True)
-udp_job = cube.create_job(
-    title=f"UDP",
-    auto_add_save_result=True,
+udp_job = cube.save_result(format="GTiff").create_job(
+    title="UDP"
 )
 
 try:
@@ -63,24 +67,9 @@ except Exception as e:
 print(f"UDP job finished: {udp_job.job_id}", flush=True)
 
 job_results = udp_job.get_results()
-job_metadata = job_results.get_metadata()
+rasters = job_results.download_files(output_folder)
 
-raster = job_results.download_files(output_folder)
-biab_output("output_raster", raster)
+raster_outs = [str(r) for r in rasters if not str(r).endswith(".json")]
+biab_output("output_rasters", raster_outs)
 
-###############################################
 
-# # Submit aggregation as separate job
-# result.save_result("GTiff")
-# print("Starting aggregation job", flush=True)
-# job2 = result.create_job()
-# try:
-#     job2.start_and_wait()
-# except Exception as e:
-#     biab_error_stop(f"openEO job failed: {e}")
-#
-# rasters = job2.get_results().download_files(output_folder)
-# print("Job finished:", rasters, flush=True)
-#
-# raster_outs = [str(r) for r in rasters if not str(r).endswith(".json")]
-# biab_output("rasters", raster_outs)
