@@ -56,6 +56,7 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Duration
+import org.jetbrains.annotations.VisibleForTesting
 
 class OpenEOStep: ScriptStep {
     constructor(
@@ -157,7 +158,8 @@ class OpenEOStep: ScriptStep {
             return JSONObject(response.body())
         }
 
-        private fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
+        @VisibleForTesting
+        fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
             if (jsonFile.isEmpty) throw IllegalArgumentException("catalogJson is empty")
 
             val outputYaml = mutableMapOf<String, Any>()
@@ -229,7 +231,8 @@ class OpenEOStep: ScriptStep {
             return outputYaml
         }
 
-        private fun convertInputs(processJson: JSONObject): Map<String, Any> {
+        @VisibleForTesting
+        fun convertInputs(processJson: JSONObject): Map<String, Any> {
             if (processJson.isEmpty) throw IllegalArgumentException("processJson is empty")
             val outputYaml = mutableMapOf<String, Any>()
             val parameters = processJson.optJSONArray(UDP__INPUTS) ?: return outputYaml
@@ -313,7 +316,8 @@ class OpenEOStep: ScriptStep {
             return outputYaml
         }
 
-        private fun addOutputs(): Map<String, Any> {
+        @VisibleForTesting
+        fun addOutputs(): Map<String, Any> {
             val output = mutableMapOf<String, Any>()
             output[IO__LABEL] = "Output raster"
             output[IO__DESCRIPTION] = "Output raster of the process, generated from the output datacube."
@@ -328,7 +332,8 @@ class OpenEOStep: ScriptStep {
             return outputYaml
         }
 
-        private fun addCondaEnv(): Map<String, Any> {
+        @VisibleForTesting
+        fun addCondaEnv(): Map<String, Any> {
             val condaEnv = mutableMapOf<String, Any>()
             condaEnv["channels"] = listOf("conda-forge")
             condaEnv["dependencies"] = listOf("openeo")
