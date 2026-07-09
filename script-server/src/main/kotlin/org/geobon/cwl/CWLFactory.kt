@@ -111,10 +111,16 @@ class CWLFactory {
                 """
               $key:
                 label: ${definition.label}
-                doc: >
             """.replaceIndent("  ")
             )
-            sb.appendLine(definition.description.replaceIndent(indent(3)))
+
+            if(definition.description.contains('\n')) {
+                sb.appendLine(2, "doc: >")
+                sb.appendLine(definition.description.replaceIndent(indent(3)))
+            } else {
+                sb.appendLine(2, "doc: ${definition.description}")
+            }
+
             sb.appendLine(
                 """
                 type:
