@@ -20,7 +20,6 @@ proj4.defs([
 setSqljsWasmLocateFile(() => sqlWasmUrl);
 
 const DEST_PROJ = "EPSG:4326";
-const emptyFC = { type: "FeatureCollection", features: [] };
 
 function reprojectCoords(coords, converter) {
   if (typeof coords[0] === "number") {
@@ -39,7 +38,7 @@ function reprojectGeometry(geom, converter) {
 }
 
 function GeoPackageLayer({ geoPackage, clearLayers }) {
-  const [geoJsonState, setGeoJsonState] = useState(emptyFC);
+  const [geoJsonState, setGeoJsonState] = useState(null);
 
   useEffect(() => {
     if (!geoPackage) return;
@@ -84,6 +83,8 @@ function GeoPackageLayer({ geoPackage, clearLayers }) {
 
             const geom = geomData.toGeoJSON();
             const geometry = converter ? reprojectGeometry(geom, converter) : geom;
+
+            // Excluding property that contains a binary blob
             const { [geomColName]: _geom, ...properties } = featureRow.values;
 
             allFeatures.push({ type: "Feature", geometry, properties });
@@ -104,11 +105,11 @@ function GeoPackageLayer({ geoPackage, clearLayers }) {
 
     return () => {
       cancelled = true;
-      setGeoJsonState(emptyFC);
+      setGeoJsonState(null);
     };
   }, [geoPackage]);
 
-  return <GeoJSONLayer geojsonOutput={geoJsonState} clearLayers={clearLayers} />;
+  return geoJsonState && <GeoJSONLayer geojsonOutput={geoJsonState} clearLayers={clearLayers} />;
 }
 
 export default GeoPackageLayer;
