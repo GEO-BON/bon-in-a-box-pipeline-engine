@@ -20,8 +20,8 @@ class CWLFactory {
             if (condaEnvYml == null) {
                 condaEnvYml = ""
             } else { // Add indent and quotes
-                condaEnvYml = condaEnvYml.trim().prependIndent("  ".repeat(4))
-                condaEnvYml = "\"\n$condaEnvYml\n${"  ".repeat(3)}\""
+                condaEnvYml = condaEnvYml.trim().prependIndent(indent(4))
+                condaEnvYml = "\"\n$condaEnvYml\n${indent(3)}\""
             }
 
             val replacements = mapOf<String, String>(
@@ -55,82 +55,86 @@ class CWLFactory {
         private fun toCWL(definitions: Map<String, IODefinition>, isInput: Boolean): String {
             val sb = StringBuilder()
             definitions.forEach { (key, value) ->
-                sb.append(toCWL(key, value, isInput))
+                sb.append(key.toCWL(value, isInput))
             }
             return sb.toString()
         }
 
-        private fun toCWL(key: String, definition: IODefinition, isInput: Boolean): String {
+        private fun String.toCWL(definition: IODefinition, isInput: Boolean): String {
             // Location chooser objects need to be exploded in CWL
             ObjectInputDefinition.fromDef(definition.type)?.let {
-                return toCWL(key, definition, it.requiredProperties, isInput)
+                return toCWL(this, definition, it.requiredProperties, isInput)
             }
 
-            val type = toCWLType(definition.type)
+            val type = toCWLType(definition, 2)
 
-            val sb = StringBuilder()
-            sb.appendLine(
-                """
-                $key:
-                  type: $type
-                  label: ${definition.label}
-                  doc: >
-                """.replaceIndent("  ")
-            )
-            sb.appendLine(definition.description.replaceIndent("  ".repeat(3)))
+            return buildString {
+                appendLine(1, "${this@toCWL}:")
+                appendLine(2, "type: $type")
+                appendLine(2, "label: ${definition.label}")
+                if(definition.description.contains('\n')) {
+                    appendLine(2, "doc: >")
+                    appendLine(definition.description.replaceIndent(indent(3)))
+                } else {
+                    appendLine(2, "doc: ${definition.description}")
+                }
 
-            if (isInput) {
-                sb.appendLine("default: ${definition.example}".replaceIndent("  ".repeat(2)))
-            } else {
-                val extractFunction =
-                    if (type.startsWith(CWL__IO__TYPE_FILE)) "extractOutputFile"
-                    else "extractOutput"
+                if (isInput) {
+                    appendLine("default: ${definition.example}".replaceIndent(indent(2)))
+                } else {
+                    val extractFunction = // TODO support output arrays
+                        if (type.startsWith(CWL__IO__TYPE_FILE)) "extractOutputFile"
+                        else "extractOutput"
 
-                sb.appendLine(
-                    """
+                    appendLine(
+                        """
                     outputBinding:
                       glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
                       loadContents: true
-                      outputEval: $($extractFunction(self, "$key"))
-                """.replaceIndent("  ".repeat(2))
-                )
-            }
+                      outputEval: $($extractFunction(self, "${this@toCWL}"))
+                """.replaceIndent(indent(2))
+                    )
+                }
 
-            sb.appendLine()
-            return sb.toString()
+                appendLine()
+            }
         }
 
         private fun toCWL(
             key: String,
             definition: IODefinition,
             schema: JSONObject,
-            isInput: Boolean
+            isInput: Boolean // TODO: Add examples if input
         ): String {
             val sb = StringBuilder()
-            sb.appendLine("""
+            sb.appendLine(
+                """
               $key:
                 label: ${definition.label}
                 doc: >
-            """.replaceIndent("  "))
-            sb.appendLine(definition.description.replaceIndent("  ".repeat(3)))
-            sb.appendLine("""
+            """.replaceIndent("  ")
+            )
+            sb.appendLine(definition.description.replaceIndent(indent(3)))
+            sb.appendLine(
+                """
                 type:
                   type: record
                   name: ${definition.type}
                   fields:
-            """.replaceIndent("  ".repeat(2)))
+            """.replaceIndent(indent(2))
+            )
 
             // Creating a CWL "record" for the input objects.
             schema.keys().forEach { subKey ->
                 schema.optJSONObject(subKey)?.let { section ->
                     sb.appendLine(
                         """
-                            - name: ${subKey}
+                            - name: $subKey
                               type:
                                 name: ${subKey}Definition
                                 type: record
                                 fields: 
-                        """.replaceIndent("  ".repeat(3))
+                        """.replaceIndent(indent(3))
                     )
 
                     section.keys().forEach { fieldKey ->
@@ -138,8 +142,8 @@ class CWLFactory {
                             sb.appendLine(
                                 """
                                     - name: $fieldKey
-                                      type: ${toCWLType(fieldType)}?
-                                """.replaceIndent("  ".repeat(5))
+                                      type: ${toCWLTypeName(fieldType)}?
+                                """.replaceIndent(indent(5))
                             )
                         }
                     }
@@ -150,8 +154,8 @@ class CWLFactory {
                     sb.append(
                         """
                             - name: $subKey
-                              type: ${toCWLType(propertyType)}
-                        """.replaceIndent("  ".repeat(3))
+                              type: ${toCWLTypeName(propertyType)}
+                        """.replaceIndent(indent(3))
                     )
                 }
             }
@@ -161,7 +165,26 @@ class CWLFactory {
             return if (sb.isBlank()) "" else sb.toString()
         }
 
-        private fun toCWLType(biabType: String): String {
+        private fun toCWLType(definition: IODefinition, baseIndent: Int): String {
+            val typeName = toCWLTypeName(definition.type)
+            if(definition.type == IO__TYPE_OPTIONS) {
+                return buildString {
+                    append("\n${indent(baseIndent + 1)}type: $typeName")
+                    append("\n${indent(baseIndent + 1)}symbols:")
+                    definition.options?.forEach {
+                        append("\n${indent(baseIndent + 2)}- $it")
+                    }
+                }
+            }
+            return typeName
+        }
+
+        /**
+         * Use only when there is no access to the full definition of the object.
+         * It's the case for conversion of location chooser objects where we only have the type name,
+         * and know there will not be option objects included.
+         */
+        private fun toCWLTypeName(biabType: String): String {
             val arrayIndex = biabType.indexOf("[")
             val arraySuffix = if (arrayIndex == -1) "" else biabType.substring(arrayIndex)
             val biabRawType = if (arrayIndex == -1) biabType else biabType.substring(0, arrayIndex)
@@ -174,9 +197,17 @@ class CWLFactory {
             // Primitives
             return when (biabRawType) {
                 IO__TYPE_TEXT -> CWL__IO__TYPE_STRING
-                IO__TYPE_OPTIONS -> CWL__IO__TYPE_ENUM // TODO need to add the symbols
+                IO__TYPE_OPTIONS -> CWL__IO__TYPE_ENUM
                 else -> biabRawType
-            } + arraySuffix
+            }  + arraySuffix
         }
     }
+}
+
+private fun indent(n:Int):String {
+    return "  ".repeat(n)
+}
+
+fun StringBuilder.appendLine(indent: Int, text: String) {
+    appendLine("${indent(indent)}$text")
 }

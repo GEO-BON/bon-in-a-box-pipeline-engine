@@ -24,7 +24,8 @@ class CWLFactoryTest {
         if(SystemCall().run(listOf("which", "cwl-runner")).success) {
             val validationResult = SystemCall().run(
                 listOf("cwl-runner", "--validate", cwlFile.absolutePath),
-                mergeErrors = true
+                mergeErrors = true,
+                timeoutAmount = 10
             )
             println(validationResult.output)
             assertTrue(validationResult.success, "CWL Validation failed")
