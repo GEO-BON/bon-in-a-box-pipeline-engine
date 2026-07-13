@@ -57,17 +57,13 @@ function CustomLayer(props: any) {
         geojsonOutput.features.length !== 0 && (
           <GeoJSONLayer
             geojsonOutput={geojsonOutput}
-            setGeojson={setGeojson}
-            map={map}
             clearLayers={clearLayers}
           ></GeoJSONLayer>
         )}
       {typeof geoPackage !== "undefined" && geoPackage && (
         <GeoPackageLayer
           geoPackage={geoPackage}
-          map={map}
           clearLayers={clearLayers}
-          setGeoPackage={setGeoPackage}
         ></GeoPackageLayer>
       )}
       {typeof selectedLayerTiles !== "undefined" && selectedLayerTiles && (
