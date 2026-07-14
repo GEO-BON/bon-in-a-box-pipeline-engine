@@ -50,6 +50,8 @@ class ScriptStep : YMLStep {
     )
 
     val scriptFile: File = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
+    val scriptType
+        get() = ScriptType.fromFile(scriptFile)
 
     val condaEnvName by lazy {
         yamlParsed[CONDA]?.let { // We only define the env name if there is a conda section
@@ -170,7 +172,7 @@ class ScriptStep : YMLStep {
 
     private fun shouldUseHPC(): Boolean {
         return context?.serverContext?.hpc?.connection?.let { connection ->
-            when (connection.statusFor(ScriptType.fromFile(scriptFile))) {
+            when (connection.statusFor(scriptType)) {
                 RemoteSetupState.PREPARING, RemoteSetupState.READY -> true
                 else -> false
             }

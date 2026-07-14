@@ -30,7 +30,9 @@ class CWLFactory {
                 "inputsProperties" to generateInputProperties(step.inputDefinitions.keys),
                 "outputs" to toCWL(step.outputDefinitions, false),
                 "condaEnvName" to (step.condaEnvName ?: ""),
-                "condaEnvYml" to condaEnvYml
+                "condaEnvYml" to condaEnvYml,
+                "program" to step.scriptType.program,
+                "scriptWrapper" to "scriptWrapper.${step.scriptType.extension}"
             )
 
             // Load the step template
@@ -70,9 +72,9 @@ class CWLFactory {
 
             return buildString {
                 appendLine(1, "${this@toCWL}:")
-                appendLine(2, "type: $type")
+                appendLine(2, "type:$type")
                 appendLine(2, "label: ${definition.label}")
-                if(definition.description.contains('\n')) {
+                if (definition.description.contains('\n')) {
                     appendLine(2, "doc: >")
                     appendLine(definition.description.replaceIndent(indent(3)))
                 } else {
@@ -83,7 +85,7 @@ class CWLFactory {
                     appendLine("default: ${definition.example}".replaceIndent(indent(2)))
                 } else {
                     val extractFunction = // TODO support output arrays
-                        if (type.startsWith(CWL__IO__TYPE_FILE)) "extractOutputFile"
+                        if (type.trimStart().startsWith(CWL__IO__TYPE_FILE)) "extractOutputFile"
                         else "extractOutput"
 
                     appendLine(
@@ -114,7 +116,7 @@ class CWLFactory {
             """.replaceIndent("  ")
             )
 
-            if(definition.description.contains('\n')) {
+            if (definition.description.contains('\n')) {
                 sb.appendLine(2, "doc: >")
                 sb.appendLine(definition.description.replaceIndent(indent(3)))
             } else {
@@ -139,7 +141,7 @@ class CWLFactory {
                               type:
                                 name: ${subKey}Definition
                                 type: record
-                                fields: 
+                                fields:
                         """.replaceIndent(indent(3))
                     )
 
@@ -173,7 +175,7 @@ class CWLFactory {
 
         private fun toCWLType(definition: IODefinition, baseIndent: Int): String {
             val typeName = toCWLTypeName(definition.type)
-            if(definition.type == IO__TYPE_OPTIONS) {
+            if (definition.type == IO__TYPE_OPTIONS) {
                 return buildString {
                     append("\n${indent(baseIndent + 1)}type: $typeName")
                     append("\n${indent(baseIndent + 1)}symbols:")
@@ -182,7 +184,7 @@ class CWLFactory {
                     }
                 }
             }
-            return typeName
+            return " $typeName"
         }
 
         /**
@@ -205,12 +207,12 @@ class CWLFactory {
                 IO__TYPE_TEXT -> CWL__IO__TYPE_STRING
                 IO__TYPE_OPTIONS -> CWL__IO__TYPE_ENUM
                 else -> biabRawType
-            }  + arraySuffix
+            } + arraySuffix
         }
     }
 }
 
-private fun indent(n:Int):String {
+private fun indent(n: Int): String {
     return "  ".repeat(n)
 }
 

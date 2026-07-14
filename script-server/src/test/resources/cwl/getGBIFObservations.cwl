@@ -130,7 +130,7 @@ inputs:
         type:
           name: CRSDefinition
           type: record
-          fields: 
+          fields:
           - name: unit
             type: string?
           - name: code

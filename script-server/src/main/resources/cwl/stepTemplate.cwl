@@ -90,8 +90,8 @@ arguments:
     source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION {{condaEnvName}} \
       {{condaEnvYml}} /conda-envs $(inputs.condaPackURL) 2>&1 >> $log
 
-    python3 \
-      $SCRIPT_STUBS_LOCATION/system/scriptWrapper.py \
+    {{program}} \
+      $SCRIPT_STUBS_LOCATION/system/{{scriptWrapper}} \
       $OUTPUT_LOCATION \
       $SCRIPT_LOCATION/$(inputs.scriptPath) \
       2>&1 | tee -a $log

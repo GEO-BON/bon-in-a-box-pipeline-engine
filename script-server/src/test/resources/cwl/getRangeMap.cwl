@@ -3,7 +3,7 @@ cwlVersion: v1.2
 class: CommandLineTool
 
 # To run this proof of concept:
-# cwltool <path/url to cwl file> --envFolder="./env" --species=<array of species> --expert_source="IUCN"
+# cwltool <path/url to cwl file> --envFolder="./env" [optional inputs] --environment="path/to/runner.env"
 # envFolder will keep conda environments between runs.
 # environment file is necessary when the script requires credentials.
 
@@ -79,8 +79,8 @@ arguments:
     cat > "$OUTPUT_LOCATION/input.json" <<'JSON'
     ${
       return JSON.stringify({
-        "expert_source": inputs.expert_source,
-        "species": inputs.species
+        species: inputs.species,
+        expert_source: inputs.expert_source,
       }, null, 2);
     }
     JSON
@@ -88,21 +88,11 @@ arguments:
     echo "Inputs:" | tee -a $log
     cat $OUTPUT_LOCATION/input.json | tee -a $log
 
-    # This script does not really need the conda environment. Switch the comments to test with Conda.
-    # source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION rbase 2>&1 >> $log
     source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION forCWL__getRangeMap \
       "
+        channels: [conda-forge, r]
+        dependencies: [r-rjson, r-dplyr, r-tidyr, r-purrr, r-sf, r-stringr]
         name: forCWL__getRangeMap
-        channels:
-          - conda-forge
-          - r
-        dependencies:
-          - r-rjson
-          - r-dplyr
-          - r-tidyr
-          - r-purrr
-          - r-sf
-          - r-stringr
       " /conda-envs $(inputs.condaPackURL) 2>&1 >> $log
 
     Rscript \
@@ -121,6 +111,11 @@ inputs:
   #################
   # Script inputs #
   #################
+  species:
+    type: string[]
+    label: species
+    doc: Scientific name of the species. Multiple species names can be specified, separated with a comma.
+    default: [Myrmecophaga tridactyla]
 
   expert_source:
     type:
@@ -129,11 +124,13 @@ inputs:
         - MOL
         - IUCN
         - QC
+    label: source of expert range map
+    doc: >
+      Source of the expert range map for the species. The options are:
+      Map of Life (MOL), International union for conservation of nature (IUCN) and range maps from the Ministère de l’Environnement du Québec (QC).
     default: IUCN
 
-  species:
-    type: string[]
-    default: ["Myrmecophaga tridactyla"]
+
 
   ###################
   # Run environment #
@@ -170,7 +167,7 @@ inputs:
   scriptPath:
     type: string
     doc: Path to the script, relative to scripts root.
-    default: data/getRangeMap.R
+    default: forCWL/getRangeMap.R
 
   scripts_root:
     type: Directory?
@@ -178,11 +175,14 @@ inputs:
 
 outputs:
   sf_range_map:
-    type: File
+    type: File[]
+    label: expert range map
+    doc: Polygon with expected area for the species.
     outputBinding:
       glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
       loadContents: true
       outputEval: $(extractOutputFile(self, "sf_range_map"))
+
 
   logs:
     type: File
