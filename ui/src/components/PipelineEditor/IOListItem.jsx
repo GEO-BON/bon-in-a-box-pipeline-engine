@@ -53,9 +53,9 @@ export function IOListItem({ io, id, valueEdited, setter, className, expand }) {
                                         <label className="inline-label"><span>Type:&nbsp;</span>
                                         <input className="type"
                                             name="type"
-                                            defaultValue={io.type} 
-                                            onBlur={e => valueEdited(e.target.type, "type", io, setter)}
-                                            onKeyDown={(e) => { if (e.ctrlKey) valueEdited(e.target.value, "type", io, setter) }} 
+                                            defaultValue={io.type}
+                                            onBlur={e => valueEdited(e.target.value, "type", io, setter)}
+                                            onKeyDown={(e) => { if (e.ctrlKey) valueEdited(e.target.value, "type", io, setter) }}
                                         />
                                         </label>
                                     </div>
