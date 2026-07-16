@@ -14,6 +14,7 @@ import org.json.JSONObject
 
 class CWLFactory {
     companion object {
+
         fun toCWL(step: ScriptStep): String {
 
             var condaEnvYml = step.condaEnvYml
@@ -32,7 +33,8 @@ class CWLFactory {
                 "condaEnvName" to (step.condaEnvName ?: ""),
                 "condaEnvYml" to condaEnvYml,
                 "program" to step.scriptType.program,
-                "scriptWrapper" to "scriptWrapper.${step.scriptType.extension}"
+                "scriptWrapper" to "scriptWrapper.${step.scriptType.extension}",
+                "metadata" to toCWLMetadata(step)
             )
 
             // Load the step template
@@ -208,6 +210,16 @@ class CWLFactory {
                 IO__TYPE_OPTIONS -> CWL__IO__TYPE_ENUM
                 else -> biabRawType
             } + arraySuffix
+        }
+
+        private fun toCWLMetadata(step: ScriptStep): String {
+            return buildString {
+                appendLine("label: ${step.metadata.name}")
+                step.metadata.description?.let {
+                    appendLine("doc:")
+                    appendLine(it.replaceIndent(indent(1)))
+                }
+            }
         }
     }
 }

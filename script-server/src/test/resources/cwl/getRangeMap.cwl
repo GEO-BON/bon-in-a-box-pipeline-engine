@@ -7,6 +7,11 @@ class: CommandLineTool
 # envFolder will keep conda environments between runs.
 # environment file is necessary when the script requires credentials.
 
+label: Get species range map
+doc:
+  This script downloads the range map of the species according to the expert source chosen.
+
+
 requirements:
   InlineJavascriptRequirement:
     expressionLib:

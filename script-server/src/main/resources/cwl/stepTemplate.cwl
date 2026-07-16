@@ -7,6 +7,8 @@ class: CommandLineTool
 # envFolder will keep conda environments between runs.
 # environment file is necessary when the script requires credentials.
 
+{{metadata}}
+
 requirements:
   InlineJavascriptRequirement:
     expressionLib:

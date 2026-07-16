@@ -7,6 +7,11 @@ class: CommandLineTool
 # envFolder will keep conda environments between runs.
 # environment file is necessary when the script requires credentials.
 
+label: GBIF Observations from Download API
+doc:
+  Load complete GBIF data from GBIF download API
+
+
 requirements:
   InlineJavascriptRequirement:
     expressionLib:
