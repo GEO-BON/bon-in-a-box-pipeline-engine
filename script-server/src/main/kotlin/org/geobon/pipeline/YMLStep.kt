@@ -1,21 +1,44 @@
 package org.geobon.pipeline
 
+import org.geobon.pipeline.metadata.CondaMetadata
+import org.geobon.pipeline.metadata.PersonMetadata
+import org.geobon.pipeline.metadata.IOMetadata
+import org.geobon.pipeline.metadata.ReferenceMetadata
+import org.geobon.pipeline.metadata.StepMetadata
+import org.geobon.pipeline.metadata.StepMetadata.Companion.DEFAULT_TIMEOUT
+import org.geobon.script.Description.AUTHORS
+import org.geobon.script.Description.CONDA
+import org.geobon.script.Description.CONDA__NAME
+import org.geobon.script.Description.PERSON__EMAIL
+import org.geobon.script.Description.PERSON__IDENTIFIER
+import org.geobon.script.Description.PERSON_NAME
+import org.geobon.script.Description.PERSON__ROLE
+import org.geobon.script.Description.DESCRIPTION
+import org.geobon.script.Description.EXTERNAL_LINK
 import org.geobon.script.Description.INPUTS
 import org.geobon.script.Description.IO__LABEL
 import org.geobon.script.Description.IO__TYPE
 import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
+import org.geobon.script.Description.LICENSE
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
-import org.geobon.script.IODefinition
+import org.geobon.script.Description.REFERENCES
+import org.geobon.script.Description.REFERENCES_LINK
+import org.geobon.script.Description.REFERENCES_TEXT
+import org.geobon.script.Description.REVIEWERS
+import org.geobon.script.Description.SCRIPT
+import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.Run
 import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileNotFoundException
+import kotlin.time.Duration.Companion.minutes
 
 
 abstract class YMLStep(
@@ -32,11 +55,28 @@ abstract class YMLStep(
      */
     var context: RunContext? = null
 
-    val inputDefinitions by lazy { readIODefinitions(yamlParsed, INPUTS, logger) }
-    val outputDefinitions by lazy { readIODefinitions(yamlParsed, OUTPUTS, logger) }
+    val metadata: StepMetadata = StepMetadata(
+        File(yamlFile.parent, yamlParsed[SCRIPT].toString()),
+        readIODefinitions(yamlParsed, INPUTS, logger),
+        readIODefinitions(yamlParsed, OUTPUTS, logger),
+        (yamlParsed[TIMEOUT] as? Int)?.minutes ?: DEFAULT_TIMEOUT,
+        yamlParsed[NAME]?.toString() ?: yamlFile.name,
+        yamlParsed[DESCRIPTION]?.toString(),
+        readPersons(yamlParsed, AUTHORS),
+        readPersons(yamlParsed, REVIEWERS),
+        yamlParsed[LICENSE]?.toString(),
+        yamlParsed[EXTERNAL_LINK]?.toString(),
+        readReferences(yamlParsed),
+        readConda(yamlFile, yamlParsed)
+    )
+
+    val inputDefinitions
+        get() = metadata.inputs
+    val outputDefinitions
+        get() = metadata.outputs
 
     override fun getDisplayBreadcrumbs(): String {
-        return if (yamlParsed.containsKey(NAME)) "\"${yamlParsed[NAME]}\" (${id.toBreadcrumbs()})"
+        return if (metadata.name != null) "\"${metadata.name}\" (${id.toBreadcrumbs()})"
         else id.toBreadcrumbs()
     }
 
@@ -152,11 +192,11 @@ abstract class YMLStep(
     }
 
     fun toDisplayName(): String {
-        return id.step.replace(">", " > ").replace(yamlFile.name, yamlParsed[NAME] as String)
+        return id.step.replace(">", " > ").replace(yamlFile.name, metadata.name as String)
     }
 
     override fun toString(): String {
-        return "${javaClass.simpleName} (id=$id, name=\"${yamlParsed[NAME]}\", file=${yamlFile.relativeTo(ServerContext.scriptsRoot)})"
+        return "${javaClass.simpleName} (id=$id, name=\"${metadata.name}\", file=${yamlFile.relativeTo(ServerContext.scriptsRoot)})"
     }
 
     companion object {
@@ -182,10 +222,10 @@ abstract class YMLStep(
         /**
          * @return Map of input name to type
          */
-        private fun readIODefinitions(yamlParsed: Map<String, Any>, section: String, logger: Logger): Map<String, IODefinition> {
-            val inputs = mutableMapOf<String, IODefinition>()
+        private fun readIODefinitions(yamlParsed: Map<String, Any>, section: String, logger: Logger): Map<String, IOMetadata> {
+            val inputs = mutableMapOf<String, IOMetadata>()
             readIO(yamlParsed, section, logger) { key, type, definition ->
-                inputs[key] = IODefinition(type, definition)
+                inputs[key] = IOMetadata(type, definition)
             }
             return inputs
         }
@@ -227,6 +267,72 @@ abstract class YMLStep(
                     logger.error("$section is not a map")
                 }
             } ?: logger.trace("No $section map")
+        }
+    }
+
+    private fun readPersons(yamlParsed: Map<String, Any>, section: String): List<PersonMetadata>? {
+        val authorsFound = mutableListOf<PersonMetadata>()
+        yamlParsed[section]?.let { authors ->
+            if (authors is Iterable<*>) {
+                authors.forEach { author ->
+                    if (author is Map<*, *>) {
+                        (author[PERSON_NAME] as? String)?.let { name ->
+                            authorsFound.add(
+                                PersonMetadata(
+                                    name,
+                                    author[PERSON__EMAIL]?.toString(),
+                                    author[PERSON__IDENTIFIER]?.toString(),
+                                    author[PERSON__ROLE]?.toString()
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        return if (authorsFound.isEmpty()) null
+        else authorsFound
+    }
+
+    private fun readReferences(yamlParsed: Map<String, Any>): List<ReferenceMetadata>? {
+        val referencesFound = mutableListOf<ReferenceMetadata>()
+        yamlParsed[REFERENCES]?.let { authors ->
+            if (authors is Iterable<*>) {
+                authors.forEach { author ->
+                    if (author is Map<*, *>) {
+                        (author[REFERENCES_TEXT] as? String)?.let { text ->
+                            referencesFound.add(
+                                ReferenceMetadata(
+                                    text,
+                                    author[REFERENCES_LINK]?.toString()
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        return if (referencesFound.isEmpty()) null
+        else referencesFound
+    }
+
+    private fun readConda(yamlFile:File, yamlParsed: Map<String, Any>): CondaMetadata? {
+        return yamlParsed[CONDA]?.let { condaSection ->
+            val condaEnvName = yamlFile.relativeTo(scriptsRoot).path
+                .replace("/", "__")
+                .replace(' ', '_')
+                .removeSuffix(".yml")
+
+            try {
+                @Suppress("UNCHECKED_CAST")
+                (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName
+
+                CondaMetadata(condaEnvName, Yaml().dump(condaSection))
+            } catch (_: Exception) {
+                null
+            }
         }
     }
 }

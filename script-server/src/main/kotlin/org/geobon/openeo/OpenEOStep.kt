@@ -24,7 +24,7 @@ import org.geobon.openeo.OpenEODescription.UDP__INPUTS
 import org.geobon.openeo.OpenEODescription.APEX__PROPERTIES
 import org.geobon.openeo.OpenEODescription.APEX__TITLE
 import org.geobon.openeo.OpenEODescription.CDSE__URL
-import org.geobon.script.Description.AUTHOR
+import org.geobon.script.Description.AUTHORS
 import org.geobon.script.Description.DESCRIPTION
 import org.geobon.script.Description.EXTERNAL_LINK
 import org.geobon.script.Description.INPUTS
@@ -158,7 +158,7 @@ fun convertMetadata(jsonFile: JSONObject): Map<String, Any> {
         }
 
         if (!authors.isNullOrEmpty()) {
-            outputYaml[AUTHOR] = authors
+            outputYaml[AUTHORS] = authors
         } else {
             logger.warn("No authors found in catalog file...")
         }

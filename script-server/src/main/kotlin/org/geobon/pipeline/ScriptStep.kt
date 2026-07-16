@@ -3,24 +3,14 @@ package org.geobon.pipeline
 import org.geobon.hpc.HPCRequirements
 import org.geobon.hpc.HPCRun
 import org.geobon.k8s.KubernetesRun
-import org.geobon.script.ComputeRequirements
-import org.geobon.script.Description
-import org.geobon.script.Description.CONDA
-import org.geobon.script.Description.CONDA__NAME
+import org.geobon.script.*
 import org.geobon.script.Description.COMPUTE
-import org.geobon.script.Description.SCRIPT
-import org.geobon.script.Description.TIMEOUT
-import org.geobon.script.DockerizedRun
-import org.geobon.script.Run
-import org.geobon.script.ScriptType
 import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.fromSlurm
-import org.yaml.snakeyaml.Yaml
 import java.io.File
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 
 
 class ScriptStep : YMLStep {
@@ -49,27 +39,14 @@ class ScriptStep : YMLStep {
         inputs
     )
 
-    val scriptFile: File = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
+    val scriptFile: File = metadata.script
     val scriptType
         get() = ScriptType.fromFile(scriptFile)
 
-    val condaEnvName by lazy {
-        yamlParsed[CONDA]?.let { // We only define the env name if there is a conda section
-            yamlFile.relativeTo(scriptsRoot).path
-                .replace("/", "__").replace(' ', '_').removeSuffix(".yml")
-        }
-    }
-    val condaEnvYml by lazy {
-        yamlParsed[CONDA]?.let { condaSection ->
-            try {
-                @Suppress("UNCHECKED_CAST")
-                (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName.toString()
-                Yaml().dump(condaSection)
-            } catch (_: Exception) {
-                null
-            }
-        }
-    }
+    val condaEnvName
+        get() = metadata.conda?.name
+    val condaEnvYml
+        get() = metadata.conda?.yml
 
     override fun validateStep(): String {
         if (!yamlFile.exists())
@@ -85,7 +62,6 @@ class ScriptStep : YMLStep {
     override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
         @Suppress("KotlinUnreachableCode") // the code is reachable. There is an error with the linting...
         context?.let { context ->
-            val specificTimeout = (yamlParsed[TIMEOUT] as? Int)?.minutes
 
             var runOwner = false
             val run = synchronized(currentRuns) {
@@ -134,7 +110,7 @@ class ScriptStep : YMLStep {
                         KubernetesRun(
                             context,
                             scriptFile,
-                            specificTimeout ?: Run.DEFAULT_TIMEOUT,
+                            metadata.timeout,
                             condaEnvName,
                             condaEnvYml,
                             computeRequirements
@@ -143,7 +119,7 @@ class ScriptStep : YMLStep {
                         DockerizedRun(
                             context,
                             scriptFile,
-                            specificTimeout ?: Run.DEFAULT_TIMEOUT,
+                            metadata.timeout,
                             condaEnvName,
                             condaEnvYml
                         )

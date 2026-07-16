@@ -8,7 +8,7 @@ import org.geobon.pipeline.ObjectInputDefinition
 import org.geobon.pipeline.ScriptStep
 import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
-import org.geobon.script.IODefinition
+import org.geobon.pipeline.metadata.IOMetadata
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 
@@ -54,7 +54,7 @@ class CWLFactory {
             return sb.toString().trimEnd()
         }
 
-        private fun toCWL(definitions: Map<String, IODefinition>, isInput: Boolean): String {
+        private fun toCWL(definitions: Map<String, IOMetadata>, isInput: Boolean): String {
             val sb = StringBuilder()
             definitions.forEach { (key, value) ->
                 sb.append(key.toCWL(value, isInput))
@@ -62,7 +62,7 @@ class CWLFactory {
             return sb.toString()
         }
 
-        private fun String.toCWL(definition: IODefinition, isInput: Boolean): String {
+        private fun String.toCWL(definition: IOMetadata, isInput: Boolean): String {
             // Location chooser objects need to be exploded in CWL
             ObjectInputDefinition.fromDef(definition.type)?.let {
                 return toCWL(this, definition, it.requiredProperties, isInput)
@@ -104,7 +104,7 @@ class CWLFactory {
 
         private fun toCWL(
             key: String,
-            definition: IODefinition,
+            definition: IOMetadata,
             schema: JSONObject,
             isInput: Boolean // TODO: Add examples if input
         ): String {
@@ -173,7 +173,7 @@ class CWLFactory {
             return if (sb.isBlank()) "" else sb.toString()
         }
 
-        private fun toCWLType(definition: IODefinition, baseIndent: Int): String {
+        private fun toCWLType(definition: IOMetadata, baseIndent: Int): String {
             val typeName = toCWLTypeName(definition.type)
             if (definition.type == IO__TYPE_OPTIONS) {
                 return buildString {
