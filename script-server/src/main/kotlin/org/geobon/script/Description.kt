@@ -14,6 +14,10 @@ object Description {
     const val DESCRIPTION = "description"
     const val LICENSE = "license"
 
+    const val LIFECYCLE = "lifecycle"
+    const val LIFECYCLE__STATUS = "status"
+    const val LIFECYCLE__MESSAGE = "message"
+
     const val REFERENCES = "references"
     const val REFERENCES_TEXT = "text"
     const val REFERENCES_LINK = "link"

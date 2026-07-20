@@ -9,7 +9,11 @@ class: CommandLineTool
 
 label: GBIF Observations from Download API
 doc:
-  Load complete GBIF data from GBIF download API
+  - "Description:
+    Load complete GBIF data from GBIF download API"
+  - "Lifecycle tag: LifecycleMetadata(status=CORE, message=null)"
+  - "Authors:
+    Guillaume Larocque (https://orcid.org/0000-0002-5967-9156)"
 
 
 requirements:

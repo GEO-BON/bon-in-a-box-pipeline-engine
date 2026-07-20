@@ -11,6 +11,7 @@ data class StepMetadata(
     val timeout: Duration = DEFAULT_TIMEOUT,
     val name: String? = null,
     val description: String? = null,
+    val lifecycle: LifecycleMetadata? = null,
     val authors: List<PersonMetadata>? = null,
     val reviewers: List<PersonMetadata>? = null,
     val license: String? = null,

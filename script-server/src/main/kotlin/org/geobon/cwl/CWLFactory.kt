@@ -215,9 +215,38 @@ class CWLFactory {
         private fun toCWLMetadata(step: ScriptStep): String {
             return buildString {
                 appendLine("label: ${step.metadata.name}")
+                val docEntries = mutableListOf<String>()
+
                 step.metadata.description?.let {
+                    docEntries.add("Description:\n${it.replaceIndent(indent(2))}")
+                }
+
+                step.metadata.lifecycle?.let { docEntries.add("Lifecycle tag: $it") }
+                step.metadata.authors?.let { authors ->
+                    docEntries.add(
+                        "Authors:\n" +
+                                (authors.joinToString("\n").replaceIndent(indent(2)))
+                    )
+                }
+                step.metadata.reviewers?.let { reviewers ->
+                    docEntries.add(
+                        "Reviewers:\n" +
+                                (reviewers.joinToString("\n").replaceIndent(indent(2)))
+                    )
+                }
+                step.metadata.references?.let { references ->
+                    docEntries.add(
+                        "References:" +
+                                references.joinToString("\n") {
+                                    "\n${indent(2)}${it.text} ${it.link}"
+                                })
+                }
+
+                if (docEntries.isNotEmpty()) {
                     appendLine("doc:")
-                    appendLine(it.replaceIndent(indent(1)))
+                    docEntries.forEach { entry ->
+                        appendLine("  - \"$entry\"")
+                    }
                 }
             }
         }

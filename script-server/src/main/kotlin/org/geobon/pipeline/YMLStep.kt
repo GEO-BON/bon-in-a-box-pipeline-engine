@@ -3,6 +3,7 @@ package org.geobon.pipeline
 import org.geobon.pipeline.metadata.CondaMetadata
 import org.geobon.pipeline.metadata.PersonMetadata
 import org.geobon.pipeline.metadata.IOMetadata
+import org.geobon.pipeline.metadata.LifecycleMetadata
 import org.geobon.pipeline.metadata.ReferenceMetadata
 import org.geobon.pipeline.metadata.StepMetadata
 import org.geobon.pipeline.metadata.StepMetadata.Companion.DEFAULT_TIMEOUT
@@ -21,6 +22,9 @@ import org.geobon.script.Description.IO__TYPE
 import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.script.Description.LICENSE
+import org.geobon.script.Description.LIFECYCLE
+import org.geobon.script.Description.LIFECYCLE__MESSAGE
+import org.geobon.script.Description.LIFECYCLE__STATUS
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
 import org.geobon.script.Description.REFERENCES
@@ -62,6 +66,7 @@ abstract class YMLStep(
         (yamlParsed[TIMEOUT] as? Int)?.minutes ?: DEFAULT_TIMEOUT,
         yamlParsed[NAME]?.toString() ?: yamlFile.name,
         yamlParsed[DESCRIPTION]?.toString(),
+        readLifecycle(yamlParsed),
         readPersons(yamlParsed, AUTHORS),
         readPersons(yamlParsed, REVIEWERS),
         yamlParsed[LICENSE]?.toString(),
@@ -316,6 +321,25 @@ abstract class YMLStep(
 
         return if (referencesFound.isEmpty()) null
         else referencesFound
+    }
+
+    private fun readLifecycle(yamlParsed: Map<String, Any>): LifecycleMetadata? {
+        return yamlParsed[LIFECYCLE]?.let { lifecycle ->
+            if (lifecycle is Map<*, *>) {
+                (lifecycle[LIFECYCLE__STATUS] as? String)?.let { statusStr ->
+                    try {
+                        val status = LifecycleMetadata.Lifecycle.valueOf(statusStr.uppercase())
+                        LifecycleMetadata(
+                            status,
+                            lifecycle[LIFECYCLE__MESSAGE] as? String
+                        )
+                    } catch (e: Exception) {
+                        logger.debug(e.message)
+                        null
+                    }
+                }
+            } else null
+        }
     }
 
     private fun readConda(yamlFile:File, yamlParsed: Map<String, Any>): CondaMetadata? {
