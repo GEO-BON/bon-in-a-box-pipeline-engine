@@ -57,6 +57,7 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Duration
 import org.jetbrains.annotations.VisibleForTesting
+import org.json.JSONArray
 
 class OpenEOStep: ScriptStep {
     constructor(
@@ -282,16 +283,30 @@ class OpenEOStep: ScriptStep {
                     }
 
                     rawType == "array" -> {
-                        val itemType = schema.optJSONObject(UDP__INPUT__ITEMS)?.let { items ->
-                            items.optJSONArray("anyOf")?.let { anyOf ->
+                        val items = schema.optJSONObject(UDP__INPUT__ITEMS)
+                            ?: throw RuntimeException("Could not determine item type for parameter '$id'")
+
+                        val itemsEnum = items.optJSONArray(UDP__INPUT__ENUM)
+                        if (itemsEnum != null) {
+                            input[IO__TYPE] = "$IO__TYPE_OPTIONS[]"
+                            input[IO__TYPE_OPTIONS] = (0 until itemsEnum.length()).map { itemsEnum.getString(it) }
+                        } else {
+                            val itemType = items.optJSONArray("anyOf")?.let { anyOf ->
                                 (0 until anyOf.length()).firstNotNullOfOrNull {
                                     anyOf.optJSONObject(it)?.optString(UDP__INPUT__TYPE)
                                         ?.takeIf { t -> t.isNotEmpty() && t != "null" }
                                 }
-                            } ?: items.optString(UDP__INPUT__TYPE)
-                        } ?: throw RuntimeException("Could not determine item type for parameter '$id'")
+                            } ?: items.optString(UDP__INPUT__TYPE).takeIf { it.isNotEmpty() }
+                            ?: throw RuntimeException("Could not determine item type for parameter '$id'")
 
-                        input[IO__TYPE] = "${mapType(itemType)}[]"
+                            input[IO__TYPE] = "${mapType(itemType)}[]"
+                        }
+                    }
+
+                    (rawType == "object" && id == "geometry") -> {
+                        input[IO__LABEL] = "Polygon"
+                        input[IO__TYPE] = "application/geopackage+sqlite3[]"
+                        input[DESCRIPTION] = "Polygon of the study area, in GeoPackage format. To use a custom study area, input the path to the file in the userdata folder (e.g. /userdata/study_area_polygon.gpkg)."
                     }
 
                     else -> {
@@ -299,10 +314,10 @@ class OpenEOStep: ScriptStep {
                     }
                 }
                 val example = param.opt("default")
-                if (example == JSONObject.NULL) {
-                    input[IO__EXAMPLE] = null
-                } else {
-                    input[IO__EXAMPLE] = example
+                input[IO__EXAMPLE] = when (example) {
+                    JSONObject.NULL, null -> null
+                    is JSONArray -> (0 until example.length()).map { example.get(it).toString() }
+                    else -> example
                 }
 
                 inputs[id] = input
