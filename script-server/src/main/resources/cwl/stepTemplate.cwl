@@ -15,27 +15,9 @@ requirements:
       - |
         function extractOutput(outputFiles, key) {
           if (!outputFiles || outputFiles.length === 0) return null;
-          return JSON.parse(outputFiles[0].contents)[key];
-        }
-        function extractOutputs(outputFiles, key) {
-          var value = extractOutput(outputFiles, key, true);
-          if (value === undefined || value === null) return null;
-
-          return Array.isArray(value) ? value : [value];
-        }
-        function extractOutputFile(outputFiles, key) {
-          var value = extractOutput(outputFiles, key, true);
-          if(value === undefined || value === null) return null;
-          return { class: "File", location: "file://" + value };
-        }
-        function extractOutputFiles(outputFiles, key) {
-          var value = extractOutput(outputFiles, key, true);
-          if (value === undefined || value === null) return null;
-
-          var filePaths = Array.isArray(value) ? value : [value];
-          return filePaths.map(function (filePath) {
-            return { class: "File", location: "file://" + filePath };
-          });
+          var value = JSON.parse(outputFiles[0].contents)[key]
+          if (value === undefined) return null
+          return value;
         }
   InplaceUpdateRequirement:
     inplaceUpdate: true

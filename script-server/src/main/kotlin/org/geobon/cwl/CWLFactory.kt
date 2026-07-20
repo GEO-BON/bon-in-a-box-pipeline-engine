@@ -1,8 +1,14 @@
 package org.geobon.cwl
 
 
+import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_BOOLEAN
+import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_DIRECTORY
+import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_DOUBLE
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_ENUM
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_FILE
+import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_FLOAT
+import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_INT
+import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_LONG
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
 import org.geobon.pipeline.ObjectInputDefinition
 import org.geobon.pipeline.ScriptStep
@@ -51,7 +57,7 @@ class CWLFactory {
         private fun generateInputProperties(inputNames: Iterable<String>): String {
             val sb = StringBuilder()
             inputNames.forEach {
-                sb.appendLine("        $it: inputs.$it,")
+                sb.appendLine(4,"$it: inputs.$it,")
             }
             return sb.toString().trimEnd()
         }
@@ -59,15 +65,15 @@ class CWLFactory {
         private fun toCWL(definitions: Map<String, IOMetadata>, isInput: Boolean): String {
             val sb = StringBuilder()
             definitions.forEach { (key, value) ->
-                sb.append(key.toCWL(value, isInput))
+                sb.append(toCWL(key, value, isInput))
             }
             return sb.toString()
         }
 
-        private fun String.toCWL(definition: IOMetadata, isInput: Boolean): String {
+        private fun toCWL(key:String, definition: IOMetadata, isInput: Boolean): String {
             // Location chooser objects need to be exploded in CWL
             ObjectInputDefinition.fromDef(definition.type)?.let {
-                return toCWL(this, definition, it.requiredProperties, isInput)
+                return toCWL(key, definition, it.requiredProperties, isInput)
             }
 
             val typeName = toCWLTypeName(definition.type)
@@ -82,7 +88,7 @@ class CWLFactory {
             } else " $typeName"
 
             return buildString {
-                appendLine(1, "${this@toCWL}:")
+                appendLine(1, "$key:")
                 appendLine(2, "type:$type")
                 appendLine(2, "label: ${definition.label}")
                 if (definition.description.contains('\n')) {
@@ -95,20 +101,74 @@ class CWLFactory {
                 if (isInput) {
                     appendLine("default: ${definition.example}".replaceIndent(indent(2)))
                 } else {
-                    val arraySuffix = if(typeName.endsWith("[]")) "s" else ""
-                    val extractFunction =
-                        if (typeName.startsWith(CWL__IO__TYPE_FILE)) "extractOutputFile$arraySuffix"
-                        else "extractOutput$arraySuffix"
-                    // TODO: parseInt for ints, etc
-
                     appendLine(
-                        """
-                    outputBinding:
-                      glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
-                      loadContents: true
-                      outputEval: $($extractFunction(self, "${this@toCWL}"))
-                """.replaceIndent(indent(2))
-                    )
+                        $$"""
+                            outputBinding:
+                              glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
+                              loadContents: true
+                              outputEval: |
+                                ${
+                        """.replaceIndent(indent(2)))
+
+                    // Build a custom function for each file type
+                    val isArray = typeName.endsWith("[]")
+                    var indent = 5
+
+                    appendLine(indent, """var value = extractOutput(self, "$key");""")
+
+                    if(isArray) { // Note that this is not recursive, hence doesn't support more depth, like int[][]
+                        appendLine(indent, "if (value === null) return null;")
+                        appendLine(indent, "var items = Array.isArray(value) ? value : [value];")
+                        // shadow the "value" variable for the next lines to be agnostic of if it's an array or not
+                        appendLine(indent, "return items.map(function (value) {")
+                        indent++
+                    }
+
+                    when {
+                        typeName.startsWith(CWL__IO__TYPE_FILE) -> {
+                            appendLine(indent, "if (value === null) return null;")
+                            appendLine(indent, """return { class: "File", location: "file://" + value };""")
+                        }
+
+                        typeName.startsWith(CWL__IO__TYPE_DIRECTORY) -> {
+                            appendLine(indent, "if (value === null) return null;")
+                            appendLine(indent, """return { class: "Directory", location: "file://" + value };""")
+                        }
+
+                        typeName.startsWith(CWL__IO__TYPE_BOOLEAN) -> {
+                            appendLine(indent, """return value === "true";""")
+                        }
+
+                        typeName.startsWith(CWL__IO__TYPE_INT) -> {
+                            appendLine(indent, "if (value === null) return null;")
+                            appendLine(indent, """return parseInt(value);""")
+                        }
+
+                        typeName.startsWith(CWL__IO__TYPE_LONG) -> {
+                            appendLine(indent, "if (value === null) return null;")
+                            appendLine(indent, """return parseLong(value);""")
+                        }
+
+                        typeName.startsWith(CWL__IO__TYPE_FLOAT) -> {
+                            appendLine(indent, "if (value === null) return null;")
+                            appendLine(indent, """return parseFloat(value);""")
+                        }
+
+                        typeName.startsWith(CWL__IO__TYPE_DOUBLE) -> {
+                            appendLine(indent, "if (value === null) return null;")
+                            appendLine(indent, """return parseDouble(value);""")
+                        }
+
+                        // string or enum
+                        else -> appendLine(indent, "return value;")
+                    }
+
+                    if(isArray) {
+                        indent--
+                        appendLine(indent, "});")
+                    }
+
+                    appendLine(4, "}")
                 }
 
                 appendLine()
