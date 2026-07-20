@@ -55,19 +55,19 @@ class CWLFactory {
         }
 
         private fun generateInputProperties(inputNames: Iterable<String>): String {
-            val sb = StringBuilder()
-            inputNames.forEach {
-                sb.appendLine(4,"$it: inputs.$it,")
-            }
-            return sb.toString().trimEnd()
+            return buildString {
+                inputNames.forEach {
+                    appendLine(4, "$it: inputs.$it,")
+                }
+            }.trimEnd()
         }
 
         private fun toCWL(definitions: Map<String, IOMetadata>, isInput: Boolean): String {
-            val sb = StringBuilder()
-            definitions.forEach { (key, value) ->
-                sb.append(toCWL(key, value, isInput))
+            return buildString {
+                definitions.forEach { (key, value) ->
+                    append(toCWL(key, value, isInput))
+                }
             }
-            return sb.toString()
         }
 
         private fun toCWL(key:String, definition: IOMetadata, isInput: Boolean): String {
@@ -181,69 +181,69 @@ class CWLFactory {
             schema: JSONObject,
             isInput: Boolean // TODO: Add examples if input
         ): String {
-            val sb = StringBuilder()
-            sb.appendLine(
-                """
+            return buildString {
+                appendLine(
+                    """
               $key:
                 label: ${definition.label}
             """.replaceIndent("  ")
-            )
+                )
 
-            if (definition.description.contains('\n')) {
-                sb.appendLine(2, "doc: >")
-                sb.appendLine(definition.description.replaceIndent(indent(3)))
-            } else {
-                sb.appendLine(2, "doc: ${definition.description}")
-            }
+                if (definition.description.contains('\n')) {
+                    appendLine(2, "doc: >")
+                    appendLine(definition.description.replaceIndent(indent(3)))
+                } else {
+                    appendLine(2, "doc: ${definition.description}")
+                }
 
-            sb.appendLine(
-                """
+                appendLine(
+                    """
                 type:
                   type: record
                   name: ${definition.type}
                   fields:
             """.replaceIndent(indent(2))
-            )
+                )
 
-            // Creating a CWL "record" for the input objects.
-            schema.keys().forEach { subKey ->
-                schema.optJSONObject(subKey)?.let { section ->
-                    sb.appendLine(
-                        """
+                // Creating a CWL "record" for the input objects.
+                schema.keys().forEach { subKey ->
+                    schema.optJSONObject(subKey)?.let { section ->
+                        appendLine(
+                            """
                             - name: $subKey
                               type:
                                 name: ${subKey}Definition
                                 type: record
                                 fields:
                         """.replaceIndent(indent(3))
-                    )
+                        )
 
-                    section.keys().forEach { fieldKey ->
-                        section.optString(fieldKey)?.let { fieldType ->
-                            sb.appendLine(
-                                """
+                        section.keys().forEach { fieldKey ->
+                            section.optString(fieldKey)?.let { fieldType ->
+                                appendLine(
+                                    """
                                     - name: $fieldKey
                                       type: ${toCWLTypeName(fieldType)}?
                                 """.replaceIndent(indent(5))
-                            )
+                                )
+                            }
                         }
-                    }
 
 
-                } ?: schema.optString(subKey)?.let { propertyType ->
-                    // If no depth, just output as separate IO
-                    sb.append(
-                        """
+                    } ?: schema.optString(subKey)?.let { propertyType ->
+                        // If no depth, just output as separate IO
+                        append(
+                            """
                             - name: $subKey
                               type: ${toCWLTypeName(propertyType)}
                         """.replaceIndent(indent(3))
-                    )
+                        )
+                    }
                 }
-            }
-            sb.appendLine()
-            sb.appendLine()
+                appendLine()
+                appendLine()
 
-            return if (sb.isBlank()) "" else sb.toString()
+            }
         }
 
         /**
