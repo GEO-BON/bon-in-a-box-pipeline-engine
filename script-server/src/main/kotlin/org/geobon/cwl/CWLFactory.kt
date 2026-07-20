@@ -70,7 +70,16 @@ class CWLFactory {
                 return toCWL(this, definition, it.requiredProperties, isInput)
             }
 
-            val type = toCWLType(definition, 2)
+            val typeName = toCWLTypeName(definition.type)
+            val type = if (definition.type == IO__TYPE_OPTIONS) {
+                buildString {
+                    append("\n${indent(3)}type: $typeName")
+                    append("\n${indent(3)}symbols:")
+                    definition.options?.forEach {
+                        append("\n${indent(4)}- $it")
+                    }
+                }
+            } else " $typeName"
 
             return buildString {
                 appendLine(1, "${this@toCWL}:")
@@ -86,9 +95,11 @@ class CWLFactory {
                 if (isInput) {
                     appendLine("default: ${definition.example}".replaceIndent(indent(2)))
                 } else {
-                    val extractFunction = // TODO support output arrays
-                        if (type.trimStart().startsWith(CWL__IO__TYPE_FILE)) "extractOutputFile"
-                        else "extractOutput"
+                    val arraySuffix = if(typeName.endsWith("[]")) "s" else ""
+                    val extractFunction =
+                        if (typeName.startsWith(CWL__IO__TYPE_FILE)) "extractOutputFile$arraySuffix"
+                        else "extractOutput$arraySuffix"
+                    // TODO: parseInt for ints, etc
 
                     appendLine(
                         """
@@ -173,20 +184,6 @@ class CWLFactory {
             sb.appendLine()
 
             return if (sb.isBlank()) "" else sb.toString()
-        }
-
-        private fun toCWLType(definition: IOMetadata, baseIndent: Int): String {
-            val typeName = toCWLTypeName(definition.type)
-            if (definition.type == IO__TYPE_OPTIONS) {
-                return buildString {
-                    append("\n${indent(baseIndent + 1)}type: $typeName")
-                    append("\n${indent(baseIndent + 1)}symbols:")
-                    definition.options?.forEach {
-                        append("\n${indent(baseIndent + 2)}- $it")
-                    }
-                }
-            }
-            return " $typeName"
         }
 
         /**
