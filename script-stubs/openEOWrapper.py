@@ -62,6 +62,7 @@ udp_job = cube.save_result(format="GTiff").create_job(
 try:
     udp_job.start_and_wait()
 except Exception as e:
+    udp_job.stop()
     biab_error_stop(f"UDP job failed: {e}")
 
 print(f"UDP job finished: {udp_job.job_id}", flush=True)
