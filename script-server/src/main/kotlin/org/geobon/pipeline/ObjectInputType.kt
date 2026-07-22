@@ -6,7 +6,6 @@ import org.json.JSONObject
  * Enum type for special object that the pipeline engine can receive.
  * These objects are the result of a "chooser" UI that produces an object after an interaction with the user.
  */
-@Suppress("EnumEntryName") // we want their names to match with the incoming types
 enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObject) {
     /* Location choosers are all subsets of the full "location" object:
       CRS:
@@ -85,7 +84,7 @@ enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObje
         JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__CRS, LOCATION__BBOX)
     ),
     // Legacy, name was not descriptive of content. TODO: Remove in future version.
-    BBOX_CRS(LOCATION__TYPE__BBOX_CRS, JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties));
+    BBOX_CRS(LOCATION__TYPE__BBOX_CRS, COUNTRY_REGION_CRS_BBOX.requiredProperties);
 
     companion object {
         fun fromString(typeStr: String): ObjectInputType? {
