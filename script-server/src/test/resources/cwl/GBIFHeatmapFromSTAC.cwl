@@ -159,7 +159,6 @@ inputs:
       - name: bbox
         type: float[]
 
-
   spatial_res:
     type: float
     label: Spatial resolution

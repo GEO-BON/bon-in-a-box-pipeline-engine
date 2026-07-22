@@ -96,7 +96,7 @@ arguments:
     echo "Inputs:" | tee -a $log
     cat $OUTPUT_LOCATION/input.json | tee -a $log
 
-    source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION forCWL__getGBIFObservations \
+    source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "forCWL__getGBIFObservations" \
       "
         channels: [conda-forge]
         dependencies: [pygbif, pandas, pyproj]
