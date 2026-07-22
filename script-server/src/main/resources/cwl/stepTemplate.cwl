@@ -153,4 +153,4 @@ outputs:
   logs:
     type: File
     outputBinding:
-       glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'logs.txt')"
+      glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'logs.txt')"

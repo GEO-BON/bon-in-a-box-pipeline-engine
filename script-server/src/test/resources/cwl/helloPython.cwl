@@ -7,13 +7,13 @@ class: CommandLineTool
 # envFolder will keep conda environments between runs.
 # environment file is necessary when the script requires credentials.
 
-label: GBIF Observations from Download API
+label: Python Example
 doc:
   - "Description:
-    Load complete GBIF data from GBIF download API"
-  - "Lifecycle tag: LifecycleMetadata(status=CORE, message=null)"
+    Sample python script that increments a number."
+  - "Lifecycle tag: LifecycleMetadata(status=EXAMPLE, message=null)"
   - "Authors:
-    Guillaume Larocque (https://orcid.org/0000-0002-5967-9156)"
+    Jean-Michel Lord (https://orcid.org/0009-0007-3826-1125)"
 
 
 requirements:
@@ -85,10 +85,7 @@ arguments:
     cat > "$OUTPUT_LOCATION/input.json" <<'JSON'
     ${
       return JSON.stringify({
-        taxa: inputs.taxa,
-        bbox_crs: inputs.bbox_crs,
-        min_year: inputs.min_year,
-        max_year: inputs.max_year,
+        some_int: inputs.some_int,
       }, null, 2);
     }
     JSON
@@ -96,12 +93,8 @@ arguments:
     echo "Inputs:" | tee -a $log
     cat $OUTPUT_LOCATION/input.json | tee -a $log
 
-    source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "forCWL__getGBIFObservations" \
-      "
-        channels: [conda-forge]
-        dependencies: [pygbif, pandas, pyproj]
-        name: forCWL__getGBIFObservations
-      " /conda-envs $(inputs.condaPackURL) 2>&1 >> $log
+    source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "pythonbase" \
+      "" /conda-envs $(inputs.condaPackURL) 2>&1 >> $log
 
     python3 \
       $SCRIPT_STUBS_LOCATION/system/scriptWrapper.py \
@@ -111,7 +104,7 @@ arguments:
     scriptExitCode=\${PIPESTATUS[0]}
     echo "Script exited with code $scriptExitCode" | tee -a $log
 
-    source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh forCWL__getGBIFObservations /conda-envs 2>&1 >> $log
+    source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh pythonbase /conda-envs 2>&1 >> $log
 
     exit "$scriptExitCode"
 
@@ -119,52 +112,11 @@ inputs:
   #################
   # Script inputs #
   #################
-  taxa:
-    type: string[]
-    label: Taxa list
-    doc: Comma-separated list of [taxa](https://en.wikipedia.org/wiki/Taxon). Each value could be a species name, order, class, genus, kingdom or family, as long as it is an exact match with the GBIF taxonomic backbone. Individual species can be looked up [on the GBIF website](https://www.gbif.org/species/).
-    default: [Acer saccharum, Acer nigrum]
-
-  bbox_crs:
-    label: Bounding box and CRS
-    doc: Select a bounding box and CRS
-    type:
-      type: record
-      name: crsBBox
-      fields:
-      - name: CRS
-        type:
-          name: CRSDefinition
-          type: record
-          fields:
-          - name: unit
-            type: string?
-          - name: code
-            type: int?
-          - name: authority
-            type: string?
-          - name: name
-            type: string?
-          - name: CRSBboxWGS84
-            type: float[]?
-          - name: proj4Def
-            type: string?
-          - name: wktDef
-            type: string?
-      - name: bbox
-        type: float[]
-
-  min_year:
+  some_int:
     type: int
-    label: minimum year
-    doc: Min year observations wanted
-    default: 2010
-
-  max_year:
-    type: int
-    label: maximum year
-    doc: Max year observations wanted
-    default: 2024
+    label: Some int
+    doc: A number that we will increment
+    default: 3
 
 
 
@@ -203,52 +155,25 @@ inputs:
   scriptPath:
     type: string
     doc: Path to the script, relative to scripts root.
-    default: forCWL/getGBIFObservations.py
+    default: helloWorld/helloPython.py
 
   scripts_root:
     type: Directory?
     doc: Root folder for scripts. Use this to override the image's scripts while debugging.
 
 outputs:
-  observations_file:
-    type: File
-    label: Observations
-    doc: Output file with observations
-    outputBinding:
-      glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
-      loadContents: true
-      outputEval: |
-        ${
-          var value = extractOutput(self, "observations_file");
-          if (value === null) return null;
-          return { class: "File", location: "file://" + value };
-        }
-
-  total_records:
+  increment:
     type: int
-    label: Total number of occurrences
-    doc: Total number of GBIF occurrences in csv file
+    label: A number (input++)
+    doc: bla bla
     outputBinding:
       glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
       loadContents: true
       outputEval: |
         ${
-          var value = extractOutput(self, "total_records");
+          var value = extractOutput(self, "increment");
           if (value === null) return null;
           return parseInt(value);
-        }
-
-  gbif_doi:
-    type: string
-    label: DOI of GBIF download
-    doc: DOI of GBIF download. Used for citing downloaded data.
-    outputBinding:
-      glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
-      loadContents: true
-      outputEval: |
-        ${
-          var value = extractOutput(self, "gbif_doi");
-          return value;
         }
 
 

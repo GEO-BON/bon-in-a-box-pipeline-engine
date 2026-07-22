@@ -82,7 +82,16 @@ class CWLFactoryTest {
 
     @Test
     fun `test single script with pythonbase Conda environment`() {
+        val stepToTest = "helloPython"
+        val step = ScriptStep("helloWorld/$stepToTest.yml", StepId("step", "0"), noHPCContext)
+        val result = toCWL(step)
 
+        resultFile = File(cwlResources, "${stepToTest}_gen.cwl").also { resultFile ->
+            resultFile.writeText(result)
+            validateCWL(resultFile)
+        }
+
+        val expected = File(cwlResources, "$stepToTest.cwl").readText()
+        assertMultilineEquals(expected, result)
     }
-
 }

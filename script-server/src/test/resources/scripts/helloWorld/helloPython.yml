@@ -6,8 +6,7 @@ author:
 license: CC0
 description: "Sample python script that increments a number."
 lifecycle:
-  status: in_development
-  message: bla bla
+  status: example
 timeout: 1
 inputs:
   some_int:
