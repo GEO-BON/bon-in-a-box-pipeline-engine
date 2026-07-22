@@ -48,17 +48,17 @@ enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObje
     COUNTRY_REGION_CRS_BBOX(LOCATION__TYPE__LOCATION, JSONObject().apply {
         put(LOCATION__COUNTRY, JSONObject().apply {
             put(LOCATION__COUNTRY__ISO3, "text")
-            put(LOCATION__COUNTRY__BBOX_WGS84, "int[]")
+            put(LOCATION__COUNTRY__BBOX_WGS84, "float[]")
             put(LOCATION__COUNTRY__ENGLISH_NAME, "text")
         })
         put(LOCATION__REGION, JSONObject().apply {
-            put(LOCATION__REGION__BBOX_WGS84, "int[]")
+            put(LOCATION__REGION__BBOX_WGS84, "float[]")
             put(LOCATION__REGION__COUNTRY_ENGLISH_NAME, "text")
             put(LOCATION__REGION__REGION_ID, "text")
             put(LOCATION__REGION__REGION_NAME, "text")
         })
         put(LOCATION__CRS, JSONObject().apply {
-            put(LOCATION__CRS__CRS_BBOX_WGS84, "int[]")
+            put(LOCATION__CRS__CRS_BBOX_WGS84, "float[]")
             put(LOCATION__CRS__AUTHORITY, "text")
             put(LOCATION__CRS__CODE, "int")
             put(LOCATION__CRS__NAME, "text")

@@ -86,8 +86,8 @@ arguments:
     echo "Inputs:" | tee -a $log
     cat $OUTPUT_LOCATION/input.json | tee -a $log
 
-    source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION {{condaEnvName}} \
-      {{condaEnvYml}} /conda-envs $(inputs.condaPackURL) 2>&1 >> $log
+    source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "{{condaEnvName}}" \
+      "{{condaEnvYml}}" /conda-envs $(inputs.condaPackURL) 2>&1 >> $log
 
     {{program}} \
       $SCRIPT_STUBS_LOCATION/system/{{scriptWrapper}} \

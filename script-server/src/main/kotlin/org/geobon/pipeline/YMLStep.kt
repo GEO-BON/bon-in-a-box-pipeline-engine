@@ -34,6 +34,7 @@ import org.geobon.script.Description.REVIEWERS
 import org.geobon.script.Description.SCRIPT
 import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.Run
+import org.geobon.script.ScriptType
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
@@ -343,19 +344,31 @@ abstract class YMLStep(
     }
 
     private fun readConda(yamlFile:File, yamlParsed: Map<String, Any>): CondaMetadata? {
-        return yamlParsed[CONDA]?.let { condaSection ->
-            val condaEnvName = yamlFile.relativeTo(scriptsRoot).path
-                .replace("/", "__")
-                .replace(' ', '_')
-                .removeSuffix(".yml")
+        // If available, return specific environment for script
+        if(yamlParsed.containsKey(CONDA)) {
+            yamlParsed[CONDA]?.let { condaSection ->
+                val condaEnvName = yamlFile.relativeTo(scriptsRoot).path
+                    .replace("/", "__")
+                    .replace(' ', '_')
+                    .removeSuffix(".yml")
 
-            try {
-                @Suppress("UNCHECKED_CAST")
-                (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName
+                try {
+                    @Suppress("UNCHECKED_CAST")
+                    (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName
 
-                CondaMetadata(condaEnvName, Yaml().dump(condaSection))
-            } catch (_: Exception) {
-                null
+                    return CondaMetadata(condaEnvName, Yaml().dump(condaSection))
+                } catch (_: Exception) {
+                }
+            }
+        }
+
+        // Return default environment for script type
+        return (yamlParsed[SCRIPT] as? String)?.let { script ->
+            val scriptType = ScriptType.fromFile(File(script))
+            when (scriptType) {
+                ScriptType.R -> CondaMetadata("rbase")
+                ScriptType.PYTHON -> CondaMetadata("pythonbase")
+                else -> null
             }
         }
     }

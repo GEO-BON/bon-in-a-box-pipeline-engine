@@ -12,9 +12,9 @@ import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_LONG
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
 import org.geobon.pipeline.ObjectInputDefinition
 import org.geobon.pipeline.ScriptStep
+import org.geobon.pipeline.metadata.IOMetadata
 import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
-import org.geobon.pipeline.metadata.IOMetadata
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 
@@ -28,7 +28,7 @@ class CWLFactory {
                 condaEnvYml = ""
             } else { // Add indent and quotes
                 condaEnvYml = condaEnvYml.trim().prependIndent(indent(4))
-                condaEnvYml = "\"\n$condaEnvYml\n${indent(3)}\""
+                condaEnvYml = "\n$condaEnvYml\n${indent(3)}"
             }
 
             val replacements = mapOf<String, String>(
@@ -70,7 +70,7 @@ class CWLFactory {
             }
         }
 
-        private fun toCWL(key:String, definition: IOMetadata, isInput: Boolean): String {
+        private fun toCWL(key: String, definition: IOMetadata, isInput: Boolean): String {
             // Location chooser objects need to be exploded in CWL
             ObjectInputDefinition.fromDef(definition.type)?.let {
                 return toCWL(key, definition, it.requiredProperties, isInput)
@@ -108,7 +108,8 @@ class CWLFactory {
                               loadContents: true
                               outputEval: |
                                 ${
-                        """.replaceIndent(indent(2)))
+                        """.replaceIndent(indent(2))
+                    )
 
                     // Build a custom function for each file type
                     val isArray = typeName.endsWith("[]")
@@ -116,7 +117,7 @@ class CWLFactory {
 
                     appendLine(indent, """var value = extractOutput(self, "$key");""")
 
-                    if(isArray) { // Note that this is not recursive, hence doesn't support more depth, like int[][]
+                    if (isArray) { // Note that this is not recursive, hence doesn't support more depth, like int[][]
                         appendLine(indent, "if (value === null) return null;")
                         appendLine(indent, "var items = Array.isArray(value) ? value : [value];")
                         // shadow the "value" variable for the next lines to be agnostic of if it's an array or not
@@ -163,7 +164,7 @@ class CWLFactory {
                         else -> appendLine(indent, "return value;")
                     }
 
-                    if(isArray) {
+                    if (isArray) {
                         indent--
                         appendLine(indent, "});")
                     }
@@ -232,7 +233,7 @@ class CWLFactory {
 
                     } ?: schema.optString(subKey)?.let { propertyType ->
                         // If no depth, just output as separate IO
-                        append(
+                        appendLine(
                             """
                             - name: $subKey
                               type: ${toCWLTypeName(propertyType)}
@@ -240,7 +241,6 @@ class CWLFactory {
                         )
                     }
                 }
-                appendLine()
                 appendLine()
 
             }

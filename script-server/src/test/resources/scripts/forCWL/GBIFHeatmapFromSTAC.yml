@@ -1,0 +1,39 @@
+script: loadFromStac.R
+name: GBIF Heatmap
+description: |
+  Download raster representing the number of observations in GBIF for each pixel for specific taxonomic groups.
+  Source layer can be found on the [GEO BON STAC catalog](https://stac.geobon.org/viewer/).
+author:
+  - name: Guillaume Larocque
+    identifier: https://orcid.org/0000-0002-5967-9156
+lifecycle:
+  status: core
+inputs:
+  taxa:
+    label: Taxa
+    description: taxonomic group for which to retrieve GBIF heatmap
+    type: options
+    options:
+      - reptiles
+      - plants
+      - mammals
+      - birds
+      - arthropods
+      - amphibians
+      - all
+    example: plants
+  bbox_crs:
+    description: Select a bounding box and CRS
+    label: Bounding box and CRS
+    type: crsBbox
+    example:
+  spatial_res:
+    label: Spatial resolution
+    description: Integer, spatial resolution of the rasters
+    type: float
+    example: 1000.0
+outputs:
+  rasters:
+    label: Density raster
+    description: Array with output raster path
+    type: image/tiff;application=geotiff

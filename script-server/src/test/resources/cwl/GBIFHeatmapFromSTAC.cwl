@@ -7,10 +7,11 @@ class: CommandLineTool
 # envFolder will keep conda environments between runs.
 # environment file is necessary when the script requires credentials.
 
-label: GBIF Observations from Download API
+label: GBIF Heatmap
 doc:
   - "Description:
-    Load complete GBIF data from GBIF download API"
+    Download raster representing the number of observations in GBIF for each pixel for specific taxonomic groups.
+    Source layer can be found on the [GEO BON STAC catalog](https://stac.geobon.org/viewer/)."
   - "Lifecycle tag: LifecycleMetadata(status=CORE, message=null)"
   - "Authors:
     Guillaume Larocque (https://orcid.org/0000-0002-5967-9156)"
@@ -87,8 +88,7 @@ arguments:
       return JSON.stringify({
         taxa: inputs.taxa,
         bbox_crs: inputs.bbox_crs,
-        min_year: inputs.min_year,
-        max_year: inputs.max_year,
+        spatial_res: inputs.spatial_res,
       }, null, 2);
     }
     JSON
@@ -96,22 +96,18 @@ arguments:
     echo "Inputs:" | tee -a $log
     cat $OUTPUT_LOCATION/input.json | tee -a $log
 
-    source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION forCWL__getGBIFObservations \
-      "
-        channels: [conda-forge]
-        dependencies: [pygbif, pandas, pyproj]
-        name: forCWL__getGBIFObservations
-      " /conda-envs $(inputs.condaPackURL) 2>&1 >> $log
+    source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "rbase" \
+      "" /conda-envs $(inputs.condaPackURL) 2>&1 >> $log
 
-    python3 \
-      $SCRIPT_STUBS_LOCATION/system/scriptWrapper.py \
+    Rscript \
+      $SCRIPT_STUBS_LOCATION/system/scriptWrapper.R \
       $OUTPUT_LOCATION \
       $SCRIPT_LOCATION/$(inputs.scriptPath) \
       2>&1 | tee -a $log
     scriptExitCode=\${PIPESTATUS[0]}
     echo "Script exited with code $scriptExitCode" | tee -a $log
 
-    source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh forCWL__getGBIFObservations /conda-envs 2>&1 >> $log
+    source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh rbase /conda-envs 2>&1 >> $log
 
     exit "$scriptExitCode"
 
@@ -120,17 +116,26 @@ inputs:
   # Script inputs #
   #################
   taxa:
-    type: string[]
-    label: Taxa list
-    doc: Comma-separated list of [taxa](https://en.wikipedia.org/wiki/Taxon). Each value could be a species name, order, class, genus, kingdom or family, as long as it is an exact match with the GBIF taxonomic backbone. Individual species can be looked up [on the GBIF website](https://www.gbif.org/species/).
-    default: [Acer saccharum, Acer nigrum]
+    type:
+      type: enum
+      symbols:
+        - reptiles
+        - plants
+        - mammals
+        - birds
+        - arthropods
+        - amphibians
+        - all
+    label: Taxa
+    doc: taxonomic group for which to retrieve GBIF heatmap
+    default: plants
 
   bbox_crs:
     label: Bounding box and CRS
     doc: Select a bounding box and CRS
     type:
       type: record
-      name: crsBBox
+      name: crsBbox
       fields:
       - name: CRS
         type:
@@ -154,17 +159,12 @@ inputs:
       - name: bbox
         type: float[]
 
-  min_year:
-    type: int
-    label: minimum year
-    doc: Min year observations wanted
-    default: 2010
 
-  max_year:
-    type: int
-    label: maximum year
-    doc: Max year observations wanted
-    default: 2024
+  spatial_res:
+    type: float
+    label: Spatial resolution
+    doc: Integer, spatial resolution of the rasters
+    default: 1000.0
 
 
 
@@ -203,52 +203,25 @@ inputs:
   scriptPath:
     type: string
     doc: Path to the script, relative to scripts root.
-    default: forCWL/getGBIFObservations.py
+    default: forCWL/loadFromStac.R
 
   scripts_root:
     type: Directory?
     doc: Root folder for scripts. Use this to override the image's scripts while debugging.
 
 outputs:
-  observations_file:
+  rasters:
     type: File
-    label: Observations
-    doc: Output file with observations
+    label: Density raster
+    doc: Array with output raster path
     outputBinding:
       glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
       loadContents: true
       outputEval: |
         ${
-          var value = extractOutput(self, "observations_file");
+          var value = extractOutput(self, "rasters");
           if (value === null) return null;
           return { class: "File", location: "file://" + value };
-        }
-
-  total_records:
-    type: int
-    label: Total number of occurrences
-    doc: Total number of GBIF occurrences in csv file
-    outputBinding:
-      glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
-      loadContents: true
-      outputEval: |
-        ${
-          var value = extractOutput(self, "total_records");
-          if (value === null) return null;
-          return parseInt(value);
-        }
-
-  gbif_doi:
-    type: string
-    label: DOI of GBIF download
-    doc: DOI of GBIF download. Used for citing downloaded data.
-    outputBinding:
-      glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
-      loadContents: true
-      outputEval: |
-        ${
-          var value = extractOutput(self, "gbif_doi");
-          return value;
         }
 
 

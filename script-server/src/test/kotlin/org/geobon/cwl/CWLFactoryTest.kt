@@ -13,8 +13,6 @@ import kotlin.test.assertTrue
 
 class CWLFactoryTest {
 
-
-
     private val cwlResources = File("src/test/resources/cwl")
 
     private var resultFile:File? = null
@@ -69,7 +67,17 @@ class CWLFactoryTest {
 
     @Test
     fun `test single script with rbase Conda environment`() {
+        val stepToTest = "GBIFHeatmapFromSTAC"
+        val step = ScriptStep("forCWL/$stepToTest.yml", StepId("step", "0"), noHPCContext)
+        val result = toCWL(step)
 
+        resultFile = File(cwlResources, "${stepToTest}_gen.cwl").also { resultFile ->
+            resultFile.writeText(result)
+            validateCWL(resultFile)
+        }
+
+        val expected = File(cwlResources, "$stepToTest.cwl").readText()
+        assertMultilineEquals(expected, result)
     }
 
     @Test
