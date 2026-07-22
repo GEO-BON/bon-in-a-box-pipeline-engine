@@ -4,6 +4,11 @@
 condaEnvName=$1
 condaPackDir=$2
 
+# No need to pack base environments, they are already in the docker
+if [[ "$condaEnvName" == "pythonbase" || "$condaEnvName" == "rbase" ]]; then
+    exit 0
+fi
+
 function packEnvironment {
     echo "Packing conda environment $condaEnvName..."
     mamba activate base
