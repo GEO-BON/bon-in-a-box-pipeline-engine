@@ -1,5 +1,6 @@
 #!/bin/python3
 import os, sys, json, signal
+from pathlib import Path
 
 biab_output_list = {}
 
@@ -39,6 +40,10 @@ if __name__ == "__main__":
 	# Receive args
 	output_folder = os.path.abspath(sys.argv[1])
 	script_path = os.path.abspath(sys.argv[2])
+
+	# Updating the pid file for the python process
+	file_path = Path(output_folder)/".pid"
+	file_path.write_text(f"{os.getpid()}")
 
 	# Add script dir to sys.path
 	script_dir = os.path.dirname(os.path.abspath(script_path))

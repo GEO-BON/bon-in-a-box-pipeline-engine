@@ -1,5 +1,7 @@
 import openeo
 import os
+from pathlib import Path
+from system.scriptWrapper import signal_handler
 
 # Credentials
 id = os.getenv("CDSE_CLIENT_ID")
@@ -59,11 +61,28 @@ udp_job = cube.save_result(format="GTiff").create_job(
     title="UDP"
 )
 
+# Signal handler will allow to write whatever outputs we have (in the finally clause below)
+def openEO_signal_handler(sig, frame):
+    print('Termination signal received. Stopping opeEO process.', flush=True)
+    biab_output_list[ "error" ] = "Script run has received a stop signal before completion.\nCancelling openEO process..."
+    udp_job.stop()
+    sys.exit(0)
+
+current_signal_SIGTERM = signal.getsignal(signal.SIGTERM)
+current_signal_SIGINT = signal.getsignal(signal.SIGINT)
+signal.signal(signal.SIGTERM, openEO_signal_handler)
+signal.signal(signal.SIGINT, openEO_signal_handler)
+
 try:
     udp_job.start_and_wait()
 except Exception as e:
-    udp_job.stop()
     biab_error_stop(f"UDP job failed: {e}")
+finally:
+    signal.signal(signal.SIGTERM, current_signal_SIGTERM)
+    signal.signal(signal.SIGINT, current_signal_SIGINT)
+
+for entry in udp_job.logs(level = "warning"):
+    print(f"[{entry.get('level')}]: {entry.get('message')}", flush=True)
 
 print(f"UDP job finished: {udp_job.job_id}", flush=True)
 
