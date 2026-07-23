@@ -11,7 +11,7 @@ label: Python Example
 doc:
   - "Description:
     Sample python script that increments a number."
-  - "Lifecycle tag: LifecycleMetadata(status=EXAMPLE, message=null)"
+  - "Lifecycle tag: Example. Testing lifecycle messages."
   - "Authors:
     Jean-Michel Lord (https://orcid.org/0009-0007-3826-1125)"
 

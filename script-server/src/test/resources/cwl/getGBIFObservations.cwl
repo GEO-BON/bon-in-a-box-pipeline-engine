@@ -11,7 +11,7 @@ label: GBIF Observations from Download API
 doc:
   - "Description:
     Load complete GBIF data from GBIF download API"
-  - "Lifecycle tag: LifecycleMetadata(status=CORE, message=null)"
+  - "Lifecycle tag: Core."
   - "Authors:
     Guillaume Larocque (https://orcid.org/0000-0002-5967-9156)"
 

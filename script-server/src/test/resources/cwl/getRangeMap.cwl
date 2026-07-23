@@ -11,7 +11,7 @@ label: Get species range map
 doc:
   - "Description:
     This script downloads the range map of the species according to the expert source chosen."
-  - "Lifecycle tag: LifecycleMetadata(status=CORE, message=null)"
+  - "Lifecycle tag: Core."
   - "Authors:
     Maria Isabel Arce-Plata (https://orcid.org/0000-0003-4024-9268)
     Guillaume Larocque (https://orcid.org/0000-0002-5967-9156)"

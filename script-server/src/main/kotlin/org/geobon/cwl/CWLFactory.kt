@@ -278,7 +278,12 @@ class CWLFactory {
                     docEntries.add("Description:\n${it.replaceIndent(indent(2))}")
                 }
 
-                step.metadata.lifecycle?.let { docEntries.add("Lifecycle tag: $it") }
+                step.metadata.lifecycle?.let { lifecycle ->
+                    docEntries.add(buildString {
+                        append("Lifecycle tag: ${lifecycle.status.text}.")
+                        lifecycle.message?.let { append(" $it") }
+                    })
+                }
                 step.metadata.authors?.let { authors ->
                     docEntries.add(
                         "Authors:\n" +
