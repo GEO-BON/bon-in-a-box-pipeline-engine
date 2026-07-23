@@ -79,7 +79,20 @@ object CWLExportMain {
                                 destinationFile.writeText(CWLFactory.toCWL(step))
                             }
                             val validationDuration = measureTime {
-                                if (!validateCWL(destinationFile)) {
+                                if (validateCWL(destinationFile)) {
+                                    val templateResult = SystemCall().run(
+                                        listOf("cwl-runner", "--make-template", destinationFile.absolutePath),
+                                        timeoutAmount = 10
+                                    )
+
+                                    if(templateResult.success){
+                                        val templateFile = File(destinationFile.parentFile, "${file.nameWithoutExtension}_template.yml")
+                                        templateFile.writeText(templateResult.output)
+                                    } else {
+                                        logger.warn("Failed to create template for ${destinationFile.path}")
+                                    }
+
+                                } else {
                                     scriptFailures++
                                 }
                             }
