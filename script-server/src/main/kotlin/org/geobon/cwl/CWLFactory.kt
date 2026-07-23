@@ -42,7 +42,7 @@ class CWLFactory {
                 "condaEnvYml" to condaEnvYml,
                 "program" to step.scriptType.program,
                 "scriptWrapper" to "scriptWrapper.${step.scriptType.extension}",
-                "metadata" to toCWLMetadata(step)
+                "metadata" to metadataToCWL(step)
             )
 
             // Load the step template
@@ -78,7 +78,7 @@ class CWLFactory {
                 return toCWL(key, definition, it.requiredProperties, isInput)
             }
 
-            val typeName = toCWLTypeName(definition.type)
+            val typeName = typeToCWL(definition.type)
             val type = if (definition.type == IO__TYPE_OPTIONS) {
                 buildString {
                     append("\n${indent(3)}type: $typeName")
@@ -226,7 +226,7 @@ class CWLFactory {
                                 appendLine(
                                     """
                                         - name: $fieldKey
-                                          type: ${toCWLTypeName(fieldType)}?
+                                          type: ${typeToCWL(fieldType)}?
                                     """.replaceIndent(indent(5))
                                 )
                             }
@@ -238,7 +238,7 @@ class CWLFactory {
                         appendLine(
                             """
                                 - name: $subKey
-                                  type: ${toCWLTypeName(propertyType)}
+                                  type: ${typeToCWL(propertyType)}
                             """.replaceIndent(indent(3))
                         )
                     }
@@ -263,7 +263,7 @@ class CWLFactory {
          * It's the case for conversion of location chooser objects where we only have the type name,
          * and know there will not be option objects included.
          */
-        private fun toCWLTypeName(biabType: String): String {
+        private fun typeToCWL(biabType: String): String {
             val arrayIndex = biabType.indexOf("[")
             val arraySuffix = if (arrayIndex == -1) "" else biabType.substring(arrayIndex)
             val biabRawType = if (arrayIndex == -1) biabType else biabType.substring(0, arrayIndex)
@@ -281,7 +281,7 @@ class CWLFactory {
             } + arraySuffix
         }
 
-        private fun toCWLMetadata(step: ScriptStep): String {
+        private fun metadataToCWL(step: ScriptStep): String {
             return buildString {
                 appendLine("label: ${step.metadata.name}")
                 val docEntries = mutableListOf<String>()
