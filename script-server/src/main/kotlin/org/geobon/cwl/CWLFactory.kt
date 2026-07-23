@@ -79,7 +79,7 @@ class CWLFactory {
             }
 
             val typeName = typeToCWL(definition.type)
-            val type = if (definition.type == IO__TYPE_OPTIONS) {
+            val type = if (definition.type.startsWith(IO__TYPE_OPTIONS)) {
                 buildString {
                     append("\n${indent(3)}type: $typeName")
                     append("\n${indent(3)}symbols:")
