@@ -17,6 +17,8 @@ import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
+import org.yaml.snakeyaml.Yaml
+import kotlin.text.appendLine
 
 class CWLFactory {
     companion object {
@@ -98,8 +100,8 @@ class CWLFactory {
                     appendLine(2, "doc: ${definition.description}")
                 }
 
-                if (isInput) {
-                    appendLine("default: ${definition.example}".replaceIndent(indent(2)))
+                if (isInput && definition.example != null) {
+                    appendLine(exampleToCWL(2, definition.example))
                 } else {
                     appendLine(
                         $$"""
@@ -180,14 +182,14 @@ class CWLFactory {
             key: String,
             definition: IOMetadata,
             schema: JSONObject,
-            isInput: Boolean // TODO: Add examples if input
+            isInput: Boolean
         ): String {
             return buildString {
                 appendLine(
                     """
-              $key:
-                label: ${definition.label}
-            """.replaceIndent("  ")
+                      $key:
+                        label: ${definition.label}
+                    """.replaceIndent(indent(1))
                 )
 
                 if (definition.description.contains('\n')) {
@@ -199,11 +201,11 @@ class CWLFactory {
 
                 appendLine(
                     """
-                type:
-                  type: record
-                  name: ${definition.type}
-                  fields:
-            """.replaceIndent(indent(2))
+                        type:
+                          type: record
+                          name: ${definition.type}
+                          fields:
+                    """.replaceIndent(indent(2))
                 )
 
                 // Creating a CWL "record" for the input objects.
@@ -211,21 +213,21 @@ class CWLFactory {
                     schema.optJSONObject(subKey)?.let { section ->
                         appendLine(
                             """
-                            - name: $subKey
-                              type:
-                                name: ${subKey}Definition
-                                type: record
-                                fields:
-                        """.replaceIndent(indent(3))
+                                - name: $subKey
+                                  type:
+                                    name: ${subKey}Definition
+                                    type: record
+                                    fields:
+                            """.replaceIndent(indent(3))
                         )
 
                         section.keys().forEach { fieldKey ->
                             section.optString(fieldKey)?.let { fieldType ->
                                 appendLine(
                                     """
-                                    - name: $fieldKey
-                                      type: ${toCWLTypeName(fieldType)}?
-                                """.replaceIndent(indent(5))
+                                        - name: $fieldKey
+                                          type: ${toCWLTypeName(fieldType)}?
+                                    """.replaceIndent(indent(5))
                                 )
                             }
                         }
@@ -235,15 +237,25 @@ class CWLFactory {
                         // If no depth, just output as separate IO
                         appendLine(
                             """
-                            - name: $subKey
-                              type: ${toCWLTypeName(propertyType)}
-                        """.replaceIndent(indent(3))
+                                - name: $subKey
+                                  type: ${toCWLTypeName(propertyType)}
+                            """.replaceIndent(indent(3))
                         )
                     }
                 }
-                appendLine()
 
+                // Printing the default value
+                if (isInput && definition.example != null) {
+                    appendLine(exampleToCWL(2, definition.example))
+                }
+
+                appendLine()
             }
+        }
+
+        fun exampleToCWL(baseIndent: Int, example: Any): String {
+            return Yaml().dumpAsMap(mapOf("default" to example))
+                .replaceIndent(indent(baseIndent))
         }
 
         /**
