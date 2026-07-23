@@ -130,7 +130,8 @@ inputs:
     type: string[]
     label: species
     doc: Scientific name of the species. Multiple species names can be specified, separated with a comma.
-    default: [Myrmecophaga tridactyla]
+    default:
+    - Myrmecophaga tridactyla
 
   expert_source:
     type:

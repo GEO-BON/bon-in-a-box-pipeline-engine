@@ -123,7 +123,9 @@ inputs:
     type: string[]
     label: Taxa list
     doc: Comma-separated list of [taxa](https://en.wikipedia.org/wiki/Taxon). Each value could be a species name, order, class, genus, kingdom or family, as long as it is an exact match with the GBIF taxonomic backbone. Individual species can be looked up [on the GBIF website](https://www.gbif.org/species/).
-    default: [Acer saccharum, Acer nigrum]
+    default:
+    - Acer saccharum
+    - Acer nigrum
 
   bbox_crs:
     label: Bounding box and CRS

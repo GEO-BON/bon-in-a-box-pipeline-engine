@@ -32,7 +32,7 @@ class CWLFactoryTest {
 
     @AfterTest
     fun cleanup(){
-//        resultFile?.delete()
+        resultFile?.delete()
     }
 
     @Test

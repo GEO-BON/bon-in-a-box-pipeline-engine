@@ -158,6 +158,27 @@ inputs:
             type: string?
       - name: bbox
         type: float[]
+    default:
+      bbox_crs:
+        bbox:
+        - 2313832
+        - 931786
+        - 2720193
+        - 1570189
+        CRS:
+          name: Canada Lambert Conformal Conic
+          authority: ESRI
+          code: 102002
+          proj4Def: +proj=lcc +lat_0=40 +lon_0=-96 +lat_1=50 +lat_2=70 +x_0=0 +y_0=0 +datum=NAD83
+            +units=m +no_defs +type=crs
+          wktDef: PROJCS["Canada_Lambert_Conformal_Conic",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS
+            1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["latitude_of_origin",40],PARAMETER["central_meridian",-96],PARAMETER["standard_parallel_1",50],PARAMETER["standard_parallel_2",70],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["ESRI","102002"]]
+          unit: null
+          CRSBboxWGS84:
+          - -141.01
+          - 38.21
+          - -40.73
+          - 86.46
 
   spatial_res:
     type: float
