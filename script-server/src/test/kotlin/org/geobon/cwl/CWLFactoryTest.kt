@@ -4,6 +4,7 @@ import org.geobon.cwl.CWLFactory.Companion.toCWL
 import org.geobon.pipeline.JSONPipeline
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
+import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.SystemCall
 import org.geobon.utils.assertMultilineEquals
 import org.geobon.utils.noHPCContext
@@ -15,12 +16,13 @@ import kotlin.test.assertTrue
 class CWLFactoryTest {
 
     private val cwlResources = File("src/test/resources/cwl")
+    private val cwlScripts = File(scriptsRoot, "forCWL")
 
-    private var resultFile:File? = null
+    private var resultFile: File? = null
 
     fun validateCWL(cwlFile: File) {
         // cwl validation: not necessary for the test but very useful when developing!
-        if(SystemCall().run(listOf("which", "cwl-runner")).success) {
+        if (SystemCall().run(listOf("which", "cwl-runner")).success) {
             val validationResult = SystemCall().run(
                 listOf("cwl-runner", "--validate", cwlFile.absolutePath),
                 mergeErrors = true,
@@ -31,42 +33,43 @@ class CWLFactoryTest {
         }
     }
 
-    fun testSingleStep(stepToTest:String){
-        val step = ScriptStep("forCWL/$stepToTest.yml", StepId("step", "0"), noHPCContext)
+    fun testSingleStep(yamlFile: File) {
+        val stepName = yamlFile.nameWithoutExtension
+        val step = ScriptStep(noHPCContext, yamlFile, StepId("step", "0"))
         val result = toCWL(step)
 
-        resultFile = File(cwlResources, "${stepToTest}_gen.cwl").also { resultFile ->
+        resultFile = File(cwlResources, "${stepName}_gen.cwl").also { resultFile ->
             resultFile.writeText(result)
             validateCWL(resultFile)
         }
 
-        val expected = File(cwlResources, "$stepToTest.cwl").readText()
+        val expected = File(cwlResources, "$stepName.cwl").readText()
         assertMultilineEquals(expected, result)
     }
 
     @AfterTest
-    fun cleanup(){
+    fun cleanup() {
         resultFile?.delete()
     }
 
     @Test
     fun `test single R script with Conda sub-environment`() {
-        testSingleStep("getRangeMap")
+        testSingleStep(File(cwlScripts, "getRangeMap.yml"))
     }
 
     @Test
     fun `test single python script with Conda sub-environment`() {
-        testSingleStep("getGBIFObservations")
+        testSingleStep(File(cwlScripts, "getGBIFObservations.yml"))
     }
 
     @Test
     fun `test single script with rbase Conda environment`() {
-        testSingleStep("GBIFHeatmapFromSTAC")
+        testSingleStep(File(cwlScripts, "GBIFHeatmapFromSTAC.yml"))
     }
 
     @Test
     fun `test single script with pythonbase Conda environment`() {
-        testSingleStep("helloPython")
+        testSingleStep(File(File(scriptsRoot, "helloWorld"), "helloPython.yml"))
     }
 
     @Test
