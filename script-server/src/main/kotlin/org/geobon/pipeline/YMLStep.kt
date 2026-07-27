@@ -36,6 +36,7 @@ import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.Run
 import org.geobon.script.ScriptType
 import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -64,7 +65,6 @@ abstract class YMLStep(
         File(yamlFile.parent, yamlParsed[SCRIPT].toString()),
         readIODefinitions(yamlParsed, INPUTS, logger),
         readIODefinitions(yamlParsed, OUTPUTS, logger),
-        (yamlParsed[TIMEOUT] as? Int)?.minutes ?: DEFAULT_TIMEOUT,
         yamlParsed[NAME]?.toString() ?: yamlFile.name,
         yamlParsed[DESCRIPTION]?.toString(),
         readLifecycle(yamlParsed),
@@ -73,7 +73,8 @@ abstract class YMLStep(
         yamlParsed[LICENSE]?.toString(),
         yamlParsed[EXTERNAL_LINK]?.toString(),
         readReferences(yamlParsed),
-        readConda(yamlFile, yamlParsed)
+        readConda(yamlFile, yamlParsed),
+        (yamlParsed[TIMEOUT] as? Int)?.minutes ?: DEFAULT_TIMEOUT
     )
 
     val inputDefinitions
@@ -202,7 +203,7 @@ abstract class YMLStep(
     }
 
     override fun toString(): String {
-        return "${javaClass.simpleName} (id=$id, name=\"${metadata.name}\", file=${yamlFile.relativeTo(ServerContext.scriptsRoot)})"
+        return "${javaClass.simpleName} (id=$id, name=\"${metadata.name}\", file=${yamlFile.relativeTo(scriptsRoot)})"
     }
 
     companion object {
@@ -213,10 +214,10 @@ abstract class YMLStep(
          * @see org.geobon.script.Description for return value structure
          */
         fun getScriptDescription(relativePath: String): Map<String, Any> {
-            var scriptFile = File(ServerContext.scriptsRoot, relativePath)
+            var scriptFile = File(scriptsRoot, relativePath)
 
             if (!scriptFile.exists()) {
-                scriptFile = File(ServerContext.scriptStubsRoot, relativePath)
+                scriptFile = File(scriptStubsRoot, relativePath)
 
                 if (!scriptFile.exists()) {
                     throw FileNotFoundException("$scriptFile does not exist.")

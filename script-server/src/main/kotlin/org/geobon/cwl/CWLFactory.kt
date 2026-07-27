@@ -308,6 +308,9 @@ class CWLFactory {
                                 (reviewers.joinToString("\n").replaceIndent(indent(2)))
                     )
                 }
+                step.metadata.externalLink?.let { externalLink ->
+                    docEntries.add("External link: $externalLink")
+                }
                 step.metadata.references?.let { references ->
                     docEntries.add(
                         "References:" +

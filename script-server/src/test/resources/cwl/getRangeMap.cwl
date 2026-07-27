@@ -15,6 +15,7 @@ doc:
   - "Authors:
     Maria Isabel Arce-Plata (https://orcid.org/0000-0003-4024-9268)
     Guillaume Larocque (https://orcid.org/0000-0002-5967-9156)"
+  - "External link: https://github.com/GEO-BON/biab-2.0/tree/main/scripts/SHI"
   - "References:
     Mammal Diversity Database. (2020). Mammal Diversity Database (Version 1.2) [Data set]. Zenodo. http://doi.org/10.5281/zenodo.4139818
 
