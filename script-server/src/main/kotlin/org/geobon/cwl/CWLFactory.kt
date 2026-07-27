@@ -24,7 +24,7 @@ import org.yaml.snakeyaml.Yaml
 class CWLFactory {
     companion object {
 
-        fun toCWL(step: ScriptStep): String {
+        fun toCommandLineTool(step: ScriptStep): String {
 
             var condaEnvYml = step.condaEnvYml
             if (condaEnvYml == null) {
@@ -57,7 +57,7 @@ class CWLFactory {
             return template
         }
 
-        fun toCWL(pipeline: Pipeline): String {
+        fun toWorkflow(pipeline: Pipeline): String {
 
             val replacements = mapOf(
                 "metadata" to metadataToCWL(pipeline.metadata),

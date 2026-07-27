@@ -76,7 +76,7 @@ object CWLExportMain {
                         try {
                             val exportDuration = measureTime {
                                 val step = ScriptStep(serverContext, file, StepId(file.nameWithoutExtension, "0"))
-                                destinationFile.writeText(CWLFactory.toCWL(step))
+                                destinationFile.writeText(CWLFactory.toCommandLineTool(step))
                             }
                             val validationDuration = measureTime {
                                 if (validateCWL(destinationFile)) {

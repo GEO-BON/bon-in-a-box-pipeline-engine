@@ -1,6 +1,7 @@
 package org.geobon.cwl
 
-import org.geobon.cwl.CWLFactory.Companion.toCWL
+import org.geobon.cwl.CWLFactory.Companion.toWorkflow
+import org.geobon.cwl.CWLFactory.Companion.toCommandLineTool
 import org.geobon.pipeline.JSONPipeline
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
@@ -36,7 +37,7 @@ class CWLFactoryTest {
     fun testSingleStep(yamlFile: File) {
         val stepName = yamlFile.nameWithoutExtension
         val step = ScriptStep(noHPCContext, yamlFile, StepId("step", "0"))
-        val result = toCWL(step)
+        val result = toCommandLineTool(step)
 
         resultFile = File(cwlResources, "${stepName}_gen.cwl").also { resultFile ->
             resultFile.writeText(result)
@@ -82,7 +83,7 @@ class CWLFactoryTest {
             null
         )
 
-        val result = toCWL(pipeline)
+        val result = toWorkflow(pipeline)
 
         resultFile = File(cwlResources, "${pipelineToTest}_gen.cwl").also { resultFile ->
             resultFile.writeText(result)
