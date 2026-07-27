@@ -1,6 +1,8 @@
 package org.geobon.pipeline.metadata
 
 import org.geobon.script.Description
+import org.geobon.script.Description.IO__TYPE
+import org.slf4j.Logger
 
 data class IOMetadata(
     val type: String,
@@ -19,4 +21,33 @@ data class IOMetadata(
             options.map { it.toString() }
         }
     )
+
+    companion object {
+        /**
+         * @return Map of input name to type
+         */
+        fun mapFromRawMetadata(rawMetadata: Map<String, Any>, section: String, logger: Logger): Map<String, IOMetadata> {
+            val inputs = mutableMapOf<String, IOMetadata>()
+
+            rawMetadata[section]?.let {
+                if (it is Map<*, *>) {
+                    it.forEach { (key, definition) ->
+                        key?.let {
+                            if (definition is Map<*, *>) {
+                                definition[IO__TYPE]?.let { type ->
+                                    inputs[key.toString()] = IOMetadata(type.toString(), definition)
+                                } ?: logger.error("Invalid type for input $key")
+                            } else {
+                                logger.error("description of $section is not a map")
+                            }
+                        } ?: logger.error("Invalid key")
+                    }
+                } else {
+                    logger.error("$section is not a map")
+                }
+            } ?: logger.trace("No $section map")
+
+            return inputs
+        }
+    }
 }

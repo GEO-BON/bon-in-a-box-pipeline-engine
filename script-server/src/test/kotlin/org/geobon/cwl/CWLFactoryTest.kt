@@ -1,6 +1,7 @@
 package org.geobon.cwl
 
 import org.geobon.cwl.CWLFactory.Companion.toCWL
+import org.geobon.pipeline.JSONPipeline
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
 import org.geobon.utils.SystemCall
@@ -30,6 +31,19 @@ class CWLFactoryTest {
         }
     }
 
+    fun testSingleStep(stepToTest:String){
+        val step = ScriptStep("forCWL/$stepToTest.yml", StepId("step", "0"), noHPCContext)
+        val result = toCWL(step)
+
+        resultFile = File(cwlResources, "${stepToTest}_gen.cwl").also { resultFile ->
+            resultFile.writeText(result)
+            validateCWL(resultFile)
+        }
+
+        val expected = File(cwlResources, "$stepToTest.cwl").readText()
+        assertMultilineEquals(expected, result)
+    }
+
     @AfterTest
     fun cleanup(){
         resultFile?.delete()
@@ -37,61 +51,42 @@ class CWLFactoryTest {
 
     @Test
     fun `test single R script with Conda sub-environment`() {
-        val stepToTest = "getRangeMap"
-        val step = ScriptStep("forCWL/$stepToTest.yml", StepId("step", "0"), noHPCContext)
-        val result = toCWL(step)
-
-        resultFile = File(cwlResources, "${stepToTest}_gen.cwl").also { resultFile ->
-            resultFile.writeText(result)
-            validateCWL(resultFile)
-        }
-
-        val expected = File(cwlResources, "$stepToTest.cwl").readText()
-        assertMultilineEquals(expected, result)
+        testSingleStep("getRangeMap")
     }
 
     @Test
     fun `test single python script with Conda sub-environment`() {
-        val stepToTest = "getGBIFObservations"
-        val step = ScriptStep("forCWL/$stepToTest.yml", StepId("step", "0"), noHPCContext)
-        val result = toCWL(step)
-
-        resultFile = File(cwlResources, "${stepToTest}_gen.cwl").also { resultFile ->
-            resultFile.writeText(result)
-            validateCWL(resultFile)
-        }
-
-        val expected = File(cwlResources, "$stepToTest.cwl").readText()
-        assertMultilineEquals(expected, result)
+        testSingleStep("getGBIFObservations")
     }
 
     @Test
     fun `test single script with rbase Conda environment`() {
-        val stepToTest = "GBIFHeatmapFromSTAC"
-        val step = ScriptStep("forCWL/$stepToTest.yml", StepId("step", "0"), noHPCContext)
-        val result = toCWL(step)
-
-        resultFile = File(cwlResources, "${stepToTest}_gen.cwl").also { resultFile ->
-            resultFile.writeText(result)
-            validateCWL(resultFile)
-        }
-
-        val expected = File(cwlResources, "$stepToTest.cwl").readText()
-        assertMultilineEquals(expected, result)
+        testSingleStep("GBIFHeatmapFromSTAC")
     }
 
     @Test
     fun `test single script with pythonbase Conda environment`() {
-        val stepToTest = "helloPython"
-        val step = ScriptStep("helloWorld/$stepToTest.yml", StepId("step", "0"), noHPCContext)
-        val result = toCWL(step)
+        testSingleStep("helloPython")
+    }
 
-        resultFile = File(cwlResources, "${stepToTest}_gen.cwl").also { resultFile ->
+    @Test
+    fun `test simple pipeline`() {
+        val pipelineToTest = "userInput"
+        val pipeline = JSONPipeline.createFromFile(
+            noHPCContext,
+            StepId("step", "0"),
+            "$pipelineToTest.json",
+            null
+        )
+
+        val result = toCWL(pipeline)
+
+        resultFile = File(cwlResources, "${pipelineToTest}_gen.cwl").also { resultFile ->
             resultFile.writeText(result)
             validateCWL(resultFile)
         }
 
-        val expected = File(cwlResources, "$stepToTest.cwl").readText()
+        val expected = File(cwlResources, "$pipelineToTest.cwl").readText()
         assertMultilineEquals(expected, result)
     }
 }

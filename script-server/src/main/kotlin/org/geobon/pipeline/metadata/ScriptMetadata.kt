@@ -19,7 +19,7 @@ class ScriptMetadata (
     val conda: CondaMetadata? = null,
     // TODO: compute requirements
     val timeout: Duration = DEFAULT_TIMEOUT,
-) : StepMetadata(inputs, outputs, references, externalLink, license, reviewers, authors, lifecycle, description, name) {
+) : StepMetadata(inputs, outputs, name, description, authors, reviewers, references, license, externalLink, lifecycle) {
     companion object {
         val DEFAULT_TIMEOUT = 1.days
     }

@@ -20,7 +20,6 @@ import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.yaml.snakeyaml.Yaml
-import kotlin.text.appendLine
 
 class CWLFactory {
     companion object {
@@ -51,8 +50,36 @@ class CWLFactory {
             var template = CWLFactory::class.java.getResource("/cwl/stepTemplate.cwl")?.readText()
                 ?: throw IllegalStateException("Could not read stepTemplate.cwl")
 
-            for (replacement in replacements) {
-                template = template.replace("{{${replacement.key}}}", replacement.value)
+            for ((key, value) in replacements) {
+                template = template.replace("{{$key}}", value)
+            }
+
+            return template
+        }
+
+        fun toCWL(pipeline: Pipeline): String {
+
+            val replacements = mapOf<String, String>(
+                "metadata" to metadataToCWL(pipeline.metadata),
+                "inputs" to toCWL(pipeline.metadata.inputs, true),
+                "outputs" to toCWL(pipeline.metadata.outputs, false),
+                // TODO "steps" to toCWL(...)
+/*
+quality_control:
+    run: bio-cwl-tools/fastqc/fastqc_2.cwl
+    in:
+      reads_file: rna_reads_fruitfly
+    out: [html_file]
+*/
+
+            )
+
+            // Load the step template
+            var template = CWLFactory::class.java.getResource("/cwl/workflowTemplate.cwl")?.readText()
+                ?: throw IllegalStateException("Could not read workflowTemplate.cwl")
+
+            for ((key, value) in replacements) {
+                template = template.replace("{{$key}}", value)
             }
 
             return template

@@ -1,7 +1,14 @@
 package org.geobon.pipeline
 
+import org.geobon.pipeline.metadata.*
+import org.geobon.script.Description.AUTHORS
+import org.geobon.script.Description.DESCRIPTION
+import org.geobon.script.Description.EXTERNAL_LINK
 import org.geobon.script.Description.IO__LABEL
 import org.geobon.script.Description.IO__TYPE
+import org.geobon.script.Description.LICENSE
+import org.geobon.script.Description.NAME
+import org.geobon.script.Description.REVIEWERS
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.json.JSONObject
@@ -17,10 +24,14 @@ class JSONPipeline (
     /** IO id to Input */
     inputs: MutableMap<String, Pipe>,
     /** IO id to Output */
-    outputs: Map<String, Output> = mutableMapOf()
+    outputs: Map<String, Output> = mutableMapOf(),
+    private val metadataFromFile: StepMetadata? = null,
 ) : Pipeline(
     id, debugName, steps, inputs, outputs
 ) {
+
+    override val metadata: StepMetadata
+        get() = metadataFromFile ?: super.metadata
 
     companion object {
 
@@ -81,7 +92,7 @@ class JSONPipeline (
             }
         }
 
-        private fun createFromFile(
+        fun createFromFile(
             serverContext: ServerContext, stepId: StepId, relPath: String,
             inputsJSON: String? = null
         ): Pipeline =
@@ -202,12 +213,32 @@ class JSONPipeline (
                 }
             }
 
+            val inputs = inputsToConstants(inputsJSON, pipelineJSON)
+
+            // Extract metadata to object
+            val metadata = pipelineJSON.optJSONObject(METADATA)?.let { metadata ->
+                val rawMetadata = metadata.toMap()
+                StepMetadata(
+                    inputs.mapValues { IOMetadata(it.value.type, "", "") }, // TODO
+                    outputs.mapValues { IOMetadata(it.value.type, "", "") }, // TODO
+                    metadata.opt(NAME)?.toString(),
+                    metadata.opt(DESCRIPTION)?.toString(),
+                    PersonMetadata.listFromRawMetadata(rawMetadata, AUTHORS),
+                    PersonMetadata.listFromRawMetadata(rawMetadata, REVIEWERS),
+                    ReferenceMetadata.listFromRawMetadata(rawMetadata),
+                    metadata.opt(LICENSE)?.toString(),
+                    metadata.opt(EXTERNAL_LINK)?.toString(),
+                    LifecycleMetadata.fromRawMetadata(rawMetadata)
+                )
+            }
+
             return JSONPipeline(
                 stepId,
                 debugName,
                 steps,
-                inputsToConstants(inputsJSON, pipelineJSON),
-                outputs
+                inputs,
+                outputs,
+                metadata
             )
         }
 
