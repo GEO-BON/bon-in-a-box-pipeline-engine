@@ -64,20 +64,42 @@ export default function IONode({ id, data }) {
   if(!metadata)
     return null // currently loading
 
-  let pathList = descriptionFileLocation.split('>')
-  if(metadata.name) {
-    pathList[pathList.length -1] = metadata.name
+  let stepType;
+  const extension = descriptionFileLocation.match(/\.([^.]+)$/)?.[1]?.toLowerCase();
+
+  switch (extension) {
+    case 'json':
+      stepType = 'pipeline';
+      break;
+    case 'udp':
+      stepType = 'openEO';
+      break;
+    case 'yml':
+    default:
+      stepType = 'script';
   }
 
-  let stepType = /\.json$/i.test(descriptionFileLocation) ? 'pipeline' : 'script'
+  let pathList;
+
+  if (stepType === 'openEO') {
+    pathList = ['openEO', metadata.name];
+  } else {
+    pathList = descriptionFileLocation.split('>');
+    if (metadata.name) {
+      pathList[pathList.length - 1] = metadata.name;
+    }
+  }
+
   return <>
-  <table className={`ioNode ${stepType}`} onDoubleClick={() =>
+  <table className={`ioNode ${stepType}`} onDoubleClick={(e) => {
+    if (e.target.closest('td.inputs, td.outputs')) return;
     setPopupContent(
       <StepDescription
         descriptionFile={descriptionFileLocation}
         metadata={metadata}
       />
-  )}>
+    )}
+  }>
     <tbody>
     <tr>
       <td className='inputs'>

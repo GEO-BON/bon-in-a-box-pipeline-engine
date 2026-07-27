@@ -336,17 +336,14 @@
   font-weight: bold;
 }
 
-.ioList .description {
-  font-size: small;
-}
-
-.ioList .example-tag {
-  padding-left: 5px;
-  font-size: small;
-  margin-right: 10px;
-}
-
+.ioList .description,
+.ioList .type,
 .ioList .example {
+  font-size: small;
+}
+
+.ioList .inline-label {
+  padding-left: 5px;
   font-size: small;
 }
 
@@ -357,7 +354,8 @@
 
 .ioList textarea.label,
 .ioList textarea.description,
-.ioList textarea.example {
+.ioList textarea.example,
+.ioList input.type {
   /* Removing the width of the dragHandle from 100% */
   width: calc(100% - 1.1rem);
   background-color: transparent;
@@ -368,7 +366,8 @@
 }
 
 .ioList textarea.label:hover,
-.ioList textarea.description:hover {
+.ioList textarea.description:hover,
+.ioList input.type:hover {
   background: url("../../img/pen.svg");
   background-repeat: no-repeat;
   background-position: right;
@@ -378,14 +377,20 @@
 
 .ioList textarea.label:focus,
 .ioList textarea.description:focus,
+.ioList input.type:focus,
 .ioList textarea.autoResizeHeight:focus {
   outline: 1px solid var(--biab-green-trans-main);
   border: 1px solid var(--biab-green-trans-main);
 }
 
 .ioList textarea.label:hover:focus,
-.ioList textarea.description:hover:focus {
+.ioList textarea.description:hover:focus,
+.ioList input.type:hover:focus {
   background: none;
+}
+
+.ioList .inline-label input {
+  width:auto;
 }
 
 .ioList textarea.autoResizeHeight.example {
@@ -597,19 +602,21 @@ ul#popupMenu {
 }
 
 .constant-country .left-gutter,
-.constant-countryRegionCRS .left-gutter,
-.constant-countryRegion .left-gutter,
-.constant-bboxCRS .left-gutter,
+.constant-countryregioncrs .left-gutter,
+.constant-countryregion .left-gutter,
+.constant-bboxcrs .left-gutter, /*deprecated*/
+.constant-crsbbox .left-gutter,
+.constant-location .left-gutter,
 .constant-CRS .left-gutter {
   font-size: 0;
 }
 
 .constant-country .MuiAutocomplete-root,
-.constant-countryRegionCRS .MuiAutocomplete-root,
-.constant-countryRegion .MuiAutocomplete-root,
-.constant-CRS .MuiAutocomplete-root,
-.constant-countryRegionCRS .MuiFormControl-root,
-.constant-CRS .MuiFormControl-root {
+.constant-countryregioncrs .MuiAutocomplete-root,
+.constant-countryregion .MuiAutocomplete-root,
+.constant-crs .MuiAutocomplete-root,
+.constant-countryregioncrs .MuiFormControl-root,
+.constant-crs .MuiFormControl-root {
   width: 100% !important;
 }
 

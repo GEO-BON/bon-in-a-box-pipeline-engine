@@ -1,0 +1,219 @@
+{
+  "process_graph": {
+    "runudf1": {
+      "process_id": "run_udf",
+      "arguments": {
+        "context": {
+          "burst_id": {
+            "from_parameter": "burst_id"
+          },
+          "polarization": {
+            "from_parameter": "polarization"
+          },
+          "sub_swath": {
+            "from_parameter": "sub_swath"
+          },
+          "temporal_extent": {
+            "from_parameter": "temporal_extent"
+          },
+          "spatial_extent": {
+            "from_parameter": "spatial_extent"
+          },
+          "temporal_baseline": {
+            "from_parameter": "temporal_baseline"
+          },
+          "coherence_window_rg": {
+            "from_parameter": "coherence_window_rg"
+          },
+          "coherence_window_az": {
+            "from_parameter": "coherence_window_az"
+          }
+        },
+        "data": null,
+        "runtime": "EOAP-CWL",
+        "udf": "https://raw.githubusercontent.com/cloudinsar/s1-workflows/refs/heads/main/cwl/sar_coherence.cwl"
+      },
+      "result": true
+    }
+  },
+  "id": "sentinel1_sar_coherence",
+  "description": "This process generates a time series of Sentinel\u20111 interferometric coherence for a set of interferometric pairs. The area of interest is specified at burst level using the Sentinel\u20111 burst_id and sub_swath, ensuring precise spatial targeting and consistent acquisition geometry across the time series.\nInterferometric pairs are automatically defined by specifying a temporal extent and temporal baseline.\nThe workflow is implemented using ESA SNAP operators and is defined as a Common Workflow Language (CWL) pipeline [sar_coherence.cwl](https://github.com/cloudinsar/s1-workflows/blob/main/cwl/sar_coherence.cwl).\nInterferometric coherence provides a quantitative measure of phase stability between acquisitions and is widely used to assess surface change and temporal decorrelation driven by factors such as snow cover, vegetation dynamics, surface moisture, or mass movement. Coherence time series can be used for a variety of scientific and operational applications, including land cover classification, change detection, and as a diagnostic input for more advanced SAR analysis workflows.\n\nAn example on how to use it:\n\n```python\nimport openeo\n\nconnection = openeo.connect(\"https://openeo.dataspace.copernicus.eu\").authenticate_oidc()\nstac_resource = connection.datacube_from_process(\n    \"sentinel1_sar_coherence\",\n    namespace=\"https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/refs/heads/main/algorithm_catalog/eurac/sentinel1_sar_coherence/openeo_udp/sentinel1_sar_coherence.json\",\n    **{\n        \"temporal_extent\": [\"2018-01-28\", \"2018-02-04\"],\n        \"temporal_baseline\": 6,\n        \"burst_id\": 329488,\n        \"coherence_window_az\": 2,\n        \"coherence_window_rg\": 10,\n        \"polarization\": \"VH\",\n        \"sub_swath\": \"IW2\"\n    }\n)\n\njob = stac_resource.create_job(title=\"sentinel1_sar_coherence test\")\njob.start_and_wait()\njob.get_results().download_files()\n```",
+  "parameters": [
+    {
+      "name": "burst_id",
+      "description": "A temporal extent could have multiple bursts per day. Use [this notebook](https://github.com/cloudinsar/s1-workflows/blob/main/input_selection/InSAR_workflow_input_selection.ipynb) to find a fitting `burst_id`.\nAlternatively, the burst id map can be downloaded here: [Burst ID Maps 2022-05-30](https://sar-mpc.eu/files/S1_burstid_20220530.zip).\nYou can also specify `temporal_extent` instead, so that a `burst_id` gets automatically selected.",
+      "schema": {
+        "type": "integer"
+      },
+      "optional": true,
+      "default": null
+    },
+    {
+      "name": "polarization",
+      "description": "polarization",
+      "schema": {
+        "type": "string",
+        "enum": [
+          "VV",
+          "VH"
+        ]
+      }
+    },
+    {
+      "name": "sub_swath",
+      "description": "Sub-swath identifier",
+      "schema": {
+        "type": "string",
+        "enum": [
+          "IW1",
+          "IW2",
+          "IW3"
+        ]
+      },
+      "optional": true,
+      "default": null
+    },
+    {
+      "name": "temporal_extent",
+      "description": "Temporal extent as [start_date, end_date], e.g., ['2024-08-01', '2024-09-30']. Specify at least a period equivalent to the selected temporal baseline * 2 to make sure at least one pair gets found. E.g. for a temporal baseline of 12 days, select at least a 24 days interval.",
+      "schema": {
+        "type": "array",
+        "subtype": "temporal-interval",
+        "uniqueItems": true,
+        "minItems": 2,
+        "maxItems": 2,
+        "items": {
+          "anyOf": [
+            {
+              "type": "string",
+              "subtype": "date-time",
+              "format": "date-time"
+            },
+            {
+              "type": "string",
+              "subtype": "date",
+              "format": "date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "spatial_extent",
+      "description": "Specifies area where to search for bursts. If multiple bursts are found, the one with the lowest id number will be selected. This parameter can be used instead of `burst_id`.",
+      "schema": [
+        {
+          "title": "Bounding Box",
+          "type": "object",
+          "subtype": "bounding-box",
+          "required": [
+            "west",
+            "south",
+            "east",
+            "north"
+          ],
+          "properties": {
+            "west": {
+              "description": "West (lower left corner, coordinate axis 1).",
+              "type": "number"
+            },
+            "south": {
+              "description": "South (lower left corner, coordinate axis 2).",
+              "type": "number"
+            },
+            "east": {
+              "description": "East (upper right corner, coordinate axis 1).",
+              "type": "number"
+            },
+            "north": {
+              "description": "North (upper right corner, coordinate axis 2).",
+              "type": "number"
+            },
+            "base": {
+              "description": "Base (optional, lower left corner, coordinate axis 3).",
+              "type": [
+                "number",
+                "null"
+              ],
+              "default": null
+            },
+            "height": {
+              "description": "Height (optional, upper right corner, coordinate axis 3).",
+              "type": [
+                "number",
+                "null"
+              ],
+              "default": null
+            },
+            "crs": {
+              "description": "Coordinate reference system of the extent, specified as as [EPSG code](http://www.epsg-registry.org/) or [WKT2 CRS string](http://docs.opengeospatial.org/is/18-010r7/18-010r7.html). Defaults to `4326` (EPSG code 4326) unless the client explicitly requests a different coordinate reference system.",
+              "anyOf": [
+                {
+                  "title": "EPSG Code",
+                  "type": "integer",
+                  "subtype": "epsg-code",
+                  "minimum": 1000,
+                  "examples": [
+                    3857
+                  ]
+                },
+                {
+                  "title": "WKT2",
+                  "type": "string",
+                  "subtype": "wkt2-definition"
+                }
+              ],
+              "default": 4326
+            }
+          }
+        },
+        {
+          "title": "Vector data cube",
+          "description": "Limits the data cube to the bounding box of the given geometries in the vector data cube. For raster data, all pixels inside the bounding box that do not intersect with any of the polygons will be set to no data (`null`). Empty geometries are ignored.",
+          "type": "object",
+          "subtype": "datacube",
+          "dimensions": [
+            {
+              "type": "geometry"
+            }
+          ]
+        },
+        {
+          "title": "No filter",
+          "description": "Don't filter spatially. All data is included in the data cube.",
+          "type": "null"
+        }
+      ],
+      "optional": true,
+      "default": null
+    },
+    {
+      "name": "temporal_baseline",
+      "description": "Should be a multiple of 6. This is used to select how many days the secondary date will be after the primary for each date pair.",
+      "schema": {
+        "type": "integer"
+      }
+    },
+    {
+      "name": "coherence_window_rg",
+      "description": "Coherence window size in range direction",
+      "schema": {
+        "type": "integer"
+      },
+      "optional": true,
+      "default": 10
+    },
+    {
+      "name": "coherence_window_az",
+      "description": "Coherence window size in azimuth direction",
+      "schema": {
+        "type": "integer"
+      },
+      "optional": true,
+      "default": 2
+    }
+  ]
+}
