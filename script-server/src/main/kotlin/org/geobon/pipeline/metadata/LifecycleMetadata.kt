@@ -5,13 +5,13 @@ import org.geobon.script.Description.LIFECYCLE__MESSAGE
 import org.geobon.script.Description.LIFECYCLE__STATUS
 
 data class LifecycleMetadata(val status: Lifecycle, val message:String? = null) {
-    enum class Lifecycle(val tag: String, val text:String) {
-        IN_DEVELOPMENT("in_development", "In development"),
-        IN_REVIEW("in_review", "In review"),
-        REVIEWED("reviewed", "Reviewed"),
-        CORE("core", "Core"),
-        EXAMPLE("example", "Example"),
-        DEPRECATED("deprecated", "Deprecated");
+    enum class Lifecycle(val text:String) {
+        IN_DEVELOPMENT("In development"),
+        IN_REVIEW("In review"),
+        REVIEWED("Reviewed"),
+        CORE("Core"),
+        EXAMPLE("Example"),
+        DEPRECATED("Deprecated");
     }
 
     companion object {
