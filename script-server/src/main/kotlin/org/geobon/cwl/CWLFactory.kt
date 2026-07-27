@@ -11,8 +11,10 @@ import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_INT
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_LONG
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
 import org.geobon.pipeline.ObjectInputDefinition
+import org.geobon.pipeline.Pipeline
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.metadata.IOMetadata
+import org.geobon.pipeline.metadata.StepMetadata
 import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.server.ServerContext.Companion.scriptsRoot
@@ -42,7 +44,7 @@ class CWLFactory {
                 "condaEnvYml" to condaEnvYml,
                 "program" to step.scriptType.program,
                 "scriptWrapper" to "scriptWrapper.${step.scriptType.extension}",
-                "metadata" to metadataToCWL(step)
+                "metadata" to metadataToCWL(step.metadata)
             )
 
             // Load the step template
@@ -281,37 +283,37 @@ class CWLFactory {
             } + arraySuffix
         }
 
-        private fun metadataToCWL(step: ScriptStep): String {
+        private fun metadataToCWL(stepMetadata: StepMetadata): String {
             return buildString {
-                appendLine("label: ${step.metadata.name}")
+                appendLine("label: ${stepMetadata.name}")
                 val docEntries = mutableListOf<String>()
 
-                step.metadata.description?.let {
+                stepMetadata.description?.let {
                     docEntries.add("Description:\n${it.replaceIndent(indent(2))}")
                 }
 
-                step.metadata.lifecycle?.let { lifecycle ->
+                stepMetadata.lifecycle?.let { lifecycle ->
                     docEntries.add(buildString {
                         append("Lifecycle tag: ${lifecycle.status.text}.")
                         lifecycle.message?.let { append(" $it") }
                     })
                 }
-                step.metadata.authors?.let { authors ->
+                stepMetadata.authors?.let { authors ->
                     docEntries.add(
                         "Authors:\n" +
                                 (authors.joinToString("\n").replaceIndent(indent(2)))
                     )
                 }
-                step.metadata.reviewers?.let { reviewers ->
+                stepMetadata.reviewers?.let { reviewers ->
                     docEntries.add(
                         "Reviewers:\n" +
                                 (reviewers.joinToString("\n").replaceIndent(indent(2)))
                     )
                 }
-                step.metadata.externalLink?.let { externalLink ->
+                stepMetadata.externalLink?.let { externalLink ->
                     docEntries.add("External link: $externalLink")
                 }
-                step.metadata.references?.let { references ->
+                stepMetadata.references?.let { references ->
                     docEntries.add(
                         "References:" +
                                 references.joinToString("\n") {
