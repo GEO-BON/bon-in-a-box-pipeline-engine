@@ -4,7 +4,7 @@ import java.io.File
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
-data class StepMetadata(
+data class ScriptMetadata(
     val script: File,
     val inputs: Map<String, IOMetadata>,
     val outputs: Map<String, IOMetadata>,

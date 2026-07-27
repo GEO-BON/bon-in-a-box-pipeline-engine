@@ -5,8 +5,8 @@ import org.geobon.pipeline.metadata.PersonMetadata
 import org.geobon.pipeline.metadata.IOMetadata
 import org.geobon.pipeline.metadata.LifecycleMetadata
 import org.geobon.pipeline.metadata.ReferenceMetadata
-import org.geobon.pipeline.metadata.StepMetadata
-import org.geobon.pipeline.metadata.StepMetadata.Companion.DEFAULT_TIMEOUT
+import org.geobon.pipeline.metadata.ScriptMetadata
+import org.geobon.pipeline.metadata.ScriptMetadata.Companion.DEFAULT_TIMEOUT
 import org.geobon.script.Description.AUTHORS
 import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
@@ -60,7 +60,7 @@ abstract class YMLStep(
      */
     var context: RunContext? = null
 
-    val metadata: StepMetadata = StepMetadata(
+    val metadata: ScriptMetadata = ScriptMetadata(
         File(yamlFile.parent, yamlParsed[SCRIPT].toString()),
         readIODefinitions(yamlParsed, INPUTS, logger),
         readIODefinitions(yamlParsed, OUTPUTS, logger),
