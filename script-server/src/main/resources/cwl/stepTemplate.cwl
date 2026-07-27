@@ -2,7 +2,7 @@
 cwlVersion: v1.2
 class: CommandLineTool
 
-# To run this proof of concept:
+# To run this step individually:
 # cwltool <path/url to cwl file> --envFolder="./env" [optional inputs] --environment="path/to/runner.env"
 # envFolder will keep conda environments between runs.
 # environment file is necessary when the script requires credentials.
