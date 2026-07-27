@@ -8,17 +8,6 @@ class: Workflow
 
 {{metadata}}
 
-requirements:
-  InlineJavascriptRequirement:
-    expressionLib:
-      - |
-        function extractOutput(outputFiles, key) {
-          if (!outputFiles || outputFiles.length === 0) return null;
-          var value = JSON.parse(outputFiles[0].contents)[key]
-          if (value === undefined) return null
-          return value;
-        }
-
 inputs:
   #################
   # Script inputs #

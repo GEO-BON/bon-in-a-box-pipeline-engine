@@ -59,11 +59,11 @@ class CWLFactory {
 
         fun toCWL(pipeline: Pipeline): String {
 
-            val replacements = mapOf<String, String>(
+            val replacements = mapOf(
                 "metadata" to metadataToCWL(pipeline.metadata),
                 "inputs" to toCWL(pipeline.metadata.inputs, true),
                 "outputs" to toCWL(pipeline.metadata.outputs, false),
-                // TODO "steps" to toCWL(...)
+                "steps" to "" // TODO toCWL(...)
 /*
 quality_control:
     run: bio-cwl-tools/fastqc/fastqc_2.cwl

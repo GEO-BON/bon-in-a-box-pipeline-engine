@@ -217,10 +217,14 @@ class JSONPipeline (
 
             // Extract metadata to object
             val metadata = pipelineJSON.optJSONObject(METADATA)?.let { metadata ->
+                // Transfer IO from main body to metadata (like in script descriptions)
+                metadata.append(INPUTS, pipelineJSON.optJSONObject(INPUTS))
+                metadata.append(OUTPUTS, pipelineJSON.optJSONObject(OUTPUTS))
+
                 val rawMetadata = metadata.toMap()
                 StepMetadata(
-                    inputs.mapValues { IOMetadata(it.value.type, "", "") }, // TODO
-                    outputs.mapValues { IOMetadata(it.value.type, "", "") }, // TODO
+                    IOMetadata.mapFromRawMetadata(rawMetadata, INPUTS, logger),
+                    IOMetadata.mapFromRawMetadata(rawMetadata, OUTPUTS, logger),
                     metadata.opt(NAME)?.toString(),
                     metadata.opt(DESCRIPTION)?.toString(),
                     PersonMetadata.listFromRawMetadata(rawMetadata, AUTHORS),

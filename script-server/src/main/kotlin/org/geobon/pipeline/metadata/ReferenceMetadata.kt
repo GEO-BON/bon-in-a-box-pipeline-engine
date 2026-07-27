@@ -11,9 +11,9 @@ data class ReferenceMetadata (
     companion object {
         fun listFromRawMetadata(rawMetadata: Map<String, Any>): List<ReferenceMetadata>? {
             val referencesFound = mutableListOf<ReferenceMetadata>()
-            rawMetadata[REFERENCES]?.let { authors ->
-                if (authors is Iterable<*>) {
-                    authors.forEach { author ->
+            rawMetadata[REFERENCES]?.let { reference ->
+                if (reference is Iterable<*>) {
+                    reference.forEach { author ->
                         if (author is Map<*, *>) {
                             (author[REFERENCES_TEXT] as? String)?.let { text ->
                                 referencesFound.add(

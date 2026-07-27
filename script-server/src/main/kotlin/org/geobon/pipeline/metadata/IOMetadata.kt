@@ -30,21 +30,26 @@ data class IOMetadata(
             val inputs = mutableMapOf<String, IOMetadata>()
 
             rawMetadata[section]?.let {
-                if (it is Map<*, *>) {
-                    it.forEach { (key, definition) ->
-                        key?.let {
-                            if (definition is Map<*, *>) {
-                                definition[IO__TYPE]?.let { type ->
-                                    inputs[key.toString()] = IOMetadata(type.toString(), definition)
-                                } ?: logger.error("Invalid type for input $key")
-                            } else {
-                                logger.error("description of $section is not a map")
-                            }
-                        } ?: logger.error("Invalid key")
+                val ioMap:Map<*,*>? = when (it) {
+                    is Map<*, *> -> it // Parsed from SnakeYAML
+                    is List<*> -> { // Parsed from JSONObject, there is somehow an extra list in the way
+                        it.firstOrNull() as? Map<*, *>
                     }
-                } else {
-                    logger.error("$section is not a map")
+                    else -> null
                 }
+
+                ioMap?.forEach { (key, definition) ->
+                    key?.let {
+                        if (definition is Map<*, *>) {
+                            definition[IO__TYPE]?.let { type ->
+                                inputs[key.toString()] = IOMetadata(type.toString(), definition)
+                            } ?: logger.error("Invalid type for input $key")
+                        } else {
+                            logger.error("description of $section is not a map")
+                        }
+                    } ?: logger.error("Invalid key")
+                } ?: logger.error("$section is not a map")
+
             } ?: logger.trace("No $section map")
 
             return inputs
