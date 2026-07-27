@@ -3,7 +3,7 @@ package org.geobon.pipeline
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
-import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
+import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
 import org.geobon.server.ServerContext
 import org.geobon.utils.noHPCContext
 import org.json.JSONObject
