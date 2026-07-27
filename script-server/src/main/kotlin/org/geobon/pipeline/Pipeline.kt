@@ -1,15 +1,11 @@
 package org.geobon.pipeline
 
 import kotlinx.coroutines.*
-import org.geobon.script.Description.IO__LABEL
-import org.geobon.script.Description.IO__TYPE
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.io.FileNotFoundException
 
 open class Pipeline (
     override val id: StepId,

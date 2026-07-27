@@ -61,7 +61,7 @@ abstract class YMLStep(
      */
     var context: RunContext? = null
 
-    val metadata: ScriptMetadata = ScriptMetadata(
+    override val metadata: ScriptMetadata = ScriptMetadata(
         File(yamlFile.parent, yamlParsed[SCRIPT].toString()),
         readIODefinitions(yamlParsed, INPUTS, logger),
         readIODefinitions(yamlParsed, OUTPUTS, logger),
