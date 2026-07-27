@@ -10,6 +10,7 @@ import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_FLOAT
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_INT
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_LONG
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
+import org.geobon.pipeline.IStep
 import org.geobon.pipeline.ObjectInputDefinition
 import org.geobon.pipeline.Pipeline
 import org.geobon.pipeline.ScriptStep
@@ -20,6 +21,7 @@ import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.yaml.snakeyaml.Yaml
+import java.io.File
 
 class CWLFactory {
     companion object {
@@ -57,21 +59,15 @@ class CWLFactory {
             return template
         }
 
-        fun toWorkflow(pipeline: Pipeline): String {
+        fun toWorkflow(pipeline: Pipeline, relativePathToSteps: File): String {
 
             val replacements = mapOf(
                 "metadata" to metadataToCWL(pipeline.metadata),
                 "inputs" to toCWL(pipeline.metadata.inputs, true),
                 "outputs" to toCWL(pipeline.metadata.outputs, false),
-                "steps" to "" // TODO toCWL(...)
-/*
-quality_control:
-    run: bio-cwl-tools/fastqc/fastqc_2.cwl
-    in:
-      reads_file: rna_reads_fruitfly
-    out: [html_file]
-*/
-
+                "steps" to pipeline.steps.mapNotNull {
+                    stepsToCWL(it.value, relativePathToSteps)
+                }.joinToString("\n\n")
             )
 
             // Load the step template
@@ -285,6 +281,29 @@ quality_control:
         fun exampleToCWL(baseIndent: Int, example: Any): String {
             return Yaml().dumpAsMap(mapOf("default" to example))
                 .replaceIndent(indent(baseIndent))
+        }
+
+        private fun stepsToCWL(step: IStep, relativePathToSteps: File): String {
+            return buildString {
+                appendLine(1, "${step.id}:")
+
+                val run: String = when (step) {
+                    is ScriptStep -> {
+                        File(relativePathToSteps, step.yamlFile.nameWithoutExtension + ".cwl").path
+                    }
+
+                    else -> throw UnsupportedOperationException("Exporting ${step.javaClass.name} to CWL is not yet supported.")
+                }
+                appendLine(2, "run: $run")
+
+                appendLine(2, "in: $run")
+                step.inputs.forEach { input ->
+                    // TODO
+                }
+
+                // TODO out: ...
+            }
+
         }
 
         /**

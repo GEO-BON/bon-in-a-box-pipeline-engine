@@ -83,7 +83,7 @@ class CWLFactoryTest {
             null
         )
 
-        val result = toWorkflow(pipeline)
+        val result = toWorkflow(pipeline, File("../commandLineTools"))
 
         resultFile = File(cwlResources, "${pipelineToTest}_gen.cwl").also { resultFile ->
             resultFile.writeText(result)

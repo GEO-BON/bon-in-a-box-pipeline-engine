@@ -11,7 +11,7 @@ open class Pipeline (
     override val id: StepId,
     private val debugName: String,
     /** Node id to Step */
-    private val steps: Map<String, IStep>,
+    val steps: Map<String, IStep>,
     /** IO id to Input */
     final override val inputs: MutableMap<String, Pipe>,
     /** IO id to Output */

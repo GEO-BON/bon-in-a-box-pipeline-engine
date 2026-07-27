@@ -29,7 +29,7 @@ import kotlin.time.Duration.Companion.minutes
 
 abstract class YMLStep(
     protected val serverContext: ServerContext,
-    protected val yamlFile: File,
+    val yamlFile: File,
     stepId: StepId,
     inputs: MutableMap<String, Pipe> = mutableMapOf(),
     internal val logger: Logger = LoggerFactory.getLogger(yamlFile.name),
