@@ -64,7 +64,7 @@ function prepareSubEnvironment {
             fi
         fi
 
-    # the environement does not exist
+    # the environment does not exist
     elif useCondaPack; then
         mv "$condaEnvFileNew" "$condaEnvFile" ; assertSuccess
 
@@ -88,7 +88,7 @@ function prepareSubEnvironment {
 }
 
 # Activate a conda environment normally.
-# (Conda-pack environements are not activated like this.)
+# (Conda-pack environments are not activated like this.)
 function activateSubEnvironment {
     mamba activate $condaEnvName
     if [[ $CONDA_DEFAULT_ENV == $condaEnvName ]]; then
