@@ -12,8 +12,11 @@ import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_LONG
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
 import org.geobon.pipeline.IStep
 import org.geobon.pipeline.ObjectInputDefinition
+import org.geobon.pipeline.Output
+import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.Pipeline
 import org.geobon.pipeline.ScriptStep
+import org.geobon.pipeline.UserInput
 import org.geobon.pipeline.metadata.IOMetadata
 import org.geobon.pipeline.metadata.StepMetadata
 import org.geobon.script.Description.IO__TYPE_OPTIONS
@@ -59,14 +62,16 @@ class CWLFactory {
             return template
         }
 
-        fun toWorkflow(pipeline: Pipeline, relativePathToSteps: File): String {
+        fun toWorkflow(pipeline: Pipeline, destinationFile:File, commandLineToolsDir: File) {
+            commandLineToolsDir.mkdirs()
+            destinationFile.parentFile.mkdirs()
 
             val replacements = mapOf(
                 "metadata" to metadataToCWL(pipeline.metadata),
                 "inputs" to toCWL(pipeline.metadata.inputs, true),
-                "outputs" to toCWL(pipeline.metadata.outputs, false),
+                "outputs" to toCWL(pipeline.metadata.outputs, false, pipeline.outputs),
                 "steps" to pipeline.steps.mapNotNull {
-                    stepsToCWL(it.value, relativePathToSteps)
+                    stepsToCWL(it.value, destinationFile.parentFile, commandLineToolsDir)
                 }.joinToString("\n\n")
             )
 
@@ -78,7 +83,7 @@ class CWLFactory {
                 template = template.replace("{{$key}}", value)
             }
 
-            return template
+            destinationFile.writeText(template)
         }
 
         private fun generateInputProperties(inputNames: Iterable<String>): String {
@@ -89,15 +94,15 @@ class CWLFactory {
             }.trimEnd()
         }
 
-        private fun toCWL(definitions: Map<String, IOMetadata>, isInput: Boolean): String {
+        private fun toCWL(definitions: Map<String, IOMetadata>, isInput: Boolean, outputPipes: Map<String, Output>? = null): String {
             return buildString {
                 definitions.forEach { (key, value) ->
-                    append(toCWL(key, value, isInput))
+                    append(toCWL(key, value, isInput, outputPipes?.get(key)))
                 }
             }
         }
 
-        private fun toCWL(key: String, definition: IOMetadata, isInput: Boolean): String {
+        private fun toCWL(key: String, definition: IOMetadata, isInput: Boolean, outputPipe: Output? = null): String {
             // Location chooser objects need to be exploded in CWL
             ObjectInputDefinition.fromDef(definition.type)?.let {
                 return toCWL(key, definition, it.requiredProperties, isInput)
@@ -125,8 +130,14 @@ class CWLFactory {
                     appendLine(2, "doc: ${definition.description}")
                 }
 
-                if (isInput && definition.example != null) {
-                    appendLine(exampleToCWL(2, definition.example))
+                if (isInput) {
+                    if(definition.example != null) {
+                        appendLine(exampleToCWL(2, definition.example))
+                    }
+
+                } else if (outputPipe != null) {
+                    appendLine(2,"outputSource: ${toCWL(outputPipe)}")
+
                 } else {
                     appendLine(
                         $$"""
@@ -278,33 +289,53 @@ class CWLFactory {
             }
         }
 
+        private fun toCWL(pipe: Pipe): String {
+            return when (pipe) {
+                is Output -> (pipe.step as? UserInput)?.id?.toString()
+                    ?: pipe.getId().run { "${step}/${inputOrOutput}" }
+
+                else -> throw UnsupportedOperationException("Exporting ${pipe.javaClass.name} inputs to CWL is not yet supported.")
+            }
+        }
+
         fun exampleToCWL(baseIndent: Int, example: Any): String {
             return Yaml().dumpAsMap(mapOf("default" to example))
                 .replaceIndent(indent(baseIndent))
         }
 
-        private fun stepsToCWL(step: IStep, relativePathToSteps: File): String {
+        private fun stepsToCWL(step: IStep, targetDir: File, commandLineToolsDir: File): String? {
             return buildString {
-                appendLine(1, "${step.id}:")
-
                 val run: String = when (step) {
                     is ScriptStep -> {
-                        File(relativePathToSteps, step.yamlFile.nameWithoutExtension + ".cwl").path
+                        val stepFile = File(commandLineToolsDir, step.yamlFile.nameWithoutExtension + ".cwl")
+                        if (stepFile.createNewFile()) { // early file creation to "reserve the spot"
+                            stepFile.writeText(toCommandLineTool(step))
+                        }
+                        stepFile.relativeTo(targetDir).path
                     }
 
-                    else -> throw UnsupportedOperationException("Exporting ${step.javaClass.name} to CWL is not yet supported.")
+                    is UserInput -> return null
+
+                    else -> throw UnsupportedOperationException("Exporting ${step.javaClass.name} steps to CWL is not yet supported.")
                 }
+
+                appendLine(1, "${step.id}:")
                 appendLine(2, "run: $run")
-
-                appendLine(2, "in: $run")
-                step.inputs.forEach { input ->
-                    // TODO
+                appendLine(2, "in:")
+                step.inputs.forEach { (key, pipe) ->
+                    appendLine(3, "$key: ${toCWL(pipe)}")
+                }
+                val mandatoryInputs = listOf("envFolder", "runFolder", "environment", "condaPackURL", "scripts_root")
+                mandatoryInputs.forEach {
+                    appendLine(3, "$it: $it")
                 }
 
-                // TODO out: ...
+                appendLine(2, "out: ${step.outputs.keys}")
             }
 
         }
+
+
 
         /**
          * Use only when there is no access to the full definition of the object.

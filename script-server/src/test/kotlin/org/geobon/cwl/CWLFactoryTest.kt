@@ -18,12 +18,15 @@ class CWLFactoryTest {
 
     private val cwlResources = File("src/test/resources/cwl")
     private val cwlScripts = File(scriptsRoot, "forCWL")
+    private val pathToSteps = File(cwlResources,"commandLineTools")
+
+    private val hasRunner = SystemCall().run(listOf("which", "cwl-runner")).success
 
     private var resultFile: File? = null
 
     fun validateCWL(cwlFile: File) {
         // cwl validation: not necessary for the test but very useful when developing!
-        if (SystemCall().run(listOf("which", "cwl-runner")).success) {
+        if (hasRunner) {
             val validationResult = SystemCall().run(
                 listOf("cwl-runner", "--validate", cwlFile.absolutePath),
                 mergeErrors = true,
@@ -31,6 +34,20 @@ class CWLFactoryTest {
             )
             println(validationResult.output)
             assertTrue(validationResult.success, "CWL Validation failed")
+        }
+    }
+
+    fun makeTemplate(cwlFile: File) {
+        // cwl validation: not necessary for the test but very useful when developing!
+        if (hasRunner) {
+            val validationResult = SystemCall().run(
+                listOf("cwl-runner", "--make-template", cwlFile.absolutePath),
+                mergeErrors = false,
+                timeoutAmount = 10
+            )
+            assertTrue(validationResult.success, "Make template failed")
+            File(cwlFile.parentFile.absolutePath, "${cwlFile.nameWithoutExtension}_template.yml")
+                .writeText(validationResult.output)
         }
     }
 
@@ -51,6 +68,7 @@ class CWLFactoryTest {
     @AfterTest
     fun cleanup() {
         resultFile?.delete()
+        pathToSteps.deleteRecursively()
     }
 
     @Test
@@ -83,14 +101,18 @@ class CWLFactoryTest {
             null
         )
 
-        val result = toWorkflow(pipeline, File("../commandLineTools"))
-
         resultFile = File(cwlResources, "${pipelineToTest}_gen.cwl").also { resultFile ->
-            resultFile.writeText(result)
+            toWorkflow(
+                pipeline,
+                resultFile,
+                pathToSteps
+            )
             validateCWL(resultFile)
-        }
+            makeTemplate(resultFile)
 
-        val expected = File(cwlResources, "$pipelineToTest.cwl").readText()
-        assertMultilineEquals(expected, result)
+            val expected = File(cwlResources, "$pipelineToTest.cwl").readText()
+            assertMultilineEquals(expected, resultFile.readText())
+        }
     }
+
 }

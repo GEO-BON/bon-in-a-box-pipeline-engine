@@ -46,11 +46,6 @@ inputs:
     doc: Base URL to check for conda-pack environments.
     default: https://object-arbutus.alliancecan.ca/swift/v1/3857940e33774dca8ae21e4999fe402e/conda-pack/
 
-  scriptPath:
-    type: string
-    doc: Path to the script, relative to scripts root.
-    default: {{scriptPath}}
-
   scripts_root:
     type: Directory?
     doc: Root folder for scripts. Use this to override the image's scripts while debugging.
