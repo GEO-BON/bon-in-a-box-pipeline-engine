@@ -1,7 +1,22 @@
 import openeo
 import os
+import yaml
 from pathlib import Path
 from system.scriptWrapper import signal_handler
+
+# Accessing yaml file to extract input types
+script_name = Path(output_folder).parent.name
+yaml_path = Path("/script-stubs/openEO")/f"{script_name}.yml"
+
+with open(yaml_path) as f:
+    yaml_file = yaml.safe_load(f)
+
+input_info = {
+    input_id: input_def["type"]
+    for input_id, input_def in yaml_file["inputs"].items()
+}
+
+print("Input types:", input_info)
 
 # Credentials
 id = os.getenv("CDSE_CLIENT_ID")
@@ -18,20 +33,22 @@ if (data['url'] is not None):
     process_graph = data['url']
 else:
     biab_error_stop("Missing the process url.")
+
 # Set up inputs for process call
 inputs = dict(data)
 inputs.pop('url', None)
 
-# Special cases
-# bboxCRS
-spatial_extent = data.get('spatial_extent')
-if spatial_extent and spatial_extent.get('bbox') is not None:
-    bbox = spatial_extent['bbox']
-    crs_info = spatial_extent['CRS']
-    crs = f"{crs_info['authority']}:{crs_info['code']}"
-    epsg = int(crs.split(':')[1])
-    aoi = {"west": bbox[0], "south": bbox[1], "east": bbox[2], "north": bbox[3], "crs": epsg}
-    inputs['spatial_extent'] = aoi
+# Check input types for special cases
+for key in input_info.keys():
+    # bboxCRS
+    if input_info[key] == "bboxCRS":
+        spatial_extent = data.get(key) if data.get(key) else biab_error_stop("Something went wrong. Yaml does not match input.json. Please contact the BON in a Box team.")
+        bbox = spatial_extent['bbox']
+        crs_info = spatial_extent['CRS']
+        crs = f"{crs_info['authority']}:{crs_info['code']}"
+        epsg = int(crs.split(':')[1])
+        aoi = {"west": bbox[0], "south": bbox[1], "east": bbox[2], "north": bbox[3], "crs": epsg}
+        inputs[key] = aoi
 
 # Pass inputs to openEO process
 connection = openeo.connect("https://openeo.dataspace.copernicus.eu/")

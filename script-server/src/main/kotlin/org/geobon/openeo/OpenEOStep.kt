@@ -272,10 +272,6 @@ class OpenEOStep: ScriptStep {
                     ?.let { input[DESCRIPTION] = it.toString() }
 
                 when {
-                    subtype == UDP__INPUT__BOUNDING_BOX -> {
-                        input[IO__TYPE] = "bboxCRS"
-                    }
-
                     schema?.optJSONArray(UDP__INPUT__ENUM) != null -> {
                         input[IO__TYPE] = IO__TYPE_OPTIONS
                         val enum = schema.optJSONArray(UDP__INPUT__ENUM)!!
@@ -299,18 +295,12 @@ class OpenEOStep: ScriptStep {
                             } ?: items.optString(UDP__INPUT__TYPE).takeIf { it.isNotEmpty() }
                             ?: throw RuntimeException("Could not determine item type for parameter '$id'")
 
-                            input[IO__TYPE] = "${mapType(itemType)}[]"
+                            input[IO__TYPE] = "${mapType(itemType, null)}[]"
                         }
                     }
 
-                    (rawType == "object" && id == "geometry") -> {
-                        input[IO__LABEL] = "Polygon"
-                        input[IO__TYPE] = "application/geopackage+sqlite3[]"
-                        input[DESCRIPTION] = "Polygon of the study area, in GeoPackage format. To use a custom study area, input the path to the file in the userdata folder (e.g. /userdata/study_area_polygon.gpkg)."
-                    }
-
                     else -> {
-                        if (rawType != null) input[IO__TYPE] = mapType(rawType)
+                        if (rawType != null) input[IO__TYPE] = mapType(rawType, subtype)
                     }
                 }
                 val example = param.opt("default")
@@ -351,7 +341,7 @@ class OpenEOStep: ScriptStep {
         fun addCondaEnv(): Map<String, Any> {
             val condaEnv = mutableMapOf<String, Any>()
             condaEnv["channels"] = listOf("conda-forge")
-            condaEnv["dependencies"] = listOf("openeo")
+            condaEnv["dependencies"] = listOf("openeo", "pyyaml")
 
             val condaYaml = mutableMapOf<String, Any>()
             condaYaml["conda"] = condaEnv
@@ -363,12 +353,18 @@ class OpenEOStep: ScriptStep {
                 .split(' ')
                 .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
 
-        private fun mapType(type: String): String = when (type) {
-            "integer" -> "int"
-            "number" -> "float"
-            "string" -> "text"
-            "boolean" -> "boolean"
-            else -> type
+        private fun mapType(type: String, subtype: String?): String {
+            if (subtype == UDP__INPUT__BOUNDING_BOX) return "bboxCRS"
+
+            return when (Pair(type, subtype)) {
+                Pair("integer", null) -> "int"
+                Pair("number", null) -> "float"
+                Pair("string", null) -> "text"
+                Pair("boolean", null) -> "boolean"
+                Pair("object", "geojson") -> "application/geo+json"
+                Pair("object", "datacube") -> "application/geo+json"
+                else -> type
+            }
         }
     }
 }
