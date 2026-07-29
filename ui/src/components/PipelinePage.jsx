@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useCallback } from "react";
+import React, { useState, useEffect, useReducer, useCallback, useRef} from "react";
 
 import { PipelineForm } from "./form/PipelineForm";
 import { useParams } from "react-router-dom";
@@ -90,6 +90,7 @@ export function PipelinePage({ runType }) {
   const [httpError, setHttpError] = useState(null);
   const [pipelineMetadata, setPipelineMetadata] = useState(null);
   const [expandInputs, setExpandInputs] = useState(true);
+  const resultsRef = useRef(null);
 
   /**
    * String: Content of input.json for this run
@@ -258,11 +259,50 @@ export function PipelinePage({ runType }) {
     });
   };
 
-  useEffect(()=>{
-    if(pipStates.runHash){
-      setExpandInputs(false)
+  // Scroll when results first appear for a run (null -> data).
+  // Do not scroll on the intermediate render that still has stale resultsData
+  // after runHash changes — that used to mark the run as "already scrolled".
+  const prevResultsDataRef = useRef(null);
+  useEffect(() => {
+    const hadResults = prevResultsDataRef.current != null;
+    const hasResults = resultsData != null;
+    prevResultsDataRef.current = resultsData;
+
+    if (!pipStates.runHash || !hasResults || hadResults || !resultsRef.current) {
+      return;
     }
-  },[pipStates.runHash])
+
+    const el = resultsRef.current;
+    // Page scrolls inside .right-content (overflow: auto), not the window.
+    const scrollParent = el.closest(".right-content");
+
+    const scrollToResults = () => {
+      if (!resultsRef.current) return;
+
+      if (!scrollParent) {
+        resultsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      const top =
+        resultsRef.current.getBoundingClientRect().top -
+        scrollParent.getBoundingClientRect().top +
+        scrollParent.scrollTop;
+
+      scrollParent.scrollTo({ top, behavior: "smooth" });
+    };
+
+    // Wait for PipelineResults to mount/layout before measuring.
+    const frameId = requestAnimationFrame(() => {
+      requestAnimationFrame(scrollToResults);
+    });
+    const timeoutId = window.setTimeout(scrollToResults, 150);
+
+    return () => {
+      cancelAnimationFrame(frameId);
+      window.clearTimeout(timeoutId);
+    };
+  }, [pipStates.runHash, resultsData]);
 
   const toggleAccord  = useCallback(() => {
     setExpandInputs(prev => !prev);
@@ -318,18 +358,20 @@ export function PipelinePage({ runType }) {
           </div>
         )}
         {pipelineMetadata && (
-          <PipelineResults
-            key="results"
-            pipelineMetadata={pipelineMetadata}
-            inputFileContent={inputFileContent}
-            resultsData={resultsData}
-            runningScripts={runningScripts}
-            setRunningScripts={setRunningScripts}
-            pipeline={pipeline}
-            runHash={runHash}
-            displayTimeStamp={pipStates.timestamp}
-            isPipeline={runType === "pipeline"}
-          />
+          <div ref={resultsRef}>
+            <PipelineResults
+              key="results"
+              pipelineMetadata={pipelineMetadata}
+              inputFileContent={inputFileContent}
+              resultsData={resultsData}
+              runningScripts={runningScripts}
+              setRunningScripts={setRunningScripts}
+              pipeline={pipeline}
+              runHash={runHash}
+              displayTimeStamp={pipStates.timestamp}
+              isPipeline={runType === "pipeline"}
+            />
+          </div>
         )}
       </div>
     </>

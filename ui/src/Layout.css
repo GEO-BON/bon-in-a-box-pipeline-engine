@@ -131,11 +131,6 @@ h2 {
   margin: 0 auto;
 }
 
-.title-container {
-  display: flex;
-  align-items: center;
-  gap: 35px;
-}
 
 .green-separator {
   display: block;
@@ -147,11 +142,23 @@ h2 {
   margin-top: 40px;
 }
 
+.home-page-pre-title {
+  z-index: 1;
+  color: #548b7b;
+  margin-top: 30px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 66px;
+}
+
 .home-page-title {
   z-index: 1;
   color: #DAECE5;
   font-weight: bold;
   font-size: 66px;
+  margin-bottom: 40px;
+  margin-top: 0px;
+  width: 100%;
 }
 
 .home-page-subtitle {
