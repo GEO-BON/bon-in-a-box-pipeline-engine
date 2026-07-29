@@ -4,6 +4,8 @@ import yaml
 from pathlib import Path
 from system.scriptWrapper import signal_handler
 
+log_level = "warning"
+
 # Accessing yaml file to extract input types
 script_name = Path(output_folder).parent.name
 yaml_path = Path("/script-stubs/openEO")/f"{script_name}.yml"
@@ -102,7 +104,7 @@ finally:
     signal.signal(signal.SIGTERM, current_signal_SIGTERM)
     signal.signal(signal.SIGINT, current_signal_SIGINT)
 
-for entry in udp_job.logs(level = "warning"):
+for entry in udp_job.logs(level = log_level):
     print(f"[{entry.get('level')}]: {entry.get('message')}", flush=True)
 
 print(f"UDP job finished: {udp_job.job_id}", flush=True)
