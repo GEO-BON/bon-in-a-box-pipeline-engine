@@ -108,16 +108,22 @@ function FoldableOutputInternal({
 }) {
   const titleRef = useRef(null);
 
-  useEffect(() => {
-    if (active) {
-      titleRef.current.scrollIntoView({ block: "start", behavior: "smooth" });
+  // Only scroll on user toggle. Auto-activating a result (e.g. script page load)
+  // must not steal scroll away from the Results section top.
+  const handleToggle = () => {
+    const willOpen = !active;
+    toggle();
+    if (willOpen) {
+      requestAnimationFrame(() => {
+        titleRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
+      });
     }
-  }, [active]);
+  };
 
   return (
     <div className={className}>
       <div className="outputTitle">
-        <div className="expandIcon clickable" onClick={toggle}>
+        <div className="expandIcon clickable" onClick={handleToggle}>
           {active ? (
             <ExpandLessIcon
               sx={{
@@ -139,7 +145,7 @@ function FoldableOutputInternal({
           )}{" "}
           {icon}
         </div>
-        <h3 className="clickable" ref={titleRef} onClick={toggle}>{title}</h3>
+        <h3 className="clickable" ref={titleRef} onClick={handleToggle}>{title}</h3>
         <div className="inlinePreview">
           {inline}
           {active ? inlineExpanded : inlineCollapsed}
