@@ -21,15 +21,16 @@ export default function HomePage() {
 
             <div className="home-page-content">
                 <div className="title-container">
+                    <h1 className="home-page-pre-title"
+                    >Bon in a Box</h1>
                     <h1 className="home-page-title"
-                        style={{ marginTop: "30px" , marginBottom: "10px"}}
-                    >The BON in a Box Pipeline Engine</h1>
+                    >Biodiversity Evaluation Engine</h1>
                 </div>
                 <p style={{
                     lineHeight: "1.75",
                     textAlign: "justify"
                 }} >
-                    The BON in a Box modelling tool is an open tool aiming to enhance the capacity of
+                    The Biodiversity Evaluation Enging is an open tool aiming to enhance the capacity of
                     Biodiversity Observation Networks and countries to report on biodiversity effectively.
 
                     It connects individual analyses scripts into automated pipelines that convert data into
