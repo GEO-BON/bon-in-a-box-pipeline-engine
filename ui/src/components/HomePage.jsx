@@ -30,7 +30,7 @@ export default function HomePage() {
                     lineHeight: "1.75",
                     textAlign: "justify"
                 }} >
-                    The Biodiversity Evaluation Enging is an open tool aiming to enhance the capacity of
+                    The Biodiversity Evaluation Engine is an open tool aiming to enhance the capacity of
                     Biodiversity Observation Networks and countries to report on biodiversity effectively.
 
                     It connects individual analyses scripts into automated pipelines that convert data into
