@@ -325,7 +325,18 @@ class CWLFactory {
                 step.inputs.forEach { (key, pipe) ->
                     appendLine(3, "$key: ${toCWL(pipe)}")
                 }
-                val mandatoryInputs = listOf("envFolder", "runFolder", "environment", "condaPackURL", "scripts_root")
+                appendLine(3, "envFolderWriteable:")
+                appendLine(4, "default: false")
+
+                val runFolder = step.id.toString().replace(">","__").replace('@', '/')
+                appendLine($$"""
+                    runFolder:
+                        source: runFolder
+                        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/$$runFolder' } : null)" 
+                """.replaceIndent(indent(3)))
+
+
+                val mandatoryInputs = listOf("envFolder", "environment", "condaPackURL", "scripts_root")
                 mandatoryInputs.forEach {
                     appendLine(3, "$it: $it")
                 }

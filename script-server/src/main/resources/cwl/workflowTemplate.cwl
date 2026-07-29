@@ -8,6 +8,12 @@ class: Workflow
 
 {{metadata}}
 
+requirements:
+  StepInputExpressionRequirement:
+    class: StepInputExpressionRequirement
+  InlineJavascriptRequirement:
+    class: InlineJavascriptRequirement
+
 inputs:
   #################
   # Script inputs #
