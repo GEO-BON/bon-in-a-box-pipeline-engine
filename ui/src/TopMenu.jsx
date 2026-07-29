@@ -20,7 +20,6 @@ const pages = [
   { title: 'Info', link: '/info' }
 ];
 
-
 function TopMenu() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
 
@@ -86,7 +85,16 @@ function TopMenu() {
               </NavLink>
             ))}
           </Box>
-          <Box sx={{ flexGrow: 0 }}>
+          <Box sx={{ flexGrow: 0, display: 'flex', alignContent: 'center', flexWrap: 'wrap' }}>
+            <NavLink
+              to="https://members.geobon.org/register/index"
+              target="_blank"
+              className="navigation-bar-link"
+              style={{ display: "flex", fontWeight: 700, marginTop: '6px'}}
+            >
+                Sign up
+            </NavLink>
+
             <NavLink
               to="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/"
               target="_blank"

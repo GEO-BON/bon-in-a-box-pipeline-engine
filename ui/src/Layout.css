@@ -86,7 +86,7 @@ h2 {
 
 .navigation-bar-link {
   color: #f3f3f1;
-  font-weight: normal;
+  font-weight: 500;
   font-size: 15px;
   text-decoration: underline 0.15em rgba(0, 0, 0, 0);
   text-underline-offset: 5px;
