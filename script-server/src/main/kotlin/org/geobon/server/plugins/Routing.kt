@@ -216,7 +216,10 @@ fun Application.configureRouting() {
 
             // Validate the existence of the file
             val descriptionFile = File(
-                if (singleScript) scriptsRoot else pipelinesRoot,
+                if (singleScript)
+                    if (descriptionPath.startsWith("openEO>")) scriptStubsRoot
+                    else scriptsRoot
+                else pipelinesRoot,
                 descriptionPath.replace(FILE_SEPARATOR, '/')
             )
             if (!descriptionFile.exists()) {
