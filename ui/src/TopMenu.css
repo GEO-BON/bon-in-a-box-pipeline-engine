@@ -1,0 +1,160 @@
+.navigation-bar {
+  font-family: "Montserrat", sans-serif;
+  z-index: 999; /* Navigation bar */
+  background-color: var(--dark-green) !important;
+  padding-left: 15px;
+}
+
+.navigation-bar-link {
+  color: var(--grey);
+  font-weight: 500;
+  font-size: 15px;
+  text-decoration: underline 0.15em rgba(0, 0, 0, 0);
+  text-underline-offset: 5px;
+  transition: all 0.5s ease;
+  display: inline-block;
+  margin-left: 30px;
+}
+
+.navigation-bar-link:hover {
+  text-decoration: underline 0.1em;
+  transform: scale(1.1);
+  text-decoration-color: var(--light-green);
+}
+
+.navigation-bar-link.active {
+  color: #E6F7F0;
+  text-decoration: underline 0.1em;
+  text-decoration-color: var(--light-green);
+  /* 1.2x size */
+  transform: scale(1.1);
+
+  /* Bold without extra width, see https://stackoverflow.com/a/46452396/3519951 */
+  -webkit-text-stroke-width: 0.04ex;
+  text-shadow: -0.03ex 0 0, 0.03ex 0 0;
+}
+
+.navigation-bar-profile-container {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    font-weight: 700;
+    align-content: center;
+    border-radius: 15px;
+    padding: 4px 8px;
+    transition: all ease-in-out 0.3s;
+    cursor: pointer;
+}
+
+.navigation-bar-profile-container:hover {
+    background-color: var(--medium-green-50);
+}
+
+.navigation-bar-profile {
+  color: var(--grey);
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: underline 0.15em rgba(0, 0, 0, 0);
+  text-underline-offset: 5px;
+  display: inline-block;
+  /* margin-left: 30px; */
+}
+
+.navigation-bar-avatar {
+    height: 32px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border: 2.5px solid var(--light-green);
+    border-radius: 50%;
+    margin: auto;
+}
+
+.fade-in {
+  animation: fadeInAnimation 0.3s ease-in-out forwards;
+}
+
+.fade-out {
+  animation: fadeOutAnimation 0.3s ease-in-out forwards;
+}
+
+@keyframes fadeInAnimation {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOutAnimation {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.navbar-profile-popup {
+    position: absolute;
+    z-index: 100;
+    top: 64px;
+    background-color: var(--grey);
+    border-radius: 8px;
+    box-shadow: 0 0 4px #00000040;
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px;
+    color: var(--dark-blue);
+    font-size: 15px;
+    
+    a {
+        color: inherit;
+        font-weight: 500;
+        text-decoration: none;
+    }
+}
+
+.divider {
+    background-color: #E3E3E2;
+    height: 1px;
+}
+
+.navbar-profile-popup-icon {
+    height: 20px;
+}
+
+.navbar-profile-popup-option {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    border-radius: 6px;
+    padding: 12px 16px;
+    transition: all ease-in-out 0.2s;
+}
+
+.navbar-profile-popup-option:hover {
+    background-color: #E3E3E2;
+}
+
+.navbar-profile-popup-option:active {
+    background-color: #D5D5D5;
+}
+
+.navigation-bar-mobile-menu a {
+  color: var(--dark-green)
+}
+
+.navigation-bar-mobile-menu a.active {
+  color: #71bba6
+}
+
+.help-link {
+  margin-right: 30px;
+}
