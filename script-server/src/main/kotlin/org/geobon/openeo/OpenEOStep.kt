@@ -300,7 +300,8 @@ class OpenEOStep: ScriptStep {
                     }
 
                     else -> {
-                        if (rawType != null) input[IO__TYPE] = mapType(rawType, subtype)
+                        if (rawType == null) throw IllegalArgumentException("Input '$id' has no type.")
+                        else input[IO__TYPE] = mapType(rawType, subtype)
                     }
                 }
                 val example = param.opt("default")
@@ -362,7 +363,7 @@ class OpenEOStep: ScriptStep {
                 Pair("string", null) -> "text"
                 Pair("boolean", null) -> "boolean"
                 Pair("object", "geojson") -> "application/geo+json"
-                Pair("object", "datacube") -> "application/geo+json"
+                Pair("object", "datacube") -> "image/tiff;application=geotiff"
                 else -> type
             }
         }

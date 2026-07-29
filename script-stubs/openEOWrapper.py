@@ -50,6 +50,10 @@ for key in input_info.keys():
         aoi = {"west": bbox[0], "south": bbox[1], "east": bbox[2], "north": bbox[3], "crs": epsg}
         inputs[key] = aoi
 
+    # datacube or geoTIFF
+    if input_info[key] == "image/tiff;application=geotiff":
+        biab_error_stop("GeoTIFF inputs files not yet supported with openEO scripts.")
+
 # Pass inputs to openEO process
 connection = openeo.connect("https://openeo.dataspace.copernicus.eu/")
 
