@@ -190,14 +190,14 @@ h2 {
 .navbar-profile-popup {
     position: absolute;
     z-index: 100;
-    left: 79%;
+    top: 64px;
     background-color: var(--grey);
     border-radius: 8px;
     box-shadow: 0 0 4px #00000040;
     width: fit-content;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
     padding: 4px;
     color: var(--dark-blue);
     font-size: 15px;

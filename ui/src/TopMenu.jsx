@@ -85,7 +85,6 @@ function TopMenu() {
     }, [isPopupOpen]);
 
     return (
-        <div>
         <AppBar position="static"className="navigation-bar">
             <Container maxWidth="xl" disableGutters>
                 <Toolbar disableGutters>
@@ -145,6 +144,40 @@ function TopMenu() {
                         <p className="navigation-bar-profile">{name}</p>
                     </div>
 
+                    {/* popup for user space */}
+                    {shouldRender && (
+                        <Box
+                            ref={popupRef}
+                            className={`navbar-profile-popup ${isPopupOpen ? 'fade-in' : 'fade-out'}`}
+                            onAnimationEnd={handleAnimationEnd}>
+                            <NavLink
+                                to="/user-space"
+                                className="navbar-profile-popup-option"
+                            >
+                                <img src={IconDashboard} className='navbar-profile-popup-icon'></img>
+                                User space
+                            </NavLink>
+
+                            <NavLink
+                                to=""
+                                className="navbar-profile-popup-option"
+                            >
+                                <img src={IconProfile} className='navbar-profile-popup-icon'></img>
+                                GEO BON profile
+                            </NavLink>
+
+                            <div className='divider'></div>
+
+                            <NavLink 
+                                to=""
+                                className="navbar-profile-popup-option"
+                            >
+                                <img src={IconLogout} className='navbar-profile-popup-icon'></img>
+                                Log out
+                            </NavLink>
+                        </Box>
+                    )}
+
                     <NavLink
                         to="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/"
                         target="_blank"
@@ -160,41 +193,6 @@ function TopMenu() {
                 </Toolbar>
             </Container>
         </AppBar>
-
-
-        {shouldRender && (
-            <Box
-                ref={popupRef}
-                className={`navbar-profile-popup ${isPopupOpen ? 'fade-in' : 'fade-out'}`}
-                onAnimationEnd={handleAnimationEnd}>
-                <NavLink
-                    to="/user-space"
-                    className="navbar-profile-popup-option"
-                >
-                    <img src={IconDashboard} className='navbar-profile-popup-icon'></img>
-                    User space
-                </NavLink>
-
-                <NavLink
-                    to=""
-                    className="navbar-profile-popup-option"
-                >
-                    <img src={IconProfile} className='navbar-profile-popup-icon'></img>
-                    GEO BON profile
-                </NavLink>
-
-                <div className='divider'></div>
-
-                <NavLink 
-                    to=""
-                    className="navbar-profile-popup-option"
-                >
-                    <img src={IconLogout} className='navbar-profile-popup-icon'></img>
-                    Log out
-                </NavLink>
-            </Box>
-        )}
-        </div>
   );
 }
 export default TopMenu;
