@@ -109,13 +109,27 @@ steps:
       baseCommand: [bash, -c]
       arguments:
         - |
-          echo "Start of bash script"
-          log=$OUTPUT_LOCATION/logs.txt
-          rm -f $log
-          mkdir -p $OUTPUT_LOCATION $CONDA_PKGS_DIRS /conda-env-yml/envs
-          source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "pythonbase" \
-            "" $(inputs.envFolderWrite.path) $(inputs.condaPackURL) 2>&1 >> $log
-          source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh pythonbase $(inputs.envFolderWrite.path) 2>&1 >> $log
+          echo "Exporting all environments"
+          mkdir -p "$OUTPUT_LOCATION" "$CONDA_PKGS_DIRS" /conda-env-yml/envs
+          
+          function exportEnv {
+            condaEnvName=$1
+            condaEnvYml=$2
+            unpackedFolder=$(inputs.envFolderWrite.path)/$condaEnvName
+            
+            echo "Exporting $condaEnvName..."
+            source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "$condaEnvName" \
+            "$condaEnvYml" $(inputs.envFolderWrite.path) $(inputs.condaPackURL)
+            source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh $condaEnvName $(inputs.envFolderWrite.path)
+            if [[ ! -d "$unpackedFolder" ]]; then
+              mkdir -p "$unpackedFolder"
+              tar -xf "$unpackedFolder.tar.gz" -C "$unpackedFolder" --use-compress-program=pigz
+            fi
+            echo "Done."
+          }
+          export -f exportEnv
+          
+          bash -c 'exportEnv "pythonbase" ""'
           
       inputs:
         envFolderWrite:

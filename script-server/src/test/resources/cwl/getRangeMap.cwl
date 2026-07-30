@@ -109,7 +109,7 @@ arguments:
         channels: [conda-forge, r]
         dependencies: [r-rjson, r-dplyr, r-tidyr, r-purrr, r-sf, r-stringr]
         name: forCWL__getRangeMap
-      " /conda-envs $(inputs.condaPackURL) 2>&1 >> $log
+      " /conda-envs $(inputs.condaPackURL) >> "$log" 2>&1
 
     Rscript \
       $SCRIPT_STUBS_LOCATION/system/scriptWrapper.R \
@@ -119,7 +119,7 @@ arguments:
     scriptExitCode=\${PIPESTATUS[0]}
     echo "Script exited with code $scriptExitCode" | tee -a $log
 
-    source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh forCWL__getRangeMap /conda-envs 2>&1 >> $log
+    source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh forCWL__getRangeMap /conda-envs >> "$log" 2>&1
 
     exit "$scriptExitCode"
 
