@@ -1,0 +1,75 @@
+script: cleanCoordinates.R
+name: Clean Coordinates
+description: "This script enables to apply several cleaning filters to the observations. The tests equal,
+     zeros, duplicates, same_pixel, capitals, centroids, seas, urban, gbif and institutions are wrappers around CoordinateCleaner functions.
+     Test same_pixel remove points inside the same pixel, based on a provided raster or from a STAC catalogue. Test env allows removing environmental outliers using the
+     the Reverse Jackknife procedure as described by Chapman (2005) and adapted from the package biogeo."
+author:
+  - name: Sarah Valentin
+    identifier: https://orcid.org/0000-0002-9028-681X
+external_link: https://github.com/ropensci/CoordinateCleaner
+references:
+  - text: Chapman, A.D. (2005) Principles and Methods of Data Cleaning - Primary Species and Species- Occurrence Data, version 1.0. Report for the Global Biodiversity Information Facility, Copenhagen.
+  - text: Zizka A, Silvestro D, Andermann T, Azevedo J, Duarte Ritter C, Edler D, Farooq H, Herdean A, Ariza M, Scharn R, Svanteson S, Wengtrom N, Zizka V & Antonelli A (2019) CoordinateCleaner, standardized cleaning of occurrence records from biological collection databases. Methods in Ecology and Evolution, 10(5):744-751
+    doi: https://doi.org/10.1111/2041-210X.13152
+lifecycle:
+  status: core
+
+inputs:
+  presence:
+    label: presence
+    description: Dataframe, presence data.
+    type: text/tab-separated-values
+    example: "/scripts/filtering/cleanCoordinates_presence.tsv"
+  predictors:
+    label: predictors
+    description: Raster, predictors.
+    type: image/tiff;application=geotiff[]
+    example: ["/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio141981-01-01.tif", "/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio151981-01-01.tif", "/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio181981-01-01.tif","/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio21981-01-01.tif","/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio31981-01-01.tif","/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio81981-01-01.tif","/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio91981-01-01.tif"]
+  tests:
+    label: cleaning tests
+    description: Vector of strings, tests to run from all tests available - capitals, centroids, same_pixel, equal, gbif, institutions, duplicates, urban, seas, zeros, env
+    type: text[]
+    example:
+     - equal
+     - zeros
+     - duplicates
+     - same_pixel
+     - capitals
+     - centroids
+     - seas
+     - urban
+     - gbif
+     - institutions
+     - env
+  env_threshold:
+    label: env threshold
+    description: Float, proportion of predictors to consider the observation as an outlier.
+    type: float
+    example: 0.8
+outputs:
+  n_presence:
+    label: n presence
+    description: Integer, initial number of presences points.
+    type: int
+    example: 500
+  n_clean:
+    label: n clean presence
+    description: Integer, final number of presences points after cleaning.
+    type: int
+    example: 400
+  clean_presence:
+     label: clean presences
+     description: Dataframe, table with clean presence points.
+     type: text/tab-separated-values
+conda:
+  channels:
+    - conda-forge
+    - r
+  dependencies:
+    - r-terra
+    - r-rjson
+    - r-raster
+    - r-dplyr
+    - r-CoordinateCleaner
+    - r-gdalcubes

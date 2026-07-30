@@ -24,6 +24,42 @@ class CWLFactoryTest {
 
     private var resultFile: File? = null
 
+    @AfterTest
+    fun cleanup() {
+        resultFile?.delete()
+        pathToSteps.deleteRecursively()
+    }
+
+    @Test
+    fun `test single R script with Conda sub-environment`() {
+        testSingleStep(File(cwlScripts, "getRangeMap.yml"))
+    }
+
+    @Test
+    fun `test single python script with Conda sub-environment`() {
+        testSingleStep(File(cwlScripts, "getGBIFObservations.yml"))
+    }
+
+    @Test
+    fun `test single script with rbase Conda environment`() {
+        testSingleStep(File(cwlScripts, "GBIFHeatmapFromSTAC.yml"))
+    }
+
+    @Test
+    fun `test single script with pythonbase Conda environment`() {
+        testSingleStep(File(File(scriptsRoot, "helloWorld"), "helloPython.yml"))
+    }
+
+    @Test
+    fun `test simple pipeline`() {
+        testWorkflow("userInput")
+    }
+
+    @Test
+    fun `test complex pipeline`() {
+        testWorkflow("forCWL/SDM_maxEnt")
+    }
+
     fun validateCWL(cwlFile: File) {
         // cwl validation: not necessary for the test but very useful when developing!
         if (hasRunner) {
@@ -65,35 +101,7 @@ class CWLFactoryTest {
         assertMultilineEquals(expected, result)
     }
 
-    @AfterTest
-    fun cleanup() {
-        resultFile?.delete()
-        pathToSteps.deleteRecursively()
-    }
-
-    @Test
-    fun `test single R script with Conda sub-environment`() {
-        testSingleStep(File(cwlScripts, "getRangeMap.yml"))
-    }
-
-    @Test
-    fun `test single python script with Conda sub-environment`() {
-        testSingleStep(File(cwlScripts, "getGBIFObservations.yml"))
-    }
-
-    @Test
-    fun `test single script with rbase Conda environment`() {
-        testSingleStep(File(cwlScripts, "GBIFHeatmapFromSTAC.yml"))
-    }
-
-    @Test
-    fun `test single script with pythonbase Conda environment`() {
-        testSingleStep(File(File(scriptsRoot, "helloWorld"), "helloPython.yml"))
-    }
-
-    @Test
-    fun `test simple pipeline`() {
-        val pipelineToTest = "userInput"
+    fun testWorkflow(pipelineToTest: String) {
         val pipeline = JSONPipeline.createFromFile(
             noHPCContext,
             StepId("step", "0"),

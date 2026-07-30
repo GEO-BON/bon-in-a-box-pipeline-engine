@@ -11,6 +11,7 @@ import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_INT
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_LONG
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
 import org.geobon.pipeline.ConstantPipe
+import org.geobon.pipeline.IOId
 import org.geobon.pipeline.IStep
 import org.geobon.pipeline.ObjectInputDefinition
 import org.geobon.pipeline.Output
@@ -332,8 +333,10 @@ class CWLFactory {
                 appendLine(1, "${step.id}:")
                 appendLine(2, "run: $run")
                 appendLine(2, "in:")
-                step.inputs.forEach { (key, pipe) ->
-                    appendLine(3, "$key: ${toCWL(pipe)}")
+                step.metadata.inputs.keys.forEach { key ->
+                    step.inputs[key]?.let { pipe ->
+                        appendLine(3, "$key: ${toCWL(pipe)}")
+                    } ?: appendLine(3, "$key: ${IOId(step.id, key)}")
                 }
                 appendLine(3, "envFolder: prepareEnvironments/envFolder")
                 appendLine(3, "envFolderWriteable:")
@@ -432,9 +435,9 @@ class CWLFactory {
 
         private fun generateEnvironmentScript(condaMetadata: CondaMetadata):String {
             return $$"""
-                source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "$${condaMetadata.name}" \
-                  "$${condaMetadata.yml ?: ""}" $(inputs.envFolderWrite.path) $(inputs.condaPackURL) 2>&1 >> $log
-                source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh $${condaMetadata.name} $(inputs.envFolderWrite.path) 2>&1 >> $log
+source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "$${condaMetadata.name}" \
+  "$${condaMetadata.yml ?: ""}" $(inputs.envFolderWrite.path) $(inputs.condaPackURL) 2>&1 >> $log
+source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh $${condaMetadata.name} $(inputs.envFolderWrite.path) 2>&1 >> $log
             """.replaceIndent(indent(5))
         }
     }
