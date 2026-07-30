@@ -1,0 +1,10 @@
+.file-manager {
+    margin-top: 24px;
+}
+
+.wx-willow-dark-theme {
+    --wx-fm-background: var(--dark-blue);
+    --wx-background: var(--dark-green-25);
+    --wx-color-primary: var(--dark-green);
+    --wx-font-family: "Montserrat", sans-serif;
+}

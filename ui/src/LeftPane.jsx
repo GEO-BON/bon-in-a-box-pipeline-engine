@@ -28,7 +28,7 @@ export default function LeftPane() {
                     </NavLink>
                     <NavLink
                         className="left-pane-link"
-                        to="/files">
+                        to="/manage-files">
                             <img src={IconFiles} className='left-pane-icon'></img>
                             Manage input files
                     </NavLink>

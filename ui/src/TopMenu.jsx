@@ -168,7 +168,7 @@ function TopMenu() {
                             </NavLink>
 
                             <NavLink
-                                to="/files"
+                                to="/manage-files"
                                 className="navbar-profile-popup-option mobile-popup-link">
                                 <img src={IconFiles} className='navbar-profile-popup-icon'></img>
                                 Manage input files
