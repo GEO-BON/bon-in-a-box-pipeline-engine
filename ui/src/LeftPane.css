@@ -20,7 +20,7 @@ a.active {
     gap: 4px;
     align-items: center;
     background-color: var(--grey);
-    width: 300px;
+    /* width: 300px; */
     flex-direction: column;
     display: flex;
     height: 100vh;
