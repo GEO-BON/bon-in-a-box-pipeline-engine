@@ -81,7 +81,10 @@ class CWLFactory {
                 "stepDependencies" to
                         pipeline.steps.mapNotNull { (_, step) -> (step as? YMLStep)?.metadata?.conda }
                             .distinctBy { it.name }
-                            .joinToString("\n\n") { generateEnvironmentScript(it) }
+                            .joinToString("\n\n") { condaMetadata ->
+                                """bash -c 'exportEnv "${condaMetadata.name}" "${condaMetadata.yml ?: ""}"'"""
+                            }
+                            .replaceIndent(indent(5))
             )
 
             // Load the step template
@@ -431,14 +434,6 @@ class CWLFactory {
                     }
                 }
             }
-        }
-
-        private fun generateEnvironmentScript(condaMetadata: CondaMetadata):String {
-            return $$"""
-source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "$${condaMetadata.name}" \
-  "$${condaMetadata.yml ?: ""}" $(inputs.envFolderWrite.path) $(inputs.condaPackURL) 2>&1 >> $log
-source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh $${condaMetadata.name} $(inputs.envFolderWrite.path) 2>&1 >> $log
-            """.replaceIndent(indent(5))
         }
     }
 }
