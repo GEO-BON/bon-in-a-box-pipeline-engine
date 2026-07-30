@@ -59,6 +59,70 @@ inputs:
 
 
 steps:
+  # This step prepares the environments for all the following steps
+  prepareEnvironments:
+    run:
+      class: CommandLineTool
+      requirements:
+        InplaceUpdateRequirement:
+          inplaceUpdate: true
+        NetworkAccess:
+          networkAccess: true
+        InlineJavascriptRequirement: {}
+        InitialWorkDirRequirement:
+          listing: |
+            ${
+              return [
+                { entry: inputs.envFolderWrite, writable: true },
+                {
+                  entry: { "class": "Directory", "basename": "conda-env-yml", "listing": [] },
+                  entryname: "/conda-env-yml",
+                  writable: true
+                }
+              ].concat(
+                inputs.runFolderWrite
+                  ? [{ entry: inputs.runFolder, writable: true }]
+                  : []
+              );
+            }
+        DockerRequirement:
+          dockerPull: ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:cwl-poc
+        EnvVarRequirement:
+          envDef:
+            CONDA_PKGS_DIRS: /conda-env-yml/pkgs
+            CONDA_ENVS_PATH: /opt/conda/envs:/conda-env-yml/envs
+            SCRIPT_STUBS_LOCATION: /script-stubs
+            OUTPUT_LOCATION: "$(inputs.runFolderWrite ? inputs.runFolderWrite.path : runtime.outdir)"
+      baseCommand: [bash, -c]
+      arguments:
+        - |
+          echo "Start of bash script"
+          log=$OUTPUT_LOCATION/logs.txt
+          rm -f $log
+          mkdir -p $OUTPUT_LOCATION $CONDA_PKGS_DIRS /conda-env-yml/envs
+{{stepDependencies}}
+          
+      inputs:
+        envFolderWrite:
+          type: Directory
+        runFolderWrite:
+          type: Directory?
+        condaPackURL:
+          type: string
+      outputs:
+        envFolder:
+          type: Directory
+          outputBinding:
+            glob: .
+            outputEval: $(inputs.envFolderWrite)
+    in:
+      envFolderWrite: envFolder
+      runFolder:
+        source: runFolder
+        valueFrom: "$({ class: 'Directory', location: (self ? self.location : '/tmp/cwl' ) + '/prepareEnvironments' })"
+      condaPackURL: condaPackURL
+    out: [envFolder]
+
 {{steps}}
 
 outputs:

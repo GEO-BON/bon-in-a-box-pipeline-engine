@@ -17,6 +17,8 @@ import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.Pipeline
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.UserInput
+import org.geobon.pipeline.YMLStep
+import org.geobon.pipeline.metadata.CondaMetadata
 import org.geobon.pipeline.metadata.IOMetadata
 import org.geobon.pipeline.metadata.StepMetadata
 import org.geobon.script.Description.IO__TYPE_OPTIONS
@@ -25,6 +27,7 @@ import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import kotlin.text.replaceIndent
 
 class CWLFactory {
     companion object {
@@ -70,9 +73,13 @@ class CWLFactory {
                 "metadata" to metadataToCWL(pipeline.metadata),
                 "inputs" to toCWL(pipeline.metadata.inputs, true),
                 "outputs" to toCWL(pipeline.metadata.outputs, false, pipeline.outputs),
-                "steps" to pipeline.steps.mapNotNull {
-                    stepsToCWL(it.value, destinationFile.parentFile, commandLineToolsDir)
-                }.joinToString("\n\n")
+                "steps" to pipeline.steps.mapNotNull { (_, step) ->
+                    toCWL(step, destinationFile.parentFile, commandLineToolsDir)
+                }.joinToString("\n\n"),
+                "stepDependencies" to
+                        pipeline.steps.mapNotNull { (_, step) -> (step as? YMLStep)?.metadata?.conda }
+                            .distinctBy { it.name }
+                            .joinToString("\n\n") { generateEnvironmentScript(it) }
             )
 
             // Load the step template
@@ -303,7 +310,7 @@ class CWLFactory {
                 .replaceIndent(indent(baseIndent))
         }
 
-        private fun stepsToCWL(step: IStep, targetDir: File, commandLineToolsDir: File): String? {
+        private fun toCWL(step: IStep, targetDir: File, commandLineToolsDir: File): String? {
             return buildString {
                 val run: String = when (step) {
                     is ScriptStep -> {
@@ -325,19 +332,23 @@ class CWLFactory {
                 step.inputs.forEach { (key, pipe) ->
                     appendLine(3, "$key: ${toCWL(pipe)}")
                 }
+                appendLine(3, "envFolder: prepareEnvironments/envFolder")
                 appendLine(3, "envFolderWriteable:")
                 appendLine(4, "default: false")
 
-                val runFolder = step.id.toString().replace(">","__").replace('@', '/')
+                val runFolder = step.id.toString()
+                    .replace(">","__")
+                    .replace(' ', '_')
+                    .replace('@', '/')
+                    .replace(".yml", "")
                 appendLine($$"""
                     runFolder:
                         source: runFolder
                         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/$$runFolder' } : null)" 
                 """.replaceIndent(indent(3)))
 
-
-                val mandatoryInputs = listOf("envFolder", "environment", "condaPackURL", "scripts_root")
-                mandatoryInputs.forEach {
+                val passedInputs = listOf("environment", "condaPackURL", "scripts_root")
+                passedInputs.forEach {
                     appendLine(3, "$it: $it")
                 }
 
@@ -416,6 +427,14 @@ class CWLFactory {
                     }
                 }
             }
+        }
+
+        private fun generateEnvironmentScript(condaMetadata: CondaMetadata):String {
+            return $$"""
+                source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "$${condaMetadata.name}" \
+                  "$${condaMetadata.yml ?: ""}" $(inputs.envFolderWrite.path) $(inputs.condaPackURL) 2>&1 >> $log
+                source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh $${condaMetadata.name} $(inputs.envFolderWrite.path) 2>&1 >> $log
+            """.replaceIndent(indent(5))
         }
     }
 }

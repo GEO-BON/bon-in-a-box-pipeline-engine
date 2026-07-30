@@ -120,7 +120,7 @@ inputs:
 
   envFolderWriteable:
     type: boolean
-    doc: 
+    doc:
       Whether the envFolder should be writable. If false, the folder will be mounted read-only.
       In that case, the conda environment needs to be present as an unpacked conda-pack beforehand otherwise the script can't run.
       envFolderWriteable must be false when running in a workflow, but can be true when ran as an individual tool.
