@@ -3,9 +3,12 @@ package org.geobon.cwl
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.geobon.pipeline.JSONPipeline
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
+import org.geobon.pipeline.YMLStep
 import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.SystemCall
 import org.slf4j.Logger
@@ -21,7 +24,9 @@ object CWLExportMain {
 
     @Volatile
     var scriptFailures = 0
+    var pipelineFailures = 0
     lateinit var destinationRoot: File
+    lateinit var toolsRoot: File
 
     /**
      * An alternative main to export all scripts and pipelines
@@ -44,39 +49,74 @@ object CWLExportMain {
             logger.error("Could not create destination folder $destinationRoot.")
             exitProcess(1)
         }
-
+        toolsRoot= File(destinationRoot, "tools")
         runBlocking {
             scriptFailures = 0
-            exportAllScripts(destinationRoot)
+            exportAllFiles(destinationRoot, scriptsRoot, "script")
+
+            pipelineFailures = 0
+            exportAllFiles(destinationRoot, pipelinesRoot, "pipeline")
         }
 
         if (cwlRunnerAvailable) {
-            if (scriptFailures == 0) {
+            if (scriptFailures == 0 && pipelineFailures == 0) {
                 logger.info("There were no failures!")
             } else {
-                logger.warn("There were $scriptFailures failures in CommandLineTool validation.")
+                logger.warn("There were $scriptFailures script failures and $pipelineFailures pipeline failures in CommandLineTool validation.")
             }
         } else {
             logger.warn("""Could not validate CWL. Make sure "cwl-runner" is installed.""")
         }
     }
 
-    suspend fun exportAllScripts(destinationRoot: File, directory: File = scriptsRoot) {
+    // Type should either be "script" or "pipeline"
+    suspend fun exportAllFiles(destinationRoot: File, directory: File, type: String) {
+        val root: File
+        val extension: String
+
+        when (type) {
+            "script" -> {
+                root = scriptsRoot
+                extension = "yml"
+            }
+            "pipeline" -> {
+                root = pipelinesRoot
+                extension = "json"
+            }
+            else -> {
+                logger.warn("Wrong type was passed to exportAllFiles() function.")
+                return
+            }
+        }
+
         val serverContext = ServerContext()
-        val destinationFolder = File(destinationRoot, directory.relativeTo(scriptsRoot).path)
+        val destinationFolder = File(destinationRoot, directory.relativeTo(root).path)
         destinationFolder.mkdirs()
 
         return coroutineScope {
             directory.listFiles()?.forEach { file ->
                 if (file.isDirectory) {
-                    exportAllScripts(destinationRoot, file)
-                } else if (file.extension == "yml") {
+                    exportAllFiles(destinationRoot, file, type)
+                } else if (file.extension == extension) {
                     launch {
                         val destinationFile = File(destinationFolder, "${file.nameWithoutExtension}.cwl")
                         try {
                             val exportDuration = measureTime {
-                                val step = ScriptStep(serverContext, file, StepId(file.nameWithoutExtension, "0"))
-                                destinationFile.writeText(CWLFactory.toCommandLineTool(step))
+                                when (type) {
+                                    "script" -> {
+                                        destinationFile.writeText(CWLFactory.toCommandLineTool(
+                                            ScriptStep(serverContext, file, StepId(file.nameWithoutExtension, "0"))
+                                        ))
+                                    }
+                                    "pipeline" -> {
+                                        CWLFactory.toWorkflow(
+                                            JSONPipeline.createFromFile(
+                                                serverContext, StepId(file.nameWithoutExtension, "0"), file.relativeTo(root).path),
+                                                destinationFile,
+                                                toolsRoot
+                                        )
+                                    }
+                                }
                             }
                             val validationDuration = measureTime {
                                 if (validateCWL(destinationFile)) {
@@ -93,7 +133,10 @@ object CWLExportMain {
                                     }
 
                                 } else {
-                                    scriptFailures++
+                                    when (type) {
+                                        "script" -> scriptFailures++
+                                        "pipeline" -> pipelineFailures++
+                                    }
                                 }
                             }
                             logger.trace("Export took $exportDuration, validation took $validationDuration")
