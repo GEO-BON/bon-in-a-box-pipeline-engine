@@ -87,7 +87,7 @@ arguments:
     cat $OUTPUT_LOCATION/input.json | tee -a $log
 
     source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "{{condaEnvName}}" \
-      "{{condaEnvYml}}" /conda-envs $(inputs.condaPackURL) 2>&1 >> $log
+      "{{condaEnvYml}}" /conda-envs $(inputs.condaPackURL) >> "$log" 2>&1
 
     {{program}} \
       $SCRIPT_STUBS_LOCATION/system/{{scriptWrapper}} \
@@ -97,7 +97,7 @@ arguments:
     scriptExitCode=\${PIPESTATUS[0]}
     echo "Script exited with code $scriptExitCode" | tee -a $log
 
-    source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh {{condaEnvName}} /conda-envs 2>&1 >> $log
+    source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh {{condaEnvName}} /conda-envs >> "$log" 2>&1
 
     exit "$scriptExitCode"
 
