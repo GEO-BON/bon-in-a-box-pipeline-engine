@@ -10,6 +10,7 @@ import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_FLOAT
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_INT
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_LONG
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
+import org.geobon.pipeline.ConstantPipe
 import org.geobon.pipeline.IStep
 import org.geobon.pipeline.ObjectInputDefinition
 import org.geobon.pipeline.Output
@@ -143,7 +144,7 @@ class CWLFactory {
                     }
 
                 } else if (outputPipe != null) {
-                    appendLine(2,"outputSource: ${toCWL(outputPipe)}")
+                    appendLine(2, "outputSource: ${toCWL(outputPipe)}")
 
                 } else {
                     appendLine(
@@ -296,18 +297,20 @@ class CWLFactory {
             }
         }
 
+        fun exampleToCWL(baseIndent: Int, example: Any): String {
+            return Yaml().dumpAsMap(mapOf("default" to example))
+                .replaceIndent(indent(baseIndent))
+        }
+
         private fun toCWL(pipe: Pipe): String {
             return when (pipe) {
                 is Output -> (pipe.step as? UserInput)?.id?.toString()
                     ?: pipe.getId().run { "${step}/${inputOrOutput}" }
 
+                is ConstantPipe -> "{ default: ${pipe.value} }"
+
                 else -> throw UnsupportedOperationException("Exporting ${pipe.javaClass.name} inputs to CWL is not yet supported.")
             }
-        }
-
-        fun exampleToCWL(baseIndent: Int, example: Any): String {
-            return Yaml().dumpAsMap(mapOf("default" to example))
-                .replaceIndent(indent(baseIndent))
         }
 
         private fun toCWL(step: IStep, targetDir: File, commandLineToolsDir: File): String? {
@@ -356,8 +359,6 @@ class CWLFactory {
             }
 
         }
-
-
 
         /**
          * Use only when there is no access to the full definition of the object.
