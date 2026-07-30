@@ -23,7 +23,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 
-class ScriptStep : YMLStep {
+open class ScriptStep : YMLStep {
 
     constructor(
         serverContext: ServerContext,
@@ -34,7 +34,7 @@ class ScriptStep : YMLStep {
         serverContext.hpc?.register(this)
     }
 
-    private val scriptFile: File = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
+    protected var scriptFile: File = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
 
     /**
      * Used for a lighter test syntax
