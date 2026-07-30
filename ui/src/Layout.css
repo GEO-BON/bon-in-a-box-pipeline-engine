@@ -63,19 +63,8 @@ h2 {
   cursor: pointer;
 }
 
-.left-pane {
-  float: left;
-  background-color: var(--grey);
-  flex-direction: column;
-  display: flex;
-  height: 100vh;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
-
-
 .right-content {
   background-color: var(--dark-blue);
-  /* z-index: ; */
   height: 100vh;
   color: var(--grey);
   overflow: auto;
@@ -773,168 +762,174 @@ h2.MuiDialogTitle-root {
   font-weight: 1000;
 }
 
-@media (max-width: 1100px) {
-  .navigation-bar-link {
-    margin-left: 10px;
-  }
+.homepage-background-images {
+    margin: 0 -30px;
+}
 
-  .home-page-content {
-    max-width: unset;
-  }
+@media (max-width: 1100px) {
+    .navigation-bar-link {
+        margin-left: 10px;
+    }
+
+    .home-page-content {
+        max-width: 90%;
+    }
+
+    .homepage-background-images {
+        margin: 0;
+    }
 }
 
 @media (max-width: 739px) or (max-height: 549px) {
+    button#clear,
+    button#saveBtn,
+    button#saveAsBtn,
+    button#loadFromFileBtn,
+    .stepChooser {
+        display: none;
+    }
 
-  button#clear,
-  button#saveBtn,
-  button#saveAsBtn,
-  button#loadFromFileBtn,
-  .stepChooser {
-    display: none;
-  }
+    .pipelineTitle {
+        font-size: unset;
+        margin: 8px 0px;
+    }
 
-  .pipelineTitle {
-    font-size: unset;
-    margin: 8px 0px;
-  }
+    div.left-pane:has(.stepChooser) img#logo {
+        max-width: 60px;
+        padding: 0 0 0 0px;
+    }
 
-  div.left-pane:has(.stepChooser) img#logo {
-    max-width: 60px;
-    padding: 0 0 0 0px;
-  }
+    .previewMode {
+        display: inline;
+        color: #555 !important;
+        border-bottom-left-radius: 10px;
+    }
 
-  .previewMode {
-    display: inline;
-    color: #555 !important;
-    border-bottom-left-radius: 10px;
-  }
+    div.right-content main {
+        padding: 0px 5px;
+    }
 
-  div.right-content main {
-    padding: 0px 5px;
-  }
-
-  .home-page-content {
-    max-width: 90%;
-    margin: auto;
-  }
+    .home-page-content {
+        max-width: 90%;
+        margin: auto;
+    }
 }
 
 @media (max-width: 600px) {
-  div.left-pane {
-    display: none;
-  }
+    div.left-pane {
+        display: none;
+    }
 
-  img#logo {
-    max-width: 65px;
-  }
+    img#logo {
+        max-width: 65px;
+    }
 
-  .help-link {
-    margin-right: 10px;
-  }
+    .help-link {
+        margin-right: 10px;
+    }
 
-  div.right-content {
-    padding: 0;
-  }
+    div.right-content {
+        padding: 0;
+    }
 
-  div.right-content nav {
-    padding: 0 0 5px 95px;
-    background-color: #222;
-    position: fixed;
-    width: 100vw;
-    z-index: 100000;
-    /*cellphone nav*/
-    border-bottom: 2px solid #87cefa45;
-  }
+    div.right-content nav {
+        padding: 0 0 5px 95px;
+        background-color: #222;
+        position: fixed;
+        width: 100vw;
+        z-index: 100000;
+        /*cellphone nav*/
+        border-bottom: 2px solid #87cefa45;
+    }
 
-  div.right-content nav .separator {
-    display: block;
-    height: 0px;
-    visibility: collapse;
-  }
+    div.right-content nav .separator {
+        display: block;
+        height: 0px;
+        visibility: collapse;
+    }
 
-  .right-content main {
-    padding: 3.5em 10px 10px 10px;
-  }
+    .right-content main {
+        padding: 3.5em 10px 10px 10px;
+    }
 
-  .home-page-title {
-    z-index: 100;
-    color: #DAECE5;
-    font-weight: bold;
-    font-size: 44px;
-  }
+    .home-page-title {
+        z-index: 100;
+        color: #DAECE5;
+        font-weight: bold;
+        font-size: 44px;
+    }
 
-  .home-page-subtitle {
-    color: var(--light-green);
-    font-weight: bold;
-    font-size: 24px;
-  }
+    .home-page-subtitle {
+        color: var(--light-green);
+        font-weight: bold;
+        font-size: 24px;
+    }
 
-  .home-page-content {
-    padding-top: 30px;
-  }
+    .home-page-content {
+        padding-top: 30px;
+    }
 
-  .navigation-bar {
-    z-index: 999;
-    background-color: var(--dark-green);
-    position: fixed;
-    height: 75px;
-    padding: 0;
-  }
+    .navigation-bar {
+        z-index: 999;
+        background-color: var(--dark-green);
+        position: fixed;
+        /* height: 75px; */
+        padding: 0;
+    }
 
-  .pipeline-columns {
-    display: block;
-    margin: 1em 0;
-  }
+    .pipeline-columns {
+        display: block;
+        margin: 1em 0;
+    }
 
-  .pipeline-columns ul {
-    margin: 0;
-  }
+    .pipeline-columns ul {
+        margin: 0;
+    }
 
-  .home-tooltip.right .tooltip-wrapper,
-  .home-tooltip.left .tooltip-wrapper {
-    position: relative;
-    display: none;
-    left: -45px;
-    right: 0px;
-    padding: 0;
-  }
+    .home-tooltip.right .tooltip-wrapper,
+    .home-tooltip.left .tooltip-wrapper {
+        position: relative;
+        display: none;
+        left: -45px;
+        right: 0px;
+        padding: 0;
+    }
 
-  .home-tooltip:hover {
-    transform: unset;
-  }
+    .home-tooltip:hover {
+        transform: unset;
+    }
 
-  .home-tooltip.right:hover .tooltip-wrapper,
-  .home-tooltip.left:hover .tooltip-wrapper {
-    display: unset;
-  }
+    .home-tooltip.right:hover .tooltip-wrapper,
+    .home-tooltip.left:hover .tooltip-wrapper {
+        display: unset;
+    }
 
-  .home-tooltip.right .tooltiptext,
-  .home-tooltip.left .tooltiptext {
-    width: 85vw;
-    margin-bottom: 10px;
-  }
+    .home-tooltip.right .tooltiptext,
+    .home-tooltip.left .tooltiptext {
+        width: 85vw;
+        margin-bottom: 10px;
+    }
 
-  .outputTitle {
-    flex-wrap: wrap
-  }
+    .outputTitle {
+        flex-wrap: wrap
+    }
 
-  .outputTitle h3 {
-    flex-shrink: unset;
-  }
+    .outputTitle h3 {
+        flex-shrink: unset;
+    }
 
-  .stepChooser,
-  .reactflow-wrapper {
-    visibility: collapse;
-    display: none;
-  }
+    .stepChooser,
+    .reactflow-wrapper {
+        visibility: collapse;
+        display: none;
+    }
 
-  .pipelineTitle,
-  .previewMode {
-    display: none;
-  }
+    .pipelineTitle,
+    .previewMode {
+        display: none;
+    }
 
-  .narrowWarning {
-    display: inline;
-  }
-
+    .narrowWarning {
+        display: inline;
+    }
 }

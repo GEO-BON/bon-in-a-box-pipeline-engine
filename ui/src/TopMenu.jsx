@@ -16,18 +16,22 @@ import Avatar from "./img/avatar-green.png"
 import IconDashboard from "./img/icon-dashboard.png"
 import IconProfile from "./img/icon-profile copy.png"
 import IconLogout from "./img/icon-logout.png"
+import IconFiles from "./img/icon-gear.png";
+import IconDiscourse from "./img/icon-discourse.png";
+import IconMembers from "./img/icon-members.png";
+import IconEBV from "./img/icon-ebv.png";
 
 const pages = [
-  { title: 'Home', link: '/' },
-  { title: 'Run a script', link: '/script-form' },
-  { title: 'Run a pipeline', link: '/pipeline-form' },
-  { title: 'Pipeline editor', link: '/pipeline-editor' },
-  { title: 'History', link: '/history' },
-  { title: 'Info', link: '/info' }
+    { title: 'Home', link: '/' },
+    { title: 'Run a script', link: '/script-form' },
+    { title: 'Run a pipeline', link: '/pipeline-form' },
+    { title: 'Pipeline editor', link: '/pipeline-editor' },
+    { title: 'History', link: '/history' },
+    { title: 'Info', link: '/info' }
 ];
 
 // only temporary
-const userInfo = { name: 'FirstName LastName' }
+const userInfo = { name: 'FirstName' }
 const { name } = userInfo
 
 function TopMenu() {
@@ -44,7 +48,7 @@ function TopMenu() {
     // open/close popup 
     const [isPopupOpen, setIsPopupOpen] = React.useState(false);
     const [shouldRender, setShouldRender] = React.useState(false);
-    const toggleButtonRef = React.useRef(null); // ref for the profile icon/button
+    const toggleButtonRef = React.useRef(null); // ref for the profile button
 
     const togglePopup = () => {
         if (isPopupOpen) {
@@ -92,7 +96,7 @@ function TopMenu() {
                 <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
                     <img id="logo" src={BiaBLogo} alt="BON in a Box logo" style={{ display: { xs: 'block', sm: 'none' } }} />
                 </Box>
-                <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                <Box sx={{ flexGrow: 1, display: { xs: 'flex', lg: 'none' } }}>
                     <IconButton
                     size="large"
                     aria-label="hamburger menu"
@@ -104,32 +108,37 @@ function TopMenu() {
                     <MenuIcon />
                     </IconButton>
                     <Menu
-                    id="menu-appbar"
-                    className="navigation-bar-mobile-menu"
-                    anchorEl={anchorElNav}
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'left',
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'left',
-                    }}
-                    open={Boolean(anchorElNav)}
-                    onClose={handleCloseNavMenu}
-                    sx={{ padding: 20 }}
-                    >
-                    {pages.map((page) => (
-                        <MenuItem key={`nav-sm-${page.title}`} onClick={() => handleCloseNavMenu()}>
-                        <NavLink key={page.title} to={page.link}>
-                            {page.title}
-                        </NavLink>
+                        id="menu-appbar"
+                        className="navigation-bar-mobile-menu"
+                        anchorEl={anchorElNav}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        keepMounted
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                        }}
+                        open={Boolean(anchorElNav)}
+                        onClose={handleCloseNavMenu}
+                        sx={{ padding: 20 }}
+                        >
+                        {pages.map((page) => (
+                            <MenuItem key={`nav-sm-${page.title}`} onClick={() => handleCloseNavMenu()}>
+                            <NavLink key={page.title} to={page.link}>
+                                {page.title}
+                            </NavLink>
+                            </MenuItem>
+                        ))}
+                        <MenuItem key={`nav-sm-help`} onClick={() => handleCloseNavMenu()}>
+                            <NavLink className="help-link-mobile" key='Help' to='https://geo-bon.github.io/bon-in-a-box-pipeline-engine/'>
+                                Help
+                            </NavLink>
                         </MenuItem>
-                    ))}
                     </Menu>
                 </Box>
-                <Box sx={{ flexGrow: 1, gap: '20px', display: { xs: 'none', md: 'flex' } }}>
+                <Box sx={{ flexGrow: 1, gap: '20px', display: { xs: 'none', lg: 'flex' } }}>
                     {pages.map((page) => (
                     <NavLink
                         key={`nav-lg-${page.title}`}
@@ -153,26 +162,44 @@ function TopMenu() {
                             onAnimationEnd={handleAnimationEnd}>
                             <NavLink
                                 to="/user-space"
-                                className="navbar-profile-popup-option"
-                            >
+                                className="navbar-profile-popup-option">
                                 <img src={IconDashboard} className='navbar-profile-popup-icon'></img>
                                 User space
                             </NavLink>
 
                             <NavLink
+                                to="/files"
+                                className="navbar-profile-popup-option mobile-popup-link">
+                                <img src={IconFiles} className='navbar-profile-popup-icon'></img>
+                                Manage input files
+                            </NavLink>
+
+                            <NavLink
                                 to=""
-                                className="navbar-profile-popup-option"
-                            >
+                                className="navbar-profile-popup-option">
                                 <img src={IconProfile} className='navbar-profile-popup-icon'></img>
                                 GEO BON profile
+                            </NavLink>
+
+                            <NavLink
+                                to=""
+                                className="navbar-profile-popup-option mobile-popup-link">
+                                <img src={IconDiscourse} className='navbar-profile-popup-icon'></img>
+                                Discourse
+                            </NavLink>
+
+                            <NavLink
+                                to=""
+                                className="navbar-profile-popup-option mobile-popup-link">
+                                <img src={IconMembers} className='navbar-profile-popup-icon'></img>
+                                Members
                             </NavLink>
 
                             <div className='divider'></div>
 
                             <NavLink 
                                 to=""
-                                className="navbar-profile-popup-option"
-                            >
+                                className="navbar-profile-popup-option">
                                 <img src={IconLogout} className='navbar-profile-popup-icon'></img>
                                 Log out
                             </NavLink>
@@ -183,7 +210,6 @@ function TopMenu() {
                         to="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/"
                         target="_blank"
                         className="navigation-bar-link help-link"
-                        style={{ display: "flex" }}
                     >
                     <HelpIcon
                         alt="Help"

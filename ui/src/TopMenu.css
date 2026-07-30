@@ -101,7 +101,7 @@
 
 .navbar-profile-popup {
     position: absolute;
-    z-index: 100;
+    z-index: 999;
     top: 64px;
     background-color: var(--grey);
     border-radius: 8px;
@@ -117,6 +117,11 @@
     a {
         color: inherit;
         font-weight: 500;
+        text-decoration: none;
+    }
+
+    a:hover, a:active {
+        color: var(--dark-green);
         text-decoration: none;
     }
 }
@@ -147,14 +152,75 @@
     background-color: #D5D5D5;
 }
 
+.mobile-popup-link {
+    display: none;
+}
+
+/* phone menu */
+
+#menu-appbar .css-1tktgsa-MuiPaper-root-MuiPopover-paper-MuiMenu-paper {
+    background-color: var(--grey) !important;
+    top: 96px !important;
+    border-radius: 8px;
+}
+
 .navigation-bar-mobile-menu a {
-  color: var(--dark-green)
+    color: var(--dark-blue);
+    font-weight: 500;
+    text-decoration: none;
 }
 
 .navigation-bar-mobile-menu a.active {
-  color: #71bba6
+    color: var(--dark-green);
+    font-weight: 700;
 }
 
 .help-link {
-  margin-right: 30px;
+    margin-right: 30px;
+    display: flex;
 }
+
+.help-link-mobile {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .navigation-bar {
+        z-index: 999;
+        background-color: var(--dark-green);
+        position: fixed;
+        /* height: 75px; */
+        padding: 0;
+    }
+
+    img#logo {
+        padding-left: 16px !important;
+    }
+
+    .navbar-profile-popup {
+        top: 96px;
+        right: 4px;
+        width: 212px;
+        font-size: 16px;
+    }
+
+    .mobile-popup-link {
+        display: inherit;
+    }
+}
+
+@media (max-width: 900px) {
+    .help-link {
+        display: none;
+    }
+
+    .help-link-mobile {
+        display: inherit;
+    }
+
+    .navigation-bar-profile-container {
+        margin-right: 16px;
+    }
+}
+
+

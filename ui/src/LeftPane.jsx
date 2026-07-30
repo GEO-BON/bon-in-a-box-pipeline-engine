@@ -3,10 +3,11 @@ import { NavLink } from "react-router-dom";
 import "./LeftPane.css";
 // images
 import BiaBLogo from "./img/boninabox_logo.jpg";
+import IconDashboard from "./img/icon-dashboard.png"
 import IconFiles from "./img/icon-gear.png";
 import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";
-import IconData from "./img/icon-data.png";
+import IconEBV from "./img/icon-ebv.png";
 
 export default function LeftPane() {
     return (
@@ -19,6 +20,12 @@ export default function LeftPane() {
 
             <div className='left-pane-link-container'>
                 <div className='left-pane-links-top'>
+                    <NavLink
+                        className="left-pane-link"
+                        to="/user-space">
+                            <img src={IconDashboard} className='left-pane-icon'></img>
+                            User space
+                    </NavLink>
                     <NavLink
                         className="left-pane-link"
                         to="/files">
@@ -44,8 +51,8 @@ export default function LeftPane() {
                     <NavLink
                         className="left-pane-link"
                         to="https://portal.geobon.org/datasets">
-                            <img src={IconData} className='left-pane-icon'></img>
-                            EBV Data portal
+                            <img src={IconEBV} className='left-pane-icon'></img>
+                            Data portal
                     </NavLink>
                 </div>
             </div>

@@ -29,17 +29,17 @@ a.active {
     box-sizing: border-box;
     
     .divider {
-        height: 3px;
+        height: 2px;
         width: 100%;
         background-color: var(--dark-green);
     }
 }
 
 img#logo {
-    width: 150px;
+    width: 148px;
     height: auto;
     margin: auto;
-    padding: 0;
+    padding: 12px 0;
 }
 
 .left-pane-link-container {
@@ -47,7 +47,6 @@ img#logo {
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 12px;
     justify-content: space-between;
 }
 
@@ -78,6 +77,12 @@ img#logo {
 }
 
 .left-pane-icon {
-    width: 24px;
+    width: 28px;
     height: auto;
+}
+
+.left-pane-links-bottom, .left-pane-links-top {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
