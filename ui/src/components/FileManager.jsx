@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { RestDataProvider } from "@svar-ui/filemanager-data-provider";
 import { Filemanager, WillowDark } from "@svar-ui/react-filemanager";
+import { BACKEND_URL } from "../config";
+
 import "@svar-ui/react-filemanager/all.css";
 import "./FileManager.css";
 
-const BackendServer = "http://localhost:3200";
+const BackendServer = BACKEND_URL;
 const restProvider = new RestDataProvider(BackendServer);
 
 
@@ -15,7 +17,7 @@ export default function FileManager() {
     const init = (api) => {
         api.setNext(restProvider); // save/rename/delete/upload
 
-        // lazy-loading the folder's content
+        // lazy loading subfolder content
         api.on("request-data", ({ id }) => {
             restProvider.loadFiles(id).then((files) => {
                 api.exec("provide-data", { id, data: files });
