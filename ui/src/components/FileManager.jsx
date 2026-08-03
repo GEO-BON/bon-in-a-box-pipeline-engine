@@ -13,7 +13,14 @@ export default function FileManager() {
     const [drive, setDrive] = useState({});
 
     const init = (api) => {
-        api.setNext(restProvider); // wires save/rename/delete/upload to the backend
+        api.setNext(restProvider); // save/rename/delete/upload
+
+        // lazy-loading the folder's content
+        api.on("request-data", ({ id }) => {
+            restProvider.loadFiles(id).then((files) => {
+                api.exec("provide-data", { id, data: files });
+            });
+        });
     };
 
     useEffect(() => {
