@@ -8,3 +8,9 @@
     --wx-color-primary: var(--dark-green);
     --wx-font-family: "Montserrat", sans-serif;
 }
+
+.wx-text.wx-lUZMtgT1 {
+    font-family: "Montserrat", sans-serif;
+    background-color: var(--dark-blue);
+    border-radius: 12px;
+}

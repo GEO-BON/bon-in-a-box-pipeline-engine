@@ -41,7 +41,7 @@
     font-weight: 700;
     align-content: center;
     border-radius: 15px;
-    padding: 4px 8px;
+    padding: 2px 12px;
     transition: all ease-in-out 0.3s;
     cursor: pointer;
 }
