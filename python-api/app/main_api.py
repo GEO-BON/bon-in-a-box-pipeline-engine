@@ -1,12 +1,12 @@
-from fastapi import FastAPI, HTTPException, Response, File, Form, UploadFile
+from fastapi import FastAPI, APIRouter, HTTPException, Response, File, Form, UploadFile, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from pathlib import Path
 import duckdb
 import os
 import json
 import geopandas as gpd
 import pandas as pd
-from pathlib import Path
 import shutil
 
 app = FastAPI()
@@ -89,111 +89,103 @@ def region_geometry(type: str = 'country', id: str = ""):
 
 
 # backend for file uploads
-# Resolve workspace structure correctly relative to main_api.py
-# BASE_DIR = Path(__file__).resolve().parent.parent.parent
-# STORAGE_ROOT = BASE_DIR / "pipeline-repo" / "userdata" / "files"
-# STORAGE_ROOT.mkdir(parents=True, exist_ok=True)
+fm_router = APIRouter(prefix="/fm-api")
 
-# @app.get("/")
-# def get_files(id: str = Query(None)):
-#     """
-#     SVAR RestDataProvider queries the root path directly.
-#     When expanding deep nested files, it sends a target directory query string (?id=/subfolder).
-#     """
-#     items = []
-    
-#     # Check if we are checking the root directory or a specific subdirectory extension
-#     target_dir = STORAGE_ROOT / id.lstrip("/") if id else STORAGE_ROOT
-    
-#     if not target_dir.exists() or not target_dir.is_dir():
-#         return items
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+STORAGE_ROOT = BASE_DIR / "pipeline-repo" / "userdata" / "files"
+STORAGE_ROOT.mkdir(parents=True, exist_ok=True)
 
-#     # RestDataProvider prefers single-level shallow listing when an ID is targeted
-#     search_pattern = "*" if id else "**/*"
-#     iterator = target_dir.glob("*") if id else STORAGE_ROOT.rglob("*")
+def resolve(id: str) -> Path:
+    # id comes in like "/New folder" (striping leading slash), keep inside STORAGE_ROOT
+    return STORAGE_ROOT / id.lstrip("/")
 
-#     for path in iterator:
-#         try:
-#             rel_path = "/" + str(path.relative_to(STORAGE_ROOT)).replace("\\", "/")
-            
-#             # Map standard top-level structural identifiers
-#             if path.parent == STORAGE_ROOT:
-#                 parent_id = "/"
-#             else:
-#                 parent_id = "/" + str(path.parent.relative_to(STORAGE_ROOT)).replace("\\", "/")
+def to_id(path: Path) -> str:
+    return "/" + str(path.relative_to(STORAGE_ROOT)).replace("\\", "/")
 
-#             items.append({
-#                 "id": rel_path,
-#                 "value": path.name,
-#                 "type": "folder" if path.is_dir() else "file",
-#                 "size": path.stat().st_size if path.is_file() else 0,
-#                 "parent": parent_id
-#             })
-#         except Exception:
-#             continue
-            
-#     return items
+def list_dir(target: Path):
+    items = []
+    for path in target.glob("*"):
+        items.append({
+            "id": to_id(path),
+            "value": path.name,
+            "type": "folder" if path.is_dir() else "file",
+            "size": path.stat().st_size if path.is_file() else 0,
+        })
+    return items
 
-# @app.get("/info")
-# def get_info():
-#     """
-#     Maps your operating system drive context directly into your component layout.
-#     Matches your React file's expectation: info.stats
-#     """
-#     total, used, free = shutil.disk_usage(STORAGE_ROOT)
-#     return {
-#         "stats": {
-#             "total": total,
-#             "used": used,
-#             "free": free
-#         }
-#     }
+@fm_router.get("/files")
+def get_root_files():
+    return list_dir(STORAGE_ROOT)
 
-# @app.post("/")
-# async def handle_action(
-#     action: str = Form(...), 
-#     source: str = Form(None), 
-#     target: str = Form(None), 
-#     name: str = Form(None)
-# ):
-#     """Handles directory actions natively sent via the RestDataProvider execution pipeline."""
-#     if action == "create-folder":
-#         clean_target = target.lstrip("/") if target else ""
-#         dest = STORAGE_ROOT / clean_target / name if clean_target else STORAGE_ROOT / name
-#         dest.mkdir(parents=True, exist_ok=True)
-#         return {"status": "success", "id": "/" + str(dest.relative_to(STORAGE_ROOT)).replace("\\", "/")}
-        
-#     elif action == "delete":
-#         target_path = STORAGE_ROOT / source.lstrip("/")
-#         if target_path.exists():
-#             if target_path.is_dir():
-#                 shutil.rmtree(target_path)
-#             else:
-#                 target_path.unlink()
-#         return {"status": "success"}
+@fm_router.get("/files/{id:path}")
+def get_subfolder_files(id: str):
+    target = resolve(id)
+    if not target.exists() or not target.is_dir():
+        return []
+    return list_dir(target)
 
-#     elif action == "rename":
-#         source_path = STORAGE_ROOT / source.lstrip("/")
-#         if source_path.exists():
-#             new_path = source_path.parent / name
-#             source_path.rename(new_path)
-#             return {"status": "success", "id": "/" + str(new_path.relative_to(STORAGE_ROOT)).replace("\\", "/")}
+@fm_router.post("/files/{id:path}")
+def create_item(id: str, body: dict = Body(...)):
+    name = body.get("name")
+    item_type = body.get("type")
+    if not name or not item_type:
+        raise HTTPException(400, "'type' and 'name' parameters must be provided")
+    dest = resolve(id) / name
+    if item_type == "folder":
+        dest.mkdir(parents=True, exist_ok=True)
+    else:
+        dest.touch(exist_ok=True)
+    return {"id": to_id(dest)}
 
-#     raise HTTPException(status_code=400, detail=f"Action '{action}' is unhandled")
+@fm_router.put("/files/{id:path}")
+def rename_item(id: str, body: dict = Body(...)):
+    if body.get("operation") != "rename":
+        raise HTTPException(400, "Unsupported operation")
+    source = resolve(id)
+    if not source.exists():
+        raise HTTPException(404, "Not found")
+    new_path = source.parent / body["name"]
+    source.rename(new_path)
+    return {"id": to_id(new_path)}
 
-# @app.post("/upload")
-# async def upload_file(file: UploadFile = File(...), id: str = Form("/")):
-#     """Catches multipart stream packages safely inside the requested user scope folder."""
-#     clean_target = id.lstrip("/")
-#     dest_folder = STORAGE_ROOT / clean_target if clean_target else STORAGE_ROOT
-#     dest_folder.mkdir(parents=True, exist_ok=True)
-    
-#     dest_file = dest_folder / file.filename
-#     with dest_file.open("wb") as buffer:
-#         shutil.copyfileobj(file.file, buffer)
-        
-#     return {
-#         "status": "success", 
-#         "value": file.filename, 
-#         "id": "/" + str(dest_file.relative_to(STORAGE_ROOT)).replace("\\", "/")
-#     }
+@fm_router.put("/files")
+def move_or_copy(body: dict = Body(...)):
+    operation = body.get("operation")  # "move" or "copy"
+    target_dir = resolve(body["target"])
+    target_dir.mkdir(parents=True, exist_ok=True)
+    results = []
+    for item_id in body.get("ids", []):
+        src = resolve(item_id)
+        dest = target_dir / src.name
+        if operation == "move":
+            src.rename(dest)
+        else:
+            (shutil.copytree if src.is_dir() else shutil.copy2)(src, dest)
+        results.append({"id": to_id(dest), "name": dest.name})
+    return {"result": results}
+
+@fm_router.delete("/files")
+def delete_items(body: dict = Body(...)):
+    for item_id in body.get("ids", []):
+        target = resolve(item_id)
+        if target.is_dir():
+            shutil.rmtree(target, ignore_errors=True)
+        elif target.exists():
+            target.unlink()
+    return {"status": "success"}
+
+@fm_router.post("/upload")
+async def upload_file(file: UploadFile = File(...), id: str = Form("/")):
+    dest_folder = resolve(id)
+    dest_folder.mkdir(parents=True, exist_ok=True)
+    dest_file = dest_folder / file.filename
+    with dest_file.open("wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    return {"id": to_id(dest_file), "value": file.filename}
+
+@fm_router.get("/info")
+def get_info():
+    total, used, free = shutil.disk_usage(STORAGE_ROOT)
+    return {"stats": {"total": total, "used": used, "free": free}}
+
+app.include_router(fm_router)
