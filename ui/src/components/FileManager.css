@@ -14,3 +14,7 @@
     background-color: var(--dark-blue);
     border-radius: 12px;
 }
+
+wx-content-wrapper.wx-RJbNonjJ {
+    min-height: 50vh;
+}

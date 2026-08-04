@@ -15,9 +15,9 @@ export default function FileManager() {
     const [drive, setDrive] = useState({});
 
     const init = (api) => {
-        api.setNext(restProvider); // save/rename/delete/upload
+        api.setNext(restProvider); // to save/rename/delete/upload
 
-        // lazy loading subfolder content
+        // loading subfolder content
         api.on("request-data", ({ id }) => {
             restProvider.loadFiles(id).then((files) => {
                 api.exec("provide-data", { id, data: files });

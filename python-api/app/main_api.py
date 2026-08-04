@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response, File, Form, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 import duckdb
@@ -6,6 +6,8 @@ import os
 import json
 import geopandas as gpd
 import pandas as pd
+from pathlib import Path
+import shutil
 
 app = FastAPI()
 
@@ -85,3 +87,113 @@ def region_geometry(type: str = 'country', id: str = ""):
     gdf.to_file(file_path, driver='GPKG', layer='country_region', overwrite=True)
     return FileResponse(file_path, media_type="application/geopackage+sqlite3", filename="%s.gpkg" % fname)
 
+
+# backend for file uploads
+# Resolve workspace structure correctly relative to main_api.py
+# BASE_DIR = Path(__file__).resolve().parent.parent.parent
+# STORAGE_ROOT = BASE_DIR / "pipeline-repo" / "userdata" / "files"
+# STORAGE_ROOT.mkdir(parents=True, exist_ok=True)
+
+# @app.get("/")
+# def get_files(id: str = Query(None)):
+#     """
+#     SVAR RestDataProvider queries the root path directly.
+#     When expanding deep nested files, it sends a target directory query string (?id=/subfolder).
+#     """
+#     items = []
+    
+#     # Check if we are checking the root directory or a specific subdirectory extension
+#     target_dir = STORAGE_ROOT / id.lstrip("/") if id else STORAGE_ROOT
+    
+#     if not target_dir.exists() or not target_dir.is_dir():
+#         return items
+
+#     # RestDataProvider prefers single-level shallow listing when an ID is targeted
+#     search_pattern = "*" if id else "**/*"
+#     iterator = target_dir.glob("*") if id else STORAGE_ROOT.rglob("*")
+
+#     for path in iterator:
+#         try:
+#             rel_path = "/" + str(path.relative_to(STORAGE_ROOT)).replace("\\", "/")
+            
+#             # Map standard top-level structural identifiers
+#             if path.parent == STORAGE_ROOT:
+#                 parent_id = "/"
+#             else:
+#                 parent_id = "/" + str(path.parent.relative_to(STORAGE_ROOT)).replace("\\", "/")
+
+#             items.append({
+#                 "id": rel_path,
+#                 "value": path.name,
+#                 "type": "folder" if path.is_dir() else "file",
+#                 "size": path.stat().st_size if path.is_file() else 0,
+#                 "parent": parent_id
+#             })
+#         except Exception:
+#             continue
+            
+#     return items
+
+# @app.get("/info")
+# def get_info():
+#     """
+#     Maps your operating system drive context directly into your component layout.
+#     Matches your React file's expectation: info.stats
+#     """
+#     total, used, free = shutil.disk_usage(STORAGE_ROOT)
+#     return {
+#         "stats": {
+#             "total": total,
+#             "used": used,
+#             "free": free
+#         }
+#     }
+
+# @app.post("/")
+# async def handle_action(
+#     action: str = Form(...), 
+#     source: str = Form(None), 
+#     target: str = Form(None), 
+#     name: str = Form(None)
+# ):
+#     """Handles directory actions natively sent via the RestDataProvider execution pipeline."""
+#     if action == "create-folder":
+#         clean_target = target.lstrip("/") if target else ""
+#         dest = STORAGE_ROOT / clean_target / name if clean_target else STORAGE_ROOT / name
+#         dest.mkdir(parents=True, exist_ok=True)
+#         return {"status": "success", "id": "/" + str(dest.relative_to(STORAGE_ROOT)).replace("\\", "/")}
+        
+#     elif action == "delete":
+#         target_path = STORAGE_ROOT / source.lstrip("/")
+#         if target_path.exists():
+#             if target_path.is_dir():
+#                 shutil.rmtree(target_path)
+#             else:
+#                 target_path.unlink()
+#         return {"status": "success"}
+
+#     elif action == "rename":
+#         source_path = STORAGE_ROOT / source.lstrip("/")
+#         if source_path.exists():
+#             new_path = source_path.parent / name
+#             source_path.rename(new_path)
+#             return {"status": "success", "id": "/" + str(new_path.relative_to(STORAGE_ROOT)).replace("\\", "/")}
+
+#     raise HTTPException(status_code=400, detail=f"Action '{action}' is unhandled")
+
+# @app.post("/upload")
+# async def upload_file(file: UploadFile = File(...), id: str = Form("/")):
+#     """Catches multipart stream packages safely inside the requested user scope folder."""
+#     clean_target = id.lstrip("/")
+#     dest_folder = STORAGE_ROOT / clean_target if clean_target else STORAGE_ROOT
+#     dest_folder.mkdir(parents=True, exist_ok=True)
+    
+#     dest_file = dest_folder / file.filename
+#     with dest_file.open("wb") as buffer:
+#         shutil.copyfileobj(file.file, buffer)
+        
+#     return {
+#         "status": "success", 
+#         "value": file.filename, 
+#         "id": "/" + str(dest_file.relative_to(STORAGE_ROOT)).replace("\\", "/")
+#     }
