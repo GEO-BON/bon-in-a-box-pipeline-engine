@@ -40,11 +40,14 @@ services:
     container_name: biab-python-api
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
+      - ${PIPELINE_REPO_PATH}/userdata:/data/userdata:rw  # for user uploads, used in "/manage-files"
+
     user: ${MY_UID}:${DOCKER_GID}
     environment:
       PORT: 8000
       WORKERS_PER_CORE: 1
       TITILER_API_CORS_ORIGINS: "*"
+      USERDATA_ROOT: /data/userdata/files
     expose:
       - "8000"
       - "8001"

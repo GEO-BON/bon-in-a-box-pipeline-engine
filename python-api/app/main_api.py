@@ -1,9 +1,11 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Response, File, Form, UploadFile, Body
+from fastapi import FastAPI, APIRouter, HTTPException, Response, File, Form, UploadFile, Body, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from typing import Optional
 from pathlib import Path
 import duckdb
 import os
+import json
 import json
 import geopandas as gpd
 import pandas as pd
@@ -92,11 +94,10 @@ def region_geometry(type: str = 'country', id: str = ""):
 fm_router = APIRouter(prefix="/fm-api")
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-STORAGE_ROOT = BASE_DIR / "pipeline-repo" / "userdata" / "files"
+STORAGE_ROOT = Path(os.environ.get("USERDATA_ROOT", "./storage"))
 STORAGE_ROOT.mkdir(parents=True, exist_ok=True)
 
 def resolve(id: str) -> Path:
-    # id comes in like "/New folder" (striping leading slash), keep inside STORAGE_ROOT
     return STORAGE_ROOT / id.lstrip("/")
 
 def to_id(path: Path) -> str:
@@ -105,27 +106,45 @@ def to_id(path: Path) -> str:
 def list_dir(target: Path):
     items = []
     for path in target.glob("*"):
-        items.append({
+        # items.append({
+        #     "id": to_id(path),
+        #     "value": path.name,
+        #     "type": "folder" if path.is_dir() else "file",
+        #     "size": path.stat().st_size if path.is_file() else 0,
+        # })
+
+        is_dir = path.is_dir()
+        item = {
             "id": to_id(path),
             "value": path.name,
-            "type": "folder" if path.is_dir() else "file",
+            "type": "folder" if is_dir else "file",
             "size": path.stat().st_size if path.is_file() else 0,
-        })
+        }
+        # Explicitly tell SVAR to treat folders as lazy-loaded assets
+        if is_dir:
+            item["lazy"] = True
+            
+        items.append(item)
     return items
 
+# loading root files
 @fm_router.get("/files")
 def get_root_files():
     return list_dir(STORAGE_ROOT)
 
+# route for lazy-loaded folders
 @fm_router.get("/files/{id:path}")
 def get_subfolder_files(id: str):
-    target = resolve(id)
+    clean_id = id.lstrip("/")   # strip double slashes
+    target = resolve(clean_id)
     if not target.exists() or not target.is_dir():
         return []
     return list_dir(target)
 
 @fm_router.post("/files/{id:path}")
-def create_item(id: str, body: dict = Body(...)):
+async def create_item(id: str, request: Request):
+    raw = await request.body()
+    body = json.loads(raw)
     name = body.get("name")
     item_type = body.get("type")
     if not name or not item_type:
@@ -135,10 +154,12 @@ def create_item(id: str, body: dict = Body(...)):
         dest.mkdir(parents=True, exist_ok=True)
     else:
         dest.touch(exist_ok=True)
-    return {"id": to_id(dest)}
+    return {"result": {"id": to_id(dest), "name": dest.name, "type": item_type}}
 
 @fm_router.put("/files/{id:path}")
-def rename_item(id: str, body: dict = Body(...)):
+async def rename_item(id: str, request: Request):
+    raw = await request.body()
+    body = json.loads(raw)
     if body.get("operation") != "rename":
         raise HTTPException(400, "Unsupported operation")
     source = resolve(id)
@@ -146,10 +167,12 @@ def rename_item(id: str, body: dict = Body(...)):
         raise HTTPException(404, "Not found")
     new_path = source.parent / body["name"]
     source.rename(new_path)
-    return {"id": to_id(new_path)}
+    return {"result": {"id": to_id(new_path), "name": new_path.name}}
 
 @fm_router.put("/files")
-def move_or_copy(body: dict = Body(...)):
+async def move_or_copy(request: Request):
+    raw = await request.body()
+    body = json.loads(raw)
     operation = body.get("operation")  # "move" or "copy"
     target_dir = resolve(body["target"])
     target_dir.mkdir(parents=True, exist_ok=True)
@@ -165,7 +188,9 @@ def move_or_copy(body: dict = Body(...)):
     return {"result": results}
 
 @fm_router.delete("/files")
-def delete_items(body: dict = Body(...)):
+async def delete_items(request: Request):
+    raw = await request.body()
+    body = json.loads(raw)
     for item_id in body.get("ids", []):
         target = resolve(item_id)
         if target.is_dir():
@@ -175,7 +200,7 @@ def delete_items(body: dict = Body(...)):
     return {"status": "success"}
 
 @fm_router.post("/upload")
-async def upload_file(file: UploadFile = File(...), id: str = Form("/")):
+async def upload_file(file: UploadFile = File(...), id: str = Query("/")):
     dest_folder = resolve(id)
     dest_folder.mkdir(parents=True, exist_ok=True)
     dest_file = dest_folder / file.filename
