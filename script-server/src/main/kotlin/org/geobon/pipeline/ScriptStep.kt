@@ -93,7 +93,8 @@ open class ScriptStep : YMLStep {
                             ?: throw RuntimeException("compute ${Description.COMPUTE__MEMORY} parameter is not formatted as expected. \nExample: 30G \nGot: ${computeSection[Description.COMPUTE__MEMORY]}")
                         val cpus = computeSection[Description.COMPUTE__CPUS] as? Int
                             ?: throw RuntimeException("compute ${Description.COMPUTE__CPUS} parameter should be an int. Got: ${computeSection[Description.COMPUTE__CPUS]}")
-                        ComputeRequirements(mem, cpus)
+                        val memMax = computeSection[Description.COMPUTE__MEMORY_MAX] as? String
+                        ComputeRequirements(mem, cpus, memMax)
                     } else null
 
                     if (computeSection is Map<*, *> && computeSection[Description.COMPUTE__HPC] == true && shouldUseHPC()) {
