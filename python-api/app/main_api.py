@@ -106,13 +106,6 @@ def to_id(path: Path) -> str:
 def list_dir(target: Path):
     items = []
     for path in target.glob("*"):
-        # items.append({
-        #     "id": to_id(path),
-        #     "value": path.name,
-        #     "type": "folder" if path.is_dir() else "file",
-        #     "size": path.stat().st_size if path.is_file() else 0,
-        # })
-
         is_dir = path.is_dir()
         item = {
             "id": to_id(path),
@@ -120,7 +113,7 @@ def list_dir(target: Path):
             "type": "folder" if is_dir else "file",
             "size": path.stat().st_size if path.is_file() else 0,
         }
-        # Explicitly tell SVAR to treat folders as lazy-loaded assets
+        # treat folders as lazy-loaded assets
         if is_dir:
             item["lazy"] = True
             
