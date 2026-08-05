@@ -12,7 +12,8 @@ import shutil
 
 # for file scanning
 import io
-import clamd
+# import clamd
+from clamav_client.clamd import ClamdNetworkSocket
 from fastapi.concurrency import run_in_threadpool
 
 app = FastAPI()
@@ -102,47 +103,45 @@ CLAMAV_PORT = 3310
 
 def _sync_scan(file_bytes: bytes) -> dict:
     """
-    Synchronous helper function that communicates over the network socket.
-    """
-    # Connects via TCP network socket to the clamd daemon
-    cd = clamd.ClamdNetworkSocket(host=CLAMAV_HOST, port=CLAMAV_PORT)
-    # Stream the file bytes to ClamAV over the connection
-    scan_result = cd.instream(io.BytesIO(file_bytes))
+    Synchronous socket scanning executed inside a threadpool worker
+    """    
+    # Uses the type-hinted ClamdNetworkSocket from clamav-client
+    cd = ClamdNetworkSocket(host=CLAMAV_HOST, port=CLAMAV_PORT)
     
-    # ADD THIS PRINT TO YOUR CONSOLE LOGS
+    scan_result = cd.instream(io.BytesIO(file_bytes))
+    # debugging
     print(f"[ClamAV Scanner] Result for upload: {scan_result}", flush=True)
     return scan_result
 
 async def scan_file_buffer(file: UploadFile = File(...)) -> UploadFile:
     """
-    FastAPI dependency that safely moves the synchronous clamd execution 
-    to an external worker threadpool, keeping your API responsive.
+    FastAPI validation dependency. Automatically catches incoming multi-part files,
+    scans them over the docker socket, and rejects threats before saving them.
     """
     try:
-        # 1. Read file bytes into RAM stream
+        # 1. Read file bytes into RAM stream buffer
         file_bytes = await file.read()
         
-        # 2. Run the synchronous clamd task inside FastAPI's threadpool to prevent blocking
+        # 2. Run blocking socket operation safely via worker threadpools
         scan_result = await run_in_threadpool(_sync_scan, file_bytes)
         
-        # 3. Reset the read pointer index so downstream code can read the file
+        # 3. Reset file seeker index back to 0 so downstream shutil code can read it
         await file.seek(0)
         
-        # 4. Check if clamd detected a virus signature match
-        # Expected response structure on infection: {"stream": ("FOUND", "Eicar-Signature")}
+        # 4. Check scan result signature
         if scan_result and "stream" in scan_result:
             status_type, threat_name = scan_result["stream"]
             if status_type == "FOUND":
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Malware detected! File blocked: {threat_name}"
+                    detail=f"Malware detected! File blocked by antivirus: {threat_name}"
                 )
                 
     except HTTPException:
         raise
     except Exception as e:
-        # Fallback security profile (Log the error, reset pointer)
-        print(f"Antivirus service connectivity error: {str(e)}")
+        # Fallback security profile: Log network connection issues gracefully
+        print(f"Antivirus service connectivity down: {str(e)}")
         await file.seek(0)
         
     return file

@@ -39,7 +39,7 @@ services:
   # adding a ClamAV container to scan user uploaded files
   clamav:
     image: clamav/clamav-debian:latest  # '-debian' fixes error : no matching manifest for linux/arm64 
-    container_name: clamav
+    container_name: biab-clamav
     ports:
       - "3310:3310"
     volumes:

@@ -15,8 +15,8 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR /app/
 
-# added python-multipart, and clamd
-RUN uv pip install fastapi "uvicorn[standard]" requests duckdb pandas geopandas pandas_geojson shapely pygadm fiona python-multipart clamd
+# added python-multipart and clamav-client
+RUN uv pip install fastapi "uvicorn[standard]" requests duckdb pandas geopandas pandas_geojson shapely pygadm fiona python-multipart clamav-client
 
 COPY app /app
 
