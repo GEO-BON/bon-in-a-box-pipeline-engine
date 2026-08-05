@@ -96,8 +96,6 @@ def region_geometry(type: str = 'country', id: str = ""):
 
 # backend for file scanning 
 # configure connection clamAV daemon instance
-# CLAMAV_HOST = "localhost"
-# CLAMAV_PORT = 3310
 CLAMAV_HOST = os.environ.get("CLAMAV_HOST", "clamav")
 CLAMAV_PORT = 3310
 
@@ -105,7 +103,6 @@ def _sync_scan(file_bytes: bytes) -> dict:
     """
     Synchronous socket scanning executed inside a threadpool worker
     """    
-    # Uses the type-hinted ClamdNetworkSocket from clamav-client
     cd = ClamdNetworkSocket(host=CLAMAV_HOST, port=CLAMAV_PORT)
     
     scan_result = cd.instream(io.BytesIO(file_bytes))
@@ -119,16 +116,11 @@ async def scan_file_buffer(file: UploadFile = File(...)) -> UploadFile:
     scans them over the docker socket, and rejects threats before saving them.
     """
     try:
-        # 1. Read file bytes into RAM stream buffer
         file_bytes = await file.read()
-        
-        # 2. Run blocking socket operation safely via worker threadpools
         scan_result = await run_in_threadpool(_sync_scan, file_bytes)
         
-        # 3. Reset file seeker index back to 0 so downstream shutil code can read it
         await file.seek(0)
         
-        # 4. Check scan result signature
         if scan_result and "stream" in scan_result:
             status_type, threat_name = scan_result["stream"]
             if status_type == "FOUND":
@@ -140,7 +132,7 @@ async def scan_file_buffer(file: UploadFile = File(...)) -> UploadFile:
     except HTTPException:
         raise
     except Exception as e:
-        # Fallback security profile: Log network connection issues gracefully
+        # log network connection issues
         print(f"Antivirus service connectivity down: {str(e)}")
         await file.seek(0)
         
@@ -190,6 +182,32 @@ def get_subfolder_files(id: str):
         return []
     return list_dir(target)
 
+# endpoint to fetch ALL files (not just root ones)
+def get_file_info(path: Path) -> dict:
+    is_dir = path.is_dir()
+    item = {
+        "id": to_id(path),  # Uses your existing to_id helper to get the leading '/'
+        "value": path.name,
+        "type": "folder" if is_dir else "file",
+        "size": path.stat().st_size if path.is_file() else 0,
+    }
+    # Match your existing logic for subfolders
+    if is_dir:
+        item["lazy"] = True
+        
+    return item
+
+@fm_router.get("/files/all")    # does not work yet
+def get_all_files_flat():
+    all_items = []
+    for path in STORAGE_ROOT.rglob("*"):
+        if any(part.startswith('.') for part in path.parts):
+            continue
+        all_items.append(get_file_info(path))
+        
+    return all_items
+
+# creating a file/folder
 @fm_router.post("/files/{id:path}")
 async def create_item(id: str, request: Request):
     raw = await request.body()
@@ -205,6 +223,7 @@ async def create_item(id: str, request: Request):
         dest.touch(exist_ok=True)
     return {"result": {"id": to_id(dest), "name": dest.name, "type": item_type}}
 
+# renaming a folder
 @fm_router.put("/files/{id:path}")
 async def rename_item(id: str, request: Request):
     raw = await request.body()
@@ -218,6 +237,7 @@ async def rename_item(id: str, request: Request):
     source.rename(new_path)
     return {"result": {"id": to_id(new_path), "name": new_path.name}}
 
+# moving or copying a file
 @fm_router.put("/files")
 async def move_or_copy(request: Request):
     raw = await request.body()
@@ -231,11 +251,12 @@ async def move_or_copy(request: Request):
         dest = target_dir / src.name
         if operation == "move":
             src.rename(dest)
-        else:
+        else:   # operation == "copy"
             (shutil.copytree if src.is_dir() else shutil.copy2)(src, dest)
         results.append({"id": to_id(dest), "name": dest.name})
     return {"result": results}
 
+# deleting a file
 @fm_router.delete("/files")
 async def delete_items(request: Request):
     raw = await request.body()
@@ -248,6 +269,7 @@ async def delete_items(request: Request):
             target.unlink()
     return {"status": "success"}
 
+# uploading a file 
 @fm_router.post("/upload")
 # modified the signature, before it was : `file: UploadFile = File(...)`
 async def upload_file(id: str = Query("/"), file: UploadFile = Depends(scan_file_buffer)):
@@ -258,6 +280,7 @@ async def upload_file(id: str = Query("/"), file: UploadFile = Depends(scan_file
         shutil.copyfileobj(file.file, buffer)
     return {"id": to_id(dest_file), "value": file.filename}
 
+# get total storage used
 @fm_router.get("/info")
 def get_info():
     total, used, free = shutil.disk_usage(STORAGE_ROOT)

@@ -581,6 +581,175 @@ paths:
                 format: binary
         "404":
           description: Region ID not found
+  /fm-api/files:
+    get:
+      summary: Returns the list of root files and folders uploaded by the user.
+      operationId: getRootItems
+      responses:
+        "200":
+          description: Array with list of root files and folders.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - value
+                  - type
+                  - size
+                  example:
+                    {
+                      "id": "/test.txt",
+                      "value": "test.txt",
+                      "type": "file",
+                      "size": 0
+                    }
+  /fm-api/files/{id:path}:
+    get:
+      summary: Returns the list of files and folders uploaded by the user under a specific subfolder.
+      operationId: getSubfolderItems
+      responses:
+        "200":
+          description: Array with list of files and folders under a specific subfolder.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - value
+                  - type
+                  - size
+                  example:
+                    {
+                      "id": "/test.txt",
+                      "value": "test.txt",
+                      "type": "file",
+                      "size": 0
+                    }
+  /fm-api/files/{id}:
+    post:
+      summary: Creates a file or folder.
+      operationId: createItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The parent folder path where the new item will be created.
+          schema:
+            type: string
+            example: "file1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - type
+              properties:
+                name:
+                  type: string
+                  description: The name of the new file or folder.
+                  example: "new.txt"
+                type:
+                  type: string
+                  enum: [file, folder]
+                  description: The type of item to create.
+                  example: "file"
+      responses:
+        "200":
+          description: Item successfully created. Returns the metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    required:
+                      - id
+                      - name
+                      - type
+                    properties:
+                      id:
+                        type: string
+                        example: "/file1/new_document.txt"
+                      name:
+                        type: string
+                        example: "new_document.txt"
+                      type:
+                        type: string
+                        enum: [file, folder]
+                        example: "file"
+        "400":
+          description: Missing type or name parameters.
+  /fm-api/files/{id}:
+    put:
+      summary: Renames a file or folder.
+      operationId: renameItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The current path/id of the file or folder that is being renamed.
+          schema:
+            type: string
+            example: "old_name.txt"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - operation
+                - name
+              properties:
+                operation:
+                  type: string
+                  enum: [rename]
+                  description: The action to perform. Must be set to 'rename'.
+                  example: "rename"
+                name:
+                  type: string
+                  description: The new name for the file or folder (including its extension).
+                  example: "new_name.txt"
+      responses:
+        "200":
+          description: Item successfully renamed. Returns the updated metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    required:
+                      - id
+                      - name
+                    properties:
+                      id:
+                        type: string
+                        example: "new_name.txt"
+                      name:
+                        type: string
+                        example: "new_name.txt"
+        "400":
+          description: Unsupported operation.
+        "404":
+          description: The file or folder with that ID could not be found.
+  /fm-api/files:
+    put:
+      summary: Moves or copies a file.
+      operationId: moveCopyItem
+      parameters:
+
 components:
   parameters:
     stepType:

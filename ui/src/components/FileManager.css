@@ -9,6 +9,20 @@
     --wx-font-family: "Montserrat", sans-serif;
 }
 
+/* menu for adding/creating files/folders */
+.wx-menu.wx-XMmAGqVx {
+    background-color: var(--dark-green);
+}
+
+.wx-option.wx-cDCz9rZQ {
+    background-color: inherit;
+}
+
+.wx-option.wx-cDCz9rZQ:hover {
+    background: #476c61;
+}
+
+/* background */
 .wx-text.wx-lUZMtgT1 {
     font-family: "Montserrat", sans-serif;
     background-color: var(--dark-blue);
