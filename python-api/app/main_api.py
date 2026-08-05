@@ -1,7 +1,6 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Response, File, Form, UploadFile, Body, Query, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Response, File, UploadFile, Query, Request, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
-from typing import Optional
 from pathlib import Path
 import duckdb
 import os
@@ -10,6 +9,11 @@ import json
 import geopandas as gpd
 import pandas as pd
 import shutil
+
+# for file scanning
+import io
+import clamd
+from fastapi.concurrency import run_in_threadpool
 
 app = FastAPI()
 
@@ -89,6 +93,59 @@ def region_geometry(type: str = 'country', id: str = ""):
     gdf.to_file(file_path, driver='GPKG', layer='country_region', overwrite=True)
     return FileResponse(file_path, media_type="application/geopackage+sqlite3", filename="%s.gpkg" % fname)
 
+# backend for file scanning 
+# configure connection clamAV daemon instance
+# CLAMAV_HOST = "localhost"
+# CLAMAV_PORT = 3310
+CLAMAV_HOST = os.environ.get("CLAMAV_HOST", "clamav")
+CLAMAV_PORT = 3310
+
+def _sync_scan(file_bytes: bytes) -> dict:
+    """
+    Synchronous helper function that communicates over the network socket.
+    """
+    # Connects via TCP network socket to the clamd daemon
+    cd = clamd.ClamdNetworkSocket(host=CLAMAV_HOST, port=CLAMAV_PORT)
+    # Stream the file bytes to ClamAV over the connection
+    scan_result = cd.instream(io.BytesIO(file_bytes))
+    
+    # ADD THIS PRINT TO YOUR CONSOLE LOGS
+    print(f"[ClamAV Scanner] Result for upload: {scan_result}", flush=True)
+    return scan_result
+
+async def scan_file_buffer(file: UploadFile = File(...)) -> UploadFile:
+    """
+    FastAPI dependency that safely moves the synchronous clamd execution 
+    to an external worker threadpool, keeping your API responsive.
+    """
+    try:
+        # 1. Read file bytes into RAM stream
+        file_bytes = await file.read()
+        
+        # 2. Run the synchronous clamd task inside FastAPI's threadpool to prevent blocking
+        scan_result = await run_in_threadpool(_sync_scan, file_bytes)
+        
+        # 3. Reset the read pointer index so downstream code can read the file
+        await file.seek(0)
+        
+        # 4. Check if clamd detected a virus signature match
+        # Expected response structure on infection: {"stream": ("FOUND", "Eicar-Signature")}
+        if scan_result and "stream" in scan_result:
+            status_type, threat_name = scan_result["stream"]
+            if status_type == "FOUND":
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Malware detected! File blocked: {threat_name}"
+                )
+                
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Fallback security profile (Log the error, reset pointer)
+        print(f"Antivirus service connectivity error: {str(e)}")
+        await file.seek(0)
+        
+    return file
 
 # backend for file uploads
 fm_router = APIRouter(prefix="/fm-api")
@@ -193,7 +250,8 @@ async def delete_items(request: Request):
     return {"status": "success"}
 
 @fm_router.post("/upload")
-async def upload_file(file: UploadFile = File(...), id: str = Query("/")):
+# modified the signature, before it was : `file: UploadFile = File(...)`
+async def upload_file(id: str = Query("/"), file: UploadFile = Depends(scan_file_buffer)):
     dest_folder = resolve(id)
     dest_folder.mkdir(parents=True, exist_ok=True)
     dest_file = dest_folder / file.filename

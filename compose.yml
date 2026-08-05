@@ -36,6 +36,16 @@ services:
       - hpc_known_hosts_file
       - hpc_ssh_config_file
 
+  # adding a ClamAV container to scan user uploaded files
+  clamav:
+    image: clamav/clamav-debian:latest  # '-debian' fixes error : no matching manifest for linux/arm64 
+    container_name: clamav
+    ports:
+      - "3310:3310"
+    volumes:
+      - clamav_data:/var/lib/clamav
+    restart: unless-stopped
+
   python-api: # Serves Titiler and a FastAPI app to serve country and region names and geometries
     container_name: biab-python-api
     volumes:
@@ -53,6 +63,8 @@ services:
       - "8001"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    depends_on: 
+      - clamav  # added so that ClamAV is running before the python-api
 
   runner-conda:
     container_name: biab-runner-conda
@@ -104,3 +116,7 @@ secrets:
     file: $HPC_KNOWN_HOSTS_FILE
   hpc_ssh_config_file:
     file: $HPC_SSH_CONFIG_FILE
+
+# added this to prevent downloading large files every time docker restarts
+volumes:
+  clamav_data:
