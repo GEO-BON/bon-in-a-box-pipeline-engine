@@ -10,6 +10,8 @@ servers:
 tags:
   - name: placeholder
     description: We could use tags
+  - name: File manager
+    description: Functionalities added to handle the user's file management system.
 paths:
   /{type}/list:
     get:
@@ -584,6 +586,8 @@ paths:
   /fm-api/files:
     get:
       summary: Returns the list of root files and folders uploaded by the user.
+      tags: 
+        - File manager
       operationId: getRootItems
       responses:
         "200":
@@ -615,6 +619,8 @@ paths:
                     size: 0
     put:
       summary: Moves or copies one or multiple files/folders.
+      tags: 
+        - File manager
       operationId: moveCopyItem
       requestBody: 
         required: true
@@ -666,6 +672,8 @@ paths:
                           example: "file1.txt"
     delete: 
       summary: Deletes a file or folder.
+      tags: 
+        - File manager
       operationId: deleteItem
       requestBody: 
         required: true
@@ -699,6 +707,8 @@ paths:
   /fm-api/files/all: 
     get: 
       summary: Returns the list of all files uploaded by the user.
+      tags: 
+        - File manager
       operationId: getAllFiles 
       responses: 
         "200": 
@@ -732,6 +742,8 @@ paths:
   /fm-api/files/{id}:
     get:
       summary: Returns the list of files and folders uploaded by the user under a specific subfolder.
+      tags: 
+        - File manager
       operationId: getSubfolderItems
       parameters:
         - name: id
@@ -764,6 +776,8 @@ paths:
                     }
     post:
       summary: Creates a file or folder.
+      tags: 
+        - File manager
       operationId: createItem
       parameters:
         - name: id
@@ -821,6 +835,8 @@ paths:
           description: Missing type or name parameters.
     put:
       summary: Renames a file or folder.
+      tags: 
+        - File manager
       operationId: renameItem
       parameters:
         - name: id
@@ -877,6 +893,8 @@ paths:
   /fm-api/upload:
     post: 
       summary: Uploads a file to the user's profile.
+      tags: 
+        - File manager
       operationId: uploadFile
       parameters:
         - name: id
@@ -921,6 +939,8 @@ paths:
   /fm-api/info:
     get:
       summary: Gets the total, used, and free storage.
+      tags: 
+        - File manager
       operationId: getFileStorage
       responses:
         "200":
