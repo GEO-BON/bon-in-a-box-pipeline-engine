@@ -104,7 +104,6 @@ def _sync_scan(file_bytes: bytes) -> dict:
     Synchronous socket scanning executed inside a threadpool worker
     """    
     cd = ClamdNetworkSocket(host=CLAMAV_HOST, port=CLAMAV_PORT)
-    
     scan_result = cd.instream(io.BytesIO(file_bytes))
     # debugging
     print(f"[ClamAV Scanner] Result for upload: {scan_result}", flush=True)
@@ -118,9 +117,7 @@ async def scan_file_buffer(file: UploadFile = File(...)) -> UploadFile:
     try:
         file_bytes = await file.read()
         scan_result = await run_in_threadpool(_sync_scan, file_bytes)
-        
         await file.seek(0)
-        
         if scan_result and "stream" in scan_result:
             status_type, threat_name = scan_result["stream"]
             if status_type == "FOUND":
@@ -128,14 +125,12 @@ async def scan_file_buffer(file: UploadFile = File(...)) -> UploadFile:
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=f"Malware detected! File blocked by antivirus: {threat_name}"
                 )
-                
     except HTTPException:
         raise
     except Exception as e:
         # log network connection issues
         print(f"Antivirus service connectivity down: {str(e)}")
         await file.seek(0)
-        
     return file
 
 # backend for file uploads
@@ -173,39 +168,35 @@ def list_dir(target: Path):
 def get_root_files():
     return list_dir(STORAGE_ROOT)
 
-# route for lazy-loaded folders
-@fm_router.get("/files/{id:path}")
-def get_subfolder_files(id: str):
-    clean_id = id.lstrip("/")   # strip double slashes
-    target = resolve(clean_id)
-    if not target.exists() or not target.is_dir():
-        return []
-    return list_dir(target)
-
 # endpoint to fetch ALL files (not just root ones)
 def get_file_info(path: Path) -> dict:
     is_dir = path.is_dir()
     item = {
-        "id": to_id(path),  # Uses your existing to_id helper to get the leading '/'
+        "id": to_id(path),
         "value": path.name,
         "type": "folder" if is_dir else "file",
         "size": path.stat().st_size if path.is_file() else 0,
     }
-    # Match your existing logic for subfolders
     if is_dir:
         item["lazy"] = True
-        
     return item
 
-@fm_router.get("/files/all")    # does not work yet
-def get_all_files_flat():
-    all_items = []
+@fm_router.get("/files/all")
+def get_all_files():
+    items = []
     for path in STORAGE_ROOT.rglob("*"):
-        if any(part.startswith('.') for part in path.parts):
-            continue
-        all_items.append(get_file_info(path))
-        
-    return all_items
+        if path.is_file() : 
+            items.append(get_file_info(path))
+    return items
+
+# method for lazy-loaded folders
+@fm_router.get("/files/{id:path}")
+def get_subfolder_files(id: str):
+    clean_id = id.lstrip("/")   # stripping double slashes
+    target = resolve(clean_id)
+    if not target.exists() or not target.is_dir():
+        return []
+    return list_dir(target)
 
 # creating a file/folder
 @fm_router.post("/files/{id:path}")
@@ -215,7 +206,7 @@ async def create_item(id: str, request: Request):
     name = body.get("name")
     item_type = body.get("type")
     if not name or not item_type:
-        raise HTTPException(400, "'type' and 'name' parameters must be provided")
+        raise HTTPException(400, "'type' and 'name' parameters must be provided.")
     dest = resolve(id) / name
     if item_type == "folder":
         dest.mkdir(parents=True, exist_ok=True)
