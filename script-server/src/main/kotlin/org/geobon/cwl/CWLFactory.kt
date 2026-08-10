@@ -10,17 +10,7 @@ import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_FLOAT
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_INT
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_LONG
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
-import org.geobon.pipeline.ConstantPipe
-import org.geobon.pipeline.IOId
-import org.geobon.pipeline.IStep
-import org.geobon.pipeline.ObjectInputDefinition
-import org.geobon.pipeline.Output
-import org.geobon.pipeline.Pipe
-import org.geobon.pipeline.Pipeline
-import org.geobon.pipeline.ScriptStep
-import org.geobon.pipeline.UserInput
-import org.geobon.pipeline.YMLStep
-import org.geobon.pipeline.metadata.CondaMetadata
+import org.geobon.pipeline.*
 import org.geobon.pipeline.metadata.IOMetadata
 import org.geobon.pipeline.metadata.StepMetadata
 import org.geobon.script.Description.IO__TYPE_OPTIONS
@@ -29,7 +19,6 @@ import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.yaml.snakeyaml.Yaml
 import java.io.File
-import kotlin.text.replaceIndent
 
 class CWLFactory {
     companion object {
@@ -129,7 +118,7 @@ class CWLFactory {
                         append("\n${indent(4)}- $it")
                     }
                 }
-            } else " $typeName"
+            } else " $typeName${if (isInput) "?" else ""}"
 
             return buildString {
                 appendLine(1, "$key:")

@@ -181,7 +181,7 @@ inputs:
           - 86.46
 
   spatial_res:
-    type: float
+    type: float?
     label: Spatial resolution
     doc: Integer, spatial resolution of the rasters
     default: 1000.0

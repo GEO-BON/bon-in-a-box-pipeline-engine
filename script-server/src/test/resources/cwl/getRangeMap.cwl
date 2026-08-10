@@ -128,7 +128,7 @@ inputs:
   # Script inputs #
   #################
   species:
-    type: string[]
+    type: string[]?
     label: species
     doc: Scientific name of the species. Multiple species names can be specified, separated with a comma.
     default:

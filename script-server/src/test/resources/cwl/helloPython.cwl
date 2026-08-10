@@ -113,7 +113,7 @@ inputs:
   # Script inputs #
   #################
   some_int:
-    type: int
+    type: int?
     label: Some int
     doc: A number that we will increment
     default: 3

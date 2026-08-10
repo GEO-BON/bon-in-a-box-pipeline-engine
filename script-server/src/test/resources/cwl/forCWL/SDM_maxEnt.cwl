@@ -43,23 +43,23 @@ inputs:
   # Script inputs #
   #################
   forCWL>SDM_maxEnt>data>loadFromStac.yml@144|temporal_res:
-    type: string
+    type: string?
     label: Temporal resolution
     doc: Temporal resolution to use when querying STAC items by date, in the format ("P", time interval, and time unit, e.g. "P1Y" is yearly, "P1M" is montly, and "P1D" is daily). Leave blank if not querying by date. If the temporal resolution is coarser than the temporal resolution of the time series, the layers will be aggregated with the aggregation method chosen below.
 
   forCWL>SDM_maxEnt>data>loadFromStac.yml@144|study_area:
-    type: File
+    type: File?
     label: Study area
     doc: Polygon of study area used to mask output layers, in geopackage format.
 
   forCWL>SDM_maxEnt>SDM>selectBackground.yml@40|n_background:
-    type: int
+    type: int?
     label: Number of background points
     doc: number of background points
     default: 10000
 
   pipeline@121:
-    type: string[]
+    type: string[]?
     label: Taxa list
     doc: Array of taxa
     default:
@@ -94,19 +94,19 @@ inputs:
     default: block
 
   forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|max_year:
-    type: int
+    type: int?
     label: Maximum year
     doc: Max year observations wanted
     default: 2024
 
   forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|min_year:
-    type: int
+    type: int?
     label: Minimum year
     doc: Min year observations wanted
     default: 2010
 
   forCWL>SDM_maxEnt>data>loadFromStac.yml@144|collections_items:
-    type: string[]
+    type: string[]?
     label: STAC collection items
     doc: Vector of strings. To pull specific collection items, input the collection name followed by '|' followed by item id (e.g. "chelsa-clim|bio1"). To extract a whole collection, type the collection name only (e.g. "chelsa-clim"). To pull collection items by date, write the collection name and provide a start date, end date, and temporal resolution. If pulling a layer that is tiled (e.g. https://stac.geobon.org/viewer/gfw-lossyear/_80N_180W), enter the collection name (e.g. gfw-lossyear), bounding box and time range if the layer is a time series, and the script will assemble the tiles into a continuous layer automatically.)
     default:
@@ -114,13 +114,13 @@ inputs:
     - chelsa-clim|bio2
 
   pipeline@128:
-    type: float
+    type: float?
     label: spatial resolution
     doc: Integer, spatial resolution of the rasters
     default: 1000
 
   forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|fc:
-    type: string[]
+    type: string[]?
     label: feature classes
     doc: Vector of strings, feature classes for MaxEnt algorithm. Accepted values are combinations of L (linear), Q (quadratic), P (product), H (hinge) or T (threshold).
     default:
@@ -129,7 +129,7 @@ inputs:
     - LQHP
 
   forCWL>SDM_maxEnt>data>loadFromStac.yml@144|t1:
-    type: string
+    type: string?
     label: End date
     doc: End date for time series layers. Can be in the format YYYY or YYYY-MM-DD. Leave blank if extracting items by name.
 
@@ -146,7 +146,7 @@ inputs:
     default: random
 
   forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|rm:
-    type: float[]
+    type: float[]?
     label: regularization multiplier
     doc: Vector of numbers, regularization multipliers for MaxEnt algorithm.
     default:
@@ -155,12 +155,12 @@ inputs:
     - 2
 
   forCWL>SDM_maxEnt>data>loadFromStac.yml@144|t0:
-    type: string
+    type: string?
     label: Start date
     doc: Start date for time series layers. Can be in the format YYYY or YYYY-MM-DD. Leave blank if extracting items by name or to extract layers from all available dates.
 
   forCWL>SDM_maxEnt>data>loadFromStac.yml@144|stac_url:
-    type: string
+    type: string?
     label: STAC URL
     doc: URL of the STAC catalog.
     default: https://stac.geobon.org/
@@ -195,7 +195,7 @@ inputs:
         type: float[]
 
   pipeline@46:
-    type: int
+    type: int?
     label: number of runs
     doc: number of runs (in bootstrap or crossvalidation method)
     default: 2

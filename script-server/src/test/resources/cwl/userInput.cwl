@@ -26,7 +26,7 @@ inputs:
   # Script inputs #
   #################
   pipeline@1:
-    type: int
+    type: int?
     label: Some int
     doc: A number that we will increment
     default: 3
