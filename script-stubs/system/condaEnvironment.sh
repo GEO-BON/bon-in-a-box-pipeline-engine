@@ -185,18 +185,22 @@ function useLocalPack {
             echo "    Already unpacked."
         else
             # Unpack
-            echo "Unpacking conda-pack environment at $condaPackZip"
+            echo "Unpacking conda-pack environment at $condaPackZip..."
+            echo "    Extracting archive..."
             rm -rf $condaPackExtracted
             mkdir -p $condaPackExtracted || return 1
             tar -xf $condaPackZip -C $condaPackExtracted --use-compress-program=pigz || return 1
+
+            echo "    Unpacking..."
+            mamba activate base || return 1
+            $condaPackExtracted/bin/conda-unpack || return 1
+            mamba deactivate # base    
+
             echo "    Done."
         fi
 
         # Activate
         echo "Activating extracted environment from $condaPackExtracted..."
-        mamba activate base || return 1
-        $condaPackExtracted/bin/conda-unpack || return 1
-        mamba deactivate # base
         source $condaPackExtracted/bin/activate || return 1
 
         echo "    Done."
