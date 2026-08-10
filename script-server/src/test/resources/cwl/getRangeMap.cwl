@@ -105,11 +105,10 @@ arguments:
     cat $OUTPUT_LOCATION/input.json | tee -a $log
 
     source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "forCWL__getRangeMap" \
-      "
-        channels: [conda-forge, r]
-        dependencies: [r-rjson, r-dplyr, r-tidyr, r-purrr, r-sf, r-stringr]
-        name: forCWL__getRangeMap
-      " /conda-envs $(inputs.condaPackURL) >> "$log" 2>&1
+    "channels: [conda-forge, r]
+    dependencies: [r-rjson, r-dplyr, r-tidyr, r-purrr, r-sf, r-stringr]
+    name: forCWL__getRangeMap
+    " /conda-envs $(inputs.condaPackURL) >> "$log" 2>&1
 
     Rscript \
       $SCRIPT_STUBS_LOCATION/system/scriptWrapper.R \

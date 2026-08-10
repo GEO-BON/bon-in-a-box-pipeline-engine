@@ -25,13 +25,9 @@ class CWLFactory {
 
         fun toCommandLineTool(step: ScriptStep): String {
 
-            var condaEnvYml = step.condaEnvYml
-            if (condaEnvYml == null) {
-                condaEnvYml = ""
-            } else { // Add indent and quotes
-                condaEnvYml = condaEnvYml.trim().prependIndent(indent(4))
-                condaEnvYml = "\n$condaEnvYml\n${indent(3)}"
-            }
+            // Indent all lines except first
+            val condaEnvYml = step.condaEnvYml?.prependIndent(indent(2))?.trimStart()
+                ?: ""
 
             val replacements = mapOf<String, String>(
                 "scriptPath" to step.scriptFile.relativeTo(scriptsRoot).path,

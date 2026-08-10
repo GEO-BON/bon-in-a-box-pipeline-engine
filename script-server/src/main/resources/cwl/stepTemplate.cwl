@@ -87,7 +87,7 @@ arguments:
     cat $OUTPUT_LOCATION/input.json | tee -a $log
 
     source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "{{condaEnvName}}" \
-      "{{condaEnvYml}}" /conda-envs $(inputs.condaPackURL) >> "$log" 2>&1
+    "{{condaEnvYml}}" /conda-envs $(inputs.condaPackURL) >> "$log" 2>&1
 
     {{program}} \
       $SCRIPT_STUBS_LOCATION/system/{{scriptWrapper}} \
