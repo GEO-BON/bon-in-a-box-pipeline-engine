@@ -70,6 +70,7 @@ class CWLFactory {
                 "stepDependencies" to
                         pipeline.steps.mapNotNull { (_, step) -> (step as? YMLStep)?.metadata?.conda }
                             .distinctBy { it.name }
+                            .filter { it.name != "rbase" && it.name != "pythonbase" }
                             .joinToString("\n\n") { condaMetadata ->
                                 """bash -c 'exportEnv "${condaMetadata.name}" "${condaMetadata.yml ?: ""}"'"""
                             }

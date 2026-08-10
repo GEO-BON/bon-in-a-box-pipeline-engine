@@ -324,8 +324,6 @@ steps:
           name: forCWL__SDM_maxEnt__SDM__removeCollinearity
           "'
           
-          bash -c 'exportEnv "rbase" ""'
-          
           bash -c 'exportEnv "forCWL__SDM_maxEnt__SDM__runMaxent" "channels: [conda-forge, r]
           dependencies: [libgdal, r-abind, r-base, r-curl, r-dismo, r-downloader, r-dplyr, r-enmeval=2.0.3,
             r-ecospat, r-essentials, r-geojsonsf, r-ggsci, r-jpeg, r-landscapemetrics, r-magrittr,

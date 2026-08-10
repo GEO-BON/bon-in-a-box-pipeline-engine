@@ -129,7 +129,7 @@ steps:
           }
           export -f exportEnv
           
-          bash -c 'exportEnv "pythonbase" ""'
+
           
       inputs:
         envFolderWrite:
