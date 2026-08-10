@@ -22,11 +22,13 @@ class CWLFactoryTest {
 
     private val hasRunner = SystemCall().run(listOf("which", "cwl-runner")).success
 
-    private var resultFile: File? = null
+    private var cwlFile: File? = null
+    private var templateFile: File? = null
 
     @AfterTest
     fun cleanup() {
-        resultFile?.delete()
+        cwlFile?.delete()
+        templateFile?.delete()
         pathToSteps.deleteRecursively()
     }
 
@@ -82,8 +84,8 @@ class CWLFactoryTest {
                 timeoutAmount = 10
             )
             assertTrue(validationResult.success, "Make template failed")
-            File(cwlFile.parentFile.absolutePath, "${cwlFile.nameWithoutExtension}_template.yml")
-                .writeText(validationResult.output)
+            templateFile = File(cwlFile.parentFile.absolutePath, "${cwlFile.nameWithoutExtension}_template.yml")
+                .apply { writeText(validationResult.output) }
         }
     }
 
@@ -92,7 +94,7 @@ class CWLFactoryTest {
         val step = ScriptStep(noHPCContext, yamlFile, StepId("step", "0"))
         val result = toCommandLineTool(step)
 
-        resultFile = File(cwlResources, "${stepName}_gen.cwl").also { resultFile ->
+        cwlFile = File(cwlResources, "${stepName}_gen.cwl").also { resultFile ->
             resultFile.writeText(result)
             validateCWL(resultFile)
         }
@@ -109,7 +111,7 @@ class CWLFactoryTest {
             null
         )
 
-        resultFile = File(cwlResources, "${pipelineToTest}_gen.cwl").also { resultFile ->
+        cwlFile = File(cwlResources, "${pipelineToTest}_gen.cwl").also { resultFile ->
             toWorkflow(
                 pipeline,
                 resultFile,
