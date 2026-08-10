@@ -1,5 +1,6 @@
 package org.geobon.cwl
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -103,7 +104,7 @@ object CWLExportMain {
                 if (file.isDirectory) {
                     exportAllFiles(destinationRoot, file, type)
                 } else if (file.extension == extension) {
-                    launch {
+                    launch(Dispatchers.IO) {
                         val destinationFile = File(destinationFolder, "${file.nameWithoutExtension}.cwl")
                         try {
                             val exportDuration = measureTime {
