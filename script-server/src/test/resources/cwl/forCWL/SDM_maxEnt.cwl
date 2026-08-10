@@ -367,7 +367,7 @@ steps:
     out: [envFolder]
 
   forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34:
-    run: ../commandLineTools/cleanCoordinates.cwl
+    run: ../commandLineTools/forCWL/SDM_maxEnt/filtering/cleanCoordinates.cwl
     in:
       presence: forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142/observations_file
       predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected
@@ -386,7 +386,7 @@ steps:
 
 
   forCWL>SDM_maxEnt>SDM>selectBackground.yml@40:
-    run: ../commandLineTools/selectBackground.cwl
+    run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/selectBackground.cwl
     in:
       presence: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence
       extent: forCWL>SDM_maxEnt>SDM>studyExtent.yml@104/study_extent
@@ -407,7 +407,7 @@ steps:
 
 
   forCWL>SDM_maxEnt>SDM>setupDataSdm.yml@44:
-    run: ../commandLineTools/setupDataSdm.cwl
+    run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/setupDataSdm.cwl
     in:
       presence: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence
       background: forCWL>SDM_maxEnt>SDM>selectBackground.yml@40/background
@@ -429,7 +429,7 @@ steps:
 
 
   forCWL>SDM_maxEnt>SDM>rangePredictions.yml@68:
-    run: ../commandLineTools/rangePredictions.cwl
+    run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/rangePredictions.cwl
     in:
       predictions: forCWL>SDM_maxEnt>SDM>runMaxent.yml@108/sdm_runs
       envFolder: prepareEnvironments/envFolder
@@ -445,7 +445,7 @@ steps:
 
 
   forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97:
-    run: ../commandLineTools/removeCollinearity.cwl
+    run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/removeCollinearity.cwl
     in:
       rasters: forCWL>SDM_maxEnt>data>loadFromStac.yml@144/rasters
       method: { default: vif.cor }
@@ -466,7 +466,7 @@ steps:
 
 
   forCWL>SDM_maxEnt>SDM>studyExtent.yml@104:
-    run: ../commandLineTools/studyExtent.cwl
+    run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/studyExtent.cwl
     in:
       presence: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence
       bbox_crs: pipeline@140
@@ -485,7 +485,7 @@ steps:
 
 
   forCWL>SDM_maxEnt>SDM>runMaxent.yml@108:
-    run: ../commandLineTools/runMaxent.cwl
+    run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/runMaxent.cwl
     in:
       presence_background: forCWL>SDM_maxEnt>SDM>setupDataSdm.yml@44/presence_background
       predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected
@@ -509,7 +509,7 @@ steps:
 
 
   forCWL>SDM_maxEnt>data>GBIFHeatmapFromSTAC.yml@139:
-    run: ../commandLineTools/GBIFHeatmapFromSTAC.cwl
+    run: ../commandLineTools/forCWL/SDM_maxEnt/data/GBIFHeatmapFromSTAC.cwl
     in:
       taxa: forCWL>SDM_maxEnt>data>GBIFHeatmapFromSTAC.yml@139|taxa
       bbox_crs: pipeline@140
@@ -527,7 +527,7 @@ steps:
 
 
   forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142:
-    run: ../commandLineTools/getGBIFObservations.cwl
+    run: ../commandLineTools/forCWL/SDM_maxEnt/data/getGBIFObservations/getGBIFObservations.cwl
     in:
       taxa: pipeline@121
       bbox_crs: pipeline@140
@@ -546,7 +546,7 @@ steps:
 
 
   forCWL>SDM_maxEnt>data>loadFromStac.yml@144:
-    run: ../commandLineTools/loadFromStac.cwl
+    run: ../commandLineTools/forCWL/SDM_maxEnt/data/loadFromStac.cwl
     in:
       bbox_crs: pipeline@140
       stac_url: forCWL>SDM_maxEnt>data>loadFromStac.yml@144|stac_url

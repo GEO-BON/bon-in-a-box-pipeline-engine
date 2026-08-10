@@ -310,11 +310,14 @@ class CWLFactory {
             return buildString {
                 val run: String = when (step) {
                     is ScriptStep -> {
-                        val stepFile = File(commandLineToolsDir, step.yamlFile.nameWithoutExtension + ".cwl")
-                        if (stepFile.createNewFile()) { // early file creation to "reserve the spot"
-                            stepFile.writeText(toCommandLineTool(step))
+                        val exportFolder = File(commandLineToolsDir, step.yamlFile.parentFile.relativeTo(scriptsRoot).path)
+                        exportFolder.mkdirs()
+
+                        val exportFile = File(exportFolder, step.yamlFile.nameWithoutExtension + ".cwl")
+                        if (exportFile.createNewFile()) { // early file creation to "reserve the spot"
+                            exportFile.writeText(toCommandLineTool(step))
                         }
-                        stepFile.relativeTo(targetDir).path
+                        exportFile.relativeTo(targetDir).path
                     }
 
                     is UserInput -> return null

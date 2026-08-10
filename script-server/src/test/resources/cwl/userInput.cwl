@@ -153,7 +153,7 @@ steps:
     out: [envFolder]
 
   helloWorld>helloPython.yml@0:
-    run: commandLineTools/helloPython.cwl
+    run: commandLineTools/helloWorld/helloPython.cwl
     in:
       some_int: pipeline@1
       envFolder: prepareEnvironments/envFolder
@@ -169,7 +169,7 @@ steps:
 
 
   helloWorld>helloPython.yml@2:
-    run: commandLineTools/helloPython.cwl
+    run: commandLineTools/helloWorld/helloPython.cwl
     in:
       some_int: pipeline@1
       envFolder: prepareEnvironments/envFolder
@@ -185,7 +185,7 @@ steps:
 
 
   helloWorld>helloPython.yml@5:
-    run: commandLineTools/helloPython.cwl
+    run: commandLineTools/helloWorld/helloPython.cwl
     in:
       some_int: helloWorld>helloPython.yml@0/increment
       envFolder: prepareEnvironments/envFolder

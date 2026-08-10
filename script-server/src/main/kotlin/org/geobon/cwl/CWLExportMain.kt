@@ -53,10 +53,11 @@ object CWLExportMain {
             logger.error("Could not create destination folder $destinationRoot.")
             exitProcess(1)
         }
-        toolsRoot= File(destinationRoot, "tools")
+        toolsRoot = File(destinationRoot, "tools")
+        val workflowsRoot = File(destinationRoot, "workflows")
         runBlocking {
-            exportAllFiles(destinationRoot, scriptsRoot, "script")
-            exportAllFiles(destinationRoot, pipelinesRoot, "pipeline")
+            exportAllFiles(toolsRoot, scriptsRoot, "script")
+            exportAllFiles(workflowsRoot, pipelinesRoot, "pipeline")
         }
 
         if (cwlRunnerAvailable) {
