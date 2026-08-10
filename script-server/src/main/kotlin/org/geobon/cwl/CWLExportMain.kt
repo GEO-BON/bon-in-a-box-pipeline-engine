@@ -6,7 +6,6 @@ import kotlinx.coroutines.runBlocking
 import org.geobon.pipeline.JSONPipeline
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
-import org.geobon.pipeline.YMLStep
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
@@ -24,7 +23,12 @@ object CWLExportMain {
 
     @Volatile
     var scriptFailures = 0
+    @Volatile
+    var scriptsFound = 0
+    @Volatile
     var pipelineFailures = 0
+    @Volatile
+    var pipelinesFound = 0
     lateinit var destinationRoot: File
     lateinit var toolsRoot: File
 
@@ -51,18 +55,18 @@ object CWLExportMain {
         }
         toolsRoot= File(destinationRoot, "tools")
         runBlocking {
-            scriptFailures = 0
             exportAllFiles(destinationRoot, scriptsRoot, "script")
-
-            pipelineFailures = 0
             exportAllFiles(destinationRoot, pipelinesRoot, "pipeline")
         }
 
         if (cwlRunnerAvailable) {
             if (scriptFailures == 0 && pipelineFailures == 0) {
                 logger.info("There were no failures!")
+                logger.info("Exported $scriptsFound scripts and $pipelinesFound pipelines.")
             } else {
                 logger.warn("There were $scriptFailures script failures and $pipelineFailures pipeline failures in CommandLineTool validation.")
+                logger.info("Valid scripts: ${scriptsFound - scriptFailures}/$scriptsFound.")
+                logger.info("Valid pipelines: ${pipelinesFound - pipelineFailures}/$pipelinesFound.")
             }
         } else {
             logger.warn("""Could not validate CWL. Make sure "cwl-runner" is installed.""")
@@ -104,11 +108,13 @@ object CWLExportMain {
                             val exportDuration = measureTime {
                                 when (type) {
                                     "script" -> {
+                                        scriptsFound++
                                         destinationFile.writeText(CWLFactory.toCommandLineTool(
                                             ScriptStep(serverContext, file, StepId(file.nameWithoutExtension, "0"))
                                         ))
                                     }
                                     "pipeline" -> {
+                                        pipelinesFound++
                                         CWLFactory.toWorkflow(
                                             JSONPipeline.createFromFile(
                                                 serverContext, StepId(file.nameWithoutExtension, "0"), file.relativeTo(root).path),
