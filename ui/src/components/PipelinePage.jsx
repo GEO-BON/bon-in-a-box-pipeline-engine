@@ -270,7 +270,7 @@ export function PipelinePage({ runType }) {
       // scrolling immediately targets a position that's stale by the time
       // those animations finish. Wait for the section's position to settle
       // before scrolling to it.
-      let rafId;
+      let frameRequestId; // valid for a single frame
       let lastTop = null;
       let stableFrames = 0;
       const waitForStableLayout = () => {
@@ -281,15 +281,16 @@ export function PipelinePage({ runType }) {
           stableFrames = 0;
           lastTop = top;
         }
+        
         if (stableFrames >= 5) {
           resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
         } else {
-          rafId = requestAnimationFrame(waitForStableLayout);
+          frameRequestId = requestAnimationFrame(waitForStableLayout);
         }
       };
-      rafId = requestAnimationFrame(waitForStableLayout);
+      frameRequestId = requestAnimationFrame(waitForStableLayout);
       hadResultsRef.current = true;
-      return () => cancelAnimationFrame(rafId);
+      return () => cancelAnimationFrame(frameRequestId);
     }
     hadResultsRef.current = resultsData != null;
   }, [resultsData])
