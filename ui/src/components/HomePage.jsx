@@ -22,7 +22,7 @@ export default function HomePage() {
             <div className="home-page-content">
                 <div className="title-container">
                     <h1 className="home-page-pre-title"
-                    >Bon in a Box</h1>
+                    >BON in a Box</h1>
                     <h1 className="home-page-title"
                     >Biodiversity Evaluation Engine</h1>
                 </div>
