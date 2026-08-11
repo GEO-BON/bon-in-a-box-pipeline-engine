@@ -168,7 +168,7 @@ def list_dir(target: Path):
 def get_root_files():
     return list_dir(STORAGE_ROOT)
 
-# endpoint to fetch ALL files (not just root ones)
+# endpoint to fetch ALL files/folders (not just root ones)
 def get_file_info(path: Path) -> dict:
     is_dir = path.is_dir()
     item = {
@@ -185,8 +185,8 @@ def get_file_info(path: Path) -> dict:
 def get_all_files():
     items = []
     for path in STORAGE_ROOT.rglob("*"):
-        if path.is_file() : 
-            items.append(get_file_info(path))
+        # if path.is_file() : 
+        items.append(get_file_info(path))
     return items
 
 # method for lazy-loaded folders

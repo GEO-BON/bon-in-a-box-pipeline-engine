@@ -706,13 +706,13 @@ paths:
 
   /fm-api/files/all: 
     get: 
-      summary: Returns the list of all files uploaded by the user.
+      summary: Returns the list of all files and folders uploaded by the user.
       tags: 
         - File manager
-      operationId: getAllFiles 
+      operationId: getAllItems
       responses: 
         "200": 
-          description: Array with list of all files.
+          description: Array with list of all files and folders.
           content:
             application/json:
               schema:

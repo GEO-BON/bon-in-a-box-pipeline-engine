@@ -19,7 +19,6 @@ import IconLogout from "./img/icon-logout.png"
 import IconFiles from "./img/icon-gear.png";
 import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";
-import IconEBV from "./img/icon-ebv.png";
 
 const pages = [
     { title: 'Home', link: '/' },
@@ -150,7 +149,7 @@ function TopMenu() {
                 </Box>
                 <Box sx={{ flexGrow: 0, display: 'flex', alignContent: 'center', flexWrap: 'wrap' }}>
                     <div ref={toggleButtonRef} onClick={togglePopup} className='navigation-bar-profile-container'>   
-                        <img class="navigation-bar-avatar" src={Avatar}></img>
+                        <img className="navigation-bar-avatar" src={Avatar}></img>
                         <p className="navigation-bar-profile">{name}</p>
                     </div>
 

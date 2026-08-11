@@ -35,7 +35,7 @@ export default function FileManager() {
                 }
             }
         ).catch(err => {
-            console.error("Failed to load file manager workspace data:", err);
+            console.error("Failed to load file manager data:", err);
         });
     }, []);
 

@@ -2,6 +2,9 @@ import GreenSquares from "../img/greenSquares.png";
 import BigGreenBoxes from "../img/bigGreenSquares.png"
 import { LastNRuns } from "./RunHistory";
 
+// temporary
+import FileBrowser from "./FileBrowser";
+
 export default function HomePage() {
 
     return (
@@ -136,6 +139,12 @@ export default function HomePage() {
 
             </div>
                 <LastNRuns n={4} />
+            </div>
+
+
+            {/* only temporary */}
+            <div>
+                <FileBrowser />
             </div>
 
         </div>
