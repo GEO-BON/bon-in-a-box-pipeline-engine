@@ -20,12 +20,13 @@ export default function LeftPane() {
 
             <div className='left-pane-link-container'>
                 <div className='left-pane-links-top'>
-                    <NavLink
+                    {/* not needed for now */}
+                    {/* <NavLink
                         className="left-pane-link"
                         to="/user-space">
                             <img src={IconDashboard} className='left-pane-icon'></img>
                             User space
-                    </NavLink>
+                    </NavLink> */}
                     <NavLink
                         className="left-pane-link"
                         to="/manage-files">

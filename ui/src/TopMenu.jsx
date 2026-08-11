@@ -159,12 +159,13 @@ function TopMenu() {
                             ref={popupRef}
                             className={`navbar-profile-popup ${isPopupOpen ? 'fade-in' : 'fade-out'}`}
                             onAnimationEnd={handleAnimationEnd}>
-                            <NavLink
+                            {/* not needed for now */}
+                            {/* <NavLink
                                 to="/user-space"
                                 className="navbar-profile-popup-option">
                                 <img src={IconDashboard} className='navbar-profile-popup-icon'></img>
                                 User space
-                            </NavLink>
+                            </NavLink> */}
 
                             <NavLink
                                 to="/manage-files"

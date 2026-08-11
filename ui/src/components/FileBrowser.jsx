@@ -54,7 +54,7 @@ export default function FileBrowser({ onSelect }) {
 
     const handleChange = (event) => {
         const { value } = event.target;
-        setfileNames(typeof value === 'string' ? value.split(',') : value);
+        setfileNames(typeof value === 'string' ? value.split(',') : value); // saves all fileIDs under an array
     };
 
     useEffect(() => {
