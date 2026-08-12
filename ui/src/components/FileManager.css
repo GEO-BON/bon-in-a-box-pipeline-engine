@@ -34,9 +34,12 @@ wx-content-wrapper.wx-RJbNonjJ {
     min-height: 50vh;
 }
 
-/* CSS for the modal (FileBrowser.jsx) */
+/* fixes scrolling bug (when there are a lot of files) */
+.wx-filemanager.wx-RJbNonjJ.wx-flex {
+    overflow: scroll;
+}
 
-/* !important for  */
+/* CSS for the modal (FileBrowser.jsx) */
 .filebrowser .button-modal {
     background-color: var(--dark-green);
     color: var(--grey);
@@ -55,6 +58,8 @@ wx-content-wrapper.wx-RJbNonjJ {
         display: block;
         margin: 32px auto 0;
         color: var(--grey);
+        font-family: var(--wx-font-family);
+        font-size: 14px;
     }
 
     .filebrowser-select-button:hover {

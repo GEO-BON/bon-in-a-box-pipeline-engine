@@ -63,6 +63,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.1",
     "@watergis/maplibre-gl-terradraw": "^1.12.2",
+    "dotenv": "^17.4.2",
     "vite": "^8.0.3"
   },
   "scripts": {

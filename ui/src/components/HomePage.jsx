@@ -4,6 +4,7 @@ import { LastNRuns } from "./RunHistory";
 
 // temporary
 import FileBrowser from "./FileBrowser";
+import { DISABLE_MY_FILES } from "../config.js";
 
 export default function HomePage() {
 
@@ -144,7 +145,7 @@ export default function HomePage() {
 
             {/* only temporary */}
             <div>
-                <FileBrowser />
+                {!DISABLE_MY_FILES && <FileBrowser multipleFiles={false}/>}
             </div>
 
         </div>

@@ -9,6 +9,9 @@ import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";
 import IconEBV from "./img/icon-ebv.png";
 
+// disabling "My files" if read-only
+import { DISABLE_MY_FILES } from "./config.js";
+
 export default function LeftPane() {
     return (
         <div className="left-pane">
@@ -16,7 +19,7 @@ export default function LeftPane() {
                 to="/">
                 <img id="logo" src={BiaBLogo} alt="BON in a Box logo" /> 
             </NavLink>
-            <div className="divider"></div>
+            {/* <div className="divider"></div> */}
 
             <div className='left-pane-link-container'>
                 <div className='left-pane-links-top'>
@@ -27,16 +30,17 @@ export default function LeftPane() {
                             <img src={IconDashboard} className='left-pane-icon'></img>
                             User space
                     </NavLink> */}
-                    <NavLink
-                        className="left-pane-link"
-                        to="/manage-files">
-                            <img src={IconFiles} className='left-pane-icon'></img>
-                            Manage input files
-                    </NavLink>
                 </div>
 
                 <div className='left-pane-links-bottom'>
                     <div className="divider"></div>
+                    {/* doesn't render if this is a READ ONLY environment */}
+                    {!DISABLE_MY_FILES && <NavLink
+                        className="left-pane-link"
+                        to="/manage-files">
+                            <img src={IconFiles} className='left-pane-icon'></img>
+                            My files
+                    </NavLink>}
                     <NavLink
                         className="left-pane-link"
                         to="https://discourse.geobon.org/">

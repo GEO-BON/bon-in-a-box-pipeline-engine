@@ -133,12 +133,21 @@ async def scan_file_buffer(file: UploadFile = File(...)) -> UploadFile:
         await file.seek(0)
     return file
 
-# backend for file uploads
+#################################################
+####    BACKEND FOR FILE MANAGEMENT SYSTEM    ###
+#################################################
+
 fm_router = APIRouter(prefix="/fm-api")
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 STORAGE_ROOT = Path(os.environ.get("USERDATA_ROOT", "./storage"))
 STORAGE_ROOT.mkdir(parents=True, exist_ok=True)
+# disables everything if set to true
+DISABLE_MY_FILES = os.environ.get("DISABLE_MY_FILES", "false").lower() == "true"
+
+def check_if_disabled():
+    if DISABLE_MY_FILES:
+        raise HTTPException(status_code=403, detail="Cannot load files. This instance is read-only")
 
 def resolve(id: str) -> Path:
     return STORAGE_ROOT / id.lstrip("/")
@@ -166,9 +175,10 @@ def list_dir(target: Path):
 # loading root files
 @fm_router.get("/files")
 def get_root_files():
+    check_if_disabled()
     return list_dir(STORAGE_ROOT)
 
-# endpoint to fetch ALL files/folders (not just root ones)
+# endpoint to fetch ALL files + folders (not just root ones)
 def get_file_info(path: Path) -> dict:
     is_dir = path.is_dir()
     item = {
@@ -183,15 +193,16 @@ def get_file_info(path: Path) -> dict:
 
 @fm_router.get("/files/all")
 def get_all_files():
+    check_if_disabled()
     items = []
     for path in STORAGE_ROOT.rglob("*"):
-        # if path.is_file() : 
         items.append(get_file_info(path))
     return items
 
 # method for lazy-loaded folders
 @fm_router.get("/files/{id:path}")
 def get_subfolder_files(id: str):
+    check_if_disabled()
     clean_id = id.lstrip("/")   # stripping double slashes
     target = resolve(clean_id)
     if not target.exists() or not target.is_dir():
@@ -201,6 +212,7 @@ def get_subfolder_files(id: str):
 # creating a file/folder
 @fm_router.post("/files/{id:path}")
 async def create_item(id: str, request: Request):
+    check_if_disabled()
     raw = await request.body()
     body = json.loads(raw)
     name = body.get("name")
@@ -217,6 +229,7 @@ async def create_item(id: str, request: Request):
 # renaming a folder
 @fm_router.put("/files/{id:path}")
 async def rename_item(id: str, request: Request):
+    check_if_disabled()
     raw = await request.body()
     body = json.loads(raw)
     if body.get("operation") != "rename":
@@ -231,6 +244,7 @@ async def rename_item(id: str, request: Request):
 # moving or copying a file
 @fm_router.put("/files")
 async def move_or_copy(request: Request):
+    check_if_disabled()
     raw = await request.body()
     body = json.loads(raw)
     operation = body.get("operation")  # "move" or "copy"
@@ -250,6 +264,7 @@ async def move_or_copy(request: Request):
 # deleting a file
 @fm_router.delete("/files")
 async def delete_items(request: Request):
+    check_if_disabled()
     raw = await request.body()
     body = json.loads(raw)
     for item_id in body.get("ids", []):
@@ -264,6 +279,7 @@ async def delete_items(request: Request):
 @fm_router.post("/upload")
 # modified the signature, before it was : `file: UploadFile = File(...)`
 async def upload_file(id: str = Query("/"), file: UploadFile = Depends(scan_file_buffer)):
+    check_if_disabled()
     dest_folder = resolve(id)
     dest_folder.mkdir(parents=True, exist_ok=True)
     dest_file = dest_folder / file.filename
@@ -274,6 +290,7 @@ async def upload_file(id: str = Query("/"), file: UploadFile = Depends(scan_file
 # get total storage used
 @fm_router.get("/info")
 def get_info():
+    check_if_disabled()
     total, used, free = shutil.disk_usage(STORAGE_ROOT)
     return {"stats": {"total": total, "used": used, "free": free}}
 

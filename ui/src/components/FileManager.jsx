@@ -4,6 +4,7 @@ import { Filemanager, WillowDark } from "@svar-ui/react-filemanager";
 
 import "@svar-ui/react-filemanager/all.css";
 import "./FileManager.css";
+import { DISABLE_MY_FILES } from '../config';
 
 const BackendServer = "/fm-api"; 
 const restProvider = new RestDataProvider(BackendServer);
@@ -25,14 +26,16 @@ export default function FileManager() {
     };
 
     useEffect(() => {
+        // debugging 
+        console.log({ DISABLE_MY_FILES });
+
         // captures backend responses
         Promise.all([restProvider.loadFiles(), restProvider.loadInfo()]).then(
             ([files, info]) => {
                 setData(files);
-                
-                if (info && info.stats) {
-                    setDrive(info.stats);
-                }
+                // if (info && info.stats) {
+                //     setDrive(info.stats);
+                // }
             }
         ).catch(err => {
             console.error("Failed to load file manager data:", err);
@@ -40,7 +43,7 @@ export default function FileManager() {
     }, []);
 
     return (
-        <div className="file-manager" style={{ width: "100%", height: "600px" }}>
+        <div className="file-manager" style={{ width: "100%" }}>
             <WillowDark>
                 <Filemanager init={init} data={data} drive={drive} />
             </WillowDark>
