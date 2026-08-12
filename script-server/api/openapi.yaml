@@ -10,6 +10,8 @@ servers:
 tags:
   - name: placeholder
     description: We could use tags
+  - name: File manager
+    description: Functionalities added to handle the user's file management system.
 paths:
   /{type}/list:
     get:
@@ -581,6 +583,394 @@ paths:
                 format: binary
         "404":
           description: Region ID not found
+  /fm-api/files:
+    get:
+      summary: Returns the list of root files and folders uploaded by the user.
+      tags: 
+        - File manager
+      operationId: getRootItems
+      responses:
+        "200":
+          description: Array with list of root files and folders.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - value
+                  - type
+                  - size
+                  properties:
+                    id:
+                      type: string
+                    value:
+                      type: string
+                    type:
+                      type: string
+                    size:
+                      type: integer
+                  example:
+                    id: "/test.txt"
+                    value: "test.txt"
+                    type: "file"
+                    size: 0
+    put:
+      summary: Moves or copies one or multiple files/folders.
+      tags: 
+        - File manager
+      operationId: moveCopyItem
+      requestBody: 
+        required: true
+        content: 
+          application/json:
+            schema: 
+              type: object
+              required: 
+              - operation
+              - target
+              - ids
+              properties: 
+                operation:
+                  type: string
+                  enum: [move, copy]
+                  description: The action to perform. Must be set to 'move' or 'copy'.
+                  example: "move"
+                target: 
+                  type: string
+                  description: The ID for the destination folder in where the files/folders will move into.
+                  example: "/folder1"
+                ids: 
+                  type: array
+                  description: An array containing the IDs of the files/folders that will be processed.
+                  items: 
+                    type: string
+                  example: ["/file1.txt", "/file2.txt"]
+      responses:
+        "200" :
+          description: Item was successfully copied/moved. It returns the updated file metadata.
+          content:
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  result: 
+                    type: array 
+                    items:
+                      type: object 
+                      required: 
+                        - id
+                        - name
+                      properties: 
+                        id: 
+                          type: string
+                          example: "/folder1/file1.txt"
+                        name: 
+                          type: string
+                          example: "file1.txt"
+    delete: 
+      summary: Deletes a file or folder.
+      tags: 
+        - File manager
+      operationId: deleteItem
+      requestBody: 
+        required: true
+        content:
+          application/json: 
+            schema: 
+              type: object
+              required: 
+                - ids
+              properties: 
+                ids: 
+                  type: array
+                  description: An array containing the IDs of the files/folders that will be deleted.
+                  items: 
+                    type: string
+                  example: ["/file1.txt", "/file2.txt"]
+      responses: 
+        "200":
+          description: Array with list of root files and folders.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+
+  /fm-api/files/all: 
+    get: 
+      summary: Returns the list of all files and folders uploaded by the user.
+      tags: 
+        - File manager
+      operationId: getAllItems
+      responses: 
+        "200": 
+          description: Array with list of all files and folders.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - value
+                    - type
+                    - size
+                  properties:
+                    id:
+                      type: string
+                    value:
+                      type: string
+                    type:
+                      type: string
+                    size:
+                      type: integer
+                  example:
+                    id: "/test.txt"
+                    value: "test.txt"
+                    type: "file"
+                    size: 0
+
+  /fm-api/files/{id}:
+    get:
+      summary: Returns the list of files and folders uploaded by the user under a specific subfolder.
+      tags: 
+        - File manager
+      operationId: getSubfolderItems
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The path of the parent folder contaning the files we want to get.
+          schema:
+            type: string
+            example: "/folder1"
+      responses:
+        "200":
+          description: Array with list of files and folders under a specific subfolder.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - value
+                  - type
+                  - size
+                  example:
+                    {
+                      "id": "/test.txt",
+                      "value": "test.txt",
+                      "type": "file",
+                      "size": 0
+                    }
+    post:
+      summary: Creates a file or folder.
+      tags: 
+        - File manager
+      operationId: createItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The parent folder path where the new item will be created.
+          schema:
+            type: string
+            example: "/folder1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - type
+              properties:
+                name:
+                  type: string
+                  description: The name of the new file or folder.
+                  example: "new.txt"
+                type:
+                  type: string
+                  enum: [file, folder]
+                  description: The type of item to create.
+                  example: "file"
+      responses:
+        "200":
+          description: Item successfully created. Returns the metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    required:
+                      - id
+                      - name
+                      - type
+                    properties:
+                      id:
+                        type: string
+                        example: "/file1/new_document.txt"
+                      name:
+                        type: string
+                        example: "new_document.txt"
+                      type:
+                        type: string
+                        enum: [file, folder]
+                        example: "file"
+        "400":
+          description: Missing type or name parameters.
+    put:
+      summary: Renames a file or folder.
+      tags: 
+        - File manager
+      operationId: renameItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The current path/id of the file or folder that is being renamed.
+          schema:
+            type: string
+            example: "/old_name.txt"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - operation
+                - name
+              properties:
+                operation:
+                  type: string
+                  enum: [rename]
+                  description: The action to perform. Must be set to 'rename'.
+                  example: "rename"
+                name:
+                  type: string
+                  description: The new name for the file or folder (including its extension).
+                  example: "new_name.txt"
+      responses:
+        "200":
+          description: Item successfully renamed. It returns the updated file metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    required:
+                      - id
+                      - name
+                    properties:
+                      id:
+                        type: string
+                        example: "/new_name.txt"
+                      name:
+                        type: string
+                        example: "new_name.txt"
+        "400":
+          description: Unsupported operation.
+        "404":
+          description: The file or folder with that ID could not be found.
+
+  /fm-api/upload:
+    post: 
+      summary: Uploads a file to the user's profile.
+      tags: 
+        - File manager
+      operationId: uploadFile
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: The parent folder path where the new item will be uploaded.
+          schema:
+            type: string
+            example: "/folder1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file that will be uploaded
+      responses:
+        "200": 
+          description: File is successfully uploaded. It returns the file's metadata.
+          content : 
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - value
+                properties:
+                  id:
+                    type: string
+                  value:
+                    type: string
+                example:
+                  id: "/uploaded_file.txt"
+                  value: "uploaded_file.txt"
+
+  /fm-api/info:
+    get:
+      summary: Gets the total, used, and free storage.
+      tags: 
+        - File manager
+      operationId: getFileStorage
+      responses:
+        "200":
+          description: Successfully fetched the file manager storage information.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - stats
+                properties:
+                  stats:
+                    type: object
+                    required:
+                      - total
+                      - used
+                      - free
+                    properties:
+                      total:
+                        type: integer
+                      used:
+                        type: integer
+                      free:
+                        type: integer
+                example:
+                  stats:
+                    total: 494384795648
+                    used: 276180869120
+                    free: 218203926528
+
 components:
   parameters:
     stepType:

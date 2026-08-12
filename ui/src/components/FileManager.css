@@ -1,0 +1,90 @@
+.file-manager {
+    margin-top: 24px;
+
+    .wx-toolbar.wx-5PZQQztG {
+        padding: 12px;
+    }
+
+    .wx-item.wx-GAOa4kDV {
+        width: 200px;
+    }
+}
+
+/* didn't need the !important before -- why?  */
+.wx-willow-dark-theme {
+    --wx-fm-background: var(--dark-blue) !important;
+    --wx-background: var(--dark-green-25) !important;
+    --wx-color-primary: var(--dark-green) !important;
+    --wx-font-family: "Montserrat", sans-serif !important;
+}
+
+
+
+/* menu for adding/creating files/folders */
+.wx-menu.wx-XMmAGqVx {
+    background-color: var(--dark-green) !important;
+}
+
+.wx-option.wx-cDCz9rZQ {
+    background-color: inherit !important;
+}
+
+.wx-option.wx-cDCz9rZQ:hover {
+    background: #476c61 !important;
+}
+
+/* background */
+.wx-text.wx-lUZMtgT1 {
+    font-family: "Montserrat", sans-serif;
+    background-color: var(--dark-blue) !important;
+    border-radius: 12px !important;
+}
+
+wx-content-wrapper.wx-RJbNonjJ {
+    min-height: 50vh;
+}
+
+/* fixes scrolling bug (when there are a lot of files) */
+.wx-filemanager.wx-RJbNonjJ.wx-flex {
+    overflow: scroll;
+}
+
+/* CSS for the modal (FileBrowser.jsx) */
+.filebrowser .button-modal {
+    background-color: var(--dark-green);
+    color: var(--grey);
+    font-weight: 600;
+    margin: 12px;
+}
+
+.filebrowser-modal-card {
+    .MuiFormControl-root {
+        margin: 0;
+        margin-top: 24px;
+        width: 100%;
+    }
+
+    .filebrowser-select-button, .filebrowser-select-button:disabled {
+        display: block;
+        margin: 32px auto 0;
+        color: var(--grey);
+        font-family: var(--wx-font-family);
+        font-size: 14px;
+    }
+
+    .filebrowser-select-button:hover {
+        background-color: #529381;
+        color: var(--grey);
+    }
+
+    .MuiChip-root {
+        background-color: #ABD6C680;
+        font-weight: 500;
+    }
+
+    #modal-modal-title {
+        font-size: 20px;
+        color: #1D7368;
+        font-weight: 700;
+    }
+}

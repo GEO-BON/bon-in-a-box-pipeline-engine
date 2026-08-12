@@ -1,0 +1,1 @@
+export const DISABLE_MY_FILES = import.meta.env.DISABLE_MY_FILES === "true";
