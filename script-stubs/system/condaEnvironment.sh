@@ -165,7 +165,7 @@ function getRemotePack {
         return 0
     elif [ "$status" = "200" ]; then
         echo "    Remote conda-pack environment downloaded."
-        mv download $condaPackZip
+        mv -f download $condaPackZip
         return 0
     else # "download" being the output, it contains a message in this case.
         echo "    Return code: $status, $(head download 2>/dev/null)"
