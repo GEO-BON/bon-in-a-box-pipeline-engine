@@ -217,17 +217,12 @@ class OpenEOStep: ScriptStep {
                     ?.let { outputYaml[LICENSE] = it.toString() }
             }
 
-            //    val references = linkList
-            //        .filter { it.optString("type") != "application/vnd.openeo+json;type=process" }
-            //        .map { link ->
-            //            mapOf(
-            //                "href" to link.optString("href").takeIf { it.isNotEmpty() },
-            //                "rel" to link.optString("rel").takeIf { it.isNotEmpty() },
-            //                "type" to link.optString("type").takeIf { it.isNotEmpty() },
-            //                "title" to link.optString("title").takeIf { it.isNotEmpty() }
-            //            ).filterValues { it != null }
-            //        }
-            //    if (references.isNotEmpty()) outputYaml["references"] = references
+            outputYaml["references"] = listOf(
+                mapOf(
+                    "text" to "openEO platform",
+                    "link" to "https://openeofed.dataspace.copernicus.eu"
+                )
+            )
 
             return outputYaml
         }
