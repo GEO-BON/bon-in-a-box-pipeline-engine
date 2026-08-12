@@ -140,7 +140,7 @@ class CWLFactory {
                     appendLine(
                         $$"""
                             outputBinding:
-                              glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
+                              glob: "output.json"
                               loadContents: true
                               outputEval: |
                                 ${
