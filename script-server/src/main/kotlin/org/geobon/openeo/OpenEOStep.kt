@@ -217,12 +217,25 @@ class OpenEOStep: ScriptStep {
                     ?.let { outputYaml[LICENSE] = it.toString() }
             }
 
-            outputYaml["references"] = listOf(
-                mapOf(
-                    "text" to "openEO platform",
-                    "link" to "https://openeofed.dataspace.copernicus.eu"
-                )
-            )
+            val references = links
+                .filter { it.optString("rel") == "platform" }
+                .mapNotNull { link ->
+                    val title = link.optString("title")
+                    val href = link.optString("href")
+
+                    if (title.isNotBlank() && href.isNotBlank()) {
+                        mapOf(
+                            "text" to title,
+                            "link" to href
+                        )
+                    } else {
+                        null
+                    }
+                }
+
+            if (references.isNotEmpty()) {
+                outputYaml["references"] = references
+            }
 
             return outputYaml
         }
