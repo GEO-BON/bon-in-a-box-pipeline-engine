@@ -110,6 +110,12 @@ h2 {
   font-size: 48px;
 }
 
+.home-page-subtitle {
+  color: var(--light-green);
+  font-weight: bold;
+  font-size: 28px;
+}
+
 .pipeline-columns {
   display: flex;
   gap: 2rem;
@@ -860,8 +866,6 @@ h2.MuiDialogTitle-root {
     }
 
     .home-page-subtitle {
-        color: var(--light-green);
-        font-weight: bold;
         font-size: 24px;
     }
 
