@@ -1,5 +1,13 @@
 .file-manager {
     margin-top: 24px;
+
+    .wx-toolbar.wx-5PZQQztG {
+        padding: 12px;
+    }
+
+    .wx-item.wx-GAOa4kDV {
+        width: 200px;
+    }
 }
 
 /* didn't need the !important before -- why?  */
@@ -9,6 +17,8 @@
     --wx-color-primary: var(--dark-green) !important;
     --wx-font-family: "Montserrat", sans-serif !important;
 }
+
+
 
 /* menu for adding/creating files/folders */
 .wx-menu.wx-XMmAGqVx {

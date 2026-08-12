@@ -19,6 +19,7 @@ import IconLogout from "./img/icon-logout.png"
 import IconFiles from "./img/icon-gear.png";
 import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";
+import { DISABLE_MY_FILES } from './config';
 
 const pages = [
     { title: 'Home', link: '/' },
@@ -167,12 +168,12 @@ function TopMenu() {
                                 User space
                             </NavLink> */}
 
-                            <NavLink
+                            {!DISABLE_MY_FILES && <NavLink
                                 to="/manage-files"
                                 className="navbar-profile-popup-option mobile-popup-link">
                                 <img src={IconFiles} className='navbar-profile-popup-icon'></img>
-                                Manage input files
-                            </NavLink>
+                                My files
+                            </NavLink>}
 
                             <NavLink
                                 to=""

@@ -27,15 +27,12 @@ export default function FileManager() {
 
     useEffect(() => {
         // debugging 
-        console.log({ DISABLE_MY_FILES });
+        // console.log({ DISABLE_MY_FILES });
 
         // captures backend responses
         Promise.all([restProvider.loadFiles(), restProvider.loadInfo()]).then(
             ([files, info]) => {
                 setData(files);
-                // if (info && info.stats) {
-                //     setDrive(info.stats);
-                // }
             }
         ).catch(err => {
             console.error("Failed to load file manager data:", err);
