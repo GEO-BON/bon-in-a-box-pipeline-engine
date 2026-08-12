@@ -8,7 +8,7 @@ services:
     volumes:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ${PIPELINE_REPO_PATH}/.git:/.git:ro
-      - ./script-stubs:/script-stubs:ro
+      - ./script-stubs:/script-stubs:rw
       - ${PIPELINE_REPO_PATH}/pipelines:/pipelines:rw
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw

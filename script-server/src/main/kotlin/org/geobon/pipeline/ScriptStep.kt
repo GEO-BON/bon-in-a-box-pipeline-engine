@@ -13,7 +13,7 @@ import java.io.File
 import kotlin.time.Duration
 
 
-class ScriptStep : YMLStep {
+open class ScriptStep : YMLStep {
 
     constructor(
         serverContext: ServerContext,

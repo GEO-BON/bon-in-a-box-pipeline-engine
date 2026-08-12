@@ -10,10 +10,10 @@ import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
 import org.geobon.hpc.HPC
 import org.geobon.k8s.K8sConnection
-import org.geobon.openeo.getOpenEODescription
+import org.geobon.openeo.OpenEOStep.Companion.updateYaml
 import org.geobon.pipeline.*
-import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
+import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
@@ -168,10 +168,8 @@ fun Application.configureRouting() {
                         call.respondText(JSONPipeline.getPipelineDescription(jsonPath).toString(), ContentType.Application.Json)
                     }
                     "openEO" -> {
-                        call.respondText(
-                            JSONObject(getOpenEODescription(descriptionPath)).toString(),
-                            ContentType.Application.Json
-                        )
+                        val file = updateYaml(descriptionPath)
+                        call.respond(Yaml().load(file.readText()))
                     }
                 }
             } catch (_: FileNotFoundException) {
@@ -218,7 +216,10 @@ fun Application.configureRouting() {
 
             // Validate the existence of the file
             val descriptionFile = File(
-                if (singleScript) scriptsRoot else pipelinesRoot,
+                if (singleScript)
+                    if (descriptionPath.startsWith("openEO>")) scriptStubsRoot
+                    else scriptsRoot
+                else pipelinesRoot,
                 descriptionPath.replace(FILE_SEPARATOR, '/')
             )
             if (!descriptionFile.exists()) {

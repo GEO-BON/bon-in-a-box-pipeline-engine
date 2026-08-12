@@ -5,7 +5,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
 class ScriptMetadata (
-    val script: File,
+    var script: File,
     inputs: Map<String, IOMetadata>,
     outputs: Map<String, IOMetadata>,
     name: String? = null,

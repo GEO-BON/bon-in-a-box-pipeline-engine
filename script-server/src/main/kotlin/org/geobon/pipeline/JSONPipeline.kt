@@ -1,5 +1,6 @@
 package org.geobon.pipeline
 
+import org.geobon.openeo.OpenEOStep
 import org.geobon.pipeline.metadata.*
 import org.geobon.script.Description.AUTHORS
 import org.geobon.script.Description.DESCRIPTION
@@ -140,6 +141,7 @@ class JSONPipeline (
                                 // resulting in a security breach.
                                 // TODO: This will be needed for openEO steps, so keeping this comment as an example:
                                 //scriptFile == "pipeline/AssignId.yml" -> AssignId(serverContext, innerStepId)
+                                scriptFile.endsWith(".udp") -> OpenEOStep(scriptFile, innerStepId, serverContext)
 
                                 // Regular script steps
                                 else -> ScriptStep(scriptFile, innerStepId, serverContext)

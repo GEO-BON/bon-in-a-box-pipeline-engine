@@ -1,14 +1,15 @@
 package org.geobon.openeo
 
-import io.kotest.matchers.string.Diff
-import io.ktor.http.parameters
-import org.json.JSONArray
+import org.geobon.openeo.OpenEOStep.Companion.addCondaEnv
+import org.geobon.openeo.OpenEOStep.Companion.addOutputs
+import org.geobon.openeo.OpenEOStep.Companion.convertInputs
+import org.geobon.openeo.OpenEOStep.Companion.convertMetadata
 import org.json.JSONObject
 import java.io.File
-import kotlin.collections.get
 import kotlin.test.*
 
-class OpenEOConversionTest {
+
+class OpenEOStepTest {
 
     private fun loadTestResource(filename: String): JSONObject {
         val file = File("src/test/resources/openeo/$filename")
@@ -98,11 +99,21 @@ class OpenEOConversionTest {
     fun addOutputsTest() {
         val result = addOutputs()
         val outputs = result["outputs"] as Map<*, *>
-        val outputRaster = outputs["output_raster"] as Map<*, *>
+        val outputRaster = outputs["output_rasters"] as Map<*, *>
 
         assertEquals(1, outputs.size)
-        assertTrue(outputs.containsKey("output_raster"))
-        assertEquals("image/tiff;application=geotiff", outputRaster["type"])
+        assertTrue(outputs.containsKey("output_rasters"))
+        assertEquals("image/tiff;application=geotiff[]", outputRaster["type"])
+    }
+
+    @Test
+    fun addCondaEnvTest() {
+        val result = addCondaEnv()
+        val conda = result["conda"] as Map<*, *>
+        val channels = conda["channels"] as List<*>
+        val dependencies = conda["dependencies"] as List<*>
+        assertTrue(channels.contains("conda-forge"))
+        assertTrue(dependencies.contains("openeo"))
     }
 
     @Test
