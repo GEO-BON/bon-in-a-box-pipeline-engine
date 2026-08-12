@@ -217,17 +217,25 @@ class OpenEOStep: ScriptStep {
                     ?.let { outputYaml[LICENSE] = it.toString() }
             }
 
-            //    val references = linkList
-            //        .filter { it.optString("type") != "application/vnd.openeo+json;type=process" }
-            //        .map { link ->
-            //            mapOf(
-            //                "href" to link.optString("href").takeIf { it.isNotEmpty() },
-            //                "rel" to link.optString("rel").takeIf { it.isNotEmpty() },
-            //                "type" to link.optString("type").takeIf { it.isNotEmpty() },
-            //                "title" to link.optString("title").takeIf { it.isNotEmpty() }
-            //            ).filterValues { it != null }
-            //        }
-            //    if (references.isNotEmpty()) outputYaml["references"] = references
+            val references = links
+                .filter { it.optString("rel") == "platform" }
+                .mapNotNull { link ->
+                    val title = link.optString("title")
+                    val href = link.optString("href")
+
+                    if (title.isNotBlank() && href.isNotBlank()) {
+                        mapOf(
+                            "text" to title,
+                            "link" to href
+                        )
+                    } else {
+                        null
+                    }
+                }
+
+            if (references.isNotEmpty()) {
+                outputYaml["references"] = references
+            }
 
             return outputYaml
         }
