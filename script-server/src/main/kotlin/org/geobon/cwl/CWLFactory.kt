@@ -32,7 +32,7 @@ class CWLFactory {
             val replacements = mapOf<String, String>(
                 "scriptPath" to step.scriptFile.relativeTo(scriptsRoot).path,
                 "inputs" to toCWL(step.inputDefinitions, true),
-                "inputsProperties" to generateInputProperties(step.inputDefinitions.keys),
+                "inputsProperties" to generateInputProperties(step.inputDefinitions),
                 "outputs" to toCWL(step.outputDefinitions, false),
                 "condaEnvName" to (step.condaEnvName ?: ""),
                 "condaEnvYml" to condaEnvYml,
@@ -84,10 +84,18 @@ class CWLFactory {
             destinationFile.writeText(template)
         }
 
-        private fun generateInputProperties(inputNames: Iterable<String>): String {
+        private fun generateInputProperties(inputDefinitions: Map<String, IOMetadata>): String {
             return buildString {
-                inputNames.forEach {
-                    appendLine(4, "$it: inputs.$it,")
+                inputDefinitions.forEach { (key, definition) ->
+                    if(definition.isFile()) {
+                        if(definition.isArray()) {
+                            appendLine(4, "$key: (inputs.$key || []).map(function(file) { return file.path; }),")
+                        } else {
+                            appendLine(4, "$key: inputs.$key ? inputs.$key.path : null,")
+                        }
+                    } else {
+                        appendLine(4, "$key: inputs.$key,")
+                    }
                 }
             }.trimEnd()
         }

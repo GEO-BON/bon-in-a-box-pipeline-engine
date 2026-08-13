@@ -12,6 +12,13 @@ data class IOMetadata(
     val options: List<String>? = null,
     // TODO val range: Pair<Int, Int>? = null
 ) {
+    /**
+     * If the type of this input is some sort of file
+     * We assume that any input type containing a '/' is a mime type, hence a file.
+     */
+    fun isFile() = type.contains('/')
+    fun isArray() = type.endsWith("[]")
+
     constructor(type: String, definition: Map<*, *>) : this(
         type,
         definition[Description.IO__LABEL].toString(),
