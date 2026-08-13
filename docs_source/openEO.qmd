@@ -20,7 +20,7 @@ This makes it possible to incorporate large-scale EO processing into BON in a Bo
 
 ### User-Defined Processes
 
-openEO provides standard processes for common Earth observation operations. These processes can also be combined into reusable workflows called **User-Defined Processes (UDPs)**.
+openEO provides standard processes or workflows for common Earth observation operations (e.g., cloud masking, vegetation index calculation) called **User-Defined Processes (UDPs)**.
 
 A UDP is a predefined openEO process graph that performs a particular analysis. It defines:
 
@@ -82,7 +82,7 @@ OpenEO UDPs available to BON in a Box are registered in `externalScripts.yaml`.
 
 For example:
 
-```{{YAML}}
+```{#YAML}
 CDSE:
   LAI.udp:
     name: Leaf Area Index
@@ -102,7 +102,7 @@ The UDP definition is then used to determine which parameters are required by th
 
 If you want to add a new UDP, you can add it to the `externalScripts.yaml` file. The process definition URL can be found in the [APEx Algorithm Catalogue](https://algorithm-catalogue.apex.esa.int/).
 
-**NOTE:** This is still a beta function so if you encounter and issues, please contact the BON in a Box team.
+**NOTE:** Adding new UDPs is still a beta function. It is made to be robust to multiple additions, however if you encounter any issues, please contact the BON in a Box team.
 
 ### 2. Add your openEO credentials
 
@@ -121,23 +121,37 @@ You can obtain these credentials by registering for a CDSE account at [https://d
 
 The openEO wrapper retrieves these credentials from the environment when the process is run.
 
+### 3. Adding the UDP to your pipeline
+
+Once the UDP is registered in `externalScripts.yaml`, it can be added to a BON in a Box pipeline like any other script.
+
+It will appear in the list of available scripts in the pipeline editor under the `openEO` category. When selected, the required inputs for the UDP will be displayed in the BON in a Box interface.
+
 ## What happens when the UDP is run?
 
 Once the UDP has been added, it can be incorporated into BON in a Box pipelines in the same way as other scripts.
 
 When the UDP is executed, the following steps occur:
 
-1. The user configures the UDP inputs through the BON in a Box interface.
-2. BON in a Box passes these values to the generic openEO wrapper.
-3. The wrapper reads the script definition to determine the type of each input.
-4. The wrapper identifies the UDP process ID and process definition.
-5. Inputs that require special formatting are converted to the format expected by openEO.
-6. BON in a Box connects and authenticates with the openEO backend.
-7. The inputs are passed to the UDP.
-8. A remote openEO processing job is created and started.
-9. BON in a Box waits for the remote job to finish.
-10. The resulting files are downloaded.
-11. The output rasters are returned to BON in a Box and can be connected to subsequent pipeline steps.
+**1**. The user configures the UDP inputs through the BON in a Box input form.
+
+**2**. BON in a Box passes these values to the generic openEO wrapper.
+
+**3**. The wrapper reads the script definition to determine the type of each input.
+
+**4**. The wrapper identifies the UDP process ID and process definition.
+
+**5**. BON in a Box connects and authenticates with the openEO backend.
+
+**6**. The inputs are passed to the UDP.
+
+**7**. A remote openEO processing job is created and started.
+
+**8**. BON in a Box waits for the remote job to finish.
+
+**9**. The resulting files are downloaded.
+
+**10**. The output GeoTIFF files are returned to BON in a Box and can be connected to subsequent pipeline steps.
 
 Conceptually:
 
@@ -147,16 +161,34 @@ Because the same wrapper is used for different UDPs, integrating a new supported
 
 ## Troubleshooting
 
+##### **Authentication errors**
+Authentication errors typically occur when the CDSE client credentials are missing or incorrect. Ensure that the `CDSE_CLIENT_ID` and `CDSE_CLIENT_SECRET` are correctly set in the `runner.env` file.
 
+##### **Remote job failure**
+openEO processing occurs outside BON in a Box. A job may therefore fail because of:
+
+- issues with the remote backend;
+- unavailable input data;
+- invalid processing parameters;
+- resource limits; or
+- temporary service interruptions.
+
+Check both the BON in a Box logs and, where available, the logs returned by the openEO job or contact the openEO team.
 
 ## Limitations
 
 There are several considerations when using openEO UDPs within BON in a Box.
 
-**Processing time can vary**
-Jobs are executed remotely and may be queued depending on the backend's available computational resources.
+##### **Processing time can vary**
+Jobs are executed remotely and may be queued depending on the backend's available computational resources. The size of the input data and the complexity of the processing can also affect the time it takes to complete a job.
+
+##### **Available timespans and locations**
+The available timespans and locations for data depend on the specific openEO UDP being used. Check the UDP documentation for details.
+
+##### **Limited CRS support**
+Currently, the [attached Coordinate Reference Systems (CRS)](https://gist.github.com/JeroenVerstraelen/0a57950ce9828bbab1ef8614595d0e5c) are supported by the openEO backend. Ensure that you choose one of these when setting your inputs in BON in a Box and that your data and processing steps are compatible with the supported CRS.
 
 ## Additional resources
-[openEO documentation](https://openeo.org/documentation/)
+- [openEO documentation](https://openeo.org/documentation/)
 
-[APEx Algorithm Catalogue](https://algorithm-catalogue.apex.esa.int/)
+- [APEx Algorithm Catalogue](https://algorithm-catalogue.apex.esa.int/)
