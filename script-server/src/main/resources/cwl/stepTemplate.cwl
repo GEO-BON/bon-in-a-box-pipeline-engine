@@ -21,9 +21,11 @@ requirements:
           if(inputs.runFolder != null) {
             if(Array.isArray(value)) {
               value = value.map(function (item) {
-                return item.replace(inputs.runFolder.path, runtime.outdir);
+                if(typeof item.replace === "function")
+                  return item.replace(inputs.runFolder.path, runtime.outdir);
+                else return item
               });
-            } else {
+            } else if(typeof value.replace === "function") {
               value = value.replace(inputs.runFolder.path, runtime.outdir);
             }
           }
