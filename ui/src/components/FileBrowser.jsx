@@ -99,7 +99,7 @@ export default function FileBrowser({ multipleFiles, onSelect }) {
             <Button 
                 className="button-modal" 
                 onClick={handleOpen}
-                disabled={fileManagerDisabled}>
+                disabled={disableMyFiles} >
                     Browse files
             </Button>
             <Modal
