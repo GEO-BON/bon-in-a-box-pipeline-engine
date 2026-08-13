@@ -267,4 +267,6 @@ else
     exec {lockfd}>&-
 fi
 
-echo "Conda environment ready."
+if [[ "$noActivate" != "--noActivate" ]]; then
+    echo "Conda environment ready."
+fi
