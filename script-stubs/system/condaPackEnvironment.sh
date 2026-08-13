@@ -23,7 +23,10 @@ function packEnvironment {
 
 
 # No need to pack base environments, they are already in the docker
-if [[ "$condaEnvName" != "pythonbase" && "$condaEnvName" != "rbase" && -d "$condaPackDir" ]]; then
+if [[ "$condaEnvName" != "pythonbase" && "$condaEnvName" != "rbase"
+    # conda-pack directory must be provided and writable
+    && -n "$condaPackDir" && -d "$condaPackDir" && -w "$condaPackDir" ]]; then
+
     if mamba env list | grep -q "\b$condaEnvName\b"; then
         condaEnvFile="/conda-env-yml/$condaEnvName.yml"
         condaPackEnvFile=$condaPackDir/$condaEnvName.yml
