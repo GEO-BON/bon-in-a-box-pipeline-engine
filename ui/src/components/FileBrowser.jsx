@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import Button from '@mui/material/Button';
 import Modal from "@mui/material/Modal";
 import Select from "@mui/material/Select";
@@ -13,9 +13,9 @@ import Chip from '@mui/material/Chip';
 import ListItemText from '@mui/material/ListItemText';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { uiContext } from '../uiContext.jsx';
 
-// disabling if read-only
-import { DISABLE_MY_FILES } from "../config.js";
+
 
 const style = {
     position: 'absolute',
@@ -40,7 +40,7 @@ const MenuProps = { // so that the file list doesn't cover the modal below
     },
 };
 
-export default function FileBrowser({ onSelect, multipleFiles }) {
+export default function FileBrowser({ multipleFiles, onSelect }) {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -50,6 +50,7 @@ export default function FileBrowser({ onSelect, multipleFiles }) {
     const [error, setError] = useState(null);
 
     const [fileNames, setfileNames] = useState([]);
+    const { disableMyFiles } = useContext(uiContext); // gets the value of the variable from runner.env
 
     // const multipleFiles = true or false, will be passed on as a variable
 
@@ -98,7 +99,7 @@ export default function FileBrowser({ onSelect, multipleFiles }) {
             <Button 
                 className="button-modal" 
                 onClick={handleOpen}
-                disabled={DISABLE_MY_FILES}>
+                disabled={fileManagerDisabled}>
                     Browse files
             </Button>
             <Modal
@@ -154,11 +155,9 @@ export default function FileBrowser({ onSelect, multipleFiles }) {
                         className='filebrowser-select-button'
                         variant="contained"
                         disabled={fileNames.length === 0}
-                        onClick={() => {
+                            onClick={() => {
                             if (onSelect) { // if this function is passed on as a parameter
                                 onSelect(fileNames);
-                            } else {        // temporary, for debugging
-                                console.log("Selected file IDs:", fileNames);
                             }
                             handleClose();
                         }}

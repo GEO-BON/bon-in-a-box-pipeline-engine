@@ -60,7 +60,7 @@ services:
       WORKERS_PER_CORE: 1
       TITILER_API_CORS_ORIGINS: "*"
       USERDATA_ROOT: /data/userdata/files
-      DISABLE_MY_FILES: ${DISABLE_MY_FILES} # added to remove the 
+      DISABLE_MY_FILES: ${DISABLE_MY_FILES} 
     expose:
       - "8000"
       - "8001"

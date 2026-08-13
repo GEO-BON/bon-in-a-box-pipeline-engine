@@ -24,8 +24,8 @@ class InfoInputsValue {
      * Constructs a new <code>InfoInputsValue</code>.
      * @alias module:model/InfoInputsValue
      */
-    constructor() {
-
+    constructor() { 
+        
         InfoInputsValue.initialize(this);
     }
 
@@ -34,7 +34,7 @@ class InfoInputsValue {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) {
+    static initialize(obj) { 
     }
 
     /**

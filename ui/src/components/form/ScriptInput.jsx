@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Switch from "@mui/material/Switch";
@@ -7,8 +8,12 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 import AutoResizeTextArea from "./AutoResizeTextArea";
 import Choosers from "./Choosers";
+import { uiContext } from "../../uiContext.jsx";
+import FileBrowser from "../FileBrowser";
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
 export const CONSTANT_PLACEHOLDER = "Constant";
+
+
 
 function joinIfArray(value) {
   return value && typeof value.join === "function" ? value.join(", ") : value;
@@ -45,6 +50,7 @@ export default function ScriptInput({
 }) {
   const [fieldValue, setFieldValue] = useState(value);
   const small = size == "small";
+  const { disableMyFiles } = useContext(uiContext);
 
   useEffect(() => {
     setFieldValue(value);
@@ -147,21 +153,42 @@ export default function ScriptInput({
     };
 
     return (
-      <TextField
-        multiline
-        variant="outlined"
-        size={size}
-        label=""
-        {...passedProps}
-        value={joinIfArray(fieldValue) || ""}
-        onChange={(e) => setFieldValue(e.target.value)}
-        placeholder={ARRAY_PLACEHOLDER}
-        cols={cols}
-        onBlur={onUpdateArray}
-        slotProps={{ input: { style: small ? smallPadding() : null } }}
-        onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
-        sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
-      />
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "flex-start",
+          "& .filebrowser": { display: "flex" },
+          "& .button-modal": {
+            margin: 0,
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+          },
+        }}
+      >
+        <TextField
+          multiline
+          variant="outlined"
+          size={size}
+          label=""
+          {...passedProps}
+          value={joinIfArray(fieldValue) || ""}
+          onChange={(e) => setFieldValue(e.target.value)}
+          placeholder={ARRAY_PLACEHOLDER}
+          cols={cols}
+          onBlur={onUpdateArray}
+          slotProps={{ input: { style: small ? smallPadding() : null } }}
+          onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
+          sx={{
+            width: "100%",
+            maxWidth: small ? 220 : "500px",
+            "& .MuiOutlinedInput-root": {
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+            },
+          }}
+        />
+        {!disableMyFiles && <FileBrowser multipleFiles={true} onSelect={setFieldValue} />}
+      </Box>
     );
   }
 
@@ -265,7 +292,18 @@ export default function ScriptInput({
 
       // Single line text fields
       if (type.includes("/") /* assume MIME type, files have no line breaks */) {
-        return <TextField
+        return <Box
+        sx={{
+          /*display: "flex",
+          alignItems: "flex-start",
+          "& .filebrowser": { display: "flex" },
+          "& .button-modal": {
+            margin: 0,
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+          },*/
+        }}
+      ><TextField
           type="text"
           label=""
           size={size}
@@ -275,7 +313,7 @@ export default function ScriptInput({
           }}
           slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
           sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
-        />
+        />{ !disableMyFiles && <FileBrowser multipleFiles={false} onSelect={setFieldValue} />}</Box>
       }
 
       // Multiline text field

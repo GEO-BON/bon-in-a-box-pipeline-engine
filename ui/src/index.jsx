@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, useContext, lazy, Suspense } from "react";
 
 import { createRoot } from "react-dom/client";
 import "./index.css";
@@ -21,9 +21,7 @@ import RunHistory from "./components/RunHistory";
 import { Spinner } from "./components/Spinner";
 import { HttpError } from "./components/HttpErrors";
 import FileManager from "./components/FileManager";
-
-// disabling if read-only
-import { DISABLE_MY_FILES } from "./config.js";
+import { uiContext } from "./uiContext.jsx";
 
 const PipelineEditor = lazy(() =>
   import("./components/PipelineEditor/PipelineEditor")
@@ -32,6 +30,17 @@ const PipelineEditor = lazy(() =>
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { Alert } from "@mui/material";
 export const api = new BonInABoxScriptService.DefaultApi();
+export const fm_api = new BonInABoxScriptService.FileManagerApi();
+
+function ManageFilesPage() {
+  const { disableMyFiles } = useContext(uiContext);
+  return (
+    <>
+      <PageTitle title="Manage files" />
+      {!disableMyFiles && <FileManager />}
+    </>
+  );
+}
 
 function NotFound() {
   const location = useLocation();
@@ -105,15 +114,7 @@ const router = createBrowserRouter([
   },
   {
     path: "manage-files",
-    element: (
-      <Layout right={
-        <>
-          <PageTitle title="Manage files" />
-          {!DISABLE_MY_FILES && <FileManager />}
-        </>
-        }
-      />
-    ),
+    element: <Layout right={<ManageFilesPage />} />,
   },
   {
     path: "*",
@@ -134,6 +135,7 @@ const staticRouter = (content) => {
 function App() {
   const [systemError, setSystemError] = useState(null);
   const [statusChecked, setStatusChecked] = useState(false);
+  const [disableMyFiles, setDisableMyFiles] = useState(false);
 
   useEffect(() => {
     api.getSystemStatus((error, _, response) => {
@@ -162,6 +164,17 @@ function App() {
     });
   }, [setSystemError, setStatusChecked]);
 
+  useEffect(() => {
+    fm_api.isFileManagerDisabled((error, data, response) => {
+      if (error) {
+        console.error("Error checking file manager status:", error);
+        setSystemError({ error, response });
+      } else {
+        setDisableMyFiles(data.disabled);
+      }
+    });
+  }, []);
+
   if (!statusChecked) return staticRouter(<Spinner />);
 
   if (systemError) {
@@ -182,7 +195,7 @@ function App() {
     );
   }
 
-  return <RouterProvider router={router} />;
+  return <uiContext.Provider value={{ disableMyFiles }}><RouterProvider router={router} /></uiContext.Provider>;
 }
 
 const root = createRoot(document.getElementById("root"));

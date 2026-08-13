@@ -19,7 +19,8 @@ import IconLogout from "./img/icon-logout.png"
 import IconFiles from "./img/icon-gear.png";
 import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";
-import { DISABLE_MY_FILES } from './config';
+import { uiContext } from "./uiContext.jsx";
+
 
 const pages = [
     { title: 'Home', link: '/' },
@@ -36,6 +37,7 @@ const { name } = userInfo
 
 function TopMenu() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
+    const { disableMyFiles } = React.useContext(uiContext);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -168,7 +170,7 @@ function TopMenu() {
                                 User space
                             </NavLink> */}
 
-                            {!DISABLE_MY_FILES && <NavLink
+                            {!disableMyFiles && <NavLink
                                 to="/manage-files"
                                 className="navbar-profile-popup-option mobile-popup-link">
                                 <img src={IconFiles} className='navbar-profile-popup-icon'></img>

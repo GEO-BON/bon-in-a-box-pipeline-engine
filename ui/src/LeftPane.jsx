@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useContext} from 'react';
 import { NavLink } from "react-router-dom";
 import "./LeftPane.css";
 // images
@@ -8,11 +8,11 @@ import IconFiles from "./img/icon-gear.png";
 import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";
 import IconEBV from "./img/icon-ebv.png";
+import { uiContext } from "./uiContext.jsx";
 
-// disabling "My files" if read-only
-import { DISABLE_MY_FILES } from "./config.js";
 
 export default function LeftPane() {
+    const { disableMyFiles } = useContext(uiContext);
     return (
         <div className="left-pane">
             <NavLink
@@ -35,7 +35,7 @@ export default function LeftPane() {
                 <div className='left-pane-links-bottom'>
                     <div className="divider"></div>
                     {/* doesn't render if this is a READ ONLY environment */}
-                    {!DISABLE_MY_FILES && <NavLink
+                    {!disableMyFiles && <NavLink
                         className="left-pane-link"
                         to="/manage-files">
                             <img src={IconFiles} className='left-pane-icon'></img>

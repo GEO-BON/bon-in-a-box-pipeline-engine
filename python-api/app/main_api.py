@@ -9,12 +9,15 @@ import json
 import geopandas as gpd
 import pandas as pd
 import shutil
+from dotenv import load_dotenv
 
 # for file scanning
 import io
 # import clamd
 from clamav_client.clamd import ClamdNetworkSocket
 from fastapi.concurrency import run_in_threadpool
+
+
 
 app = FastAPI()
 
@@ -171,6 +174,11 @@ def list_dir(target: Path):
             
         items.append(item)
     return items
+
+# loading root files
+@fm_router.get("/is_disabled")
+def get_root_files():
+    return {"disabled": DISABLE_MY_FILES}
 
 # loading root files
 @fm_router.get("/files")

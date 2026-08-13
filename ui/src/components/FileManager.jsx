@@ -4,7 +4,6 @@ import { Filemanager, WillowDark } from "@svar-ui/react-filemanager";
 
 import "@svar-ui/react-filemanager/all.css";
 import "./FileManager.css";
-import { DISABLE_MY_FILES } from '../config';
 
 const BackendServer = "/fm-api"; 
 const restProvider = new RestDataProvider(BackendServer);

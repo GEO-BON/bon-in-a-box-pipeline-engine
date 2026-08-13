@@ -55,6 +55,7 @@ wx-content-wrapper.wx-RJbNonjJ {
     color: var(--grey);
     font-weight: 600;
     margin: 12px;
+    min-height: 56px;
 }
 
 .filebrowser-modal-card {

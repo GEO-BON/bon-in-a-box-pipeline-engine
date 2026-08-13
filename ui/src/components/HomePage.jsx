@@ -1,13 +1,13 @@
+import { useContext } from "react";
 import GreenSquares from "../img/greenSquares.png";
 import BigGreenBoxes from "../img/bigGreenSquares.png"
 import { LastNRuns } from "./RunHistory";
+import { uiContext } from '../uiContext.jsx';
 
 // temporary
 import FileBrowser from "./FileBrowser";
-import { DISABLE_MY_FILES } from "../config.js";
 
 export default function HomePage() {
-
     return (
         <div className="homepage-background-images"
             style={{
@@ -143,11 +143,6 @@ export default function HomePage() {
                 <LastNRuns n={4} />
             </div>
 
-
-            {/* only temporary */}
-            <div>
-                {!DISABLE_MY_FILES && <FileBrowser multipleFiles={false}/>}
-            </div>
 
         </div>
 

@@ -583,6 +583,24 @@ paths:
                 format: binary
         "404":
           description: Region ID not found
+  /fm-api/is_disabled:
+    get:
+      summary: Returns whether the file manager is disabled or not.
+      tags: 
+        - File manager
+      operationId: isFileManagerDisabled
+      responses:
+        "200":
+          description: Returns a JSON object with a boolean property "disabled" indicating if the file manager is disabled.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  disabled:
+                    type: boolean
+                example:
+                  disabled: true
   /fm-api/files:
     get:
       summary: Returns the list of root files and folders uploaded by the user.
@@ -617,6 +635,17 @@ paths:
                     value: "test.txt"
                     type: "file"
                     size: 0
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
     put:
       summary: Moves or copies one or multiple files/folders.
       tags: 
@@ -670,6 +699,17 @@ paths:
                         name: 
                           type: string
                           example: "file1.txt"
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
     delete: 
       summary: Deletes a file or folder.
       tags: 
@@ -703,7 +743,17 @@ paths:
                   status:
                     type: string
                     example: "success"
-
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
   /fm-api/files/all: 
     get: 
       summary: Returns the list of all files and folders uploaded by the user.
@@ -738,6 +788,17 @@ paths:
                     value: "test.txt"
                     type: "file"
                     size: 0
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
 
   /fm-api/files/{id}:
     get:
@@ -774,6 +835,17 @@ paths:
                       "type": "file",
                       "size": 0
                     }
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
     post:
       summary: Creates a file or folder.
       tags: 
@@ -833,6 +905,18 @@ paths:
                         example: "file"
         "400":
           description: Missing type or name parameters.
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
+
     put:
       summary: Renames a file or folder.
       tags: 
@@ -889,6 +973,17 @@ paths:
           description: Unsupported operation.
         "404":
           description: The file or folder with that ID could not be found.
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
 
   /fm-api/upload:
     post: 
@@ -935,6 +1030,17 @@ paths:
                 example:
                   id: "/uploaded_file.txt"
                   value: "uploaded_file.txt"
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
 
   /fm-api/info:
     get:
@@ -970,6 +1076,17 @@ paths:
                     total: 494384795648
                     used: 276180869120
                     free: 218203926528
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
 
 components:
   parameters:
