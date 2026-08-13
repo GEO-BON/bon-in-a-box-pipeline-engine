@@ -8,11 +8,13 @@ class: Workflow
 
 label: User input
 doc:
-  - "Description:
-    Pipeline for automated tests"
+  - |
+    Description:
+    Pipeline for automated tests
   - "Lifecycle tag: In development. bla bla"
-  - "Authors:
-    Jean-Michel Lord (https://orcid.org/0009-0007-3826-1125)"
+  - |
+    Authors:
+    Jean-Michel Lord (https://orcid.org/0009-0007-3826-1125)
 
 
 requirements:
@@ -115,12 +117,16 @@ steps:
           function getPackedEnv {
             condaEnvName=$1
             condaEnvYml=$2
-            unpackedFolder=$(inputs.envFolderWrite.path)/$condaEnvName
+            # We use a dedicated env folder to avoid copying the whole env folder between steps in a k8 context
+            dedicatedEnvFolder=$(inputs.envFolderWrite.path)/$condaEnvName
+            mkdir -p "$dedicatedEnvFolder"
             
             echo "Exporting $condaEnvName..."
-            source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "$condaEnvName" \
-              "$condaEnvYml" $(inputs.envFolderWrite.path)/$condaEnvName $(inputs.condaPackURL)
-            source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh $condaEnvName $(inputs.envFolderWrite.path)
+            source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh "$OUTPUT_LOCATION" "$condaEnvName" \
+              "$condaEnvYml" "$dedicatedEnvFolder" "$(inputs.condaPackURL)"
+            source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh "$condaEnvName" "$dedicatedEnvFolder"
+          
+            unpackedFolder=$dedicatedEnvFolder/$condaEnvName
             rm -f "$unpackedFolder"
             echo "Done."
           }

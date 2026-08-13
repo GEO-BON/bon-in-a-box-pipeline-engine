@@ -8,28 +8,37 @@ class: Workflow
 
 label: Species distribution modeling with Maxent
 doc:
-  - "Description:
+  - |
+    Description:
     ## Introduction 
     Species distributions are an important EBV in the species populations class. Knowing where species are is essential for understanding biodiversity patterns and informing conservation efforts. However, less than 10% of the world is well sampled, and even the longest running and well-sampled biodiversity observation networks have substantial data gaps. Information on species occurrences is often sparse and heavily spatially and taxonomically biased, necessitating the need for species distribution models (SDMs) to fill these data gaps and provide a better, less biased idea of where species are. SDM outputs can be used as key base layers for a wide variety of purposes including: creating maps for estimating species richness, sampling prioritization, quantifying the impact of environmental stressors on species, mapping habitat suitability for at-risk species, mapping biodiversity hotspots across the landscape, identifying the locations of conservation priorities and protected area expansion, identifying sampling gaps and the needed locations of future sampling, and calculating a range of biodiversity indicators including the Species Habitat Index (SHI), the Species Protection Index (SPI).
     ## Methods 
-    SDMs predict where species are likely to occur based on a suite of environmental variables that are associated with known occurrences (Peterson, 2001; Elith and Leathwick, 2009). The MaxEnt pipeline pulls occurrences of the species of interest from GBIF and environmental raster layers from the GEO BON STAC catalog. Then, the pipeline cleans the GBIF data by only including one occurrence of a single species per pixel and removes collinearity between the environmental layers. Third, the pipeline creates a set of pseudo-absences (background points) and combines this with presences and the environmental predictors to create a dataset that is ready to be input into the SDM model. Several background methods are possible, including randomly  distributed pseudo-absences throughout the region, background thickening  [Vollering et al. 2019](https://doi.org/10.1111/ecog.04503) and  target-group background selection [Phillips et al. 2009]( https://doi.org/10.1890/07-2153.1). Bias correction is achieved using the target-group background selection method. The pipeline runs the SDM on this data using the MaxEnt algorithm using the ENMeval R package (Kass et al. 2021). The MaxEnt SDM is run by 1) partitioning occurrence and background points into subsets for training and evaluation, 2) building the model with different algorithmic settings (model tuning), and 3) evaluating their performance (see [package vignette](https://jamiemkass.github.io/ENMeval/articles/ENMeval-2.0-vignette.html)). Lastly, the pipeline computes the 95% confidence interval using bootstrapping and cross validation techniques. A variance map to represent the prediction uncertainty is generated through bootstraping."
-  - "Authors:
+    SDMs predict where species are likely to occur based on a suite of environmental variables that are associated with known occurrences (Peterson, 2001; Elith and Leathwick, 2009). The MaxEnt pipeline pulls occurrences of the species of interest from GBIF and environmental raster layers from the GEO BON STAC catalog. Then, the pipeline cleans the GBIF data by only including one occurrence of a single species per pixel and removes collinearity between the environmental layers. Third, the pipeline creates a set of pseudo-absences (background points) and combines this with presences and the environmental predictors to create a dataset that is ready to be input into the SDM model. Several background methods are possible, including randomly  distributed pseudo-absences throughout the region, background thickening  [Vollering et al. 2019](https://doi.org/10.1111/ecog.04503) and  target-group background selection [Phillips et al. 2009]( https://doi.org/10.1890/07-2153.1). Bias correction is achieved using the target-group background selection method. The pipeline runs the SDM on this data using the MaxEnt algorithm using the ENMeval R package (Kass et al. 2021). The MaxEnt SDM is run by 1) partitioning occurrence and background points into subsets for training and evaluation, 2) building the model with different algorithmic settings (model tuning), and 3) evaluating their performance (see [package vignette](https://jamiemkass.github.io/ENMeval/articles/ENMeval-2.0-vignette.html)). Lastly, the pipeline computes the 95% confidence interval using bootstrapping and cross validation techniques. A variance map to represent the prediction uncertainty is generated through bootstraping.
+  - |
+    Authors:
     Sarah Valentin (Pipeline development, https://orcid.org/0000-0002-9028-681X)
     Guillaume Larocque (Pipeline development, guillaume.larocque@mcgill.ca, https://orcid.org/0000-0002-5967-9156)
-    François Rousseu (Pipeline development, https://orcid.org/0000-0002-2400-2479)"
+    François Rousseu (Pipeline development, https://orcid.org/0000-0002-2400-2479)
   - "External link: https://github.com/GEO-BON/biab-2.0/blob/main/scripts/SDM/runMaxent.R"
-  - "References:
-    Vollering et al. 2019 null
+  - |
+    References:
+    Vollering et al. 2019
+    https://doi.org/10.1111/ecog.04503
 
-    Phillips et al. 2009 null
+    Phillips et al. 2009
+    https://doi.org/10.1890/07-2153.1
 
-    Bastion 2023 null
+    Bastion 2023
+    https://doi.org/10.32614/CRAN.package.exactextractr
 
-    Kass et al. 2021 null
+    Kass et al. 2021
+    https://doi.org/10.1111/2041-210X.13628
 
-    Elith and Leathwick, 2009 null
+    Elith and Leathwick, 2009
+    https://doi.org/10.1146/annurev.ecolsys.110308.120159
 
-    Peterson, 2001 null"
+    Peterson, 2001
+    https://doi.org/10.1641/0006-3568(2001)051[0363:PSIUEN]2.0.CO;2
 
 
 requirements:
@@ -284,12 +293,16 @@ steps:
           function getPackedEnv {
             condaEnvName=$1
             condaEnvYml=$2
-            unpackedFolder=$(inputs.envFolderWrite.path)/$condaEnvName
+            # We use a dedicated env folder to avoid copying the whole env folder between steps in a k8 context
+            dedicatedEnvFolder=$(inputs.envFolderWrite.path)/$condaEnvName
+            mkdir -p "$dedicatedEnvFolder"
             
             echo "Exporting $condaEnvName..."
-            source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "$condaEnvName" \
-              "$condaEnvYml" $(inputs.envFolderWrite.path)/$condaEnvName $(inputs.condaPackURL)
-            source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh $condaEnvName $(inputs.envFolderWrite.path)
+            source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh "$OUTPUT_LOCATION" "$condaEnvName" \
+              "$condaEnvYml" "$dedicatedEnvFolder" "$(inputs.condaPackURL)"
+            source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh "$condaEnvName" "$dedicatedEnvFolder"
+          
+            unpackedFolder=$dedicatedEnvFolder/$condaEnvName
             rm -f "$unpackedFolder"
             echo "Done."
           }

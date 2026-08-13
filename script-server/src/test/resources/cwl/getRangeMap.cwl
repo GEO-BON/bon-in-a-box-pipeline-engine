@@ -9,21 +9,28 @@ class: CommandLineTool
 
 label: Get species range map
 doc:
-  - "Description:
-    This script downloads the range map of the species according to the expert source chosen."
+  - |
+    Description:
+    This script downloads the range map of the species according to the expert source chosen.
   - "Lifecycle tag: Core."
-  - "Authors:
+  - |
+    Authors:
     Maria Isabel Arce-Plata (https://orcid.org/0000-0003-4024-9268)
-    Guillaume Larocque (https://orcid.org/0000-0002-5967-9156)"
+    Guillaume Larocque (https://orcid.org/0000-0002-5967-9156)
   - "External link: https://github.com/GEO-BON/biab-2.0/tree/main/scripts/SHI"
-  - "References:
-    Mammal Diversity Database. (2020). Mammal Diversity Database (Version 1.2) [Data set]. Zenodo. http://doi.org/10.5281/zenodo.4139818
+  - |
+    References:
+    Mammal Diversity Database. (2020). Mammal Diversity Database (Version 1.2) [Data set]. Zenodo.
+    http://doi.org/10.5281/zenodo.4139818
 
-    Map of Life. (2021). Mammal range maps harmonised to the Mammals Diversity Database [Data set]. Map of Life. https://doi.org/10.48600/MOL-48VZ-P413
+    Map of Life. (2021). Mammal range maps harmonised to the Mammals Diversity Database [Data set]. Map of Life.
+    https://doi.org/10.48600/MOL-48VZ-P413
 
-    IUCN. 2022. The IUCN Red List of Threatened Species. Version 2022-2. Accessed on May 2022. https://www.iucnredlist.org/resources/spatial-data-download
+    IUCN. 2022. The IUCN Red List of Threatened Species. Version 2022-2. Accessed on May 2022.
+    https://www.iucnredlist.org/resources/spatial-data-download
 
-    Ministère de l’Environnement, Lutte contre les changements climatiques, Faune et Parcs. Aires de répartition des mammifères terrestres, des reptiles, des amphibiens et des poissons d'eau douce . Acessed on May 2022. https://www.donneesquebec.ca/recherche/dataset/aires-de-repartition-faune"
+    Ministère de l’Environnement, Lutte contre les changements climatiques, Faune et Parcs. Aires de répartition des mammifères terrestres, des reptiles, des amphibiens et des poissons d'eau douce . Acessed on May 2022.
+    https://www.donneesquebec.ca/recherche/dataset/aires-de-repartition-faune
 
 
 requirements:
@@ -34,6 +41,16 @@ requirements:
           if (!outputFiles || outputFiles.length === 0) return null;
           var value = JSON.parse(outputFiles[0].contents)[key]
           if (value === undefined) return null
+
+          if(inputs.runFolder != null) {
+            if(Array.isArray(value)) {
+              value = value.map(function (item) {
+                return item.replace(inputs.runFolder.path, runtime.outdir);
+              });
+            } else {
+              value = value.replace(inputs.runFolder.path, runtime.outdir);
+            }
+          }
           return value;
         }
   InplaceUpdateRequirement:
@@ -45,16 +62,19 @@ requirements:
       ${
         return [
           {
-            entry: inputs.envFolder,
-            entryname: "/conda-envs",
-            writable: inputs.envFolderWritable
-          },
-          {
             entry: { "class": "Directory", "basename": "conda-env-yml", "listing": [] },
             entryname: "/conda-env-yml",
             writable: true
           }
         ].concat(
+          inputs.envFolder
+            ? {
+                entry: inputs.envFolder,
+                entryname: "/conda-envs",
+                writable: inputs.envFolderWritable
+              }
+            : []
+        ).concat(
           inputs.environment
             ? [{ entry: inputs.environment, entryname: "/runner.env" }]
             : []
@@ -117,6 +137,11 @@ arguments:
       2>&1 | tee -a $log
     scriptExitCode=\${PIPESTATUS[0]}
     echo "Script exited with code $scriptExitCode" | tee -a $log
+  
+    if [[ "$OUTPUT_LOCATION" != "$(runtime.outdir)" ]]; then
+      echo "Copying results from run folder to CWL output directory" | tee -a $log
+      cp -a "$OUTPUT_LOCATION"/. "$(runtime.outdir)"/
+    fi
 
     source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh forCWL__getRangeMap /conda-envs >> "$log" 2>&1
 
@@ -153,11 +178,8 @@ inputs:
   ###################
 
   envFolder:
-    type: Directory
+    type: Directory?
     doc: Folder for conda-pack to export environments. This avoids downloading/resolving the same environment multiple times.
-    default:
-      class: Directory
-      path: ./envs
 
   envFolderWriteable:
     type: boolean
@@ -203,7 +225,7 @@ outputs:
     label: expert range map
     doc: Polygon with expected area for the species.
     outputBinding:
-      glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'output.json')"
+      glob: "output.json"
       loadContents: true
       outputEval: |
         ${
@@ -220,4 +242,4 @@ outputs:
   logs:
     type: File
     outputBinding:
-      glob: "$((inputs.runFolder ? inputs.runFolder.basename + '/' : '') + 'logs.txt')"
+      glob: "logs.txt"
