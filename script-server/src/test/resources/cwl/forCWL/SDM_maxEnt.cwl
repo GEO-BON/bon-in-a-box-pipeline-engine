@@ -281,50 +281,47 @@ steps:
           echo "Exporting all environments"
           mkdir -p "$OUTPUT_LOCATION" "$CONDA_PKGS_DIRS" /conda-env-yml/envs
           
-          function exportEnv {
+          function getPackedEnv {
             condaEnvName=$1
             condaEnvYml=$2
             unpackedFolder=$(inputs.envFolderWrite.path)/$condaEnvName
             
             echo "Exporting $condaEnvName..."
             source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "$condaEnvName" \
-            "$condaEnvYml" $(inputs.envFolderWrite.path) $(inputs.condaPackURL)
+              "$condaEnvYml" $(inputs.envFolderWrite.path)/$condaEnvName $(inputs.condaPackURL)
             source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh $condaEnvName $(inputs.envFolderWrite.path)
-            if [[ ! -d "$unpackedFolder" ]]; then
-              mkdir -p "$unpackedFolder"
-              tar -xf "$unpackedFolder.tar.gz" -C "$unpackedFolder" --use-compress-program=pigz
-            fi
+            rm -f "$unpackedFolder"
             echo "Done."
           }
-          export -f exportEnv
+          export -f getPackedEnv
           
-          bash -c 'exportEnv "forCWL__SDM_maxEnt__filtering__cleanCoordinates" "channels: [conda-forge, r]
+          bash -c 'getPackedEnv "forCWL__SDM_maxEnt__filtering__cleanCoordinates" "channels: [conda-forge, r]
           dependencies: [r-terra, r-rjson, r-raster, r-dplyr, r-CoordinateCleaner, r-gdalcubes]
           name: forCWL__SDM_maxEnt__filtering__cleanCoordinates
           "'
           
-          bash -c 'exportEnv "forCWL__SDM_maxEnt__SDM__selectBackground" "channels: [conda-forge, r]
+          bash -c 'getPackedEnv "forCWL__SDM_maxEnt__SDM__selectBackground" "channels: [conda-forge, r]
           dependencies: [r-rjson, r-terra, r-dplyr, r-raster, r-CoordinateCleaner, r-stars,
             r-rstac, r-gdalcubes]
           name: forCWL__SDM_maxEnt__SDM__selectBackground
           "'
           
-          bash -c 'exportEnv "forCWL__SDM_maxEnt__SDM__setupDataSdm" "channels: [conda-forge, r]
+          bash -c 'getPackedEnv "forCWL__SDM_maxEnt__SDM__setupDataSdm" "channels: [conda-forge, r]
           dependencies: [r-gdalcubes, r-terra, r-rjson, r-raster, r-dplyr, r-ENMeval, r-devtools]
           name: forCWL__SDM_maxEnt__SDM__setupDataSdm
           "'
           
-          bash -c 'exportEnv "forCWL__SDM_maxEnt__SDM__rangePredictions" "channels: [conda-forge, r]
+          bash -c 'getPackedEnv "forCWL__SDM_maxEnt__SDM__rangePredictions" "channels: [conda-forge, r]
           dependencies: [r-terra, r-rjson, r-raster, r-dplyr]
           name: forCWL__SDM_maxEnt__SDM__rangePredictions
           "'
           
-          bash -c 'exportEnv "forCWL__SDM_maxEnt__SDM__removeCollinearity" "channels: [conda-forge, r]
+          bash -c 'getPackedEnv "forCWL__SDM_maxEnt__SDM__removeCollinearity" "channels: [conda-forge, r]
           dependencies: [r-terra, r-rjson, r-dplyr, r-gdalcubes]
           name: forCWL__SDM_maxEnt__SDM__removeCollinearity
           "'
           
-          bash -c 'exportEnv "forCWL__SDM_maxEnt__SDM__runMaxent" "channels: [conda-forge, r]
+          bash -c 'getPackedEnv "forCWL__SDM_maxEnt__SDM__runMaxent" "channels: [conda-forge, r]
           dependencies: [libgdal, r-abind, r-base, r-curl, r-dismo, r-downloader, r-dplyr, r-enmeval=2.0.3,
             r-ecospat, r-essentials, r-geojsonsf, r-ggsci, r-jpeg, r-landscapemetrics, r-magrittr,
             r-png, r-purrr, r-rcurl, r-rgbif, r-remotes, r-rjava, r-rjson, r-sf, r-stars, r-stringr,
@@ -332,12 +329,12 @@ steps:
           name: forCWL__SDM_maxEnt__SDM__runMaxent
           "'
           
-          bash -c 'exportEnv "forCWL__SDM_maxEnt__data__getGBIFObservations__getGBIFObservations" "channels: [conda-forge]
+          bash -c 'getPackedEnv "forCWL__SDM_maxEnt__data__getGBIFObservations__getGBIFObservations" "channels: [conda-forge]
           dependencies: [pygbif, pandas, pyproj]
           name: forCWL__SDM_maxEnt__data__getGBIFObservations__getGBIFObservations
           "'
           
-          bash -c 'exportEnv "forCWL__SDM_maxEnt__data__loadFromStac" "channels: [conda-forge, r]
+          bash -c 'getPackedEnv "forCWL__SDM_maxEnt__data__loadFromStac" "channels: [conda-forge, r]
           dependencies: [libgdal, r-lubridate, proj, r-proj, r-gdalcubes=0.7.1, r-rstac, r-dplyr,
             r-rcurl, r-rjson, r-sf, r-stars, r-terra]
           name: forCWL__SDM_maxEnt__data__loadFromStac
@@ -371,7 +368,9 @@ steps:
       predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected
       tests: { default: [equal, zeros, duplicates, same_pixel, capitals, centroids, gbif, institutions] }
       env_threshold: { default: 0.8 }
-      envFolder: prepareEnvironments/envFolder
+      envFolder:
+        source: prepareEnvironments/envFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__filtering__cleanCoordinates' } : null)"
       envFolderWriteable:
         default: false
       runFolder:
@@ -392,7 +391,9 @@ steps:
       n_background: forCWL>SDM_maxEnt>SDM>selectBackground.yml@40|n_background
       predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected
       raster: forCWL>SDM_maxEnt>data>GBIFHeatmapFromSTAC.yml@139/rasters
-      envFolder: prepareEnvironments/envFolder
+      envFolder:
+        source: prepareEnvironments/envFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__selectBackground' } : null)"
       envFolderWriteable:
         default: false
       runFolder:
@@ -414,7 +415,9 @@ steps:
       runs_n: pipeline@46
       boot_proportion: { default: 0.7 }
       cv_partitions: { default: 5 }
-      envFolder: prepareEnvironments/envFolder
+      envFolder:
+        source: prepareEnvironments/envFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__setupDataSdm' } : null)"
       envFolderWriteable:
         default: false
       runFolder:
@@ -430,7 +433,9 @@ steps:
     run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/rangePredictions.cwl
     in:
       predictions: forCWL>SDM_maxEnt>SDM>runMaxent.yml@108/sdm_runs
-      envFolder: prepareEnvironments/envFolder
+      envFolder:
+        source: prepareEnvironments/envFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__rangePredictions' } : null)"
       envFolderWriteable:
         default: false
       runFolder:
@@ -451,7 +456,9 @@ steps:
       nb_sample: { default: 5000 }
       cutoff_cor: { default: 0.75 }
       cutoff_vif: { default: 8 }
-      envFolder: prepareEnvironments/envFolder
+      envFolder:
+        source: prepareEnvironments/envFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__removeCollinearity' } : null)"
       envFolderWriteable:
         default: false
       runFolder:
@@ -470,9 +477,6 @@ steps:
       bbox_crs: pipeline@140
       method: { default: bbox }
       width_buffer: { default: 0 }
-      envFolder: prepareEnvironments/envFolder
-      envFolderWriteable:
-        default: false
       runFolder:
           source: runFolder
           valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__studyExtent/104' } : null)" 
@@ -494,7 +498,9 @@ steps:
       crs: pipeline@140
       n_folds: pipeline@46
       method_select_params: { default: AUC }
-      envFolder: prepareEnvironments/envFolder
+      envFolder:
+        source: prepareEnvironments/envFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__runMaxent' } : null)"
       envFolderWriteable:
         default: false
       runFolder:
@@ -512,9 +518,6 @@ steps:
       taxa: forCWL>SDM_maxEnt>data>GBIFHeatmapFromSTAC.yml@139|taxa
       bbox_crs: pipeline@140
       spatial_res: pipeline@128
-      envFolder: prepareEnvironments/envFolder
-      envFolderWriteable:
-        default: false
       runFolder:
           source: runFolder
           valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__data__GBIFHeatmapFromSTAC/139' } : null)" 
@@ -531,7 +534,9 @@ steps:
       bbox_crs: pipeline@140
       min_year: forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|min_year
       max_year: forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|max_year
-      envFolder: prepareEnvironments/envFolder
+      envFolder:
+        source: prepareEnvironments/envFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__data__getGBIFObservations__getGBIFObservations' } : null)"
       envFolderWriteable:
         default: false
       runFolder:
@@ -556,7 +561,9 @@ steps:
       resampling: { default: near }
       aggregation: { default: first }
       study_area: forCWL>SDM_maxEnt>data>loadFromStac.yml@144|study_area
-      envFolder: prepareEnvironments/envFolder
+      envFolder:
+        source: prepareEnvironments/envFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__data__loadFromStac' } : null)"
       envFolderWriteable:
         default: false
       runFolder:

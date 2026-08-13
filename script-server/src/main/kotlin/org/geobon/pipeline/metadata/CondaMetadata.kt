@@ -12,6 +12,8 @@ data class CondaMetadata(
     val name: String,
     val yml: String? = null
 ) {
+    fun isBaseEnv() = name == "rbase" || name == "pythonbase"
+
     companion object {
         fun fromRawMetadata(yamlFile: File, rawMetadata: Map<String, Any>): CondaMetadata? {
             // If available, return specific environment for script

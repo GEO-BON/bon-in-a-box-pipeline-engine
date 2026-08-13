@@ -112,22 +112,19 @@ steps:
           echo "Exporting all environments"
           mkdir -p "$OUTPUT_LOCATION" "$CONDA_PKGS_DIRS" /conda-env-yml/envs
           
-          function exportEnv {
+          function getPackedEnv {
             condaEnvName=$1
             condaEnvYml=$2
             unpackedFolder=$(inputs.envFolderWrite.path)/$condaEnvName
             
             echo "Exporting $condaEnvName..."
             source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "$condaEnvName" \
-            "$condaEnvYml" $(inputs.envFolderWrite.path) $(inputs.condaPackURL)
+              "$condaEnvYml" $(inputs.envFolderWrite.path)/$condaEnvName $(inputs.condaPackURL)
             source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh $condaEnvName $(inputs.envFolderWrite.path)
-            if [[ ! -d "$unpackedFolder" ]]; then
-              mkdir -p "$unpackedFolder"
-              tar -xf "$unpackedFolder.tar.gz" -C "$unpackedFolder" --use-compress-program=pigz
-            fi
+            rm -f "$unpackedFolder"
             echo "Done."
           }
-          export -f exportEnv
+          export -f getPackedEnv
           
 
           
@@ -156,9 +153,6 @@ steps:
     run: commandLineTools/helloWorld/helloPython.cwl
     in:
       some_int: pipeline@1
-      envFolder: prepareEnvironments/envFolder
-      envFolderWriteable:
-        default: false
       runFolder:
           source: runFolder
           valueFrom: "$(self ? { class: 'Directory', location: self.location + '/helloWorld__helloPython/0' } : null)" 
@@ -172,9 +166,6 @@ steps:
     run: commandLineTools/helloWorld/helloPython.cwl
     in:
       some_int: pipeline@1
-      envFolder: prepareEnvironments/envFolder
-      envFolderWriteable:
-        default: false
       runFolder:
           source: runFolder
           valueFrom: "$(self ? { class: 'Directory', location: self.location + '/helloWorld__helloPython/2' } : null)" 
@@ -188,9 +179,6 @@ steps:
     run: commandLineTools/helloWorld/helloPython.cwl
     in:
       some_int: helloWorld>helloPython.yml@0/increment
-      envFolder: prepareEnvironments/envFolder
-      envFolderWriteable:
-        default: false
       runFolder:
           source: runFolder
           valueFrom: "$(self ? { class: 'Directory', location: self.location + '/helloWorld__helloPython/5' } : null)" 

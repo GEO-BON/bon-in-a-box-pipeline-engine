@@ -66,9 +66,9 @@ class CWLFactory {
                 "stepDependencies" to
                         pipeline.steps.mapNotNull { (_, step) -> (step as? YMLStep)?.metadata?.conda }
                             .distinctBy { it.name }
-                            .filter { it.name != "rbase" && it.name != "pythonbase" }
+                            .filter { !it.isBaseEnv() }
                             .joinToString("\n\n") { condaMetadata ->
-                                """bash -c 'exportEnv "${condaMetadata.name}" "${condaMetadata.yml ?: ""}"'"""
+                                """bash -c 'getPackedEnv "${condaMetadata.name}" "${condaMetadata.yml ?: ""}"'"""
                             }
                             .replaceIndent(indent(5))
             )
@@ -330,9 +330,19 @@ class CWLFactory {
                         appendLine(3, "$key: ${toCWL(pipe)}")
                     } ?: appendLine(3, "$key: ${IOId(step.id, key)}")
                 }
-                appendLine(3, "envFolder: prepareEnvironments/envFolder")
-                appendLine(3, "envFolderWriteable:")
-                appendLine(4, "default: false")
+
+                step.metadata.conda?.let { condaMetadata ->
+                    if(!condaMetadata.isBaseEnv()) {
+                        appendLine(3, "envFolder:")
+                        appendLine(4, "source: prepareEnvironments/envFolder")
+                        appendLine(4,
+                            """valueFrom: "$(self ? { class: 'Directory', location: self.location + '/${condaMetadata.name}' } : null)""""
+                        )
+                        appendLine(3, "envFolderWriteable:")
+                        appendLine(4, "default: false")
+                    }
+                }
+
 
                 val runFolder = step.id.toString()
                     .replace(">","__")
@@ -412,14 +422,20 @@ class CWLFactory {
                     docEntries.add(
                         "References:" +
                                 references.joinToString("\n") {
-                                    "\n${indent(2)}${it.text} ${it.link}"
+                                    "\n${indent(2)}${it.text}" +
+                                    "\n${indent(2)}${it.link}"
                                 })
                 }
 
                 if (docEntries.isNotEmpty()) {
                     appendLine("doc:")
                     docEntries.forEach { entry ->
-                        appendLine("  - \"$entry\"")
+                        if(entry.contains('\n') || entry.contains('"')) {
+                            appendLine("  - |")
+                            appendLine(2, entry)
+                        } else {
+                            appendLine("  - \"$entry\"")
+                        }
                     }
                 }
             }
