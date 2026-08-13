@@ -30,6 +30,9 @@ fi
 # Optional, if provided, the URL where conda-pack environments are stored (read-only).
 condaPackURL=$5
 
+# Optional, if --noActivate is provided, we will exit as soon as we have a valid conda-pack.
+noActivate="${6:-}"
+
 pidFile="$outputFolder/.pid"
 
 # Permanent file (container life span) where we save the dependencies
@@ -198,6 +201,10 @@ function getRemotePack {
 function useLocalPack {
     # Check for a zip locally
     if [[ -f "$condaPackZip" ]]; then
+        if [[ "$noActivate" == "--noActivate" ]]; then
+            echo "Resolved conda-pack environment, exiting without activation."
+            return 0
+        fi
 
         if [[ -d "$condaPackDir" && -w "$condaPackDir" ]]; then
             condaPackExtracted="$condaPackDir/$condaEnvName"
@@ -231,6 +238,8 @@ function useLocalPack {
         echo "    Done."
         return 0
     fi
+
+    return 1
 }
 
 echo $$ > $pidFile

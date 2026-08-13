@@ -347,6 +347,50 @@ function test11 {
     echo -e "${GREEN}T11. Success!${ENDCOLOR}"
 }
 
+function test12 {
+    echo "T12. Using remote conda-packed env without activation..."
+    which xz
+    if [[ $? -eq 0 ]]; then
+        echo -e "${RED}FAILED: xz should not be available in the base environment before the test.${ENDCOLOR}"
+        exit 1
+    fi
+    # In case the env was created in a previous test run.
+    mamba env remove -y -n xz > /dev/null 2>&1
+
+    source condaEnvironment.sh \
+        test-output/E \
+        xz \
+        "channels: [conda-forge]\ndependencies: [xz]\nname: xz" \
+        test-output/E \
+        $CONDA_PACK_URL \
+        --noActivate
+
+    assertSuccess
+
+    which xz
+    if [[ $? -eq 0 ]]; then
+        echo -e "${RED}FAILED: xz should not be available when using --noActivate flag.${ENDCOLOR}"
+        exit 1
+    fi
+
+    if [ -d "test-output/E/xz" ]; then
+        echo -e "${RED}FAILED: Conda-packed environment should not be extracted when using --noActivate flag.${ENDCOLOR}"
+        exit 1
+    fi
+
+    if [ ! -f "test-output/E/xz.yml" ]; then
+        echo -e "${RED}FAILED: Conda-pack definition /conda-env-yml/xz.yml not found.${ENDCOLOR}"
+        exit 1
+    fi
+
+    if [ ! -f "test-output/E/xz.tar.gz" ]; then
+        echo -e "${RED}FAILED: Conda-pack archive /conda-env-yml/xz.tar.gz not found.${ENDCOLOR}"
+        exit 1
+    fi
+
+    echo -e "${GREEN}T12. Success!${ENDCOLOR}"
+}
+
 function runTests {
     echo "Running conda environment tests..."
     rm -rf test-output/*
@@ -373,8 +417,14 @@ function runTests {
         failures=$((failures + $?))
     done
 
-    # Read-only conda-pack directory fallback
+    # Suite D, Read-only conda-pack directory fallback
+    mkdir -p test-output/D
     bash -c "source /.bashrc; ./condaEnvironmentTest.sh 11"
+    failures=$((failures + $?))
+
+    # Suite E, Remote conda-pack URL with --noActivate
+    mkdir -p test-output/E
+    bash -c "source /.bashrc; ./condaEnvironmentTest.sh 12"
     failures=$((failures + $?))
 
     echo "Removing test environments..."
