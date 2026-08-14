@@ -216,11 +216,8 @@ inputs:
   ###################
 
   envFolder:
-    type: Directory
+    type: Directory?
     doc: Folder for conda-pack to export environments. This avoids downloading/resolving the same environment multiple times.
-    default:
-      class: Directory
-      path: ./envs
 
   runFolder:
     type: Directory?
@@ -252,6 +249,7 @@ inputs:
 steps:
   # This step prepares the environments for all the following steps
   prepareEnvironments:
+    when: $(inputs.envFolderWrite != null)
     run:
       class: CommandLineTool
       requirements:
@@ -352,7 +350,7 @@ steps:
           
       inputs:
         envFolderWrite:
-          type: Directory
+          type: Directory?
         runFolderWrite:
           type: Directory?
         condaPackURL:
