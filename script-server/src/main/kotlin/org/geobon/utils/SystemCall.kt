@@ -9,7 +9,7 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 open class SystemCall {
-    open fun run(
+    open fun runBlocking(
         call: List<String>,
         workingDir: File = File("."),
         timeoutAmount: Long = 1,
@@ -100,7 +100,7 @@ data class CallResult(val exitCode: Int, val output: String, val error:String = 
         get() = exitCode == 0
 }
 
-fun String.run(
+fun String.runBlocking(
     workingDir: File = File("."),
     timeoutAmount: Long = 1,
     timeoutUnit: TimeUnit = TimeUnit.SECONDS,

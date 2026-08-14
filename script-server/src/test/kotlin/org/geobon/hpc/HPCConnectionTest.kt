@@ -223,13 +223,13 @@ class HPCConnectionTest {
                 File(scriptsRoot, "HPCSyncTest.py"),
             )
             val systemCall = mockk<SystemCall>()
-            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
 
             connection.syncFiles(toSync)
 
             verify {
-                systemCall.run(
+                systemCall.runBlocking(
                     match { cmdList ->
                         cmdList.find {
                             it.contains("rsync")
@@ -260,13 +260,13 @@ class HPCConnectionTest {
                 File(scriptsRoot, "somethingWrong.py"),
             )
             val systemCall = mockk<SystemCall>()
-            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
 
             connection.syncFiles(toSync)
 
             verify { // somethingWrong.py should not be there
-                systemCall.run(
+                systemCall.runBlocking(
                     match { cmdList ->
                         cmdList.find {
                             it.contains("rsync")
@@ -294,13 +294,13 @@ class HPCConnectionTest {
                 File(scriptsRoot, "imLost.yml"),
             )
             val systemCall = mockk<SystemCall>()
-            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
 
             connection.syncFiles(toSync)
 
             verify(exactly = 0) { // somethingWrong.py should not be there
-                systemCall.run(any(), any(), any(), any(), any())
+                systemCall.runBlocking(any(), any(), any(), any(), any())
             }
             confirmVerified(systemCall)
         }
@@ -311,7 +311,7 @@ class HPCConnectionTest {
         withEnvironment(testEnvironment) {
             createSshFiles()
             val systemCall = mockk<SystemCall>()
-            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
             connection.condaImage.state = RemoteSetupState.READY
             connection.juliaImage.state = RemoteSetupState.READY

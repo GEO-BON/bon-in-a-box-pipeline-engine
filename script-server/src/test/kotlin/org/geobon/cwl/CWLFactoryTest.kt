@@ -20,7 +20,7 @@ class CWLFactoryTest {
     private val cwlScripts = File(scriptsRoot, "forCWL")
     private val pathToSteps = File(cwlResources,"commandLineTools")
 
-    private val hasRunner = SystemCall().run(listOf("which", "cwl-runner")).success
+    private val hasRunner = SystemCall().runBlocking(listOf("which", "cwl-runner")).success
 
     private var cwlFile: File? = null
     private var templateFile: File? = null
@@ -65,7 +65,7 @@ class CWLFactoryTest {
     fun validateCWL(cwlFile: File) {
         // cwl validation: not necessary for the test but very useful when developing!
         if (hasRunner) {
-            val validationResult = SystemCall().run(
+            val validationResult = SystemCall().runBlocking(
                 listOf("cwl-runner", "--validate", cwlFile.absolutePath),
                 mergeErrors = true,
                 timeoutAmount = 10
@@ -78,7 +78,7 @@ class CWLFactoryTest {
     fun makeTemplate(cwlFile: File) {
         // cwl validation: not necessary for the test but very useful when developing!
         if (hasRunner) {
-            val validationResult = SystemCall().run(
+            val validationResult = SystemCall().runBlocking(
                 listOf("cwl-runner", "--make-template", cwlFile.absolutePath),
                 mergeErrors = false,
                 timeoutAmount = 10

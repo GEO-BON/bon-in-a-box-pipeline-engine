@@ -20,7 +20,7 @@ import kotlin.time.measureTime
 object CWLExportMain {
 
     private val logger: Logger = LoggerFactory.getLogger("CWLExport")
-    private val cwlRunnerAvailable = SystemCall().run(listOf("which", "cwl-runner")).success
+    private val cwlRunnerAvailable = SystemCall().runBlocking(listOf("which", "cwl-runner")).success
 
     @Volatile
     var scriptFailures = 0
@@ -128,7 +128,7 @@ object CWLExportMain {
                             }
                             val validationDuration = measureTime {
                                 if (validateCWL(destinationFile)) {
-                                    val templateResult = SystemCall().run(
+                                    val templateResult = SystemCall().runBlocking(
                                         listOf("cwl-runner", "--make-template", destinationFile.absolutePath),
                                         timeoutAmount = 10
                                     )
@@ -160,7 +160,7 @@ object CWLExportMain {
 
     fun validateCWL(cwlFile: File): Boolean {
         return if (cwlRunnerAvailable) {
-            val validationResult = SystemCall().run(
+            val validationResult = SystemCall().runBlocking(
                 listOf("cwl-runner", "--validate", cwlFile.absolutePath),
                 mergeErrors = true,
                 timeoutAmount = 10

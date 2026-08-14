@@ -9,7 +9,7 @@ import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.SystemCall
-import org.geobon.utils.run
+import org.geobon.utils.runBlocking
 import org.geobon.utils.toSlurmDuration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -140,7 +140,7 @@ class HPCConnection(
 
                         // Create other mount endpoints
                         // and dummy runner.env file (we might need a real one in the future, but this just removes the "not found" warnings)
-                        val callResult = systemCall.run(
+                        val callResult = systemCall.runBlocking(
                             sshCommand + "mkdir -p $hpcScriptsRoot && mkdir -p $hpcOutputRoot && mkdir -p $hpcUserDataRoot && touch $hpcRoot/runner.env",
                             timeoutAmount = 1, timeoutUnit = MINUTES, logger = logger, mergeErrors = true
                         )
@@ -192,7 +192,7 @@ class HPCConnection(
 
                     // imageDigestResult: [ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
                     val imageDigestResult = "docker image inspect --format '{{.RepoDigests}}' $imageName"
-                        .run()
+                        .runBlocking()
                         ?.trim()
 
                     if (imageDigestResult.isNullOrBlank()
@@ -214,7 +214,7 @@ class HPCConnection(
                     apptainerImage.imagePath = "$hpcRoot/$apptainerImageName"
                     val overlayName = "${container.containerName}_overlay-${overlaySizeGB}GB.ext3"
                     apptainerImage.overlayPath = "$hpcRoot/$overlayName"
-                    val callResult = systemCall.run(
+                    val callResult = systemCall.runBlocking(
                         sshCommand +
                             """
                                 if [ -f ${apptainerImage.imagePath} ] && [ -f ${apptainerImage.overlayPath} ]; then
@@ -350,7 +350,7 @@ class HPCConnection(
 
                     // files are relative to our root:
                     val toDeleteAbsolute = toDelete.map { file -> File(hpcRoot, file.absolutePath.removePrefix("/")).absolutePath }
-                    systemCall.run(sshCommand +  "rm -rf ${toDeleteAbsolute.joinToString(" ")}", logFile = logFile)
+                    systemCall.runBlocking(sshCommand +  "rm -rf ${toDeleteAbsolute.joinToString(" ")}", logFile = logFile)
                 }
 
                 logFile?.appendText("""
@@ -361,7 +361,7 @@ class HPCConnection(
                     .trimIndent()
                     .also { logger.debug(it) })
 
-                val result = systemCall.run(
+                val result = systemCall.runBlocking(
                     listOf(
                         "bash", "-c",
                         """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r / $sshConfig:$hpcRoot/"""
@@ -437,7 +437,7 @@ class HPCConnection(
 
         """.trimIndent())
 
-        var callResult = systemCall.run(
+        var callResult = systemCall.runBlocking(
             listOf(
                 "bash", "-c",
                 """echo "${sBatchFileLocal.absolutePath}" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- / $sshConfig:$hpcRoot/"""
@@ -451,7 +451,7 @@ class HPCConnection(
         }
 
         val sBatchFileRemote = File(hpcOutputRoot, sBatchFileLocal.name)
-        callResult = systemCall.run(
+        callResult = systemCall.runBlocking(
             sshCommand + """bash -o pipefail -c "sbatch ${sBatchFileRemote.absolutePath} 2>&1 | tee -a ${hpcLogFiles.joinToString(" ")}"""",
             timeoutAmount = 10, timeoutUnit = MINUTES, mergeErrors = true, logger = logger
         )
@@ -478,7 +478,7 @@ class HPCConnection(
 
             logger.debug("Syncing from HPC:\n$filesString\n")
 
-            val result = systemCall.run(
+            val result = systemCall.runBlocking(
                 listOf(
                     "bash", "-c",
                     """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' -p --chmod=Da+rx,Fa+r --mkpath --files-from=- -r $sshConfig:$hpcRoot/ / """
@@ -503,7 +503,7 @@ class HPCConnection(
         }
 
         withContext(Dispatchers.IO) {
-            var callResult = systemCall.run(
+            var callResult = systemCall.runBlocking(
                 sshCommand + command,
                 timeoutAmount = timeoutMinutes, timeoutUnit = MINUTES, logger = logger,
                 logFile = logFile
