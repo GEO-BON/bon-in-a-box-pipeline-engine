@@ -51,7 +51,11 @@ requirements:
                 entryname: "/conda-envs",
                 writable: inputs.envFolderWritable
               }
-            : []
+            : { // fallback
+                entry: { "class": "Directory", "basename": "conda-envs", "listing": [] },
+                entryname: "/conda-envs",
+                writable: true
+              }
         ).concat(
           inputs.environment
             ? [{ entry: inputs.environment, entryname: "/runner.env" }]
