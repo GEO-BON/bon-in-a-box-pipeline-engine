@@ -45,6 +45,8 @@ object CWLExportMain {
             exitProcess(1)
         }
 
+        logger.info("Starting CWL export")
+
         destinationRoot = File(args[0])
         if (destinationRoot.exists()) {
             destinationRoot.deleteRecursively()
@@ -56,7 +58,7 @@ object CWLExportMain {
         }
         toolsRoot = File(destinationRoot, "tools")
         val workflowsRoot = File(destinationRoot, "workflows")
-        runBlocking {
+        runBlocking(Dispatchers.Default) {
             exportAllFiles(toolsRoot, scriptsRoot, "script")
             exportAllFiles(workflowsRoot, pipelinesRoot, "pipeline")
         }
@@ -99,33 +101,41 @@ object CWLExportMain {
         val destinationFolder = File(destinationRoot, directory.relativeTo(root).path)
         destinationFolder.mkdirs()
 
-        return coroutineScope {
+        coroutineScope {
             directory.listFiles()?.forEach { file ->
-                if (file.isDirectory) {
-                    exportAllFiles(destinationRoot, file, type)
-                } else if (file.extension == extension) {
-                    launch(Dispatchers.IO) {
+                launch(Dispatchers.IO) {
+                    if (file.isDirectory) {
+                        exportAllFiles(destinationRoot, file, type)
+
+                    } else if (file.extension == extension) {
                         val destinationFile = File(destinationFolder, "${file.nameWithoutExtension}.cwl")
                         try {
                             val exportDuration = measureTime {
                                 when (type) {
                                     "script" -> {
                                         scriptsFound++
-                                        destinationFile.writeText(CWLFactory.toCommandLineTool(
-                                            ScriptStep(serverContext, file, StepId(file.nameWithoutExtension, "0"))
-                                        ))
+                                        destinationFile.writeText(
+                                            CWLFactory.toCommandLineTool(
+                                                ScriptStep(serverContext, file, StepId(file.nameWithoutExtension, "0"))
+                                            )
+                                        )
                                     }
+
                                     "pipeline" -> {
                                         pipelinesFound++
                                         CWLFactory.toWorkflow(
                                             JSONPipeline.createFromFile(
-                                                serverContext, StepId(file.nameWithoutExtension, "0"), file.relativeTo(root).path),
-                                                destinationFile,
-                                                toolsRoot
+                                                serverContext,
+                                                StepId(file.nameWithoutExtension, "0"),
+                                                file.relativeTo(root).path
+                                            ),
+                                            destinationFile,
+                                            toolsRoot
                                         )
                                     }
                                 }
                             }
+
                             val validationDuration = measureTime {
                                 if (validateCWL(destinationFile)) {
                                     val templateResult = SystemCall().runBlocking(
@@ -133,8 +143,12 @@ object CWLExportMain {
                                         timeoutAmount = 10
                                     )
 
-                                    if(templateResult.success){
-                                        val templateFile = File(destinationFile.parentFile, "${file.nameWithoutExtension}_template.yml")
+                                    if (templateResult.success) {
+                                        val templateFile =
+                                            File(
+                                                destinationFile.parentFile,
+                                                "${file.nameWithoutExtension}_template.yml"
+                                            )
                                         templateFile.writeText(templateResult.output)
                                     } else {
                                         logger.warn("Failed to create template for ${destinationFile.path}")
@@ -158,9 +172,9 @@ object CWLExportMain {
         }
     }
 
-    fun validateCWL(cwlFile: File): Boolean {
+    suspend fun validateCWL(cwlFile: File): Boolean {
         return if (cwlRunnerAvailable) {
-            val validationResult = SystemCall().runBlocking(
+            val validationResult = SystemCall().run(
                 listOf("cwl-runner", "--validate", cwlFile.absolutePath),
                 mergeErrors = true,
                 timeoutAmount = 10
