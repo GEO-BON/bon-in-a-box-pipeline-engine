@@ -38,7 +38,7 @@ doc:
     https://doi.org/10.1146/annurev.ecolsys.110308.120159
 
     Peterson, 2001
-    https://doi.org/10.1641/0006-3568(2001)051[0363:PSIUEN]2.0.CO;2
+    https://doi.org/10.1641/0006-3568%282001%29051%5B0363%3APSIUEN%5D2.0.CO%3B2
 
 
 requirements:
