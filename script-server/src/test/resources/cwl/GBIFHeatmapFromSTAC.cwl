@@ -218,12 +218,12 @@ inputs:
     type: Directory?
     doc: Folder for conda-pack to export environments. This avoids downloading/resolving the same environment multiple times.
 
-  envFolderWriteable:
+  envFolderWritable:
     type: boolean
     doc:
       Whether the envFolder should be writable. If false, the folder will be mounted read-only.
       In that case, the conda environment needs to be present as an unpacked conda-pack beforehand otherwise the script can't run.
-      envFolderWriteable must be false when running in a workflow, but can be true when ran as an individual tool.
+      envFolderWritable must be false when running in a workflow, but can be true when ran as an individual tool.
     default: true
 
   runFolder:

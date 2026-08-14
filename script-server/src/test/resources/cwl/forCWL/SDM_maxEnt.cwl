@@ -379,7 +379,7 @@ steps:
       envFolder:
         source: prepareEnvironments/envFolder
         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__filtering__cleanCoordinates' } : null)"
-      envFolderWriteable:
+      envFolderWritable:
         default: false
       runFolder:
           source: runFolder
@@ -402,7 +402,7 @@ steps:
       envFolder:
         source: prepareEnvironments/envFolder
         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__selectBackground' } : null)"
-      envFolderWriteable:
+      envFolderWritable:
         default: false
       runFolder:
           source: runFolder
@@ -426,7 +426,7 @@ steps:
       envFolder:
         source: prepareEnvironments/envFolder
         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__setupDataSdm' } : null)"
-      envFolderWriteable:
+      envFolderWritable:
         default: false
       runFolder:
           source: runFolder
@@ -444,7 +444,7 @@ steps:
       envFolder:
         source: prepareEnvironments/envFolder
         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__rangePredictions' } : null)"
-      envFolderWriteable:
+      envFolderWritable:
         default: false
       runFolder:
           source: runFolder
@@ -467,7 +467,7 @@ steps:
       envFolder:
         source: prepareEnvironments/envFolder
         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__removeCollinearity' } : null)"
-      envFolderWriteable:
+      envFolderWritable:
         default: false
       runFolder:
           source: runFolder
@@ -509,7 +509,7 @@ steps:
       envFolder:
         source: prepareEnvironments/envFolder
         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__runMaxent' } : null)"
-      envFolderWriteable:
+      envFolderWritable:
         default: false
       runFolder:
           source: runFolder
@@ -545,7 +545,7 @@ steps:
       envFolder:
         source: prepareEnvironments/envFolder
         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__data__getGBIFObservations__getGBIFObservations' } : null)"
-      envFolderWriteable:
+      envFolderWritable:
         default: false
       runFolder:
           source: runFolder
@@ -572,7 +572,7 @@ steps:
       envFolder:
         source: prepareEnvironments/envFolder
         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__data__loadFromStac' } : null)"
-      envFolderWriteable:
+      envFolderWritable:
         default: false
       runFolder:
           source: runFolder

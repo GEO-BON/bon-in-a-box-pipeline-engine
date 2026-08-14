@@ -346,7 +346,7 @@ class CWLFactory {
                         appendLine(4,
                             """valueFrom: "$(self ? { class: 'Directory', location: self.location + '/${condaMetadata.name}' } : null)""""
                         )
-                        appendLine(3, "envFolderWriteable:")
+                        appendLine(3, "envFolderWritable:")
                         appendLine(4, "default: false")
                     }
                 }
