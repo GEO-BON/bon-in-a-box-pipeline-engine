@@ -2,11 +2,11 @@
 title: "Integrating openEO processes into BON in a Box pipelines"
 ---
 
-BON in a Box supports the integration of **openEO processes** into analysis pipelines. This allows pipeline developers to incorporate cloud-based Earth observation processing into larger BON in a Box workflows.
+BON in a Box supports the integration of **openEO User-Defined Processes (UDPs)** into analysis pipelines. This allows pipeline developers to incorporate cloud-based Earth observation processing into larger BON in a Box workflows.
 
-Using openEO can be particularly useful for analyses involving large Earth observation (EO) datasets. Rather than downloading and processing these datasets locally, computationally intensive operations can be carried out remotely on an openEO backend. The resulting products are then returned to BON in a Box, where they can be connected to subsequent pipeline steps.
+Using openEO can be particularly useful for analyses involving raw Earth observation (EO) datasets. Rather than downloading and processing these datasets locally, computationally intensive operations can be carried out remotely on an openEO backend. The resulting products are then returned to BON in a Box, where they can be connected to subsequent pipeline steps.
 
-This page explains how **openEO User-Defined Processes (UDPs)** can be added to and used within BON in a Box.
+This page explains how UDPs can be added to and used within BON in a Box.
 
 
 ## What is openEO?
@@ -31,7 +31,7 @@ A UDP is a predefined openEO process graph that performs a particular analysis. 
 
 For BON in a Box, a UDP can therefore be treated as a step (or script) in a larger biodiversity analysis pipeline.
 
-For example, a UDP could generate an Earth observation-derived environmental variable such as Leaf Area Index (LAI). The resulting raster could then be passed to another BON in a Box process for use as an environmental predictor in a species distribution model.
+For example, a UDP could generate an Earth Observation-derived environmental variable such as Leaf Area Index (LAI). The resulting raster could then be passed to another BON in a Box process for use as an environmental predictor in a species distribution model.
 
 The general workflow is:
 
@@ -76,7 +76,7 @@ When a user runs the pipeline, the values they provide are passed to the corresp
 
 ## Adding a UDP to BON in a Box
 
-### 1. Check if the UDP is already in the `externalScripts.yaml` file.
+### 1. Check if the UDP is already in the `scripts/externalScripts.yaml` file.
 
 OpenEO UDPs available to BON in a Box are registered in `externalScripts.yaml`.
 
@@ -89,7 +89,7 @@ CDSE:
     url: https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/184bd41069defabd328348f54232d6ae362775fc/algorithm_catalog/obsgession/udp_obsgession_w23_lai/openeo_udp/udp_obsgession_w23_lai.json
 ```
 
-The entry identifies the UDP and where its process definition can be found.
+The entry identifies the UDP and where its process definition can be found on the APEx catalogue.
 
 In this example:
 
