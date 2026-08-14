@@ -281,7 +281,62 @@ function test10 {
 }
 
 function test11 {
-    echo "T11.  Extracting existing pack from readonly directory..."
+    echo "T11.  Missing pack from readonly directory..."
+    if mamba list -n base xz 2>/dev/null | grep -q '^xz '; then
+        echo -e "${RED}FAILED: xz should not be installed in the base conda environment before the test.${ENDCOLOR}"
+        exit 1
+    fi
+
+    readonlyDir="test-output/D/readonly-conda-pack"
+    outputDir="test-output/D/run"
+    rm -rf "$readonlyDir" "$outputDir"
+    mkdir -p "$readonlyDir" "$outputDir"
+    chmod 555 "$readonlyDir"
+    if [[ -w "$readonlyDir" ]]; then
+        echo -e "${RED}FAILED: Read-only directory $readonlyDir is writable.${ENDCOLOR}"
+        exit 1
+    fi
+
+    mamba env remove -y -n xz > /dev/null 2>&1
+    source condaEnvironment.sh \
+        "$outputDir" \
+        xz \
+        "channels: [conda-forge]\ndependencies: [xz]\nname: xz" \
+        "$readonlyDir" \
+        $CONDA_PACK_URL
+    assertSuccess
+
+    which xz > /dev/null 2>&1; assertSuccess # can't use verifyPackage when using conda-pack
+
+    if [ ! -z "$( ls -A $readonlyDir )" ]; then
+        echo -e "${RED}FAILED: Read-only directory should have stayed empty.${ENDCOLOR}"
+        exit 1
+    fi
+
+    if [ ! -d "/tmp/biab/conda-pack/xz" ]; then
+        echo -e "${RED}FAILED: Conda-packed environment should be extracted in /tmp/biab/conda-pack/xz${ENDCOLOR}"
+        exit 1
+    fi
+
+    if [ ! -f "/tmp/biab/conda-pack/xz.yml" ]; then
+        echo -e "${RED}FAILED: Conda-pack definition should be stored in /tmp/biab/conda-pack/xz.yml${ENDCOLOR}"
+        exit 1
+    fi
+
+    if [ ! -f "/tmp/biab/conda-pack/xz.tar.gz" ]; then
+        echo -e "${RED}FAILED: Conda-pack archive should be stored in /tmp/biab/conda-pack/xz.tar.gz.${ENDCOLOR}"
+        exit 1
+    fi
+
+    chmod 755 "$readonlyDir"
+    rm -rf "$readonlyDir" "$outputDir" \
+        /tmp/biab/conda-pack/xz /tmp/biab/conda-pack/xz.tar.gz /tmp/biab/conda-pack/xz.yml \
+        "$preexistingYmlFile" "$preexistingTarFile"
+    echo -e "${GREEN}T11. Success!${ENDCOLOR}"
+}
+
+function test12 {
+    echo "T12.  Extracting existing pack from readonly directory..."
     if mamba list -n base xz 2>/dev/null | grep -q '^xz '; then
         echo -e "${RED}FAILED: xz should not be installed in the base conda environment before the test.${ENDCOLOR}"
         exit 1
@@ -344,11 +399,11 @@ function test11 {
     rm -rf "$readonlyDir" "$outputDir" \
         /tmp/biab/conda-pack/xz /tmp/biab/conda-pack/xz.tar.gz /tmp/biab/conda-pack/xz.yml \
         "$preexistingYmlFile" "$preexistingTarFile"
-    echo -e "${GREEN}T11. Success!${ENDCOLOR}"
+    echo -e "${GREEN}T12. Success!${ENDCOLOR}"
 }
 
-function test12 {
-    echo "T12. Using remote conda-packed env without activation..."
+function test13 {
+    echo "T13. Using remote conda-packed env without activation..."
     which xz
     if [[ $? -eq 0 ]]; then
         echo -e "${RED}FAILED: xz should not be available in the base environment before the test.${ENDCOLOR}"
@@ -388,7 +443,7 @@ function test12 {
         exit 1
     fi
 
-    echo -e "${GREEN}T12. Success!${ENDCOLOR}"
+    echo -e "${GREEN}T13. Success!${ENDCOLOR}"
 }
 
 function runTests {
@@ -419,12 +474,14 @@ function runTests {
 
     # Suite D, Read-only conda-pack directory fallback
     mkdir -p test-output/D
-    bash -c "source /.bashrc; ./condaEnvironmentTest.sh 11"
-    failures=$((failures + $?))
+    for i in {11..12}; do
+        bash -c "source /.bashrc; ./condaEnvironmentTest.sh $i"
+        failures=$((failures + $?))
+    done
 
     # Suite E, Remote conda-pack URL with --noActivate
     mkdir -p test-output/E
-    bash -c "source /.bashrc; ./condaEnvironmentTest.sh 12"
+    bash -c "source /.bashrc; ./condaEnvironmentTest.sh 13"
     failures=$((failures + $?))
 
     echo "Removing test environments..."
