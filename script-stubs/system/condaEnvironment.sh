@@ -164,7 +164,8 @@ function useCondaPack {
                         fi
                     fi
                 else
-                    echo "    No corresponding conda-pack environment found."
+                    echo "    No corresponding conda-pack environment found. Diff:"
+                    diff "$remotePackYml" "$condaEnvFileNew"
                 fi
             else
                 echo "    No remote conda-pack environment found: $status, $(head $remotePackYml 2>/dev/null)."
