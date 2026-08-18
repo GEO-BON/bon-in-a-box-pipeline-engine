@@ -20,6 +20,7 @@ import IconFiles from "./img/icon-gear.png";
 import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";
 import { uiContext } from "./uiContext.jsx";
+import getUserInfo from './utils/getUserInfo.js';
 
 
 const pages = [
@@ -31,13 +32,32 @@ const pages = [
     { title: 'Info', link: '/info' }
 ];
 
-// only temporary
-const userInfo = { name: 'FirstName' }
-const { name } = userInfo
+
 
 function TopMenu() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const { disableMyFiles } = React.useContext(uiContext);
+    const [userInfo, setUserInfo] = React.useState({ name: 'FirstName' });
+
+    React.useEffect(() => {
+        getUserInfo()
+            .then(response => {
+                // 401 means signed out, and its body is an error object -- spreading
+                // that into userInfo would render a bogus name.
+                if (!response.ok) {
+                    return null;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    setUserInfo(data);
+                }
+        })
+            .catch(error => {
+                console.error("Error fetching user info:", error);
+        });
+    },[]);
 
     const handleOpenNavMenu = (event) => {
         setAnchorElNav(event.currentTarget);
@@ -153,7 +173,7 @@ function TopMenu() {
                 <Box sx={{ flexGrow: 0, display: 'flex', alignContent: 'center', flexWrap: 'wrap' }}>
                     <div ref={toggleButtonRef} onClick={togglePopup} className='navigation-bar-profile-container'>   
                         <img className="navigation-bar-avatar" src={Avatar}></img>
-                        <p className="navigation-bar-profile">{name}</p>
+                        <p className="navigation-bar-profile">{userInfo.name}</p>
                     </div>
 
                     {/* popup for user space */}
@@ -201,7 +221,7 @@ function TopMenu() {
                             <div className='divider'></div>
 
                             <NavLink 
-                                to=""
+                                to="https://auth.bee.geobon.org/oauth2/sign_out"
                                 className="navbar-profile-popup-option">
                                 <img src={IconLogout} className='navbar-profile-popup-icon'></img>
                                 Log out
