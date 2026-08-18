@@ -42,8 +42,6 @@ function TopMenu() {
     React.useEffect(() => {
         getUserInfo()
             .then(response => {
-                // 401 means signed out, and its body is an error object -- spreading
-                // that into userInfo would render a bogus name.
                 if (!response.ok) {
                     return null;
                 }
