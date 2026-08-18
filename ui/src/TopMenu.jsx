@@ -196,21 +196,21 @@ function TopMenu() {
                             </NavLink>}
 
                             <NavLink
-                                to=""
+                                to="https://members.geobon.org/pages/dashboard/profile"
                                 className="navbar-profile-popup-option">
                                 <img src={IconProfile} className='navbar-profile-popup-icon'></img>
                                 GEO BON profile
                             </NavLink>
 
                             <NavLink
-                                to=""
+                                to="https://discourse.geobon.org/"
                                 className="navbar-profile-popup-option mobile-popup-link">
                                 <img src={IconDiscourse} className='navbar-profile-popup-icon'></img>
                                 Discourse
                             </NavLink>
 
                             <NavLink
-                                to=""
+                                to="https://members.geobon.org/"
                                 className="navbar-profile-popup-option mobile-popup-link">
                                 <img src={IconMembers} className='navbar-profile-popup-icon'></img>
                                 Members
