@@ -131,27 +131,7 @@ It will appear in the list of available scripts in the pipeline editor under the
 
 Once the UDP has been added, it can be incorporated into BON in a Box pipelines in the same way as other scripts.
 
-When the UDP is executed, the following steps occur:
-
-**1**. The user configures the UDP inputs through the BON in a Box input form.
-
-**2**. BON in a Box passes these values to the generic openEO wrapper.
-
-**3**. The wrapper reads the script definition to determine the type of each input.
-
-**4**. The wrapper identifies the UDP process ID and process definition.
-
-**5**. BON in a Box connects and authenticates with the openEO backend.
-
-**6**. The inputs are passed to the UDP.
-
-**7**. A remote openEO processing job is created and started.
-
-**8**. BON in a Box waits for the remote job to finish.
-
-**9**. The resulting files are downloaded.
-
-**10**. The output GeoTIFF files are returned to BON in a Box and can be connected to subsequent pipeline steps.
+When the UDP is executed, BON in a Box sends the user-defined inputs to the openEO backend, where the process is run remotely. Once processing is complete, the resulting GeoTIFF files are returned to BON in a Box and can be used as inputs in subsequent pipeline steps.
 
 Conceptually:
 
@@ -173,7 +153,7 @@ openEO processing occurs outside BON in a Box. A job may therefore fail because 
 - resource limits; or
 - temporary service interruptions.
 
-Check both the BON in a Box logs and, where available, the logs returned by the openEO job or contact the openEO team.
+Check both the BON in a Box logs and, where available, the logs returned by the openEO job or use the [APEx user forum](https://apex.esa.int/services/user-forum/) to troubleshoot issues.
 
 ## Limitations
 
