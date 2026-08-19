@@ -157,7 +157,9 @@ export default function FileBrowser({ multipleFiles, onSelect }) {
                         disabled={fileNames.length === 0}
                             onClick={() => {
                             if (onSelect) { // if this function is passed on as a parameter
-                                onSelect(fileNames);
+                                const prefix = "/userdata"  // adding prefix to the paths
+                                const filesWithPrefix = fileNames.map(item => prefix + item);
+                                onSelect(filesWithPrefix);
                             }
                             handleClose();
                         }}

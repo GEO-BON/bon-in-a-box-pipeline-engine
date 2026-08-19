@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { RestDataProvider } from "@svar-ui/filemanager-data-provider";
-import { Filemanager, WillowDark } from "@svar-ui/react-filemanager";
+import { Filemanager, WillowDark, getMenuOptions } from "@svar-ui/react-filemanager";
 
 import "@svar-ui/react-filemanager/all.css";
 import "./FileManager.css";
@@ -24,6 +24,14 @@ export default function FileManager() {
         });
     };
 
+    function menuOptions(mode, item) {
+        let options = getMenuOptions(mode);
+        if (mode == "add") {
+            options = options.filter((o) => o.id != "add-file");
+        }
+        return options;
+    }
+
     useEffect(() => {
         // debugging 
         // console.log({ DISABLE_MY_FILES });
@@ -41,7 +49,7 @@ export default function FileManager() {
     return (
         <div className="file-manager" style={{ width: "100%" }}>
             <WillowDark>
-                <Filemanager init={init} data={data} drive={drive} />
+                <Filemanager init={init} data={data} menuOptions={menuOptions} drive={drive} />
             </WillowDark>
         </div>
     );
