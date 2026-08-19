@@ -36,16 +36,6 @@ services:
       - hpc_known_hosts_file
       - hpc_ssh_config_file
 
-  # adding a ClamAV container to scan user uploaded files
-  clamav:
-    image: clamav/clamav-debian:latest  # '-debian' fixes error : no matching manifest for linux/arm64 
-    container_name: biab-clamav
-    ports:
-      - "3310:3310"
-    volumes:
-      - clamav_data:/var/lib/clamav
-    restart: unless-stopped
-
   python-api: # Serves Titiler and a FastAPI app to serve country and region names and geometries
     container_name: biab-python-api
     env_file: # added this to fetch the DISABLE_MY_FILES variable in /pipeline-repo/runner.env
@@ -53,6 +43,7 @@ services:
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
       - ${PIPELINE_REPO_PATH}/userdata:/data/userdata:rw  # for user uploads, used in "/manage-files"
+      - clamav_data:/var/lib/clamav:rw  # ClamAV signatures, scanning user uploads happens in this container
 
     user: ${MY_UID}:${DOCKER_GID}
     environment:
@@ -66,8 +57,6 @@ services:
       - "8001"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    depends_on: 
-      - clamav  # added so that ClamAV is running before the python-api
 
   runner-conda:
     container_name: biab-runner-conda
