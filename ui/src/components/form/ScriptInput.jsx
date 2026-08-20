@@ -294,14 +294,14 @@ export default function ScriptInput({
       if (type.includes("/") /* assume MIME type, files have no line breaks */) {
         return <Box
         sx={{
-          /*display: "flex",
+          display: "flex",
           alignItems: "flex-start",
           "& .filebrowser": { display: "flex" },
           "& .button-modal": {
             margin: 0,
             borderTopLeftRadius: 0,
             borderBottomLeftRadius: 0,
-          },*/
+          },
         }}
       ><TextField
           type="text"
