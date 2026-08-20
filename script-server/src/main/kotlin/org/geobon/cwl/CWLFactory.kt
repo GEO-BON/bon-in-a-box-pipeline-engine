@@ -17,6 +17,7 @@ import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
+import org.json.JSONWriter
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 
@@ -311,6 +312,60 @@ class CWLFactory {
             }
         }
 
+        /**
+         * Renders one entry of the "in" section of a workflow step.
+         *
+         * Two situations need many values to land in a single array input:
+         * several pipes plugged in the same input (AggregatePipe), and a single non-array pipe
+         * plugged in an array input (BON in a Box wraps it at run time).
+         * Both become a CWL source list merged with "merge_flattened", which has the same
+         * flattening semantics as AggregatePipe.
+         *
+         * @param sinkType the BON in a Box type declared by the step for this input.
+         */
+        private fun stepInputToCWL(key: String, pipe: Pipe, sinkType: String): String {
+            val pipes = (pipe as? AggregatePipe)?.pipes ?: listOf(pipe)
+            val needsMerge = pipes.size > 1
+                    || (sinkType.endsWith("[]") && pipes.any { !it.type.endsWith("[]") })
+
+            if (!needsMerge) {
+                return buildString { appendLine(3, "$key: ${toCWL(pipe)}") }
+            }
+
+            // Constants have no id to point a source at, so they are appended through an expression.
+            val (constants, links) = pipes.partition { it is ConstantPipe }
+
+            return buildString {
+                appendLine(3, "$key:")
+                if (links.isNotEmpty()) {
+                    appendLine(4, "source: [${links.joinToString(", ") { toCWL(it) }}]")
+                    appendLine(4, "linkMerge: merge_flattened")
+                }
+
+                if (constants.isNotEmpty()) {
+                    val values = constants.joinToString(", ") { constantToJS(it as ConstantPipe) }
+                    appendLine(
+                        4,
+                        if (links.isEmpty()) "valueFrom: \$([$values])"
+                        else "valueFrom: \$(self.concat([$values]))"
+                    )
+                }
+            }
+        }
+
+        /**
+         * @return the constant's value as a javascript literal, usable inside a valueFrom expression.
+         */
+        private fun constantToJS(pipe: ConstantPipe): String {
+            val values = (pipe.value as? Collection<*>) ?: listOf(pipe.value)
+            return values.joinToString(", ") { value ->
+                if (value != null && Pipe.MIME_TYPE_REGEX.matches(pipe.type))
+                    """{ "class": "File", "location": "file://$value" }"""
+                else
+                    JSONWriter.valueToString(value)
+            }
+        }
+
         private fun toCWL(step: IStep, targetDir: File, commandLineToolsDir: File): String? {
             return buildString {
                 val run: String = when (step) {
@@ -333,9 +388,9 @@ class CWLFactory {
                 appendLine(1, "${step.id}:")
                 appendLine(2, "run: $run")
                 appendLine(2, "in:")
-                step.metadata.inputs.keys.forEach { key ->
+                step.metadata.inputs.forEach { (key, definition) ->
                     step.inputs[key]?.let { pipe ->
-                        appendLine(3, "$key: ${toCWL(pipe)}")
+                        append(stepInputToCWL(key, pipe, definition.type))
                     } ?: appendLine(3, "$key: ${IOId(step.id, key)}")
                 }
 

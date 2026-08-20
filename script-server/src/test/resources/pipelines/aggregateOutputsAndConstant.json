@@ -1,0 +1,120 @@
+{
+  "nodes": [
+    {
+      "id": "0",
+      "type": "io",
+      "position": {
+        "x": 350,
+        "y": 200
+      },
+      "data": {
+        "descriptionFile": "0in1out.yml"
+      }
+    },
+    {
+      "id": "1",
+      "type": "io",
+      "position": {
+        "x": 350,
+        "y": 320
+      },
+      "data": {
+        "descriptionFile": "0in1out.yml"
+      }
+    },
+    {
+      "id": "2",
+      "type": "constant",
+      "position": {
+        "x": 350,
+        "y": 440
+      },
+      "dragHandle": ".dragHandle",
+      "data": {
+        "type": "int[]",
+        "value": [
+          "12",
+          "13"
+        ]
+      }
+    },
+    {
+      "id": "3",
+      "type": "io",
+      "position": {
+        "x": 739,
+        "y": 320
+      },
+      "data": {
+        "descriptionFile": "assertArray.yml"
+      }
+    },
+    {
+      "id": "4",
+      "type": "output",
+      "position": {
+        "x": 1067,
+        "y": 320
+      },
+      "data": {
+        "label": "Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "0",
+      "sourceHandle": "randomness",
+      "target": "3",
+      "targetHandle": "array",
+      "id": "reactflow__edge-0randomness-3array"
+    },
+    {
+      "source": "1",
+      "sourceHandle": "randomness",
+      "target": "3",
+      "targetHandle": "array",
+      "id": "reactflow__edge-1randomness-3array"
+    },
+    {
+      "source": "2",
+      "sourceHandle": null,
+      "target": "3",
+      "targetHandle": "array",
+      "id": "reactflow__edge-2-3array"
+    },
+    {
+      "source": "3",
+      "sourceHandle": "the_same",
+      "target": "4",
+      "targetHandle": null,
+      "id": "reactflow__edge-3the_same-4"
+    }
+  ],
+  "inputs": {},
+  "outputs": {
+    "assertArray.yml@3|the_same": {
+      "description": "The same array as in the inputs. But this crashes if not an array",
+      "label": "Same value",
+      "type": "int[]",
+      "example": [
+        3,
+        4,
+        5
+      ]
+    }
+  },
+  "metadata": {
+    "name": "Aggregate outputs and constant to int[]",
+    "description": "Pipeline for automated tests",
+    "lifecycle": {
+      "status": "reviewed"
+    },
+    "author": [
+      {
+        "name": "Jean-Michel Lord",
+        "identifier": "https://orcid.org/0009-0007-3826-1125"
+      }
+    ]
+  }
+}

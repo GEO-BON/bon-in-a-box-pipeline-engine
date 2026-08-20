@@ -6,12 +6,12 @@ class: Workflow
 # envFolder will keep conda environments between runs.
 # environment file is necessary when the script requires credentials.
 
-label: User input
+label: Aggregate int and int[] to int[]
 doc:
   - |
     Description:
     Pipeline for automated tests
-  - "Lifecycle tag: In development. bla bla"
+  - "Lifecycle tag: Reviewed."
   - |
     Authors:
     Jean-Michel Lord (https://orcid.org/0009-0007-3826-1125)
@@ -29,12 +29,6 @@ inputs:
   #################
   # Script inputs #
   #################
-  pipeline@1:
-    type: int?
-    label: Some int
-    doc: A number that we will increment
-    default: 3
-
 
 
   ###################
@@ -152,55 +146,24 @@ steps:
       condaPackURL: condaPackURL
     out: [envFolder]
 
-  helloWorld>helloPython.yml@0:
-    run: commandLineTools/helloWorld/helloPython.cwl
+  assertArray.yml@0:
+    run: commandLineTools/assertArray.cwl
     in:
-      some_int: pipeline@1
+      array:
+        valueFrom: $([11, 12, 13])
       runFolder:
           source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/helloWorld__helloPython/0' } : null)" 
+          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/assertArray/0' } : null)" 
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [increment]
-
-
-  helloWorld>helloPython.yml@2:
-    run: commandLineTools/helloWorld/helloPython.cwl
-    in:
-      some_int: pipeline@1
-      runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/helloWorld__helloPython/2' } : null)" 
-      environment: environment
-      condaPackURL: condaPackURL
-      scripts_root: scripts_root
-    out: [increment]
-
-
-  helloWorld>helloPython.yml@5:
-    run: commandLineTools/helloWorld/helloPython.cwl
-    in:
-      some_int: helloWorld>helloPython.yml@0/increment
-      runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/helloWorld__helloPython/5' } : null)" 
-      environment: environment
-      condaPackURL: condaPackURL
-      scripts_root: scripts_root
-    out: [increment]
+    out: [the_same]
 
 
 outputs:
-  helloWorld>helloPython.yml@5|increment:
-    type: int
-    label: Incremented twice
-    doc: bla bla
-    outputSource: helloWorld>helloPython.yml@5/increment
-
-  helloWorld>helloPython.yml@2|increment:
-    type: int
-    label: Incremented once
-    doc: bla bla
-    outputSource: helloWorld>helloPython.yml@2/increment
+  assertArray.yml@0|the_same:
+    type: int[]
+    label: Same value
+    doc: The same array as in the inputs. But this crashes if not an array
+    outputSource: assertArray.yml@0/the_same
 

@@ -62,6 +62,21 @@ class CWLFactoryTest {
         testWorkflow("forCWL/SDM_maxEnt")
     }
 
+    @Test
+    fun `test single output wrapped into array input`() {
+        testWorkflow("wrapIntTowardsArray")
+    }
+
+    @Test
+    fun `test many constants aggregated into array input`() {
+        testWorkflow("aggregateIntAndIntArray")
+    }
+
+    @Test
+    fun `test many outputs and a constant aggregated into array input`() {
+        testWorkflow("aggregateOutputsAndConstant")
+    }
+
     fun validateCWL(cwlFile: File) {
         // cwl validation: not necessary for the test but very useful when developing!
         if (hasRunner) {
