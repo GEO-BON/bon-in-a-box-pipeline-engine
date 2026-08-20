@@ -37,6 +37,29 @@ const smallPaddingNumeric = () => {
   };
 };
 
+// Joins the text field and the "Browse files" button into a single control:
+// the button stretches to the field's height and sits flush against it.
+const fileBrowserRow = {
+  display: "flex",
+  alignItems: "stretch",
+  "& .filebrowser": { display: "flex" },
+  "& .filebrowser .button-modal": {
+    margin: 0,
+    minHeight: 0,
+    height: "100%",
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+  },
+};
+
+// Squares off the right side of the field it is joined to
+const joinedTextField = {
+  "& .MuiOutlinedInput-root": {
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+};
+
 export default function ScriptInput({
   type,
   value,
@@ -151,21 +174,8 @@ export default function ScriptInput({
         onValueUpdated(event.target.value.split(",").map((v) => v.trim()));
       }
     };
-
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "flex-start",
-          "& .filebrowser": { display: "flex" },
-          "& .button-modal": {
-            margin: 0,
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-          },
-        }}
-      >
-        <TextField
+    const withFileBrowser = type.includes('/') && !disableMyFiles && !small;
+    const txtField = <TextField
           multiline
           variant="outlined"
           size={size}
@@ -181,15 +191,19 @@ export default function ScriptInput({
           sx={{
             width: "100%",
             maxWidth: small ? 220 : "500px",
-            "& .MuiOutlinedInput-root": {
-              borderTopRightRadius: 0,
-              borderBottomRightRadius: 0,
-            },
+            ...(withFileBrowser ? joinedTextField : null),
           }}
         />
-        {!disableMyFiles && <FileBrowser multipleFiles={true} onSelect={setFieldValue} />}
-      </Box>
-    );
+      if(withFileBrowser) {
+        return (
+          <Box sx={fileBrowserRow}>
+            {txtField}
+            <FileBrowser multipleFiles={true} onSelect={setFieldValue} />
+          </Box>
+        ) 
+      } else {
+          return (<>{txtField}</>)
+      }
   }
 
   switch (type) {
@@ -292,18 +306,8 @@ export default function ScriptInput({
 
       // Single line text fields
       if (type.includes("/") /* assume MIME type, files have no line breaks */) {
-        return <Box
-        sx={{
-          display: "flex",
-          alignItems: "flex-start",
-          "& .filebrowser": { display: "flex" },
-          "& .button-modal": {
-            margin: 0,
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-          },
-        }}
-      ><TextField
+        const withFileBrowser = !disableMyFiles && !small;
+        const txtField = <TextField
           type="text"
           label=""
           size={size}
@@ -312,8 +316,22 @@ export default function ScriptInput({
             if (e.key === "Enter" || e.ctrlKey) updateValue(e);
           }}
           slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
-          sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
-        />{ !disableMyFiles && <FileBrowser multipleFiles={false} onSelect={setFieldValue} />}</Box>
+          sx={{
+            width: "100%",
+            maxWidth: small ? 220 : "500px",
+            ...(withFileBrowser ? joinedTextField : null),
+          }}
+        />
+        if(withFileBrowser) {
+          return (
+            <Box sx={fileBrowserRow}>
+              {txtField}
+              <FileBrowser multipleFiles={false} onSelect={setFieldValue} />
+            </Box>
+          )
+        } else {
+          return (<>{txtField}</>)
+        }
       }
 
       // Multiline text field
