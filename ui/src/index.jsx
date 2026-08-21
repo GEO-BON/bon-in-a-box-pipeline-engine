@@ -23,8 +23,8 @@ import { HttpError } from "./components/HttpErrors";
 import FileManager from "./components/FileManager";
 import { uiContext } from "./uiContext.jsx";
 
-const PipelineEditor = lazy(() =>
-  import("./components/PipelineEditor/PipelineEditor")
+const PipelineEditor = lazy(
+  () => import("./components/PipelineEditor/PipelineEditor"),
 );
 
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
@@ -56,7 +56,8 @@ const healthFmApi = new BonInABoxScriptService.FileManagerApi(healthClient);
 // Module scope, so the references are stable across renders and usable as effect
 // dependencies.
 const checkSystemStatus = (callback) => healthApi.getSystemStatus(callback);
-const checkFileManager = (callback) => healthFmApi.isFileManagerDisabled(callback);
+const checkFileManager = (callback) =>
+  healthFmApi.isFileManagerDisabled(callback);
 
 /**
  * Calls `check` on a fixed interval until it succeeds, then stops.
@@ -68,7 +69,11 @@ const checkFileManager = (callback) => healthFmApi.isFileManagerDisabled(callbac
  * reloading the page becomes the only way to recover.
  */
 function useHealthCheck(check) {
-  const [state, setState] = useState({ pending: true, error: null, data: null });
+  const [state, setState] = useState({
+    pending: true,
+    error: null,
+    data: null,
+  });
 
   useEffect(() => {
     let stopped = false;
@@ -134,9 +139,7 @@ function NotFound() {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <Layout right={<HomePage />} />
-    ),
+    element: <Layout right={<HomePage />} />,
   },
   {
     path: "script-form/:pipeline?/:runHash?",
@@ -169,11 +172,12 @@ const router = createBrowserRouter([
   {
     path: "history",
     element: (
-      <Layout right={
-        <>
-          <PageTitle title="History" />
-          <RunHistory />
-        </>
+      <Layout
+        right={
+          <>
+            <PageTitle title="History" />
+            <RunHistory />
+          </>
         }
       />
     ),
@@ -181,11 +185,12 @@ const router = createBrowserRouter([
   {
     path: "info",
     element: (
-      <Layout right={
-        <>
-          <PageTitle title="Info" />
-          <InfoPage />
-        </>
+      <Layout
+        right={
+          <>
+            <PageTitle title="Info" />
+            <InfoPage />
+          </>
         }
       />
     ),
@@ -224,7 +229,9 @@ function App() {
   ];
   // A real failure outranks a not-up-yet one, so a configuration error is never
   // hidden behind a notice that says to keep waiting.
-  const failed = checks.find((c) => c.state.error && !isStarting(c.state.error));
+  const failed = checks.find(
+    (c) => c.state.error && !isStarting(c.state.error),
+  );
   const starting = checks.find((c) => c.state.error);
 
   if (failed) {
@@ -233,16 +240,20 @@ function App() {
         className="systemError"
         error={failed.state.error.error}
         response={failed.state.error.response}
-      />
+      />,
     );
   }
 
   if (starting) {
     return staticRouter(
-      <Alert severity="error" className="systemError">
-        {starting.label} appears to be offline. If it is starting, it is not yet
-        ready to respond — retrying every {HEALTH_RETRY_MS / 1000} seconds.
-      </Alert>
+      <>
+        <LinearProgress color="success" aria-label="Loading…" sx={{ mb: 2 }} />
+        <Alert severity="warning" className="systemError">
+          {starting.label} appears to be offline. If it is starting, it is not
+          yet ready to respond — retrying every {HEALTH_RETRY_MS / 1000}{" "}
+          seconds.
+        </Alert>
+      </>,
     );
   }
 
