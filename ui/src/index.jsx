@@ -19,6 +19,7 @@ import { Layout, PageTitle } from "./Layout";
 import InfoPage from "./components/info/InfoPage";
 import RunHistory from "./components/RunHistory";
 import { Spinner } from "./components/Spinner";
+import { LinearProgress } from "@mui/material";
 import { HttpError } from "./components/HttpErrors";
 import FileManager from "./components/FileManager";
 import { uiContext } from "./uiContext.jsx";
