@@ -23,7 +23,10 @@ import java.io.File
 
 class CWLFactory {
     companion object {
-
+        /**
+         * Exports a BON in a Box step (such as a script) to a CWL CommandLineTool.
+         * see https://www.commonwl.org/v1.0/CommandLineTool.html
+         */
         fun toCommandLineTool(step: ScriptStep): String {
 
             // Indent all lines except first
@@ -53,6 +56,10 @@ class CWLFactory {
             return template
         }
 
+        /**
+         * Exports a BON in a Box pipeline to a CWL workflow.
+         * see https://www.commonwl.org/v1.0/Workflow.html
+         */
         fun toWorkflow(pipeline: Pipeline, destinationFile:File, commandLineToolsDir: File) {
             commandLineToolsDir.mkdirs()
             destinationFile.parentFile.mkdirs()
@@ -321,12 +328,13 @@ class CWLFactory {
          * Both become a CWL source list merged with "merge_flattened", which has the same
          * flattening semantics as AggregatePipe.
          *
-         * @param sinkType the BON in a Box type declared by the step for this input.
+         * @param inputType the BON in a Box type declared by the step for this input.
          */
-        private fun stepInputToCWL(key: String, pipe: Pipe, sinkType: String): String {
+        private fun stepInputToCWL(key: String, pipe: Pipe, inputType: String): String {
             val pipes = (pipe as? AggregatePipe)?.pipes ?: listOf(pipe)
-            val needsMerge = pipes.size > 1
-                    || (sinkType.endsWith("[]") && pipes.any { !it.type.endsWith("[]") })
+            val needsMerge = pipes.size > 1 // type -> type[] aggregation (multiple edges)
+                    // type to type[] conversion (single edge)
+                    || (inputType.endsWith("[]") && pipes.any { !it.type.endsWith("[]") })
 
             if (!needsMerge) {
                 return buildString { appendLine(3, "$key: ${toCWL(pipe)}") }
@@ -354,7 +362,7 @@ class CWLFactory {
         }
 
         /**
-         * @return the constant's value as a javascript literal, usable inside a valueFrom expression.
+         * @return the constant's value as a JavaScript literal, usable inside a valueFrom expression.
          */
         private fun constantToJS(pipe: ConstantPipe): String {
             val values = (pipe.value as? Collection<*>) ?: listOf(pipe.value)
