@@ -11,10 +11,10 @@ doc:
   - |
     Description:
     Pipeline for automated tests
-  - "Lifecycle tag: Reviewed."
+  - "Lifecycle tag: Example."
   - |
     Authors:
-    Jean-Michel Lord (https://orcid.org/0009-0007-3826-1125)
+    Guillaume Larocque
 
 
 requirements:

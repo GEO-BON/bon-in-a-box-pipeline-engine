@@ -108,12 +108,11 @@
     "name": "Aggregate outputs and constant to int[]",
     "description": "Pipeline for automated tests",
     "lifecycle": {
-      "status": "reviewed"
+      "status": "example"
     },
     "author": [
       {
-        "name": "Jean-Michel Lord",
-        "identifier": "https://orcid.org/0009-0007-3826-1125"
+        "name": "Guillaume Larocque",
       }
     ]
   }
