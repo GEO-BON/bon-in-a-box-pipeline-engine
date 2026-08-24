@@ -40,7 +40,7 @@ The general workflow is:
 
 ## Finding an openEO UDP
 
-Available Earth observation algorithms can be explored through the [APEx Algorithm Catalogue](https://algorithm-catalogue.apex.esa.int/).
+Available Earth observation algorithms can be explored through the [APEx Algorithm Catalogue](https://algorithm-catalogue.apex.esa.int/?types=openEO).
 
 The catalogue provides information about available algorithms, including algorithms implemented as openEO UDPs. Each UDP contains information describing the process and the inputs required to run it.
 
@@ -100,13 +100,13 @@ In this example:
 
 The UDP definition is then used to determine which parameters are required by the process.
 
-If you want to add a new UDP, you can add it to the `externalScripts.yaml` file. The process definition URL can be found in the [APEx Algorithm Catalogue](https://algorithm-catalogue.apex.esa.int/).
+If you want to add a new UDP, you can add it to the `externalScripts.yaml` file. The process definition URL can be found in the [APEx Algorithm Catalogue](https://algorithm-catalogue.apex.esa.int/?types=openEO).
 
 **NOTE:** Adding new UDPs is still a beta function. It is made to be robust to multiple additions, however if you encounter any issues, please contact the BON in a Box team.
 
 ### 2. Add your openEO credentials
 
-The openEO process is executed remotely and requires authentication with the backend.
+The openEO process is executed remotely and requires [authentication with the backend](https://documentation.dataspace.copernicus.eu/APIs/openEO/authentication/client_credentials.html#how-to-create-service-accounts-and-obtain-client-credentials).
 
 The current BON in a Box openEO integration connects to the Copernicus Data Space Ecosystem (CDSE) openEO backend.
 
@@ -171,4 +171,4 @@ Currently, the [attached Coordinate Reference Systems (CRS)](https://gist.github
 ## Additional resources
 - [openEO documentation](https://openeo.org/documentation/)
 
-- [APEx Algorithm Catalogue](https://algorithm-catalogue.apex.esa.int/)
+- [APEx Algorithm Catalogue](https://algorithm-catalogue.apex.esa.int/?types=openEO)
