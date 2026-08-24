@@ -15,6 +15,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import kotlin.system.exitProcess
+import kotlin.text.replace
 import kotlin.time.measureTime
 
 object CWLExportMain {
@@ -149,7 +150,13 @@ object CWLExportMain {
                                                 destinationFile.parentFile,
                                                 "${file.nameWithoutExtension}_template.yml"
                                             )
-                                        templateFile.writeText(templateResult.output)
+
+                                        templateFile.writeText(
+                                            templateResult.output.replace(
+                                                Regex("""file://[\w/-]*/(tools|workflows)/"""),
+                                                """https://raw.githubusercontent.com/GEO-BON/bon-in-a-box-pipelines-cwl/refs/heads/main/$1/"""
+                                            )
+                                        )
                                     } else {
                                         logger.warn("Failed to create template for ${destinationFile.path}")
                                     }
