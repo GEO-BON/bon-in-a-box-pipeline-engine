@@ -422,8 +422,8 @@ class CWLFactory {
                     .replace(".yml", "")
                 appendLine($$"""
                     runFolder:
-                        source: runFolder
-                        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/$$runFolder' } : null)" 
+                      source: runFolder
+                      valueFrom: "$(self ? { class: 'Directory', location: self.location + '/$$runFolder' } : null)"
                 """.replaceIndent(indent(3)))
 
                 val passedInputs = listOf("environment", "condaPackURL", "scripts_root")

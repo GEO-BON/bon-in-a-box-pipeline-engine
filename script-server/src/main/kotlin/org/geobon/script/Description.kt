@@ -34,6 +34,7 @@ object Description {
     const val IO__TYPE = "type"
     const val IO__TYPE_OPTIONS = "options"
     const val IO__TYPE_TEXT = "text"
+    const val IO__WEIGHT = "weight"
     const val IO__LABEL = "label"
     const val IO__EXAMPLE = "example"
     const val IO__DESCRIPTION = "description"

@@ -122,7 +122,7 @@ steps:
             echo "Done."
           }
           export -f getPackedEnv
-          
+
 
           
       inputs:
@@ -152,8 +152,8 @@ steps:
       array:
         valueFrom: $([11, 12, 13])
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/assertArray/0' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/assertArray/0' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root

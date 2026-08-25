@@ -122,7 +122,7 @@ steps:
             echo "Done."
           }
           export -f getPackedEnv
-          
+
 
           
       inputs:
@@ -150,8 +150,8 @@ steps:
     run: commandLineTools/0in1out.cwl
     in:
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/0in1out/0' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/0in1out/0' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -165,8 +165,8 @@ steps:
         source: [0in1out.yml@0/randomness]
         linkMerge: merge_flattened
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/assertArray/1' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/assertArray/1' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root

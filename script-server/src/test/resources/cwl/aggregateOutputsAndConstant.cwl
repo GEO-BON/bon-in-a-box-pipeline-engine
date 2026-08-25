@@ -122,7 +122,7 @@ steps:
             echo "Done."
           }
           export -f getPackedEnv
-          
+
 
           
       inputs:
@@ -150,8 +150,8 @@ steps:
     run: commandLineTools/0in1out.cwl
     in:
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/0in1out/0' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/0in1out/0' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -162,8 +162,8 @@ steps:
     run: commandLineTools/0in1out.cwl
     in:
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/0in1out/1' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/0in1out/1' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -178,8 +178,8 @@ steps:
         linkMerge: merge_flattened
         valueFrom: $(self.concat([12, 13]))
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/assertArray/3' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/assertArray/3' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root

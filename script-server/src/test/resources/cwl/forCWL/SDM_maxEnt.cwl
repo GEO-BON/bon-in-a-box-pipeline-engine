@@ -53,128 +53,12 @@ inputs:
   #################
   # Script inputs #
   #################
-  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|temporal_res:
-    type: string?
-    label: Temporal resolution
-    doc: Temporal resolution to use when querying STAC items by date, in the format ("P", time interval, and time unit, e.g. "P1Y" is yearly, "P1M" is montly, and "P1D" is daily). Leave blank if not querying by date. If the temporal resolution is coarser than the temporal resolution of the time series, the layers will be aggregated with the aggregation method chosen below.
-
-  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|study_area:
-    type: File?
-    label: Study area
-    doc: Polygon of study area used to mask output layers, in geopackage format.
-
-  forCWL>SDM_maxEnt>SDM>selectBackground.yml@40|n_background:
-    type: int?
-    label: Number of background points
-    doc: number of background points
-    default: 10000
-
   pipeline@121:
     type: string[]?
     label: Taxa list
     doc: Array of taxa
     default:
     - Acer saccharum
-
-  forCWL>SDM_maxEnt>data>GBIFHeatmapFromSTAC.yml@139|taxa:
-    type:
-      type: enum
-      symbols:
-        - reptiles
-        - plants
-        - mammals
-        - birds
-        - arthropods
-        - amphibians
-        - all
-    label: Taxa
-    doc: taxonomic group for which to retrieve GBIF heatmap
-    default: plants
-
-  forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|partition_type:
-    type:
-      type: enum
-      symbols:
-        - randomkfold
-        - jackknife
-        - block
-        - checkerboard1
-        - checkerboard2
-    label: Partition type
-    doc: String, name of partitioning technique.
-    default: block
-
-  forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|max_year:
-    type: int?
-    label: Maximum year
-    doc: Max year observations wanted
-    default: 2024
-
-  forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|min_year:
-    type: int?
-    label: Minimum year
-    doc: Min year observations wanted
-    default: 2010
-
-  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|collections_items:
-    type: string[]?
-    label: STAC collection items
-    doc: Vector of strings. To pull specific collection items, input the collection name followed by '|' followed by item id (e.g. "chelsa-clim|bio1"). To extract a whole collection, type the collection name only (e.g. "chelsa-clim"). To pull collection items by date, write the collection name and provide a start date, end date, and temporal resolution. If pulling a layer that is tiled (e.g. https://stac.geobon.org/viewer/gfw-lossyear/_80N_180W), enter the collection name (e.g. gfw-lossyear), bounding box and time range if the layer is a time series, and the script will assemble the tiles into a continuous layer automatically.)
-    default:
-    - chelsa-clim|bio1
-    - chelsa-clim|bio2
-
-  pipeline@128:
-    type: float?
-    label: spatial resolution
-    doc: Integer, spatial resolution of the rasters
-    default: 1000
-
-  forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|fc:
-    type: string[]?
-    label: feature classes
-    doc: Vector of strings, feature classes for MaxEnt algorithm. Accepted values are combinations of L (linear), Q (quadratic), P (product), H (hinge) or T (threshold).
-    default:
-    - L
-    - LQ
-    - LQHP
-
-  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|t1:
-    type: string?
-    label: End date
-    doc: End date for time series layers. Can be in the format YYYY or YYYY-MM-DD. Leave blank if extracting items by name.
-
-  forCWL>SDM_maxEnt>SDM>selectBackground.yml@40|method_background:
-    type:
-      type: enum
-      symbols:
-        - random
-        - inclusion_buffer
-        - weighted_raster
-        - unweighted_raster
-    label: Method background
-    doc: method used to sample background points
-    default: random
-
-  forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|rm:
-    type: float[]?
-    label: regularization multiplier
-    doc: Vector of numbers, regularization multipliers for MaxEnt algorithm.
-    default:
-    - 0.5
-    - 1
-    - 2
-
-  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|t0:
-    type: string?
-    label: Start date
-    doc: Start date for time series layers. Can be in the format YYYY or YYYY-MM-DD. Leave blank if extracting items by name or to extract layers from all available dates.
-
-  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|stac_url:
-    type: string?
-    label: STAC URL
-    doc: URL of the STAC catalog.
-    default: https://stac.geobon.org/
 
   pipeline@140:
     label: Bounding box and CRS
@@ -205,11 +89,127 @@ inputs:
       - name: bbox
         type: float[]
 
+  forCWL>SDM_maxEnt>SDM>selectBackground.yml@40|method_background:
+    type:
+      type: enum
+      symbols:
+        - random
+        - inclusion_buffer
+        - weighted_raster
+        - unweighted_raster
+    label: Method background
+    doc: method used to sample background points
+    default: random
+
+  forCWL>SDM_maxEnt>SDM>selectBackground.yml@40|n_background:
+    type: int?
+    label: Number of background points
+    doc: number of background points
+    default: 10000
+
+  pipeline@128:
+    type: float?
+    label: spatial resolution
+    doc: Integer, spatial resolution of the rasters
+    default: 1000
+
+  forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|fc:
+    type: string[]?
+    label: feature classes
+    doc: Vector of strings, feature classes for MaxEnt algorithm. Accepted values are combinations of L (linear), Q (quadratic), P (product), H (hinge) or T (threshold).
+    default:
+    - L
+    - LQ
+    - LQHP
+
+  forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|rm:
+    type: float[]?
+    label: regularization multiplier
+    doc: Vector of numbers, regularization multipliers for MaxEnt algorithm.
+    default:
+    - 0.5
+    - 1
+    - 2
+
+  forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|partition_type:
+    type:
+      type: enum
+      symbols:
+        - randomkfold
+        - jackknife
+        - block
+        - checkerboard1
+        - checkerboard2
+    label: Partition type
+    doc: String, name of partitioning technique.
+    default: block
+
   pipeline@46:
     type: int?
     label: number of runs
     doc: number of runs (in bootstrap or crossvalidation method)
     default: 2
+
+  forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|min_year:
+    type: int?
+    label: Minimum year
+    doc: Min year observations wanted
+    default: 2010
+
+  forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|max_year:
+    type: int?
+    label: Maximum year
+    doc: Max year observations wanted
+    default: 2024
+
+  forCWL>SDM_maxEnt>data>GBIFHeatmapFromSTAC.yml@139|taxa:
+    type:
+      type: enum
+      symbols:
+        - reptiles
+        - plants
+        - mammals
+        - birds
+        - arthropods
+        - amphibians
+        - all
+    label: Taxa
+    doc: taxonomic group for which to retrieve GBIF heatmap
+    default: plants
+
+  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|t1:
+    type: string?
+    label: End date
+    doc: End date for time series layers. Can be in the format YYYY or YYYY-MM-DD. Leave blank if extracting items by name.
+
+  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|temporal_res:
+    type: string?
+    label: Temporal resolution
+    doc: Temporal resolution to use when querying STAC items by date, in the format ("P", time interval, and time unit, e.g. "P1Y" is yearly, "P1M" is montly, and "P1D" is daily). Leave blank if not querying by date. If the temporal resolution is coarser than the temporal resolution of the time series, the layers will be aggregated with the aggregation method chosen below.
+
+  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|stac_url:
+    type: string?
+    label: STAC URL
+    doc: URL of the STAC catalog.
+    default: https://stac.geobon.org/
+
+  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|collections_items:
+    type: string[]?
+    label: STAC collection items
+    doc: Vector of strings. To pull specific collection items, input the collection name followed by '|' followed by item id (e.g. "chelsa-clim|bio1"). To extract a whole collection, type the collection name only (e.g. "chelsa-clim"). To pull collection items by date, write the collection name and provide a start date, end date, and temporal resolution. If pulling a layer that is tiled (e.g. https://stac.geobon.org/viewer/gfw-lossyear/_80N_180W), enter the collection name (e.g. gfw-lossyear), bounding box and time range if the layer is a time series, and the script will assemble the tiles into a continuous layer automatically.)
+    default:
+    - chelsa-clim|bio1
+    - chelsa-clim|bio2
+
+  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|t0:
+    type: string?
+    label: Start date
+    doc: Start date for time series layers. Can be in the format YYYY or YYYY-MM-DD. Leave blank if extracting items by name or to extract layers from all available dates.
+
+  forCWL>SDM_maxEnt>data>loadFromStac.yml@144|study_area:
+    type: File?
+    label: Study area
+    doc: Polygon of study area used to mask output layers, in geopackage format.
 
 
 
@@ -304,7 +304,7 @@ steps:
             echo "Done."
           }
           export -f getPackedEnv
-          
+
           bash -c 'getPackedEnv "forCWL__SDM_maxEnt__filtering__cleanCoordinates" "channels: [conda-forge, r]
           dependencies: [r-terra, r-rjson, r-raster, r-dplyr, r-CoordinateCleaner, r-gdalcubes]
           name: forCWL__SDM_maxEnt__filtering__cleanCoordinates
@@ -384,8 +384,8 @@ steps:
       envFolderWritable:
         default: false
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__filtering__cleanCoordinates/34' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__filtering__cleanCoordinates/34' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -407,8 +407,8 @@ steps:
       envFolderWritable:
         default: false
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__selectBackground/40' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__selectBackground/40' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -431,8 +431,8 @@ steps:
       envFolderWritable:
         default: false
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__setupDataSdm/44' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__setupDataSdm/44' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -449,8 +449,8 @@ steps:
       envFolderWritable:
         default: false
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__rangePredictions/68' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__rangePredictions/68' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -472,8 +472,8 @@ steps:
       envFolderWritable:
         default: false
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__removeCollinearity/97' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__removeCollinearity/97' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -488,8 +488,8 @@ steps:
       method: { default: bbox }
       width_buffer: { default: 0 }
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__studyExtent/104' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__studyExtent/104' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -514,8 +514,8 @@ steps:
       envFolderWritable:
         default: false
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__runMaxent/108' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__runMaxent/108' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -529,8 +529,8 @@ steps:
       bbox_crs: pipeline@140
       spatial_res: pipeline@128
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__data__GBIFHeatmapFromSTAC/139' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__data__GBIFHeatmapFromSTAC/139' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -550,8 +550,8 @@ steps:
       envFolderWritable:
         default: false
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__data__getGBIFObservations__getGBIFObservations/142' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__data__getGBIFObservations__getGBIFObservations/142' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -577,8 +577,8 @@ steps:
       envFolderWritable:
         default: false
       runFolder:
-          source: runFolder
-          valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__data__loadFromStac/144' } : null)" 
+        source: runFolder
+        valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__data__loadFromStac/144' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
@@ -586,29 +586,11 @@ steps:
 
 
 outputs:
-  forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|sdm_pred:
-    type: File
-    label: Predictions
-    doc: Model predictions from Maxent algorithm
-    outputSource: forCWL>SDM_maxEnt>SDM>runMaxent.yml@108/sdm_pred
-
   forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34|clean_presence:
     type: File
     label: Presences
     doc: Occurrences from GBIF after cleaning
     outputSource: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence
-
-  forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|gbif_doi:
-    type: string
-    label: DOI of GBIF download
-    doc: DOI of GBIF download. Used for citing downloaded data.
-    outputSource: forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142/gbif_doi
-
-  pipeline@121|default_output:
-    type: string[]
-    label: Taxa list
-    doc: Comma-separated list of [taxa](https://en.wikipedia.org/wiki/Taxon). Each value could be a species name, order, class, genus, kingdom or family, as long as it is an exact match with the GBIF taxonomic backbone. Individual species can be looked up [on the GBIF website](https://www.gbif.org/species/).
-    outputSource: pipeline@121
 
   forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97|rasters_selected:
     type: File[]
@@ -616,9 +598,27 @@ outputs:
     doc: Environmental layers used as predictors in species distribution modeling
     outputSource: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected
 
+  forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|sdm_pred:
+    type: File
+    label: Predictions
+    doc: Model predictions from Maxent algorithm
+    outputSource: forCWL>SDM_maxEnt>SDM>runMaxent.yml@108/sdm_pred
+
   forCWL>SDM_maxEnt>SDM>rangePredictions.yml@68|range_predictions:
     type: File
     label: Variability of predictions
     doc: Variability of predictions based on range method
     outputSource: forCWL>SDM_maxEnt>SDM>rangePredictions.yml@68/range_predictions
+
+  pipeline@121|default_output:
+    type: string[]
+    label: Taxa list
+    doc: Comma-separated list of [taxa](https://en.wikipedia.org/wiki/Taxon). Each value could be a species name, order, class, genus, kingdom or family, as long as it is an exact match with the GBIF taxonomic backbone. Individual species can be looked up [on the GBIF website](https://www.gbif.org/species/).
+    outputSource: pipeline@121
+
+  forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|gbif_doi:
+    type: string
+    label: DOI of GBIF download
+    doc: DOI of GBIF download. Used for citing downloaded data.
+    outputSource: forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142/gbif_doi
 
