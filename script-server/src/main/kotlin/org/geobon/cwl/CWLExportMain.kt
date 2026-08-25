@@ -34,6 +34,10 @@ object CWLExportMain {
     lateinit var destinationRoot: File
     lateinit var toolsRoot: File
 
+    // Each export/validation spawns external cwl-runner processes; unbounded parallelism
+    // would cause cwl-runner calls to time out (killed with SIGTERM, exit 143).
+    private val exportDispatcher = Dispatchers.IO.limitedParallelism(Runtime.getRuntime().availableProcessors())
+
     /**
      * An alternative main to export all scripts and pipelines
      */
@@ -107,7 +111,7 @@ object CWLExportMain {
 
         coroutineScope {
             directory.listFiles()?.forEach { file ->
-                launch(Dispatchers.IO) {
+                launch(exportDispatcher) {
                     if (file.isDirectory) {
                         exportAllFiles(destinationRoot, file, type)
 
