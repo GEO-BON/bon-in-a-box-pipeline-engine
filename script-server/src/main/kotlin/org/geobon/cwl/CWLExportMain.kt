@@ -49,16 +49,19 @@ object CWLExportMain {
         logger.info("Starting CWL export")
 
         destinationRoot = File(args[0])
-        if (destinationRoot.exists()) {
-            destinationRoot.deleteRecursively()
-        }
         destinationRoot.mkdirs()
         if (!destinationRoot.exists()) {
             logger.error("Could not create destination folder $destinationRoot.")
             exitProcess(1)
         }
         toolsRoot = File(destinationRoot, "tools")
+        if (toolsRoot.exists()) {
+            toolsRoot.deleteRecursively()
+        }
         val workflowsRoot = File(destinationRoot, "workflows")
+        if (workflowsRoot.exists()) {
+            workflowsRoot.deleteRecursively()
+        }
         runBlocking(Dispatchers.Default) {
             exportAllFiles(toolsRoot, scriptsRoot, "script")
             exportAllFiles(workflowsRoot, pipelinesRoot, "pipeline")
@@ -184,7 +187,7 @@ object CWLExportMain {
             val validationResult = SystemCall().run(
                 listOf("cwl-runner", "--validate", cwlFile.absolutePath),
                 mergeErrors = true,
-                timeoutAmount = 10
+                timeoutAmount = 30
             )
 
             val relativePath = cwlFile.relativeTo(destinationRoot).path
