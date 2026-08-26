@@ -64,7 +64,14 @@ Prerequisites:
 
     **Mac users:** make sure the cloned repo is under the user folder (for example `~/bon-in-a-box`), and **not** under iCloud.
 
-2.  Clone the repository either via terminal using `git clone git@github.com:GEO-BON/bon-in-a-box-pipelines.git` or in GitHub desktop.
+2. Clone the repository either via terminal using `git clone --config core.autocrlf=false git@github.com:GEO-BON/bon-in-a-box-pipelines.git` or in GitHub desktop.
+
+   **Windows users only:** if using github desktop to clone, you will have to do these extra steps in the console after cloning to avoid problems with the CRLF line endings:
+   
+   a. `cd` to the cloned folder's root directory
+   b. `git config core.autocrlf false`
+   c. `git rm --cached -r .`
+   d. `git reset --hard`
 
 ### Step 4: Set environment file
 
