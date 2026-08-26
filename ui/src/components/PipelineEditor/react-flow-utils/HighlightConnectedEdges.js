@@ -16,7 +16,7 @@ export const highlightConnectedEdges = (selectedNodes, allEdges) => {
   return allEdges.map((edge) => {
     const color = connectedIds.includes(edge.id) ? '#0000ff' : '#fcfcfc'
 
-    if (edge.color === '#0000ff') {
+    if (edge.color === color) {
       return edge
     }
     return {

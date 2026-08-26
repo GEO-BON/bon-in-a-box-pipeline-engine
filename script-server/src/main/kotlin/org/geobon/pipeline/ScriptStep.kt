@@ -2,16 +2,18 @@ package org.geobon.pipeline
 
 import org.geobon.hpc.HPCRequirements
 import org.geobon.hpc.HPCRun
-import org.geobon.hpc.RemoteSetupState
+import org.geobon.k8s.KubernetesRun
+import org.geobon.script.ComputeRequirements
 import org.geobon.script.Description
 import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
-import org.geobon.script.Description.HPC
+import org.geobon.script.Description.COMPUTE
 import org.geobon.script.Description.SCRIPT
 import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.DockerizedRun
 import org.geobon.script.Run
 import org.geobon.script.ScriptType
+import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.fromSlurm
@@ -21,7 +23,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 
-class ScriptStep : YMLStep {
+open class ScriptStep : YMLStep {
 
     constructor(
         serverContext: ServerContext,
@@ -32,7 +34,7 @@ class ScriptStep : YMLStep {
         serverContext.hpc?.register(this)
     }
 
-    private val scriptFile: File = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
+    protected var scriptFile: File = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
 
     /**
      * Used for a lighter test syntax
@@ -85,22 +87,23 @@ class ScriptStep : YMLStep {
                         }
                     }
 
-                    val hpcSection = yamlParsed[HPC]
-                    if (hpcSection is Map<*, *> && shouldUseHPC()) {
-                        val memory = (hpcSection[Description.HPC__MEMORY] as? String)?.let {
-                            Regex("""(\d+)G""").find(it)?.groups?.get(1)?.value?.toInt() // Get rid of the G
-                        } ?: throw RuntimeException("HPC ${Description.HPC__MEMORY} parameter is not formatted as gigabytes. \nExample: 30G \nGot: ${hpcSection[Description.HPC__MEMORY]}")
+                    val computeSection = yamlParsed[COMPUTE]
+                    val computeRequirements = if (computeSection is Map<*, *>) {
+                        val mem = computeSection[Description.COMPUTE__MEMORY] as? String
+                            ?: throw RuntimeException("compute ${Description.COMPUTE__MEMORY} parameter is not formatted as expected. \nExample: 30G \nGot: ${computeSection[Description.COMPUTE__MEMORY]}")
+                        val cpus = computeSection[Description.COMPUTE__CPUS] as? Int
+                            ?: throw RuntimeException("compute ${Description.COMPUTE__CPUS} parameter should be an int. Got: ${computeSection[Description.COMPUTE__CPUS]}")
+                        ComputeRequirements(mem, cpus)
+                    } else null
 
-                        val cpus = hpcSection[Description.HPC__CPUS] as? Int
-                            ?: throw RuntimeException("HPC ${Description.HPC__CPUS} parameter should be an int. Got: ${hpcSection[Description.HPC__CPUS]}")
-
-                        val durationString = hpcSection[Description.HPC__DURATION]
-                            ?: throw RuntimeException("HPC ${Description.HPC__DURATION} parameter missing.")
+                    if (computeSection is Map<*, *> && computeSection[Description.COMPUTE__HPC] == true && shouldUseHPC()) {
+                        val durationString = computeSection[Description.COMPUTE__DURATION]
+                            ?: throw RuntimeException("compute ${Description.COMPUTE__DURATION} parameter missing.")
 
                         if (durationString !is String) {
                             throw RuntimeException(
                                 """
-                                HPC parameter ${Description.HPC__DURATION} must be expressed as a string, for example "1:30:00".
+                                compute parameter ${Description.COMPUTE__DURATION} must be expressed as a string, for example "1:30:00".
                                 See [SLURM documentation](https://slurm.schedmd.com/sbatch.html#OPT_time) for accepted formats.
                             """.trimIndent()
                             )
@@ -112,12 +115,21 @@ class ScriptStep : YMLStep {
                             scriptFile,
                             inputs,
                             HPCRequirements(
-                                memory,
-                                cpus,
+                                computeRequirements!!.mem,
+                                computeRequirements.cpus,
                                 duration
                             ),
                             condaEnvName,
                             condaEnvYml
+                        )
+                    } else if(shouldUseK8s()) {
+                        KubernetesRun(
+                            context,
+                            scriptFile,
+                            specificTimeout ?: Run.DEFAULT_TIMEOUT,
+                            condaEnvName,
+                            condaEnvYml,
+                            computeRequirements
                         )
                     } else {
                         DockerizedRun(
@@ -150,13 +162,22 @@ class ScriptStep : YMLStep {
         } ?: throw RuntimeException("Context not defined.")
     }
 
-    private fun shouldUseHPC(): Boolean{
+    private fun shouldUseHPC(): Boolean {
         return context?.serverContext?.hpc?.connection?.let { connection ->
-            when(connection.statusFor(ScriptType.fromFile(scriptFile))) {
+            when (connection.statusFor(ScriptType.fromFile(scriptFile))) {
                 RemoteSetupState.PREPARING, RemoteSetupState.READY -> true
                 else -> false
             }
         } == true
+    }
+
+    private fun shouldUseK8s(): Boolean {
+        val connection = context?.serverContext?.k8s
+        return if (connection == null) false
+        else when (connection.clusterStatus.state) {
+            RemoteSetupState.PREPARING, RemoteSetupState.READY -> true
+            else -> false
+        }
     }
 
     override fun cleanUp() {

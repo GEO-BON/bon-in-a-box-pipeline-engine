@@ -9,6 +9,10 @@ object Description {
     const val SCRIPT = "script"
     const val NAME = "name"
     const val TIMEOUT = "timeout"
+    const val EXTERNAL_LINK = "external_link"
+    const val DESCRIPTION = "description"
+    const val AUTHOR = "author"
+    const val LICENSE = "license"
 
     const val INPUTS = "inputs"
     const val OUTPUTS = "outputs"
@@ -18,12 +22,14 @@ object Description {
     const val IO__LABEL = "label"
     const val IO__EXAMPLE = "example"
     const val IO__PROPERTIES = "properties"
+    const val IO__DESCRIPTION = "description"
 
     const val CONDA = "conda"
     const val CONDA__NAME = "name"
 
-    const val HPC = "hpc"
-    const val HPC__MEMORY = "mem"
-    const val HPC__CPUS = "cpus-per-task"
-    const val HPC__DURATION = "time"
+    const val COMPUTE = "compute"
+    const val COMPUTE__HPC = "hpc"
+    const val COMPUTE__MEMORY = "mem"
+    const val COMPUTE__CPUS = "cpus-per-task"
+    const val COMPUTE__DURATION = "time"
 }

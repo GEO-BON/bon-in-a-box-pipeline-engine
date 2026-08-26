@@ -434,6 +434,54 @@ paths:
           description: |
             Service unavailable: the HPC has not been configured on that host.
 
+  /api/k8s/status:
+    get:
+      summary: Get status of Kubernetes cluster workers.
+      operationId: getK8sStatus
+      responses:
+        "200":
+          description: |
+            The status of Kubernetes connection and workers.
+            Includes a Configuration entry and one entry per worker node.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    state:
+                      type: string
+                      enum: [NOT_CONFIGURED, CONFIGURED, PREPARING, READY, ERROR]
+                    image:
+                      type: string
+                    message:
+                      type: string
+                  additionalProperties:
+                    type: string
+              examples:
+                ready:
+                  value: {"Configuration":{"state":"READY","namespace":"default","message":null},"worker-1":{"state":"READY","image":null,"message":null},"worker-2":{"state":"READY","image":null,"message":null}}
+                not_configured:
+                  value: {"Configuration":{"state":"NOT_CONFIGURED","message":"Kubernetes not configured: ..."}}
+                partial_failure:
+                  value: {"Configuration":{"state":"ERROR","namespace":"default","message":"At least one worker node has an error"},"worker-1":{"state":"READY","image":null,"message":null},"worker-2":{"state":"ERROR","image":null,"message":"Connection failed"}}
+
+  /api/k8s/prepare:
+    get:
+      summary:
+        Refresh and validate Kubernetes worker readiness for BON in a Box tasks.
+      operationId: prepareK8s
+      responses:
+        "200":
+          description: |
+            Kubernetes status refresh has been launched.
+            Watch /k8s/status for current worker readiness.
+
+        "503":
+          description: |
+            Service unavailable: Kubernetes has not been configured on that host.
+
   /region/countries_list:
     get:
       summary: Returns the list of countries from FieldMaps.io with their ISO3 and English names
@@ -538,13 +586,13 @@ components:
     stepType:
       name: type
       in: path
-      description: Script or pipeline
+      description: Script, pipeline or openEO
       required: true
       style: simple
       explode: false
       schema:
         type: string
-        enum: [script, pipeline]
+        enum: [script, pipeline, openEO]
     descriptionPath:
       name: descriptionPath
       in: path
@@ -646,9 +694,14 @@ components:
         timeout:
           type: number
           example: 60
-        hpc:
+        compute:
           type: object
           properties:
+            hpc:
+              type: boolean
+              description: |
+                Whether this script is meant to be run on a HPC.
+                If true, the script will be run on a HPC when configured, otherwise on kubernetes or locally.
             mem:
               type: string
               example: 30G

@@ -15,6 +15,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import java.io.FileNotFoundException
 
 
 abstract class YMLStep(
@@ -164,7 +165,23 @@ abstract class YMLStep(
                     properties.map { it.toString() }
                 }
         }
+        /**
+         * @param relativePath the relative path to the .yml description file
+         * @return the pipeline metadata as a deep map.
+         * @see org.geobon.script.Description for return value structure
+         */
+        fun getScriptDescription(relativePath: String): Map<String, Any> {
+            var scriptFile = File(ServerContext.scriptsRoot, relativePath)
 
+            if (!scriptFile.exists()) {
+                scriptFile = File(ServerContext.scriptStubsRoot, relativePath)
+
+                if (!scriptFile.exists()) {
+                    throw FileNotFoundException("$scriptFile does not exist.")
+                }
+            }
+            return Yaml().load(scriptFile.readText())
+        }
 
         /**
          * @return Map of input name to type

@@ -1,6 +1,7 @@
 package org.geobon.pipeline
 
 import kotlinx.coroutines.*
+import org.geobon.openeo.OpenEOStep
 import org.geobon.script.Description.IO__LABEL
 import org.geobon.script.Description.IO__TYPE
 import org.geobon.server.ServerContext
@@ -9,6 +10,7 @@ import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.FileNotFoundException
 
 open class Pipeline (
     override val id: StepId,
@@ -118,7 +120,6 @@ open class Pipeline (
     }
 
     override suspend fun execute() {
-        logger.info("TEMP Starting pipeline $this")
         coroutineScope {
             finalSteps.forEach { launch { it.execute() } }
         } // exits when all final steps have their results
@@ -252,6 +253,7 @@ open class Pipeline (
                                 // resulting in a security breach.
                                 // TODO: This will be needed for openEO steps, so keeping this comment as an example:
                                 //scriptFile == "pipeline/AssignId.yml" -> AssignId(serverContext, innerStepId)
+                                scriptFile.endsWith(".udp") -> OpenEOStep(scriptFile, innerStepId, serverContext)
 
                                 // Regular script steps
                                 else -> ScriptStep(scriptFile, innerStepId, serverContext)
@@ -422,6 +424,33 @@ open class Pipeline (
                 }
             }
         }
-    }
 
+        /**
+         * @param relativePath relative path to the JSON file
+         * @return the pipeline metadata as a JSONObject
+         * @see org.geobon.script.Description for return value structure
+         */
+        fun getPipelineDescription(relativePath: String): JSONObject {
+            val descriptionFile =
+                File(pipelinesRoot, relativePath)
+
+            if (descriptionFile.exists()) {
+                val descriptionJSON = JSONObject(descriptionFile.readText())
+                val metadataJSON = JSONObject()
+                metadataJSON.putOpt(INPUTS, descriptionJSON.get(INPUTS))
+                metadataJSON.putOpt(OUTPUTS, descriptionJSON.get(OUTPUTS))
+
+                descriptionJSON.optJSONObject(METADATA)?.let { metadata ->
+                    metadata.keys().forEach { key ->
+                        metadataJSON.putOpt(key, metadata.get(key))
+                    }
+                }
+
+                return metadataJSON
+
+            } else {
+                throw FileNotFoundException("$descriptionFile does not exist.")
+            }
+        }
+    }
 }
