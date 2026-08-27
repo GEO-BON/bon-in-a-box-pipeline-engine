@@ -26,7 +26,9 @@ function CustomLayer(props: any) {
     setGeojson,
     clearLayers,
   } = props;
-  const [basemap, setBasemap] = useState("cartoDark");
+  const [basemap, setBasemap] = useState("dark");
+
+  const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
 
   const basemaps: any = {
     osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -40,11 +42,12 @@ function CustomLayer(props: any) {
     mapbox: `https://api.mapbox.com/styles/v1/glaroc/cl8eqr05i000416umaxkuc4sp/tiles/256/{z}/{x}/{y}@2x?access_token=${
       import.meta.env.VITE_APP_MAPBOX_TOKEN
     }`,
+    dark: `https://api.maptiler.com/maps/dataviz-v4-dark/256/{z}/{x}/{y}{r}.png?key=${key}`,
   };
 
   useEffect(() => {
     const layer = L.tileLayer(basemaps[basemap], {
-      attribution: "Planet",
+      attribution: "Maptiler",
     });
     const container = map;
     container.addLayer(layer);
