@@ -21,6 +21,7 @@
     "//ol": "OpenLayers map in location chooser, to handle CRS visualisation.",
     "//@xyflow/react": "renders and manages the pipeline editor graph canvas.",
     "//react-markdown": "renders markdown content, especially in step metadata.",
+    "//remark-gfm": "GitHub-flavored markdown (tables, strikethrough) for assistant replies in the chat panel.",
     "//react-router-dom": "client-side routing between UI pages.",
     "//react-select": "Searchable select input to choose the script/pipeline to run.",
     "//web-vitals": "Currently unused: frontend performance metrics. Was there in project template.",
@@ -58,6 +59,7 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.13.2",
     "react-select": "^5.10.2",
+    "remark-gfm": "^4.0.1",
     "web-vitals": "^5.2.0"
   },
   "devDependencies": {

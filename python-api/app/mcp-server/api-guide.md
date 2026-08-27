@@ -6,7 +6,7 @@ All questions MUST be answered by making queries to this API. If it is not avail
 
 The list of scripts can be found here: http://biab-script-server:8080/script/list
 
-The list of pipelines can be found here: http://biab-script-server:8080/script/list
+The list of pipelines can be found here: http://biab-script-server:8080/pipeline/list
 
 FIRST check to see which scripts or pipelines are available to answer the request. You MUST query the endpoint http://biab-script-server:8080/{type}/{descriptionPath}/info to get the information about the pipeline.
 

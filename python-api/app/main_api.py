@@ -303,3 +303,64 @@ def get_info():
     return {"stats": {"total": total, "used": used, "free": free}}
 
 app.include_router(fm_router)
+
+
+# --- Assistant -------------------------------------------------------------
+# The chat assistant's system prompt.
+#
+# This exists because ollama-mcp-bridge has no notion of a system prompt of its
+# own: it forwards whatever `messages` the client sends. So the guidance has to
+# ride in as messages[0] from the UI, and the UI has to get it from somewhere.
+#
+# Serving it here keeps it single-sourced with the MCP server's own copies of
+# these files (mcp-server/*.md) rather than duplicating the text into the React
+# bundle, where it would drift the first time anyone edited the guide.
+ASSISTANT_PROMPT_DIR = Path(__file__).parent / "mcp-server"
+
+# The guides address services by the names they answer to INSIDE the compose network.
+# A browser cannot resolve any of them, so every viewer and form link the model is
+# told to hand the user would be dead on arrival -- and in the per-session deployment
+# there is no single right host to hardcode instead, since each user is on their own
+# subdomain. Rewriting them to whichever origin served the request is what makes the
+# links work in dev, on the shared instance, and in a session alike.
+_INTERNAL_ORIGINS = (
+    "http://biab-script-server:8080",
+    "http://biab-python-api:8001",
+    "http://biab-python-api:8000",
+    "http://swagger_ui:8080",
+    "http://localhost",
+)
+
+
+def _read_prompt_part(name: str) -> str:
+    path = ASSISTANT_PROMPT_DIR / name
+    try:
+        return path.read_text().strip()
+    except OSError as exc:
+        print(f"WARNING: assistant prompt part {path} unreadable: {exc}", flush=True)
+        return ""
+
+
+@app.get("/assistant/prompt")
+def assistant_prompt(request: Request):
+    """System prompt for the chat assistant, assembled from the MCP server's guides.
+
+    The origin is taken from the request rather than configured, because in the
+    per-session deployment every user reaches their own engine on their own
+    subdomain -- a hardcoded host would hand every user someone else's links.
+    """
+    origin = str(request.base_url).rstrip("/")
+    forwarded_host = request.headers.get("x-forwarded-host")
+    if forwarded_host:
+        proto = request.headers.get("x-forwarded-proto", "https")
+        origin = f"{proto}://{forwarded_host}"
+
+    parts = [
+        _read_prompt_part("assistant-role.md"),
+        "## API GUIDE\n" + _read_prompt_part("api-guide.md"),
+        "## PLATFORM DOCUMENTATION\n" + _read_prompt_part("documentation.md"),
+    ]
+    prompt = "\n\n".join(p for p in parts if p.strip())
+    for internal in _INTERNAL_ORIGINS:
+        prompt = prompt.replace(internal, origin)
+    return {"prompt": prompt}

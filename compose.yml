@@ -102,25 +102,33 @@ services:
       - script-server
       - python-api
 
-  chat-api:
-    build:
-      context: ./chat-api
+  # Bridges the chat UI to Ollama, executing MCP tool calls against this instance's
+  # own MCP server (python-api:8002) in between rounds. It holds no model and no GPU:
+  # inference happens on whatever OLLAMA_URL points at, which is deliberately a
+  # shared, already-running Ollama rather than one of ours.
+  mcp-bridge:
+    image: ghcr.io/jonigl/ollama-mcp-bridge:latest
+    command:
+      - uv
+      - run
+      - ollama-mcp-bridge
+      - --ollama-url
+      - ${OLLAMA_URL:-http://host.docker.internal:11435}
+      - --config
+      - /app/mcp-servers.json
     volumes:
-      - ./chat-api:/usr/src/app:rw
-    working_dir: /usr/src/app
-    command: sh -c "npm install; npm run start;"
+      - ./mcp-bridge/mcp-servers.json:/app/mcp-servers.json:ro
     expose:
-      - "4000"
+      - "8000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
-      GOOGLE_GENERATIVE_AI_API_KEY: ${GOOGLE_GENERATIVE_AI_API_KEY}
-      GROQ_API_KEY: ${GROQ_API_KEY}
-      OPENAI_API_KEY: ${OPENROUTER_API_KEY}
-      OPENAI_BASE_URL: ${OPENAI_BASE_URL}
-      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      # An agentic turn is several generations plus tool round trips, and the shared
+      # Ollama serialises requests (OLLAMA_NUM_PARALLEL=1), so a turn can sit in a
+      # queue before it even starts. Must stay >= the gateway's proxy_read_timeout.
+      OLLAMA_PROXY_TIMEOUT: 600000
+    depends_on:
+      - python-api
 
 secrets:
   hpc_ssh_key:

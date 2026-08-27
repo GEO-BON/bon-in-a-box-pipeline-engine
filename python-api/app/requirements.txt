@@ -1,16 +1,23 @@
-mcp
+# Pinned as a PAIR, and the only pins in this file, because they broke together:
+# mcp 2.x renamed McpError to MCPError, fastmcp 2.x still imports the old name, and
+# fastmcp's own dependency range is loose enough to let pip resolve the combination.
+# Both being unpinned meant a rebuild picked up mcp 2.1.1 and mcp-server/server.py
+# died on import -- which, per startup.sh, took the whole python-api down with it.
+# Move them together, and check `from fastmcp import FastMCP` still imports.
+mcp>=1.12,<2
+fastmcp>=2.14,<3
 duckdb
 pandas
 uvicorn
 tabulate
 pystac
 requests
-fastapi 
-fastmcp
-uvicorn[standard] 
+fastapi
+uvicorn[standard]
 requests 
 geopandas
 pandas_geojson 
 shapely 
 pygadm 
 fiona
+pydantic_settings

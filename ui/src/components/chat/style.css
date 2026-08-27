@@ -93,6 +93,18 @@
   font-size: 0.9em;
 }
 
+/* Shown between sending and the first token. The shared Ollama serialises requests
+   (OLLAMA_NUM_PARALLEL=1), so a turn can genuinely queue behind another session --
+   this says so rather than leaving the composer looking frozen. */
+.chat-waiting {
+  align-self: center;
+  margin: 4px 12px 8px;
+  font-size: 0.82em;
+  font-style: italic;
+  color: #888;
+  text-align: center;
+}
+
 .thinking-block {
   margin-bottom: 8px;
   font-size: 0.82em;

@@ -4,12 +4,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from "./components/styles/theme";
 import useWindowDimensions from "./utils/WindowDimensions";
 import TopMenu from "./TopMenu";
-<<<<<<< HEAD
-import { ReactNode } from "react";
-import { CopilotKitProvider } from "@copilotkit/react-core/v2";
-=======
 import LeftPane from "./LeftPane";
->>>>>>> my_files
 
 export const PopupContentContext = createContext();
 export const TitleContext = createContext();

@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "biab": {
+      "url": "http://python-api:8002/mcp"
+    }
+  }
+}
