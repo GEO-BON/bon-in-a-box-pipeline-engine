@@ -8,11 +8,12 @@ services:
     volumes:
       - ${PIPELINE_REPO_PATH}/scripts:/scripts:ro
       - ${PIPELINE_REPO_PATH}/.git:/.git:ro
-      - ./script-stubs:/script-stubs:ro
+      - ./script-stubs:/script-stubs:rw
       - ${PIPELINE_REPO_PATH}/pipelines:/pipelines:rw
       - ${PIPELINE_REPO_PATH}/userdata:/userdata:ro
       - ${PIPELINE_REPO_PATH}/output:/output:rw
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${K8S_CONFIG_PATH:-/dev/null}:/home/gradle/.kube/config:ro
     expose:
       - "8080"
     user: ${MY_UID}:${DOCKER_GID} # docker group necessary to access docker.sock
@@ -89,6 +90,7 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ${PIPELINE_REPO_PATH}/output:/static/output:ro
       - ${PIPELINE_REPO_PATH}/userdata:/static/userdata:ro
+      - ${PIPELINE_REPO_PATH}/scripts:/static/scripts:ro
     depends_on:
       - script-server
       - python-api

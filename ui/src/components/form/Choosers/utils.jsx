@@ -1,5 +1,4 @@
 import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
 import { polygon, bbox } from "@turf/turf";
 import proj4 from "proj4";
 import { DefaultApi } from "bon_in_a_box_script_service";
@@ -281,13 +280,6 @@ export const bboxToCoords = (bbox) => {
     [bbox[2], bbox[1]],
   ].map((bb) => [parseFloat(bb[0]), parseFloat(bb[1])]);
   return b;
-};
-
-export const validTerraPolygon = (feature) => {
-  feature.properties.mode = "rectangle";
-  feature.id = uuidv4();
-  delete feature.bbox;
-  return feature;
 };
 
 export const cleanBbox = (bbox, units) => {

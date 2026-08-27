@@ -7,8 +7,6 @@ import CountryRegionMenu from "./CountryRegionMenu";
 import BBox from "./BBox";
 import CRSMenu from "./CRSMenu";
 import { CustomButtonGreen } from "../../CustomMUI";
-import ReactMarkdown from "react-markdown";
-import Alert from "@mui/material/Alert";
 import { defaultCRS, defaultCountry, defaultRegion } from "./utils";
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import Modal from "@mui/material/Modal";
@@ -23,7 +21,6 @@ export default function Choosers({
     label: "",
     type: "",
   },
-  descriptionCell = true,
   leftLabel = true,
   updateValue,
   value = null,
@@ -53,7 +50,7 @@ export default function Choosers({
               setOpenModal(false);
             }}
             className="locationChooserButton"
-            style={{ marginBottom: "1rem", fontSize: "1rem", width: "500px" }}
+            style={{ marginBottom: "1rem", fontSize: "1rem", width: !isCompact && "500px" }}
           >
             {`Choose ${inputDescription.label}`}
           </CustomButtonGreen>

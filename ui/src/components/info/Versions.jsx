@@ -14,10 +14,17 @@ function formatVersionJson(jsonString, indent = 0) {
       formattedString += "\n";
     }
 
+    formattedString += "\t".repeat(indent) + `${key}:`;
     if (typeof versionInfo[key] === 'object' && versionInfo[key] !== null) {
-      formattedString += "\t".repeat(indent) + `${key}:\n${formatVersionJson(JSON.stringify(versionInfo[key]), indent + 1)}`;
-    } else {
-      formattedString += "\t".repeat(indent) + `${key}: ${versionInfo[key]}\n`;
+      formattedString += "\n";
+      formattedString += formatVersionJson(JSON.stringify(versionInfo[key]), indent + 1);
+    } else if (typeof versionInfo[key] === 'string' && versionInfo[key].includes("\n")) {
+      formattedString += "\n";
+      versionInfo[key].split("\n").forEach((line, _) => {
+        formattedString += "\t".repeat(indent + 1) + `${line}\n`;
+      });
+    } else {
+      formattedString += ` ${versionInfo[key]}\n`;
     }
   }
 

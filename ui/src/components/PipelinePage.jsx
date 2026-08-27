@@ -14,8 +14,9 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import Box from "@mui/material/Box";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ReactMarkdown from 'react-markdown';
+import { PageTitle } from "../Layout";
 
-const pipelineConfig = { extension: ".json", defaultFile: "helloWorld.json" };
+const pipelineConfig = { extension: ".json", defaultFile: null };
 const scriptConfig = {
   extension: ".yml",
   defaultFile: "helloWorld>helloR.yml",
@@ -139,6 +140,11 @@ export function PipelinePage({ runType }) {
   }
 
   function loadPipelineMetadata(choice, setExamples = true) {
+    if(!choice) {
+      setPipelineMetadata(null)
+      return
+    }
+
     var callback = function (error, data, response) {
       if (error) {
         setHttpError(formatError(error, response, "while loading pipeline metadata from script server"));
@@ -262,62 +268,70 @@ export function PipelinePage({ runType }) {
     setExpandInputs(prev => !prev);
   }, [setExpandInputs])
 
-
   return (
-    <div className="pipeline-page">
-      <h2>{runType === "pipeline" ? "Pipeline" : "Script"} run</h2>
-      <Box className="inputsTop" >
-        <Accordion expanded={expandInputs} onChange={toggleAccord}>
-          <AccordionSummary
-            className="outputTitle"
-            expandIcon={<ExpandMoreIcon />}
+    <>
+      <PageTitle
+        title={
+          pipelineMetadata?.name ? pipelineMetadata.name : runType === "pipeline" ? "Pipeline run" : "Script run"
+        }
+      />
+      <div className="pipeline-page">
+        <h2>{runType === "pipeline" ? "Pipeline" : "Script"} run</h2>
+        <Box className="inputsTop" >
+          <Accordion expanded={expandInputs} onChange={toggleAccord}>
+            <AccordionSummary
+              className="outputTitle"
+              expandIcon={<ExpandMoreIcon />}
+            >
+              Input form
+            </AccordionSummary>
+            <AccordionDetails className="outputContent">
+              <PipelineForm
+                pipelineMetadata={pipelineMetadata}
+                setInputFileContent={setInputFileContent}
+                inputFileContent={inputFileContent}
+                pipStates={pipStates}
+                setPipStates={setPipStates}
+                setHttpError={setHttpError}
+                setResultsData={setResultsData}
+                runType={runType}
+                restoreDefaults={restoreDefaults}
+              />
+            </AccordionDetails>
+          </Accordion>
+        </Box>
+        {pipStates.runId && (
+          <CustomButtonGreen
+            onClick={stop}
+            disabled={!stoppable}
+            variant="contained"
+            sx={{ margin: "10px 0 10px 0" }}
           >
-            Input form
-          </AccordionSummary>
-          <AccordionDetails className="outputContent">
-            <PipelineForm
-              pipelineMetadata={pipelineMetadata}
-              setInputFileContent={setInputFileContent}
-              inputFileContent={inputFileContent}
-              pipStates={pipStates}
-              setPipStates={setPipStates}
-              setHttpError={setHttpError}
-              setResultsData={setResultsData}
-              runType={runType}
-              restoreDefaults={restoreDefaults}
-            />
-          </AccordionDetails>
-        </Accordion>
-      </Box>
-      {pipStates.runId && (
-        <CustomButtonGreen
-          onClick={stop}
-          disabled={!stoppable}
-          variant="contained"
-          sx={{ margin: "10px 0 10px 0" }}
-        >
-          Stop
-        </CustomButtonGreen>
-      )}
-      {httpError && (
-        <Alert severity="error" key="httpError">
-          <ReactMarkdown>{httpError}</ReactMarkdown>
-        </Alert>
-      )}
-      {pipelineMetadata && (
-        <PipelineResults
-          key="results"
-          pipelineMetadata={pipelineMetadata}
-          inputFileContent={inputFileContent}
-          resultsData={resultsData}
-          runningScripts={runningScripts}
-          setRunningScripts={setRunningScripts}
-          pipeline={pipeline}
-          runHash={runHash}
-          displayTimeStamp={pipStates.timestamp}
-          isPipeline={runType === "pipeline"}
-        />
-      )}
-    </div>
+            Stop
+          </CustomButtonGreen>
+        )}
+        {httpError && (
+          <div style={{ marginTop: "20px", paddingBottom: "30px" }}>
+            <Alert severity="error" key="httpError" >
+              <ReactMarkdown>{httpError}</ReactMarkdown>
+            </Alert>
+          </div>
+        )}
+        {pipelineMetadata && (
+          <PipelineResults
+            key="results"
+            pipelineMetadata={pipelineMetadata}
+            inputFileContent={inputFileContent}
+            resultsData={resultsData}
+            runningScripts={runningScripts}
+            setRunningScripts={setRunningScripts}
+            pipeline={pipeline}
+            runHash={runHash}
+            displayTimeStamp={pipStates.timestamp}
+            isPipeline={runType === "pipeline"}
+          />
+        )}
+      </div>
+    </>
   );
 }

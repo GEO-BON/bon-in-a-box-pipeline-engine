@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import "./RunHistory.css";
+
+import { useEffect, useState, useCallback } from "react";
 import { Spinner } from "./Spinner";
 import { HttpError } from "./HttpErrors";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
@@ -21,76 +23,143 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { styled } from "@mui/material/styles";
 import ReactMarkdown from "react-markdown";
-import { CustomButtonGreen, CustomButtonGrey } from "./CustomMUI";
+import { CustomButtonGreen, CustomButtonGrey, CustomSelect } from "./CustomMUI";
 import { Alert } from "@mui/material";
 import Warning from "@mui/icons-material/Warning";
 import yaml from "js-yaml";
+import debounce from "lodash.debounce";
+import filterIconWhite from "../img/filter-icon-white.svg"
+import filterIconGreen from "../img/filter-icon-green.svg"
+import { center } from "@turf/turf";
+import FilterMenu from "./FilterMenu";
+
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export default function RunHistory() {
   let [runHistory, setRunHistory] = useState(null);
   let [start, setStart] = useState(0);
+  let [keyword, setKeyword] = useState("");
+  let [inputValue, setInputValue] = useState("");
+  let [filterStatus, setFilterStatus] = useState(null);
   let limit = 30;
-  useEffect(() => {
-    api.getHistory({ start, limit }, (error, _, response) => {
-      document
-        .getElementById("pageTop")
-        ?.scrollIntoView({ behavior: "smooth" });
-      if (error) {
-        setRunHistory(
-          <Box sx={{ padding: "50px" }}>
-            <HttpError
-              httpError={error}
-              response={response}
-              context={"getting run history"}
-            />
-          </Box>
-        );
-      } else if (response && response.body.length === 0) {
-        setRunHistory(
-          <Box sx={{ padding: "50px" }}>
-            <h1>Previous runs</h1>
-            <Alert severity="info">There are no runs in history.</Alert>
-          </Box>
-        );
-      } else if (response && response.body.length > 0) {
-        const runs = response.body.sort((a, b) => {
-          const aa = new Date(a.startTime);
-          const bb = new Date(b.startTime);
-          return bb - aa;
-        });
-        setRunHistory(
-          <div id="pageTop" style={{ padding: "20px" }}>
-            <h1>Previous runs</h1>
-            <Grid container spacing={2}>
-              {runs.map((res, i) => (
-                <RunCard key={i} run={res} />
-              ))}
-            </Grid>
-            <PreviousNext
-              start={start}
-              limit={limit}
-              runsLength={runs.length}
-              showNext={response.status === 206}
-              setStart={setStart}
-            />
-          </div>
-        );
-      } else {
-        setRunHistory(
-          <Alert severity="warning">
-            Could not retrieve history: empty response.
-          </Alert>
-        );
-      }
-    });
-  }, [start, limit]);
 
-  return runHistory ? runHistory : <Spinner variant="light" />;
+  const [activeFilters, setActiveFilters] = useState(null);
+
+  const debouncedSetKeyword = useCallback(
+    debounce((value) => {
+      setKeyword(value);
+    }, 300),
+    []
+  );
+
+  const handleFilterChange = (filters) => {
+    const active = Object.entries(filters)
+      .filter(([label, checked]) => checked && label !== "All")
+      .map(([label]) => label.toLowerCase());
+
+    setFilterStatus(active);
+  };
+
+  useEffect(() => {
+    let request = {
+      start,
+      limit,
+    }
+
+    if(keyword) {
+      request.keyword = keyword.trim();
+    }
+
+    if(filterStatus) {
+      request.filterStatus = filterStatus.length === 0 ? ["none"] : filterStatus;
+    }
+
+    api.getHistory(request,
+      (error, _, response) => {
+        if (error) {
+          setRunHistory(
+            <Box sx={{ padding: "50px" }}>
+              <HttpError
+                httpError={error}
+                response={response}
+                context={"getting run history"}
+              />
+            </Box>
+          );
+        } else if (response && response.body.length === 0) {
+          setRunHistory(
+            <Box sx={{ padding: "5px" }}>
+              <h1>Previous runs</h1>
+              <Alert severity="info">
+                {keyword || filterStatus ? "No runs match your search or filter." : "There are no runs in history."}
+              </Alert>
+            </Box>
+          );
+        } else if (response && response.body.length > 0) {
+          const runs = response.body.sort((a, b) => {
+            const aa = new Date(a.startTime);
+            const bb = new Date(b.startTime);
+            return bb - aa;
+          });
+          setRunHistory(
+            <div id="pageTop">
+              <h1>Previous runs</h1>
+              <Grid container spacing={2}>
+                {runs.map((res, i) => (
+                  <RunCard key={i} run={res} />
+                ))}
+              </Grid>
+              <PreviousNext
+                start={start}
+                limit={limit}
+                runsLength={runs.length}
+                showNext={response.status === 206}
+                setStart={setStart}
+              />
+            </div>
+          );
+        } else {
+          setRunHistory(
+            <Alert severity="warning">
+              Could not retrieve history: empty response.
+            </Alert>
+          );
+        }
+      });
+  }, [start, limit, keyword, filterStatus]);
+
+  useEffect(() => {
+    setStart(0);
+  }, [keyword]);
+
+  useEffect(() => {
+    document
+      .getElementById("pageTop")
+      ?.scrollIntoView({ behavior: "smooth" });
+  }, [start]);
+
+  return (
+    <div className="history">
+      <div className="search-container">
+        <input
+          type="search"
+          className="step-search-input"
+          placeholder="Search history..."
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            debouncedSetKeyword(e.target.value);
+          }}
+        />
+        <FilterMenu onChange={handleFilterChange}></FilterMenu>
+      </div>
+      {runHistory ? runHistory : <Spinner variant="light" />}
+    </div>
+  );
 }
 
-export const LastNRuns = ({n}) => {
+export const LastNRuns = ({ n }) => {
   const [lastRuns, setLastRuns] = useState(null);
 
   useEffect(() => {
@@ -179,7 +248,7 @@ const PreviousNext = (props) => {
       sx={{ marginTop: "20px", paddingBottom: "100px" }}
     >
       {start > 0 && (
-        <Grid size={{xs:12, md:6}}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomButtonGrey
             onClick={() => {
               setStart((prev) => Math.max(prev - limit, 0));
@@ -190,7 +259,7 @@ const PreviousNext = (props) => {
         </Grid>
       )}
       {showNext && runsLength === limit && (
-        <Grid size={{xs:12, md:6}}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomButtonGrey
             onClick={() => {
               setStart((prev) => prev + limit);
@@ -224,9 +293,8 @@ const RunCard = (props) => {
   const debug_url = `/${run.type}-form/${pipeline}/${runHash}`;
   useEffect(() => {
     setExpanded(false); // close card if card reused for another history item
-    const descriptionPath = `${pipeline}.${
-      run.type === "script" ? "yaml" : "json"
-    }`;
+    const descriptionPath = `${pipeline}.${run.type === "script" ? "yaml" : "json"
+      }`;
     api.getInfo(run.type, descriptionPath, (error, _, response) => {
       if (response.status !== 404) {
         const res = JSON.parse(response.text);
@@ -305,7 +373,7 @@ const RunCard = (props) => {
           <Collapse in={expanded} timeout="auto" unmountOnExit>
             {expanded && (
               <CardContent>
-                <ReactMarkdown className="historyDescription">
+                <ReactMarkdown>
                   {desc}
                 </ReactMarkdown>
                 <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>

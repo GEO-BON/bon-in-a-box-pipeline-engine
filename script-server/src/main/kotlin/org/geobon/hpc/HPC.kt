@@ -111,7 +111,7 @@ open class HPC (
                 connection.sendJobs(
                     jobsToSend,
                     HPCRequirements(
-                        tasksToSend.values.maxOf { it.requirements.memoryG },
+                        tasksToSend.values.maxBy { it.requirements.mem.toMemMB() }.requirements.mem,
                         tasksToSend.values.maxOf { it.requirements.cpus },
                         tasksToSend.values.sumOf { it.requirements.duration.inWholeSeconds }.seconds
                     ),
@@ -170,4 +170,10 @@ open class HPC (
     companion object {
         const val SEND_THRESHOLD = 10
     }
+}
+
+private fun String.toMemMB(): Long {
+    val match = Regex("""^(\d+)([GM])$""").find(this) ?: return 0L
+    val value = match.groupValues[1].toLong()
+    return if (match.groupValues[2] == "G") value * 1024L else value
 }

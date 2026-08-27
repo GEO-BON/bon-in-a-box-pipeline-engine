@@ -70,8 +70,6 @@ export default function HPCStatus() {
     <div>
       {Object.keys(status).sort().map(key => {
         const { state, message, image , ...otherProps } = status[key]
-        console.log("all", status[key])
-        console.log("other", otherProps)
 
         return <div key={key}>
           <p>

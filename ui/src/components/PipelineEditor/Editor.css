@@ -27,6 +27,11 @@
 .tooltip .reactMarkdown {
   padding: 0px;
   margin: 0px;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .noLink a {
@@ -91,8 +96,14 @@
   cursor: grabbing;
 }
 
+.react-flow {
+  --xy-selection-background-color-default: #0041d01A;
+  --xy-selection-border-default: 2px dotted #0041d0AA;
+}
+
 .react-flow__node-output {
-  border-color: #ff0072;
+  border-color: #ff0072 !important;
+  padding: 1px 40px;
 }
 
 .reactflow-wrapper {
@@ -114,7 +125,7 @@
 }
 
 .react-flow__edge.selected .react-flow__edge-path {
-  stroke: #9e2b25;
+  stroke: #9e2b25 !important;
 }
 
 .ioNode {
@@ -175,31 +186,53 @@
 }
 
 .ioNode .ioNode-folder,
-.ioNode .ioNode-script {
+.ioNode .ioNode-script,
+.ioNode .ioNode-phantom {
   display: block;
 }
 .ioNode .ioNode-folder {
   font-size: 0.6em;
 }
-.ioNode .ioNode-script {
+.ioNode .ioNode-script,
+.ioNode .ioNode-phantom {
   font-weight: 700;
   color: var(--biab-green-main);
+}
+
+.ioNode .ioNode-phantom {
+  padding: '20px';
+  border: '2px dotted red'
+}
+
+.ioNode:has(.ioNode-phantom) {
+  background-color: #acb2c0;
+}
+
+.selected .ioNode:has(.ioNode-phantom) {
+  background-color: rgba(255, 0, 0, 0.2);
 }
 
 .inputs,
 .outputs {
   vertical-align: top;
   font-size: 0.7rem;
+  white-space: pre;
 }
 
 .react-flow__handle {
   width: 0.5rem;
   height: 0.5rem;
+  border-radius: 50%;
+  border: 1px solid white;
 }
 
 .inputs .react-flow__handle,
 .outputs .react-flow__handle {
   position: relative;
+}
+
+.react-flow__handle-right {
+  background-color: #555;
 }
 
 .inputs .react-flow__handle-left,
@@ -211,6 +244,8 @@
   bottom: auto;
   transform: none;
   display: inline-block;
+  background-color: #555;
+  position: relative;
 }
 
 .inputs .react-flow__handle-left {
@@ -308,6 +343,7 @@
 .ioList .example-tag {
   padding-left: 5px;
   font-size: small;
+  margin-right: 10px;
 }
 
 .ioList .example {

@@ -121,6 +121,8 @@ export default class DefaultApi {
      * @param {Object} opts Optional parameters
      * @param {Number} [start] Start index for pagination
      * @param {Number} [limit] Limit the number of results
+     * @param {String} [keyword] Filter search based on keyword. This applies to the script/pipeline names and their inputs.
+     * @param {Array.<module:model/String>} [filterStatus] Filter option based on pipeline status. The default value is \"all\" when null.
      * @param {module:api/DefaultApi~getHistoryCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Array.<module:model/GetHistory200ResponseInner>}
      */
@@ -132,7 +134,9 @@ export default class DefaultApi {
       };
       let queryParams = {
         'start': opts['start'],
-        'limit': opts['limit']
+        'limit': opts['limit'],
+        'keyword': opts['keyword'],
+        'filterStatus': this.apiClient.buildCollectionParam(opts['filterStatus'], 'multi')
       };
       let headerParams = {
       };
@@ -160,7 +164,7 @@ export default class DefaultApi {
 
     /**
      * Get metadata about this script or pipeline.
-     * @param {module:model/String} type Script or pipeline
+     * @param {module:model/String} type Script, pipeline or openEO
      * @param {String} descriptionPath Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.
      * @param {module:api/DefaultApi~getInfoCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link module:model/Info}
@@ -199,6 +203,42 @@ export default class DefaultApi {
     }
 
     /**
+     * Callback function to receive the result of the getK8sStatus operation.
+     * @callback module:api/DefaultApi~getK8sStatusCallback
+     * @param {String} error Error message, if any.
+     * @param {Object.<String, module:model/{String: GetHPCStatus200ResponseValue}>} data The data returned by the service call.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Get status of Kubernetes cluster workers.
+     * @param {module:api/DefaultApi~getK8sStatusCallback} callback The callback function, accepting three arguments: error, data, response
+     * data is of type: {@link Object.<String, module:model/{String: GetHPCStatus200ResponseValue}>}
+     */
+    getK8sStatus(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = ['application/json'];
+      let returnType = {'String': GetHPCStatus200ResponseValue};
+      return this.apiClient.callApi(
+        '/api/k8s/status', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the getListOf operation.
      * @callback module:api/DefaultApi~getListOfCallback
      * @param {String} error Error message, if any.
@@ -208,7 +248,7 @@ export default class DefaultApi {
 
     /**
      * Get a list of available steps of given type and their names.
-     * @param {module:model/String} type Script or pipeline
+     * @param {module:model/String} type Script, pipeline or openEO
      * @param {module:api/DefaultApi~getListOfCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Object.<String, {String: String}>}
      */
@@ -250,7 +290,7 @@ export default class DefaultApi {
 
     /**
      * Get the output folders of the scripts composing this pipeline
-     * @param {module:model/String} type Script or pipeline
+     * @param {module:model/String} type Script, pipeline or openEO
      * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
      * @param {module:api/DefaultApi~getOutputFoldersCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Object.<String, {String: String}>}
@@ -339,7 +379,7 @@ export default class DefaultApi {
      */
 
     /**
-     * Returns the geometry of the specified country or region from FieldMaps.io in GeoJSON format
+     * Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
      * @param {String} id ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes
      * @param {Object} opts Optional parameters
      * @param {module:model/String} [type = 'country')] Type of region to get the geometry for (country or region)
@@ -526,6 +566,41 @@ export default class DefaultApi {
     }
 
     /**
+     * Callback function to receive the result of the prepareK8s operation.
+     * @callback module:api/DefaultApi~prepareK8sCallback
+     * @param {String} error Error message, if any.
+     * @param data This operation does not return a value.
+     * @param {String} response The complete HTTP response.
+     */
+
+    /**
+     * Refresh and validate Kubernetes worker readiness for BON in a Box tasks.
+     * @param {module:api/DefaultApi~prepareK8sCallback} callback The callback function, accepting three arguments: error, data, response
+     */
+    prepareK8s(callback) {
+      let postBody = null;
+
+      let pathParams = {
+      };
+      let queryParams = {
+      };
+      let headerParams = {
+      };
+      let formParams = {
+      };
+
+      let authNames = [];
+      let contentTypes = [];
+      let accepts = [];
+      let returnType = null;
+      return this.apiClient.callApi(
+        '/api/k8s/prepare', 'GET',
+        pathParams, queryParams, headerParams, formParams, postBody,
+        authNames, contentTypes, accepts, returnType, null, callback
+      );
+    }
+
+    /**
      * Callback function to receive the result of the run operation.
      * @callback module:api/DefaultApi~runCallback
      * @param {String} error Error message, if any.
@@ -535,7 +610,7 @@ export default class DefaultApi {
 
     /**
      * Runs the script or pipeline matching `descriptionPath`.
-     * @param {module:model/String} type Script or pipeline
+     * @param {module:model/String} type Script, pipeline or openEO
      * @param {String} descriptionPath Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.
      * @param {Object} opts Optional parameters
      * @param {String} [callback] Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully.
@@ -635,7 +710,7 @@ export default class DefaultApi {
 
     /**
      * Stop the specified pipeline run.
-     * @param {module:model/String} type Script or pipeline
+     * @param {module:model/String} type Script, pipeline or openEO
      * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
      * @param {module:api/DefaultApi~stopCallback} callback The callback function, accepting three arguments: error, data, response
      */

@@ -1,8 +1,7 @@
 /**
- * Code from https://github.com/marudhupandiyang/react-csv-to-table
+ * Code adapted from https://github.com/marudhupandiyang/react-csv-to-table
  * For some reason NPM would not install this dependency.
  */
-import React from "react";
 
 export function parseCsvToRowsAndColumn(csvText, csvColumnDelimiter = '\t') {
     const rows = csvText.split('\n');
@@ -10,20 +9,49 @@ export function parseCsvToRowsAndColumn(csvText, csvColumnDelimiter = '\t') {
         return [];
     }
 
-    return rows.map(row => row.split(csvColumnDelimiter));
+    return rows.map(row => {
+      const splitRow = parseDelimitedRow(row, csvColumnDelimiter);
+      if(splitRow && splitRow.length > 0){
+        return splitRow.map(cell => cell.trim()).map(cell => cell.replace(/^"(.*)"$/, '$1'));
+      }
+      return splitRow;
+    });
+}
+
+function parseDelimitedRow(row, delimiter) {
+    const result = [];
+    let current = '';
+    let insideQuotes = false;
+
+    for (let i = 0; i < row.length; i++) {
+        const char = row[i];
+
+        if (char === '"') {
+            insideQuotes = !insideQuotes;
+            current += char;
+        } else if (char === delimiter && !insideQuotes) {
+            result.push(current);
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+
+    result.push(current);
+    return result;
 }
 
 
 const CsvToHtmlTable = ({
   data,
-  csvDelimiter,
-  hasHeader,
-  tableClassName,
-  tableRowClassName,
-  tableColumnClassName,
-  rowKey,
-  colKey,
-  renderCell
+  csvDelimiter = '\t',
+  hasHeader = true,
+  tableClassName = '',
+  tableRowClassName = '',
+  tableColumnClassName = '',
+  rowKey = (row, rowIdx) => `row-${rowIdx}`,
+  colKey = (col, colIdx, rowIdx) => `col-${colIdx}`,
+  renderCell = (col, colIdx, rowIdx) => col,
 }) => {
   const rowsWithColumns = parseCsvToRowsAndColumn(data.trimEnd(), csvDelimiter);
   let headerRow = undefined;
@@ -55,14 +83,14 @@ const CsvToHtmlTable = ({
         <tbody>
           {
             rows.map((row, rowIdx) => (
-              <tr className={tableRowClassName} key={typeof(rowKey) === 'function' ? rowKey(row, rowIdx) : rowIdx}>
+              <tr className={tableRowClassName} key={rowKey(row, rowIdx)}>
                 {
                   row.map && row.map((column, colIdx) => (
                     <td
                       className={tableColumnClassName}
-                      key={typeof(rowKey) === 'function' ? colKey(row, colIdx, rowIdx) : column[colKey]}
+                      key={colKey(row, colIdx, rowIdx)}
                     >
-                      {typeof renderCell === "function" ? renderCell(column, colIdx, rowIdx) : column}
+                      {renderCell(column, colIdx, rowIdx)}
                     </td>
                   ))
                 }
@@ -80,17 +108,6 @@ const CsvToHtmlTable = ({
       {renderTableBody(rowsWithColumns)}
     </table>
   );
-};
-
-CsvToHtmlTable.defaultProps = {
-  data: '',
-  rowKey: (row, rowIdx) => `row-${rowIdx}`,
-  colKey: (col, colIdx, rowIdx) => `col-${colIdx}`,
-  hasHeader: true,
-  csvDelimiter: '\t',
-  tableClassName: '',
-  tableRowClassName: '',
-  tableColumnClassName: '',
 };
 
 export default CsvToHtmlTable;

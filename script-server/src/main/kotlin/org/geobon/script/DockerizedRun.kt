@@ -3,6 +3,8 @@ package org.geobon.script
 import kotlinx.coroutines.*
 import org.geobon.pipeline.RunContext
 import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.condaPackDir
+import org.geobon.server.ServerContext.Companion.condaPackURL
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.plugins.Containers
 import java.io.File
@@ -32,7 +34,8 @@ class DockerizedRun( // Constructor used in single script run
 
     companion object {
         private val USE_RUNNERS = System.getenv("USE_RUNNERS").equals("true", ignoreCase = true)
-        private val CONDA_ENV_SCRIPT = "${System.getenv("SCRIPT_STUBS_LOCATION")}/system/condaEnvironment.sh"
+        private val CONDA_ENV_SCRIPT = "$scriptStubsRoot/system/condaEnvironment.sh"
+        private val CONDA_PACK_SCRIPT = "$scriptStubsRoot/system/condaPackEnvironment.sh"
     }
 
     @OptIn(ExperimentalTime::class)
@@ -48,6 +51,16 @@ class DockerizedRun( // Constructor used in single script run
         runCatching {
             val escapedOutputFolder = context.outputFolderEscaped
             val command: List<String>
+            val condaUnpackArgs =
+                if (condaPackDir != null) """ "$condaPackDir" "$condaPackURL" """
+                else ""
+
+            val condaPackCmd =
+                if (condaPackDir != null) "scriptExitCode=\$?; " +
+                    """source $CONDA_PACK_SCRIPT "$condaEnvName" "$condaPackDir" ; """ +
+                    "exit \$scriptExitCode"
+                else ""
+
             when (ScriptType.fromFile(scriptFile)) {
                 ScriptType.JULIA -> {
                     container = Containers.JULIA
@@ -68,13 +81,15 @@ class DockerizedRun( // Constructor used in single script run
                     command = container.dockerCommandList + listOf(
                         "bash", "-c",
                         """
-                            source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" ;
-                            Rscript $scriptStubsRoot/system/scriptWrapper.R ${context.outputFolder.absolutePath} ${scriptFile.absolutePath}
+                            source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "rbase"} "$condaEnvYml" $condaUnpackArgs ;
+                            Rscript $scriptStubsRoot/system/scriptWrapper.R ${context.outputFolder.absolutePath} ${scriptFile.absolutePath} ;
+                            $condaPackCmd
                         """.trimIndent()
                     )
                 }
 
                 ScriptType.SHELL -> command = listOf("sh", scriptFile.absolutePath, context.outputFolder.absolutePath)
+
                 ScriptType.PYTHON -> {
                     val scriptPath = scriptFile.absolutePath
                     val pythonWrapper = "$scriptStubsRoot/system/scriptWrapper.py"
@@ -84,8 +99,9 @@ class DockerizedRun( // Constructor used in single script run
                         command = container.dockerCommandList + listOf(
                             "bash", "-c",
                             """
-                                source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" ;
-                                python3 $pythonWrapper $escapedOutputFolder $scriptPath
+                                source $CONDA_ENV_SCRIPT $escapedOutputFolder ${condaEnvName ?: "pythonbase"} "$condaEnvYml" $condaUnpackArgs ;
+                                python3 $pythonWrapper $escapedOutputFolder $scriptPath ;
+                                $condaPackCmd
                             """.trimIndent()
                         )
                     } else {

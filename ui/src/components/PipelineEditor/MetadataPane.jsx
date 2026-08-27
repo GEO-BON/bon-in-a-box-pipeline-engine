@@ -5,7 +5,7 @@ const Editor = lazy(() => import('@monaco-editor/react'));
 // TODO: Try this for code validation: https://github.com/suren-atoyan/monaco-react/issues/228#issuecomment-1159365104
 
 const emptyMetadata = `name: # short name, such as My Script
-description: # Targetted to those who will interpret pipeline results and edit pipelines.
+description: # Targeted to those who will interpret pipeline results and edit pipelines.
 author: # 1 to many
   - name: # Full name
     email: # Optional, email address of the author. This will be publicly available.
@@ -17,6 +17,11 @@ references: # 0 to many
     link: # full link to the resource (ex. https://doi.org/...)
   - text: # plain text reference
     link: # full link to the resource (ex. https://doi.org/...)
+compute: # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.
+  hpc: false  # Optional, send to a HPC cluster if available. Defaults to false.
+  mem: 4Gi # Hard cap for the memory usage, default 4Gi.
+  cpus-per-task: 4 # Number of CPU  allocated, default 4.
+  time: "02:00:00" # Only when "hpc: true", maximum time allowed before the job is interrupted.
 `
 
 /**

@@ -1,17 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
-  Marker,
   MapContainer,
   TileLayer,
-  GeoJSON,
-  Popup,
-  useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import TiTilerLayer from "./TiTilerLayer";
-import ReactDOMServer from "react-dom/server";
 import Alert from "@mui/material/Alert";
 import GeoPackageLayer from './GeoPackageLayer';
 import GeoJSONLayer from './GeoJSONLayer';
@@ -88,14 +83,12 @@ export default function MapResult({ tiff, range, json, geopackage }) {
       {jsonContent && (
         <GeoJSONLayer
           geojsonOutput={jsonContent}
-          setGeojson={setJsonContent}
         />
       )}
 
       {geopackageContent && (
         <GeoPackageLayer
           geoPackage={geopackageContent}
-          setGeoPackage={setGeopackageContent}
         />
       )}
 

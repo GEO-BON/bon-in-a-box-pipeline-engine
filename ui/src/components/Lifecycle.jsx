@@ -35,6 +35,11 @@ export function LifecycleChip({ lifecycle }) {
       displayText = "Reviewed";
       title = "Approved by an independent peer-review process. Use according to documented guidelines."
       break;
+    case 'core':
+      chipStyle.backgroundColor = '#999';
+      displayText = "Core";
+      title = "A core component of the system, shared among many pipelines."
+      break;
     case 'deprecated':
       chipStyle.backgroundColor = 'black';
       chipStyle.color = 'white';

@@ -133,7 +133,7 @@ export const SingleIOResult = memo(
           mime.startsWith("text/csv") ||
           mime.startsWith("text/tab-separated-values")
         ) {
-          let splitMime = mime.slice(0, -2);
+          let actualMime = mime.slice(0, -2);
           return content.map((splitContent, i) => {
             return (
               <FoldableOutput
@@ -145,7 +145,7 @@ export const SingleIOResult = memo(
                 }
                 className="foldableOutput"
               >
-                {renderWithMime(splitContent, splitMime)}
+                {renderWithMime(splitContent, actualMime)}
               </FoldableOutput>
             );
           });
@@ -169,29 +169,6 @@ export const SingleIOResult = memo(
             return <RenderedCSV url={content} delimiter="&#9;" />;
 
           break;
-
-        case "object":
-          return Object.entries(content).map((entry) => {
-            const [key, value] = entry;
-            let isLink = isRelativeLink(value);
-            return (
-              <FoldableOutput
-                key={key}
-                title={key}
-                inline={
-                  isLink && (
-                    <a href={value} target="_blank" rel="noreferrer">
-                      {value}
-                    </a>
-                  )
-                }
-                inlineCollapsed={!isLink && renderInline(value)}
-                className="foldableOutput"
-              >
-                {renderWithMime(value, "unknown")}
-              </FoldableOutput>
-            );
-          });
 
         case "application":
           if (subtype === "geo+json") return <MapResult json={content} />;
@@ -281,10 +258,11 @@ export const SingleIOResult = memo(
 
       if (ioMetadata.description) {
         description = (
-          <ReactMarkdown
-            className="reactMarkdown outputDescription"
-            children={ioMetadata.description}
-          />
+          <div className="reactMarkdown outputDescription">
+            <ReactMarkdown>
+              {ioMetadata.description}
+            </ReactMarkdown>
+          </div>
         );
       } else {
         errorMsg = (

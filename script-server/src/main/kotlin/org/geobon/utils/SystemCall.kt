@@ -20,7 +20,6 @@ open class SystemCall {
     ): CallResult {
         var inputString = ""
         var errorString = ""
-        println("TEMP SystemCall: ${call.joinToString(" ")}")
         return runBlocking(Dispatchers.IO) {
             try {
                 val process = ProcessBuilder(call)

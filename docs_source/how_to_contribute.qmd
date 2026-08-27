@@ -161,7 +161,7 @@ The user inputs can also be file types if you want to upload a file or connect t
 
 For example:
 
-```
+``` yaml
 inputs:
   landcover_raster:
     label: Raster of landcover
@@ -279,7 +279,7 @@ Example of conda sub-environment for an R script:
 conda: # Optional: if you script requires specific versions of packages.
   channels:
     - conda-forge # make sure to put conda forge first
-    - r
+    # - r # use this chanel only if some packages are not available in conda-forge
   dependencies:
     - r-rjson # read inputs and save outputs for R scripts
     - r-terra
@@ -305,17 +305,40 @@ conda:
 Conda dependency management is not available in Julia. There is a central project at /julia_depot/.
 :::
 
+For more information, refer to the [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually).
+
 #### Loading packages that are not available in conda
 
 If you need a package that is not available in conda, such as one downloaded from GitHub, install the package directly in the script. Do not add these packages to the conda portion of the yml file because conda will not be able to recognize them.
 
-For more information, refer to the [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually).
+**In R,** concurrent installation of packages can be problematic (for example when running the same script multiple times in parallel). For this language only, you must use the function \`biab_ensure_package(...)\` that monitors the R locking mechanism to hold back the concurrent scripts during installation. Below is an example usage:\
+
+``` R
+biab_ensure_package(
+    "duckdbfs",
+    version = "0.1.2",
+    installer = function() {
+        remotes::install_version("duckdbfs", version = "0.1.2", dependencies = FALSE, upgrade = "never")
+    }
+)
+
+biab_ensure_package(
+    "duckspatial",
+    version = "0.9.0",
+    installer = function() {
+        remotes::install_github("Cidree/duckspatial@v0.9.0", dependencies = FALSE, upgrade = "never")
+    }
+)
+
+library(duckdbfs)
+library(duckspatial)
+```
 
 ### Examples
 
 #### Full example of a YAML file:
 
-```
+``` yaml
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -368,6 +391,11 @@ conda: # Optional, only needed if you need packages not in the central environme
     - r-ggplot2
     - r-sf
     - r-terra
+compute: # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.
+  hpc: false # Optional, send to a HPC cluster if available. Defaults to false.
+  mem: 4Gi # Hard cap for the memory usage, default 4Gi.
+  cpus-per-task: 4 # Number of CPU  allocated, default 4.
+  time: "02:00:00" # Only when "hpc: true", maximum time allowed before the job is interrupted.
 ```
 
 YAML is a space sensitive format, so make sure all the tab sets are correct in the file.
@@ -376,7 +404,7 @@ If inputs are outputs from a previous step in the pipeline, make sure to give th
 
 #### Empty commented template to fill in:
 
-```
+``` yaml
 script: # script file with extension, such as "myScript.R".
 name: # short name, such as My Script
 description: # Targeted to those who will interpret pipeline results and edit pipelines.
@@ -412,6 +440,12 @@ conda: # Optional, only needed if your script has specific package dependencies
     - # list here
   dependencies: # any packages that are dependent on a specfic version
     - # list here
+
+compute: # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.
+  hpc: false # Optional, send to a HPC cluster if available. Defaults to false.
+  mem: 4Gi # Hard cap for the memory usage, default 4Gi.
+  cpus-per-task: 4 # Number of CPU  allocated, default 4.
+  time: "02:00:00" # Only when "hpc: true", maximum time allowed before the job is interrupted.
 ```
 
 See [example](https://GitHub.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/helloR.R)
@@ -511,9 +545,7 @@ and the ID of the coordinate reference system of the bounding box, made of the a
 ``` r
 crs_id <- paste0(input$study_area_bbox$CRS$authority,input$study_area_bbox$CRS$code)
 ```
-:::
 
-::: panel-tabset
 ## Python
 
 A convenience function `biab_inputs` is loaded in Python by default to load the file into a list. Here is an example of how to read the input file in the script and use it's value:
@@ -525,9 +557,7 @@ my_int = data['some_int_input']
 ```
 
 To access selector values in Python, the approach is similar to R. For example, to create the CRS ID from the authority and code:
-:::
 
-:::: panel-tabset
 ``` python
 crs_id = data['study_area_bbox']['CRS']['authority']+':'+str(data['study_area_bbox']['CRS']['code'])
 ```
@@ -548,14 +578,12 @@ number = input_data["number"]
 # do something with number
 ```
 
-::: panel-tabset
 To access selector values in Julia, the approach is similar to R or Python. For example, to create the CRS ID from the authority and code:
-:::
 
 ``` julia
 crs_id = string(input_data["study_area_bbox"]["CRS"]["authority"],":",input_data["study_area_bbox"]["CRS"]["code"])
 ```
-::::
+:::
 
 ### Writing outputs
 

@@ -1,6 +1,7 @@
 package org.geobon.pipeline
 
 import kotlinx.coroutines.*
+import org.geobon.openeo.OpenEOStep
 import org.geobon.script.Description.IO__LABEL
 import org.geobon.script.Description.IO__TYPE
 import org.geobon.server.ServerContext
@@ -9,15 +10,16 @@ import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.FileNotFoundException
 
 open class Pipeline (
     override val id: StepId,
     private val debugName: String,
     /** Node id to Step */
     private val steps: Map<String, IStep>,
-    /** IO Id to Input */
+    /** IO id to Input */
     final override val inputs: MutableMap<String, Pipe>,
-    /** IO Id to Output */
+    /** IO id to Output */
     final override val outputs: Map<String, Output> = mutableMapOf()
 ) : IStep {
 
@@ -118,7 +120,6 @@ open class Pipeline (
     }
 
     override suspend fun execute() {
-        logger.info("TEMP Starting pipeline $this")
         coroutineScope {
             finalSteps.forEach { launch { it.execute() } }
         } // exits when all final steps have their results
@@ -250,8 +251,9 @@ open class Pipeline (
                                 // Instantiating kotlin "special steps".
                                 // Not done with reflection on purpose, since this could allow someone to instantiate any class,
                                 // resulting in a security breach.
-                                scriptFile == "pipeline/AssignId.yml" -> AssignId(serverContext, innerStepId)
-                                scriptFile == "pipeline/PullLayersById.yml" -> PullLayersById(serverContext, innerStepId)
+                                // TODO: This will be needed for openEO steps, so keeping this comment as an example:
+                                //scriptFile == "pipeline/AssignId.yml" -> AssignId(serverContext, innerStepId)
+                                scriptFile.endsWith(".udp") -> OpenEOStep(scriptFile, innerStepId, serverContext)
 
                                 // Regular script steps
                                 else -> ScriptStep(scriptFile, innerStepId, serverContext)
@@ -356,8 +358,8 @@ open class Pipeline (
             val inputsParsed = JSONObject(inputsString)
             val constants = mutableMapOf<String, Pipe>()
             inputsParsed.keySet().forEach { key ->
-                val type = step.inputTypes[key]
-                    ?: throw RuntimeException("Input received \"$key\" is not listed in script inputs. Listed inputs are ${step.inputTypes.keys}")
+                val type = step.inputDefinitions[key]?.type
+                    ?: throw RuntimeException("Input received \"$key\" is not listed in script inputs. Listed inputs are ${step.inputDefinitions.keys}")
 
                 val inputId = IOId(step.id, key)
                 constants[inputId.toBreadcrumbs()] = createConstant(key, inputsParsed, type, key)
@@ -422,6 +424,33 @@ open class Pipeline (
                 }
             }
         }
-    }
 
+        /**
+         * @param relativePath relative path to the JSON file
+         * @return the pipeline metadata as a JSONObject
+         * @see org.geobon.script.Description for return value structure
+         */
+        fun getPipelineDescription(relativePath: String): JSONObject {
+            val descriptionFile =
+                File(pipelinesRoot, relativePath)
+
+            if (descriptionFile.exists()) {
+                val descriptionJSON = JSONObject(descriptionFile.readText())
+                val metadataJSON = JSONObject()
+                metadataJSON.putOpt(INPUTS, descriptionJSON.get(INPUTS))
+                metadataJSON.putOpt(OUTPUTS, descriptionJSON.get(OUTPUTS))
+
+                descriptionJSON.optJSONObject(METADATA)?.let { metadata ->
+                    metadata.keys().forEach { key ->
+                        metadataJSON.putOpt(key, metadata.get(key))
+                    }
+                }
+
+                return metadataJSON
+
+            } else {
+                throw FileNotFoundException("$descriptionFile does not exist.")
+            }
+        }
+    }
 }

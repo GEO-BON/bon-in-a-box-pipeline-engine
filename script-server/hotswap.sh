@@ -1,4 +1,7 @@
-docker exec -it biab-script-server sh -c "cd /home/gradle/project/ && gradle assemble"
+
+# Hotswap broke with Java 26. Falling back on container restart for now.
+docker restart biab-script-server
+#docker exec -it biab-script-server sh -c "cd /home/gradle/project/ && gradle assemble"
 
 
 # optional

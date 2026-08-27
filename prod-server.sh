@@ -12,11 +12,6 @@ COPYRIGHT_RANGE="2021-2026"
 symlink=$?
 if [[ $symlink -eq 0 ]] ; then echo "Detected a symlink on .server folder: this is a development setup!"; fi
 
-which docker > /dev/null
-if [[ $? -ne 0 ]] ; then
-    echo -e "${RED}Docker and docker compose plugin are required to run the pipeline engine.${ENDCOLOR}" ; exit 1
-fi
-
 which git > /dev/null
 if [[ $? -ne 0 ]] ; then
     echo -e "${RED}Git is required to run the latest version of the pipeline engine.${ENDCOLOR}" ; exit 1
@@ -69,6 +64,11 @@ function help {
 
 # Must be called once before command function can be called
 function prepareCommands {
+    which docker > /dev/null
+    if [[ $? -ne 0 ]] ; then
+        echo -e "${RED}Docker and docker compose plugin are required to run the pipeline engine.${ENDCOLOR}" ; exit 1
+    fi
+
     # Get docker group. Will not work on Windows, silencing the warning with 2> /dev/null
     export DOCKER_GID="$(getent group docker 2> /dev/null | cut -d: -f3)"
 
@@ -106,16 +106,11 @@ function prepareCommands {
         export MY_UID="$(id -u)"
     fi
 
-    # Apple M2 chip check, see https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/issues/85
     composeFiles="-f .server/compose.yml -f .server/compose.prod.yml -f compose.env.yml"
-    macCPU=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
-    if ! [[ -z "$macCPU" ]]; then
-        # This is a Mac, check chip type
-        if [[ "$macCPU" =~ ^Apple\ M[1-9] ]]; then
-            echo "Apple M* chip detected"
-            composeFiles+=" -f .server/compose.apple.yml"
-        fi
-    fi
+    # macCPU=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
+    # if ! [[ -z "$macCPU" ]]; then
+    #     # This is a Mac, here we could do some specific things if needed
+    # fi
 }
 
 # Run your docker commands on the server manually.
@@ -133,13 +128,13 @@ function validate {
 
     echo "Checking for duplicate descriptions in scripts..."
     cd scripts ; assertSuccess
-    ../.server/.github/findDuplicateDescriptions.sh ; flagErrors
+    ../.server/.github/findDuplicateDescriptions.py ; flagErrors
     cd ..
 
     echo "Validating script metadata against schema..."
     docker run --rm --name biab-yaml-validator -v $(pwd)/scripts:"/scripts" \
         -v $(pwd)/.server/.github/:"/.github" \
-        navikt/yaml-validator:v4 \
+        ghcr.io/navikt/yaml-validator/yaml-validator:v4 \
         ".github/scriptValidationSchema.yml" "scripts/" "no" ".yml"
     flagErrors
 
@@ -187,10 +182,9 @@ function checkout {
     git checkout $branch -- .prod-paths.env ; assertSuccess
     git checkout $branch -- compose.yml ; assertSuccess
     git checkout $branch -- compose.prod.yml ; assertSuccess
-    git checkout $branch -- compose.apple.yml; assertSuccess
     git checkout $branch -- version.txt; ## Don't assert. Only informative, plus hasn't always been there.
 
-    git checkout $branch -- .github/findDuplicateDescriptions.sh ; assertSuccess
+    git checkout $branch -- .github/findDuplicateDescriptions.py ; assertSuccess
     git checkout $branch -- .github/findDuplicateIds.sh ; assertSuccess
     git checkout $branch -- .github/scriptValidationSchema.yml ; assertSuccess
     git checkout $branch -- .github/pipelineValidationSchema.yml ; assertSuccess
@@ -362,7 +356,7 @@ function up {
                     local containerNoTag=$(echo $container | cut -d':' -f1)
                     echo -e "${YELLOW} - $containerNoTag${ENDCOLOR}"
                 done
-                echo -e "${YELLOW}This means that conda environments and dependencies installed at runtime will need to be reinstalled.${ENDCOLOR}"
+                echo -e "${YELLOW}This means that environments and dependencies installed at runtime in these containers will need to be reinstalled.${ENDCOLOR}"
             fi
 
             if [[ " $@ " == *" -y "* || " $@ " == *" --yes "* ]]; then
@@ -472,6 +466,25 @@ function licence {
     echo ""
     echo "You should have received a copy of the GNU General Public License"
     echo "along with this program.  If not, see <https://www.gnu.org/licenses/>."
+    echo ""
+    echo "--------------------------------------------------------------------------------"
+    echo ""
+    echo "Please use the following citation to reference the BON in a Box pipeline engine:"
+    echo ""
+    echo "    Jory Griffith, Jean-Michel Lord, Michael D Catchen, Maria Isabel Arce-Plata,"
+    echo "    F Guillaume Blanchet, Mathusan Chandramohan, M Camila Diaz-Corzo, Dominique"
+    echo "    Gravel, César Gutiérrez, Isabelle S Helfenstein, Sean Hoban, Jamie M Kass,"
+    echo "    Linda Laikre, Guillaume Larocque, Deborah M Leigh, Brian Leung, Alicia"
+    echo "    Mastretta-Yanes, Katie L Millette, Maria Alejandra Molina Berbeo, Dat Nguyen,"
+    echo "    Kari E Norman, María Helena Olaya-Rodríguez, Simon Pahls, Kaitlyn Pereira, Pedro"
+    echo "    R Peres-Neto, Timothée Poisot, Laura J Pollock, Juan Carlos Rey-Velasco, Victor"
+    echo "    J Rincon-Parra, Claudia Roeoesli, François Rousseu, Lina María Sánchez-Clavijo,"
+    echo "    Meredith C Schuman, Oliver Selmoni, Jessica M da Silva, Erika Suarez-Valencia,"
+    echo "    Thilina D Surasinghe, Eren Turak, Luis Fernando Urbina, Sarah Valentin, Noah"
+    echo "    Wightman, Juan Zuloaga, Maria Cecilia Londoño, Andrew Gonzalez. 2026. BON in a"
+    echo "    Box: An Open and Collaborative Platform for Biodiversity Monitoring, Indicator"
+    echo "    Calculation, and Reporting. BioScience. 76(4):345-358."
+    echo "    https://doi.org/10.1093/biosci/biaf189"
 }
 
 case "$1" in

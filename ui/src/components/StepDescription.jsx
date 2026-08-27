@@ -96,15 +96,19 @@ export function GeneralDescription({ ymlPath, metadata }) {
 
     const codeLink = getCodeUrl(ymlPath, metadata.script)
 
-    const hpcMessage = metadata.hpc &&
-        `HPC enabled: Uses ${metadata.hpc["cpus-per-task"]} core${metadata.hpc["cpus-per-task"] > 1 ? "s" : ""
-        } for a maximum time of ${metadata.hpc.time}, capped to ${metadata.hpc.mem} of memory.`
+    let computeMessage = metadata.compute &&
+        `Compute: Uses ${metadata.compute["cpus-per-task"]} core${metadata.compute["cpus-per-task"] > 1 ? "s" : ""
+        } capped to ${metadata.compute.mem} of memory.`
+
+    if (metadata.compute?.hpc === true) {
+        computeMessage += ` This script can run on a HPC, with a maximum duration of ${metadata.compute.time}.`
+    }
 
     return <div className='stepDescription'>
         <div style={{ marginBottom: "20px" }}>
             <LifecycleChip lifecycle={metadata.lifecycle} />
-            {metadata.hpc &&
-                <Chip label="HPC" size="small" title={hpcMessage} style={{
+            {metadata.compute?.hpc === true &&
+                <Chip label="HPC" size="small" title={computeMessage} style={{
                     marginBottom: '8px',
                     border: '1px solid black',
                     background: 'white',
@@ -126,12 +130,12 @@ export function GeneralDescription({ ymlPath, metadata }) {
                 <i>{generatePersonList(metadata.reviewer)}</i>
             </small></div>
         }
-        {metadata.description && <ReactMarkdown className="reactMarkdown" children={metadata.description} />}
-        {codeLink && <p>
+        {metadata.description && <div className="reactMarkdown"><ReactMarkdown children={metadata.description} /></div>}
+        {codeLink && <p style={{wordBreak: 'break-all'}}>
                 Code: <a href={codeLink} target="_blank">{codeLink.substring(codeLink.search(/(scripts|pipelines)\//))}</a>
             </p>
         }
-        {hpcMessage && <p>{hpcMessage}</p>}
+        {computeMessage && <p>{computeMessage}</p>}
         {metadata.external_link &&
             <p>See&nbsp;
                 <a href={metadata.external_link} target="_blank">{metadata.external_link}</a>
@@ -199,6 +203,9 @@ function getCodeUrl(ymlPath, scriptFileName) {
         return null
     }
 
+    if(scriptFileName.startsWith("http://") || scriptFileName.startsWith("https://"))
+        return scriptFileName
+
     return 'https://github.com/GEO-BON/biab-2.0/tree/main/scripts/' + removeLastSlash(ymlPath.replaceAll('>', '/')) + scriptFileName
 }
 
@@ -242,7 +249,7 @@ function jsonToYaml(jsonObj, indent = 0, lineWidth = 80) {
         return <div key={key}>
             {'  '.repeat(indent) + key + ': '}
             {key === 'description'
-                ? <>|<ReactMarkdown className='ioDescription' children={jsonObj[key]} /></>
+                ? <div className='ioDescription'>|<ReactMarkdown children={jsonObj[key]} /></div>
                 : valuetoYaml(jsonObj[key], indent, lineWidth)}
         </div>
     })

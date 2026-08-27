@@ -131,12 +131,6 @@ h2 {
   margin: 0 auto;
 }
 
-.title-container {
-  display: flex;
-  align-items: center;
-  gap: 35px;
-}
-
 .green-separator {
   display: block;
   height: 1px;
@@ -152,12 +146,16 @@ h2 {
   color: #DAECE5;
   font-weight: bold;
   font-size: 66px;
+  margin-bottom: 50px;
+  margin-top: 0px;
 }
 
-.home-page-subtitle {
+.home-page-pre-title {
   color: #ABD6C6;
   font-weight: bold;
-  font-size: 28px;
+  margin-top: 40px;
+  margin-bottom: 0px;
+  font-size: 48px;
 }
 
 .pipeline-columns {
@@ -309,12 +307,14 @@ ul.pipeline-bullets li::before {
 
 .fullScreenPopup {
   position: absolute;
-  top: 100px;
+  top: 75px;
   bottom: 10px;
-  margin-left: -10px;
+  margin-left: 10px;
+  margin-right: 10px;
   z-index: 10000;
   /* Full screen popup */
   min-width: 50%;
+  max-width: 75%;
 
   display: flex;
   flex-direction: row;
@@ -571,6 +571,15 @@ td {
   padding: 3px 5px;
 }
 
+cite {
+  display: block;
+  border-left: 3px solid #bbb;
+  color: #bbb;
+  font-size: small;
+  padding-left: 8px;
+  font-style: normal;
+}
+
 /**
  * Hiding arrows in float input type=number
  * see https://www.w3schools.com/howto/howto_css_hide_arrow_number.asp
@@ -601,6 +610,7 @@ input[type="number"].input-float {
 
 .logs {
   border: 2px solid #87cefa45;
+  outline: none;
   height: 30em;
   overflow: auto;
   padding: 0.5em;

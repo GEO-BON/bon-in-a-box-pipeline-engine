@@ -1,4 +1,4 @@
-import { Handle, Position } from 'react-flow-renderer/nocss';
+import { Handle, Position } from '@xyflow/react';
 
 // props content, see https://reactflow.dev/docs/api/nodes/custom-nodes/#passed-prop-types
 export default function UserInputNode({ id, data, type }) {

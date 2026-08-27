@@ -8,7 +8,7 @@ import {
   Link,
 } from "@mui/material";
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import CustomTable from "../CustomTable";
 import CsvToGeojson, { CsvToMapArray } from "../../helpers/csv_processing";
 import { Item } from "./styles";
@@ -17,23 +17,19 @@ import _ from "underscore";
 import { PipelineOutput } from "./PipelineOutput";
 
 import type { FeatureCollection } from "geojson";
-import { url } from "inspector";
 import YAML from "yaml";
 import axios from "axios";
 import Markdown from "markdown-to-jsx";
+import "./sidebar.css";
 
 export default function Sidebar(props: any) {
   const {
-    t = (text: string) => text,
     setSelectedLayer,
     pipelineData,
     setPipelineRunId,
-    geojson,
-    setGeojson,
     setGeojsonOutput,
     setGeoPackage,
     generateStats,
-    map,
   } = props;
 
   interface Params {
@@ -44,11 +40,9 @@ export default function Sidebar(props: any) {
     features: [],
   };
 
-  const navigate = useNavigate();
   const { pipeline_run_id } = useParams<keyof Params>() as Params;
   const containerRef = useRef<HTMLInputElement>(null);
   const [pips, setPips] = useState([]);
-  const { pathname } = useLocation();
   const [outputType, setOutputType] = useState("");
   const [selectedOutput, setSelectedOutput] = useState("");
   const [openModal, setOpenModal] = useState(false);
@@ -63,7 +57,7 @@ export default function Sidebar(props: any) {
 
   const displayOutput = (output: any, type: string) => {
     if (type.includes("geotiff")) {
-      clearOtherLayers("geotiff")
+      clearOtherLayers("geotiff");
       setSelectedLayer(output);
     } else if (type.includes("points/")) {
       let crs = "EPSG:4326";
@@ -90,12 +84,12 @@ export default function Sidebar(props: any) {
         });
       });
     } else if (type.includes("geo+json")) {
-      clearOtherLayers("geo+json")
+      clearOtherLayers("geo+json");
       GetJSON(output).then((res: any) => {
         setGeojsonOutput(res);
       });
     } else if (type.includes("geopackage")) {
-      clearOtherLayers("geopackage")
+      clearOtherLayers("geopackage");
       setGeoPackage(output);
     } else if (
       type.includes("value") ||
@@ -112,14 +106,18 @@ export default function Sidebar(props: any) {
       setModalContent(
         <Grid
           sx={{
-            background: `url("${output}")`,
             backgroundColor: "#444",
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
-            width: "60vw",
-            height: "80vh",
+            padding: "20px",
           }}
-        ></Grid>
+        >
+          <img
+            src={output}
+            alt="output image"
+            style={{ maxWidth: "60vw", maxHeight: "80vh" }}
+          />
+        </Grid>,
       );
       setOpenModal(true);
     } else if (type.includes("json") && !type.includes("geojson")) {
@@ -143,29 +141,28 @@ export default function Sidebar(props: any) {
             <Typography sx={{ color: "#aaa", whiteSpace: "pre-wrap" }}>
               {doc.toString()}
             </Typography>
-          </Grid>
+          </Grid>,
         );
         setOpenModal(true);
       });
     }
   };
 
-
-  const clearOtherLayers=(thisLayer:string)=>{
-    if(thisLayer!=='geotiff'){
+  const clearOtherLayers = (thisLayer: string) => {
+    if (thisLayer !== "geotiff") {
       setSelectedLayer({
         url: "",
         band_id: "b1",
         description: "",
       });
     }
-    if(thisLayer!=='geo+json'){
-      setGeojsonOutput(emptyFC)
+    if (thisLayer !== "geo+json") {
+      setGeojsonOutput(emptyFC);
     }
-    if(thisLayer!=='geopackage'){
-      setGeoPackage("")
+    if (thisLayer !== "geopackage") {
+      setGeoPackage("");
     }
-  }
+  };
 
   useEffect(() => {
     const pips: any = [];
@@ -182,7 +179,7 @@ export default function Sidebar(props: any) {
           <Typography color="primary.contrastText" sx={{ fontWeight: "bold" }}>
             {pipelineData.name}
           </Typography>
-        </Link>
+        </Link>,
       );
       setPipelineDescription(pipelineData.description);
       if (pipelineData.author.length > 0) {
@@ -190,6 +187,7 @@ export default function Sidebar(props: any) {
           let divider = i < arr.length - 1 ? <>, </> : "";
           let name = (
             <Typography
+              key={a.name}
               fontSize={11}
               color="primary.contrastText"
               sx={{ display: "inline" }}
@@ -201,13 +199,13 @@ export default function Sidebar(props: any) {
 
           if (a.identifier) {
             return (
-              <Link target="_blank" href={`${a.identifier}`}>
+              <Link key={a.name} target="_blank" href={`${a.identifier}`}>
                 {name}
               </Link>
             );
           } else if (a.email) {
             return (
-              <Link target="_blank" href={`mailto:${a.email}`}>
+              <Link key={a.name} target="_blank" href={`mailto:${a.email}`}>
                 {name}
               </Link>
             );
@@ -226,39 +224,34 @@ export default function Sidebar(props: any) {
           return a.weight - b.weight;
         });
       }
-      sortable.map((pd: any) => {
-        if (pd) {
-          return pips.push(
-            <PipelineOutput
-              key={pd.label}
-              outputObj={pd}
-              displayOutput={displayOutput}
-              setOutputType={setOutputType}
-              outputType={outputType}
-              selectedOutput={selectedOutput}
-              setSelectedOutput={setSelectedOutput}
-              generateStats={generateStats}
-            />
-          );
-        }
-        return false;
-      });
+      sortable
+        .filter(
+          (pd: any) =>
+            pd &&
+            pd.outputs !== "undefined" &&
+            pd.outputs !== undefined &&
+            pd.outputs !== null,
+        )
+        .map((pd: any) => {
+          if (pd) {
+            return pips.push(
+              <PipelineOutput
+                key={pd.label}
+                outputObj={pd}
+                displayOutput={displayOutput}
+                setOutputType={setOutputType}
+                outputType={outputType}
+                selectedOutput={selectedOutput}
+                setSelectedOutput={setSelectedOutput}
+                generateStats={generateStats}
+              />,
+            );
+          }
+          return false;
+        });
       setPips(pips);
     }
   }, [pipelineData.pipeline_outputs]);
-
-  const drawPolygon = () => {
-    const el = document.getElementsByClassName("leaflet-draw-draw-polygon");
-    if (el[0] instanceof HTMLElement) {
-      el[0].click();
-    }
-  };
-  const drawRectangle = () => {
-    const el = document.getElementsByClassName("leaflet-draw-draw-rectangle");
-    if (el[0] instanceof HTMLElement) {
-      el[0].click();
-    }
-  };
 
   const modalClose = () => {
     setOpenModal(false);
@@ -279,108 +272,112 @@ export default function Sidebar(props: any) {
   }, []);
 
   return (
-    <Box
-      sx={{
-        width: "30vw",
-        background: "#333",
-        zIndex: 999,
-        position: "fixed",
-        top: 0,
-        left: 0,
-        height: "100vh",
-        border: "2px solid #444",
-        overflowY: "scroll",
-        overflowX: "hidden",
-        "&::-webkit-scrollbar": {
-          background: "#222",
-          width: "10px",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          background: "#444",
-          borderRadius: "3px",
-        },
-      }}
-      draggable
-      ref={containerRef}
-    >
-      <Grid sx={{ marginLeft: "15px" }}>
-        <Stack
-          spacing={{ xs: 1, sm: 1, md: 2 }}
-          sx={{ width: "100%", background: "none", border: "0px" }}
-        >
-          <Item sx={{ background: "none", border: "0px" }}>
-            <Grid
-              container
-              spacing={2}
-              direction="row"
-              justifyContent="flex-end"
-              alignItems="center"
-            >
-              <Grid item sm={2}>
-                <img src="/viewer/logo.png" style={{ width: "100%" }} />
-              </Grid>
-              <Grid item sm={10}>
-                <Typography variant="h5" color="primary.light">
-                  Results Viewer
-                </Typography>
-              </Grid>
-            </Grid>
-            <Box>
-              <Typography color="secondary.light">
-                Explore results from a BON in a Box analysis pipeline
-              </Typography>
-            </Box>
-            {pipelineTitle && (
-              <Box>
-                <Paper
-                  sx={{
-                    padding: "15px",
-                    margin: "10px 30px 10px 0px",
-                    border: "1.5px solid #222",
-                  }}
-                  elevation={5}
-                >
-                  {pipelineTitle}
-
-                  <Box
-                    sx={{
-                      maxHeight: "200px",
-                      overflowY: "auto",
-                      "&::-webkit-scrollbar": {
-                        background: "#444",
-                        width: "10px",
-                      },
-                      "&::-webkit-scrollbar-thumb": {
-                        background: "#666",
-                        borderRadius: "3px",
-                      },
-                    }}
-                  >
-                    <Typography color="primary.contrastText" fontSize={14}>
-                      <Markdown>{pipelineDescription}</Markdown>
-                    </Typography>
-                    <Typography color="primary.contrastText" fontSize={11}>
-                      By: {pipelineAuthors}
-                    </Typography>
-                  </Box>
-                </Paper>
-              </Box>
-            )}
-            <Box>{pips}</Box>
-          </Item>
-        </Stack>
-      </Grid>
-      <Modal
-        open={openModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        onClose={modalClose}
-        sx={{ width: "60vw", height: "80vh", margin: "auto" }}
+    <>
+      <title>{pipelineData?.name ? pipelineData.name : "Results Viewer"}</title>
+      <Box
+        sx={{
+          width: "30vw",
+          background: "#333",
+          zIndex: 999,
+          position: "fixed",
+          top: 0,
+          left: 0,
+          height: "100vh",
+          border: "2px solid #444",
+          overflowY: "scroll",
+          overflowX: "hidden",
+          "&::-webkit-scrollbar": {
+            background: "#222",
+            width: "10px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            background: "#444",
+            borderRadius: "3px",
+          },
+        }}
+        draggable
+        ref={containerRef}
       >
-        <Box sx={{ width: "60vw", height: "80vh", margin: "auto" }}>
-          {modalContent}
-        </Box>
-      </Modal>
-    </Box>
+        <Grid sx={{ marginLeft: "15px" }}>
+          <Stack
+            spacing={{ xs: 1, sm: 1, md: 2 }}
+            sx={{ width: "100%", background: "none", border: "0px" }}
+          >
+            <Item sx={{ background: "none", border: "0px" }}>
+              <Grid
+                container
+                spacing={2}
+                direction="row"
+                justifyContent="flex-end"
+                alignItems="center"
+              >
+                <Grid size={{ sm: 2 }}>
+                  <img src="/viewer/logo.png" style={{ width: "100%" }} />
+                </Grid>
+                <Grid size={{ sm: 10 }}>
+                  <Typography variant="h5" color="primary.light">
+                    Results Viewer
+                  </Typography>
+                </Grid>
+              </Grid>
+              <Box>
+                <Typography color="secondary.light">
+                  Explore results from a BON in a Box analysis pipeline
+                </Typography>
+              </Box>
+              {pipelineTitle && (
+                <Box>
+                  <Paper
+                    sx={{
+                      padding: "15px",
+                      margin: "10px 30px 10px 0px",
+                      border: "1.5px solid #222",
+                    }}
+                    elevation={5}
+                  >
+                    {pipelineTitle}
+
+                    <Box
+                      sx={{
+                        maxHeight: "200px",
+                        overflowY: "auto",
+                        "&::-webkit-scrollbar": {
+                          background: "#444",
+                          width: "10px",
+                        },
+                        "&::-webkit-scrollbar-thumb": {
+                          background: "#666",
+                          borderRadius: "3px",
+                        },
+                      }}
+                    >
+                      <div className="markdown">
+                        <Markdown style={{ fontSize: 14 }}>
+                          {pipelineDescription}
+                        </Markdown>
+                      </div>
+                      <Typography color="primary.contrastText" fontSize={11}>
+                        Pipeline authors:&nbsp;
+                      </Typography>
+                      {pipelineAuthors}
+                    </Box>
+                  </Paper>
+                </Box>
+              )}
+              <Box>{pips}</Box>
+            </Item>
+          </Stack>
+        </Grid>
+        <Modal
+          open={openModal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          onClose={modalClose}
+          sx={{ width: "fit-content", height: "fit-content", margin: "auto" }}
+        >
+          <Box sx={{ margin: "auto" }}>{modalContent}</Box>
+        </Modal>
+      </Box>
+    </>
   );
 }

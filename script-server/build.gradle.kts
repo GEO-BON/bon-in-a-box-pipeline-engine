@@ -4,11 +4,13 @@ val ktorVersion: String by project
 val kotlinVersion: String by project
 
 plugins {
-    kotlin("jvm") version "2.2.10"
+    // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
+    kotlin("jvm") version "2.4.0"
     id("io.ktor.plugin")
 
     // Better behavior of trimIndent() when it includes variables
-    id("com.bennyhuo.kotlin.trimindent") version "2.2.0-1.1.0"
+    // https://github.com/bennyhuo/kotlin-trim-indent
+    // id("com.bennyhuo.kotlin.trimindent") version "2.2.0-1.1.0"
 }
 
 group = "org.geobon"
@@ -51,6 +53,7 @@ tasks.test {
 }
 
 tasks.register("runValidator", JavaExec::class) {
+    description = "Validates that pipelines are well structured."
     mainClass.set("org.geobon.pipeline.Validator")
     classpath = sourceSets["main"].runtimeClasspath
 }
@@ -60,24 +63,30 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
     implementation("io.ktor:ktor-serialization-gson-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-netty-jvm:$ktorVersion")
-    implementation("ch.qos.logback:logback-classic:1.5.18")
     implementation("io.ktor:ktor-server-config-yaml:$ktorVersion")
 
-    // Source: https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.5.0.202512021534-r")
+    // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+    implementation("ch.qos.logback:logback-classic:1.5.34")
+
+    // https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.6.0.202603022253-r")
 
     // https://mvnrepository.com/artifact/org.json/json
-    implementation("org.json:json:20250107")
+    implementation("org.json:json:20260522")
 
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
-    implementation("org.yaml:snakeyaml:2.5")
+    implementation("org.yaml:snakeyaml:2.6")
 
     // https://github.com/vishna/watchservice-ktx?tab=readme-ov-file
     implementation("com.github.vishna:watchservice-ktx:master-SNAPSHOT")
 
+    // Source: https://mvnrepository.com/artifact/io.kubernetes/client-java
+    implementation("io.kubernetes:client-java:26.0.0")
+
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
-    testImplementation("io.mockk:mockk:1.14.5")
+    testImplementation("io.mockk:mockk:1.14.9")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
-    testImplementation("io.kotest:kotest-runner-junit5:6.0.3")
+    // https://mvnrepository.com/artifact/io.kotest/kotest-runner-junit5
+    testImplementation("io.kotest:kotest-runner-junit5:6.1.10")
 }

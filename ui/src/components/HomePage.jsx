@@ -21,15 +21,16 @@ export default function HomePage() {
 
             <div className="home-page-content">
                 <div className="title-container">
+                    <h1 className="home-page-pre-title"
+                    >BON in a Box</h1>
                     <h1 className="home-page-title"
-                        style={{ marginTop: "30px" , marginBottom: "10px"}}
-                    >The BON in a Box Pipeline Engine</h1>
+                    >Biodiversity Evaluation Engine</h1>
                 </div>
                 <p style={{
                     lineHeight: "1.75",
                     textAlign: "justify"
                 }} >
-                    The BON in a Box modelling tool is an open tool aiming to enhance the capacity of
+                    The Biodiversity Evaluation Engine is an open tool aiming to enhance the capacity of
                     Biodiversity Observation Networks and countries to report on biodiversity effectively.
 
                     It connects individual analyses scripts into automated pipelines that convert data into
@@ -98,7 +99,7 @@ export default function HomePage() {
                             <div className="tooltip-wrapper">
                                 <div className="tooltiptext"
                                     >Are species losing or gaining habitat? <br></br>
-                                    <a href="https://boninabox.geobon.org/indicator?i=SHI" target="_blank">More info</a>      |       <a href="/pipeline-form/SHI_pipeline">Run pipeline</a>
+                                    <a href="https://boninabox.geobon.org/indicator?i=SHI" target="_blank">More info</a>      |       <a href="/pipeline-form/SHI>SHI_GFW">Run pipeline</a>
                                 </div>
                             </div>
                         </div>

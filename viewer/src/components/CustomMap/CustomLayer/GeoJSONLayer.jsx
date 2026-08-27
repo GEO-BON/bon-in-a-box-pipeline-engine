@@ -1,53 +1,56 @@
-import React, { useState, useEffect, useRef } from "react";
-import _ from "underscore";
+import { useEffect } from "react";
 import L from "leaflet";
+import { useMap } from "react-leaflet";
 
 /**
  *
  * @param props
  */
-function GeoJSONLayer(props) {
-  const { geojsonOutput, setGeojson, map, clearLayers } = props;
-  const emptyFC = {
-    type: "FeatureCollection",
-    features: [],
-  };
+function GeoJSONLayer({ geojsonOutput, clearLayers }) {
+
+  const map = useMap();
   useEffect(() => {
-    clearLayers();
     if (geojsonOutput.features.length !== 0) {
       const markerStyle = {
         radius: 2.5,
-        fillColor: "#ff7800",
+        fillColor: "#00f",
         color: "#000",
         weight: 1,
         opacity: 0.3,
         fillOpacity: 0.5,
       };
+      geojsonOutput.features=geojsonOutput.features.filter((f) => (
+        f?.geometry?.type
+      ))
+
+      clearLayers();
       const l = L.geoJSON(geojsonOutput, {
         attribution: "io",
         pointToLayer: function (feature, latlng) {
-          return L.circleMarker(latlng, markerStyle);
+            return L.circleMarker(latlng, markerStyle);
         },
         style: (feature) => {
-          switch (feature?.geometry.type) {
-            case "Point":
-            case "MultiPoint":
-              return markerStyle;
-            default:
-              return {
-                color: "#ff7800",
-                weight: 5,
-                opacity: 0.7,
-                fillOpacity: 0.3,
-              };
+          if(feature){
+            switch (feature?.geometry.type) {
+              case "Point":
+              case "MultiPoint":
+                return markerStyle;
+              default:
+                return {
+                  color: "#00f",
+                  weight: 5,
+                  opacity: 0.7,
+                  fillOpacity: 0.3,
+                };
+            }
           }
         },
       });
       l.addTo(map);
-      map.fitBounds(l.getBounds());
-    }
-    return () => {
-      setGeojson(emptyFC);
+      const bounds = L.latLngBounds(l.getBounds());
+      if (bounds.isValid()) {
+        map.fitBounds(bounds);
+      }
     };
   }, [geojsonOutput, map]);
 

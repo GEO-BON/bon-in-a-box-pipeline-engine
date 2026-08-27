@@ -1,28 +1,177 @@
-.copilot-chat textarea{
-    background-color: #333 ;
-}
-/*
-.copilot-chat h1{
-    color: #fff;
-}
-
-.copilot-chat .prose{
-    color:white;
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-width: 600px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: sans-serif;
 }
 
-.copilot-chat button {
-    color: white;
+.chat-header {
+  padding: 16px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #333;
+  background: #1a1a1a;
+  color: #fff;
 }
 
-.copilot-chat {
-    margin-bottom: 100px;
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #242424;
 }
-    */
 
-.copilot-chat{
-    padding-bottom: 100px;
+.chat-message {
+  display: flex;
 }
 
-cpk-web-inspector {
-    display: none;
+.chat-message.user {
+  justify-content: flex-end;
+}
+
+.chat-message.assistant {
+  justify-content: flex-start;
+}
+
+.chat-bubble {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+  text-align: left;
+}
+
+.chat-message.user .chat-bubble {
+  background: #3a6ea5;
+  color: #fff;
+  white-space: pre-wrap;
+}
+
+.chat-message.assistant .chat-bubble {
+  background: #333;
+  color: #eee;
+}
+
+/* Markdown element styles inside assistant bubbles */
+.chat-message.assistant .chat-bubble p {
+  margin: 0 0 0.5em;
+}
+.chat-message.assistant .chat-bubble p:last-child {
+  margin-bottom: 0;
+}
+.chat-message.assistant .chat-bubble h1,
+.chat-message.assistant .chat-bubble h2,
+.chat-message.assistant .chat-bubble h3,
+.chat-message.assistant .chat-bubble h4 {
+  font-size: 1em;
+  font-weight: bold;
+  margin: 0.7em 0 0.2em;
+}
+.chat-message.assistant .chat-bubble ul,
+.chat-message.assistant .chat-bubble ol {
+  margin: 0.2em 0 0.5em 1.5em;
+  padding: 0;
+}
+.chat-message.assistant .chat-bubble li {
+  margin: 0.15em 0;
+}
+.chat-message.assistant .chat-bubble a {
+  color: #7ab4f5;
+  text-decoration: underline;
+}
+.chat-message.assistant .chat-bubble code {
+  background: #1a1a1a;
+  border-radius: 3px;
+  padding: 0 3px;
+  font-size: 0.9em;
+}
+
+.thinking-block {
+  margin-bottom: 8px;
+  font-size: 0.82em;
+  color: #888;
+  border-left: 2px solid #555;
+  padding-left: 8px;
+}
+
+.thinking-block summary {
+  cursor: pointer;
+  user-select: none;
+  font-style: italic;
+  color: #aaa;
+  list-style: none;
+}
+
+.thinking-block summary::before {
+  content: "▶ ";
+  font-size: 0.75em;
+}
+
+details[open].thinking-block summary::before {
+  content: "▼ ";
+}
+
+.thinking-content {
+  margin-top: 6px;
+  white-space: pre-wrap;
+  color: #777;
+  font-style: italic;
+  max-height: 200px;
+  overflow-y: auto;
+  line-height: 1.4;
+}
+
+.cursor {
+  animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #333;
+  color: #fff;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.chat-input:focus {
+  border-color: #3a6ea5;
+}
+
+.chat-send {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: #3a6ea5;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.chat-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

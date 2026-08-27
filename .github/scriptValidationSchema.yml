@@ -18,7 +18,7 @@ lifecycle:
     - schema:
         status:
           type: string
-          allowed: ["in_development", "in_review", "reviewed", "example"]
+          allowed: ["in_development", "in_review", "reviewed", "core", "example"]
           required: true
         message:
           type: string
@@ -100,21 +100,14 @@ inputs:
         required: true
         type: string
         oneof:
-        - forbidden: [options, "options[]", object, "object[]"]
+        - forbidden: [options, "options[]"]
         - allowed: [options, "options[]"]
           dependencies: options
-        - allowed: [object, "object[]"]
-          dependencies: properties
       options:
         required: false
         type: list
         dependencies:
           type: [options, "options[]"]
-      properties:
-        required: false
-        type: list
-        dependencies:
-          type: [object, "object[]"]
       example:
         required: true
         nullable: true
@@ -154,21 +147,14 @@ outputs:
           # normal case, with explicit type
           - type: string
             oneof:
-            - forbidden: [options, "options[]", object, "object[]"]
+            - forbidden: [options, "options[]"]
             - allowed: [options, "options[]"]
               dependencies: options
-            - allowed: [object, "object[]"]
-              dependencies: properties
       options:
         required: false
         type: list
         dependencies:
           type: [options, "options[]"]
-      properties:
-        required: false
-        type: list
-        dependencies:
-          type: [object, "object[]"]
       range:
         required: false
         type: list
@@ -186,8 +172,6 @@ outputs:
         - type: boolean
         - type: list
         - type: dict
-          dependencies:
-            type: [object]
 
 references:
   required: false
@@ -222,10 +206,13 @@ conda:
       required: true
       type: list
 
-hpc:
+compute:
   required: false
   type: dict
   schema:
+    hpc: 
+      required: false
+      type: boolean
     mem:
       required: true
       type: string
@@ -234,6 +221,8 @@ hpc:
       required: true
       type: integer
     time:
-      required: true
+      required: false
       type: string
       regex: '^(\d-)?(\d?\d:){0,2}\d?\d$'
+      dependencies:
+        hpc: [true]
