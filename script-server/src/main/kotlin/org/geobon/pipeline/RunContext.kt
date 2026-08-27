@@ -10,7 +10,7 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
-import org.geobon.utils.run
+import org.geobon.utils.runBlocking
 import org.geobon.utils.toSHA256
 import org.json.JSONObject
 import java.io.File
@@ -63,7 +63,7 @@ open class RunContext(val runId: String, val inputs: Map<String, Any?>, val serv
                 "environment" to container.environment,
                 "version" to container.version
             ),
-            "dependencies" to "cat ${outputFolder.absolutePath}/dependencies.txt".run(showErrors = false)
+            "dependencies" to "cat ${outputFolder.absolutePath}/dependencies.txt".runBlocking(showErrors = false)
         )
         return environment
     }

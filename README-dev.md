@@ -263,11 +263,11 @@ Script artifacts:
 
 ### Resolving Conda environments
 
-Resolving conda environements is a multi-step process because of two factors.
+Resolving conda environments is a multi-step process because of two factors.
 
-First, checking if a conda environment needs to be updated through conda looks online for updated packages and is time-consuming. It is not meant to be done over and over again when you run the same script at a few seconds interval. We have thus designed a yml file based comparison to avoid the online operations in cases where the definition of the environement did not change in the yml description file.
+First, checking if a conda environment needs to be updated through conda looks online for updated packages and is time-consuming. It is not meant to be done over and over again when you run the same script at a few seconds interval. We have thus designed a yml file based comparison to avoid the online operations in cases where the definition of the environment did not change in the yml description file.
 
-Second, conda-pack is used to avoid resolving multiple times the same environement in cases where containers are discarded (Kubernetes) or cannot even be created (HPC). A conda-pack can be found online, in a local zip, or locally extracted.
+Second, conda-pack is used to avoid resolving multiple times the same environment in cases where containers are discarded (Kubernetes) or cannot even be created (HPC). A conda-pack can be found online, in a local zip, or locally extracted.
 
 The decision flow looks like this:
 

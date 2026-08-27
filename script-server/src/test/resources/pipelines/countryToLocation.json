@@ -8,7 +8,7 @@
         "y": 325.3000030517578
       },
       "data": {
-        "descriptionFile": "assertBBoxCRS.yml"
+        "descriptionFile": "assertLocation.yml"
       }
     },
     {
@@ -84,10 +84,10 @@
     }
   },
   "outputs": {
-    "assertBBoxCRS.yml@3|the_same": {
-      "description": "The same bboxCRS as in the inputs.",
+    "assertLocation.yml@3|the_same": {
+      "description": "The same location as in the inputs.",
       "label": "Same value",
-      "type": "bboxCRS",
+      "type": "location",
       "example": {
         "CRS": {
           "CRSBboxWGS84": [
@@ -136,7 +136,7 @@
   },
   "metadata": {
     "name": "Country to BBox erroneous conversion",
-    "description": "This pipeline features an invalid Country to BBoxCRS object conversion",
+    "description": "This pipeline features an invalid Country to Location object conversion",
     "author": [
       {
         "name": "Jean-Michel Lord"

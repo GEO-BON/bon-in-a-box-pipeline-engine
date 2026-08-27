@@ -1,6 +1,6 @@
 package org.geobon.pipeline
 
-import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
+import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
 import org.geobon.script.Description.IO__EXAMPLE
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.pipelinesRoot

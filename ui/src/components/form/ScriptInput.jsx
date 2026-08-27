@@ -206,7 +206,7 @@ export default function ScriptInput({
       }
   }
 
-  switch (type) {
+  switch (type.toLowerCase()) {
     case "boolean":
       const booleanValue = fieldValue === undefined || fieldValue === null ? false : value
 
@@ -276,16 +276,22 @@ export default function ScriptInput({
       );
 
     case "country":
-    case "countryRegionCRS":
-    case "CRS":
-    case "countryRegion":
+    case "countryregioncrs":
+    case "crs":
+    case "countryregion":
       return (
         <Choosers inputId={passedProps.id} inputDescription={{ type: type }} value={value} updateValue={(value) => { onValueUpdated(value) }} />
       );
 
-    case "bboxCRS":
+    case "bboxcrs": // deprecated
+    case "crsbbox":
       return (
         <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={size=='small'}/>
+      );
+
+    case "location":
+      return (
+        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Country, region, CRS and Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={size=='small'}/>
       );
 
     default:

@@ -3,24 +3,14 @@ package org.geobon.pipeline
 import org.geobon.hpc.HPCRequirements
 import org.geobon.hpc.HPCRun
 import org.geobon.k8s.KubernetesRun
-import org.geobon.script.ComputeRequirements
-import org.geobon.script.Description
-import org.geobon.script.Description.CONDA
-import org.geobon.script.Description.CONDA__NAME
+import org.geobon.script.*
 import org.geobon.script.Description.COMPUTE
-import org.geobon.script.Description.SCRIPT
-import org.geobon.script.Description.TIMEOUT
-import org.geobon.script.DockerizedRun
-import org.geobon.script.Run
-import org.geobon.script.ScriptType
 import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.fromSlurm
-import org.yaml.snakeyaml.Yaml
 import java.io.File
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 
 
 open class ScriptStep : YMLStep {
@@ -34,14 +24,12 @@ open class ScriptStep : YMLStep {
         serverContext.hpc?.register(this)
     }
 
-    protected var scriptFile: File = File(yamlFile.parent, yamlParsed[SCRIPT].toString())
-
     /**
      * Used for a lighter test syntax
      */
     constructor(
         fileName: String,
-        stepId: StepId,
+        stepId: StepId = StepId("testStep", "nodeId"),
         serverContext: ServerContext = ServerContext(),
         inputs: MutableMap<String, Pipe> = mutableMapOf()
     ) : this(
@@ -50,6 +38,15 @@ open class ScriptStep : YMLStep {
         stepId,
         inputs
     )
+
+    val scriptFile: File = metadata.script
+    val scriptType
+        get() = ScriptType.fromFile(scriptFile)
+
+    val condaEnvName
+        get() = metadata.conda?.name
+    val condaEnvYml
+        get() = metadata.conda?.yml
 
     override fun validateStep(): String {
         if (!yamlFile.exists())
@@ -65,7 +62,6 @@ open class ScriptStep : YMLStep {
     override suspend fun execute(resolvedInputs: Map<String, Any?>): Map<String, Any?> {
         @Suppress("KotlinUnreachableCode") // the code is reachable. There is an error with the linting...
         context?.let { context ->
-            val specificTimeout = (yamlParsed[TIMEOUT] as? Int)?.minutes
 
             var runOwner = false
             val run = synchronized(currentRuns) {
@@ -73,19 +69,7 @@ open class ScriptStep : YMLStep {
                     runOwner = true
 
                     // Optional specific conda environment for this script
-                    var condaEnvName: String? = null
-                    val condaEnvYml = yamlParsed[CONDA]?.let { condaSection ->
-                        try {
-                            condaEnvName = yamlFile.relativeTo(scriptsRoot).path
-                                .replace("/", "__").replace(' ', '_').removeSuffix(".yml")
 
-                            @Suppress("UNCHECKED_CAST")
-                            (condaSection as MutableMap<String, Any>)[CONDA__NAME] = condaEnvName
-                            Yaml().dump(condaSection)
-                        } catch (_: Exception) {
-                            null
-                        }
-                    }
 
                     val computeSection = yamlParsed[COMPUTE]
                     val computeRequirements = if (computeSection is Map<*, *>) {
@@ -126,7 +110,7 @@ open class ScriptStep : YMLStep {
                         KubernetesRun(
                             context,
                             scriptFile,
-                            specificTimeout ?: Run.DEFAULT_TIMEOUT,
+                            metadata.timeout,
                             condaEnvName,
                             condaEnvYml,
                             computeRequirements
@@ -135,7 +119,7 @@ open class ScriptStep : YMLStep {
                         DockerizedRun(
                             context,
                             scriptFile,
-                            specificTimeout ?: Run.DEFAULT_TIMEOUT,
+                            metadata.timeout,
                             condaEnvName,
                             condaEnvYml
                         )
@@ -164,7 +148,7 @@ open class ScriptStep : YMLStep {
 
     private fun shouldUseHPC(): Boolean {
         return context?.serverContext?.hpc?.connection?.let { connection ->
-            when (connection.statusFor(ScriptType.fromFile(scriptFile))) {
+            when (connection.statusFor(scriptType)) {
                 RemoteSetupState.PREPARING, RemoteSetupState.READY -> true
                 else -> false
             }

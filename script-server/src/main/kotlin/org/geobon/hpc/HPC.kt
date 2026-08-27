@@ -1,6 +1,8 @@
 package org.geobon.hpc
 
 import kotlinx.coroutines.*
+import kotlinx.io.IOException
+import kotlinx.io.files.FileNotFoundException
 import org.geobon.pipeline.ScriptStep
 import java.io.File
 import java.util.*
@@ -62,7 +64,10 @@ open class HPC (
                     }
                 } finally {
                     condaSyncJobs.remove(condaEnvName)
-                    logFile.appendText("Releasing lock.\n")
+
+                    // This try-catch block silences an error that occurred only when running tests.
+                    try { logFile.appendText("Releasing lock.\n") }
+                    catch (_: IOException) {}
                 }
             } to mutableListOf()
         }

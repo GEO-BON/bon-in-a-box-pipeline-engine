@@ -58,6 +58,12 @@ tasks.register("runValidator", JavaExec::class) {
     classpath = sourceSets["main"].runtimeClasspath
 }
 
+tasks.register("exportCWL", JavaExec::class) {
+    description = "Exports all scripts and pipelines to Common Worlflow Language (CWL)."
+    mainClass.set("org.geobon.cwl.CWLExportMain")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
 dependencies {
     implementation("io.ktor:ktor-server-content-negotiation-jvm:$ktorVersion")
     implementation("io.ktor:ktor-server-core-jvm:$ktorVersion")
