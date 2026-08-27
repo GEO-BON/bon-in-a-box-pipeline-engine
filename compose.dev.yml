@@ -58,6 +58,11 @@ services:
         BIAB_VERSION: "dev"
     volumes:
       - ./python-api/app:/app:rw
+      # The MCP server builds its whole toolset from this. Mounted at the same path
+      # the published image bakes it into, so dev exercises the same code path as
+      # production instead of silently relying on the swagger_ui container -- which
+      # is what hid the production breakage in the first place.
+      - ./script-server/api/openapi.yaml:/app/mcp-server/openapi.yaml:ro
 
   gateway:
     image: nginxinc/nginx-unprivileged

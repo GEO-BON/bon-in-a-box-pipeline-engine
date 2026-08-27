@@ -105,6 +105,15 @@ jobs:
             org.opencontainers.image.licenses=GPL-v3
             org.opencontainers.image.title=BON in a Box Python API
 
+      # The MCP server generates its entire toolset from this document. The build
+      # context is python-api/, which cannot reach ../script-server/, and the root
+      # .dockerignore excludes script-server/ from any wider context -- so stage it
+      # in rather than widening the context and disturbing the gateway build.
+      # Without this the server falls back to fetching /swagger/openapi.yaml, which
+      # only exists in development.
+      - name: Stage the OpenAPI spec into the build context
+        run: cp script-server/api/openapi.yaml python-api/app/mcp-server/openapi.yaml
+
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@v7
