@@ -68,7 +68,7 @@ Prerequisites:
 
    **Windows users only:** if using github desktop to clone, you will have to do these extra steps in the console after cloning to avoid problems with the CRLF line endings:
    
-   a. `cd` to the cloned folder's root directory
+   a. `cd` to the cloned folder's root directory (for example `cd /c/Users/yourUsername/folder/bon-in-a-box-pipelines`)
    b. `git config core.autocrlf false`
    c. `git rm --cached -r .`
    d. `git reset --hard`
