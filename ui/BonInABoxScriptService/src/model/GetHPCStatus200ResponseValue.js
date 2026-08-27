@@ -24,8 +24,8 @@ class GetHPCStatus200ResponseValue {
      * @alias module:model/GetHPCStatus200ResponseValue
      * @extends Object
      */
-    constructor() {
-
+    constructor() { 
+        
         GetHPCStatus200ResponseValue.initialize(this);
     }
 
@@ -34,7 +34,7 @@ class GetHPCStatus200ResponseValue {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) {
+    static initialize(obj) { 
     }
 
     /**
@@ -49,7 +49,7 @@ class GetHPCStatus200ResponseValue {
             obj = obj || new GetHPCStatus200ResponseValue();
 
             ApiClient.constructFromObject(data, obj, 'String');
-
+            
 
             if (data.hasOwnProperty('state')) {
                 obj['state'] = ApiClient.convertToType(data['state'], 'String');

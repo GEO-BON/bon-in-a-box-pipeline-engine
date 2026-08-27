@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@svar-ui/react-filemanager": "^2.6.0"
+  }
+}

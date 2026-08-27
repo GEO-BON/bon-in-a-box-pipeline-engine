@@ -12,6 +12,8 @@ services:
     user: "node"
     volumes:
       - "./ui:/app:rw"
+      # adding the runner.env file in order to read the DISABLE_MY_FILES env
+      - ${PIPELINE_REPO_PATH}/runner.env:/pipeline-repo/runner.env:ro
     working_dir: "/app"
     command: sh -c "cd BonInABoxScriptService; npm run build; cd -; npm install; npm start;"
     expose:

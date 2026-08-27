@@ -1,12 +1,15 @@
 import "./Layout.css";
 import React, { useEffect, createContext, useState, useContext } from "react";
-import BiaBLogo from "./img/boninabox_logo.jpg";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./components/styles/theme";
 import useWindowDimensions from "./utils/WindowDimensions";
 import TopMenu from "./TopMenu";
+<<<<<<< HEAD
 import { ReactNode } from "react";
 import { CopilotKitProvider } from "@copilotkit/react-core/v2";
+=======
+import LeftPane from "./LeftPane";
+>>>>>>> my_files
 
 export const PopupContentContext = createContext();
 export const TitleContext = createContext();
@@ -52,52 +55,32 @@ export function Layout(props) {
 
   return (
     <PopupContentContext.Provider value={{popupContent, setPopupContent}}>
-      <ThemeProvider theme={theme}>
-        <CopilotKitProvider 
-          runtimeUrl="/copilotkit"
-          showDevConsole={true}
-        > 
-        <div className="left-pane">
-          <div>
-            <img id="logo" src={BiaBLogo} alt="BON in a Box logo" />
-          </div>
-          {props.left}
-        </div>
-        <div>
-        <div className="right-content">
-          <TopMenu/>
-          {popupContent && (
-            <div className="fullScreenPopup">
-              <div className="content">{popupContent}</div>
-              <button
-                title="Close"
-                className="close"
-                onClick={() => setPopupContent(null)}
-              >
+        <TitleContext.Provider value={{ title, setTitle }}>
+            <ThemeProvider theme={theme}>
+                <LeftPane/>
+            <div>
+                <div className="right-content">
+                    <TopMenu/>
+                    {popupContent && (
+                    <div className="fullScreenPopup">
+                        <div className="content">{popupContent}</div>
+                        <button
+                        title="Close"
+                        className="close"
+                        onClick={() => setPopupContent(null)}
+                        >
 
-                ×
+                        ×
 
-              </button>
+                        </button>
+                    </div>
+                    )}
+
+                    <main style={{ height: mainHeight }}>{props.right}</main>
+                </div>
             </div>
-            {props.left}
-          </div>
-          <div>
-          <div className="right-content">
-            <TopMenu/>
-            {popupContent && (
-              <div className="fullScreenPopup">
-                <div className="content">{popupContent}</div>
-                <button
-                  title="Close"
-                  className="close"
-                  onClick={() => setPopupContent(null)}
-                >
-
-          <main style={{ height: mainHeight }}>{props.right}</main>
-        </div>
-        </div>
-        </CopilotKitProvider>
-      </ThemeProvider>
+            </ThemeProvider>
+        </TitleContext.Provider>
     </PopupContentContext.Provider>
   );
 }

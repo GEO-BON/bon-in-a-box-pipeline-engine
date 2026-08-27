@@ -15,11 +15,31 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR /app/
 
+# added python-multipart and clamav-client
+RUN uv pip install fastapi "uvicorn[standard]" requests duckdb pandas geopandas pandas_geojson shapely pygadm fiona python-multipart clamav-client
+
 COPY app /app
 
 RUN uv pip install -r /app/requirements.txt
 
 FROM ghcr.io/developmentseed/titiler:${TITILER_VERSION} AS runtime
+
+# ClamAV runs in this container rather than in one of its own, since the API is its only consumer.
+RUN set -ex; \
+    apt-get update; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends clamav-daemon clamav-freshclam; \
+    apt-get clean all; \
+    rm -rf /var/lib/apt/lists/*; \
+    # the postinst pulls signatures; keep those ~350MB out of the image layer, freshclam fetches them at startup
+    rm -rf /var/lib/clamav/*; \
+    # the container runs as an arbitrary UID, so everything clamd writes to must be world-writable
+    mkdir -p /run/clamav /var/lib/clamav; \
+    chmod -R 777 /run/clamav /var/lib/clamav
+
+# Replacing the Debian-generated configs rather than patching them: their User/DatabaseOwner
+# directives make the daemons attempt a setuid they cannot perform as a non-root UID.
+COPY clamav/clamd.conf /etc/clamav/clamd.conf
+COPY clamav/freshclam.conf /etc/clamav/freshclam.conf
 
 # Set up virtual environment path
 ENV VIRTUAL_ENV=/opt/venv
@@ -36,6 +56,7 @@ ENV VARIABLE_NAME=app
 ENV HOST=0.0.0.0
 ENV PORT=8000
 ENV WEB_CONCURRENCY=1
+ENV CLAMAV_HOST=127.0.0.1
 
 ARG BIAB_VERSION
 RUN echo $BIAB_VERSION > /version.txt
