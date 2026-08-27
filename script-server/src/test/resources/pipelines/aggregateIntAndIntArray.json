@@ -92,7 +92,7 @@
     "name": "Aggregate int and int[] to int[]",
     "description": "Pipeline for automated tests",
     "lifecycle": {
-      "status": "reviewed"
+      "status": "example"
     },
 
     "author": [

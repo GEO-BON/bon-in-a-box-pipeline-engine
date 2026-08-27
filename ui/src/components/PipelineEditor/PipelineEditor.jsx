@@ -496,6 +496,30 @@ export default function PipelineEditor(props) {
     refreshInputList(nodes, edges);
   }, [nodes, edges, refreshInputList]);
 
+  // Propagate the data type change to user inputs
+  useEffect(() => {
+    if (reactFlowInstance) {
+      setNodes((nodes) => {
+        let changed = false;
+        let newNodes = [...nodes];
+
+        inputList.forEach((input) => {
+          const node = reactFlowInstance.getNode(input.nodeId);
+          if (node && node.type === "userInput" && node.data.type !== input.type) {
+            changed = true;
+            newNodes = newNodes.map((prevNode) =>
+              prevNode.id === input.nodeId
+                ? { ...prevNode, data: { ...prevNode.data, type: input.type } }
+                : prevNode
+            )
+          }
+        })
+
+        return changed ? newNodes : nodes
+      })
+    }
+  }, [inputList, reactFlowInstance]);
+
   /**
    * Refresh the list of outputs on edge change.
    */

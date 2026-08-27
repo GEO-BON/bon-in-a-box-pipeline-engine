@@ -1,6 +1,7 @@
 package org.geobon.utils
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.slf4j.Logger
@@ -9,7 +10,26 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 open class SystemCall {
-    open fun run(
+
+    /**
+     * Runs on a blocking thread.
+     * Prefer using run(...) in a coroutine context.
+     */
+    open fun runBlocking(
+        call: List<String>,
+        workingDir: File = File("."),
+        timeoutAmount: Long = 1,
+        timeoutUnit: TimeUnit = TimeUnit.SECONDS,
+        mergeErrors: Boolean = false,
+        logger: Logger? = null,
+        logFile: File? = null
+    ): CallResult {
+        return runBlocking(Dispatchers.IO) {
+            run(call, workingDir, timeoutAmount, timeoutUnit, mergeErrors, logger, logFile)
+        }
+    }
+
+    open suspend fun run(
         call: List<String>,
         workingDir: File = File("."),
         timeoutAmount: Long = 1,
@@ -20,7 +40,7 @@ open class SystemCall {
     ): CallResult {
         var inputString = ""
         var errorString = ""
-        return runBlocking(Dispatchers.IO) {
+        return coroutineScope {
             try {
                 val process = ProcessBuilder(call)
                     .directory(workingDir)
@@ -33,8 +53,8 @@ open class SystemCall {
                         try {
                             while (true) { // Breaks when input's readLine returns null
                                 process.inputReader().readLine()?.let {
-                                     logFile.appendText("$it\n")
-                                     inputString += "$it\n"
+                                    logFile.appendText("$it\n")
+                                    inputString += "$it\n"
                                 } ?: break
                             }
                         } catch (ex: IOException) {
@@ -47,8 +67,8 @@ open class SystemCall {
                         try {
                             while (true) { // Breaks when error's readLine returns null
                                 process.errorReader().readLine()?.let {
-                                     logFile.appendText("$it\n")
-                                     errorString += "$it\n"
+                                    logFile.appendText("$it\n")
+                                    errorString += "$it\n"
                                 } ?: break
                             }
                         } catch (ex: IOException) {
@@ -82,14 +102,15 @@ open class SystemCall {
                 CallResult(process.exitValue(), inputString, errorString)
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                if(errorString.isNotBlank()) errorString += "\n"
+                if (errorString.isNotBlank()) errorString += "\n"
                 errorString += "${ex.message}\n"
                 logFile?.appendText(errorString)
 
                 CallResult(
                     1,
                     inputString,
-                    errorString + (ex.message ?: ex.javaClass.name))
+                    errorString + (ex.message ?: ex.javaClass.name)
+                )
             }
         }
     }
@@ -100,7 +121,7 @@ data class CallResult(val exitCode: Int, val output: String, val error:String = 
         get() = exitCode == 0
 }
 
-fun String.run(
+fun String.runBlocking(
     workingDir: File = File("."),
     timeoutAmount: Long = 1,
     timeoutUnit: TimeUnit = TimeUnit.SECONDS,

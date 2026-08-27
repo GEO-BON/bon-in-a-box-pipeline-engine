@@ -7,14 +7,31 @@ condaEnvName=$2
 # Raw content of the yml file
 condaEnvYml=$3
 
-# Optional, if provided, the directory where conda-pack environments are stored (read-write).
-condaPackDir=$4
-condaPackZip=$condaPackDir/$condaEnvName.tar.gz
-condaPackExtracted="$condaPackDir/$condaEnvName"
+# Temp directory for downloaded files, etc.
+tmpDir="/tmp/biab"
+tmpPackDir="$tmpDir/conda-pack"
+mkdir -p "$tmpPackDir"
 
+# Optional, if provided, the directory where conda-pack environments are stored.
+# If the directory is writable, we use it as the writable cache; otherwise
+# we keep using it as a read-only source and fall back to /tmp for writes.
+condaPackDir=$4
+if [[ -n "$condaPackDir" && -d "$condaPackDir" && -w "$condaPackDir" ]]; then
+    condaPackWriteable=$condaPackDir
+else
+    condaPackWriteable="$tmpPackDir"
+fi
+
+condaPackZip="$condaPackDir/$condaEnvName.tar.gz"
+if [[ ! -f "$condaPackZip" ]]; then
+    condaPackZip="$condaPackWriteable/$condaEnvName.tar.gz"
+fi
 
 # Optional, if provided, the URL where conda-pack environments are stored (read-only).
 condaPackURL=$5
+
+# Optional, if --noActivate is provided, we will exit as soon as we have a valid conda-pack.
+noActivate="${6:-}"
 
 pidFile="$outputFolder/.pid"
 
@@ -24,8 +41,8 @@ condaEnvFile="/conda-env-yml/$condaEnvName.yml"
 
 # Temporary file that we use to compare the new yml file with the previous one.
 n=$RANDOM
-tmpDir="/tmp/conda-env-yml"
-condaEnvFileNew="$tmpDir/$condaEnvName.$n.yml"
+tmpYmlDir="$tmpDir/conda-env-yml"
+condaEnvFileNew="$tmpYmlDir/$condaEnvName.$n.yml"
 
 function assertSuccess {
     if [[ $? -ne 0 ]] ; then
@@ -40,7 +57,7 @@ function activateBaseEnvironment {
 function prepareSubEnvironment {
     set -o pipefail
 
-    mkdir -p "$tmpDir"
+    mkdir -p "$tmpYmlDir"
     printf "$condaEnvYml\n" > "$condaEnvFileNew" ; assertSuccess
 
     mamba env list | grep " $condaEnvName "
@@ -64,7 +81,7 @@ function prepareSubEnvironment {
             fi
         fi
 
-    # the environement does not exist
+    # the environment does not exist
     elif useCondaPack; then
         mv "$condaEnvFileNew" "$condaEnvFile" ; assertSuccess
 
@@ -88,7 +105,7 @@ function prepareSubEnvironment {
 }
 
 # Activate a conda environment normally.
-# (Conda-pack environements are not activated like this.)
+# (Conda-pack environments are not activated like this.)
 function activateSubEnvironment {
     mamba activate $condaEnvName
     if [[ $CONDA_DEFAULT_ENV == $condaEnvName ]]; then
@@ -117,7 +134,11 @@ function useCondaPack {
                 fi
             else
                 echo "    Local conda-pack yml file is outdated."
-                rm -rf "$condaPackZip" "$condaPackDir/$condaEnvName" "$condaEnvFilePacked" ; assertSuccess
+                if [[ -w "$condaPackZip" ]]; then
+                    rm -rf "$condaPackZip" "$condaPackDir/$condaEnvName" "$condaEnvFilePacked" ; assertSuccess
+                else 
+                    echo "    Cannot delete: readonly file system."
+                fi
             fi
         else
             echo "    No local conda-pack yml file found."
@@ -125,7 +146,7 @@ function useCondaPack {
 
         # Check for a yml file online only if url is provided
         if [[ -n "$condaPackURL" ]]; then
-            remotePackYml="$tmpDir/$condaEnvName.remote.yml"
+            remotePackYml="$tmpYmlDir/$condaEnvName.remote.yml"
             rm -f $remotePackYml
             tryUrl="$condaPackURL$condaEnvName.yml"
             echo "    Trying $tryUrl..."
@@ -136,14 +157,15 @@ function useCondaPack {
                     echo "    Remote conda-pack description corresponds to the target environment."
                     if getRemotePack; then
                         if useLocalPack; then
-                            mv $remotePackYml $condaEnvFilePacked ; assertSuccess
+                            mv $remotePackYml "$condaPackWriteable/$condaEnvName.yml" ; assertSuccess
                             return 0
                         else
                             echo "    Remote conda-pack environment not usable."
                         fi
                     fi
                 else
-                    echo "    No corresponding conda-pack environment found."
+                    echo "    No corresponding conda-pack environment found. Diff:"
+                    diff "$remotePackYml" "$condaEnvFileNew"
                 fi
             else
                 echo "    No remote conda-pack environment found: $status, $(head $remotePackYml 2>/dev/null)."
@@ -158,18 +180,20 @@ function useCondaPack {
 function getRemotePack {
     url="$condaPackURL$condaEnvName.tar.gz"
     echo "Fetching environment archive at $url..."
+    download="$tmpPackDir/$condaEnvName.$n.download"
+
     # -z flag is used to replace existing zip only if online version is newer one
-    status=$(curl -s -z $condaPackZip -o download -w "%{http_code}" "$url")
+    status=$(curl -s -z $condaPackZip -o "$download" -w "%{http_code}" "$url")
     if [ "$status" = "304" ]; then
         echo "    Already up to date."
         return 0
     elif [ "$status" = "200" ]; then
         echo "    Remote conda-pack environment downloaded."
-        mv download $condaPackZip
+        mv -f "$download" $condaPackZip
         return 0
-    else # "download" being the output, it contains a message in this case.
-        echo "    Return code: $status, $(head download 2>/dev/null)"
-        rm -f download
+    else # "$download" being the output, it contains a message in this case.
+        echo "    Return code: $status, $(head "$download" 2>/dev/null)"
+        rm -f "$download"
     fi
 
     return 1
@@ -177,31 +201,46 @@ function getRemotePack {
 
 function useLocalPack {
     # Check for a zip locally
-    packYml="$condaPackDir/$condaEnvName.yml"
     if [[ -f "$condaPackZip" ]]; then
+        if [[ "$noActivate" == "--noActivate" ]]; then
+            echo "Resolved conda-pack environment, exiting without activation."
+            return 0
+        fi
+
+        if [[ -d "$condaPackDir" && -w "$condaPackDir" ]]; then
+            condaPackExtracted="$condaPackDir/$condaEnvName"
+        else
+            condaPackExtracted="$condaPackWriteable/$condaEnvName"
+        fi
 
         # Check for an unzipped folder locally
         if [ -d "$condaPackExtracted" ] && [ -f "$condaPackExtracted/bin/conda-unpack" ] && [ -f "$condaPackExtracted/bin/activate" ]; then
             echo "    Already unpacked."
         else
             # Unpack
-            echo "Unpacking conda-pack environment at $condaPackZip"
+            echo "Unpacking conda-pack environment at $condaPackZip..."
+            echo "    Extracting archive..."
             rm -rf $condaPackExtracted
             mkdir -p $condaPackExtracted || return 1
             tar -xf $condaPackZip -C $condaPackExtracted --use-compress-program=pigz || return 1
+
+            echo "    Unpacking..."
+            mamba activate base || return 1
+            $condaPackExtracted/bin/conda-unpack || return 1
+            mamba deactivate # base    
+
             echo "    Done."
         fi
 
         # Activate
         echo "Activating extracted environment from $condaPackExtracted..."
-        mamba activate base || return 1
-        $condaPackExtracted/bin/conda-unpack || return 1
-        mamba deactivate # base
         source $condaPackExtracted/bin/activate || return 1
 
         echo "    Done."
         return 0
     fi
+
+    return 1
 }
 
 echo $$ > $pidFile
@@ -229,4 +268,6 @@ else
     exec {lockfd}>&-
 fi
 
-echo "Conda environment ready."
+if [[ "$noActivate" != "--noActivate" ]]; then
+    echo "Conda environment ready."
+fi

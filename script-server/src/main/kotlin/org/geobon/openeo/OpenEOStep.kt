@@ -1,11 +1,22 @@
 package org.geobon.openeo
 
-import org.geobon.openeo.OpenEODescription.UDP__INPUT__BOUNDING_BOX
-import org.geobon.openeo.OpenEODescription.CDSE
 import org.geobon.openeo.OpenEODescription.APEX__CONTACTS
 import org.geobon.openeo.OpenEODescription.APEX__CONTACT_HREF
 import org.geobon.openeo.OpenEODescription.APEX__CONTACT_LINKS
 import org.geobon.openeo.OpenEODescription.APEX__CONTACT_NAME
+import org.geobon.openeo.OpenEODescription.APEX__DESCRIPTION
+import org.geobon.openeo.OpenEODescription.APEX__HREF
+import org.geobon.openeo.OpenEODescription.APEX__LICENSE
+import org.geobon.openeo.OpenEODescription.APEX__LINKS
+import org.geobon.openeo.OpenEODescription.APEX__PROPERTIES
+import org.geobon.openeo.OpenEODescription.APEX__TITLE
+import org.geobon.openeo.OpenEODescription.APEX__TYPE
+import org.geobon.openeo.OpenEODescription.CDSE
+import org.geobon.openeo.OpenEODescription.CDSE__NAME
+import org.geobon.openeo.OpenEODescription.CDSE__SCRIPT
+import org.geobon.openeo.OpenEODescription.CDSE__URL
+import org.geobon.openeo.OpenEODescription.UDP__INPUTS
+import org.geobon.openeo.OpenEODescription.UDP__INPUT__BOUNDING_BOX
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__ENUM
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__ITEMS
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__NAME
@@ -13,22 +24,11 @@ import org.geobon.openeo.OpenEODescription.UDP__INPUT__SCHEMA
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__SUBTYPE
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__TITLE
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__TYPE
-import org.geobon.openeo.OpenEODescription.APEX__DESCRIPTION
-import org.geobon.openeo.OpenEODescription.APEX__LICENSE
-import org.geobon.openeo.OpenEODescription.CDSE__NAME
-import org.geobon.openeo.OpenEODescription.CDSE__SCRIPT
-import org.geobon.openeo.OpenEODescription.APEX__TYPE
-import org.geobon.openeo.OpenEODescription.APEX__HREF
-import org.geobon.openeo.OpenEODescription.APEX__LINKS
-import org.geobon.openeo.OpenEODescription.UDP__INPUTS
-import org.geobon.openeo.OpenEODescription.APEX__PROPERTIES
-import org.geobon.openeo.OpenEODescription.APEX__TITLE
-import org.geobon.openeo.OpenEODescription.CDSE__URL
 import org.geobon.pipeline.ConstantPipe
 import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
-import org.geobon.script.Description.AUTHOR
+import org.geobon.script.Description.AUTHORS
 import org.geobon.script.Description.DESCRIPTION
 import org.geobon.script.Description.EXTERNAL_LINK
 import org.geobon.script.Description.INPUTS
@@ -44,6 +44,8 @@ import org.geobon.script.Description.SCRIPT
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.jetbrains.annotations.VisibleForTesting
+import org.json.JSONArray
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -56,8 +58,6 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Duration
-import org.jetbrains.annotations.VisibleForTesting
-import org.json.JSONArray
 
 class OpenEOStep: ScriptStep {
     constructor(
@@ -69,7 +69,7 @@ class OpenEOStep: ScriptStep {
 
     init {
         // Fetching wrapper script to run openEO
-        scriptFile = File(scriptStubsRoot, "openEOWrapper.py")
+        metadata.script = File(scriptStubsRoot, "openEOWrapper.py")
     }
 
     private var url = ConstantPipe("text",  yamlParsed[SCRIPT].toString())
@@ -207,11 +207,11 @@ class OpenEOStep: ScriptStep {
                         }
                 }
 
-                if (!authors.isNullOrEmpty()) {
-                    outputYaml[AUTHOR] = authors
-                } else {
-                    logger.warn("No authors found in catalog file...")
-                }
+        if (!authors.isNullOrEmpty()) {
+            outputYaml[AUTHORS] = authors
+        } else {
+            logger.warn("No authors found in catalog file...")
+        }
 
                 properties.opt(APEX__LICENSE)
                     ?.let { outputYaml[LICENSE] = it.toString() }
@@ -363,7 +363,7 @@ class OpenEOStep: ScriptStep {
                 .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
 
         private fun mapType(type: String, subtype: String?): String {
-            if (subtype == UDP__INPUT__BOUNDING_BOX) return "bboxCRS"
+            if (subtype == UDP__INPUT__BOUNDING_BOX) return "crsBbox"
 
             return when (Pair(type, subtype)) {
                 Pair("integer", null) -> "int"

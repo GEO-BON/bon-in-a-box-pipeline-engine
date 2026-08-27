@@ -1,13 +1,12 @@
 package org.geobon.openeo
 
-import org.json.JSONObject
-import java.io.File
-import kotlin.collections.get
-import kotlin.test.*
 import org.geobon.openeo.OpenEOStep.Companion.addCondaEnv
 import org.geobon.openeo.OpenEOStep.Companion.addOutputs
 import org.geobon.openeo.OpenEOStep.Companion.convertInputs
 import org.geobon.openeo.OpenEOStep.Companion.convertMetadata
+import org.json.JSONObject
+import java.io.File
+import kotlin.test.*
 
 
 class OpenEOStepTest {
@@ -75,12 +74,12 @@ class OpenEOStepTest {
     @Test
     fun convertInputsBboxTest() {
         val json = loadTestResource("processExample.json")
-        val result = OpenEOStep.convertInputs(json)
+        val result = convertInputs(json)
         val inputs = result["inputs"] as Map<*, *>
 
         val spatialExtent = inputs["spatial_extent"] as Map<*, *>
         assertEquals("Bounding Box", spatialExtent["label"])
-        assertEquals("bboxCRS", spatialExtent["type"])
+        assertEquals("crsBbox", spatialExtent["type"])
         assertTrue(spatialExtent.containsKey("example"))
     }
 
