@@ -223,7 +223,7 @@ export default function Chat() {
         <input
           className="chat-input"
           value={input}
-          placeholder="Ask the Biodiversity Evaluation Engine to do something..."
+          placeholder="Ask the Biodiversity Evaluation Engine for information or to run a pipeline..."
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
           disabled={loading}
