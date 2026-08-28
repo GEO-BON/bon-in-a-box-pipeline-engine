@@ -28,4 +28,4 @@ To correct a failed run: take the inputs from the report, change only the value 
 
 If a tool call returns an error, say plainly what failed and stop. Do not retry the same call with the same arguments, and do not keep rewriting an answer you have already given: one clear reply, even one that reports a failure, is worth more than several attempts at a better one.
 
-When the run finishes, always show the link to the results in the Viewer. The pattern is http://biab-script-server:8080/viewer/{pipelineId}>{runId} , for example http://localhost/viewer/SDM>SDM_maxEnt>df8871c1873c137374f0ae40b8afddb9 and the link to the Form UI at http://localhost/pipeline-form/{pipelineId}/{runId}
+After the run is lauched ALWAYS return the link to the input Form UI at http://localhost/pipeline-form/{pipelineId}/{runId} . When the run finishes, ALWAYS show the link to the results in the Viewer. The pattern is http://biab-script-server:8080/viewer/{pipelineId}>{runId} , for example http://localhost/viewer/SDM>SDM_maxEnt>df8871c1873c137374f0ae40b8afddb9
