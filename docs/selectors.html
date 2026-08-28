@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -75,10 +78,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-7d53a38e1771e0164136871ee961ecee.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-c6dffefdb99efd576fc0d43d67924b8c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -201,34 +204,34 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>When specifying input types ‘country’, ‘countryRegion’, ‘countryRegionCRS’, ‘CRS’ or ‘bboxCRS’, selectors are automatically created that facilitate the selection of those inputs. After being selected, those inputs appear in the <code>input.json</code> of the script or pipeline as objects with various parameters that will be available when loading then in R, Python or Julia.</p>
-<p>For example, the bboxCRS selector allows the user to specify a country, region and coordinate reference system to define a bounding box. The bounding box can also be selected manually, without first selecting a country or region. Here is an example of an object created through the selection of the Putumayo department in Colombia, in the Bogota 1975 / Colombia West zone reference system:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="bboxCRS"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="bboxCRS-1"><a href="#bboxCRS-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bbox</span><span class="kw">:</span></span>
-<span id="bboxCRS-2"><a href="#bboxCRS-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">983337</span></span>
-<span id="bboxCRS-3"><a href="#bboxCRS-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">428305</span></span>
-<span id="bboxCRS-4"><a href="#bboxCRS-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">1360903</span></span>
-<span id="bboxCRS-5"><a href="#bboxCRS-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">659616</span></span>
-<span id="bboxCRS-6"><a href="#bboxCRS-6" aria-hidden="true" tabindex="-1"></a><span class="fu">CRS</span><span class="kw">:</span></span>
-<span id="bboxCRS-7"><a href="#bboxCRS-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Bogota 1975 / Colombia West zone</span></span>
-<span id="bboxCRS-8"><a href="#bboxCRS-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">authority</span><span class="kw">:</span><span class="at"> EPSG</span></span>
-<span id="bboxCRS-9"><a href="#bboxCRS-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">code</span><span class="kw">:</span><span class="at"> </span><span class="dv">21896</span></span>
-<span id="bboxCRS-10"><a href="#bboxCRS-10" aria-hidden="true" tabindex="-1"></a><span class="fu">  proj4Def</span><span class="kw">: </span><span class="ch">&gt;-</span></span>
-<span id="bboxCRS-11"><a href="#bboxCRS-11" aria-hidden="true" tabindex="-1"></a>    +proj=tmerc +lat_0=4.59904722222222 +lon_0=-77.0809166666667 +k=1</span>
-<span id="bboxCRS-12"><a href="#bboxCRS-12" aria-hidden="true" tabindex="-1"></a>    +x_0=1000000 +y_0=1000000 +ellps=intl +towgs84=307,304,-318,0,0,0,0 +units=m</span>
-<span id="bboxCRS-13"><a href="#bboxCRS-13" aria-hidden="true" tabindex="-1"></a>    +no_defs +type=crs</span>
-<span id="bboxCRS-14"><a href="#bboxCRS-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">unit</span><span class="kw">:</span><span class="at"> metre</span></span>
-<span id="bboxCRS-15"><a href="#bboxCRS-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">bbox</span><span class="kw">:</span></span>
-<span id="bboxCRS-16"><a href="#bboxCRS-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">-79.1</span></span>
-<span id="bboxCRS-17"><a href="#bboxCRS-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">0.03</span></span>
-<span id="bboxCRS-18"><a href="#bboxCRS-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">-75.58</span></span>
-<span id="bboxCRS-19"><a href="#bboxCRS-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">10.21</span></span>
-<span id="bboxCRS-20"><a href="#bboxCRS-20" aria-hidden="true" tabindex="-1"></a><span class="fu">country</span><span class="kw">:</span></span>
-<span id="bboxCRS-21"><a href="#bboxCRS-21" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">englishName</span><span class="kw">:</span><span class="at"> Colombia</span></span>
-<span id="bboxCRS-22"><a href="#bboxCRS-22" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">ISO3</span><span class="kw">:</span><span class="at"> COL</span></span>
-<span id="bboxCRS-23"><a href="#bboxCRS-23" aria-hidden="true" tabindex="-1"></a><span class="fu">region</span><span class="kw">:</span></span>
-<span id="bboxCRS-24"><a href="#bboxCRS-24" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">regionName</span><span class="kw">:</span><span class="at"> Putumayo Department</span></span>
-<span id="bboxCRS-25"><a href="#bboxCRS-25" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">regionGID</span><span class="kw">:</span><span class="at"> COL.24_2</span></span>
-<span id="bboxCRS-26"><a href="#bboxCRS-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">countryEnglishName</span><span class="kw">:</span><span class="at"> Colombia</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>When specifying input types ‘location’, ‘country’, ‘countryRegion’, ‘countryRegionCRS’, ‘CRS’ or ‘crsBbox’, selectors are automatically created that facilitate the selection of those inputs. After being selected, those inputs appear in the <code>input.json</code> of the script or pipeline as objects with various parameters that will be available when loading then in R, Python or Julia.</p>
+<p>For example, the ‘location’ selector allows the user to define a bounding box by choosing a country, region and coordinate reference system. Here is an example of an object created through the selection of the Putumayo department in Colombia, in the Bogota 1975 / Colombia West zone reference system:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="location"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="location-1"><a href="#location-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bbox</span><span class="kw">:</span></span>
+<span id="location-2"><a href="#location-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">983337</span></span>
+<span id="location-3"><a href="#location-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">428305</span></span>
+<span id="location-4"><a href="#location-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">1360903</span></span>
+<span id="location-5"><a href="#location-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">659616</span></span>
+<span id="location-6"><a href="#location-6" aria-hidden="true" tabindex="-1"></a><span class="fu">CRS</span><span class="kw">:</span></span>
+<span id="location-7"><a href="#location-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Bogota 1975 / Colombia West zone</span></span>
+<span id="location-8"><a href="#location-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">authority</span><span class="kw">:</span><span class="at"> EPSG</span></span>
+<span id="location-9"><a href="#location-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">code</span><span class="kw">:</span><span class="at"> </span><span class="dv">21896</span></span>
+<span id="location-10"><a href="#location-10" aria-hidden="true" tabindex="-1"></a><span class="fu">  proj4Def</span><span class="kw">: </span><span class="ch">&gt;-</span></span>
+<span id="location-11"><a href="#location-11" aria-hidden="true" tabindex="-1"></a>    +proj=tmerc +lat_0=4.59904722222222 +lon_0=-77.0809166666667 +k=1</span>
+<span id="location-12"><a href="#location-12" aria-hidden="true" tabindex="-1"></a>    +x_0=1000000 +y_0=1000000 +ellps=intl +towgs84=307,304,-318,0,0,0,0 +units=m</span>
+<span id="location-13"><a href="#location-13" aria-hidden="true" tabindex="-1"></a>    +no_defs +type=crs</span>
+<span id="location-14"><a href="#location-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">unit</span><span class="kw">:</span><span class="at"> metre</span></span>
+<span id="location-15"><a href="#location-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">bbox</span><span class="kw">:</span></span>
+<span id="location-16"><a href="#location-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">-79.1</span></span>
+<span id="location-17"><a href="#location-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">0.03</span></span>
+<span id="location-18"><a href="#location-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">-75.58</span></span>
+<span id="location-19"><a href="#location-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">10.21</span></span>
+<span id="location-20"><a href="#location-20" aria-hidden="true" tabindex="-1"></a><span class="fu">country</span><span class="kw">:</span></span>
+<span id="location-21"><a href="#location-21" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">englishName</span><span class="kw">:</span><span class="at"> Colombia</span></span>
+<span id="location-22"><a href="#location-22" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">ISO3</span><span class="kw">:</span><span class="at"> COL</span></span>
+<span id="location-23"><a href="#location-23" aria-hidden="true" tabindex="-1"></a><span class="fu">region</span><span class="kw">:</span></span>
+<span id="location-24"><a href="#location-24" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">regionName</span><span class="kw">:</span><span class="at"> Putumayo Department</span></span>
+<span id="location-25"><a href="#location-25" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">regionGID</span><span class="kw">:</span><span class="at"> COL.24_2</span></span>
+<span id="location-26"><a href="#location-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">countryEnglishName</span><span class="kw">:</span><span class="at"> Colombia</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Here is the meaning of each key.</p>
 <table class="caption-top table">
 <colgroup>
@@ -306,7 +309,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>When using other selectors, the object create contains a subset of the bboxCRS selector. For example, the countryRegion selector will only contain the country and region sections, and countryRegionCRS will contain all but the bbox section.</p>
+<p>When using other selectors, the object create contains a subset of the location selector. For example, the countryRegion selector will only contain the country and region sections, and countryRegionCRS will contain all but the bbox section.</p>
 
 
 
