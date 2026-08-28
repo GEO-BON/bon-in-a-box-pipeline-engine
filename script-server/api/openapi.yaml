@@ -3,7 +3,7 @@ info:
   title: BON in a Box - Script service
   contact:
     email: jean-michel.lord@mcgill.ca
-  version: 1.0.0
+  version: 2.3.0
 servers:
   - url: http://localhost/
     description: script service
