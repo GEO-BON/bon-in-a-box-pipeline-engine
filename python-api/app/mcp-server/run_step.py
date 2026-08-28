@@ -103,9 +103,17 @@ def prepare(declared, inputs):
 
     notes = []
     if defaulted:
+        # Counted, never listed. Naming the keys here is what turns a note that means
+        # "this is fine" into an item to go and fix: a caller handed
+        # `zonal_statistics>zonal_stats.yml@25|summary_statistic` reads back through the
+        # description for its example, finds the value already sitting in the run, and
+        # spends a whole round re-launching the run it has just started. The three notes
+        # arrive in one sentence and in one register, so this is the only place to draw
+        # the line between the one that needs nothing and the two that do.
         notes.append(
-            f"{len(defaulted)} input(s) left at their example value: "
-            + ", ".join(f"`{k}`" for k in defaulted)
+            f"{len(defaulted)} input(s) took the step's own example value. That is "
+            "normal and needs no action; it is worth saying which of the user's own "
+            "choices you set, not worth correcting."
         )
     if blank:
         notes.append(
@@ -127,17 +135,33 @@ def prepare(declared, inputs):
 
 
 def launch_summary(step_type, run_id, notes):
-    """What to tell the caller once the engine has accepted the run."""
+    """What to tell the caller once the engine has accepted the run.
+
+    Notes first, run id and links last. What a caller acts on is what it read last, and
+    a note in that position becomes the outstanding item: it goes back to `run_step` for
+    another round instead of writing the answer, and on a small model with a per-round
+    token budget that round is the one the answer needed. Ending on the links puts the
+    thing to be reported where the run id used to have a note sitting after it.
+
+    The rule against relaunching lives in api-guide.md too, but that is read once at the
+    top of a conversation and this is read at the only moment it is ever tempting to
+    break -- the same argument as the input keys in this file's opening.
+    """
     step_path, _, run_hash = run_id.rpartition(">")
-    lines = [
+    lines = []
+    if notes:
+        lines.append("Inputs: " + " ".join(notes))
+    lines += [
         "The run has STARTED. It is not finished -- do not wait for it and do not "
-        "check on it; the user follows it in the interface.",
+        "check on it; the user follows it in the interface. It is also already "
+        "launched: do NOT call `run_step` again for this request, whatever the input "
+        "notes above say. Anything above worth correcting is worth telling the user "
+        "about, and is not a reason to start the pipeline a second time.",
         f"runId: {run_id}",
         "Form (relative to this instance's address): "
         + FORM_PATH.format(step_type=step_type, step_path=step_path, run_hash=run_hash),
         "Viewer (relative to this instance's address): "
         + VIEWER_PATH.format(run_id=run_id),
+        "Give the user the runId and these links now, then stop.",
     ]
-    if notes:
-        lines.append("Inputs: " + " ".join(notes))
     return "\n".join(lines)
