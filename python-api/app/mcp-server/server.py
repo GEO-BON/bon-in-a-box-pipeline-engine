@@ -7,6 +7,7 @@ import os
 import sys
 
 import docs_search
+import run_report
 
 # Create an HTTP client for your API
 client = httpx.AsyncClient(base_url="http://biab-gateway")
@@ -195,6 +196,41 @@ def search_documentation(query: str, max_results: int = 3) -> str:
     except Exception as exc:  # a doc lookup must never be what kills a chat turn
         print(f"[docs] search failed for {query!r}: {exc}", file=sys.stderr)
         return f"The documentation search failed ({exc}). Answer without it."
+
+
+# -------------------------------------------------------------------------
+# 4. RUN DIAGNOSIS
+# -------------------------------------------------------------------------
+@mcp.tool()
+def get_run_report(runId: str, max_log_lines: int = 30) -> str:
+    """Report on one run: the inputs it was given, whether it failed, and why.
+
+    Call this whenever a run has failed, whenever the user says a result looks wrong,
+    and before offering to run anything again. `getHistory` says a run failed;
+    only this says what went wrong, because the step's error message and log are not
+    otherwise reachable through the API.
+
+    The inputs come back exactly as `run` accepts them, so a run whose inputs were
+    filled in wrongly is corrected by editing the offending value in what this returns
+    and submitting the whole object again. Say which input was wrong and what it should
+    be, and let the user confirm before you re-run.
+
+    Args:
+        runId: The id returned by `run`, or a runId from `getHistory` -- for example
+            `BII>BIIChange>7f3a…`.
+        max_log_lines: Lines of log to include for each failed step, 1-100.
+
+    Returns:
+        The run's inputs, its status, and the error and log tail of any step that
+        failed to produce output.
+    """
+    try:
+        return run_report.report(runId, max_log_lines=max(1, min(100, max_log_lines)))
+    except ValueError as exc:
+        return f"Cannot read that run: {exc}"
+    except Exception as exc:
+        print(f"[run] report failed for {runId!r}: {exc}", file=sys.stderr)
+        return f"Could not read the run's files ({exc})."
 
 
 if __name__ == "__main__":
