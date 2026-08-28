@@ -8,6 +8,7 @@ import sys
 
 import docs_search
 import run_report
+import run_step as run_step_helper
 
 # Create an HTTP client for your API
 client = httpx.AsyncClient(base_url="http://biab-gateway")
@@ -231,6 +232,79 @@ def get_run_report(runId: str, max_log_lines: int = 30) -> str:
     except Exception as exc:
         print(f"[run] report failed for {runId!r}: {exc}", file=sys.stderr)
         return f"Could not read the run's files ({exc})."
+
+
+# -------------------------------------------------------------------------
+# 5. LAUNCHING A RUN
+# -------------------------------------------------------------------------
+# Replaces the generated `run` tool, whose body parameter is a JSON-encoded string with
+# an object for an example and no hint of the key format. See run_step.py.
+mcp.remove_tool("run")
+
+
+@mcp.tool()
+async def run_step(stepType: str, descriptionPath: str, inputs: dict | None = None) -> str:
+    """Start a pipeline or script. This is the only way to launch a run.
+
+    Call `getInfo` on the step first: its `inputs` block gives both the keys this tool
+    takes and what each one means. The keys are `{step id}|{input name}` exactly as
+    `getInfo` returns them -- `data>loadFromStac.yml@56|t0`, not `t0` -- along with bare
+    `pipeline@NN` keys for the pipeline's own selector inputs. Pass them as an object,
+    not as a string.
+
+    Any input you leave out is sent at the example value from the step's description,
+    which is what the web form starts from, so supplying only what the user actually
+    asked to change is correct and is usually the right thing to do.
+
+    It returns as soon as the engine accepts the run; the run itself takes minutes to
+    hours. Report the run id and the links, then stop.
+
+    Args:
+        stepType: "pipeline" or "script". Prefer pipelines: scripts are pieces of one
+            and usually need inputs produced by an earlier step.
+        descriptionPath: The step's path as `getListOf` gives it, e.g. `BII>BII.json`.
+        inputs: The inputs to set, as an object keyed by full input key. Omit it to run
+            entirely on the step's own examples.
+
+    Returns:
+        The run id and the links to follow it, or -- if an input key is wrong -- the
+        list of keys this step actually accepts.
+    """
+    try:
+        info = await client.get(f"/{stepType}/{descriptionPath}/info")
+        info.raise_for_status()
+        declared = (info.json() or {}).get("inputs") or {}
+    except Exception as exc:
+        print(f"[run] could not describe {descriptionPath!r}: {exc}", file=sys.stderr)
+        return (
+            f"Could not read the description of {descriptionPath!r} ({exc}). Check the "
+            "path with `getListOf` before running it."
+        )
+
+    if not declared:
+        return (
+            f"{descriptionPath!r} declares no inputs, which usually means the path is "
+            "wrong. Check it with `getListOf`."
+        )
+
+    try:
+        body, notes = run_step_helper.prepare(declared, inputs)
+    except ValueError as exc:
+        return str(exc)
+
+    try:
+        started = await client.post(
+            f"/{stepType}/{descriptionPath}/run",
+            content=json.dumps(body),
+            headers={"Content-Type": "application/json"},
+            timeout=60,
+        )
+        started.raise_for_status()
+    except Exception as exc:
+        print(f"[run] launch failed for {descriptionPath!r}: {exc}", file=sys.stderr)
+        return f"The engine refused to start {descriptionPath!r}: {exc}"
+
+    return run_step_helper.launch_summary(stepType, started.text.strip(), notes)
 
 
 if __name__ == "__main__":
