@@ -4,7 +4,9 @@ Check this documentation whenever you are uncertain of the resources available.
 
 Questions about the data, the scripts, the pipelines and their runs MUST be answered by making queries to this API. If the answer is not available through this API or through the `search_documentation` tool, then you cannot find it.
 
-Questions about the platform itself are answered by the `search_documentation` tool instead: what an input type means and how to write a value for it (bboxCRS, country, CRS, options, `text[]`, MIME types), how to pass a file with a /userdata/ path, what a lifecycle status implies, how to install or contribute. Search the documentation before telling a user how to fill in an input whose type you cannot explain from its own description.
+Questions about the platform itself are answered by the `search_documentation` tool instead: what an input type means and how to write a value for it (bboxCRS, country, CRS, options, `text[]`, MIME types), how to pass a file with a /userdata/ path, how to install, how to contribute a pipeline. Search the documentation before telling a user how to fill in an input whose type you cannot explain from its own description.
+
+The documentation does not cover lifecycle statuses, nor anything about an individual script or pipeline. Take those from the step's own metadata.
 
 The list of scripts can be found here: http://biab-script-server:8080/script/list
 

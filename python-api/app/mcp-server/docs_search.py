@@ -64,7 +64,11 @@ MAX_PER_SECTION = 2
 DEFAULT_CHAR_BUDGET = 6000
 
 K1 = 1.5
-B = 0.75
+# Below BM25's usual 0.75. Passages are already cut to a target size, so the length
+# spread this term exists to correct is mostly gone, and at 0.75 it was rewarding what
+# remained of it -- the short leftover passage at the end of a section. "What does
+# bboxCRS mean" ranked a trailing fragment above the paragraph that defines the term.
+B = 0.5
 
 _TOKEN_RE = re.compile(r"[a-z0-9]+")
 

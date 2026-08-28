@@ -122,8 +122,8 @@ def search_documentation(query: str, max_results: int = 3) -> str:
     Use this whenever a question is about the platform itself rather than about data:
     what an input type means and how to write a value for it (bboxCRS, country, CRS,
     options, text[], MIME types such as image/tiff;application=geotiff), how to refer
-    to a file with a /userdata/ path, what a lifecycle status implies, how pipelines
-    and scripts differ, how the pipeline editor works, or how to install the platform.
+    to a file with a /userdata/ path, how pipelines and scripts differ, how the
+    pipeline editor and run history work, or how to install the platform.
 
     It does NOT describe individual scripts or pipelines. For those, and for what one
     specific input of one specific step means, call getInfo on that step instead.
