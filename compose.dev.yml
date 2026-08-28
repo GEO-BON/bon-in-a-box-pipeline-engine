@@ -63,6 +63,10 @@ services:
       # production instead of silently relying on the swagger_ui container -- which
       # is what hid the production breakage in the first place.
       - ./script-server/api/openapi.yaml:/app/mcp-server/openapi.yaml:ro
+      # Corpus for the assistant's search_documentation tool. Mounted from the Quarto
+      # output rather than copied, so `quarto render docs_source` is enough to see new
+      # documentation in the chat -- restart python-api, it is read once at startup.
+      - ./docs/search.json:/app/mcp-server/docs-search.json:ro
 
   gateway:
     image: nginxinc/nginx-unprivileged

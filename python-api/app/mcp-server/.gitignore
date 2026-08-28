@@ -4,6 +4,12 @@
 .python-version
 .mcpregistry_*
 
+# Staged into this directory by the build (see .github/workflows/docker_python-api.yml)
+# and bind-mounted here in development. Both live elsewhere in the repo; a copy landing
+# in a commit would be the stale one everything then loads.
+openapi.yaml
+docs-search.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

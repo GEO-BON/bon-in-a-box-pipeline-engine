@@ -5,6 +5,8 @@ import json
 import os
 import sys
 
+import docs_search
+
 # Create an HTTP client for your API
 client = httpx.AsyncClient(base_url="http://biab-gateway")
 
@@ -102,6 +104,47 @@ def analyst_persona() -> str:
     DOCUMENTATION FOR THE PLATFORM:
     {DOCUMENTATION}
     """
+
+# -------------------------------------------------------------------------
+# 3. DOCUMENTATION SEARCH
+# -------------------------------------------------------------------------
+# The one tool here that is not generated from the OpenAPI spec, because the thing it
+# reads is not part of the API. The prompt used to hand the model the docs site's URL
+# and stop there, which told it the answer existed somewhere it had no way to reach.
+DOCS_INDEX = docs_search.load_index()
+print(f"[docs] {len(DOCS_INDEX)} documentation passages indexed", file=sys.stderr)
+
+
+@mcp.tool()
+def search_documentation(query: str, max_results: int = 3) -> str:
+    """Search the BON in a Box user and contributor documentation.
+
+    Use this whenever a question is about the platform itself rather than about data:
+    what an input type means and how to write a value for it (bboxCRS, country, CRS,
+    options, text[], MIME types such as image/tiff;application=geotiff), how to refer
+    to a file with a /userdata/ path, what a lifecycle status implies, how pipelines
+    and scripts differ, how the pipeline editor works, or how to install the platform.
+
+    It does NOT describe individual scripts or pipelines. For those, and for what one
+    specific input of one specific step means, call getInfo on that step instead.
+
+    Args:
+        query: What you want to know, in words. Natural questions work; so do
+            keywords. Prefer the platform's own vocabulary ("bboxCRS selector",
+            "input types", "userdata folder").
+        max_results: How many passages to return, 1-5. Keep it low; each one costs
+            context that the rest of the conversation needs.
+
+    Returns:
+        The matching documentation passages with the URL of the page each came from,
+        or a sentence explaining why there is nothing to return.
+    """
+    try:
+        return DOCS_INDEX.search(query, max_results=max(1, min(5, max_results)))
+    except Exception as exc:  # a doc lookup must never be what kills a chat turn
+        print(f"[docs] search failed for {query!r}: {exc}", file=sys.stderr)
+        return f"The documentation search failed ({exc}). Answer without it."
+
 
 if __name__ == "__main__":
     mcp.run(transport="http", host="0.0.0.0", port=8002)
