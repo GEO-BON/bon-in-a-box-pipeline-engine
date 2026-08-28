@@ -1296,6 +1296,7 @@ export default function PipelineEditor(props) {
               deleteKeyCode={['Backspace', 'Delete']}
               onMouseDownCapture={onPopupMenuHide}
               reconnectRadius="100"
+              panActivationKeyCode={null} // default here blocks the pace key in metadata pane
             >
               {toolTip && <div className="tooltip">{toolTip}</div>}
 

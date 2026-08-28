@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, lazy } from "react";
 const Editor = lazy(() => import('@monaco-editor/react'));
 
-// TODO: See https://github.com/suren-atoyan/monaco-react for configuration
+// See https://github.com/suren-atoyan/monaco-react for configuration
 // TODO: Try this for code validation: https://github.com/suren-atoyan/monaco-react/issues/228#issuecomment-1159365104
 
 const emptyMetadata = `name: # short name, such as My Script
