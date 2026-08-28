@@ -8,6 +8,9 @@
 # This is a sub-repo with it's own git history
 pipeline-repo
 
+# Temp files for openEO UDPs
+script-stubs/openEO
+
 # Generated files by quarto documentation tools and R that supports it
 .quarto
 .Rproj.user
