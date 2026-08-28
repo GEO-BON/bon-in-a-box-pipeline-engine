@@ -1,3 +1,4 @@
+import asyncio
 import httpx
 from fastmcp import FastMCP
 import yaml
@@ -75,6 +76,56 @@ mcp = FastMCP.from_openapi(
     client=client,
     name="BON in a Box MCP Server",
 )
+
+
+def non_json_operations(spec):
+    """operationIds whose 200 response is declared, but not as JSON.
+
+    These return plain text (a run id, "OK") or a binary body, and so can never produce
+    the structured output an outputSchema promises. Named from the spec rather than
+    found by scanning the registered tools, so that tools this file defines itself --
+    which do return structured output -- can never be caught by it.
+    """
+    named = set()
+    for methods in (spec.get("paths") or {}).values():
+        for operation in methods.values():
+            if not isinstance(operation, dict) or "operationId" not in operation:
+                continue
+            content = ((operation.get("responses") or {}).get("200") or {}).get("content") or {}
+            if content and not any("json" in media_type for media_type in content):
+                named.add(operation["operationId"])
+    return named
+
+
+async def drop_unfulfillable_output_schemas():
+    """Remove the outputSchema from tools that cannot return structured output.
+
+    FastMCP derives an outputSchema from the 200 response of every operation, including
+    the three that respond `text/plain` -- `run`, `savePipeline` and `getSystemStatus`.
+    Nothing then produces the structured content that schema advertises, so the client
+    rejects the result:
+
+        Output validation error: outputSchema defined but no structured output returned
+
+    The call itself has already happened by then. `run` is the one that matters: the
+    pipeline starts, the engine returns its run id, and the assistant is handed an error
+    instead -- so it retries, starts a second pipeline, still gets an error, and has no
+    run id to report or poll. That is what a chat session looks like when it launches
+    two runs of the same pipeline and then loops on "the pipeline is running" without
+    ever being able to say which one or fetch a result.
+
+    Dropping the schema lets the run id come back as ordinary text content, which is
+    what these endpoints have always returned and all the model needs.
+    """
+    tools = await mcp.get_tools()
+    for name in sorted(non_json_operations(spec)):
+        tool = tools.get(name)
+        if tool is not None and tool.output_schema is not None:
+            tool.output_schema = None
+            print(f"[mcp] dropped unfulfillable outputSchema on {name}", file=sys.stderr)
+
+
+asyncio.run(drop_unfulfillable_output_schemas())
 
 # -------------------------------------------------------------------------
 # 2. CONFIGURATION & FILE LOADING

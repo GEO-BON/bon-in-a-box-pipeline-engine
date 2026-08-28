@@ -103,6 +103,13 @@ export default function Chat() {
           options: {
             num_ctx: 16384,
             num_batch: 64,
+            // Ollama's default is -1: generate until the model emits a stop token or
+            // the context window is full. A reasoning model that never leaves its
+            // reasoning has neither, so an unbounded turn grinds through all 16384
+            // tokens and then hits nginx's 600s read timeout with nothing to show.
+            // This is per generation, and the bridge runs one per tool-call round, so
+            // it bounds a runaway round without shortening a legitimate answer.
+            num_predict: 2048,
           },
           messages: outgoing,
         }),
@@ -163,6 +170,26 @@ export default function Chat() {
         }
       }
       reader.cancel();
+
+      // A turn can end having produced only reasoning: the model never leaves its
+      // thinking, or spends the whole turn on tool rounds that error. cleanContent can
+      // also empty a bubble on its own, by stripping a response that was nothing but a
+      // tool call the bridge failed to execute. Either way the bubble renders blank and
+      // the turn looks like it silently died -- so say what happened instead. The
+      // reasoning, if there is any, sits in the disclosure above this text.
+      setMessages((m) => {
+        const last = m.at(-1);
+        if (last?.role !== "assistant" || cleanContent(last.content)) return m;
+        return [
+          ...m.slice(0, -1),
+          {
+            ...last,
+            content: last.thinking
+              ? "_Stopped while still reasoning, without reaching an answer. The reasoning is above. Asking again, more narrowly, usually helps._"
+              : "_No answer was returned. Please try again._",
+          },
+        ];
+      });
     } catch (err) {
       setMessages((m) => [
         ...m.slice(0, -1),
