@@ -36,20 +36,38 @@ services:
       - hpc_known_hosts_file
       - hpc_ssh_config_file
 
+  # adding a ClamAV container to scan user uploaded files
+  clamav:
+    image: clamav/clamav-debian:latest  # '-debian' fixes error : no matching manifest for linux/arm64 
+    container_name: biab-clamav
+    ports:
+      - "3310:3310"
+    volumes:
+      - clamav_data:/var/lib/clamav
+    restart: unless-stopped
+
   python-api: # Serves Titiler and a FastAPI app to serve country and region names and geometries
     container_name: biab-python-api
+    env_file: # added this to fetch the DISABLE_MY_FILES variable in /pipeline-repo/runner.env
+      - ${PIPELINE_REPO_PATH}/runner.env
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
+      - ${PIPELINE_REPO_PATH}/userdata:/data/userdata:rw  # for user uploads, used in "/manage-files"
+
     user: ${MY_UID}:${DOCKER_GID}
     environment:
       PORT: 8000
       WORKERS_PER_CORE: 1
       TITILER_API_CORS_ORIGINS: "*"
+      USERDATA_ROOT: /data/userdata/files
+      DISABLE_MY_FILES: ${DISABLE_MY_FILES} # added to remove the 
     expose:
       - "8000"
       - "8001"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    depends_on: 
+      - clamav  # added so that ClamAV is running before the python-api
 
   runner-conda:
     container_name: biab-runner-conda
@@ -101,3 +119,7 @@ secrets:
     file: $HPC_KNOWN_HOSTS_FILE
   hpc_ssh_config_file:
     file: $HPC_SSH_CONFIG_FILE
+
+# added this to prevent downloading large files every time docker restarts
+volumes:
+  clamav_data:

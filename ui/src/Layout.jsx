@@ -1,10 +1,10 @@
 import "./Layout.css";
 import React, { useEffect, createContext, useState, useContext } from "react";
-import BiaBLogo from "./img/boninabox_logo.jpg";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./components/styles/theme";
 import useWindowDimensions from "./utils/WindowDimensions";
 import TopMenu from "./TopMenu";
+import LeftPane from "./LeftPane";
 
 export const PopupContentContext = createContext();
 export const TitleContext = createContext();
@@ -50,37 +50,32 @@ export function Layout(props) {
 
   return (
     <PopupContentContext.Provider value={{popupContent, setPopupContent}}>
-      <TitleContext.Provider value={{ title, setTitle }}>
-        <ThemeProvider theme={theme}>
-          <div className="left-pane">
+        <TitleContext.Provider value={{ title, setTitle }}>
+            <ThemeProvider theme={theme}>
+                <LeftPane/>
             <div>
-              <img id="logo" src={BiaBLogo} alt="BON in a Box logo" />
+                <div className="right-content">
+                    <TopMenu/>
+                    {popupContent && (
+                    <div className="fullScreenPopup">
+                        <div className="content">{popupContent}</div>
+                        <button
+                        title="Close"
+                        className="close"
+                        onClick={() => setPopupContent(null)}
+                        >
+
+                        ×
+
+                        </button>
+                    </div>
+                    )}
+
+                    <main style={{ height: mainHeight }}>{props.right}</main>
+                </div>
             </div>
-            {props.left}
-          </div>
-          <div>
-          <div className="right-content">
-            <TopMenu/>
-            {popupContent && (
-              <div className="fullScreenPopup">
-                <div className="content">{popupContent}</div>
-                <button
-                  title="Close"
-                  className="close"
-                  onClick={() => setPopupContent(null)}
-                >
-
-                  ×
-
-                </button>
-              </div>
-            )}
-
-            <main style={{ height: mainHeight }}>{props.right}</main>
-          </div>
-          </div>
-        </ThemeProvider>
-      </TitleContext.Provider>
+            </ThemeProvider>
+        </TitleContext.Provider>
     </PopupContentContext.Provider>
   );
 }

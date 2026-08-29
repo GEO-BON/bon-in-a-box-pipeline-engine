@@ -20,6 +20,11 @@ import InfoPage from "./components/info/InfoPage";
 import RunHistory from "./components/RunHistory";
 import { Spinner } from "./components/Spinner";
 import { HttpError } from "./components/HttpErrors";
+import FileManager from "./components/FileManager";
+
+// disabling if read-only
+import { DISABLE_MY_FILES } from "./config.js";
+
 const PipelineEditor = lazy(() =>
   import("./components/PipelineEditor/PipelineEditor")
 );
@@ -93,6 +98,18 @@ const router = createBrowserRouter([
         <>
           <PageTitle title="Info" />
           <InfoPage />
+        </>
+        }
+      />
+    ),
+  },
+  {
+    path: "manage-files",
+    element: (
+      <Layout right={
+        <>
+          <PageTitle title="Manage files" />
+          {!DISABLE_MY_FILES && <FileManager />}
         </>
         }
       />
