@@ -25,7 +25,7 @@ import Info from '../model/Info';
 export default class DefaultApi {
 
     /**
-    * Constructs a new DefaultApi.
+    * Constructs a new DefaultApi. 
     * @alias module:api/DefaultApi
     * @class
     * @param {module:ApiClient} [apiClient] Optional API client implementation to use,
@@ -291,7 +291,7 @@ export default class DefaultApi {
     /**
      * Get the output folders of the scripts composing this pipeline
      * @param {module:model/String} type Script, pipeline or openEO
-     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
+     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
      * @param {module:api/DefaultApi~getOutputFoldersCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Object.<String, {String: String}>}
      */
@@ -711,7 +711,7 @@ export default class DefaultApi {
     /**
      * Stop the specified pipeline run.
      * @param {module:model/String} type Script, pipeline or openEO
-     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
+     * @param {String} id Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
      * @param {module:api/DefaultApi~stopCallback} callback The callback function, accepting three arguments: error, data, response
      */
     stop(type, id, callback) {

@@ -192,6 +192,24 @@ In addition to these services,
 - `scripts` folder contains all the scripts that can be run.
 - `output` folder contains all script results.
 
+#### Antivirus scanning of user uploads
+
+Files uploaded through "My Files" are scanned by ClamAV before being saved. The clamd
+daemon runs *inside* the python-api container (started by `python-api/app/startup.sh`,
+configured in `python-api/clamav/`), listening on 127.0.0.1:3310 — it is not a separate
+service and no port is published to the host. Signatures live in the `clamav_data`
+volume; on a fresh volume the first boot downloads roughly 350 MB in the background, and
+uploads are allowed through unscanned until that finishes.
+
+> **Upgrading from the standalone `biab-clamav` container:** the existing `clamav_data`
+> volume is owned by that container's internal `clamav` user, which the python-api UID
+> cannot write to, so signature updates will fail with permission errors. Drop the volume
+> once so it is recreated with the right ownership:
+> ```bash
+> docker compose down
+> docker volume rm bon-in-a-box_clamav_data      # bon-in-a-box_dev_clamav_data in dev
+> ```
+
 ### Restrict access to a BON in a Box instance
 In order to require authentication to access a BON in a Box instance,
 a simple http authentication can be configured in the host instance.

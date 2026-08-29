@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Switch from "@mui/material/Switch";
@@ -7,8 +8,12 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 import AutoResizeTextArea from "./AutoResizeTextArea";
 import Choosers from "./Choosers";
+import { uiContext } from "../../uiContext.jsx";
+import FileBrowser from "../FileBrowser";
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
 export const CONSTANT_PLACEHOLDER = "Constant";
+
+
 
 function joinIfArray(value) {
   return value && typeof value.join === "function" ? value.join(", ") : value;
@@ -32,6 +37,29 @@ const smallPaddingNumeric = () => {
   };
 };
 
+// Joins the text field and the "Browse files" button into a single control:
+// the button stretches to the field's height and sits flush against it.
+const fileBrowserRow = {
+  display: "flex",
+  alignItems: "stretch",
+  "& .filebrowser": { display: "flex" },
+  "& .filebrowser .button-modal": {
+    margin: 0,
+    minHeight: 0,
+    height: "100%",
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+  },
+};
+
+// Squares off the right side of the field it is joined to
+const joinedTextField = {
+  "& .MuiOutlinedInput-root": {
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+};
+
 export default function ScriptInput({
   type,
   value,
@@ -45,6 +73,7 @@ export default function ScriptInput({
 }) {
   const [fieldValue, setFieldValue] = useState(value);
   const small = size == "small";
+  const { disableMyFiles } = useContext(uiContext);
 
   useEffect(() => {
     setFieldValue(value);
@@ -145,24 +174,36 @@ export default function ScriptInput({
         onValueUpdated(event.target.value.split(",").map((v) => v.trim()));
       }
     };
-
-    return (
-      <TextField
-        multiline
-        variant="outlined"
-        size={size}
-        label=""
-        {...passedProps}
-        value={joinIfArray(fieldValue) || ""}
-        onChange={(e) => setFieldValue(e.target.value)}
-        placeholder={ARRAY_PLACEHOLDER}
-        cols={cols}
-        onBlur={onUpdateArray}
-        slotProps={{ input: { style: small ? smallPadding() : null } }}
-        onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
-        sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
-      />
-    );
+    const withFileBrowser = type.includes('/') && !disableMyFiles && !small;
+    const txtField = <TextField
+          multiline
+          variant="outlined"
+          size={size}
+          label=""
+          {...passedProps}
+          value={joinIfArray(fieldValue) || ""}
+          onChange={(e) => setFieldValue(e.target.value)}
+          placeholder={ARRAY_PLACEHOLDER}
+          cols={cols}
+          onBlur={onUpdateArray}
+          slotProps={{ input: { style: small ? smallPadding() : null } }}
+          onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
+          sx={{
+            width: "100%",
+            maxWidth: small ? 220 : "500px",
+            ...(withFileBrowser ? joinedTextField : null),
+          }}
+        />
+      if(withFileBrowser) {
+        return (
+          <Box sx={fileBrowserRow}>
+            {txtField}
+            <FileBrowser multipleFiles={true} onSelect={setFieldValue} />
+          </Box>
+        ) 
+      } else {
+          return (<>{txtField}</>)
+      }
   }
 
   switch (type.toLowerCase()) {
@@ -271,7 +312,8 @@ export default function ScriptInput({
 
       // Single line text fields
       if (type.includes("/") /* assume MIME type, files have no line breaks */) {
-        return <TextField
+        const withFileBrowser = !disableMyFiles && !small;
+        const txtField = <TextField
           type="text"
           label=""
           size={size}
@@ -280,8 +322,22 @@ export default function ScriptInput({
             if (e.key === "Enter" || e.ctrlKey) updateValue(e);
           }}
           slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
-          sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
+          sx={{
+            width: "100%",
+            maxWidth: small ? 220 : "500px",
+            ...(withFileBrowser ? joinedTextField : null),
+          }}
         />
+        if(withFileBrowser) {
+          return (
+            <Box sx={fileBrowserRow}>
+              {txtField}
+              <FileBrowser multipleFiles={false} onSelect={setFieldValue} />
+            </Box>
+          )
+        } else {
+          return (<>{txtField}</>)
+        }
       }
 
       // Multiline text field
