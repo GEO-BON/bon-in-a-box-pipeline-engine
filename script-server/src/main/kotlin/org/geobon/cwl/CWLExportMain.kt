@@ -99,7 +99,7 @@ object CWLExportMain {
             result = SystemCall().runBlocking(
                 listOf(
                     "docker", "run", "--rm", "-v", "${tempDir.pathString}:/out",
-                    "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:cwl-poc",
+                    "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:$runnerTag",
                     "cp", "-r", "--dereference", "/scripts", "/pipelines", "/out/"
                 ),
                 logger = logger,
