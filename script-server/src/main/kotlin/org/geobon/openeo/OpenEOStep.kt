@@ -362,7 +362,7 @@ class OpenEOStep: ScriptStep {
                 .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
 
         private fun mapType(type: String, subtype: String?): String {
-            if (subtype == UDP__INPUT__BOUNDING_BOX) return "crsBbox"
+            if (subtype == UDP__INPUT__BOUNDING_BOX) return "crsBBox"
 
             return when (Pair(type, subtype)) {
                 Pair("integer", null) -> "int"

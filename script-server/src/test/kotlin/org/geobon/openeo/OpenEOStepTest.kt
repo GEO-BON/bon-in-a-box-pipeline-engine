@@ -79,7 +79,7 @@ class OpenEOStepTest {
 
         val spatialExtent = inputs["spatial_extent"] as Map<*, *>
         assertEquals("Bounding Box", spatialExtent["label"])
-        assertEquals("crsBbox", spatialExtent["type"])
+        assertEquals("crsBBox", spatialExtent["type"])
         assertTrue(spatialExtent.containsKey("example"))
     }
 

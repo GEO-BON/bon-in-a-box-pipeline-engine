@@ -161,7 +161,7 @@ inputs:
     doc: Select a bounding box and CRS
     type:
       type: record
-      name: crsBbox
+      name: crsBBox
       fields:
       - name: CRS
         type:
