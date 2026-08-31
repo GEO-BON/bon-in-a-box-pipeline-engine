@@ -9,6 +9,9 @@ class ServerContext(
     val k8s: K8sConnection? = null
 ) {
 
+    val pipelinesRoot
+        get() = File(System.getenv("PIPELINES_LOCATION"))
+
     companion object {
         // Using a getter allows to change the value of these environment variables in tests
         val scriptsRoot
@@ -16,9 +19,6 @@ class ServerContext(
 
         val scriptStubsRoot
             get() = File(System.getenv("SCRIPT_STUBS_LOCATION"))
-
-        val pipelinesRoot
-            get() = File(System.getenv("PIPELINES_LOCATION"))
 
         val userDataRoot
             get() = File(System.getenv("USERDATA_LOCATION"))

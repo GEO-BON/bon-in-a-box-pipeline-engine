@@ -8,20 +8,19 @@ import org.geobon.pipeline.JSONPipeline
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.SystemCall
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import kotlin.system.exitProcess
-import kotlin.text.replace
 import kotlin.time.measureTime
 
 object CWLExportMain {
 
     private val logger: Logger = LoggerFactory.getLogger("CWLExport")
     private val cwlRunnerAvailable = SystemCall().runBlocking(listOf("which", "cwl-runner")).success
+    private val serverContext = ServerContext()
 
     @Volatile
     var scriptFailures = 0
@@ -68,7 +67,7 @@ object CWLExportMain {
         }
         runBlocking(Dispatchers.Default) {
             exportAllFiles(toolsRoot, scriptsRoot, "script")
-            exportAllFiles(workflowsRoot, pipelinesRoot, "pipeline")
+            exportAllFiles(workflowsRoot, serverContext.pipelinesRoot, "pipeline")
         }
 
         if (cwlRunnerAvailable) {
@@ -96,7 +95,7 @@ object CWLExportMain {
                 extension = "yml"
             }
             "pipeline" -> {
-                root = pipelinesRoot
+                root = serverContext.pipelinesRoot
                 extension = "json"
             }
             else -> {
@@ -105,7 +104,6 @@ object CWLExportMain {
             }
         }
 
-        val serverContext = ServerContext()
         val destinationFolder = File(destinationRoot, directory.relativeTo(root).path)
         destinationFolder.mkdirs()
 

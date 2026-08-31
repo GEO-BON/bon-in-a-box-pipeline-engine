@@ -15,7 +15,6 @@ import org.geobon.pipeline.*
 import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONException
@@ -70,7 +69,7 @@ fun Application.configureRouting() {
             val extension: String
             when (type) {
                 "pipeline" -> {
-                    roots = listOf(pipelinesRoot)
+                    roots = listOf(serverContext.pipelinesRoot)
                     extension = "json"
                 }
 
@@ -165,7 +164,8 @@ fun Application.configureRouting() {
 
                     "pipeline" -> {
                         val jsonPath = descriptionPath.replace('>', '/')
-                        call.respondText(JSONPipeline.getPipelineDescription(jsonPath).toString(), ContentType.Application.Json)
+                        val descriptionFile = File(serverContext.pipelinesRoot, jsonPath)
+                        call.respondText(JSONPipeline.getPipelineDescription(descriptionFile).toString(), ContentType.Application.Json)
                     }
                     "openEO" -> {
                         val file = updateYaml(descriptionPath)
@@ -182,7 +182,7 @@ fun Application.configureRouting() {
         }
 
         get("/pipeline/{descriptionPath}/get") {
-            val descriptionFile = File(pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
+            val descriptionFile = File(serverContext.pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
             if (descriptionFile.exists()) {
                 call.respondText(descriptionFile.readText(), ContentType.Application.Json)
             } else {
@@ -219,7 +219,7 @@ fun Application.configureRouting() {
                 if (singleScript)
                     if (descriptionPath.startsWith("openEO>")) scriptStubsRoot
                     else scriptsRoot
-                else pipelinesRoot,
+                else serverContext.pipelinesRoot,
                 descriptionPath.replace(FILE_SEPARATOR, '/')
             )
             if (!descriptionFile.exists()) {
@@ -441,7 +441,7 @@ fun Application.configureRouting() {
                 .replace("../", "") // Avoid any attempt to access outside of pipelines directory
                 .trim() // Remove trailing whitespaces
 
-            val file = File(pipelinesRoot, "$filename.json")
+            val file = File(serverContext.pipelinesRoot, "$filename.json")
             if (file.nameWithoutExtension.isEmpty()) {
                 call.respond(HttpStatusCode.BadRequest, "File name is empty.")
                 return@post
