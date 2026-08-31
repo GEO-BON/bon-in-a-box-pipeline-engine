@@ -84,9 +84,11 @@ biab_ensure_package <- function(pkg, version = NULL, installer, timeout_sec = 60
 
         wait_for_r_pkg_unlock(pkg, timeout_sec = timeout_sec, poll_sec = poll_sec)
         if (has_required_version()) {
+            print(sprintf("Package '%s' is installed and meets version requirements", pkg))
             return(invisible(TRUE))
         }
 
+        print(sprintf("Installing package '%s' (required version: %s)", pkg, ifelse(is.null(version), "any", version)))
         install_ok <- TRUE
         tryCatch(
             installer(),
@@ -95,6 +97,7 @@ biab_ensure_package <- function(pkg, version = NULL, installer, timeout_sec = 60
                 if (grepl("failed to lock directory|00LOCK", msg, ignore.case = TRUE)) {
                     install_ok <<- FALSE
                 } else {
+                    print("Done.")
                     stop(e)
                 }
             }
