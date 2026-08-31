@@ -22,18 +22,18 @@ import org.yaml.snakeyaml.Yaml
 import java.io.File
 
 class CWLFactory(val serverContext: ServerContext) {
-
     /**
      * Exports a BON in a Box step (such as a script) to a CWL CommandLineTool.
      * see https://www.commonwl.org/v1.0/CommandLineTool.html
      */
-    fun toCommandLineTool(step: ScriptStep): String {
+    fun toCommandLineTool(step: ScriptStep, runnerTag: String? = null): String {
 
         // Indent all lines except first
         val condaEnvYml = step.condaEnvYml?.prependIndent(indent(2))?.trimStart()
             ?: ""
 
         val replacements = mapOf<String, String>(
+            "docker-tag" to (runnerTag ?: "latest"),
             "scriptPath" to step.scriptFile.relativeTo(serverContext.scriptsRoot).path,
             "inputs" to toCWL(step.inputDefinitions, true),
             "inputsProperties" to generateInputProperties(step.inputDefinitions),
@@ -60,11 +60,12 @@ class CWLFactory(val serverContext: ServerContext) {
      * Exports a BON in a Box pipeline to a CWL workflow.
      * see https://www.commonwl.org/v1.0/Workflow.html
      */
-    fun toWorkflow(pipeline: Pipeline, destinationFile:File, commandLineToolsDir: File) {
+    fun toWorkflow(pipeline: Pipeline, destinationFile: File, commandLineToolsDir: File, runnerTag: String? = null) {
         commandLineToolsDir.mkdirs()
         destinationFile.parentFile.mkdirs()
 
         val replacements = mapOf(
+            "docker-tag" to (runnerTag ?: "latest"),
             "metadata" to metadataToCWL(pipeline.metadata),
             "inputs" to toCWL(pipeline.metadata.inputs, true),
             "outputs" to toCWL(pipeline.metadata.outputs, false, pipeline.outputs),
@@ -95,8 +96,8 @@ class CWLFactory(val serverContext: ServerContext) {
     private fun generateInputProperties(inputDefinitions: Map<String, IOMetadata>): String {
         return buildString {
             inputDefinitions.forEach { (key, definition) ->
-                if(definition.isFile()) {
-                    if(definition.isArray()) {
+                if (definition.isFile()) {
+                    if (definition.isArray()) {
                         appendLine(4, "$key: (inputs.$key || []).map(function(file) { return file.path; }),")
                     } else {
                         appendLine(4, "$key: inputs.$key ? inputs.$key.path : null,")
@@ -108,7 +109,11 @@ class CWLFactory(val serverContext: ServerContext) {
         }.trimEnd()
     }
 
-    private fun toCWL(definitions: Map<String, IOMetadata>, isInput: Boolean, outputPipes: Map<String, Output>? = null): String {
+    private fun toCWL(
+        definitions: Map<String, IOMetadata>,
+        isInput: Boolean,
+        outputPipes: Map<String, Output>? = null
+    ): String {
         return buildString {
             definitions.forEach { (key, value) ->
                 append(toCWL(key, value, isInput, outputPipes?.get(key)))
@@ -145,7 +150,7 @@ class CWLFactory(val serverContext: ServerContext) {
             }
 
             if (isInput) {
-                if(definition.example != null) {
+                if (definition.example != null) {
                     appendLine(exampleToCWL(2, definition.example))
                 }
 
@@ -378,7 +383,8 @@ class CWLFactory(val serverContext: ServerContext) {
         return buildString {
             val run: String = when (step) {
                 is ScriptStep -> {
-                    val exportFolder = File(commandLineToolsDir, step.yamlFile.parentFile.relativeTo(serverContext.scriptsRoot).path)
+                    val exportFolder =
+                        File(commandLineToolsDir, step.yamlFile.parentFile.relativeTo(serverContext.scriptsRoot).path)
                     exportFolder.mkdirs()
 
                     val exportFile = File(exportFolder, step.yamlFile.nameWithoutExtension + ".cwl")
@@ -403,10 +409,11 @@ class CWLFactory(val serverContext: ServerContext) {
             }
 
             step.metadata.conda?.let { condaMetadata ->
-                if(!condaMetadata.isBaseEnv()) {
+                if (!condaMetadata.isBaseEnv()) {
                     appendLine(3, "envFolder:")
                     appendLine(4, "source: prepareEnvironments/envFolder")
-                    appendLine(4,
+                    appendLine(
+                        4,
                         """valueFrom: "$(self ? { class: 'Directory', location: self.location + '/${condaMetadata.name}' } : null)""""
                     )
                     appendLine(3, "envFolderWritable:")
@@ -416,15 +423,17 @@ class CWLFactory(val serverContext: ServerContext) {
 
 
             val runFolder = step.id.toString()
-                .replace(">","__")
+                .replace(">", "__")
                 .replace(' ', '_')
                 .replace('@', '/')
                 .replace(".yml", "")
-            appendLine($$"""
+            appendLine(
+                $$"""
                 runFolder:
                   source: runFolder
                   valueFrom: "$(self ? { class: 'Directory', location: self.location + '/$$runFolder' } : null)"
-            """.replaceIndent(indent(3)))
+            """.replaceIndent(indent(3))
+            )
 
             val passedInputs = listOf("environment", "condaPackURL", "scripts_root")
             passedInputs.forEach {
@@ -494,14 +503,14 @@ class CWLFactory(val serverContext: ServerContext) {
                     "References:" +
                             references.joinToString("\n") {
                                 "\n${indent(2)}${it.text}" +
-                                "\n${indent(2)}${it.link}"
+                                        "\n${indent(2)}${it.link}"
                             })
             }
 
             if (docEntries.isNotEmpty()) {
                 appendLine("doc:")
                 docEntries.forEach { entry ->
-                    if(entry.contains('\n') || entry.contains('"')) {
+                    if (entry.contains('\n') || entry.contains('"')) {
                         appendLine("  - |")
                         appendLine(2, entry)
                     } else {

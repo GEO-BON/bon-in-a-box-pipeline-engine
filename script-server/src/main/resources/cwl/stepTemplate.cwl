@@ -73,7 +73,7 @@ requirements:
 
 
   DockerRequirement:
-    dockerPull: ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:cwl-poc
+    dockerPull: ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:{{docker-tag}}
     # dockerImageId: conda-cwl-runner-local
     # dockerFile:
     #     $include: ../runners/cwl/conda-cwl.dockerfile

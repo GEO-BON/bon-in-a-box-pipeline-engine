@@ -4,14 +4,14 @@ import org.geobon.hpc.HPC
 import org.geobon.k8s.K8sConnection
 import java.io.File
 
-class ServerContext(
+open class ServerContext(
     val hpc: HPC? = null,
     val k8s: K8sConnection? = null
 ) {
-    val pipelinesRoot
+    open val pipelinesRoot
         get() = File(System.getenv("PIPELINES_LOCATION"))
 
-    val scriptsRoot
+    open val scriptsRoot
         get() = File(System.getenv("SCRIPT_LOCATION"))
 
     init {
