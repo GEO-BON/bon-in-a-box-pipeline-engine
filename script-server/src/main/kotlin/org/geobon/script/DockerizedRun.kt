@@ -112,7 +112,7 @@ class DockerizedRun( // Constructor used in single script run
 
             log(logger::info, "Launching on ${container.containerName} container...")
             ProcessBuilder(command)
-                .directory(ServerContext.scriptsRoot)
+                .directory(context.serverContext.scriptsRoot)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectErrorStream(true) // Merges stderr into stdout
                 .start().also { process ->

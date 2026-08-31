@@ -1,14 +1,12 @@
 package org.geobon.cwl
 
-import org.geobon.cwl.CWLFactory.Companion.toWorkflow
-import org.geobon.cwl.CWLFactory.Companion.toCommandLineTool
 import org.geobon.pipeline.JSONPipeline
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.SystemCall
 import org.geobon.utils.assertMultilineEquals
 import org.geobon.utils.noHPCContext
+import org.geobon.utils.scriptsRoot
 import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -19,6 +17,7 @@ class CWLFactoryTest {
     private val cwlResources = File("src/test/resources/cwl")
     private val cwlScripts = File(scriptsRoot, "forCWL")
     private val pathToSteps = File(cwlResources,"commandLineTools")
+    private val cwlFactory = CWLFactory(noHPCContext)
 
     private val hasRunner = SystemCall().runBlocking(listOf("which", "cwl-runner")).success
 
@@ -49,7 +48,7 @@ class CWLFactoryTest {
 
     @Test
     fun `test single script with pythonbase Conda environment`() {
-        testSingleStep(File(File(scriptsRoot, "helloWorld"), "helloPython.yml"))
+        testSingleStep(File(File(noHPCContext.scriptsRoot, "helloWorld"), "helloPython.yml"))
     }
 
     @Test
@@ -107,7 +106,7 @@ class CWLFactoryTest {
     fun testSingleStep(yamlFile: File) {
         val stepName = yamlFile.nameWithoutExtension
         val step = ScriptStep(noHPCContext, yamlFile, StepId("step", "0"))
-        val result = toCommandLineTool(step)
+        val result = cwlFactory.toCommandLineTool(step)
 
         cwlFile = File(cwlResources, "${stepName}_gen.cwl").also { resultFile ->
             resultFile.writeText(result)
@@ -127,7 +126,7 @@ class CWLFactoryTest {
         )
 
         cwlFile = File(cwlResources, "${pipelineToTest}_gen.cwl").also { resultFile ->
-            toWorkflow(
+            cwlFactory.toWorkflow(
                 pipeline,
                 resultFile,
                 pathToSteps

@@ -8,7 +8,6 @@ import org.geobon.pipeline.JSONPipeline
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.SystemCall
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -66,7 +65,7 @@ object CWLExportMain {
             workflowsRoot.deleteRecursively()
         }
         runBlocking(Dispatchers.Default) {
-            exportAllFiles(toolsRoot, scriptsRoot, "script")
+            exportAllFiles(toolsRoot, serverContext.scriptsRoot, "script")
             exportAllFiles(workflowsRoot, serverContext.pipelinesRoot, "pipeline")
         }
 
@@ -91,7 +90,7 @@ object CWLExportMain {
 
         when (type) {
             "script" -> {
-                root = scriptsRoot
+                root = serverContext.scriptsRoot
                 extension = "yml"
             }
             "pipeline" -> {
@@ -108,6 +107,7 @@ object CWLExportMain {
         destinationFolder.mkdirs()
 
         coroutineScope {
+            val cwlFactory = CWLFactory(serverContext)
             directory.listFiles()?.forEach { file ->
                 launch(exportDispatcher) {
                     if (file.isDirectory) {
@@ -121,7 +121,7 @@ object CWLExportMain {
                                     "script" -> {
                                         scriptsFound++
                                         destinationFile.writeText(
-                                            CWLFactory.toCommandLineTool(
+                                            cwlFactory.toCommandLineTool(
                                                 ScriptStep(serverContext, file, StepId(file.nameWithoutExtension, "0"))
                                             )
                                         )
@@ -129,7 +129,7 @@ object CWLExportMain {
 
                                     "pipeline" -> {
                                         pipelinesFound++
-                                        CWLFactory.toWorkflow(
+                                        cwlFactory.toWorkflow(
                                             JSONPipeline.createFromFile(
                                                 serverContext,
                                                 StepId(file.nameWithoutExtension, "0"),

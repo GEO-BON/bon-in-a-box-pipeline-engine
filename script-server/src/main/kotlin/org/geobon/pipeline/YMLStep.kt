@@ -17,7 +17,6 @@ import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.Run
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -46,7 +45,7 @@ abstract class YMLStep(
         yamlParsed[LICENSE]?.toString(),
         yamlParsed[EXTERNAL_LINK]?.toString(),
         ReferenceMetadata.listFromRawMetadata(yamlParsed),
-        CondaMetadata.fromRawMetadata(yamlFile, yamlParsed),
+        CondaMetadata.fromRawMetadata(serverContext, yamlFile, yamlParsed),
         (yamlParsed[TIMEOUT] as? Int)?.minutes ?: DEFAULT_TIMEOUT
     )
 ) : Step(
@@ -178,7 +177,7 @@ abstract class YMLStep(
     }
 
     override fun toString(): String {
-        return "${javaClass.simpleName} (id=$id, name=\"${metadata.name}\", file=${yamlFile.relativeTo(scriptsRoot)})"
+        return "${javaClass.simpleName} (id=$id, name=\"${metadata.name}\", file=${yamlFile.relativeTo(serverContext.scriptsRoot)})"
     }
 
     companion object {
@@ -188,8 +187,8 @@ abstract class YMLStep(
          * @return the pipeline metadata as a deep map.
          * @see org.geobon.script.Description for return value structure
          */
-        fun getScriptDescription(relativePath: String): Map<String, Any> {
-            var scriptFile = File(scriptsRoot, relativePath)
+        fun getScriptDescription(serverContext: ServerContext, relativePath: String): Map<String, Any> {
+            var scriptFile = File(serverContext.scriptsRoot, relativePath)
 
             if (!scriptFile.exists()) {
                 scriptFile = File(scriptStubsRoot, relativePath)

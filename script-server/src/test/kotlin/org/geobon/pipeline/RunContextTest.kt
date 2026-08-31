@@ -2,9 +2,9 @@ package org.geobon.pipeline
 
 import com.google.gson.reflect.TypeToken
 import io.kotest.extensions.system.withEnvironment
-import org.geobon.server.ServerContext
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.noHPCContext
+import org.geobon.utils.scriptsRoot
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
@@ -32,7 +32,7 @@ internal class RunContextTest {
 
     @Test
     fun givenSameInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdSame() {
-        val someFile = File(ServerContext.scriptsRoot, "someFile")
+        val someFile = File(scriptsRoot, "someFile")
         val inputs1 = "{AAA:000, aaa:111, bbb:222, BBB:333}"
         val inputs2 = "{BBB:333, bbb:222, aaa:111, AAA:000}"
 
@@ -47,7 +47,7 @@ internal class RunContextTest {
 
     @Test
     fun givenDeepObjectInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdSame() {
-        val someFile = File(ServerContext.scriptsRoot, "someFile")
+        val someFile = File(scriptsRoot, "someFile")
         val inputs1 = """{"polygon_type":"Country or region","country_region_bbox":{"bbox":[23.17834,51.26219,32.77689,56.17223],"CRS":{"name":"WGS 84","authority":"EPSG","code":4326,"proj4Def":"+proj=longlat +datum=WGS84 +no_defs +type=crs","wktDef":"GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]","unit":"degree (supplier to define representation)","CRSBboxWGS84":[-180,-90,180,90]},"country":{"englishName":"Belarus","ISO3":"BLR","bboxWGS84":[23.17833709716797,51.26219177246094,32.776885986328125,56.17222595214844]},"region":null},"buffer":0}"""
         val inputs2 = """{"buffer":0,"polygon_type":"Country or region","country_region_bbox":{"bbox":[23.17834,51.26219,32.77689,56.17223],"CRS":{"name":"WGS 84","authority":"EPSG","code":4326,"proj4Def":"+proj=longlat +datum=WGS84 +no_defs +type=crs","wktDef":"GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]","unit":"degree (supplier to define representation)","CRSBboxWGS84":[-180,-90,180,90]},"country":{"englishName":"Belarus","ISO3":"BLR","bboxWGS84":[23.17833709716797,51.26219177246094,32.776885986328125,56.17222595214844]},"region":null}}"""
 
@@ -62,7 +62,7 @@ internal class RunContextTest {
 
     @Test
     fun givenSameInputs_whenTheOrderOfEntriesIsSame_thenRunIdSame() {
-        val someFile = File(ServerContext.scriptsRoot, "someFile")
+        val someFile = File(scriptsRoot, "someFile")
         val inputs1 = "{AAA:000, aaa:111, bbb:222, BBB:333}"
         val inputs2 = "{AAA:000, aaa:111, bbb:222, BBB:333}"
 
@@ -74,7 +74,7 @@ internal class RunContextTest {
 
     @Test
     fun givenDifferentDeepObjectInputs_whenTheOrderOfEntriesIsDifferent_thenRunIdDifferent() {
-        val someFile = File(ServerContext.scriptsRoot, "someFile")
+        val someFile = File(scriptsRoot, "someFile")
         val inputs1 = """{"polygon_type":"Country or region","country_region_bbox":{"bbox":[23.17834,51.26219,32.77689,56.17223],"CRS":{"name":"WGS 84","authority":"EPSG","code":4326,"proj4Def":"+proj=longlat +datum=WGS84 +no_defs +type=crs","wktDef":"GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]","unit":"degree (supplier to define representation)","CRSBboxWGS84":[-180,-90,180,90]},"country":{"englishName":"Belarus","ISO3":"BLR","bboxWGS84":[23.17833709716797,51.26219177246094,32.776885986328125,56.17222595214844]},"region":null},"buffer":0}"""
         val inputs2 = """{"polygon_type":"Country or region","country_region_bbox":{"bbox":[23,51,32,56],"CRS":{"name":"WGS 84","authority":"EPSG","code":4326,"proj4Def":"+proj=longlat +datum=WGS84 +no_defs +type=crs","wktDef":"GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]]","unit":"degree (supplier to define representation)","CRSBboxWGS84":[-180,-90,180,90]},"country":{"englishName":"Belarus","ISO3":"BLR","bboxWGS84":[23.17833709716797,51.26219177246094,32.776885986328125,56.17222595214844]},"region":null},"buffer":0}"""
 
@@ -86,7 +86,7 @@ internal class RunContextTest {
 
     @Test
     fun givenDifferentInputs_whenTheOrderOfEntriesIsSame_thenRunIdDifferent() {
-        val someFile = File(ServerContext.scriptsRoot, "someFile")
+        val someFile = File(scriptsRoot, "someFile")
         val inputs1 = "{AAA:000, aaa:111, bbb:222, BBB:333}"
         val inputs2 = "{AAA:000, aaa:999, bbb:222, BBB:333}"
 
@@ -136,7 +136,7 @@ internal class RunContextTest {
 
     @Test
     fun givenScriptHasRun_whenGettingEnvironment_thenDependenciesAreRead() {
-        val someFile = File(ServerContext.scriptsRoot, "someFile")
+        val someFile = File(scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val run = TestRunContext(someFile, inputs1)
         run.outputFolder.mkdirs()
@@ -151,7 +151,7 @@ internal class RunContextTest {
 
     @Test
     fun givenRunContext_whenCreateEnvironmentFile_thenFileExistsAndContainsEnvInfo() {
-        val someFile = File(ServerContext.scriptsRoot, "someFile")
+        val someFile = File(scriptsRoot, "someFile")
         val inputs1 = "{aaa:111, bbb:222}"
         val run = TestRunContext(someFile, inputs1)
         run.outputFolder.mkdirs()

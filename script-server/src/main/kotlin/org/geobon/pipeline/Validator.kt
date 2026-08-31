@@ -53,7 +53,7 @@ object Validator {
                     val fakeInputs = generateInputFromExamples(pipelineJSON)
 
                     // Run validation
-                    createRootPipeline(ServerContext(), file, fakeInputs.toString(2))
+                    createRootPipeline(serverContext, file, fakeInputs.toString(2))
                     println("$file: OK")
                 } catch (e: Exception) {
                     errorMessages += "${file.relativeTo(serverContext.pipelinesRoot)}:\n\t${e.message}\n"

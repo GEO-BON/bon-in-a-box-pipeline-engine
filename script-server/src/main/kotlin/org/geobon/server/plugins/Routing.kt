@@ -16,7 +16,6 @@ import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -74,12 +73,12 @@ fun Application.configureRouting() {
                 }
 
                 "script" -> {
-                    roots = listOf(scriptsRoot, scriptStubsRoot)
+                    roots = listOf(serverContext.scriptsRoot, scriptStubsRoot)
                     extension = "yml"
                 }
 
                 "openEO" -> {
-                    val openEOFile = scriptsRoot.resolve("externalScripts.yaml")
+                    val openEOFile = serverContext.scriptsRoot.resolve("externalScripts.yaml")
                     val udpList = mutableMapOf<String, String>()
                     if (openEOFile.exists()) {
                         val yaml = Yaml().load<Map<String, Any>>(openEOFile.readText())
@@ -159,7 +158,7 @@ fun Application.configureRouting() {
                         val ymlPath = descriptionPath
                             .replace('>', '/')
                             .replace(Regex("""\.\w+$"""), ".yml")
-                        call.respond(YMLStep.getScriptDescription(ymlPath))
+                        call.respond(YMLStep.getScriptDescription(serverContext, ymlPath))
                     }
 
                     "pipeline" -> {
@@ -168,7 +167,7 @@ fun Application.configureRouting() {
                         call.respondText(JSONPipeline.getPipelineDescription(descriptionFile).toString(), ContentType.Application.Json)
                     }
                     "openEO" -> {
-                        val file = updateYaml(descriptionPath)
+                        val file = updateYaml(serverContext, descriptionPath)
                         call.respond(Yaml().load(file.readText()))
                     }
                 }
@@ -218,7 +217,7 @@ fun Application.configureRouting() {
             val descriptionFile = File(
                 if (singleScript)
                     if (descriptionPath.startsWith("openEO>")) scriptStubsRoot
-                    else scriptsRoot
+                    else serverContext.scriptsRoot
                 else serverContext.pipelinesRoot,
                 descriptionPath.replace(FILE_SEPARATOR, '/')
             )

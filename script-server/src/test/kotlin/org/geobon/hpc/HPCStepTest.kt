@@ -10,9 +10,9 @@ import org.geobon.pipeline.*
 import org.geobon.script.ScriptType
 import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.createMockHPCContext
+import org.geobon.utils.scriptsRoot
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

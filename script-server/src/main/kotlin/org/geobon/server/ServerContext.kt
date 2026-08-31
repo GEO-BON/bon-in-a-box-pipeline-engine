@@ -8,15 +8,19 @@ class ServerContext(
     val hpc: HPC? = null,
     val k8s: K8sConnection? = null
 ) {
-
     val pipelinesRoot
         get() = File(System.getenv("PIPELINES_LOCATION"))
 
-    companion object {
-        // Using a getter allows to change the value of these environment variables in tests
-        val scriptsRoot
-            get() = File(System.getenv("SCRIPT_LOCATION"))
+    val scriptsRoot
+        get() = File(System.getenv("SCRIPT_LOCATION"))
 
+    init {
+        hpc?.connection?.allowSyncPaths(listOf(scriptsRoot, scriptStubsRoot, outputRoot))
+    }
+
+    companion object {
+        // Using a getter allows to change the value of these environment variables more easily in tests
+        // TODO: should we transfer all these static variables to the object?
         val scriptStubsRoot
             get() = File(System.getenv("SCRIPT_STUBS_LOCATION"))
 
