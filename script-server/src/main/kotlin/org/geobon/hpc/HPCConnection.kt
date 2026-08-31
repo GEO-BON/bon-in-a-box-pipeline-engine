@@ -137,7 +137,7 @@ class HPCConnection(
                         scriptsStatus.state = RemoteSetupState.PREPARING
                         scriptsStatus.message = null
 
-                        syncFiles(File(scriptStubsRoot, "system").listFiles().asList())
+                        File(scriptStubsRoot, "system").listFiles()?.asList()?.let { syncFiles(it) }
 
                         // Create other mount endpoints
                         // and dummy runner.env file (we might need a real one in the future, but this just removes the "not found" warnings)

@@ -121,7 +121,7 @@ class DockerizedRun( // Constructor used in single script run
                         // if the user cancels or if timeout delay expires.
                         val watchdog = launch {
                             try {
-                                delay(timeout.toLong(DurationUnit.MILLISECONDS))
+                                delay(timeout)
                                 throw TimeoutException("Timeout occurred after $timeout")
 
                             } catch (ex: Exception) {

@@ -205,7 +205,7 @@ internal class HPCStepTest {
             e.printStackTrace()
         }
 
-        val outputFolder = File(outputRoot, "HPCSyncTest").listFiles()[0]
+        val outputFolder = File(outputRoot, "HPCSyncTest").listFiles()!![0]
         coVerify {
             connection.syncFiles(
                 match {

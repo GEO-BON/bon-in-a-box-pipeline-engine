@@ -22,6 +22,7 @@ import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 
 class HPCConnectionTest {
 
@@ -137,7 +138,7 @@ class HPCConnectionTest {
                         break
                 }
 
-                delay(100)
+                delay(100.milliseconds)
             }
 
             client.get("/hpc/status").apply {
@@ -327,7 +328,7 @@ class HPCConnectionTest {
                 HPCRequirements("8G", 4, 1.hours)
             )
 
-            val sBatchList = outputRoot.listFiles { _, name -> name.endsWith(".sbatch") }
+            val sBatchList = outputRoot.listFiles { _, name -> name.endsWith(".sbatch") }!!
             assertEquals(1, sBatchList.size)
             val sBatchFile = sBatchList.first()
             val sBatchContent = sBatchFile.readText()

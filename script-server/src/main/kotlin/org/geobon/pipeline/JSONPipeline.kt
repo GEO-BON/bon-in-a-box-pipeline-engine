@@ -17,7 +17,6 @@ import java.io.File
 import java.io.FileNotFoundException
 
 class JSONPipeline (
-    serverContext: ServerContext,
     id: StepId,
     debugName: String,
     /** Node id to Step */
@@ -236,7 +235,6 @@ class JSONPipeline (
             }
 
             return JSONPipeline(
-                serverContext,
                 stepId,
                 debugName,
                 steps,
