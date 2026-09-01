@@ -6,12 +6,11 @@ import io.mockk.mockk
 import io.mockk.runs
 import org.geobon.hpc.HPC
 import org.geobon.hpc.HPCConnection
-import org.geobon.pipeline.Validator.serverContext
 import org.geobon.server.ServerContext
 
 val noHPCContext = ServerContext()
 
-val scriptsRoot = serverContext.scriptsRoot
+val scriptsRoot = noHPCContext.scriptsRoot
 
 fun createMockHPCContext (): ServerContext {
     return ServerContext(mockk<HPC>().also { hpc ->
