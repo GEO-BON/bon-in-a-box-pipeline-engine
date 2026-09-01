@@ -133,27 +133,35 @@ object CWLExportMain {
             exitProcess(1)
         }
 
+        logger.info("Removing previous results...")
+        toolsRoot = File(destinationRoot, "tools")
+        if (toolsRoot.exists()) {
+            toolsRoot.deleteRecursively()
+        }
+        val workflowsRoot = File(destinationRoot, "workflows")
+        if (workflowsRoot.exists()) {
+            workflowsRoot.deleteRecursively()
+        }
+        val workflowsPackedRoot = File(destinationRoot, "workflows-packed")
+        if(workflowsPackedRoot.exists()) {
+            workflowsPackedRoot.deleteRecursively()
+        }
+
         runBlocking(Dispatchers.Default) {
             logger.info("Exporting BON in a Box scripts to CWL CommandLineTools...")
-            toolsRoot = File(destinationRoot, "tools")
-            if (toolsRoot.exists()) {
-                toolsRoot.deleteRecursively()
-            }
-            exportAllFiles("script", serverContext.scriptsRoot, toolsRoot)
+            measureTime {
+                exportAllFiles("script", serverContext.scriptsRoot, toolsRoot)
+            }.also { time -> logger.info("Done in $time.") }
 
             logger.info("Exporting BON in a Box pipelines to CWL Workflows...")
-            val workflowsRoot = File(destinationRoot, "workflows")
-            if (workflowsRoot.exists()) {
-                workflowsRoot.deleteRecursively()
-            }
-            exportAllFiles("pipeline", serverContext.pipelinesRoot, workflowsRoot)
+            measureTime {
+                exportAllFiles("pipeline", serverContext.pipelinesRoot, workflowsRoot)
+            }.also { time -> logger.info("Done in $time.") }
 
-            logger.info("Packing CWL workflows")
-            val workflowsPackedRoot = File(destinationRoot, "workflows-packed")
-            if(workflowsPackedRoot.exists()) {
-                workflowsPackedRoot.deleteRecursively()
-            }
-            packAllWorkflows(workflowsRoot, workflowsPackedRoot)
+            logger.info("Packing CWL workflows...")
+            measureTime {
+                packAllWorkflows(workflowsRoot, workflowsPackedRoot)
+            }.also { time -> logger.info("Done in $time.") }
         }
 
         if (cwlRunnerAvailable) {
