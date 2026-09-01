@@ -227,7 +227,7 @@ function useLocalPack {
             echo "    Unpacking..."
             mamba activate base || return 1
             $condaPackExtracted/bin/conda-unpack || return 1
-            mamba deactivate # base    
+            mamba deactivate # base
 
             echo "    Done."
         fi
