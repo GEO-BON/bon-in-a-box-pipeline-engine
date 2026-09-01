@@ -251,9 +251,10 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         isInput: Boolean
     ): String {
         return buildString {
+            val cwlKey = if(isInput) key else "$key$OUTPUT_SUFFIX"
             appendLine(
                 """
-                  $key:
+                  $cwlKey:
                     label: ${definition.label}
                 """.replaceIndent(indent(1))
             )
