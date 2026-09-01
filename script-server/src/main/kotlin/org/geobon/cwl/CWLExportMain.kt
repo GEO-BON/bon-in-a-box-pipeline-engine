@@ -181,7 +181,7 @@ object CWLExportMain {
         destinationFolder.mkdirs()
 
         coroutineScope {
-            val cwlFactory = CWLFactory(serverContext)
+            val cwlFactory = CWLFactory(serverContext, runnerTag)
             currentDirectory.listFiles()?.forEach { file ->
                 launch(exportDispatcher) {
                     if (file.isDirectory) {
@@ -196,8 +196,7 @@ object CWLExportMain {
                                         scriptsFound++
                                         destinationFile.writeText(
                                             cwlFactory.toCommandLineTool(
-                                                ScriptStep(serverContext, file, StepId(file.nameWithoutExtension, "0")),
-                                                runnerTag
+                                                ScriptStep(serverContext, file, StepId(file.nameWithoutExtension, "0"))
                                             )
                                         )
                                     }
@@ -211,8 +210,7 @@ object CWLExportMain {
                                                 file.relativeTo(sourceRoot).path
                                             ),
                                             destinationFile,
-                                            toolsRoot,
-                                            runnerTag
+                                            toolsRoot
                                         )
                                     }
                                 }

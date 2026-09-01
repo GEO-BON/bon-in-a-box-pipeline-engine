@@ -17,7 +17,7 @@ class CWLFactoryTest {
     private val cwlResources = File("src/test/resources/cwl")
     private val cwlScripts = File(scriptsRoot, "forCWL")
     private val pathToSteps = File(cwlResources,"commandLineTools")
-    private val cwlFactory = CWLFactory(noHPCContext)
+    private val cwlFactory = CWLFactory(noHPCContext, "someTag")
 
     private val hasRunner = SystemCall().runBlocking(listOf("which", "cwl-runner")).success
 

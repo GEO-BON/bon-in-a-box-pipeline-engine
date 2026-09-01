@@ -21,12 +21,12 @@ import org.json.JSONWriter
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 
-class CWLFactory(val serverContext: ServerContext) {
+class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null) {
     /**
      * Exports a BON in a Box step (such as a script) to a CWL CommandLineTool.
      * see https://www.commonwl.org/v1.0/CommandLineTool.html
      */
-    fun toCommandLineTool(step: ScriptStep, runnerTag: String? = null): String {
+    fun toCommandLineTool(step: ScriptStep): String {
 
         // Indent all lines except first
         val condaEnvYml = step.condaEnvYml?.prependIndent(indent(2))?.trimStart()
@@ -60,7 +60,7 @@ class CWLFactory(val serverContext: ServerContext) {
      * Exports a BON in a Box pipeline to a CWL workflow.
      * see https://www.commonwl.org/v1.0/Workflow.html
      */
-    fun toWorkflow(pipeline: Pipeline, destinationFile: File, commandLineToolsDir: File, runnerTag: String? = null) {
+    fun toWorkflow(pipeline: Pipeline, destinationFile: File, commandLineToolsDir: File) {
         commandLineToolsDir.mkdirs()
         destinationFile.parentFile.mkdirs()
 
