@@ -61,7 +61,7 @@ object CWLExportMain {
                 https://github.com/GEO-BON/bon-in-a-box-pipelines/pkgs/container/bon-in-a-box-pipelines%2Frunner-conda-cwl
             """.trimIndent()
             )
-            exitProcess(1)
+            exitProcess(0)
         }
 
         if (args.size < 2 || args[1].isBlank()) {
