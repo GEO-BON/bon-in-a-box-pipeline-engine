@@ -90,7 +90,7 @@ object CWLExportMain {
                         See available tags at https://github.com/GEO-BON/bon-in-a-box-pipelines/pkgs/container/bon-in-a-box-pipelines%2Frunner-conda-cwl
                     """.trimIndent()
                 )
-                return
+                exitProcess(1)
             }
 
 
@@ -114,7 +114,7 @@ object CWLExportMain {
                         Failed to extract scripts and pipelines.
                     """.trimIndent()
                 )
-                return
+                exitProcess(1)
             }
 
             serverContext = object : ServerContext() {
