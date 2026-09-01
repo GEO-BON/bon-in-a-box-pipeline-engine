@@ -157,13 +157,13 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [the_same]
+    out: [the_same_out]
 
 
 outputs:
-  assertArray.yml@0|the_same:
+  assertArray.yml@0|the_same_out:
     type: int[]
     label: Same value
     doc: The same array as in the inputs. But this crashes if not an array
-    outputSource: assertArray.yml@0/the_same
+    outputSource: assertArray.yml@0/the_same_out
 
