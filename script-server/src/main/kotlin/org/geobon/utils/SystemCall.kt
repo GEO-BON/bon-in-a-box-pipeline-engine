@@ -36,8 +36,11 @@ open class SystemCall {
         timeoutUnit: TimeUnit = TimeUnit.SECONDS,
         mergeErrors: Boolean = false,
         logger: Logger? = null,
-        logFile: File? = null
+        logFile: File? = null,
+        echo:Boolean = false
     ): CallResult {
+        if (echo) logger?.debug(call.joinToString(" "))
+
         var inputString = ""
         var errorString = ""
         return coroutineScope {
@@ -48,33 +51,26 @@ open class SystemCall {
                     .redirectErrorStream(mergeErrors) // Merges stderr into stdout
                     .start()
 
-                val fileOutputJob = logFile?.let {
-                    launch {
-                        try {
-                            while (true) { // Breaks when input's readLine returns null
-                                process.inputReader().readLine()?.let {
-                                    logFile.appendText("$it\n")
-                                    inputString += "$it\n"
-                                } ?: break
-                            }
-                        } catch (ex: IOException) {
-                            if (ex.message != "Stream closed") // This is normal when cancelling the script
-                                logger?.trace(ex.message)
+                val outputJob = launch {
+                    try {
+                        process.inputReader().forEachLine {
+                            inputString += "$it\n"
+                            logFile?.appendText("$it\n")
                         }
+                    } catch (ex: IOException) {
+                        if (ex.message != "Stream closed") // This is normal when cancelling the script
+                            logger?.trace(ex.message)
                     }
-
-                    launch {
-                        try {
-                            while (true) { // Breaks when error's readLine returns null
-                                process.errorReader().readLine()?.let {
-                                    logFile.appendText("$it\n")
-                                    errorString += "$it\n"
-                                } ?: break
-                            }
-                        } catch (ex: IOException) {
-                            if (ex.message != "Stream closed") // This is normal when cancelling the script
-                                logger?.trace(ex.message)
+                }
+                val errorJob = if (mergeErrors) null else launch {
+                    try {
+                        process.errorReader().forEachLine {
+                            errorString += "$it\n"
+                            logFile?.appendText("$it\n")
                         }
+                    } catch (ex: IOException) {
+                        if (ex.message != "Stream closed") // This is normal when cancelling the script
+                            logger?.trace(ex.message)
                     }
                 }
 
@@ -88,9 +84,10 @@ open class SystemCall {
                         process.destroyForcibly()
                     }
                 }
-                fileOutputJob?.join()
+                outputJob.join()
+                errorJob?.join()
 
-                // Read the rest (when read continuously), or read it all (when no log file)
+                // Read the rest (we sometimes missed the end of the logs)
                 // Checking ready avoids exceptions when stream has been closed.
                 process.inputReader().apply {
                     if (ready()) inputString += readText().also { logFile?.appendText(it) }
