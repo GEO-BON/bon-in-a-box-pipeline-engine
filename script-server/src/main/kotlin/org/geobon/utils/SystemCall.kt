@@ -87,15 +87,6 @@ open class SystemCall {
                 outputJob.join()
                 errorJob?.join()
 
-                // Read the rest (we sometimes missed the end of the logs)
-                // Checking ready avoids exceptions when stream has been closed.
-                process.inputReader().apply {
-                    if (ready()) inputString += readText().also { logFile?.appendText(it) }
-                }
-                process.errorReader().apply {
-                    if (ready()) errorString += readText().also { logFile?.appendText(it) }
-                }
-
                 CallResult(process.exitValue(), inputString, errorString)
             } catch (ex: Exception) {
                 ex.printStackTrace()
