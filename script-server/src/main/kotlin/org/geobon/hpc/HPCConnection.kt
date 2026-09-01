@@ -6,7 +6,6 @@ import org.geobon.script.ScriptType
 import org.geobon.server.RemoteSetup
 import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.SystemCall
 import org.geobon.utils.runBlocking
@@ -33,6 +32,8 @@ class HPCConnection(
     val apptainerVersion: String = System.getenv("HPC_APPTAINER_VERSION").let {
         if(it.isNullOrBlank()) "" else "/$it"
     }
+
+    private val allowedSyncPaths = mutableListOf<File>()
 
     val sshCommand: List<String>?
 
@@ -136,7 +137,7 @@ class HPCConnection(
                         scriptsStatus.state = RemoteSetupState.PREPARING
                         scriptsStatus.message = null
 
-                        syncFiles(File(scriptStubsRoot, "system").listFiles().asList())
+                        File(scriptStubsRoot, "system").listFiles()?.asList()?.let { syncFiles(it) }
 
                         // Create other mount endpoints
                         // and dummy runner.env file (we might need a real one in the future, but this just removes the "not found" warnings)
@@ -300,11 +301,15 @@ class HPCConnection(
         )
     }
 
+    /**
+     * Explicitly allow these folders to be used as source paths for sync calls
+     */
+    fun allowSyncPaths(sourceFolders: List<File>) {
+        allowedSyncPaths.addAll(sourceFolders)
+    }
+
     private fun validatePath(file: File, logFile: File?): Boolean {
-        if (file.startsWith(outputRoot)
-            || file.startsWith(scriptsRoot)
-            || file.startsWith(scriptStubsRoot)
-        ) {
+        if (allowedSyncPaths.any { file.startsWith(it) }) {
             if (file.exists()) {
                 return true
             } else {
@@ -329,9 +334,8 @@ class HPCConnection(
         withContext(Dispatchers.IO) {
             var filesString = ""
             files.forEach { file ->
-                filesString = filesString +
-                        if (validatePath(file, logFile)) file.absolutePath + "\n"
-                        else ""
+                filesString += if (validatePath(file, logFile)) file.absolutePath + "\n"
+                else ""
             }
             filesString = filesString.trim()
 
@@ -503,7 +507,7 @@ class HPCConnection(
         }
 
         withContext(Dispatchers.IO) {
-            var callResult = systemCall.runBlocking(
+            val callResult = systemCall.runBlocking(
                 sshCommand + command,
                 timeoutAmount = timeoutMinutes, timeoutUnit = MINUTES, logger = logger,
                 logFile = logFile

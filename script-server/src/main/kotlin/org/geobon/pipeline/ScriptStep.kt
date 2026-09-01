@@ -7,7 +7,6 @@ import org.geobon.script.*
 import org.geobon.script.Description.COMPUTE
 import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.fromSlurm
 import java.io.File
 import kotlin.time.Duration
@@ -34,7 +33,7 @@ open class ScriptStep : YMLStep {
         inputs: MutableMap<String, Pipe> = mutableMapOf()
     ) : this(
         serverContext,
-        File(scriptsRoot, fileName),
+        File(serverContext.scriptsRoot, fileName),
         stepId,
         inputs
     )
@@ -53,7 +52,7 @@ open class ScriptStep : YMLStep {
             return "Description file not found: ${yamlFile.path}"
 
         if (!scriptFile.exists()) {
-            return "Script file not found: ${scriptFile.relativeTo(scriptsRoot)}\n"
+            return "Script file not found: ${scriptFile.relativeTo(serverContext.scriptsRoot)}\n"
         }
 
         return ""

@@ -4,7 +4,7 @@ import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
 import org.geobon.script.Description.SCRIPT
 import org.geobon.script.ScriptType
-import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.geobon.server.ServerContext
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 
@@ -15,11 +15,11 @@ data class CondaMetadata(
     fun isBaseEnv() = name == "rbase" || name == "pythonbase"
 
     companion object {
-        fun fromRawMetadata(yamlFile: File, rawMetadata: Map<String, Any>): CondaMetadata? {
+        fun fromRawMetadata(serverContext: ServerContext, yamlFile: File, rawMetadata: Map<String, Any>): CondaMetadata? {
             // If available, return specific environment for script
             if (rawMetadata.containsKey(CONDA)) {
                 rawMetadata[CONDA]?.let { condaSection ->
-                    val condaEnvName = yamlFile.relativeTo(scriptsRoot).path
+                    val condaEnvName = yamlFile.relativeTo(serverContext.scriptsRoot).path
                         .replace("/", "__")
                         .replace(' ', '_')
                         .removeSuffix(".yml")

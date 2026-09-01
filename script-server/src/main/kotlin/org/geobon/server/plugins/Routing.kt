@@ -15,9 +15,7 @@ import org.geobon.pipeline.*
 import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
@@ -70,17 +68,17 @@ fun Application.configureRouting() {
             val extension: String
             when (type) {
                 "pipeline" -> {
-                    roots = listOf(pipelinesRoot)
+                    roots = listOf(serverContext.pipelinesRoot)
                     extension = "json"
                 }
 
                 "script" -> {
-                    roots = listOf(scriptsRoot, scriptStubsRoot)
+                    roots = listOf(serverContext.scriptsRoot, scriptStubsRoot)
                     extension = "yml"
                 }
 
                 "openEO" -> {
-                    val openEOFile = scriptsRoot.resolve("externalScripts.yaml")
+                    val openEOFile = serverContext.scriptsRoot.resolve("externalScripts.yaml")
                     val udpList = mutableMapOf<String, String>()
                     if (openEOFile.exists()) {
                         val yaml = Yaml().load<Map<String, Any>>(openEOFile.readText())
@@ -160,15 +158,16 @@ fun Application.configureRouting() {
                         val ymlPath = descriptionPath
                             .replace('>', '/')
                             .replace(Regex("""\.\w+$"""), ".yml")
-                        call.respond(YMLStep.getScriptDescription(ymlPath))
+                        call.respond(YMLStep.getScriptDescription(serverContext, ymlPath))
                     }
 
                     "pipeline" -> {
                         val jsonPath = descriptionPath.replace('>', '/')
-                        call.respondText(JSONPipeline.getPipelineDescription(jsonPath).toString(), ContentType.Application.Json)
+                        val descriptionFile = File(serverContext.pipelinesRoot, jsonPath)
+                        call.respondText(JSONPipeline.getPipelineDescription(descriptionFile).toString(), ContentType.Application.Json)
                     }
                     "openEO" -> {
-                        val file = updateYaml(descriptionPath)
+                        val file = updateYaml(serverContext, descriptionPath)
                         call.respond(Yaml().load(file.readText()))
                     }
                 }
@@ -182,7 +181,7 @@ fun Application.configureRouting() {
         }
 
         get("/pipeline/{descriptionPath}/get") {
-            val descriptionFile = File(pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
+            val descriptionFile = File(serverContext.pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
             if (descriptionFile.exists()) {
                 call.respondText(descriptionFile.readText(), ContentType.Application.Json)
             } else {
@@ -218,8 +217,8 @@ fun Application.configureRouting() {
             val descriptionFile = File(
                 if (singleScript)
                     if (descriptionPath.startsWith("openEO>")) scriptStubsRoot
-                    else scriptsRoot
-                else pipelinesRoot,
+                    else serverContext.scriptsRoot
+                else serverContext.pipelinesRoot,
                 descriptionPath.replace(FILE_SEPARATOR, '/')
             )
             if (!descriptionFile.exists()) {
@@ -441,7 +440,7 @@ fun Application.configureRouting() {
                 .replace("../", "") // Avoid any attempt to access outside of pipelines directory
                 .trim() // Remove trailing whitespaces
 
-            val file = File(pipelinesRoot, "$filename.json")
+            val file = File(serverContext.pipelinesRoot, "$filename.json")
             if (file.nameWithoutExtension.isEmpty()) {
                 call.respond(HttpStatusCode.BadRequest, "File name is empty.")
                 return@post

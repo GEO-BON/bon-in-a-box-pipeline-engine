@@ -3,19 +3,21 @@ package org.geobon.pipeline
 import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
 import org.geobon.script.Description.IO__EXAMPLE
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.json.JSONObject
 import java.io.File
 import kotlin.system.exitProcess
 
 
 object Validator {
+
+    val serverContext = ServerContext()
+
     /**
      * An alternative main to validate all pipelines
      */
     @JvmStatic
     fun main(args: Array<String>) {
-        val errors = validateAllPipelines(pipelinesRoot)
+        val errors = validateAllPipelines(serverContext.pipelinesRoot)
         if (errors.isBlank()) {
             println("Pipeline validation passed.")
         } else {
@@ -51,10 +53,10 @@ object Validator {
                     val fakeInputs = generateInputFromExamples(pipelineJSON)
 
                     // Run validation
-                    createRootPipeline(ServerContext(), file, fakeInputs.toString(2))
+                    createRootPipeline(serverContext, file, fakeInputs.toString(2))
                     println("$file: OK")
                 } catch (e: Exception) {
-                    errorMessages += "${file.relativeTo(pipelinesRoot)}:\n\t${e.message}\n"
+                    errorMessages += "${file.relativeTo(serverContext.pipelinesRoot)}:\n\t${e.message}\n"
                     println("$file: FAILED")
                 }
             }

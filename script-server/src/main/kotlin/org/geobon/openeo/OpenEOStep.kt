@@ -43,7 +43,6 @@ import org.geobon.script.Description.OUTPUTS
 import org.geobon.script.Description.SCRIPT
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.jetbrains.annotations.VisibleForTesting
 import org.json.JSONArray
 import org.json.JSONObject
@@ -63,9 +62,9 @@ class OpenEOStep: ScriptStep {
     constructor(
         udpKey: String,
         stepId: StepId,
-        serverContext: ServerContext = ServerContext(),
+        serverContext: ServerContext,
         inputs: MutableMap<String, Pipe> = mutableMapOf()
-    ) : super(serverContext, updateYaml(udpKey), stepId, inputs)
+    ) : super(serverContext, updateYaml(serverContext, udpKey), stepId, inputs)
 
     init {
         // Fetching wrapper script to run openEO
@@ -85,7 +84,7 @@ class OpenEOStep: ScriptStep {
         private val logger: Logger = LoggerFactory.getLogger("Server")
         private val openEOFolder = File(scriptStubsRoot, "openEO")
 
-        fun updateYaml(udpKey: String): File {
+        fun updateYaml(serverContext: ServerContext, udpKey: String): File {
             val options = DumperOptions()
             options.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
             val yamlFile = File(openEOFolder, "$udpKey.yml")
@@ -93,7 +92,7 @@ class OpenEOStep: ScriptStep {
                 yamlFile.parentFile.mkdirs()
 
                 try {
-                    yamlFile.writeText(Yaml(options).dump(getOpenEODescription(udpKey)))
+                    yamlFile.writeText(Yaml(options).dump(getOpenEODescription(serverContext, udpKey)))
                 } catch (e: Exception) {
                     logger.error("Error: ${e.message}")
                 }
@@ -101,8 +100,8 @@ class OpenEOStep: ScriptStep {
             return yamlFile
         }
 
-        fun getOpenEODescription(key: String): Map<String, Any> {
-            val sourceFile = File(scriptsRoot, "externalScripts.yaml")
+        fun getOpenEODescription(serverContext: ServerContext, key: String): Map<String, Any> {
+            val sourceFile = File(serverContext.scriptsRoot, "externalScripts.yaml")
             if (!sourceFile.exists()) throw FileNotFoundException("externalScripts.yaml not found")
 
             val yaml = Yaml()
@@ -363,7 +362,7 @@ class OpenEOStep: ScriptStep {
                 .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
 
         private fun mapType(type: String, subtype: String?): String {
-            if (subtype == UDP__INPUT__BOUNDING_BOX) return "crsBbox"
+            if (subtype == UDP__INPUT__BOUNDING_BOX) return "crsBBox"
 
             return when (Pair(type, subtype)) {
                 Pair("integer", null) -> "int"

@@ -8,17 +8,22 @@ import org.geobon.pipeline.JSONPipeline
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.pipelinesRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.SystemCall
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.util.concurrent.TimeUnit
+import kotlin.io.path.createTempDirectory
+import kotlin.io.path.pathString
 import kotlin.system.exitProcess
-import kotlin.text.replace
 import kotlin.time.measureTime
 
 object CWLExportMain {
+
+    lateinit var serverContext: ServerContext
+    lateinit var destinationRoot: File
+    lateinit var toolsRoot: File
+    var runnerTag: String? = null
 
     private val logger: Logger = LoggerFactory.getLogger("CWLExport")
     private val cwlRunnerAvailable = SystemCall().runBlocking(listOf("which", "cwl-runner")).success
@@ -31,8 +36,6 @@ object CWLExportMain {
     var pipelineFailures = 0
     @Volatile
     var pipelinesFound = 0
-    lateinit var destinationRoot: File
-    lateinit var toolsRoot: File
 
     // Each export/validation spawns external cwl-runner processes; unbounded parallelism
     // would cause cwl-runner calls to time out (killed with SIGTERM, exit 143).
@@ -43,15 +46,88 @@ object CWLExportMain {
      */
     @JvmStatic
     fun main(args: Array<String>) {
-        if (args.isEmpty()) {
-            println("Usage: java -cp biab-script-server.jar org.geobon.cwl.CWLExportMain <outputFolder>")
-            println("The following environment variables need to be defined: ")
-            println("SCRIPT_LOCATION, SCRIPT_STUBS_LOCATION, PIPELINES_LOCATION, USERDATA_LOCATION, OUTPUT_LOCATION")
-            exitProcess(1)
+        if (args.isEmpty() || args.contains("-h") || args.contains("--help")) {
+            println(
+                """
+                Usage: java -cp biab-script-server.jar org.geobon.cwl.CWLExportMain OUTPUT_FOLDER [CWL_RUNNER_TAG]
+                
+                The following environment variables need to be defined: 
+                SCRIPT_LOCATION, SCRIPT_STUBS_LOCATION, PIPELINES_LOCATION, USERDATA_LOCATION, OUTPUT_LOCATION
+                
+                OUTPUT_FOLDER is the path towards the folder where the exported CWL files will be created.
+                
+                CWL_RUNNER_TAG is the tag of the docker image containing the scripts that will be exported.
+                This ensures scripts and CWL export match to avoid CWL failure. Tags can be found in the GitHub archive:
+                https://github.com/GEO-BON/bon-in-a-box-pipelines/pkgs/container/bon-in-a-box-pipelines%2Frunner-conda-cwl
+            """.trimIndent()
+            )
+            exitProcess(0)
         }
 
-        logger.info("Starting CWL export")
+        if (args.size < 2 || args[1].isBlank()) {
+            logger.warn("No CWL runner tag supplied.")
+            logger.warn("Assuming that you are a developer testing CWL export.")
+            logger.warn("The results of this export should not be used in production!")
 
+            serverContext = ServerContext()
+
+        } else {
+            runnerTag = args[1]
+            logger.info("Retrieving CWL runner ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:$runnerTag...")
+            var result = SystemCall().runBlocking(
+                listOf("docker", "pull", "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:$runnerTag"),
+                logger = logger,
+                mergeErrors = true,
+                timeoutAmount = 10,
+                timeoutUnit = TimeUnit.MINUTES
+            )
+
+            if (!result.success) {
+                logger.debug(result.output)
+                logger.error(
+                    """
+                        Failed to pull from GitHub's docker registry.
+                        See available tags at https://github.com/GEO-BON/bon-in-a-box-pipelines/pkgs/container/bon-in-a-box-pipelines%2Frunner-conda-cwl
+                    """.trimIndent()
+                )
+                exitProcess(1)
+            }
+
+
+            logger.info("Extracting pipelines and scripts...")
+            val tempDir = createTempDirectory("biab-pipelines")
+            result = SystemCall().runBlocking(
+                listOf(
+                    "docker", "run", "--rm", "-v", "${tempDir.pathString}:/out",
+                    "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:$runnerTag",
+                    "cp", "-r", "--dereference", "/scripts", "/pipelines", "/out/"
+                ),
+                logger = logger,
+                mergeErrors = true,
+                timeoutAmount = 1,
+                timeoutUnit = TimeUnit.MINUTES
+            )
+            if (!result.success) {
+                logger.debug(result.output)
+                logger.error(
+                    """
+                        Failed to extract scripts and pipelines.
+                    """.trimIndent()
+                )
+                exitProcess(1)
+            }
+
+            serverContext = object : ServerContext() {
+                override val pipelinesRoot
+                    get() = File(tempDir.pathString, "pipelines")
+
+                override val scriptsRoot
+                    get() = File(tempDir.pathString, "scripts")
+            }
+        }
+
+
+        logger.info("Starting CWL export")
         destinationRoot = File(args[0])
         destinationRoot.mkdirs()
         if (!destinationRoot.exists()) {
@@ -67,8 +143,8 @@ object CWLExportMain {
             workflowsRoot.deleteRecursively()
         }
         runBlocking(Dispatchers.Default) {
-            exportAllFiles(toolsRoot, scriptsRoot, "script")
-            exportAllFiles(workflowsRoot, pipelinesRoot, "pipeline")
+            exportAllFiles("script", serverContext.scriptsRoot, toolsRoot)
+            exportAllFiles("pipeline", serverContext.pipelinesRoot, workflowsRoot)
         }
 
         if (cwlRunnerAvailable) {
@@ -86,34 +162,30 @@ object CWLExportMain {
     }
 
     // Type should either be "script" or "pipeline"
-    suspend fun exportAllFiles(destinationRoot: File, directory: File, type: String) {
-        val root: File
-        val extension: String
-
-        when (type) {
-            "script" -> {
-                root = scriptsRoot
-                extension = "yml"
-            }
-            "pipeline" -> {
-                root = pipelinesRoot
-                extension = "json"
-            }
+    suspend fun exportAllFiles(
+        type: String,
+        sourceRoot: File,
+        destinationRoot: File,
+        currentDirectory: File = sourceRoot
+    ) {
+        val extension = when (type) {
+            "script" -> "yml"
+            "pipeline" -> "json"
             else -> {
                 logger.warn("Wrong type was passed to exportAllFiles() function.")
                 return
             }
         }
 
-        val serverContext = ServerContext()
-        val destinationFolder = File(destinationRoot, directory.relativeTo(root).path)
+        val destinationFolder = File(destinationRoot, currentDirectory.relativeTo(sourceRoot).path)
         destinationFolder.mkdirs()
 
         coroutineScope {
-            directory.listFiles()?.forEach { file ->
+            val cwlFactory = CWLFactory(serverContext, runnerTag)
+            currentDirectory.listFiles()?.forEach { file ->
                 launch(exportDispatcher) {
                     if (file.isDirectory) {
-                        exportAllFiles(destinationRoot, file, type)
+                        exportAllFiles(type, sourceRoot, destinationRoot, file)
 
                     } else if (file.extension == extension) {
                         val destinationFile = File(destinationFolder, "${file.nameWithoutExtension}.cwl")
@@ -123,7 +195,7 @@ object CWLExportMain {
                                     "script" -> {
                                         scriptsFound++
                                         destinationFile.writeText(
-                                            CWLFactory.toCommandLineTool(
+                                            cwlFactory.toCommandLineTool(
                                                 ScriptStep(serverContext, file, StepId(file.nameWithoutExtension, "0"))
                                             )
                                         )
@@ -131,11 +203,11 @@ object CWLExportMain {
 
                                     "pipeline" -> {
                                         pipelinesFound++
-                                        CWLFactory.toWorkflow(
+                                        cwlFactory.toWorkflow(
                                             JSONPipeline.createFromFile(
                                                 serverContext,
                                                 StepId(file.nameWithoutExtension, "0"),
-                                                file.relativeTo(root).path
+                                                file.relativeTo(sourceRoot).path
                                             ),
                                             destinationFile,
                                             toolsRoot
@@ -179,6 +251,10 @@ object CWLExportMain {
 
                         } catch (e: Exception) {
                             logger.warn("Error exporting ${file.path}", e)
+                            when (type) {
+                                "script" -> scriptFailures++
+                                "pipeline" -> pipelineFailures++
+                            }
                         }
                     }
                 }
