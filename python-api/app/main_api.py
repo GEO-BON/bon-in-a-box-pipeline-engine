@@ -76,6 +76,55 @@ def regions_list(country_iso:str):
     json_str = names.to_json(orient='records')
     return Response(content=json_str, media_type='application/json')
 
+@app.get("/region/country_region_bbox")
+def country_region_bbox(type: str = 'country', id: str = "", crs: str = 'EPSG:4326', output_format: str = 'bbox'):
+    if type == 'country':
+        reg = ddb.sql("SELECT *, ST_AsText(geometry) AS geom FROM read_parquet(?) WHERE adm0_src=?", params=[countries_parquet, id]).df()
+        if( reg.empty ):
+            raise HTTPException(status_code=404, detail="Country ID not found")
+    elif type == 'region':
+        reg = ddb.sql("SELECT *, ST_AsText(geometry) AS geom FROM read_parquet(?) WHERE adm1_src=?", params=[regions_parquet, id]).df()
+        if( reg.empty ):
+            raise HTTPException(status_code=404, detail="Region ID not found")
+        country = ddb.sql("SELECT adm0_src, geometry_bbox FROM read_parquet(?) WHERE adm0_src=?", params=[countries_parquet, reg["adm0_src"].iloc[0]]).df()
+    else:
+        raise HTTPException(status_code=400, detail="Invalid type parameter. Must be 'country' or 'region'.")
+
+    gs = gpd.GeoSeries.from_wkt(reg["geom"], crs="EPSG:4326")
+    del reg["geom"]
+    gdf = gpd.GeoDataFrame(reg, geometry=gs, crs="EPSG:4326")
+    gdf = gdf.to_crs(crs)
+    bbox = gdf.total_bounds
+    if output_format == 'bbox':
+        return {"bbox": bbox.tolist(), "crs": crs}
+    elif output_format == 'chooser_input':
+        if(type=='country'):
+            country_bb4326 = reg["geometry_bbox"].iloc[0]
+        elif(type=='region'):
+            region_bb4326 = reg["geometry_bbox"].iloc[0]
+            country_bb4326 = country["geometry_bbox"].iloc[0]
+        return {"CRS": 
+                {"CRSBboxWGS84": "", 
+                 "authority": crs.split(':')[0], 
+                 "code": crs.split(':')[1], 
+                 "proj4Def": gdf.crs.to_proj4(), 
+                 "unit": gdf.crs.axis_info[0].unit_name, 
+                 "wktDef": gdf.crs.to_wkt()},
+                 "bbox": bbox.tolist(),
+                 "country": {
+                     "ISO3": reg["adm0_src"].iloc[0], 
+                     "englishName": reg["adm0_name"].iloc[0], 
+                     "bboxWGS84": [country_bb4326["xmin"], country_bb4326["ymin"], country_bb4326["xmax"], country_bb4326["ymax"]]},
+                 "region": type=='region' and {
+                     "ISO3": reg["adm1_src"].iloc[0],
+                     "englishName": reg["adm1_name"].iloc[0],
+                     "bboxWGS84": [region_bb4326["xmin"], region_bb4326["ymin"], region_bb4326["xmax"], region_bb4326["ymax"]]
+                 } or {}
+        }
+    else:
+        raise HTTPException(status_code=400, detail="Invalid output_format parameter. Must be 'bbox' or 'chooser_input'.")
+
+
 @app.get("/region/geometry")
 def region_geometry(type: str = 'country', id: str = ""):
     if type == 'country':
@@ -312,9 +361,15 @@ app.include_router(fm_router)
 # own: it forwards whatever `messages` the client sends. So the guidance has to
 # ride in as messages[0] from the UI, and the UI has to get it from somewhere.
 #
-# Serving it here keeps it single-sourced with the MCP server's own copies of
-# these files (mcp-server/*.md) rather than duplicating the text into the React
-# bundle, where it would drift the first time anyone edited the guide.
+# Serving it here keeps it single-sourced with the MCP server's own copy of the
+# file (mcp-server/assistant-role.md) rather than duplicating the text into the
+# React bundle, where it would drift the first time anyone edited it.
+#
+# It used to be three files concatenated -- the role, a full API guide and a
+# documentation guide, about 5.7 KB in every request. That is now one routing
+# table of a dozen lines: the procedure for each kind of question lives in
+# mcp-server/modes/ and reaches the model as the result of its `start_task` call,
+# so a conversation carries the one procedure it needs instead of all five.
 ASSISTANT_PROMPT_DIR = Path(__file__).parent / "mcp-server"
 
 # The guides address services by the names they answer to INSIDE the compose network.
@@ -355,12 +410,7 @@ def assistant_prompt(request: Request):
         proto = request.headers.get("x-forwarded-proto", "https")
         origin = f"{proto}://{forwarded_host}"
 
-    parts = [
-        _read_prompt_part("assistant-role.md"),
-        "## API GUIDE\n" + _read_prompt_part("api-guide.md"),
-        "## PLATFORM DOCUMENTATION\n" + _read_prompt_part("documentation.md"),
-    ]
-    prompt = "\n\n".join(p for p in parts if p.strip())
+    prompt = _read_prompt_part("assistant-role.md")
     for internal in _INTERNAL_ORIGINS:
         prompt = prompt.replace(internal, origin)
     return {"prompt": prompt}

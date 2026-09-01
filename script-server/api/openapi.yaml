@@ -546,6 +546,62 @@ paths:
                     }
         "404":
           description: Country ID not found
+  /region/country_region_bbox:
+    get:
+      summary: Bounding box of a country or region, or the selector object a bboxCRS input takes
+      description: |
+        With `output_format=chooser_input`, returns the object that a `bboxCRS`,
+        `country`, `countryRegion`, `countryRegionCRS` or `CRS` input takes. Use what it
+        returns unchanged as that input's value.
+      operationId: getCountryRegionBbox
+      parameters:
+        - name: type
+          in: query
+          description: Whether `id` names a country (adm0) or a subnational region (adm1)
+          required: false
+          schema:
+            type: string
+            enum: [country, region]
+            default: country
+          example: country
+        - name: id
+          in: query
+          description: A code, not a name. ISO3 for a country (Colombia is COL), adm1_src for a region.
+          required: true
+          schema:
+            type: string
+          example: COL
+        - name: crs
+          in: query
+          description: CRS the bounding box is expressed in.
+          required: false
+          schema:
+            type: string
+            default: "EPSG:4326"
+        - name: output_format
+          in: query
+          description: |
+            `chooser_input` for the whole selector object, to fill in an input. `bbox` for
+            only the four numbers.
+          required: false
+          schema:
+            type: string
+            enum: [bbox, chooser_input]
+            default: bbox
+          example: chooser_input
+      responses:
+        "200":
+          description: |
+            The bounding box and its CRS, or -- with `output_format=chooser_input` -- the
+            selector object, whose `region` is empty when `type` is `country`.
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Invalid type or output_format parameter
+        "404":
+          description: Country or region ID not found
   /region/geometry:
     get:
       summary: Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format

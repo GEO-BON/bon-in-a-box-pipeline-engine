@@ -9,15 +9,16 @@ docs we already publish.
 Two things it does on top of that:
 
 - Splits long sections into passages. "Step 3: Create a YAML file" is 15k characters,
-  about as much as the chat model's whole context window (see ui/src/components/chat,
-  num_ctx 16384). Returning it whole would be useless, and truncating it from the top
-  would return the wrong part -- the input type table sits near the end. So sections
-  are scored and returned by passage.
+  more than the whole context window the chat model is given (see
+  ui/src/components/chat). Returning it whole would be useless, and truncating it from
+  the top would return the wrong part -- the input type table sits near the end. So
+  sections are scored and returned by passage.
 
 - Scores with BM25 rather than term counts, because that same size spread would
-  otherwise let the two 15k sections win every query on length alone.
+  otherwise let the two 15k sections win every query on length alone. The scoring lives
+  in bm25.py, shared with step_search.py.
 
-Kept out of server.py so that file stays about the OpenAPI toolset, and so this can be
+Kept out of server.py so that file stays about the toolset, and so this can be
 exercised without standing up an MCP server:
 
     python docs_search.py "what does bboxCRS mean"
@@ -25,11 +26,11 @@ exercised without standing up an MCP server:
 
 import html
 import json
-import math
 import os
-import re
 import sys
 from collections import Counter
+
+import bm25
 
 # Where the docs are published. Results cite it so the user can open the full page --
 # the assistant only ever sees the excerpt.
@@ -58,55 +59,10 @@ DEFAULT_MAX_RESULTS = 3
 # all three with consecutive passages of "Step 4". Two from one section is enough to
 # establish it, and the third slot is better spent on a section that disagrees.
 MAX_PER_SECTION = 2
-# Roughly 1.5k tokens. The chat model has 16k of context to hold the system prompt, the
-# conversation, and every other tool result in the turn; this is as much as doc search
-# can fairly claim of it.
+# Roughly 1.5k tokens. The chat model holds the router prompt, the mode playbook, the
+# conversation and every other tool result of the turn in the same window; this is as
+# much as doc search can fairly claim of it.
 DEFAULT_CHAR_BUDGET = 6000
-
-K1 = 1.5
-# Below BM25's usual 0.75. Passages are already cut to a target size, so the length
-# spread this term exists to correct is mostly gone, and at 0.75 it was rewarding what
-# remained of it -- the short leftover passage at the end of a section. "What does
-# bboxCRS mean" ranked a trailing fragment above the paragraph that defines the term.
-B = 0.5
-
-_TOKEN_RE = re.compile(r"[a-z0-9]+")
-
-# BM25 down-weights common words by how many documents contain them, which is enough
-# on a normal corpus and is not enough here: across 93 short passages, "what" and "i"
-# score a *higher* inverse document frequency than "bboxCRS". A natural question then
-# ranks on its question words -- "what does bboxCRS mean" returned the peer review
-# instructions -- so the function words come out before scoring rather than after.
-#
-# Deliberately absent: "mean", which in this domain is an aggregation method, and
-# "type", "input", "run" and "file", which are the platform's own vocabulary.
-_STOPWORDS = frozenset(
-    """
-    a about all also am an and any are as at be because been but by can could did do
-    does doing done for from get give had has have he her here how i if in into is it
-    its just me might more most my need no not of on one or other our out over please
-    said same see shall she should so some such than that the their them then there
-    these they this those to too us very want was way we were what when where which
-    while who why will with would you your
-    """.split()
-)
-
-
-def _tokenize(text):
-    """Lowercase alphanumeric runs, minus stopwords, crudely singularised.
-
-    The depluralisation is wrong as often as it is right ("selectors" -> "selector"
-    but "process" -> "proces"), which does not matter: it is applied to the query and
-    the corpus alike, so both sides land on the same wrong stem and still match.
-    """
-    tokens = []
-    for token in _TOKEN_RE.findall(text.lower()):
-        if token in _STOPWORDS:
-            continue
-        if len(token) > 3 and token.endswith("s") and not token.endswith("ss"):
-            token = token[:-1]
-        tokens.append(token)
-    return tokens
 
 
 def _split_passages(text):
@@ -155,67 +111,39 @@ def _unique_sections(entries):
 
 
 class _Passage:
-    __slots__ = ("heading", "url", "text", "freqs", "length")
+    __slots__ = ("heading", "url", "text")
 
-    def __init__(self, heading, url, text, tokens):
+    def __init__(self, heading, url, text):
         self.heading = heading
         self.url = url
         self.text = text
-        self.freqs = Counter(tokens)
-        self.length = len(tokens)
 
 
 class DocsIndex:
     """A searchable view of the Quarto index. Empty is a valid, non-fatal state."""
 
     def __init__(self, entries):
-        self.passages = []
+        self.index = bm25.Bm25Index()
         for entry, text in _unique_sections(entries):
             title = (entry.get("title") or "").strip()
             section = (entry.get("section") or "").strip()
             heading = " > ".join(part for part in (title, section) if part)
             href = (entry.get("href") or "").lstrip("/")
             url = f"{DOCS_BASE_URL}/{href}" if href else DOCS_BASE_URL
-            heading_tokens = _tokenize(heading) * HEADING_WEIGHT
+            heading_tokens = bm25.tokenize(heading) * HEADING_WEIGHT
             for passage in _split_passages(text):
-                self.passages.append(
-                    _Passage(heading, url, passage, heading_tokens + _tokenize(passage))
+                self.index.add(
+                    _Passage(heading, url, passage),
+                    heading_tokens + bm25.tokenize(passage),
                 )
-
-        self.avg_length = (
-            sum(p.length for p in self.passages) / len(self.passages)
-            if self.passages
-            else 0.0
-        )
-
-        doc_freq = Counter()
-        for passage in self.passages:
-            doc_freq.update(passage.freqs.keys())
-        total = len(self.passages)
-        # Floored at zero: with a corpus this small, a term in more than half the
-        # passages ("the", "pipeline") gets a negative weight from the textbook
-        # formula, which would actively penalise passages for containing it.
-        self.idf = {
-            term: max(0.0, math.log(1 + (total - n + 0.5) / (n + 0.5)))
-            for term, n in doc_freq.items()
-        }
+        self.index.finalize()
 
     def __len__(self):
-        return len(self.passages)
-
-    def _score(self, passage, query_tokens):
-        score = 0.0
-        for term in query_tokens:
-            freq = passage.freqs.get(term)
-            if not freq:
-                continue
-            norm = 1 - B + B * (passage.length / self.avg_length)
-            score += self.idf.get(term, 0.0) * (freq * (K1 + 1)) / (freq + K1 * norm)
-        return score
+        return len(self.index)
 
     def search(self, query, max_results=DEFAULT_MAX_RESULTS, char_budget=DEFAULT_CHAR_BUDGET):
         """Ranked passages as text ready to hand to a model, or a plain explanation."""
-        if not self.passages:
+        if not len(self.index):
             return (
                 "The documentation index is not available on this server, so the "
                 "documentation cannot be searched. Answer from the API and from the "
@@ -223,7 +151,7 @@ class DocsIndex:
                 "documentation is at " + DOCS_BASE_URL + "/ ."
             )
 
-        query_tokens = _tokenize(query or "")
+        query_tokens = bm25.tokenize(query or "")
         if not query_tokens:
             return (
                 "That query has no searchable terms in it -- it is all common words. "
@@ -231,8 +159,7 @@ class DocsIndex:
                 "an input type name or a feature of the platform."
             )
 
-        scored = [(self._score(p, query_tokens), p) for p in self.passages]
-        scored = [pair for pair in scored if pair[0] > 0]
+        scored = self.index.rank(query_tokens)
         if not scored:
             return (
                 f"Nothing in the BON in a Box documentation matches {query!r}. The "
@@ -241,7 +168,6 @@ class DocsIndex:
                 "describe individual scripts, whose inputs are documented by their "
                 "own metadata."
             )
-        scored.sort(key=lambda pair: pair[0], reverse=True)
 
         selected, per_section = [], Counter()
         for _, passage in scored:

@@ -126,10 +126,9 @@ def prepare(declared, inputs):
             "SENT EMPTY, and these decide what the run is actually about: "
             + ", ".join(f"`{key}` ({kind})" for key, kind in selectors)
             + ". A run with these empty is very unlikely to be the one the user asked "
-            "for. They take an object, not a name -- `search_documentation` for "
-            "\"selectors\" gives the shape, and `get_run_report` on an earlier run of "
-            "this pipeline gives a filled-in one to copy. Say so rather than "
-            "presenting the run as if it matched the request."
+            "for. They take an object, not a name -- `getCountryRegionBbox` with "
+            "`output_format=chooser_input` returns exactly that object for a country or "
+            "region. Say so rather than presenting the run as if it matched the request."
         )
     return body, notes
 
@@ -143,9 +142,9 @@ def launch_summary(step_type, run_id, notes):
     token budget that round is the one the answer needed. Ending on the links puts the
     thing to be reported where the run id used to have a note sitting after it.
 
-    The rule against relaunching lives in api-guide.md too, but that is read once at the
-    top of a conversation and this is read at the only moment it is ever tempting to
-    break -- the same argument as the input keys in this file's opening.
+    The rule against relaunching lives in modes/execute.md too, but that is read once at
+    the top of the turn and this is read at the only moment it is ever tempting to break
+    -- the same argument as the input keys in this file's opening.
     """
     step_path, _, run_hash = run_id.rpartition(">")
     lines = []
