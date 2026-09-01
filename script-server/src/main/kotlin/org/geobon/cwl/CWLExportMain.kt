@@ -237,27 +237,7 @@ object CWLExportMain {
 
                             val validationDuration = measureTime {
                                 if (validateCWL(destinationFile)) {
-                                    val templateResult = SystemCall().runBlocking(
-                                        listOf("cwl-runner", "--make-template", destinationFile.absolutePath),
-                                        timeoutAmount = 10
-                                    )
-
-                                    if (templateResult.success) {
-                                        val templateFile =
-                                            File(
-                                                destinationFile.parentFile,
-                                                "${file.nameWithoutExtension}_template.yml"
-                                            )
-
-                                        templateFile.writeText(
-                                            templateResult.output.replace(
-                                                Regex("""file://[\w/-]*/(tools|workflows)/"""),
-                                                """https://raw.githubusercontent.com/GEO-BON/bon-in-a-box-pipelines-cwl/refs/heads/main/$1/"""
-                                            )
-                                        )
-                                    } else {
-                                        logger.warn("Failed to create template for ${destinationFile.path}")
-                                    }
+                                    makeTemplate(destinationFile)
 
                                 } else {
                                     when (type) {
@@ -278,6 +258,30 @@ object CWLExportMain {
                     }
                 }
             }
+        }
+    }
+
+    fun makeTemplate(cwlFile: File) {
+        val templateResult = SystemCall().runBlocking(
+            listOf("cwl-runner", "--make-template", cwlFile.absolutePath),
+            timeoutAmount = 10
+        )
+
+        if (templateResult.success) {
+            val templateFile =
+                File(
+                    cwlFile.parentFile,
+                    "${cwlFile.nameWithoutExtension}_template.yml"
+                )
+
+            templateFile.writeText(
+                templateResult.output.replace(
+                    Regex("""file://[\w/-]*/(tools|workflows)/"""),
+                    """https://raw.githubusercontent.com/GEO-BON/bon-in-a-box-pipelines-cwl/refs/heads/main/$1/"""
+                )
+            )
+        } else {
+            logger.warn("Failed to create template for ${cwlFile.path}")
         }
     }
 
@@ -317,11 +321,11 @@ object CWLExportMain {
                     } else if (file.extension == extension) {
                         val logFile = File(file.parentFile, "${file.nameWithoutExtension}_validation.log")
                         if (logFile.exists()) {
-                            logger.debug("Skipping invalid CWL file {}", file.relativeTo(workflowsRoot))
+                            logger.trace("Skipping invalid CWL file {}", file.relativeTo(workflowsRoot))
                             return@launch
                         }
 
-                        logger.debug("Packing {}", file.relativeTo(workflowsRoot))
+                        logger.trace("Packing {}", file.relativeTo(workflowsRoot))
                         val result = SystemCall().run(
                             listOf("cwl-runner", "--pack", file.absolutePath),
                             timeoutAmount = 30,
