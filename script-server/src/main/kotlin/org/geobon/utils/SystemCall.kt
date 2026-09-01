@@ -51,7 +51,7 @@ open class SystemCall {
                     .redirectErrorStream(mergeErrors) // Merges stderr into stdout
                     .start()
 
-                val outputJob = launch {
+                val outputJob = launch(Dispatchers.IO) {
                     try {
                         process.inputReader().forEachLine {
                             inputString += "$it\n"
@@ -62,7 +62,7 @@ open class SystemCall {
                             logger?.trace(ex.message)
                     }
                 }
-                val errorJob = if (mergeErrors) null else launch {
+                val errorJob = if (mergeErrors) null else launch(Dispatchers.IO) {
                     try {
                         process.errorReader().forEachLine {
                             errorString += "$it\n"
