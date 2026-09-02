@@ -279,7 +279,7 @@ object CWLExportMain {
 
             templateFile.writeText(
                 templateResult.output.replace(
-                    Regex("""file://[\w/-]*/(tools|workflows)/"""),
+                    Regex("""file://[\w/-]*/(tools|workflows|workflows-packed)/"""),
                     """https://raw.githubusercontent.com/GEO-BON/bon-in-a-box-pipelines-cwl/refs/heads/main/$1/"""
                 )
             )
