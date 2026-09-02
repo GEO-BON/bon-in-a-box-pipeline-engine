@@ -11,7 +11,14 @@ const PROMPT_URL = import.meta.env.VITE_CHAT_PROMPT_URL || "/assistant/prompt";
 // Must name a model already resident in the shared Ollama. That instance runs with
 // OLLAMA_MAX_LOADED_MODELS=1, so asking for a different tag evicts the resident one
 // on every alternation and destroys latency for everything else using it.
-const MODEL_NAME = import.meta.env.VITE_CHAT_MODEL || "qwen3.5:9b";
+//
+// `-ctx` is a Modelfile variant of qwen3.5:9b with the context size baked in, preloaded
+// and pinned -- `ollama ps` reports it as UNTIL: Forever. This default used to be the
+// bare `qwen3.5:9b`, which is a DIFFERENT tag, so every message evicted the pinned
+// 9.2 GB model, loaded the other one, and left whatever pins `-ctx` to swap it back.
+// That is what the long pause before the assistant started thinking actually was: not
+// prefill, and not the size of the prompt, but a model swap around every turn.
+const MODEL_NAME = import.meta.env.VITE_CHAT_MODEL || "qwen3.5:9b-ctx";
 
 // Strip tool-call JSON blocks and bridge-injected "Assistant:" prefixes that leak
 // through when the model emits tool calls as plain text instead of using Ollama's
@@ -100,13 +107,20 @@ export default function Chat() {
         body: JSON.stringify({
           model: MODEL_NAME,
           stream: true,
+          // Sampling parameters only. num_ctx and num_batch are LOAD-time settings:
+          // asking for values that differ from how the resident model was loaded makes
+          // Ollama stand up a new runner, which means reloading 9.2 GB -- the same cost
+          // as naming the wrong model, arrived at a different way. They were set here to
+          // 16384 and 64; the context size now comes from the pinned `-ctx` model itself
+          // (see MODEL_NAME), which is the only place that can set it without a reload.
+          //
+          // num_batch was also eight times below Ollama's default of 512, which slows
+          // prefill on its own by splitting the prompt into far more forward passes.
           options: {
-            num_ctx: 16384,
-            num_batch: 64,
             // Ollama's default is -1: generate until the model emits a stop token or
             // the context window is full. A reasoning model that never leaves its
-            // reasoning has neither, so an unbounded turn grinds through all 16384
-            // tokens and then hits nginx's 600s read timeout with nothing to show.
+            // reasoning has neither, so an unbounded turn grinds through the whole
+            // context and then hits nginx's 600s read timeout with nothing to show.
             // This is per generation, and the bridge runs one per tool-call round, so
             // it bounds a runaway round without shortening a legitimate answer.
             num_predict: 2048,
