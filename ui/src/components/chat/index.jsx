@@ -107,6 +107,19 @@ export default function Chat() {
         body: JSON.stringify({
           model: MODEL_NAME,
           stream: true,
+          // Ollama unloads an idle model after 5 minutes, and the next request pays
+          // 9.2 GB of reload before its first token -- during which the stream carries
+          // no bytes at all. On a busy shared host that silence can outlast nginx's 600s
+          // read timeout, and the turn dies mid-flight with nothing to show for it. Since
+          // a conversation is a handful of turns separated by however long the user takes
+          // to read an answer, the 5-minute default expires constantly, which is a good
+          // part of why the assistant fails at random rather than consistently.
+          //
+          // This only asks; the host decides. Another model loaded by someone else can
+          // still evict this one, so it narrows the window rather than closing it -- the
+          // bridge patch in mcp-bridge/sitecustomize.py is what makes the eviction
+          // survivable when it does happen.
+          keep_alive: "60m",
           // Sampling parameters only. num_ctx and num_batch are LOAD-time settings:
           // asking for values that differ from how the resident model was loaded makes
           // Ollama stand up a new runner, which means reloading 9.2 GB -- the same cost

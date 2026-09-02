@@ -58,6 +58,29 @@ services:
       - "8002"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    # Watches 8002, the MCP server, because that is what mcp-bridge has to find. The
+    # bridge connects once in its lifespan hook and never retries: lose that race and it
+    # comes up with zero tools and stays that way until it is restarted, which reads to
+    # the user as an assistant that has forgotten how to do anything. startup.sh
+    # backgrounds the MCP server behind titiler and builds its toolset from the OpenAPI
+    # spec, so it is reliably the last of the three to listen -- hence the long
+    # start_period, during which failures do not count against retries.
+    #
+    # 406 is the MCP app refusing a bare GET, which is the answer we want: it proves the
+    # right server is listening, so the check only needs curl to reach it, not to be
+    # given a status it likes.
+    #
+    # This does make the container report unhealthy if the MCP server dies, which
+    # startup.sh deliberately treats as non-fatal. Nothing acts on that: only
+    # mcp-bridge's depends_on reads this condition, gateway keeps the short form and
+    # starts regardless, and compose does not restart on unhealthy. The tiler, the
+    # region API and the file manager go on serving exactly as before.
+    healthcheck:
+      test: ["CMD", "curl", "-s", "-o", "/dev/null", "http://localhost:8002/mcp"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
 
   runner-conda:
     container_name: biab-runner-conda
@@ -141,7 +164,10 @@ services:
       # here at interpreter startup.
       PYTHONPATH: /biab-patches
     depends_on:
-      - python-api
+      # Not the short form: it waits for the container to start, not for the MCP server
+      # inside it to listen, and the bridge only ever tries to connect once.
+      python-api:
+        condition: service_healthy
 
 secrets:
   hpc_ssh_key:
