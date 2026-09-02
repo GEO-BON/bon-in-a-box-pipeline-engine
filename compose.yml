@@ -118,6 +118,7 @@ services:
       - /app/mcp-servers.json
     volumes:
       - ./mcp-bridge/mcp-servers.json:/app/mcp-servers.json:ro
+      - ./mcp-bridge/sitecustomize.py:/biab-patches/sitecustomize.py:ro
     expose:
       - "8000"
     extra_hosts:
@@ -127,6 +128,11 @@ services:
       # Ollama serialises requests (OLLAMA_NUM_PARALLEL=1), so a turn can sit in a
       # queue before it even starts. Must stay >= the gateway's proxy_read_timeout.
       OLLAMA_PROXY_TIMEOUT: 600000
+      # Keeps a tool name the model invented from killing the whole chat turn. The
+      # bridge raises on an unknown name from inside the streaming response, which
+      # reaches the user as "Error in input stream" with the answer half written --
+      # see mcp-bridge/sitecustomize.py, which `site` imports from here at startup.
+      PYTHONPATH: /biab-patches
     depends_on:
       - python-api
 
