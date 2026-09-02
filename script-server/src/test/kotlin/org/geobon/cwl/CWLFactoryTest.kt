@@ -11,6 +11,7 @@ import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 
 class CWLFactoryTest {
 
@@ -82,7 +83,7 @@ class CWLFactoryTest {
             val validationResult = SystemCall().runBlocking(
                 listOf("cwl-runner", "--validate", cwlFile.absolutePath),
                 mergeErrors = true,
-                timeoutAmount = 10
+                timeout = 10.seconds
             )
             println(validationResult.output)
             assertTrue(validationResult.success, "CWL Validation failed")
@@ -95,7 +96,7 @@ class CWLFactoryTest {
             val validationResult = SystemCall().runBlocking(
                 listOf("cwl-runner", "--make-template", cwlFile.absolutePath),
                 mergeErrors = false,
-                timeoutAmount = 10
+                timeout = 10.seconds
             )
             assertTrue(validationResult.success, "Make template failed")
             templateFile = File(cwlFile.parentFile.absolutePath, "${cwlFile.nameWithoutExtension}_template.yml")

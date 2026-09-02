@@ -8,6 +8,9 @@ import org.slf4j.Logger
 import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 open class SystemCall {
 
@@ -18,22 +21,20 @@ open class SystemCall {
     open fun runBlocking(
         call: List<String>,
         workingDir: File = File("."),
-        timeoutAmount: Long = 1,
-        timeoutUnit: TimeUnit = TimeUnit.SECONDS,
+        timeout: Duration = 5.seconds,
         mergeErrors: Boolean = false,
         logger: Logger? = null,
         logFile: File? = null
     ): CallResult {
         return runBlocking(Dispatchers.IO) {
-            run(call, workingDir, timeoutAmount, timeoutUnit, mergeErrors, logger, logFile)
+            run(call, workingDir, timeout, mergeErrors, logger, logFile)
         }
     }
 
     open suspend fun run(
         call: List<String>,
         workingDir: File = File("."),
-        timeoutAmount: Long = 1,
-        timeoutUnit: TimeUnit = TimeUnit.SECONDS,
+        timeout: Duration = 5.seconds,
         mergeErrors: Boolean = false,
         logger: Logger? = null,
         logFile: File? = null,
@@ -74,7 +75,7 @@ open class SystemCall {
                     }
                 }
 
-                process.waitFor(timeoutAmount, timeoutUnit)
+                process.waitFor(timeout.toJavaDuration())
                 if (process.isAlive) {
                     logger?.warn("Timeout reached, stopping process.")
                     process.destroy()

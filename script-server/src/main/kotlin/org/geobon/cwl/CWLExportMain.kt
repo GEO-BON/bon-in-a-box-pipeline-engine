@@ -13,11 +13,12 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.pathString
 import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 object CWLExportMain {
@@ -77,8 +78,7 @@ object CWLExportMain {
                 listOf("docker", "pull", "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:$runnerTag"),
                 logger = logger,
                 mergeErrors = true,
-                timeoutAmount = 10,
-                timeoutUnit = TimeUnit.MINUTES
+                timeout = 10.minutes
             )
 
             if (!result.success) {
@@ -103,8 +103,7 @@ object CWLExportMain {
                 ),
                 logger = logger,
                 mergeErrors = true,
-                timeoutAmount = 1,
-                timeoutUnit = TimeUnit.MINUTES
+                timeout = 1.minutes
             )
             if (!result.success) {
                 logger.debug(result.output)
@@ -264,7 +263,7 @@ object CWLExportMain {
     fun makeTemplate(cwlFile: File) {
         val templateResult = SystemCall().runBlocking(
             listOf("cwl-runner", "--make-template", cwlFile.absolutePath),
-            timeoutAmount = 10
+            timeout = 10.seconds
         )
 
         if (templateResult.success) {
@@ -290,7 +289,7 @@ object CWLExportMain {
             val validationResult = SystemCall().run(
                 listOf("cwl-runner", "--validate", cwlFile.absolutePath),
                 mergeErrors = true,
-                timeoutAmount = 30,
+                timeout = 30.seconds,
                 logger = logger
             )
 
@@ -328,7 +327,7 @@ object CWLExportMain {
                         logger.trace("Packing {}", file.relativeTo(workflowsRoot))
                         val result = SystemCall().run(
                             listOf("cwl-runner", "--pack", file.absolutePath),
-                            timeoutAmount = 30,
+                            timeout = 30.seconds,
                             mergeErrors = false,
                             logger = logger
                         )

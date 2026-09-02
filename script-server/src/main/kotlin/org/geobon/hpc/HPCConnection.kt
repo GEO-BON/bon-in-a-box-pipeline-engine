@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit.MINUTES
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 @OptIn(DelicateCoroutinesApi::class)
 class HPCConnection(
@@ -143,7 +144,7 @@ class HPCConnection(
                         // and dummy runner.env file (we might need a real one in the future, but this just removes the "not found" warnings)
                         val callResult = systemCall.runBlocking(
                             sshCommand + "mkdir -p $hpcScriptsRoot && mkdir -p $hpcOutputRoot && mkdir -p $hpcUserDataRoot && touch $hpcRoot/runner.env",
-                            timeoutAmount = 1, timeoutUnit = MINUTES, logger = logger, mergeErrors = true
+                            timeout = 1.minutes, logger = logger, mergeErrors = true
                         )
 
                         scriptsStatus.state = if (callResult.success) {
@@ -256,7 +257,7 @@ class HPCConnection(
                                     fi
                                 fi
                             """.trimIndent(),
-                        timeoutAmount = 20, timeoutUnit = MINUTES, logger = logger
+                        timeout = 2.minutes, logger = logger
                     )
 
                     if (callResult.output.isNotBlank())
@@ -370,8 +371,7 @@ class HPCConnection(
                         "bash", "-c",
                         """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r / $sshConfig:$hpcRoot/"""
                     ),
-                    timeoutAmount = 10,
-                    timeoutUnit = MINUTES
+                    timeout = 10.minutes
                 )
                 // Log file was already sent, should not append to local log file now unless there is a problem.
                 if (!result.success) {
@@ -446,7 +446,7 @@ class HPCConnection(
                 "bash", "-c",
                 """echo "${sBatchFileLocal.absolutePath}" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- / $sshConfig:$hpcRoot/"""
             ),
-            timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
+            timeout = 10.minutes, logger = logger
         )
 
         if (!callResult.success) {
@@ -457,7 +457,7 @@ class HPCConnection(
         val sBatchFileRemote = File(hpcOutputRoot, sBatchFileLocal.name)
         callResult = systemCall.runBlocking(
             sshCommand + """bash -o pipefail -c "sbatch ${sBatchFileRemote.absolutePath} 2>&1 | tee -a ${hpcLogFiles.joinToString(" ")}"""",
-            timeoutAmount = 10, timeoutUnit = MINUTES, mergeErrors = true, logger = logger
+            timeout = 10.minutes, mergeErrors = true, logger = logger
         )
 
         if (!callResult.success) {
@@ -487,8 +487,7 @@ class HPCConnection(
                     "bash", "-c",
                     """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' -p --chmod=Da+rx,Fa+r --mkpath --files-from=- -r $sshConfig:$hpcRoot/ / """
                 ),
-                timeoutAmount = 10,
-                timeoutUnit = MINUTES
+                timeout = 10.minutes
             )
 
             if (!result.success) {
@@ -501,7 +500,7 @@ class HPCConnection(
     /**
      * Run an immediate command on the automation node.
      */
-    suspend fun runCommand(command: String, timeoutMinutes: Long = 10, logFile: File? = null) {
+    suspend fun runCommand(command: String, timeout: Duration = 10.minutes, logFile: File? = null) {
         if(sshCommand == null) {
             throw RuntimeException("Cannot run commands on HPC when not configured.")
         }
@@ -509,7 +508,8 @@ class HPCConnection(
         withContext(Dispatchers.IO) {
             val callResult = systemCall.runBlocking(
                 sshCommand + command,
-                timeoutAmount = timeoutMinutes, timeoutUnit = MINUTES, logger = logger,
+                timeout = timeout,
+                logger = logger,
                 logFile = logFile
             )
 
