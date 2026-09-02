@@ -104,6 +104,27 @@ GENERATED_TOOLS_KEPT = {
 }
 
 
+# Operations that DO return JSON, but not JSON their declared schema accepts. The schema
+# is the contract the client validates the result against, so where the two disagree it is
+# the tool that fails, after the call, with the answer already in hand.
+#
+# getInfo is the whole of `step_details`: it is how the assistant answers "what inputs does
+# this pipeline take?". `components.schemas.info` types each input's `example` as
+# string, number, boolean or array (openapi.yaml, inputs.additionalProperties.example.oneOf)
+# and every one of the 16 pipelines in pipeline-repo declares `example: null` on at least
+# one input -- a bboxCRS selector or an optional text field has no meaningful example. So
+# the response is valid and the schema rejects it, for every pipeline on the instance,
+# which is a model that can find ProtConn and then cannot say what it takes.
+#
+# Dropping the schema costs nothing here: it is not sent to the model (see tool_budget --
+# outputSchema is the 10k of getInfo that never reaches it), and the result still arrives
+# as JSON text the model reads the same way. The alternative is widening the oneOf in
+# script-server/api/openapi.yaml, which is the real fix but regenerates every API client.
+UNENFORCEABLE_OUTPUT_SCHEMAS = {
+    "getInfo": "inputs may declare `example: null`, which components.schemas.info forbids",
+}
+
+
 def non_json_operations(spec):
     """operationIds whose 200 response is declared, but not as JSON.
 
@@ -140,6 +161,11 @@ async def prune_generated_tools(generated_names):
     running" without ever being able to say which one. The allowlist happens to exclude
     all three offenders today; this stays because the allowlist is edited by hand and the
     failure it prevents is silent and expensive.
+
+    A schema can also be unfulfillable while the response is perfectly good JSON, when the
+    spec describes the response more narrowly than the server actually answers. Those are
+    named in UNENFORCEABLE_OUTPUT_SCHEMAS above and dropped in the same pass, because the
+    symptom is identical: a tool that fails after the call it was asked to make.
     """
     tools = await mcp.get_tools()
     for name in sorted(tools):
@@ -159,11 +185,17 @@ async def prune_generated_tools(generated_names):
             file=sys.stderr,
         )
 
-    for name in sorted(non_json_operations(spec) & GENERATED_TOOLS_KEPT):
+    unfulfillable = dict.fromkeys(non_json_operations(spec), "the 200 response is not JSON")
+    unfulfillable.update(UNENFORCEABLE_OUTPUT_SCHEMAS)
+    for name in sorted(set(unfulfillable) & GENERATED_TOOLS_KEPT):
         tool = tools.get(name)
         if tool is not None and tool.output_schema is not None:
             tool.output_schema = None
-            print(f"[mcp] dropped unfulfillable outputSchema on {name}", file=sys.stderr)
+            print(
+                f"[mcp] dropped unfulfillable outputSchema on {name}: "
+                f"{unfulfillable[name]}",
+                file=sys.stderr,
+            )
 
 
 GENERATED_NAMES = set(asyncio.run(mcp.get_tools()))
