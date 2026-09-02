@@ -126,12 +126,19 @@ services:
     environment:
       # An agentic turn is several generations plus tool round trips, and the shared
       # Ollama serialises requests (OLLAMA_NUM_PARALLEL=1), so a turn can sit in a
-      # queue before it even starts. Must stay >= the gateway's proxy_read_timeout.
+      # queue before it even starts.
+      #
+      # NOTE: this does NOT reach the streaming chat path. `stream_ollama` in the
+      # bridge builds its client with a hardcoded `timeout=None`, so /api/chat with
+      # stream:true has no timeout at all and this value never applies to it. It still
+      # covers the non-streaming call and the health check, so it stays; but there is
+      # no timeout here to raise when the link to Ollama misbehaves, which is why
+      # sitecustomize.py handles the broken stream rather than trying to prevent it.
       OLLAMA_PROXY_TIMEOUT: 600000
-      # Keeps a tool name the model invented from killing the whole chat turn. The
-      # bridge raises on an unknown name from inside the streaming response, which
-      # reaches the user as "Error in input stream" with the answer half written --
-      # see mcp-bridge/sitecustomize.py, which `site` imports from here at startup.
+      # Keeps a mid-turn failure -- an invented tool name, or a hiccup on the link to
+      # the shared Ollama -- from reaching the user as "Error in input stream" with the
+      # answer half written. See mcp-bridge/sitecustomize.py, which `site` imports from
+      # here at interpreter startup.
       PYTHONPATH: /biab-patches
     depends_on:
       - python-api
