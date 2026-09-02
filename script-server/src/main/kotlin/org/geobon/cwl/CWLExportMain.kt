@@ -157,10 +157,14 @@ object CWLExportMain {
                 exportAllFiles("pipeline", serverContext.pipelinesRoot, workflowsRoot)
             }.also { time -> logger.info("Done in $time.") }
 
-            logger.info("Packing CWL workflows...")
-            measureTime {
-                packAllWorkflows(workflowsRoot, workflowsPackedRoot)
-            }.also { time -> logger.info("Done in $time.") }
+            if (cwlRunnerAvailable) {
+                logger.info("Packing CWL workflows...")
+                measureTime {
+                    packAllWorkflows(workflowsRoot, workflowsPackedRoot)
+                }.also { time -> logger.info("Done in $time.") }
+            } else {
+                logger.warn("Skipping CWL packing: cwl-runner not available.")
+            }
         }
 
         if (cwlRunnerAvailable) {
