@@ -37,7 +37,6 @@ Generated from `script-server/api/openapi.yaml`:
 
 | tool | for |
 |---|---|
-| `getInfo` | a step's inputs — the contract `run_step` takes |
 | `getHistory` | which runs exist, and their run ids |
 | `getCountriesList` | ISO3 codes. Long; the playbook says to avoid it |
 | `getRegionsList` | adm1 codes for one country's regions |
@@ -49,6 +48,7 @@ was unusable:
 | tool | why not generated |
 |---|---|
 | `start_task` | the mode gate; returns one file from `modes/` |
+| `get_info` | replaces the generated `getInfo`, which the model called as `get_info` — the majority convention here — and the bridge answered `Tool not found` mid-stream. Its spec schema also forbids the `example: null` every pipeline declares |
 | `find_step` | `getListOf` returns 99 bare names, so a caller has to guess a path from a name. `step_search.py` ranks name, path and description with BM25 |
 | `search_documentation` | the Quarto docs index is not part of the API. `docs_search.py` |
 | `get_run_report` | a step's error and log are only on disk, not in the API. `run_report.py` |

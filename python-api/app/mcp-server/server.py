@@ -96,32 +96,10 @@ mcp = FastMCP.from_openapi(
 #
 # Removing `run` is older than that and has its own reason: see run_step below.
 GENERATED_TOOLS_KEPT = {
-    "getInfo",           # a step's inputs -- the contract for run_step
     "getHistory",        # which runs exist, and their run ids
     "getCountriesList",  # ISO3 codes, when one is not already known
     "getRegionsList",    # adm1 codes for a country's regions
     "getCountryRegionBbox",  # the selector object a bboxCRS input takes
-}
-
-
-# Operations that DO return JSON, but not JSON their declared schema accepts. The schema
-# is the contract the client validates the result against, so where the two disagree it is
-# the tool that fails, after the call, with the answer already in hand.
-#
-# getInfo is the whole of `step_details`: it is how the assistant answers "what inputs does
-# this pipeline take?". `components.schemas.info` types each input's `example` as
-# string, number, boolean or array (openapi.yaml, inputs.additionalProperties.example.oneOf)
-# and every one of the 16 pipelines in pipeline-repo declares `example: null` on at least
-# one input -- a bboxCRS selector or an optional text field has no meaningful example. So
-# the response is valid and the schema rejects it, for every pipeline on the instance,
-# which is a model that can find ProtConn and then cannot say what it takes.
-#
-# Dropping the schema costs nothing here: it is not sent to the model (see tool_budget --
-# outputSchema is the 10k of getInfo that never reaches it), and the result still arrives
-# as JSON text the model reads the same way. The alternative is widening the oneOf in
-# script-server/api/openapi.yaml, which is the real fix but regenerates every API client.
-UNENFORCEABLE_OUTPUT_SCHEMAS = {
-    "getInfo": "inputs may declare `example: null`, which components.schemas.info forbids",
 }
 
 
@@ -161,11 +139,6 @@ async def prune_generated_tools(generated_names):
     running" without ever being able to say which one. The allowlist happens to exclude
     all three offenders today; this stays because the allowlist is edited by hand and the
     failure it prevents is silent and expensive.
-
-    A schema can also be unfulfillable while the response is perfectly good JSON, when the
-    spec describes the response more narrowly than the server actually answers. Those are
-    named in UNENFORCEABLE_OUTPUT_SCHEMAS above and dropped in the same pass, because the
-    symptom is identical: a tool that fails after the call it was asked to make.
     """
     tools = await mcp.get_tools()
     for name in sorted(tools):
@@ -185,17 +158,11 @@ async def prune_generated_tools(generated_names):
             file=sys.stderr,
         )
 
-    unfulfillable = dict.fromkeys(non_json_operations(spec), "the 200 response is not JSON")
-    unfulfillable.update(UNENFORCEABLE_OUTPUT_SCHEMAS)
-    for name in sorted(set(unfulfillable) & GENERATED_TOOLS_KEPT):
+    for name in sorted(non_json_operations(spec) & GENERATED_TOOLS_KEPT):
         tool = tools.get(name)
         if tool is not None and tool.output_schema is not None:
             tool.output_schema = None
-            print(
-                f"[mcp] dropped unfulfillable outputSchema on {name}: "
-                f"{unfulfillable[name]}",
-                file=sys.stderr,
-            )
+            print(f"[mcp] dropped unfulfillable outputSchema on {name}", file=sys.stderr)
 
 
 GENERATED_NAMES = set(asyncio.run(mcp.get_tools()))
@@ -318,7 +285,7 @@ def search_documentation(query: str, max_results: int = 3) -> str:
     """Search the BON in a Box user and contributor documentation.
 
     Covers the platform: input types and selectors, /userdata/, the editor, run history,
-    installing, contributing. Not individual scripts or pipelines -- use getInfo for one
+    installing, contributing. Not individual scripts or pipelines -- use get_info for one
     of those.
 
     Args:
@@ -358,7 +325,7 @@ async def find_step(query: str = "", stepType: str = "pipeline", max_results: in
         max_results: Matches to return, 1-20.
 
     Returns:
-        Matching steps: name, one-line summary, and the path `getInfo` and `run_step`
+        Matching steps: name, one-line summary, and the path `get_info` and `run_step`
         take. Deprecated steps are left out.
     """
     try:
@@ -374,6 +341,54 @@ async def find_step(query: str = "", stepType: str = "pipeline", max_results: in
             f"The list of scripts and pipelines could not be read ({exc}). Say so rather "
             "than naming one from memory."
         )
+
+
+# -------------------------------------------------------------------------
+# 5b. READING ONE STEP
+# -------------------------------------------------------------------------
+# Hand-written rather than generated from the spec, for two reasons that both come down
+# to the name and the schema being someone else's to choose.
+#
+# The name: every tool this file defines is snake_case -- start_task, find_step, run_step,
+# get_run_report, search_documentation -- and the generated ones carry the spec's
+# camelCase operationIds. A 9B model given both writes the majority convention, called
+# `get_info`, and the bridge answers `ValueError: Tool biab.get_info not found` from
+# inside the streaming response, which reaches the user as "Error in input stream" with
+# the turn already half generated. It is not a wrong answer, it is a dead chat.
+#
+# The schema: FastMCP derives an outputSchema from the spec's `components.schemas.info`,
+# which types every input's `example` as string, number, boolean or array
+# (inputs.additionalProperties.example.oneOf). All 16 pipelines in pipeline-repo declare
+# `example: null` on at least one input -- a bboxCRS selector and an optional text field
+# have no meaningful example -- so the client rejected a response the server was right to
+# send, for every pipeline on the instance. A tool returning str has no outputSchema to
+# disagree with, so the mismatch cannot come back. Widening that oneOf in
+# script-server/api/openapi.yaml remains worth doing for the generated API clients.
+@mcp.tool()
+async def get_info(stepType: str, descriptionPath: str) -> str:
+    """What one pipeline or script does, and the inputs it takes.
+
+    The `inputs` block is the answer to "what does this take?". Each entry gives the
+    input's label, type, description, example, and for `options` inputs the values it
+    accepts. Its keys are the keys `run_step` takes.
+
+    Args:
+        stepType: "pipeline" or "script".
+        descriptionPath: The path `find_step` gives, e.g. `BII>BII.json`.
+
+    Returns:
+        The step's metadata as JSON: description, inputs, outputs, author, license.
+    """
+    try:
+        response = await client.get(f"/{stepType}/{descriptionPath}/info", timeout=30)
+        response.raise_for_status()
+    except Exception as exc:
+        print(f"[steps] no info for {stepType} {descriptionPath!r}: {exc}", file=sys.stderr)
+        return (
+            f"Could not read {descriptionPath!r} ({exc}). Check the path with `find_step` "
+            "-- it must be one that came back from there."
+        )
+    return json.dumps(response.json(), indent=2)
 
 
 # -------------------------------------------------------------------------
@@ -414,8 +429,8 @@ def get_run_report(runId: str, max_log_lines: int = 30) -> str:
 async def run_step(stepType: str, descriptionPath: str, inputs: dict | None = None) -> str:
     """Start a pipeline or script. This is the only way to launch a run.
 
-    Call `getInfo` first: its `inputs` block gives both the keys this takes and what they
-    mean. Keys are `{step id}|{input name}` as `getInfo` returns them --
+    Call `get_info` first: its `inputs` block gives both the keys this takes and what they
+    mean. Keys are `{step id}|{input name}` as `get_info` returns them --
     `data>loadFromStac.yml@56|t0`, not `t0` -- plus bare `pipeline@NN` keys. Anything you
     leave out is sent at the step's own example, so set only what the user asked to change.
 
@@ -478,10 +493,9 @@ async def tool_budget():
     Two columns, because the bridge does not forward everything it receives. `mcp` is the
     full tool definition it reads from this server; `ollama` is the {name, description,
     parameters} it puts in front of the model, which is the figure that competes with the
-    conversation for the context window. They differ by outputSchema, which is most of
-    getInfo -- 10k characters of `components.schemas.info` that the model never sees.
-    Optimising against the first column would mean rewriting a response schema that costs
-    nothing where it matters.
+    conversation for the context window. They differ by outputSchema, which the generated
+    tools carry and the hand-written ones do not: a response schema costs nothing where it
+    matters, so optimising against the first column is optimising against the wrong number.
     """
     tools = await mcp.get_tools()
     rows = []

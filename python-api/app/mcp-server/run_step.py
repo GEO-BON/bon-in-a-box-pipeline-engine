@@ -12,7 +12,7 @@ and an unusable one. Its request body is declared `text/plain` with `type: strin
   to a caller that has never seen an input.json.
 
 None of that says the thing a caller actually has to know: the keys are not the input
-names from the script, they are `{step id}|{input name}` as returned by `getInfo` on the
+names from the script, they are `{step id}|{input name}` as returned by `get_info` on the
 pipeline (`data>loadFromStac.yml@56|t0`), plus bare `pipeline@NN` keys for the pipeline's
 own selector inputs. A model reasons its way correctly to "call run", then has to invent
 that key format, and that is where the thread is lost.

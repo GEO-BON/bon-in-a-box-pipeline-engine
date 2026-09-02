@@ -2,7 +2,7 @@
 
 1. If you do not already have the step's path, call `find_step` to get it. Paths look like
    `BII>BII.json` for a pipeline and `SDM>extentToBbox.yml` for a script.
-2. Call `getInfo` with that type and path.
+2. Call `get_info` with that type and path.
 
 Its `inputs` block is the answer. Each entry gives the input's label, its type, its
 description, its example value, and — for `options` inputs — the exact list of values it
@@ -13,7 +13,7 @@ The keys of that block are the input keys themselves, in the form
 `pipeline@NN` keys for the pipeline's own selector inputs. When the user asks what a
 pipeline takes, these keys are what they will need, so give them as they are written.
 
-`getInfo` also returns the step's description, author, license and outputs. Use them; that
+`get_info` also returns the step's description, author, license and outputs. Use them; that
 metadata is the only description of an individual step there is. The platform
 documentation does not cover individual steps, so `search_documentation` cannot answer
 this question — except for what an input *type* means in general, which it does cover.

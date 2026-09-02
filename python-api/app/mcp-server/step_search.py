@@ -2,7 +2,7 @@
 
 `getListOf` returns `{path: name}` and nothing else (Routing.kt, `get("/{type}/list")`),
 so the only way to answer "which pipeline computes forest cover loss?" from it is to hand
-the model all 99 names and let it guess a path to call `getInfo` on. It guesses on the
+the model all 99 names and let it guess a path to call `get_info` on. It guesses on the
 name alone, because the names are all it was given, and a wrong guess costs a whole
 round -- one generation, with the full prompt and toolset resent -- to discover.
 
@@ -128,7 +128,7 @@ class StepIndex:
         return (
             f"The {len(lines)} {type}s on this instance:\n"
             + "\n".join(lines)
-            + f"\n\nCall `getInfo` with type `{type}` and one of these paths for its inputs."
+            + f"\n\nCall `get_info` with type `{type}` and one of these paths for its inputs."
         )
 
     def search(self, query, type=None, max_results=DEFAULT_MAX_RESULTS):
@@ -163,8 +163,8 @@ class StepIndex:
             f"{len(matches)} of this instance's steps match {query!r}, most relevant "
             "first.\n\n"
             + "\n".join(step.as_line() for step in matches)
-            + "\n\nThese paths are what `getInfo` and `run_step` take. Read a step's "
-            "`getInfo` before deciding it is the right one."
+            + "\n\nThese paths are what `get_info` and `run_step` take. Read a step's "
+            "`get_info` before deciding it is the right one."
         )
 
 

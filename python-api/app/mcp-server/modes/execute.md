@@ -6,7 +6,7 @@ Five steps, in this order. Do not improvise around them.
 Prefer pipelines: scripts are pieces of one and usually need inputs produced by an earlier
 step. If several match, ask which one rather than picking.
 
-**2. Read its inputs.** `getInfo` on that path. Its `inputs` block is BOTH the
+**2. Read its inputs.** `get_info` on that path. Its `inputs` block is BOTH the
 documentation and the exact key names step 4 takes. Read it before deciding any value.
 Keys are `{step id}|{input name}` exactly as returned — `data>loadFromStac.yml@56|t0`,
 never a bare `t0` — plus bare `pipeline@NN` keys for the pipeline's own inputs.
