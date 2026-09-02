@@ -345,11 +345,11 @@ object CWLExportMain {
                         val exportFile = File(exportRoot, file.relativeTo(workflowsRoot).path)
                         exportFile.parentFile.mkdirs()
                         if(!exportFile.parentFile.isDirectory) {
-                            throw IOException("Failed to create export directory ${file.parentFile}")
+                            throw IOException("Failed to create export directory ${exportFile.parentFile}")
                         }
                         exportFile.writeText(result.output)
                         if(!exportFile.isFile) {
-                            throw IOException("Failed to create export file $file")
+                            throw IOException("Failed to create export file $exportFile")
                         }
 
                         logger.debug("Validating {}", exportFile.relativeTo(exportRoot))
