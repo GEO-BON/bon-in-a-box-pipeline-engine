@@ -350,7 +350,9 @@ object CWLExportMain {
                         }
 
                         logger.debug("Validating {}", exportFile.relativeTo(exportRoot))
-                        if(!validateCWL(exportFile)) {
+                        if (validateCWL(exportFile)) {
+                            makeTemplate(exportFile)
+                        } else {
                             workflowPackFailures.incrementAndGet()
                         }
                     }
