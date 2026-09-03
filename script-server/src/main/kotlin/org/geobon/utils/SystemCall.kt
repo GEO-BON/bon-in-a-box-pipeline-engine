@@ -1,14 +1,13 @@
 package org.geobon.utils
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.slf4j.Logger
-import java.io.File
-import java.io.IOException
+import java.io.*
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
@@ -42,10 +41,14 @@ open class SystemCall {
     ): CallResult {
         if (echo) logger?.debug(call.joinToString(" "))
 
-        var inputString = ""
-        var errorString = ""
+        val inputString = StringBuilder()
+        val errorString = StringBuilder()
         return coroutineScope {
+            val logMutex = Mutex()
+            var logWriter: BufferedWriter? = null
+
             try {
+                logWriter = logFile?.let { FileOutputStream(it, true).bufferedWriter() }
                 val process = ProcessBuilder(call)
                     .directory(workingDir)
                     .redirectOutput(ProcessBuilder.Redirect.PIPE)
@@ -53,25 +56,20 @@ open class SystemCall {
                     .start()
 
                 val outputJob = launch(Dispatchers.IO) {
-                    try {
-                        process.inputReader().forEachLine {
-                            inputString += "$it\n"
-                            logFile?.appendText("$it\n")
-                        }
-                    } catch (ex: IOException) {
-                        if (ex.message != "Stream closed") // This is normal when cancelling the script
-                            logger?.trace(ex.message)
-                    }
+                    logAll(logMutex, logWriter, inputString) { process.inputReader() }
                 }
                 val errorJob = if (mergeErrors) null else launch(Dispatchers.IO) {
-                    try {
-                        process.errorReader().forEachLine {
-                            errorString += "$it\n"
-                            logFile?.appendText("$it\n")
-                        }
-                    } catch (ex: IOException) {
-                        if (ex.message != "Stream closed") // This is normal when cancelling the script
-                            logger?.trace(ex.message)
+                    logAll(logMutex, logWriter, errorString) { process.errorReader() }
+                }
+
+                val flusherJob = logWriter?.let {
+                    launch(Dispatchers.IO) {
+                        try {
+                            while (true) {
+                                delay(300.milliseconds) // The log is pulled by UI every second.
+                                logWriter.flush()
+                            }
+                        } catch (_: Exception) {}
                     }
                 }
 
@@ -87,22 +85,61 @@ open class SystemCall {
                 }
                 outputJob.join()
                 errorJob?.join()
+                flusherJob?.cancel()
 
-                CallResult(process.exitValue(), inputString, errorString)
+                CallResult(process.exitValue(), inputString.toString(), errorString.toString())
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                if (errorString.isNotBlank()) errorString += "\n"
-                errorString += "${ex.message}\n"
-                logFile?.appendText(errorString)
+                var message = ex.message ?: ex.javaClass.name
+                if (errorString.isNotBlank())
+                    message = "\n" + message
 
+                logMutex.withLock {
+                    errorString.appendLine(message)
+                    logFile?.appendText(message)
+                }
                 CallResult(
                     1,
-                    inputString,
-                    errorString + (ex.message ?: ex.javaClass.name)
+                    inputString.toString(),
+                    errorString.toString()
                 )
+            } finally {
+                logWriter?.close()
             }
         }
     }
+
+    private suspend fun logAll(
+        logMutex: Mutex,
+        logWriter: BufferedWriter?,
+        stringBuilder: StringBuilder,
+        getReader: () -> BufferedReader
+    ) {
+        suspend fun dualLog(line: String) {
+            logMutex.withLock {
+                logWriter?.let {
+                    logWriter.appendLine(line)
+                }
+                stringBuilder.appendLine(line)
+            }
+        }
+
+        try {
+            getReader().use { reader ->
+                while (true) {
+                    val line = reader.readLine() ?: break
+                    dualLog(line)
+                }
+            }
+        } catch (ex: IOException) {
+            ex.message?.let {
+                if (it != "Stream closed") // This is normal when cancelling the script
+                    dualLog(it)
+            }
+
+        }
+    }
+
 }
 
 data class CallResult(val exitCode: Int, val output: String, val error:String = "") {
