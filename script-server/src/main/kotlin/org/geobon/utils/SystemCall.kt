@@ -2,7 +2,9 @@ package org.geobon.utils
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.withPermit
 import org.slf4j.Logger
 import java.io.*
 import java.util.concurrent.TimeUnit
@@ -11,7 +13,13 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
-open class SystemCall {
+open class SystemCall(maxParallelism: Int? = null) {
+
+    init {
+        require(maxParallelism == null || maxParallelism > 0)
+    }
+    
+    private val processLimit = maxParallelism?.let { Semaphore(maxParallelism) }
 
     /**
      * Runs on a blocking thread.
@@ -37,76 +45,83 @@ open class SystemCall {
         mergeErrors: Boolean = false,
         logger: Logger? = null,
         logFile: File? = null,
-        echo:Boolean = false
+        echo: Boolean = false
     ): CallResult {
-        if (echo) logger?.debug(call.joinToString(" "))
+        suspend fun runImpl() : CallResult {
+            if (echo) logger?.debug(call.joinToString(" "))
+            val inputString = StringBuilder()
+            val errorString = StringBuilder()
+            return coroutineScope {
+                val logMutex = Mutex()
+                var logWriter: BufferedWriter? = null
 
-        val inputString = StringBuilder()
-        val errorString = StringBuilder()
-        return coroutineScope {
-            val logMutex = Mutex()
-            var logWriter: BufferedWriter? = null
+                try {
+                    logWriter = logFile?.let { FileOutputStream(it, true).bufferedWriter() }
+                    val process = ProcessBuilder(call)
+                        .directory(workingDir)
+                        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+                        .redirectErrorStream(mergeErrors) // Merges stderr into stdout
+                        .start()
 
-            try {
-                logWriter = logFile?.let { FileOutputStream(it, true).bufferedWriter() }
-                val process = ProcessBuilder(call)
-                    .directory(workingDir)
-                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                    .redirectErrorStream(mergeErrors) // Merges stderr into stdout
-                    .start()
+                    val outputJob = launch(Dispatchers.IO) {
+                        logAll(logMutex, logWriter, inputString) { process.inputReader() }
+                    }
+                    val errorJob = if (mergeErrors) null else launch(Dispatchers.IO) {
+                        logAll(logMutex, logWriter, errorString) { process.errorReader() }
+                    }
 
-                val outputJob = launch(Dispatchers.IO) {
-                    logAll(logMutex, logWriter, inputString) { process.inputReader() }
-                }
-                val errorJob = if (mergeErrors) null else launch(Dispatchers.IO) {
-                    logAll(logMutex, logWriter, errorString) { process.errorReader() }
-                }
-
-                val flusherJob = logWriter?.let {
-                    launch(Dispatchers.IO) {
-                        try {
-                            while (true) {
-                                delay(300.milliseconds) // The log is pulled by UI every second.
-                                logWriter.flush()
+                    val flusherJob = logWriter?.let {
+                        launch(Dispatchers.IO) {
+                            try {
+                                while (true) {
+                                    delay(300.milliseconds) // The log is pulled by UI every second.
+                                    logMutex.withLock {
+                                        logWriter.flush()
+                                    }
+                                }
+                            } catch (_: Exception) {
                             }
-                        } catch (_: Exception) {}
+                        }
                     }
-                }
 
-                process.waitFor(timeout.toJavaDuration())
-                if (process.isAlive) {
-                    logger?.warn("Timeout reached, stopping process.")
-                    process.destroy()
-                    process.waitFor(30, TimeUnit.SECONDS)
+                    process.waitFor(timeout.toJavaDuration())
                     if (process.isAlive) {
-                        logger?.warn("Destroy timeout reached, killing process.")
-                        process.destroyForcibly()
+                        logger?.warn("Timeout reached, stopping process.")
+                        process.destroy()
+                        process.waitFor(30, TimeUnit.SECONDS)
+                        if (process.isAlive) {
+                            logger?.warn("Destroy timeout reached, killing process.")
+                            process.destroyForcibly()
+                        }
                     }
-                }
-                outputJob.join()
-                errorJob?.join()
-                flusherJob?.cancel()
+                    outputJob.join()
+                    errorJob?.join()
+                    flusherJob?.cancelAndJoin()
 
-                CallResult(process.exitValue(), inputString.toString(), errorString.toString())
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                var message = ex.message ?: ex.javaClass.name
-                if (errorString.isNotBlank())
-                    message = "\n" + message
+                    CallResult(process.exitValue(), inputString.toString(), errorString.toString())
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    var message = ex.message ?: ex.javaClass.name
+                    if (errorString.isNotBlank())
+                        message = "\n" + message
 
-                logMutex.withLock {
-                    errorString.appendLine(message)
-                    logFile?.appendText(message)
+                    logMutex.withLock {
+                        errorString.appendLine(message)
+                        logFile?.appendText(message)
+                    }
+                    CallResult(
+                        1,
+                        inputString.toString(),
+                        errorString.toString()
+                    )
+                } finally {
+                    logWriter?.close()
                 }
-                CallResult(
-                    1,
-                    inputString.toString(),
-                    errorString.toString()
-                )
-            } finally {
-                logWriter?.close()
             }
         }
+
+        return processLimit?.withPermit { runImpl() }
+            ?: runImpl() // Bypass semaphore when there is no process limit
     }
 
     private suspend fun logAll(
@@ -142,7 +157,7 @@ open class SystemCall {
 
 }
 
-data class CallResult(val exitCode: Int, val output: String, val error:String = "") {
+data class CallResult(val exitCode: Int, val output: String, val error: String = "") {
     val success: Boolean
         get() = exitCode == 0
 }
@@ -151,7 +166,7 @@ fun String.runBlocking(
     workingDir: File = File("."),
     timeoutAmount: Long = 1,
     timeoutUnit: TimeUnit = TimeUnit.SECONDS,
-    showErrors:Boolean = true
+    showErrors: Boolean = true
 ): String? = runCatching {
     ProcessBuilder("bash", "-c", this)
         .directory(workingDir)
@@ -162,7 +177,7 @@ fun String.runBlocking(
 }.onFailure { it.printStackTrace() }.getOrNull()
 
 
-fun findFilesInFolderByDate(folder:File, fileName: String): List<File> {
+fun findFilesInFolderByDate(folder: File, fileName: String): List<File> {
     val process = ProcessBuilder(
         "/bin/bash", "-c",
         "find $folder -type f -name $fileName -exec stat --format '%.3Y %n' {} \\; | sort -nr | cut -d' ' -f2-"
