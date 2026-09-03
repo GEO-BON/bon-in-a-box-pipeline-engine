@@ -257,7 +257,7 @@ class HPCConnection(
                                     fi
                                 fi
                             """.trimIndent(),
-                        timeout = 2.minutes, logger = logger
+                        timeout = 20.minutes, logger = logger
                     )
 
                     if (callResult.output.isNotBlank())

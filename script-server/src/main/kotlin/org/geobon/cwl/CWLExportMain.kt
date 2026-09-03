@@ -164,7 +164,7 @@ object CWLExportMain {
                 }
             } else {
                 logger.warn("Skipping CWL packing: cwl-runner not available.")
-                0
+                0.seconds
             }
 
             logger.info("Tools $toolsTime, workflows $workflowsTime, packing $packTime.")
@@ -357,9 +357,9 @@ object CWLExportMain {
                             throw IOException("Failed to create export file $exportFile")
                         }
 
-                        logger.trace("Validating {}", file.relativeTo(exportFile))
+                        logger.trace("Validating {}", exportFile.relativeTo(exportRoot))
                         if (validateCWL(exportFile)) {
-                            logger.trace("Creating template for {}", file.relativeTo(exportFile))
+                            logger.trace("Creating template for {}", exportFile.relativeTo(exportRoot))
                             makeTemplate(exportFile)
                         } else {
                             workflowPackFailures.incrementAndGet()

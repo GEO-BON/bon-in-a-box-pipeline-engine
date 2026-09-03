@@ -107,7 +107,7 @@ open class SystemCall(maxParallelism: Int? = null) {
 
                     logMutex.withLock {
                         errorString.appendLine(message)
-                        logFile?.appendText(message)
+                        logWriter?.appendLine(message)
                     }
                     CallResult(
                         1,
