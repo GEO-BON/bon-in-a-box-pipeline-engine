@@ -226,7 +226,7 @@ inputs:
     doc: Root folder for scripts. Use this to override the image's scripts while debugging.
 
 outputs:
-  sf_range_map:
+  sf_range_map_out:
     type: File[]
     label: expert range map
     doc: Polygon with expected area for the species.

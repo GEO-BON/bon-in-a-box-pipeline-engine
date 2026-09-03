@@ -162,7 +162,7 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [increment]
+    out: [increment_out]
 
 
   helloWorld>helloPython.yml@2:
@@ -175,32 +175,32 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [increment]
+    out: [increment_out]
 
 
   helloWorld>helloPython.yml@5:
     run: commandLineTools/helloWorld/helloPython.cwl
     in:
-      some_int: helloWorld>helloPython.yml@0/increment
+      some_int: helloWorld>helloPython.yml@0/increment_out
       runFolder:
         source: runFolder
         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/helloWorld__helloPython/5' } : null)"
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [increment]
+    out: [increment_out]
 
 
 outputs:
-  helloWorld>helloPython.yml@5|increment:
+  helloWorld>helloPython.yml@5|increment_out:
     type: int
     label: Incremented twice
     doc: bla bla
-    outputSource: helloWorld>helloPython.yml@5/increment
+    outputSource: helloWorld>helloPython.yml@5/increment_out
 
-  helloWorld>helloPython.yml@2|increment:
+  helloWorld>helloPython.yml@2|increment_out:
     type: int
     label: Incremented once
     doc: bla bla
-    outputSource: helloWorld>helloPython.yml@2/increment
+    outputSource: helloWorld>helloPython.yml@2/increment_out
 

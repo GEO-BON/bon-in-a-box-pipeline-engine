@@ -22,6 +22,16 @@ import org.yaml.snakeyaml.Yaml
 import java.io.File
 
 class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null) {
+
+    companion object {
+        /**
+         * This suffix makes sure inputs and outputs don't have the same name.
+         * We sometimes see this in BON in a Box, but it creates invalid CWL workflows when packed.
+         * see https://github.com/common-workflow-language/cwltool/issues/2343
+         */
+        private const val OUTPUT_SUFFIX = "_out"
+    }
+
     /**
      * Exports a BON in a Box step (such as a script) to a CWL CommandLineTool.
      * see https://www.commonwl.org/v1.0/CommandLineTool.html
@@ -138,8 +148,9 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             }
         } else " $typeName${if (isInput) "?" else ""}"
 
+        val cwlKey = if(isInput) key else "$key$OUTPUT_SUFFIX"
         return buildString {
-            appendLine(1, "$key:")
+            appendLine(1, "$cwlKey:")
             appendLine(2, "type:$type")
             appendLine(2, "label: ${definition.label}")
             if (definition.description.contains('\n')) {
@@ -240,9 +251,10 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         isInput: Boolean
     ): String {
         return buildString {
+            val cwlKey = if(isInput) key else "$key$OUTPUT_SUFFIX"
             appendLine(
                 """
-                  $key:
+                  $cwlKey:
                     label: ${definition.label}
                 """.replaceIndent(indent(1))
             )
@@ -316,7 +328,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
     private fun toCWL(pipe: Pipe): String {
         return when (pipe) {
             is Output -> (pipe.step as? UserInput)?.id?.toString()
-                ?: pipe.getId().run { "${step}/${inputOrOutput}" }
+                ?: pipe.getId().run { "$step/$inputOrOutput$OUTPUT_SUFFIX" }
 
             is ConstantPipe -> "{ default: ${pipe.value} }"
 
@@ -440,7 +452,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
                 appendLine(3, "$it: $it")
             }
 
-            appendLine(2, "out: ${step.outputs.keys}")
+            appendLine(2, "out: ${step.outputs.keys.map { "$it$OUTPUT_SUFFIX" }}")
         }
 
     }

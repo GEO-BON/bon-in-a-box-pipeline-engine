@@ -374,8 +374,8 @@ steps:
   forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34:
     run: ../commandLineTools/forCWL/SDM_maxEnt/filtering/cleanCoordinates.cwl
     in:
-      presence: forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142/observations_file
-      predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected
+      presence: forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142/observations_file_out
+      predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected_out
       tests: { default: [equal, zeros, duplicates, same_pixel, capitals, centroids, gbif, institutions] }
       env_threshold: { default: 0.8 }
       envFolder:
@@ -389,18 +389,18 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [n_presence, n_clean, clean_presence]
+    out: [n_presence_out, n_clean_out, clean_presence_out]
 
 
   forCWL>SDM_maxEnt>SDM>selectBackground.yml@40:
     run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/selectBackground.cwl
     in:
-      presence: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence
-      extent: forCWL>SDM_maxEnt>SDM>studyExtent.yml@104/study_extent
+      presence: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence_out
+      extent: forCWL>SDM_maxEnt>SDM>studyExtent.yml@104/study_extent_out
       method_background: forCWL>SDM_maxEnt>SDM>selectBackground.yml@40|method_background
       n_background: forCWL>SDM_maxEnt>SDM>selectBackground.yml@40|n_background
-      predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected
-      raster: forCWL>SDM_maxEnt>data>GBIFHeatmapFromSTAC.yml@139/rasters
+      predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected_out
+      raster: forCWL>SDM_maxEnt>data>GBIFHeatmapFromSTAC.yml@139/rasters_out
       envFolder:
         source: prepareEnvironments/envFolder
         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__selectBackground' } : null)"
@@ -412,15 +412,15 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [n_background, background]
+    out: [n_background_out, background_out]
 
 
   forCWL>SDM_maxEnt>SDM>setupDataSdm.yml@44:
     run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/setupDataSdm.cwl
     in:
-      presence: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence
-      background: forCWL>SDM_maxEnt>SDM>selectBackground.yml@40/background
-      predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected
+      presence: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence_out
+      background: forCWL>SDM_maxEnt>SDM>selectBackground.yml@40/background_out
+      predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected_out
       partition_type: { default: bootstrap }
       runs_n: pipeline@46
       boot_proportion: { default: 0.7 }
@@ -436,13 +436,13 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [presence_background]
+    out: [presence_background_out]
 
 
   forCWL>SDM_maxEnt>SDM>rangePredictions.yml@68:
     run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/rangePredictions.cwl
     in:
-      predictions: forCWL>SDM_maxEnt>SDM>runMaxent.yml@108/sdm_runs
+      predictions: forCWL>SDM_maxEnt>SDM>runMaxent.yml@108/sdm_runs_out
       envFolder:
         source: prepareEnvironments/envFolder
         valueFrom: "$(self ? { class: 'Directory', location: self.location + '/forCWL__SDM_maxEnt__SDM__rangePredictions' } : null)"
@@ -454,13 +454,13 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [range_predictions]
+    out: [range_predictions_out]
 
 
   forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97:
     run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/removeCollinearity.cwl
     in:
-      rasters: forCWL>SDM_maxEnt>data>loadFromStac.yml@144/rasters
+      rasters: forCWL>SDM_maxEnt>data>loadFromStac.yml@144/rasters_out
       method: { default: vif.cor }
       method_cor_vif: { default: pearson }
       nb_sample: { default: 5000 }
@@ -477,13 +477,13 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [rasters_selected]
+    out: [rasters_selected_out]
 
 
   forCWL>SDM_maxEnt>SDM>studyExtent.yml@104:
     run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/studyExtent.cwl
     in:
-      presence: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence
+      presence: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence_out
       bbox_crs: pipeline@140
       method: { default: bbox }
       width_buffer: { default: 0 }
@@ -493,14 +493,14 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [area_study_extent, study_extent]
+    out: [area_study_extent_out, study_extent_out]
 
 
   forCWL>SDM_maxEnt>SDM>runMaxent.yml@108:
     run: ../commandLineTools/forCWL/SDM_maxEnt/SDM/runMaxent.cwl
     in:
-      presence_background: forCWL>SDM_maxEnt>SDM>setupDataSdm.yml@44/presence_background
-      predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected
+      presence_background: forCWL>SDM_maxEnt>SDM>setupDataSdm.yml@44/presence_background_out
+      predictors: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected_out
       fc: forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|fc
       rm: forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|rm
       partition_type: forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|partition_type
@@ -519,7 +519,7 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [sdm_pred, sdm_runs]
+    out: [sdm_pred_out, sdm_runs_out]
 
 
   forCWL>SDM_maxEnt>data>GBIFHeatmapFromSTAC.yml@139:
@@ -534,7 +534,7 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [rasters]
+    out: [rasters_out]
 
 
   forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142:
@@ -555,7 +555,7 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [observations_file, total_records, gbif_doi]
+    out: [observations_file_out, total_records_out, gbif_doi_out]
 
 
   forCWL>SDM_maxEnt>data>loadFromStac.yml@144:
@@ -582,43 +582,43 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [rasters]
+    out: [rasters_out]
 
 
 outputs:
-  forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34|clean_presence:
+  forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34|clean_presence_out:
     type: File
     label: Presences
     doc: Occurrences from GBIF after cleaning
-    outputSource: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence
+    outputSource: forCWL>SDM_maxEnt>filtering>cleanCoordinates.yml@34/clean_presence_out
 
-  forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97|rasters_selected:
+  forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97|rasters_selected_out:
     type: File[]
     label: Environmental predictors
     doc: Environmental layers used as predictors in species distribution modeling
-    outputSource: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected
+    outputSource: forCWL>SDM_maxEnt>SDM>removeCollinearity.yml@97/rasters_selected_out
 
-  forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|sdm_pred:
+  forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|sdm_pred_out:
     type: File
     label: Predictions
     doc: Model predictions from Maxent algorithm
-    outputSource: forCWL>SDM_maxEnt>SDM>runMaxent.yml@108/sdm_pred
+    outputSource: forCWL>SDM_maxEnt>SDM>runMaxent.yml@108/sdm_pred_out
 
-  forCWL>SDM_maxEnt>SDM>rangePredictions.yml@68|range_predictions:
+  forCWL>SDM_maxEnt>SDM>rangePredictions.yml@68|range_predictions_out:
     type: File
     label: Variability of predictions
     doc: Variability of predictions based on range method
-    outputSource: forCWL>SDM_maxEnt>SDM>rangePredictions.yml@68/range_predictions
+    outputSource: forCWL>SDM_maxEnt>SDM>rangePredictions.yml@68/range_predictions_out
 
-  pipeline@121|default_output:
+  pipeline@121|default_output_out:
     type: string[]
     label: Taxa list
     doc: Comma-separated list of [taxa](https://en.wikipedia.org/wiki/Taxon). Each value could be a species name, order, class, genus, kingdom or family, as long as it is an exact match with the GBIF taxonomic backbone. Individual species can be looked up [on the GBIF website](https://www.gbif.org/species/).
     outputSource: pipeline@121
 
-  forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|gbif_doi:
+  forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142|gbif_doi_out:
     type: string
     label: DOI of GBIF download
     doc: DOI of GBIF download. Used for citing downloaded data.
-    outputSource: forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142/gbif_doi
+    outputSource: forCWL>SDM_maxEnt>data>getGBIFObservations>getGBIFObservations.yml@142/gbif_doi_out
 

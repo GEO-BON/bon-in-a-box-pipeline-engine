@@ -12,10 +12,13 @@ import org.geobon.utils.SystemCall
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.util.concurrent.TimeUnit
+import java.io.IOException
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.pathString
 import kotlin.system.exitProcess
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.measureTime
 
 object CWLExportMain {
@@ -28,18 +31,15 @@ object CWLExportMain {
     private val logger: Logger = LoggerFactory.getLogger("CWLExport")
     private val cwlRunnerAvailable = SystemCall().runBlocking(listOf("which", "cwl-runner")).success
 
-    @Volatile
-    var scriptFailures = 0
-    @Volatile
-    var scriptsFound = 0
-    @Volatile
-    var pipelineFailures = 0
-    @Volatile
-    var pipelinesFound = 0
+    private val toolFailures = AtomicInteger(0)
+    private val scriptsFound = AtomicInteger(0)
+    private val workflowFailures = AtomicInteger(0)
+    private val pipelinesFound = AtomicInteger(0)
+    private val workflowPackFailures = AtomicInteger(0)
 
     // Each export/validation spawns external cwl-runner processes; unbounded parallelism
     // would cause cwl-runner calls to time out (killed with SIGTERM, exit 143).
-    private val exportDispatcher = Dispatchers.IO.limitedParallelism(Runtime.getRuntime().availableProcessors())
+    private val systemCall = SystemCall(Runtime.getRuntime().availableProcessors())
 
     /**
      * An alternative main to export all scripts and pipelines
@@ -74,12 +74,11 @@ object CWLExportMain {
         } else {
             runnerTag = args[1]
             logger.info("Retrieving CWL runner ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:$runnerTag...")
-            var result = SystemCall().runBlocking(
+            var result = systemCall.runBlocking(
                 listOf("docker", "pull", "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:$runnerTag"),
                 logger = logger,
                 mergeErrors = true,
-                timeoutAmount = 10,
-                timeoutUnit = TimeUnit.MINUTES
+                timeout = 10.minutes
             )
 
             if (!result.success) {
@@ -96,7 +95,7 @@ object CWLExportMain {
 
             logger.info("Extracting pipelines and scripts...")
             val tempDir = createTempDirectory("biab-pipelines")
-            result = SystemCall().runBlocking(
+            result = systemCall.runBlocking(
                 listOf(
                     "docker", "run", "--rm", "-v", "${tempDir.pathString}:/out",
                     "ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda-cwl:$runnerTag",
@@ -104,8 +103,7 @@ object CWLExportMain {
                 ),
                 logger = logger,
                 mergeErrors = true,
-                timeoutAmount = 1,
-                timeoutUnit = TimeUnit.MINUTES
+                timeout = 1.minutes
             )
             if (!result.success) {
                 logger.debug(result.output)
@@ -127,13 +125,14 @@ object CWLExportMain {
         }
 
 
-        logger.info("Starting CWL export")
         destinationRoot = File(args[0])
         destinationRoot.mkdirs()
         if (!destinationRoot.exists()) {
             logger.error("Could not create destination folder $destinationRoot.")
             exitProcess(1)
         }
+
+        logger.info("Removing previous results...")
         toolsRoot = File(destinationRoot, "tools")
         if (toolsRoot.exists()) {
             toolsRoot.deleteRecursively()
@@ -142,19 +141,45 @@ object CWLExportMain {
         if (workflowsRoot.exists()) {
             workflowsRoot.deleteRecursively()
         }
+        val workflowsPackedRoot = File(destinationRoot, "workflows-packed")
+        if(workflowsPackedRoot.exists()) {
+            workflowsPackedRoot.deleteRecursively()
+        }
+
         runBlocking(Dispatchers.Default) {
-            exportAllFiles("script", serverContext.scriptsRoot, toolsRoot)
-            exportAllFiles("pipeline", serverContext.pipelinesRoot, workflowsRoot)
+            logger.info("Exporting BON in a Box scripts to CWL CommandLineTools...")
+            val toolsTime = measureTime {
+                exportAllFiles("script", serverContext.scriptsRoot, toolsRoot)
+            }
+
+            logger.info("Exporting BON in a Box pipelines to CWL Workflows...")
+            val workflowsTime = measureTime {
+                exportAllFiles("pipeline", serverContext.pipelinesRoot, workflowsRoot)
+            }
+
+            val packTime = if (cwlRunnerAvailable) {
+                logger.info("Packing CWL workflows...")
+                measureTime {
+                    packAllWorkflows(workflowsRoot, workflowsPackedRoot)
+                }
+            } else {
+                logger.warn("Skipping CWL packing: cwl-runner not available.")
+                0.seconds
+            }
+
+            logger.info("Tools $toolsTime, workflows $workflowsTime, packing $packTime.")
         }
 
         if (cwlRunnerAvailable) {
-            if (scriptFailures == 0 && pipelineFailures == 0) {
+            if (toolFailures.get() == 0 && workflowFailures.get() == 0 && workflowPackFailures.get() == 0) {
                 logger.info("There were no failures!")
-                logger.info("Exported $scriptsFound scripts and $pipelinesFound pipelines.")
+                logger.info("Exported ${scriptsFound.get()} scripts and ${pipelinesFound.get()} pipelines.")
             } else {
-                logger.warn("There were $scriptFailures script failures and $pipelineFailures pipeline failures in CommandLineTool validation.")
-                logger.info("Valid scripts: ${scriptsFound - scriptFailures}/$scriptsFound.")
-                logger.info("Valid pipelines: ${pipelinesFound - pipelineFailures}/$pipelinesFound.")
+                logger.warn("There were ${toolFailures.get()} tool failures and ${workflowFailures.get()} workflow failures in CommandLineTool validation.")
+                logger.info("Valid tools: ${scriptsFound.get() - toolFailures.get()}/${scriptsFound.get()}.")
+                val validWorkflows = pipelinesFound.get() - workflowFailures.get()
+                logger.info("Valid workflows: $validWorkflows/${pipelinesFound.get()}.")
+                logger.info("Valid packed workflows: ${validWorkflows - workflowPackFailures.get()}/$validWorkflows.")
             }
         } else {
             logger.warn("""Could not validate CWL. Make sure "cwl-runner" is installed.""")
@@ -183,7 +208,7 @@ object CWLExportMain {
         coroutineScope {
             val cwlFactory = CWLFactory(serverContext, runnerTag)
             currentDirectory.listFiles()?.forEach { file ->
-                launch(exportDispatcher) {
+                launch(Dispatchers.IO) {
                     if (file.isDirectory) {
                         exportAllFiles(type, sourceRoot, destinationRoot, file)
 
@@ -193,7 +218,7 @@ object CWLExportMain {
                             val exportDuration = measureTime {
                                 when (type) {
                                     "script" -> {
-                                        scriptsFound++
+                                        scriptsFound.incrementAndGet()
                                         destinationFile.writeText(
                                             cwlFactory.toCommandLineTool(
                                                 ScriptStep(serverContext, file, StepId(file.nameWithoutExtension, "0"))
@@ -202,7 +227,7 @@ object CWLExportMain {
                                     }
 
                                     "pipeline" -> {
-                                        pipelinesFound++
+                                        pipelinesFound.incrementAndGet()
                                         cwlFactory.toWorkflow(
                                             JSONPipeline.createFromFile(
                                                 serverContext,
@@ -218,32 +243,12 @@ object CWLExportMain {
 
                             val validationDuration = measureTime {
                                 if (validateCWL(destinationFile)) {
-                                    val templateResult = SystemCall().runBlocking(
-                                        listOf("cwl-runner", "--make-template", destinationFile.absolutePath),
-                                        timeoutAmount = 10
-                                    )
-
-                                    if (templateResult.success) {
-                                        val templateFile =
-                                            File(
-                                                destinationFile.parentFile,
-                                                "${file.nameWithoutExtension}_template.yml"
-                                            )
-
-                                        templateFile.writeText(
-                                            templateResult.output.replace(
-                                                Regex("""file://[\w/-]*/(tools|workflows)/"""),
-                                                """https://raw.githubusercontent.com/GEO-BON/bon-in-a-box-pipelines-cwl/refs/heads/main/$1/"""
-                                            )
-                                        )
-                                    } else {
-                                        logger.warn("Failed to create template for ${destinationFile.path}")
-                                    }
+                                    makeTemplate(destinationFile)
 
                                 } else {
                                     when (type) {
-                                        "script" -> scriptFailures++
-                                        "pipeline" -> pipelineFailures++
+                                        "script" -> toolFailures.incrementAndGet()
+                                        "pipeline" -> workflowFailures.incrementAndGet()
                                     }
                                 }
                             }
@@ -252,8 +257,8 @@ object CWLExportMain {
                         } catch (e: Exception) {
                             logger.warn("Error exporting ${file.path}", e)
                             when (type) {
-                                "script" -> scriptFailures++
-                                "pipeline" -> pipelineFailures++
+                                "script" -> toolFailures.incrementAndGet()
+                                "pipeline" -> workflowFailures.incrementAndGet()
                             }
                         }
                     }
@@ -262,12 +267,39 @@ object CWLExportMain {
         }
     }
 
+    suspend fun makeTemplate(cwlFile: File) {
+        val templateResult = systemCall.run(
+            listOf("cwl-runner", "--make-template", cwlFile.absolutePath),
+            timeout = 10.seconds,
+            logger = logger
+        )
+
+        if (templateResult.success) {
+            val templateFile =
+                File(
+                    cwlFile.parentFile,
+                    "${cwlFile.nameWithoutExtension}_template.yml"
+                )
+
+            templateFile.writeText(
+                templateResult.output.replace(
+                    Regex("""file://[\w/-]*/(tools|workflows|workflows-packed)/"""),
+                    """https://raw.githubusercontent.com/GEO-BON/bon-in-a-box-pipelines-cwl/refs/heads/main/$1/"""
+                )
+            )
+        } else {
+            logger.warn("Failed to create template for ${cwlFile.path}")
+            logger.warn(templateResult.error)
+        }
+    }
+
     suspend fun validateCWL(cwlFile: File): Boolean {
         return if (cwlRunnerAvailable) {
-            val validationResult = SystemCall().run(
+            val validationResult = systemCall.run(
                 listOf("cwl-runner", "--validate", cwlFile.absolutePath),
                 mergeErrors = true,
-                timeoutAmount = 30
+                timeout = 30.seconds,
+                logger = logger
             )
 
             val relativePath = cwlFile.relativeTo(destinationRoot).path
@@ -282,6 +314,61 @@ object CWLExportMain {
             validationResult.success
         } else {
             true
+        }
+    }
+
+    suspend fun packAllWorkflows(workflowsRoot: File, exportRoot: File, currentDirectory: File = workflowsRoot) {
+        val extension = "cwl"
+
+        coroutineScope {
+            currentDirectory.listFiles()?.forEach { file ->
+                launch (Dispatchers.IO) {
+                    if (file.isDirectory) {
+                        packAllWorkflows(workflowsRoot, exportRoot, file)
+
+                    } else if (file.extension == extension) {
+                        val logFile = File(file.parentFile, "${file.nameWithoutExtension}_validation.log")
+                        if (logFile.exists()) {
+                            logger.trace("Skipping invalid CWL file {}", file.relativeTo(workflowsRoot))
+                            return@launch
+                        }
+
+                        logger.trace("Packing {}", file.relativeTo(workflowsRoot))
+                        val result = systemCall.run(
+                            listOf("cwl-runner", "--pack", file.absolutePath),
+                            timeout = 30.seconds,
+                            mergeErrors = false,
+                            logger = logger
+                        )
+                        if (!result.success) {
+                            logger.debug(result.error)
+                            logger.warn("Failed to pack ${file.path}")
+                            workflowPackFailures.incrementAndGet()
+                            return@launch
+                        }
+
+                        val exportFile = File(exportRoot, file.relativeTo(workflowsRoot).path)
+                        exportFile.parentFile.mkdirs()
+                        if (!exportFile.parentFile.isDirectory) {
+                            throw IOException("Failed to create export directory ${exportFile.parentFile}")
+                        }
+                        exportFile.writeText(result.output)
+                        if (!exportFile.isFile) {
+                            throw IOException("Failed to create export file $exportFile")
+                        }
+
+                        logger.trace("Validating {}", exportFile.relativeTo(exportRoot))
+                        if (validateCWL(exportFile)) {
+                            logger.trace("Creating template for {}", exportFile.relativeTo(exportRoot))
+                            makeTemplate(exportFile)
+                        } else {
+                            workflowPackFailures.incrementAndGet()
+                        }
+
+                    }
+
+                }
+            }
         }
     }
 

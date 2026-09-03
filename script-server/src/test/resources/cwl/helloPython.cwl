@@ -193,7 +193,7 @@ inputs:
     doc: Root folder for scripts. Use this to override the image's scripts while debugging.
 
 outputs:
-  increment:
+  increment_out:
     type: int
     label: A number (input++)
     doc: bla bla
