@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useReducer, useCallback } from "react";
+import React, { useState, useEffect, useReducer, useCallback, useRef } from "react";
 
 import { PipelineForm } from "./form/PipelineForm";
 import { useParams } from "react-router-dom";
@@ -90,6 +90,8 @@ export function PipelinePage({ runType }) {
   const [httpError, setHttpError] = useState(null);
   const [pipelineMetadata, setPipelineMetadata] = useState(null);
   const [expandInputs, setExpandInputs] = useState(true);
+
+  const resultsRef = useRef(null);
 
   /**
    * String: Content of input.json for this run
@@ -258,11 +260,40 @@ export function PipelinePage({ runType }) {
     });
   };
 
-  useEffect(()=>{
-    if(pipStates.runHash){
-      setExpandInputs(false)
+
+  const hadResultsRef = useRef(false);
+  useEffect(() => {
+    if (resultsData != null && !hadResultsRef.current) {
+      // The accordion collapse (triggered above) and PipelineResults' own
+      // auto-expand-first-output scroll (FoldableOutput.jsx) both keep moving
+      // the layout above the results section for a bit after it mounts, so
+      // scrolling immediately targets a position that's stale by the time
+      // those animations finish. Wait for the section's position to settle
+      // before scrolling to it.
+      let frameRequestId; // valid for a single frame
+      let lastTop = null;
+      let stableFrames = 0;
+      const waitForStableLayout = () => {
+        const top = resultsRef.current?.getBoundingClientRect().top;
+        if (top === lastTop) {
+          stableFrames++;
+        } else {
+          stableFrames = 0;
+          lastTop = top;
+        }
+        
+        if (stableFrames >= 5) {
+          resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+          frameRequestId = requestAnimationFrame(waitForStableLayout);
+        }
+      };
+      frameRequestId = requestAnimationFrame(waitForStableLayout);
+      hadResultsRef.current = true;
+      return () => cancelAnimationFrame(frameRequestId);
     }
-  },[pipStates.runHash])
+    hadResultsRef.current = resultsData != null;
+  }, [resultsData])
 
   const toggleAccord  = useCallback(() => {
     setExpandInputs(prev => !prev);
@@ -318,18 +349,20 @@ export function PipelinePage({ runType }) {
           </div>
         )}
         {pipelineMetadata && (
-          <PipelineResults
-            key="results"
-            pipelineMetadata={pipelineMetadata}
-            inputFileContent={inputFileContent}
-            resultsData={resultsData}
-            runningScripts={runningScripts}
-            setRunningScripts={setRunningScripts}
-            pipeline={pipeline}
-            runHash={runHash}
-            displayTimeStamp={pipStates.timestamp}
-            isPipeline={runType === "pipeline"}
-          />
+          <div ref={resultsRef}>
+            <PipelineResults
+              key="results"
+              pipelineMetadata={pipelineMetadata}
+              inputFileContent={inputFileContent}
+              resultsData={resultsData}
+              runningScripts={runningScripts}
+              setRunningScripts={setRunningScripts}
+              pipeline={pipeline}
+              runHash={runHash}
+              displayTimeStamp={pipStates.timestamp}
+              isPipeline={runType === "pipeline"}
+            />
+          </div>
         )}
       </div>
     </>
