@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.toJavaDuration
 
 open class SystemCall(maxParallelism: Int? = null) {
 
@@ -84,7 +83,7 @@ open class SystemCall(maxParallelism: Int? = null) {
                         }
                     }
 
-                    process.waitFor(timeout.toJavaDuration())
+                    process.waitFor(timeout.inWholeMilliseconds, TimeUnit.MILLISECONDS)
                     if (process.isAlive) {
                         logger?.warn("Timeout reached, stopping process.")
                         process.destroy()
