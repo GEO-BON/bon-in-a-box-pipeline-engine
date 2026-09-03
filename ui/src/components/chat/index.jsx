@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./style.css";
 
-// mcp-bridge serves Ollama's own API. /llm/ rather than /api/, because /api/ is
+// The chat bridge serves Ollama's own API. /llm/ rather than /api/, because /api/ is
 // already script-server's -- see http-proxy/conf.d-prod/ngnix.conf.
 const CHAT_URL = import.meta.env.VITE_CHAT_URL || "/llm/api/chat";
 const PROMPT_URL = import.meta.env.VITE_CHAT_PROMPT_URL || "/assistant/prompt";
@@ -117,7 +117,7 @@ export default function Chat() {
           //
           // This only asks; the host decides. Another model loaded by someone else can
           // still evict this one, so it narrows the window rather than closing it -- the
-          // bridge patch in mcp-bridge/sitecustomize.py is what makes the eviction
+          // bridge patch in python-api/app/bridge/sitecustomize.py is what makes the eviction
           // survivable when it does happen.
           keep_alive: "60m",
           // Sampling parameters only. num_ctx and num_batch are LOAD-time settings:

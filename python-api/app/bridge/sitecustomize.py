@@ -33,7 +33,12 @@ by `site` at interpreter startup, so nothing in the image is shadowed, and an up
 change to the bridge is inherited rather than silently reverted. Both halves are the kind
 of thing that belongs upstream; until they are there, they belong here.
 
-Wired up on the mcp-bridge service in compose.yml.
+Both patches reach into the bridge's internals -- `MCPManager.call_tool` and
+`ProxyService._proxy_with_tools_streaming` -- which is why the Dockerfile pins
+ollama-mcp-bridge to an exact version. If you move that pin, check both still attach:
+they fail loudly rather than silently, but only in the python-api log.
+
+startup.sh sets PYTHONPATH to this directory for the bridge process only.
 """
 
 import json

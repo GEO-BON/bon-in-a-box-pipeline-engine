@@ -5,7 +5,7 @@ chat assistant access to this instance's pipelines, scripts, runs and documentat
 
 It runs inside the python-api container, started in the background by `app/startup.sh`,
 and serves streamable HTTP on port 8002. `ollama-mcp-bridge` connects to it at
-`http://python-api:8002/mcp` (see `mcp-bridge/mcp-servers.json`) and executes its tools
+`http://127.0.0.1:8002/mcp` (see `app/bridge/mcp-servers.json`) and executes its tools
 between rounds of inference.
 
 ```bash

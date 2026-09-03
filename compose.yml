@@ -51,30 +51,49 @@ services:
       WORKERS_PER_CORE: 1
       TITILER_API_CORS_ORIGINS: "*"
       USERDATA_ROOT: /data/userdata/files
-      DISABLE_MY_FILES: ${DISABLE_MY_FILES} 
+      DISABLE_MY_FILES: ${DISABLE_MY_FILES}
+      # The chat bridge, started by startup.sh as a fourth process here rather than as
+      # a container of its own: it holds no model and no GPU, so it was a whole
+      # container -- and, on Kubernetes, a whole pod per session -- to run an HTTP
+      # client. Unset OLLAMA_URL disables the assistant entirely.
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11435}
+      # Covers the bridge's non-streaming call to Ollama and its health check.
+      #
+      # NOTE: it does NOT reach the streaming chat path. `stream_ollama` in the bridge
+      # builds its client with a hardcoded `timeout=None`, so /api/chat with
+      # stream:true has no timeout at all and this value never applies to it. It stays
+      # for the paths it does cover; the broken stream that results is handled by
+      # bridge/sitecustomize.py rather than prevented here.
+      OLLAMA_PROXY_TIMEOUT: 600000
     expose:
       - "8000"
       - "8001"
       - "8002"
+      - "8003"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # Watches 8002, the MCP server, because that is what mcp-bridge has to find. The
-    # bridge connects once in its lifespan hook and never retries: lose that race and it
-    # comes up with zero tools and stays that way until it is restarted, which reads to
-    # the user as an assistant that has forgotten how to do anything. startup.sh
-    # backgrounds the MCP server behind titiler and builds its toolset from the OpenAPI
-    # spec, so it is reliably the last of the three to listen -- hence the long
-    # start_period, during which failures do not count against retries.
+    # Watches 8002, the MCP server, because that is what the chat bridge has to find.
+    # The bridge connects once at startup and never retries: lose that race and it comes
+    # up with zero tools and stays that way, which reads to the user as an assistant
+    # that has forgotten how to do anything. startup.sh backgrounds the MCP server
+    # behind titiler and builds its toolset from the OpenAPI spec, so it is reliably the
+    # last to listen -- hence the long start_period, during which failures do not count
+    # against retries.
+    #
+    # Now that the bridge runs inside this container, the race is startup.sh's to lose
+    # and it waits on 8002 itself. This check is left as the outside view of the same
+    # condition: it is what tells you from `docker compose ps` that the assistant's
+    # backend is up.
     #
     # 406 is the MCP app refusing a bare GET, which is the answer we want: it proves the
     # right server is listening, so the check only needs curl to reach it, not to be
     # given a status it likes.
     #
     # This does make the container report unhealthy if the MCP server dies, which
-    # startup.sh deliberately treats as non-fatal. Nothing acts on that: only
-    # mcp-bridge's depends_on reads this condition, gateway keeps the short form and
-    # starts regardless, and compose does not restart on unhealthy. The tiler, the
-    # region API and the file manager go on serving exactly as before.
+    # startup.sh deliberately treats as non-fatal. Nothing acts on that: gateway keeps
+    # the short form of depends_on and starts regardless, and compose does not restart
+    # on unhealthy. The tiler, the region API and the file manager go on serving
+    # exactly as before.
     healthcheck:
       test: ["CMD", "curl", "-s", "-o", "/dev/null", "http://localhost:8002/mcp"]
       interval: 10s
@@ -124,50 +143,6 @@ services:
     depends_on:
       - script-server
       - python-api
-
-  # Bridges the chat UI to Ollama, executing MCP tool calls against this instance's
-  # own MCP server (python-api:8002) in between rounds. It holds no model and no GPU:
-  # inference happens on whatever OLLAMA_URL points at, which is deliberately a
-  # shared, already-running Ollama rather than one of ours.
-  mcp-bridge:
-    image: ghcr.io/jonigl/ollama-mcp-bridge:latest
-    command:
-      - uv
-      - run
-      - ollama-mcp-bridge
-      - --ollama-url
-      - ${OLLAMA_URL:-http://host.docker.internal:11435}
-      - --config
-      - /app/mcp-servers.json
-    volumes:
-      - ./mcp-bridge/mcp-servers.json:/app/mcp-servers.json:ro
-      - ./mcp-bridge/sitecustomize.py:/biab-patches/sitecustomize.py:ro
-    expose:
-      - "8000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    environment:
-      # An agentic turn is several generations plus tool round trips, and the shared
-      # Ollama serialises requests (OLLAMA_NUM_PARALLEL=1), so a turn can sit in a
-      # queue before it even starts.
-      #
-      # NOTE: this does NOT reach the streaming chat path. `stream_ollama` in the
-      # bridge builds its client with a hardcoded `timeout=None`, so /api/chat with
-      # stream:true has no timeout at all and this value never applies to it. It still
-      # covers the non-streaming call and the health check, so it stays; but there is
-      # no timeout here to raise when the link to Ollama misbehaves, which is why
-      # sitecustomize.py handles the broken stream rather than trying to prevent it.
-      OLLAMA_PROXY_TIMEOUT: 600000
-      # Keeps a mid-turn failure -- an invented tool name, or a hiccup on the link to
-      # the shared Ollama -- from reaching the user as "Error in input stream" with the
-      # answer half written. See mcp-bridge/sitecustomize.py, which `site` imports from
-      # here at interpreter startup.
-      PYTHONPATH: /biab-patches
-    depends_on:
-      # Not the short form: it waits for the container to start, not for the MCP server
-      # inside it to listen, and the bridge only ever tries to connect once.
-      python-api:
-        condition: service_healthy
 
 secrets:
   hpc_ssh_key:
