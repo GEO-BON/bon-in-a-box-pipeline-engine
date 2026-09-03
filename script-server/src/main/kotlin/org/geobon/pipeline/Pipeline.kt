@@ -2,7 +2,6 @@ package org.geobon.pipeline
 
 import kotlinx.coroutines.*
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -160,7 +159,7 @@ open class Pipeline (
 
             val miniPipeline = Pipeline(
                 pipelineId,
-                descriptionFile.relativeTo(scriptsRoot.parentFile).path,
+                descriptionFile.relativeTo(serverContext.scriptsRoot.parentFile).path,
                 mapOf(step.id.nodeId to step),
                 inputsToConstants(inputsJSON, step),
                 step.outputs.toMutableMap()

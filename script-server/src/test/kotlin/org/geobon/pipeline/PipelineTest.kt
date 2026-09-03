@@ -2,10 +2,10 @@ package org.geobon.pipeline
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
-import org.geobon.server.ServerContext
+import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.utils.noHPCContext
+import org.geobon.utils.scriptsRoot
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
@@ -443,7 +443,7 @@ internal class PipelineTest {
     fun `given a mini pipeline_when ran_then outputs generated`() = runTest {
         val pipeline = createMiniPipelineFromScript(
             noHPCContext,
-            File(ServerContext.scriptsRoot, "helloWorld/helloPython.yml"),
+            File(scriptsRoot, "helloWorld/helloPython.yml"),
             "helloWorld>helloPython.yml",
             """{ "some_int": "7" }"""
         )
@@ -462,7 +462,7 @@ internal class PipelineTest {
         assertFailsWith<RuntimeException> {
             createMiniPipelineFromScript(
                 noHPCContext,
-                File(ServerContext.scriptsRoot, "helloWorld/helloPython.yml"),
+                File(scriptsRoot, "helloWorld/helloPython.yml"),
                 "helloWorld>helloPython.yml",
                 """{ "bad_key": "7" }"""
             )

@@ -11,7 +11,6 @@ import org.geobon.script.Description.LICENSE
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.REVIEWERS
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -37,14 +36,11 @@ class JSONPipeline (
     companion object {
 
         /**
-         * @param relativePath relative path to the JSON file
+         * @param descriptionFile
          * @return the pipeline metadata as a JSONObject
          * @see org.geobon.script.Description for return value structure
          */
-        fun getPipelineDescription(relativePath: String): JSONObject {
-            val descriptionFile =
-                File(pipelinesRoot, relativePath)
-
+        fun getPipelineDescription(descriptionFile: File): JSONObject {
             if (descriptionFile.exists()) {
                 val descriptionJSON = JSONObject(descriptionFile.readText())
                 val metadataJSON = JSONObject()
@@ -65,7 +61,7 @@ class JSONPipeline (
         }
 
         fun createRootPipeline(serverContext: ServerContext, relPath: String, inputsJSON: String? = null) =
-            createRootPipeline(serverContext, File(pipelinesRoot, relPath), inputsJSON)
+            createRootPipeline(serverContext, File(serverContext.pipelinesRoot, relPath), inputsJSON)
 
         fun createRootPipeline(serverContext: ServerContext, descriptionFile: File, inputsJSON: String? = null): JSONPipeline {
             return createFromFile(
@@ -97,7 +93,7 @@ class JSONPipeline (
             serverContext: ServerContext, stepId: StepId, relPath: String,
             inputsJSON: String? = null
         ): Pipeline =
-            createFromFile(serverContext, stepId, File(pipelinesRoot, relPath), inputsJSON)
+            createFromFile(serverContext, stepId, File(serverContext.pipelinesRoot, relPath), inputsJSON)
 
         private fun createFromFile(
             serverContext: ServerContext, stepId: StepId, descriptionFile: File,
@@ -106,7 +102,7 @@ class JSONPipeline (
             createFromJSON(
                 serverContext,
                 stepId,
-                descriptionFile.relativeTo(pipelinesRoot.parentFile).path,
+                descriptionFile.relativeTo(serverContext.pipelinesRoot.parentFile).path,
                 JSONObject(descriptionFile.readText()),
                 inputsJSON?.let { JSONObject(inputsJSON) } ?: JSONObject()
             )
