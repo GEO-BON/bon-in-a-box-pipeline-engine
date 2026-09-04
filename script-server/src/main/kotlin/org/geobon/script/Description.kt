@@ -45,6 +45,7 @@ object Description {
     const val COMPUTE = "compute"
     const val COMPUTE__HPC = "hpc"
     const val COMPUTE__MEMORY = "mem"
+    const val COMPUTE__MEMORY_MAX = "mem-max"
     const val COMPUTE__CPUS = "cpus-per-task"
     const val COMPUTE__DURATION = "time"
 }

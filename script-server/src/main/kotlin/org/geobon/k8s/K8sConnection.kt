@@ -335,6 +335,22 @@ class K8sConnection {
 			)
 	}
 
+	/** True if any pod belonging to this job was killed by the kernel OOM killer. */
+	fun wasOOMKilled(namespace: String, jobName: String): Boolean {
+		return runCatching {
+			createCoreApi().listNamespacedPod(namespace)
+				.labelSelector("job-name=$jobName")
+				.execute()
+				.items
+				.any { pod ->
+					pod.status?.containerStatuses.orEmpty().any { status ->
+						status.state?.terminated?.reason == "OOMKilled"
+								|| status.lastState?.terminated?.reason == "OOMKilled"
+					}
+				}
+		}.getOrDefault(false)
+	}
+
 	fun describeJobPods(namespace: String, jobName: String) : String {
 		return runCatching {
 			val pods = createCoreApi().listNamespacedPod(namespace)

@@ -395,7 +395,8 @@ conda: # Optional, only needed if you need packages not in the central environme
     - r-terra
 compute: # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.
   hpc: false # Optional, send to a HPC cluster if available. Defaults to false.
-  mem: 4Gi # Hard cap for the memory usage, default 4Gi.
+  mem: 4Gi # Cap for the memory usage, default 4Gi.
+  mem-max: 64Gi # Optional, if the job fails, the job's available memory will be increased up to this value. 
   cpus-per-task: 4 # Number of CPU  allocated, default 4.
   time: "02:00:00" # Only when "hpc: true", maximum time allowed before the job is interrupted.
 ```
