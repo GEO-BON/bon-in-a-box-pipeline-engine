@@ -13,7 +13,7 @@
 
 import ApiClient from '../ApiClient';
 import InfoAuthorInner from './InfoAuthorInner';
-import InfoHpc from './InfoHpc';
+import InfoCompute from './InfoCompute';
 import InfoInputsValue from './InfoInputsValue';
 import InfoLifecycle from './InfoLifecycle';
 import InfoOutputsValue from './InfoOutputsValue';
@@ -81,8 +81,8 @@ class Info {
             if (data.hasOwnProperty('timeout')) {
                 obj['timeout'] = ApiClient.convertToType(data['timeout'], 'Number');
             }
-            if (data.hasOwnProperty('hpc')) {
-                obj['hpc'] = InfoHpc.constructFromObject(data['hpc']);
+            if (data.hasOwnProperty('compute')) {
+                obj['compute'] = InfoCompute.constructFromObject(data['compute']);
             }
             if (data.hasOwnProperty('inputs')) {
                 obj['inputs'] = ApiClient.convertToType(data['inputs'], {'String': InfoInputsValue});
@@ -147,9 +147,9 @@ class Info {
         if (data['external_link'] && !(typeof data['external_link'] === 'string' || data['external_link'] instanceof String)) {
             throw new Error("Expected the field `external_link` to be a primitive type in the JSON string but got " + data['external_link']);
         }
-        // validate the optional field `hpc`
-        if (data['hpc']) { // data not null
-          InfoHpc.validateJSON(data['hpc']);
+        // validate the optional field `compute`
+        if (data['compute']) { // data not null
+          InfoCompute.validateJSON(data['compute']);
         }
         if (data['references']) { // data not null
             // ensure the json data is an array
@@ -216,9 +216,9 @@ Info.prototype['external_link'] = undefined;
 Info.prototype['timeout'] = undefined;
 
 /**
- * @member {module:model/InfoHpc} hpc
+ * @member {module:model/InfoCompute} compute
  */
-Info.prototype['hpc'] = undefined;
+Info.prototype['compute'] = undefined;
 
 /**
  * @member {Object.<String, module:model/InfoInputsValue>} inputs

@@ -4,15 +4,17 @@ val ktorVersion: String by project
 val kotlinVersion: String by project
 
 plugins {
-    kotlin("jvm") version "2.2.10"
+    // https://plugins.gradle.org/plugin/org.jetbrains.kotlin.jvm
+    kotlin("jvm") version "2.4.0"
     id("io.ktor.plugin")
 
     // Better behavior of trimIndent() when it includes variables
-    id("com.bennyhuo.kotlin.trimindent") version "2.2.0-1.1.0"
+    // https://github.com/bennyhuo/kotlin-trim-indent
+    // id("com.bennyhuo.kotlin.trimindent") version "2.2.0-1.1.0"
 }
 
 group = "org.geobon"
-version = "1.2.0"
+version = "1.3.0"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 }
@@ -51,7 +53,14 @@ tasks.test {
 }
 
 tasks.register("runValidator", JavaExec::class) {
+    description = "Validates that pipelines are well structured."
     mainClass.set("org.geobon.pipeline.Validator")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.register("exportCWL", JavaExec::class) {
+    description = "Exports all scripts and pipelines to Common Worlflow Language (CWL)."
+    mainClass.set("org.geobon.cwl.CWLExportMain")
     classpath = sourceSets["main"].runtimeClasspath
 }
 
@@ -63,13 +72,13 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml:$ktorVersion")
 
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
-    implementation("ch.qos.logback:logback-classic:1.5.32")
+    implementation("ch.qos.logback:logback-classic:1.5.34")
 
     // https://mvnrepository.com/artifact/org.eclipse.jgit/org.eclipse.jgit
     implementation("org.eclipse.jgit:org.eclipse.jgit:7.6.0.202603022253-r")
 
     // https://mvnrepository.com/artifact/org.json/json
-    implementation("org.json:json:20251224")
+    implementation("org.json:json:20260522")
 
     // https://mvnrepository.com/artifact/org.yaml/snakeyaml
     implementation("org.yaml:snakeyaml:2.6")
@@ -77,7 +86,8 @@ dependencies {
     // https://github.com/vishna/watchservice-ktx?tab=readme-ov-file
     implementation("com.github.vishna:watchservice-ktx:master-SNAPSHOT")
 
-
+    // Source: https://mvnrepository.com/artifact/io.kubernetes/client-java
+    implementation("io.kubernetes:client-java:26.0.0")
 
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")

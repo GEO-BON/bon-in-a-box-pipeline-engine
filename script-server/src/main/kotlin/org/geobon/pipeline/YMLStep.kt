@@ -1,40 +1,71 @@
 package org.geobon.pipeline
 
+import org.geobon.pipeline.metadata.*
+import org.geobon.pipeline.metadata.ScriptMetadata.Companion.DEFAULT_TIMEOUT
+import org.geobon.script.Description.AUTHORS
+import org.geobon.script.Description.DESCRIPTION
+import org.geobon.script.Description.EXTERNAL_LINK
 import org.geobon.script.Description.INPUTS
-import org.geobon.script.Description.IO__LABEL
-import org.geobon.script.Description.IO__PROPERTIES
-import org.geobon.script.Description.IO__TYPE
 import org.geobon.script.Description.IO__TYPE_OPTIONS
 import org.geobon.script.Description.IO__TYPE_TEXT
+import org.geobon.script.Description.LICENSE
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
+import org.geobon.script.Description.REVIEWERS
+import org.geobon.script.Description.SCRIPT
+import org.geobon.script.Description.TIMEOUT
 import org.geobon.script.Run
 import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import java.io.FileNotFoundException
+import kotlin.time.Duration.Companion.minutes
 
 
 abstract class YMLStep(
     protected val serverContext: ServerContext,
-    protected val yamlFile: File,
-    stepId:StepId,
+    val yamlFile: File,
+    stepId: StepId,
     inputs: MutableMap<String, Pipe> = mutableMapOf(),
     internal val logger: Logger = LoggerFactory.getLogger(yamlFile.name),
-    protected val yamlParsed: Map<String, Any> = Yaml().load(yamlFile.readText())
-) : Step(stepId, inputs, readOutputs(yamlParsed, logger)) {
+    protected val yamlParsed: Map<String, Any> = Yaml().load(yamlFile.readText()),
+    override val metadata: ScriptMetadata = ScriptMetadata(
+        File(yamlFile.parent, yamlParsed[SCRIPT].toString()),
+        IOMetadata.mapFromRawMetadata(yamlParsed, INPUTS, logger),
+        IOMetadata.mapFromRawMetadata(yamlParsed, OUTPUTS, logger),
+        yamlParsed[NAME]?.toString() ?: yamlFile.name,
+        yamlParsed[DESCRIPTION]?.toString(),
+        LifecycleMetadata.fromRawMetadata(yamlParsed),
+        PersonMetadata.listFromRawMetadata(yamlParsed, AUTHORS),
+        PersonMetadata.listFromRawMetadata(yamlParsed, REVIEWERS),
+        yamlParsed[LICENSE]?.toString(),
+        yamlParsed[EXTERNAL_LINK]?.toString(),
+        ReferenceMetadata.listFromRawMetadata(yamlParsed),
+        CondaMetadata.fromRawMetadata(serverContext, yamlFile, yamlParsed),
+        (yamlParsed[TIMEOUT] as? Int)?.minutes ?: DEFAULT_TIMEOUT
+    )
+) : Step(
+    stepId,
+    inputs,
+    metadata.outputs.mapValues { Output(it.value.type) }
+) {
 
     /**
      * Context becomes set in onInputsReceived(), once the invocation inputs are known.
      */
-    var context:RunContext? = null
+    var context: RunContext? = null
 
-    val inputDefinitions = readInputTypes(yamlParsed, logger)
+    val inputDefinitions
+        get() = metadata.inputs
+    val outputDefinitions
+        get() = metadata.outputs
 
     override fun getDisplayBreadcrumbs(): String {
-        return if (yamlParsed.containsKey(NAME)) "\"${yamlParsed[NAME]}\" (${id.toBreadcrumbs()})"
+        return if (metadata.name != null) "\"${metadata.name}\" (${id.toBreadcrumbs()})"
         else id.toBreadcrumbs()
     }
 
@@ -81,8 +112,7 @@ abstract class YMLStep(
 
                     else -> {
                         // Everything else refused
-                        val description = readIODescription(INPUTS, inputKey)
-                        val label = description?.get(IO__LABEL) as? String?
+                        val label = metadata.inputs[inputKey]?.label
                         val displayName = if (label != null) "\"$label\" ($inputKey)" else inputKey
 
                         "Wrong type for input $displayName: expected \"$expectedType\" but \"${inputPipe.type}\" was received.\n"
@@ -101,12 +131,16 @@ abstract class YMLStep(
         try { // Validation
             // Check that the selected option is one of the defined options
             inputs.filter { (_, pipe) -> pipe.type == IO__TYPE_OPTIONS }.forEach { (key, _) ->
-                if(inputDefinitions[key]?.type != IO__TYPE_TEXT) { // Ignore options to text conversion
-                    val options = readIODescription(INPUTS, key)?.get(IO__TYPE_OPTIONS) as? List<*>
-                        ?: throw RuntimeException("$yamlFile: No options found for input parameter $key.")
+                metadata.inputs[key]?.let { inputDefinition ->
+                    if(inputDefinition.type != IO__TYPE_TEXT) { // Ignore options to text conversion
+                        val options = inputDefinition.options
+                            ?: throw RuntimeException("$yamlFile: No options found for input parameter $key.")
 
-                    if (!options.contains(resolvedInputs[key])) {
-                        throw RuntimeException("$yamlFile: Received value ${resolvedInputs[key]} as ${resolvedInputs[key]?.javaClass?.simpleName} not in options $options as ${options.first()?.javaClass?.simpleName}.")
+                        if (!options.contains(resolvedInputs[key])) {
+                            throw RuntimeException("$yamlFile: " +
+                                    "Received value ${resolvedInputs[key]} as ${resolvedInputs[key]?.javaClass?.simpleName} " +
+                                    "not in options $options as ${options.firstOrNull()?.javaClass?.simpleName}.")
+                        }
                     }
                 }
             }
@@ -126,16 +160,6 @@ abstract class YMLStep(
         }
     }
 
-    private fun readIODescription(section:String, searchedKey:String) : Map<*,*>? {
-        (yamlParsed[section] as? Map<*, *>)?.forEach { (key, description) ->
-            if(key == searchedKey) {
-                return description as? Map<*, *>
-            }
-        } ?: logger.warn("$section is not a valid map")
-
-        return null
-    }
-
     /**
      * @param allOutputs Map of Step identifier to output folder.
      */
@@ -149,73 +173,34 @@ abstract class YMLStep(
     }
 
     fun toDisplayName(): String {
-        return id.step.replace(">", " > ").replace(yamlFile.name, yamlParsed[NAME] as String)
+        return id.step.replace(">", " > ").replace(yamlFile.name, metadata.name as String)
     }
 
     override fun toString(): String {
-        return "${javaClass.simpleName} (id=$id, name=\"${yamlParsed[NAME]}\", file=${yamlFile.relativeTo(ServerContext.scriptsRoot)})"
+        return "${javaClass.simpleName} (id=$id, name=\"${metadata.name}\", file=${yamlFile.relativeTo(serverContext.scriptsRoot)})"
     }
 
     companion object {
 
-        data class IODefinition(val type: String, private val definition: Map<*, *>) {
-            val properties
-                get() = (definition[IO__PROPERTIES] as? Iterable<*>)?.let { properties ->
-                    properties.map { it.toString() }
+        /**
+         * @param relativePath the relative path to the .yml description file
+         * @return the pipeline metadata as a deep map.
+         * @see org.geobon.script.Description for return value structure
+         */
+        fun getScriptDescription(serverContext: ServerContext, relativePath: String): Map<String, Any> {
+            var scriptFile = File(serverContext.scriptsRoot, relativePath)
+
+            if (!scriptFile.exists()) {
+                scriptFile = File(scriptStubsRoot, relativePath)
+
+                if (!scriptFile.exists()) {
+                    throw FileNotFoundException("$scriptFile does not exist.")
                 }
-        }
-
-
-        /**
-         * @return Map of input name to type
-         */
-        private fun readInputTypes(yamlParsed: Map<String, Any>, logger: Logger): Map<String, IODefinition> {
-            val inputs = mutableMapOf<String, IODefinition>()
-            readIO(yamlParsed, INPUTS, logger) { key, type, definition ->
-                inputs[key] = IODefinition(type, definition)
             }
-            return inputs
-        }
-
-        /**
-         * @return Map of output name to type
-         */
-        private fun readOutputs(yamlParsed: Map<String, Any>, logger: Logger): Map<String, Output> {
-            val outputs = mutableMapOf<String, Output>()
-            readIO(yamlParsed, OUTPUTS, logger) { key, type, definition ->
-                outputs[key] = Output(type)
-            }
-            return outputs
-        }
-
-        /**
-         * Since both Input and output look alike, function to read key and type is in common.
-         */
-        private fun readIO(
-            yamlParsed: Map<String, Any>,
-            section: String,
-            logger: Logger,
-            toExecute: (String, String, Map<*, *>) -> Unit,
-        ) {
-            yamlParsed[section]?.let {
-                if (it is Map<*, *>) {
-                    it.forEach { (key, definition) ->
-                        key?.let {
-                            if (definition is Map<*, *>) {
-                                definition[IO__TYPE]?.let { type ->
-                                    toExecute(key.toString(), type.toString(), definition)
-                                } ?: logger.error("Invalid type for input $key")
-                            } else {
-                                logger.error("description of $section is not a map")
-                            }
-                        } ?: logger.error("Invalid key")
-                    }
-                } else {
-                    logger.error("$section is not a map")
-                }
-            } ?: logger.trace("No $section map")
+            return Yaml().load(scriptFile.readText())
         }
     }
+
 }
 
 

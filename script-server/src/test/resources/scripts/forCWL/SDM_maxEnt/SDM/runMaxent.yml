@@ -1,0 +1,133 @@
+script: runMaxent.R
+name: MaxEnt
+description: "This script runs MaxEnt algorithm based on ENMeval package."
+external_link: https://github.com/jamiemkass/ENMeval
+author:
+  - name: Sarah Valentin
+    identifier: https://orcid.org/0000-0002-9028-681X
+references:
+  - text: ENMeval 2.0 Redesigned for customizable and reproducible modeling of species’ niches and distributions
+    link: https://doi.org/10.1111/2041-210X.13628
+
+inputs:
+  presence_background:
+    label: presence background
+    description: presence
+    type: text/tab-separated-values
+    example: "/scripts/SDM/runModel_presence_background.tsv"
+  predictors:
+    label: predictors
+    description: layer names (predictors) as a list, or path to a list
+    type: image/tiff;application=geotiff[]
+    example:
+      [
+        "/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio141981-01-01.tif",
+        "/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio151981-01-01.tif",
+        "/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio181981-01-01.tif",
+        "/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio21981-01-01.tif",
+        "/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio31981-01-01.tif",
+        "/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio81981-01-01.tif",
+        "/output/SDM/loadPredictors_R/e09acd85debd23c991652771b1d771b2/bio91981-01-01.tif",
+      ]
+  fc:
+    label: feature classes
+    description:
+      Vector of strings, feature classes for MaxEnt algorithm.
+      Accepted values are combinations of L (linear), Q (quadratic), P (product), H (hinge) or T (threshold).
+    type: text[]
+    example: ["L", "LQ", "LQHP"]
+  rm:
+    label: regularization multiplier
+    description: Vector of numbers, regularization multipliers for MaxEnt algorithm.
+    type: float[]
+    example: [0.5, 1, 2]
+  partition_type:
+    label: partition type
+    description: String, name of partitioning technique.
+    type: options
+    options:
+      - randomkfold
+      - jackknife
+      - block
+      - checkerboard1
+      - checkerboard2
+    example: "block"
+  orientation_block:
+    label: orientation block
+    description: String, order of spatial partitioning for block technique..
+    type: options
+    options:
+      - lat_lon
+      - lon_lat
+      - lon_lon
+      - lat_lat
+    example: lat_lon
+  crs:
+    label: CRS
+    description: Object containing CRS.
+    type: crsBBox
+    example:
+  n_folds:
+    label: number of folds
+    description: Integer, number of random k-folds for randomkfold technique.
+    type: int
+    example: 5
+  method_select_params:
+    label: params selection method
+    description: String, method to select the best combination of MaxEnt parameters.
+    type: options
+    options:
+      - p10
+      - AIC
+      - AUC
+    example: p10
+outputs:
+  sdm_pred:
+    label: predictions
+    description: model predictions while trained on the whole dataset
+    type: image/tiff;application=geotiff
+    range: [0, 1]
+  sdm_runs:
+    label: runs predictions
+    description: model predictions among the several runs (if boostrapping or kfolds performed)
+    type: image/tiff;application=geotiff[]
+    range: [0, 1]
+conda:
+  channels:
+    - conda-forge
+    - r
+  dependencies:
+    - libgdal
+    - r-abind
+    - r-base
+    - r-curl
+    - r-dismo
+    - r-downloader
+    - r-dplyr
+    - r-enmeval=2.0.3
+    - r-ecospat
+    - r-essentials
+    - r-geojsonsf
+    - r-ggsci
+    - r-jpeg
+    - r-landscapemetrics
+    - r-magrittr
+    - r-png
+    - r-purrr
+    - r-rcurl
+    - r-rgbif
+    - r-remotes
+    - r-rjava
+    - r-rjson
+    - r-sf
+    - r-stars
+    - r-stringr
+    - r-terra
+    - r-this.path
+    - r-tidyselect
+    - r-tidyverse
+    - r-stringr
+compute:
+  hpc: false
+  mem: 24G
+  cpus-per-task: 12

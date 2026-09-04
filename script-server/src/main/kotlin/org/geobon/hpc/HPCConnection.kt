@@ -3,18 +3,20 @@ package org.geobon.hpc
 import kotlinx.coroutines.*
 import org.geobon.pipeline.outputRoot
 import org.geobon.script.ScriptType
+import org.geobon.server.RemoteSetup
+import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.plugins.Containers
 import org.geobon.utils.SystemCall
-import org.geobon.utils.run
+import org.geobon.utils.runBlocking
 import org.geobon.utils.toSlurmDuration
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit.MINUTES
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 @OptIn(DelicateCoroutinesApi::class)
 class HPCConnection(
@@ -31,6 +33,8 @@ class HPCConnection(
     val apptainerVersion: String = System.getenv("HPC_APPTAINER_VERSION").let {
         if(it.isNullOrBlank()) "" else "/$it"
     }
+
+    private val allowedSyncPaths = mutableListOf<File>()
 
     val sshCommand: List<String>?
 
@@ -134,13 +138,13 @@ class HPCConnection(
                         scriptsStatus.state = RemoteSetupState.PREPARING
                         scriptsStatus.message = null
 
-                        syncFiles(File(scriptStubsRoot, "system").listFiles().asList())
+                        File(scriptStubsRoot, "system").listFiles()?.asList()?.let { syncFiles(it) }
 
                         // Create other mount endpoints
                         // and dummy runner.env file (we might need a real one in the future, but this just removes the "not found" warnings)
-                        val callResult = systemCall.run(
+                        val callResult = systemCall.runBlocking(
                             sshCommand + "mkdir -p $hpcScriptsRoot && mkdir -p $hpcOutputRoot && mkdir -p $hpcUserDataRoot && touch $hpcRoot/runner.env",
-                            timeoutAmount = 1, timeoutUnit = MINUTES, logger = logger, mergeErrors = true
+                            timeout = 1.minutes, logger = logger, mergeErrors = true
                         )
 
                         scriptsStatus.state = if (callResult.success) {
@@ -190,7 +194,7 @@ class HPCConnection(
 
                     // imageDigestResult: [ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-conda@sha256:34acee6db172b55928aaf1312d5cd4d1aaa4d6cc3e2c030053aed1fe44fb2c8e]
                     val imageDigestResult = "docker image inspect --format '{{.RepoDigests}}' $imageName"
-                        .run()
+                        .runBlocking()
                         ?.trim()
 
                     if (imageDigestResult.isNullOrBlank()
@@ -212,7 +216,7 @@ class HPCConnection(
                     apptainerImage.imagePath = "$hpcRoot/$apptainerImageName"
                     val overlayName = "${container.containerName}_overlay-${overlaySizeGB}GB.ext3"
                     apptainerImage.overlayPath = "$hpcRoot/$overlayName"
-                    val callResult = systemCall.run(
+                    val callResult = systemCall.runBlocking(
                         sshCommand +
                             """
                                 if [ -f ${apptainerImage.imagePath} ] && [ -f ${apptainerImage.overlayPath} ]; then
@@ -253,7 +257,7 @@ class HPCConnection(
                                     fi
                                 fi
                             """.trimIndent(),
-                        timeoutAmount = 20, timeoutUnit = MINUTES, logger = logger
+                        timeout = 20.minutes, logger = logger
                     )
 
                     if (callResult.output.isNotBlank())
@@ -298,11 +302,15 @@ class HPCConnection(
         )
     }
 
+    /**
+     * Explicitly allow these folders to be used as source paths for sync calls
+     */
+    fun allowSyncPaths(sourceFolders: List<File>) {
+        allowedSyncPaths.addAll(sourceFolders)
+    }
+
     private fun validatePath(file: File, logFile: File?): Boolean {
-        if (file.startsWith(outputRoot)
-            || file.startsWith(scriptsRoot)
-            || file.startsWith(scriptStubsRoot)
-        ) {
+        if (allowedSyncPaths.any { file.startsWith(it) }) {
             if (file.exists()) {
                 return true
             } else {
@@ -327,9 +335,8 @@ class HPCConnection(
         withContext(Dispatchers.IO) {
             var filesString = ""
             files.forEach { file ->
-                filesString = filesString +
-                        if (validatePath(file, logFile)) file.absolutePath + "\n"
-                        else ""
+                filesString += if (validatePath(file, logFile)) file.absolutePath + "\n"
+                else ""
             }
             filesString = filesString.trim()
 
@@ -348,7 +355,7 @@ class HPCConnection(
 
                     // files are relative to our root:
                     val toDeleteAbsolute = toDelete.map { file -> File(hpcRoot, file.absolutePath.removePrefix("/")).absolutePath }
-                    systemCall.run(sshCommand +  "rm -rf ${toDeleteAbsolute.joinToString(" ")}", logFile = logFile)
+                    systemCall.runBlocking(sshCommand +  "rm -rf ${toDeleteAbsolute.joinToString(" ")}", logFile = logFile)
                 }
 
                 logFile?.appendText("""
@@ -359,13 +366,12 @@ class HPCConnection(
                     .trimIndent()
                     .also { logger.debug(it) })
 
-                val result = systemCall.run(
+                val result = systemCall.runBlocking(
                     listOf(
                         "bash", "-c",
                         """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r / $sshConfig:$hpcRoot/"""
                     ),
-                    timeoutAmount = 10,
-                    timeoutUnit = MINUTES
+                    timeout = 10.minutes
                 )
                 // Log file was already sent, should not append to local log file now unless there is a problem.
                 if (!result.success) {
@@ -400,7 +406,7 @@ class HPCConnection(
         // Exit code 143 for SIGTERM, see https://medium.com/@himanshurahangdale153/list-of-exit-status-codes-in-linux-f4c00c46c9e0
         sBatchFileLocal.writeText("""
             #!/bin/bash
-            #SBATCH --mem=${requirements.memoryG}G
+            #SBATCH --mem=${requirements.mem}
             #SBATCH --cpus-per-task=${requirements.cpus}
             #SBATCH --time=${requirements.duration.toSlurmDuration()}
             #SBATCH --nodes=1
@@ -435,12 +441,12 @@ class HPCConnection(
 
         """.trimIndent())
 
-        var callResult = systemCall.run(
+        var callResult = systemCall.runBlocking(
             listOf(
                 "bash", "-c",
                 """echo "${sBatchFileLocal.absolutePath}" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- / $sshConfig:$hpcRoot/"""
             ),
-            timeoutAmount = 10, timeoutUnit = MINUTES, logger = logger
+            timeout = 10.minutes, logger = logger
         )
 
         if (!callResult.success) {
@@ -449,9 +455,9 @@ class HPCConnection(
         }
 
         val sBatchFileRemote = File(hpcOutputRoot, sBatchFileLocal.name)
-        callResult = systemCall.run(
+        callResult = systemCall.runBlocking(
             sshCommand + """bash -o pipefail -c "sbatch ${sBatchFileRemote.absolutePath} 2>&1 | tee -a ${hpcLogFiles.joinToString(" ")}"""",
-            timeoutAmount = 10, timeoutUnit = MINUTES, mergeErrors = true, logger = logger
+            timeout = 10.minutes, mergeErrors = true, logger = logger
         )
 
         if (!callResult.success) {
@@ -476,13 +482,12 @@ class HPCConnection(
 
             logger.debug("Syncing from HPC:\n$filesString\n")
 
-            val result = systemCall.run(
+            val result = systemCall.runBlocking(
                 listOf(
                     "bash", "-c",
                     """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' -p --chmod=Da+rx,Fa+r --mkpath --files-from=- -r $sshConfig:$hpcRoot/ / """
                 ),
-                timeoutAmount = 10,
-                timeoutUnit = MINUTES
+                timeout = 10.minutes
             )
 
             if (!result.success) {
@@ -495,15 +500,16 @@ class HPCConnection(
     /**
      * Run an immediate command on the automation node.
      */
-    suspend fun runCommand(command: String, timeoutMinutes: Long = 10, logFile: File? = null) {
+    suspend fun runCommand(command: String, timeout: Duration = 10.minutes, logFile: File? = null) {
         if(sshCommand == null) {
             throw RuntimeException("Cannot run commands on HPC when not configured.")
         }
 
         withContext(Dispatchers.IO) {
-            var callResult = systemCall.run(
+            val callResult = systemCall.runBlocking(
                 sshCommand + command,
-                timeoutAmount = timeoutMinutes, timeoutUnit = MINUTES, logger = logger,
+                timeout = timeout,
+                logger = logger,
                 logFile = logFile
             )
 

@@ -9,7 +9,6 @@
     "//@monaco-editor/react": "provides the YAML/code editor in the YAML input and pipeline editor's metadata pane.",
     "//@mui": "provides Material components and icons used across UI controls.",
     "//@ngageoint/geopackage": "reads GeoPackage data sources.",
-    "//@ngageoint/leaflet-geopackage": "renders GeoPackage layers on Leaflet maps.",
     "//@testing-library/jest-dom": "Currently unused. Adds DOM assertions for component tests.",
     "//@testing-library/react": "Currently unused. Renders and exercises React components in tests.",
     "//@turf/turf": "performs geospatial calculations and geometry transforms.",
@@ -24,7 +23,8 @@
     "//react-markdown": "renders markdown content, especially in step metadata.",
     "//react-router-dom": "client-side routing between UI pages.",
     "//react-select": "Searchable select input to choose the script/pipeline to run.",
-    "//web-vitals": "Currently unused: frontend performance metrics. Was there in project template."
+    "//web-vitals": "Currently unused: frontend performance metrics. Was there in project template.",
+    "//proj4": "used to transform coordinates between different coordinate reference systems."
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -36,8 +36,7 @@
     "@monaco-editor/react": "^4.7.0",
     "@mui/icons-material": "^7.3.9",
     "@mui/material": "^7.3.9",
-    "@ngageoint/geopackage": "^4.2.6",
-    "@ngageoint/leaflet-geopackage": "^4.1.3",
+    "@ngageoint/geopackage": "^4.2.8",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@turf/turf": "^7.3.4",
@@ -56,7 +55,8 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.13.2",
     "react-select": "^5.10.2",
-    "web-vitals": "^5.2.0"
+    "web-vitals": "^5.2.0",
+    "proj4": "^2.20.9"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.1",
@@ -74,8 +74,5 @@
       "react-app",
       "react-app/jest"
     ]
-  },
-  "overrides": {
-    "proj4": "^2.17.0"
   }
 }

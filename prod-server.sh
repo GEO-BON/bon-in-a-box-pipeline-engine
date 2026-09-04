@@ -12,11 +12,6 @@ COPYRIGHT_RANGE="2021-2026"
 symlink=$?
 if [[ $symlink -eq 0 ]] ; then echo "Detected a symlink on .server folder: this is a development setup!"; fi
 
-which docker > /dev/null
-if [[ $? -ne 0 ]] ; then
-    echo -e "${RED}Docker and docker compose plugin are required to run the pipeline engine.${ENDCOLOR}" ; exit 1
-fi
-
 which git > /dev/null
 if [[ $? -ne 0 ]] ; then
     echo -e "${RED}Git is required to run the latest version of the pipeline engine.${ENDCOLOR}" ; exit 1
@@ -69,6 +64,11 @@ function help {
 
 # Must be called once before command function can be called
 function prepareCommands {
+    which docker > /dev/null
+    if [[ $? -ne 0 ]] ; then
+        echo -e "${RED}Docker and docker compose plugin are required to run the pipeline engine.${ENDCOLOR}" ; exit 1
+    fi
+
     # Get docker group. Will not work on Windows, silencing the warning with 2> /dev/null
     export DOCKER_GID="$(getent group docker 2> /dev/null | cut -d: -f3)"
 
@@ -384,7 +384,7 @@ function up {
     for service in $savedContainerServices; do
         flag="--no-recreate" # By default, we keep runners unless they are updated
         if [[ $containersToDiscard == *"$service"* ]]; then
-            echo "  Discarding $service runner"
+            echo "  Discarding $service container"
             flag="--force-recreate"
         fi
 

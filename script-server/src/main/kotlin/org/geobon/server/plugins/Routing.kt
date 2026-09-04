@@ -9,25 +9,25 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
 import org.geobon.hpc.HPC
+import org.geobon.k8s.K8sConnection
+import org.geobon.openeo.OpenEOStep.Companion.updateYaml
 import org.geobon.pipeline.*
+import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
-import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
 import org.geobon.server.ServerContext
-import org.geobon.server.ServerContext.Companion.pipelinesRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
+import java.io.FileNotFoundException
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-
 
 /**
  * Used to transport paths through path param.
@@ -43,7 +43,8 @@ private val logger: Logger = LoggerFactory.getLogger("Server")
 fun Application.configureRouting() {
 
     val hpc = HPC()
-    val serverContext = ServerContext(hpc)
+    val k8s = K8sConnection()
+    val serverContext = ServerContext(hpc, k8s)
 
     routing {
         get("/api/systemStatus") {
@@ -67,18 +68,46 @@ fun Application.configureRouting() {
             val extension: String
             when (type) {
                 "pipeline" -> {
-                    roots = listOf(pipelinesRoot)
+                    roots = listOf(serverContext.pipelinesRoot)
                     extension = "json"
                 }
 
                 "script" -> {
-                    roots = listOf(scriptsRoot, scriptStubsRoot)
+                    roots = listOf(serverContext.scriptsRoot, scriptStubsRoot)
                     extension = "yml"
+                }
+
+                "openEO" -> {
+                    val openEOFile = serverContext.scriptsRoot.resolve("externalScripts.yaml")
+                    val udpList = mutableMapOf<String, String>()
+                    if (openEOFile.exists()) {
+                        val yaml = Yaml().load<Map<String, Any>>(openEOFile.readText())
+                        val udps = yaml["CDSE"] as? Map<*, *>
+                        udps?.forEach { (key, value) ->
+                            if(key is String && value is  Map<*,*>) {
+                                val name = value["name"]
+                                if (name is String) {
+                                    udpList[key] = name
+                                }
+                            }
+                        }
+                    }
+
+                    if (udpList.isEmpty()) {
+                        call.respondText(
+                            text = "No UPD files were found on this server.",
+                            status = HttpStatusCode.NotFound
+                        )
+                    } else {
+                        call.respond(udpList.toSortedMap(String.CASE_INSENSITIVE_ORDER))
+                    }
+
+                    return@get
                 }
 
                 else -> {
                     call.respondText(
-                        text = "Invalid type $type. Must be either \"script\" or \"pipeline\".",
+                        text = "Invalid type $type. Must be either \"script\", \"pipeline\" or \"openEO\".",
                         status = HttpStatusCode.BadRequest
                     )
                     return@get
@@ -105,12 +134,10 @@ fun Application.configureRouting() {
                         } catch (_: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
                             null
                         }
-
                         possible[relativePath] = name ?: file.name // Fallback on file name
                     }
                 }
             }
-
             call.respond(possible.toSortedMap(String.CASE_INSENSITIVE_ORDER))
         }
 
@@ -122,53 +149,31 @@ fun Application.configureRouting() {
             handleHistoryCall(call, start, limit, keyword, filterStatus, runningPipelines)
         }
 
-        get("/script/{scriptPath}/info") {
+        get("/{type}/{descriptionPath}/info") {
             try {
-                // Put back the slashes and replace extension by .yml
-                val ymlPath = call.parameters["scriptPath"]!!.run {
-                    replace(FILE_SEPARATOR, '/').replace(Regex("""\.\w+$"""), ".yml")
-                }
-
-                var scriptFile = File(scriptsRoot, ymlPath)
-
-                if (scriptFile.exists()) {
-                    call.respond(Yaml().load(scriptFile.readText()) as Map<String, Any>)
-                } else {
-                    scriptFile = File(scriptStubsRoot, ymlPath)
-                    if (scriptFile.exists()) {
-                        call.respond(Yaml().load(scriptFile.readText()) as Map<String, Any>)
-                    } else {
-                        call.respondText(text = "$scriptFile does not exist", status = HttpStatusCode.NotFound)
-                        logger.debug("404: getInfo ${call.parameters["scriptPath"]} ${scriptFile.absolutePath}")
-                    }
-                }
-            } catch (ex: Exception) {
-                call.respondText(text = ex.message!!, status = HttpStatusCode.InternalServerError)
-                ex.printStackTrace()
-            }
-        }
-
-        get("/pipeline/{descriptionPath}/info") {
-            try {
-                // Put back the slashes before reading
-                val descriptionFile =
-                    File(pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
-                if (descriptionFile.exists()) {
-                    val descriptionJSON = JSONObject(descriptionFile.readText())
-                    val metadataJSON = JSONObject()
-                    metadataJSON.putOpt(INPUTS, descriptionJSON.get(INPUTS))
-                    metadataJSON.putOpt(OUTPUTS, descriptionJSON.get(OUTPUTS))
-                    descriptionJSON.optJSONObject(METADATA)?.let { metadata ->
-                        metadata.keys().forEach { key ->
-                            metadataJSON.putOpt(key, metadata.get(key))
-                        }
+                val type = call.parameters["type"]
+                val descriptionPath = call.parameters["descriptionPath"] ?: return@get
+                when (type) {
+                    "script" -> {
+                        val ymlPath = descriptionPath
+                            .replace('>', '/')
+                            .replace(Regex("""\.\w+$"""), ".yml")
+                        call.respond(YMLStep.getScriptDescription(serverContext, ymlPath))
                     }
 
-                    call.respondText(metadataJSON.toString(), ContentType.Application.Json)
-                } else {
-                    call.respondText(text = "$descriptionFile does not exist", status = HttpStatusCode.NotFound)
-                    logger.debug("404: getListOf ${call.parameters["descriptionPath"]}")
+                    "pipeline" -> {
+                        val jsonPath = descriptionPath.replace('>', '/')
+                        val descriptionFile = File(serverContext.pipelinesRoot, jsonPath)
+                        call.respondText(JSONPipeline.getPipelineDescription(descriptionFile).toString(), ContentType.Application.Json)
+                    }
+                    "openEO" -> {
+                        val file = updateYaml(serverContext, descriptionPath)
+                        call.respond(Yaml().load(file.readText()))
+                    }
                 }
+            } catch (_: FileNotFoundException) {
+                call.respondText(text = "Requested files not found.", status = HttpStatusCode.NotFound)
+
             } catch (ex: Exception) {
                 call.respondText(text = ex.message!!, status = HttpStatusCode.InternalServerError)
                 ex.printStackTrace()
@@ -176,7 +181,7 @@ fun Application.configureRouting() {
         }
 
         get("/pipeline/{descriptionPath}/get") {
-            val descriptionFile = File(pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
+            val descriptionFile = File(serverContext.pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
             if (descriptionFile.exists()) {
                 call.respondText(descriptionFile.readText(), ContentType.Application.Json)
             } else {
@@ -210,7 +215,10 @@ fun Application.configureRouting() {
 
             // Validate the existence of the file
             val descriptionFile = File(
-                if (singleScript) scriptsRoot else pipelinesRoot,
+                if (singleScript)
+                    if (descriptionPath.startsWith("openEO>")) scriptStubsRoot
+                    else serverContext.scriptsRoot
+                else serverContext.pipelinesRoot,
                 descriptionPath.replace(FILE_SEPARATOR, '/')
             )
             if (!descriptionFile.exists()) {
@@ -311,6 +319,24 @@ fun Application.configureRouting() {
             call.respond(HttpStatusCode.OK)
         }
 
+        get("/api/k8s/status") {
+            k8s.refreshStatus()
+            call.respond(k8s.statusMap())
+        }
+
+        get("/api/k8s/prepare") {
+            if (!k8s.configured) {
+                call.respond(HttpStatusCode.ServiceUnavailable, "Kubernetes not configured on this server")
+                return@get
+            }
+
+            launch {
+                k8s.refreshStatus()
+            }
+
+            call.respond(HttpStatusCode.OK)
+        }
+
         get("/api/versions") {
             val gitInfo = "Git" to RunContext.getGitInfo()
             call.respond(Containers.toVersionsMap() + gitInfo)
@@ -333,7 +359,7 @@ fun Application.configureRouting() {
                 val requestBody = call.receive<String>()
                 val requestJSON = try {
                     JSONObject(requestBody)
-                } catch (e: JSONException) {
+                } catch (_: JSONException) {
                     call.respond(
                         HttpStatusCode.BadRequest,
                         gson.toJson(mapOf("success" to false, "error" to "Invalid JSON"))
@@ -414,7 +440,7 @@ fun Application.configureRouting() {
                 .replace("../", "") // Avoid any attempt to access outside of pipelines directory
                 .trim() // Remove trailing whitespaces
 
-            val file = File(pipelinesRoot, "$filename.json")
+            val file = File(serverContext.pipelinesRoot, "$filename.json")
             if (file.nameWithoutExtension.isEmpty()) {
                 call.respond(HttpStatusCode.BadRequest, "File name is empty.")
                 return@post

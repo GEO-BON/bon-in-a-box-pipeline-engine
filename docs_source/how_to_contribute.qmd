@@ -175,7 +175,7 @@ inputs:
     example: null
 ```
 
-The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying 'country' as input type will create a dropdown menu with a standardized list of countries from GeoNames. Selecting 'bboxCRS' will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:
+The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying 'country' as input type will create a dropdown menu with a standardized list of countries from GeoNames. Selecting 'crsBbox' will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:
 
 +------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
 | Input name       | Description                                                                                                                                                                                                                                                                |                        |
@@ -188,7 +188,9 @@ The input type can also be set to a limited number of keywords that will automat
 +------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
 | CRS              | Creates a selector for specifying a coordinate reference system.                                                                                                                                                                                                           |                        |
 +------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
-| bboxCRS          | Creates a button to open an interface that allows the user to specify a bounding box (geographical minima and maxima) based on an optional selection of country/region and on a CRS, or by clicking on the map to set the bounds of the area of interest for the analysis. |                        |
+| crsBbox          | Creates a button to open an interface that allows the user to specify a bounding box (geographical minima and maxima) based on an optional selection of country/region and on a CRS, or by clicking on the map to set the bounds of the area of interest for the analysis. |                        |
++------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
+| location         | Full location object. Creates a button to open an interface that allows the user to specify a country, region, coordinate reference system and bounding box (geographical minima and maxima)                                                                               |                        |
 +------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
 
 Note that the use of these selectors will create objects that contain multiple elements. For example, the country selector will create an input object that contains the country name in English, the ISO3 code of the country, the ISO2 code, as well as the bounding box of that country, in longitude, latitude coordinates. [See the full list of those keys for each selector here](selectors.qmd).
@@ -391,6 +393,11 @@ conda: # Optional, only needed if you need packages not in the central environme
     - r-ggplot2
     - r-sf
     - r-terra
+compute: # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.
+  hpc: false # Optional, send to a HPC cluster if available. Defaults to false.
+  mem: 4Gi # Hard cap for the memory usage, default 4Gi.
+  cpus-per-task: 4 # Number of CPU  allocated, default 4.
+  time: "02:00:00" # Only when "hpc: true", maximum time allowed before the job is interrupted.
 ```
 
 YAML is a space sensitive format, so make sure all the tab sets are correct in the file.
@@ -435,6 +442,12 @@ conda: # Optional, only needed if your script has specific package dependencies
     - # list here
   dependencies: # any packages that are dependent on a specfic version
     - # list here
+
+compute: # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.
+  hpc: false # Optional, send to a HPC cluster if available. Defaults to false.
+  mem: 4Gi # Hard cap for the memory usage, default 4Gi.
+  cpus-per-task: 4 # Number of CPU  allocated, default 4.
+  time: "02:00:00" # Only when "hpc: true", maximum time allowed before the job is interrupted.
 ```
 
 See [example](https://GitHub.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/helloR.R)
@@ -523,7 +536,7 @@ And to project it using the CRS that the user specified:
 landcover_projected <- project(landcover, input$crs)
 ```
 
-When the inputs were entered through [preset selectors](selectors.qmd), the values associated with the selected options are available as a list with values [described here](selectors.qmd). For example, to access the bounding box of an selector with name study_area_bbox of type `BboxCRS`. The bounding box can be accessed through:
+When the inputs were entered through [preset selectors](selectors.qmd), the values associated with the selected options are available as a list with values [described here](selectors.qmd). For example, to access the bounding box of an selector with name study_area_bbox of type `crsBbox`. The bounding box can be accessed through:
 
 ``` r
 bbox <- input$study_area_bbox$bbox

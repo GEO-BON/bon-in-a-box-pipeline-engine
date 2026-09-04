@@ -5,8 +5,8 @@ import io.kotest.extensions.system.withEnvironment
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.outputRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.utils.noHPCContext
+import org.geobon.utils.scriptsRoot
 import java.io.File
 import java.lang.System.currentTimeMillis
 import kotlin.test.*

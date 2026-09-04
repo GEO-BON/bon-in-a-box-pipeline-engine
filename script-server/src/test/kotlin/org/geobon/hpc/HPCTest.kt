@@ -14,11 +14,12 @@ import org.junit.Test
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class HPCTest {
     lateinit var hpc: HPC
     lateinit var serverContext: ServerContext
-    val retrieveSyncInterval = 10000L
+    val retrieveSyncInterval = 10.seconds
 
     @Before
     fun setup() {
@@ -51,7 +52,7 @@ class HPCTest {
     private fun mockRun(
         step: ScriptStep,
         mockCommand: String,
-        requirements: HPCRequirements = HPCRequirements(1, 4, 10.minutes)
+        requirements: HPCRequirements = HPCRequirements("1G", 4, 10.minutes)
     ): HPCRun {
         val run = mockk<HPCRun>()
         every { run.getCommand() } returns mockCommand
@@ -221,17 +222,17 @@ class HPCTest {
     fun `given two HPC tasks_when sent_then max memory max cpu and total time required`() = runTest {
         val step1 = mockHPCStep(1)
         val mockCommand1 = """echo "test 1 job command" """
-        val run1 = mockRun(step1, mockCommand1, HPCRequirements(1, 4, 1.hours))
+        val run1 = mockRun(step1, mockCommand1, HPCRequirements("1G", 4, 1.hours))
 
         val step2 = mockHPCStep(2)
         val mockCommand2 = """echo "test 2 job command" """
-        val run2 = mockRun(step2, mockCommand2, HPCRequirements(10, 1, 30.minutes))
+        val run2 = mockRun(step2, mockCommand2, HPCRequirements("10G", 1, 30.minutes))
 
         hpc.ready(run1)
         hpc.ready(run2)
         verify(exactly = 1) { hpc.connection.sendJobs(
             any(),
-            HPCRequirements(10, 4, 1.hours + 30.minutes),
+            HPCRequirements("10G", 4, 1.hours + 30.minutes),
             any(), any())
         }
     }
@@ -248,7 +249,7 @@ class HPCTest {
         val run1 = mockRun(step1, "run command")
 
 
-        coEvery { hpc.connection.runCommand(any(), any(), any()) } coAnswers { delay(5000); }
+        coEvery { hpc.connection.runCommand(any(), any(), any()) } coAnswers { delay(5.seconds); }
         coEvery { hpc.connection.syncFiles(any(), any(), any()) } just runs
 
         val job1 = hpc.syncCondaEnvironment(run0, condaEnvName, logFile, syncCommand)
@@ -269,12 +270,12 @@ class HPCTest {
         val command = "conda env sync command"
 
         val step1 = mockHPCStep(1)
-        val run1 = mockRun(step1, "echo test1", HPCRequirements(1, 4, 10.minutes))
+        val run1 = mockRun(step1, "echo test1", HPCRequirements("1G", 4, 10.minutes))
         every { run1.condaEnvName } returns condaEnvName
         every { run1.fail(any()) } just runs
 
         val step2 = mockHPCStep(2)
-        val run2 = mockRun(step2, "echo test2", HPCRequirements(1, 4, 10.minutes))
+        val run2 = mockRun(step2, "echo test2", HPCRequirements("1G", 4, 10.minutes))
         every { run2.condaEnvName } returns condaEnvName
         every { run2.fail(any()) } just runs
 

@@ -1,46 +1,106 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { LifecycleMessage } from '../Lifecycle.jsx';
 import isObject from '../../utils/isObject'
 import ReactMarkdown from 'react-markdown'
-
+import { PopupContentContext } from '../../Layout.jsx';
 import { fetchStepDescription } from './StepDescriptionStore'
+import { StepDescription } from '../StepDescription.jsx';
 
 // props content, see https://reactflow.dev/docs/api/nodes/custom-nodes/#passed-prop-types
 export default function IONode({ id, data }) {
   const [descriptionFileLocation] = useState(data.descriptionFile);
   const [metadata, setMetadata] = useState(null);
+  const [missing, setMissing] = useState(false);
+  const { setPopupContent } = useContext(PopupContentContext)
 
   useEffect(() => {
     if (descriptionFileLocation) {
       fetchStepDescription(descriptionFileLocation, (newMetadata) => {
-        setMetadata(newMetadata)
+        if(!newMetadata) {
+          setMissing(true)
+        } else {
+          setMetadata(newMetadata)
+        }
       })
     }
   }, [descriptionFileLocation])
 
   function showScriptTooltip() {
-    data.setToolTip(<div className="reactMarkdown noLink"><ReactMarkdown>{metadata.description}</ReactMarkdown></div>)
+    if (!metadata) {
+      data.setToolTip(<span>Script or pipeline not found. Remove or replace this step to avoid errors.</span>);
+      return;
+    }
+    data.setToolTip(
+      <div className="reactMarkdown noLink">
+        <ReactMarkdown disallowedElements={['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'img']}>
+          {metadata.description}
+        </ReactMarkdown>
+      </div>)
   }
 
   function hideTooltip() {
     data.setToolTip(null)
   }
 
+  useEffect(() => {
+    return () => {
+      data.setToolTip(null);
+    }
+  }, [])
+
   function checkForWarning(desc) {
     return !desc.label ? "Label missing in script's description file" :
       !desc.description ? "Description missing in script's description file" : null;
   }
 
-  if (!metadata) return null
-
-  let pathList = descriptionFileLocation.split('>')
-  if(metadata.name) {
-    pathList[pathList.length -1] = metadata.name
+  if (missing) {
+    return <div className='ioNode' onMouseEnter={showScriptTooltip} onMouseLeave={hideTooltip}
+      style={{ padding: '10px', border: '2px dotted red' }}>
+      <span className='ioNode-phantom'>{data.descriptionFile}</span>
+    </div>
   }
 
-  let stepType = /\.json$/i.test(descriptionFileLocation) ? 'pipeline' : 'script'
-  return <table className={`ioNode ${stepType}`}><tbody>
+  if(!metadata)
+    return null // currently loading
+
+  let stepType;
+  const extension = descriptionFileLocation.match(/\.([^.]+)$/)?.[1]?.toLowerCase();
+
+  switch (extension) {
+    case 'json':
+      stepType = 'pipeline';
+      break;
+    case 'udp':
+      stepType = 'openEO';
+      break;
+    case 'yml':
+    default:
+      stepType = 'script';
+  }
+
+  let pathList;
+
+  if (stepType === 'openEO') {
+    pathList = ['openEO', metadata.name];
+  } else {
+    pathList = descriptionFileLocation.split('>');
+    if (metadata.name) {
+      pathList[pathList.length - 1] = metadata.name;
+    }
+  }
+
+  return <>
+  <table className={`ioNode ${stepType}`} onDoubleClick={(e) => {
+    if (e.target.closest('td.inputs, td.outputs')) return;
+    setPopupContent(
+      <StepDescription
+        descriptionFile={descriptionFileLocation}
+        metadata={metadata}
+      />
+    )}
+  }>
+    <tbody>
     <tr>
       <td className='inputs'>
         {metadata.inputs && Object.entries(metadata.inputs).map(([inputName, desc]) => {
@@ -74,7 +134,9 @@ export default function IONode({ id, data }) {
         })}
       </td>
     </tr>
-  </tbody></table>
+    </tbody>
+  </table>
+  </>
 }
 
 function ScriptIO({children, desc, setToolTip, onDoubleClick, warning}) {
