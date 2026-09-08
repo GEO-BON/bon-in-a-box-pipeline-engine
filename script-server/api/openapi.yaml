@@ -365,6 +365,68 @@ paths:
                 type: string
                 x-content-type: text/plain
                 example: Output folder is improperly configured
+  /api/status:
+    get:
+      summary: Returns which optional features are enabled on this instance.
+      description: >
+        Distinct from /api/systemStatus, which reports whether the server is
+        misconfigured and is the UI's boot gate. This one never fails: a feature being
+        off is an answer, not an error. Every flag has positive polarity, so true always
+        means the feature works, whatever the polarity of the variable behind it.
+
+        myFilesEnabled and antivirus* describe python-api, which is what acts on them;
+        they are reported here because script-server has no way to query python-api, so
+        the deployment sets both containers identically.
+
+        Not exposed to the chat assistant: it is absent from GENERATED_TOOLS_KEPT in
+        python-api/app/mcp-server/server.py, and belongs in the system prompt rather
+        than in a tool if the assistant ever needs it.
+      operationId: getServerStatus
+      responses:
+        "200":
+          description: The instance's feature flags.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - runsEnabled
+                  - savePipelineToServer
+                  - condaPackEnabled
+                  - myFilesEnabled
+                  - antivirusEnabled
+                properties:
+                  runsEnabled:
+                    type: boolean
+                    description: False when BLOCK_RUNS makes this a results-only server.
+                  savePipelineToServer:
+                    type: boolean
+                    description: False when SAVE_PIPELINE_TO_SERVER denies the save API.
+                  condaPackEnabled:
+                    type: boolean
+                    description: Whether conda environments are cached with conda-pack.
+                  myFilesEnabled:
+                    type: boolean
+                    description: False when DISABLE_MY_FILES makes the file manager read-only.
+                  antivirusEnabled:
+                    type: boolean
+                    description: >
+                      Whether uploads are scanned. When false they are saved unscanned;
+                      when true an unscannable upload is refused rather than saved.
+                  antivirusReachable:
+                    type: boolean
+                    nullable: true
+                    description: >
+                      Whether the scanner currently answers, or null when antivirus is
+                      off. False here means uploads are being refused, because the scan
+                      path fails closed.
+                example:
+                  runsEnabled: true
+                  savePipelineToServer: true
+                  condaPackEnabled: true
+                  myFilesEnabled: true
+                  antivirusEnabled: true
+                  antivirusReachable: true
   /api/versions:
     get:
       summary: Returns the version of system components.
@@ -1086,6 +1148,45 @@ paths:
                 example:
                   id: "/uploaded_file.txt"
                   value: "uploaded_file.txt"
+        "400":
+          description: >
+            The antivirus found malware in the file, which was refused and not saved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Malware detected! File blocked by antivirus: Eicar-Test-Signature"
+        "413":
+          description: >
+            The antivirus client refused to send a file larger than the scanner's
+            declared limit, so it was not saved. Raise StreamMaxLength on the scanner
+            to allow it. Note that a file over the limit is more often reported as 503,
+            because clamd closes the connection rather than replying.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        "503":
+          description: >
+            The upload could not be scanned, so it was refused rather than saved
+            unscanned. Either the scanner is unreachable -- GET /api/status reports that
+            as antivirusReachable false, before an upload is attempted -- or the file
+            exceeds its StreamMaxLength, which clamd signals by closing the connection
+            rather than replying. The python-api log distinguishes them.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
         "403":
           description: The file manager is disabled on this instance.
           content:

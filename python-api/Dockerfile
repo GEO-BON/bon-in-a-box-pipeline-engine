@@ -39,23 +39,6 @@ RUN uv venv /opt/bridge-venv \
 
 FROM ghcr.io/developmentseed/titiler:${TITILER_VERSION} AS runtime
 
-# ClamAV runs in this container rather than in one of its own, since the API is its only consumer.
-RUN set -ex; \
-    apt-get update; \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends clamav-daemon clamav-freshclam; \
-    apt-get clean all; \
-    rm -rf /var/lib/apt/lists/*; \
-    # the postinst pulls signatures; keep those ~350MB out of the image layer, freshclam fetches them at startup
-    rm -rf /var/lib/clamav/*; \
-    # the container runs as an arbitrary UID, so everything clamd writes to must be world-writable
-    mkdir -p /run/clamav /var/lib/clamav; \
-    chmod -R 777 /run/clamav /var/lib/clamav
-
-# Replacing the Debian-generated configs rather than patching them: their User/DatabaseOwner
-# directives make the daemons attempt a setuid they cannot perform as a non-root UID.
-COPY clamav/clamd.conf /etc/clamav/clamd.conf
-COPY clamav/freshclam.conf /etc/clamav/freshclam.conf
-
 # Set up virtual environment path
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
@@ -72,7 +55,9 @@ ENV VARIABLE_NAME=app
 ENV HOST=0.0.0.0
 ENV PORT=8000
 ENV WEB_CONCURRENCY=1
-ENV CLAMAV_HOST=127.0.0.1
+# No CLAMAV_* default on purpose. clamd is a shared service now, not a process in this
+# container, and an unset CLAMAV_ADDRESS means "no scanning" -- so a default here would
+# silently switch the feature on and point it at nothing. See app/main_api.py.
 
 ARG BIAB_VERSION
 RUN echo $BIAB_VERSION > /version.txt

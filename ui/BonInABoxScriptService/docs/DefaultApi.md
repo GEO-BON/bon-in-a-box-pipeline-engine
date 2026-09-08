@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**getCountriesList**](DefaultApi.md#getCountriesList) | **GET** /region/countries_list | Returns the list of countries from FieldMaps.io with their ISO3 and English names
+[**getCountryRegionBbox**](DefaultApi.md#getCountryRegionBbox) | **GET** /region/country_region_bbox | Bounding box of a country or region, or the selector object a bboxCRS input takes
 [**getHPCStatus**](DefaultApi.md#getHPCStatus) | **GET** /hpc/status | Get status of HPC connection.
 [**getHistory**](DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 [**getInfo**](DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
@@ -14,6 +15,7 @@ Method | HTTP request | Description
 [**getPipeline**](DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
 [**getRegionGeometry**](DefaultApi.md#getRegionGeometry) | **GET** /region/geometry | Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
 [**getRegionsList**](DefaultApi.md#getRegionsList) | **GET** /region/regions_list | Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
+[**getServerStatus**](DefaultApi.md#getServerStatus) | **GET** /api/status | Returns which optional features are enabled on this instance.
 [**getSystemStatus**](DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 [**getVersions**](DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
 [**hpcPrepareGet**](DefaultApi.md#hpcPrepareGet) | **GET** /hpc/prepare | Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.
@@ -52,6 +54,59 @@ This endpoint does not need any parameter.
 ### Return type
 
 **[Object]**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## getCountryRegionBbox
+
+> Object getCountryRegionBbox(id, opts)
+
+Bounding box of a country or region, or the selector object a bboxCRS input takes
+
+With &#x60;output_format&#x3D;chooser_input&#x60;, returns the object that a &#x60;bboxCRS&#x60;, &#x60;country&#x60;, &#x60;countryRegion&#x60;, &#x60;countryRegionCRS&#x60; or &#x60;CRS&#x60; input takes. Use what it returns unchanged as that input&#39;s value. 
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+let id = "COL"; // String | A code, not a name. ISO3 for a country (Colombia is COL), adm1_src for a region.
+let opts = {
+  'type': "country", // String | Whether `id` names a country (adm0) or a subnational region (adm1)
+  'crs': "'EPSG:4326'", // String | CRS the bounding box is expressed in.
+  'outputFormat': "chooser_input" // String | `chooser_input` for the whole selector object, to fill in an input. `bbox` for only the four numbers. 
+};
+apiInstance.getCountryRegionBbox(id, opts, (error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**| A code, not a name. ISO3 for a country (Colombia is COL), adm1_src for a region. | 
+ **type** | **String**| Whether &#x60;id&#x60; names a country (adm0) or a subnational region (adm1) | [optional] [default to &#39;country&#39;]
+ **crs** | **String**| CRS the bounding box is expressed in. | [optional] [default to &#39;EPSG:4326&#39;]
+ **outputFormat** | **String**| &#x60;chooser_input&#x60; for the whole selector object, to fill in an input. &#x60;bbox&#x60; for only the four numbers.  | [optional] [default to &#39;bbox&#39;]
+
+### Return type
+
+**Object**
 
 ### Authorization
 
@@ -447,6 +502,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 **[Object]**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## getServerStatus
+
+> GetServerStatus200Response getServerStatus()
+
+Returns which optional features are enabled on this instance.
+
+Distinct from /api/systemStatus, which reports whether the server is misconfigured and is the UI&#39;s boot gate. This one never fails: a feature being off is an answer, not an error. Every flag has positive polarity, so true always means the feature works, whatever the polarity of the variable behind it. myFilesEnabled and antivirus* describe python-api, which is what acts on them; they are reported here because script-server has no way to query python-api, so the deployment sets both containers identically. Not exposed to the chat assistant: it is absent from GENERATED_TOOLS_KEPT in python-api/app/mcp-server/server.py, and belongs in the system prompt rather than in a tool if the assistant ever needs it. 
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+apiInstance.getServerStatus((error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**GetServerStatus200Response**](GetServerStatus200Response.md)
 
 ### Authorization
 

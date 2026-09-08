@@ -14,18 +14,18 @@
 import ApiClient from '../ApiClient';
 
 /**
- * The GetRootItems403Response model module.
- * @module model/GetRootItems403Response
+ * The UploadFile400Response model module.
+ * @module model/UploadFile400Response
  * @version 2.3.0
  */
-class GetRootItems403Response {
+class UploadFile400Response {
     /**
-     * Constructs a new <code>GetRootItems403Response</code>.
-     * @alias module:model/GetRootItems403Response
+     * Constructs a new <code>UploadFile400Response</code>.
+     * @alias module:model/UploadFile400Response
      */
     constructor() { 
         
-        GetRootItems403Response.initialize(this);
+        UploadFile400Response.initialize(this);
     }
 
     /**
@@ -37,15 +37,15 @@ class GetRootItems403Response {
     }
 
     /**
-     * Constructs a <code>GetRootItems403Response</code> from a plain JavaScript object, optionally creating a new instance.
+     * Constructs a <code>UploadFile400Response</code> from a plain JavaScript object, optionally creating a new instance.
      * Copies all relevant properties from <code>data</code> to <code>obj</code> if supplied or a new instance if not.
      * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @param {module:model/GetRootItems403Response} obj Optional instance to populate.
-     * @return {module:model/GetRootItems403Response} The populated <code>GetRootItems403Response</code> instance.
+     * @param {module:model/UploadFile400Response} obj Optional instance to populate.
+     * @return {module:model/UploadFile400Response} The populated <code>UploadFile400Response</code> instance.
      */
     static constructFromObject(data, obj) {
         if (data) {
-            obj = obj || new GetRootItems403Response();
+            obj = obj || new UploadFile400Response();
 
             if (data.hasOwnProperty('detail')) {
                 obj['detail'] = ApiClient.convertToType(data['detail'], 'String');
@@ -55,9 +55,9 @@ class GetRootItems403Response {
     }
 
     /**
-     * Validates the JSON data with respect to <code>GetRootItems403Response</code>.
+     * Validates the JSON data with respect to <code>UploadFile400Response</code>.
      * @param {Object} data The plain JavaScript object bearing properties of interest.
-     * @return {boolean} to indicate whether the JSON data is valid with respect to <code>GetRootItems403Response</code>.
+     * @return {boolean} to indicate whether the JSON data is valid with respect to <code>UploadFile400Response</code>.
      */
     static validateJSON(data) {
         // ensure the json data is a string
@@ -76,12 +76,12 @@ class GetRootItems403Response {
 /**
  * @member {String} detail
  */
-GetRootItems403Response.prototype['detail'] = undefined;
+UploadFile400Response.prototype['detail'] = undefined;
 
 
 
 
 
 
-export default GetRootItems403Response;
+export default UploadFile400Response;
 

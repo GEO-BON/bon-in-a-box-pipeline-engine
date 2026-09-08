@@ -31,6 +31,12 @@ services:
       HPC_SSH_CONFIG_FILE: /run/secrets/hpc_ssh_config_file
       HPC_SSH_KEY: /run/secrets/hpc_ssh_key
       HPC_KNOWN_HOSTS_FILE: /run/secrets/hpc_known_hosts_file
+      # ⚠️ python-api's flag, repeated here only so GET /api/status can report the
+      # whole feature set from one endpoint -- script-server cannot ask python-api
+      # anything. It MUST match the value on python-api below, or the UI reports a
+      # confident lie about this instance. DISABLE_MY_FILES needs no line: both
+      # services already read the same runner.env above.
+      CLAMAV_ADDRESS: ${CLAMAV_ADDRESS:-}
     secrets:
       - hpc_ssh_key
       - hpc_known_hosts_file
@@ -43,7 +49,6 @@ services:
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
       - ${PIPELINE_REPO_PATH}/userdata:/data/userdata:rw  # for user uploads, used in "/manage-files"
-      - clamav_data:/var/lib/clamav:rw  # ClamAV signatures, scanning user uploads happens in this container
 
     user: ${MY_UID}:${DOCKER_GID}
     environment:
@@ -65,6 +70,10 @@ services:
       # for the paths it does cover; the broken stream that results is handled by
       # bridge/sitecustomize.py rather than prevented here.
       OLLAMA_PROXY_TIMEOUT: 600000
+      # The shared clamd. Blank -- the default -- means uploads are saved WITHOUT
+      # being scanned; set, main_api.py fails CLOSED and an unreachable scanner
+      # refuses the upload. See the antivirus block in main_api.py.
+      CLAMAV_ADDRESS: ${CLAMAV_ADDRESS:-}
     expose:
       - "8000"
       - "8001"
@@ -151,7 +160,3 @@ secrets:
     file: $HPC_KNOWN_HOSTS_FILE
   hpc_ssh_config_file:
     file: $HPC_SSH_CONFIG_FILE
-
-# added this to prevent downloading large files every time docker restarts
-volumes:
-  clamav_data:

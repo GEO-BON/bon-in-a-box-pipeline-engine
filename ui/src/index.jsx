@@ -58,6 +58,11 @@ const healthFmApi = new BonInABoxScriptService.FileManagerApi(healthClient);
 // dependencies.
 const checkSystemStatus = (callback) => healthApi.getSystemStatus(callback);
 const checkFileManager = (callback) => healthFmApi.isFileManagerDisabled(callback);
+// Which optional features this instance has switched on. Not a liveness check -- the
+// two above already cover that, one per backend -- so its failure must never gate the
+// UI: an instance that cannot answer it still works, it just cannot say which
+// features are off. See the defaults in App().
+const checkServerStatus = (callback) => healthApi.getServerStatus(callback);
 
 /**
  * Calls `check` on a fixed interval until it succeeds, then stops.
@@ -220,6 +225,7 @@ const staticRouter = (content) => {
 function App() {
   const status = useHealthCheck(checkSystemStatus);
   const fileManager = useHealthCheck(checkFileManager);
+  const features = useHealthCheck(checkServerStatus);
 
   if (status.pending) return staticRouter(<Spinner />);
 
@@ -253,10 +259,27 @@ function App() {
     );
   }
 
+  // Deliberately NOT in `checks` above: /api/status is not a liveness probe, and a
+  // failure to read it must not put an error page in front of a working instance.
+  // Every default below is the permissive one, so an unreadable /api/status leaves the
+  // UI exactly as it behaved before this endpoint existed -- the server still enforces
+  // each of these, and answers 503 with its own message if the user tries.
+  //
+  // disableMyFiles keeps coming from /fm-api/is_disabled rather than from
+  // features.data.myFilesEnabled: that call is python-api's liveness probe and has to
+  // be made anyway, and it is answered by the service that actually enforces the flag.
+  // /api/status merely reports it.
+  const value = {
+    disableMyFiles: fileManager.data?.disabled ?? false,
+    runsEnabled: features.data?.runsEnabled ?? true,
+    savePipelineToServer: features.data?.savePipelineToServer ?? true,
+    condaPackEnabled: features.data?.condaPackEnabled ?? true,
+    antivirusEnabled: features.data?.antivirusEnabled ?? false,
+    antivirusReachable: features.data?.antivirusReachable ?? null,
+  };
+
   return (
-    <uiContext.Provider
-      value={{ disableMyFiles: fileManager.data?.disabled ?? false }}
-    >
+    <uiContext.Provider value={value}>
       <RouterProvider router={router} />
     </uiContext.Provider>
   );

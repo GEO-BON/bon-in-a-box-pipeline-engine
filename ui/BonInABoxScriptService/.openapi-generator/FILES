@@ -14,6 +14,7 @@ docs/GetHPCStatus200ResponseValue.md
 docs/GetHistory200ResponseInner.md
 docs/GetRootItems200ResponseInner.md
 docs/GetRootItems403Response.md
+docs/GetServerStatus200Response.md
 docs/Info.md
 docs/InfoAuthorInner.md
 docs/InfoCompute.md
@@ -33,6 +34,8 @@ docs/RenameItem200Response.md
 docs/RenameItem200ResponseResult.md
 docs/RenameItemRequest.md
 docs/UploadFile200Response.md
+docs/UploadFile400Response.md
+docs/UploadFile413Response.md
 git_push.sh
 mocha.opts
 package.json
@@ -50,6 +53,7 @@ src/model/GetHPCStatus200ResponseValue.js
 src/model/GetHistory200ResponseInner.js
 src/model/GetRootItems200ResponseInner.js
 src/model/GetRootItems403Response.js
+src/model/GetServerStatus200Response.js
 src/model/Info.js
 src/model/InfoAuthorInner.js
 src/model/InfoCompute.js
@@ -69,3 +73,8 @@ src/model/RenameItem200Response.js
 src/model/RenameItem200ResponseResult.js
 src/model/RenameItemRequest.js
 src/model/UploadFile200Response.js
+src/model/UploadFile400Response.js
+src/model/UploadFile413Response.js
+test/model/GetServerStatus200Response.spec.js
+test/model/UploadFile400Response.spec.js
+test/model/UploadFile413Response.spec.js

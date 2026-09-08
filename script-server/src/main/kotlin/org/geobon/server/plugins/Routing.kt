@@ -62,6 +62,22 @@ fun Application.configureRouting() {
             return@get
         }
 
+        /**
+         * Which optional features this instance has switched on.
+         *
+         * Separate from /api/systemStatus above, which is unchanged and stays the UI's
+         * boot gate: that one answers text/plain and 503s with a configuration message
+         * the UI puts on screen (isStarting() in ui/src/index.jsx deliberately lets 503
+         * through for exactly that). This one is JSON and never fails -- "the feature is
+         * off" is an answer, not an error -- and it does not call SystemStatus.check(),
+         * whose mkdirs() side effect has no business running on a polled endpoint.
+         *
+         * See FeatureStatus for why two of these flags are python-api's.
+         */
+        get("/api/status") {
+            call.respond(gson.toJson(FeatureStatus.asMap()))
+        }
+
         get("/{type}/list") {
             val type = call.parameters["type"]
             val roots: List<File>
