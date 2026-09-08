@@ -126,6 +126,18 @@ function ManageFilesPage() {
   );
 }
 
+function PipelineEditorPage() {
+  const { savePipelineToServer } = useContext(uiContext);
+  return (
+      <>
+        <PageTitle title={savePipelineToServer ? "Pipeline Editor" : "Pipeline Inspector"} />
+        <Suspense fallback={<Spinner />}>
+        <PipelineEditor />
+        </Suspense>
+      </>
+  )
+}
+
 function NotFound() {
   const location = useLocation();
   return (
@@ -168,12 +180,7 @@ const router = createBrowserRouter([
       <Layout
         left={<StepChooser />}
         right={
-          <>
-            <PageTitle title="Pipeline Editor" />
-            <Suspense fallback={<Spinner />}>
-              <PipelineEditor />
-            </Suspense>
-          </>
+          <PipelineEditorPage />
         }
       />
     ),
@@ -259,16 +266,6 @@ function App() {
     );
   }
 
-  // Deliberately NOT in `checks` above: /api/status is not a liveness probe, and a
-  // failure to read it must not put an error page in front of a working instance.
-  // Every default below is the permissive one, so an unreadable /api/status leaves the
-  // UI exactly as it behaved before this endpoint existed -- the server still enforces
-  // each of these, and answers 503 with its own message if the user tries.
-  //
-  // disableMyFiles keeps coming from /fm-api/is_disabled rather than from
-  // features.data.myFilesEnabled: that call is python-api's liveness probe and has to
-  // be made anyway, and it is answered by the service that actually enforces the flag.
-  // /api/status merely reports it.
   const value = {
     disableMyFiles: fileManager.data?.disabled ?? false,
     runsEnabled: features.data?.runsEnabled ?? true,
