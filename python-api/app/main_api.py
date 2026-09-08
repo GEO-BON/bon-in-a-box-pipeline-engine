@@ -172,6 +172,18 @@ def _parse_clamav_address(address: str):
     """`host[:port]` -> `(host, port)`. None when unset or unparseable."""
     if not address:
         return None
+    if "://" in address:
+        # clamd speaks its own line protocol, not HTTP. Worth naming explicitly
+        # because OLLAMA_URL, the setting this one is modelled on, IS a URL -- and
+        # without this the scheme would be parsed as part of the hostname and every
+        # upload would fail closed against a host that cannot resolve.
+        print(
+            f"[clamav] CLAMAV_ADDRESS={address!r} has a URL scheme; clamd is not HTTP. "
+            f"Use host:port, e.g. {address.split('://', 1)[1]!r}. "
+            "ANTIVIRUS IS DISABLED, uploads will not be scanned",
+            flush=True,
+        )
+        return None
     host, sep, port = address.rpartition(":")
     if not sep:
         return address, CLAMAV_DEFAULT_PORT

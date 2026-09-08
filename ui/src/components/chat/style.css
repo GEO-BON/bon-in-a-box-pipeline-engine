@@ -1,7 +1,7 @@
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 90vh;
   min-width: 600px;
   max-width: 900px;
   margin: 0 auto;
@@ -13,7 +13,7 @@
   font-weight: bold;
   font-size: 1.1rem;
   border-bottom: 1px solid #333;
-  background: #1a1a1a;
+  background: #425b54;
   color: #fff;
 }
 
@@ -49,7 +49,7 @@
 }
 
 .chat-message.user .chat-bubble {
-  background: #3a6ea5;
+  background: #3a8e79;
   color: #fff;
   white-space: pre-wrap;
 }
@@ -87,10 +87,10 @@
   text-decoration: underline;
 }
 .chat-message.assistant .chat-bubble code {
-  background: #1a1a1a;
   border-radius: 3px;
   padding: 0 3px;
   font-size: 0.9em;
+  color: #74dac0
 }
 
 /* Shown between sending and the first token. The shared Ollama serialises requests
@@ -154,7 +154,7 @@ details[open].thinking-block summary::before {
   display: flex;
   gap: 8px;
   padding: 12px;
-  background: #1a1a1a;
+  background: #425b54;
   border-top: 1px solid #333;
 }
 
@@ -170,14 +170,14 @@ details[open].thinking-block summary::before {
 }
 
 .chat-input:focus {
-  border-color: #3a6ea5;
+  border-color: #548b7b;
 }
 
 .chat-send {
   padding: 10px 20px;
   border-radius: 8px;
   border: none;
-  background: #3a6ea5;
+  background: #548b7b;
   color: #fff;
   cursor: pointer;
   font-size: 0.95rem;
