@@ -92,6 +92,22 @@ class FeatureStatusTest {
     }
 
     @Test
+    fun `the response is JSON, not a JSON string in a text body`() = testApplication {
+        application { scriptModule() }
+
+        // Every assertion above reads bodyAsText(), which is blind to Content-Type --
+        // so they all passed while the UI saw nothing. The generated JS client is not
+        // blind to it: it parses on Content-Type, and a text/plain body reaches
+        // GetServerStatus200Response.constructFromObject as a string, whose
+        // hasOwnProperty is false for every field. The flags come back undefined and
+        // index.jsx defaults each one to permissive, so `deny` is silently ignored.
+        assertEquals(
+            ContentType.Application.Json,
+            client.get("/api/status").contentType()?.withoutParameters()
+        )
+    }
+
+    @Test
     fun `an unreachable scanner is configured but not reachable`() = testApplication {
         // Port 1 on loopback: nothing listens, so the probe fails fast rather than
         // depending on a real clamd being available to the test suite.

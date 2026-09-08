@@ -75,7 +75,18 @@ fun Application.configureRouting() {
          * See FeatureStatus for why two of these flags are python-api's.
          */
         get("/api/status") {
-            call.respond(gson.toJson(FeatureStatus.asMap()))
+            // The map, NOT gson.toJson(map) -- exactly like every other object route
+            // here. Responding with the serialized String makes Ktor send it as
+            // text/plain, and the bytes look perfect in curl, which is what made this
+            // cost an afternoon: the generated JS client dispatches on Content-Type,
+            // so superagent leaves a text/plain body unparsed, ApiClient.deserialize
+            // falls back to response.text, and GetServerStatus200Response
+            // .constructFromObject reads its fields off a *string* -- every
+            // hasOwnProperty is false, every flag comes out undefined, and index.jsx
+            // falls back to the permissive default for all of them. The UI ignores
+            // SAVE_PIPELINE_TO_SERVER=deny while this endpoint reports it faithfully.
+            // `the response is JSON, not a JSON string in a text body` pins it.
+            call.respond(FeatureStatus.asMap())
         }
 
         get("/{type}/list") {

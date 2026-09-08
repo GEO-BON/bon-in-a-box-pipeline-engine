@@ -33,12 +33,12 @@ export default function LeftPane({leftContent}) {
                 </div>
 
                 <div className='left-pane-links-bottom'>
-                    {leftContent && (
+                    {leftContent && savePipelineToServer && (
                         <>
                         {leftContent}
                         </>
                     )}
-                    {!leftContent || !savePipelineToServer && (
+                    {(!leftContent || !savePipelineToServer) && (
                         <>
                             <div className="divider"></div>
                             {/* doesn't render if this is a READ ONLY environment */}
