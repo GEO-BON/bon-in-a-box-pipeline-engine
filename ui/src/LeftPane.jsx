@@ -11,8 +11,8 @@ import IconEBV from "./img/icon-ebv.png";
 import { uiContext } from "./uiContext.jsx";
 
 
-export default function LeftPane() {
-    const { disableMyFiles } = useContext(uiContext);
+export default function LeftPane({leftContent}) {
+    const { disableMyFiles, savePipelineToServer } = useContext(uiContext);
     return (
         <div className="left-pane">
             <NavLink
@@ -33,32 +33,41 @@ export default function LeftPane() {
                 </div>
 
                 <div className='left-pane-links-bottom'>
-                    <div className="divider"></div>
-                    {/* doesn't render if this is a READ ONLY environment */}
-                    {!disableMyFiles && <NavLink
-                        className="left-pane-link"
-                        to="/manage-files">
-                            <img src={IconFiles} className='left-pane-icon'></img>
-                            My files
-                    </NavLink>}
-                    <NavLink
-                        className="left-pane-link"
-                        to="https://discourse.geobon.org/">
-                            <img src={IconDiscourse} className='left-pane-icon'></img>
-                            Discourse
-                    </NavLink>
-                    <NavLink
-                        className="left-pane-link"
-                        to="https://members.geobon.org/pages/index">
-                            <img src={IconMembers} className='left-pane-icon'></img>
-                            Members
-                    </NavLink>
-                    <NavLink
-                        className="left-pane-link"
-                        to="https://portal.geobon.org/datasets">
-                            <img src={IconEBV} className='left-pane-icon'></img>
-                            Data portal
-                    </NavLink>
+                    {leftContent && savePipelineToServer && (
+                        <>
+                        {leftContent}
+                        </>
+                    )}
+                    {!leftContent && (
+                        <>
+                            <div className="divider"></div>
+                            {/* doesn't render if this is a READ ONLY environment */}
+                            {!disableMyFiles && <NavLink
+                                className="left-pane-link"
+                                to="/manage-files">
+                                    <img src={IconFiles} className='left-pane-icon'></img>
+                                    My files
+                            </NavLink>}
+                            <NavLink
+                                className="left-pane-link"
+                                to="https://discourse.geobon.org/">
+                                    <img src={IconDiscourse} className='left-pane-icon'></img>
+                                    Discourse
+                            </NavLink>
+                            <NavLink
+                                className="left-pane-link"
+                                to="https://members.geobon.org/pages/index">
+                                    <img src={IconMembers} className='left-pane-icon'></img>
+                                    Members
+                            </NavLink>
+                            <NavLink
+                                className="left-pane-link"
+                                to="https://portal.geobon.org/datasets">
+                                    <img src={IconEBV} className='left-pane-icon'></img>
+                                    Data portal
+                            </NavLink>
+                        </>
+                ) }
                 </div>
             </div>
         </div>

@@ -52,7 +52,7 @@ export function Layout(props) {
     <PopupContentContext.Provider value={{popupContent, setPopupContent}}>
         <TitleContext.Provider value={{ title, setTitle }}>
             <ThemeProvider theme={theme}>
-                <LeftPane/>
+                <LeftPane leftContent={props.left}/>
             <div>
                 <div className="right-content">
                     <TopMenu/>
