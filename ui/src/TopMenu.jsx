@@ -22,23 +22,20 @@ import IconMembers from "./img/icon-members.png";
 import { uiContext } from "./uiContext.jsx";
 import getUserInfo from './utils/getUserInfo.js';
 
-
-const pages = [
-  { title: 'Home', link: '/' },
-  { title: 'Run a script', link: '/script-form' },
-  { title: 'Run a pipeline', link: '/pipeline-form' },
-  { title: 'Chat', link: '/chat' },
-  { title: 'Pipeline editor', link: '/pipeline-editor' },
-  { title: 'History', link: '/history' },
-  { title: 'Info', link: '/info' }
-];
-
-
-
 function TopMenu() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
-    const { disableMyFiles } = React.useContext(uiContext);
+    const { disableMyFiles, savePipelineToServer } = React.useContext(uiContext);
     const [userInfo, setUserInfo] = React.useState({ name: 'FirstName' });
+
+    const pages = [
+    { title: 'Home', link: '/' },
+    { title: 'Run a script', link: '/script-form' },
+    { title: 'Run a pipeline', link: '/pipeline-form' },
+    { title: 'Chat', link: '/chat' },
+    { title: savePipelineToServer ? 'Pipeline editor' : 'Pipeline inspector', link: '/pipeline-editor' },
+    { title: 'History', link: '/history' },
+    { title: 'Info', link: '/info' }
+    ];
 
     React.useEffect(() => {
         getUserInfo()
