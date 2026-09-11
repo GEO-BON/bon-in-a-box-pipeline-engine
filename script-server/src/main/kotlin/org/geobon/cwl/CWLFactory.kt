@@ -1,6 +1,7 @@
 package org.geobon.cwl
 
 
+import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_ARRAY
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_BOOLEAN
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_DIRECTORY
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_DOUBLE
@@ -140,10 +141,17 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         val typeName = typeToCWL(definition.type)
         val type = if (definition.type.startsWith(IO__TYPE_OPTIONS)) {
             buildString {
-                append("\n${indent(3)}type: $typeName")
-                append("\n${indent(3)}symbols:")
+                var indent = 3
+                if(definition.isArray()) {
+                    append("\n${indent(indent)}type: $CWL__IO__TYPE_ARRAY")
+                    append("\n${indent(indent)}items:")
+                    indent++
+                }
+                append("\n${indent(indent)}type: $CWL__IO__TYPE_ENUM")
+                append("\n${indent(indent)}symbols:")
+                indent++
                 definition.options?.forEach {
-                    append("\n${indent(4)}- $it")
+                    append("\n${indent(indent)}- $it")
                 }
             }
         } else " $typeName${if (isInput) "?" else ""}"

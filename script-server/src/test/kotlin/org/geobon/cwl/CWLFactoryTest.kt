@@ -53,6 +53,11 @@ class CWLFactoryTest {
     }
 
     @Test
+    fun `test single script with options array`() {
+        testSingleStep(File(File(noHPCContext.scriptsRoot, "helloWorld"), "helloR.yml"))
+    }
+
+    @Test
     fun `test simple pipeline`() {
         testWorkflow("userInput")
     }
