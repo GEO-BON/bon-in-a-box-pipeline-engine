@@ -14,8 +14,8 @@ import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
 import org.geobon.pipeline.*
 import org.geobon.pipeline.metadata.IOMetadata
 import org.geobon.pipeline.metadata.StepMetadata
-import org.geobon.script.Description.IO__TYPE_OPTIONS
-import org.geobon.script.Description.IO__TYPE_TEXT
+import org.geobon.script.Description.IO__TYPE__OPTIONS
+import org.geobon.script.Description.IO__TYPE__TEXT
 import org.geobon.server.ServerContext
 import org.json.JSONObject
 import org.json.JSONWriter
@@ -139,7 +139,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         }
 
         val typeName = typeToCWL(definition.type)
-        val type = if (definition.type.startsWith(IO__TYPE_OPTIONS)) {
+        val type = if (definition.type.startsWith(IO__TYPE__OPTIONS)) {
             buildString {
                 var indent = 3
                 if(definition.isArray()) {
@@ -482,8 +482,8 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
 
         // Primitives
         return when (biabRawType) {
-            IO__TYPE_TEXT -> CWL__IO__TYPE_STRING
-            IO__TYPE_OPTIONS -> CWL__IO__TYPE_ENUM
+            IO__TYPE__TEXT -> CWL__IO__TYPE_STRING
+            IO__TYPE__OPTIONS -> CWL__IO__TYPE_ENUM
             else -> biabRawType
         } + arraySuffix
     }
