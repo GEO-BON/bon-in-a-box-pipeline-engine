@@ -58,6 +58,11 @@ class CWLFactoryTest {
     }
 
     @Test
+    fun `test single script with STAC output`() {
+        testSingleStep(File(cwlScripts, "createCollection.yml"))
+    }
+
+    @Test
     fun `test simple pipeline`() {
         testWorkflow("userInput")
     }
@@ -80,6 +85,11 @@ class CWLFactoryTest {
     @Test
     fun `test many outputs and a constant aggregated into array input`() {
         testWorkflow("aggregateOutputsAndConstant")
+    }
+
+    @Test
+    fun `given there is no metadata object_then IO still generated`() {
+        testWorkflow("forCWL/simpleSTAC")
     }
 
     fun validateCWL(cwlFile: File) {

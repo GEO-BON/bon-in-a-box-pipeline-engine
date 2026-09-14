@@ -15,6 +15,7 @@ import org.geobon.pipeline.*
 import org.geobon.pipeline.metadata.IOMetadata
 import org.geobon.pipeline.metadata.StepMetadata
 import org.geobon.script.Description.IO__TYPE__OPTIONS
+import org.geobon.script.Description.IO__TYPE__STAC
 import org.geobon.script.Description.IO__TYPE__TEXT
 import org.geobon.server.ServerContext
 import org.json.JSONObject
@@ -176,7 +177,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             } else if (outputPipe != null) {
                 appendLine(2, "outputSource: ${toCWL(outputPipe)}")
 
-            } else {
+            } else { // JavaScript output evaluation
                 appendLine(
                     $$"""
                         outputBinding:
@@ -209,6 +210,12 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
 
                     typeName.startsWith(CWL__IO__TYPE_DIRECTORY) -> {
                         appendLine(indent, "if (value === null) return null;")
+
+                        // STAC output in Biab is folder/collection.json, but in CWL we want to output the whole folder
+                        if (definition.type.startsWith(IO__TYPE__STAC)) {
+                            appendLine(indent, "value = value.substring(0, value.lastIndexOf('/'));")
+                        }
+
                         appendLine(indent, """return { class: "Directory", location: "file://" + value };""")
                     }
 
@@ -475,6 +482,9 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         val arraySuffix = if (arrayIndex == -1) "" else biabType.substring(arrayIndex)
         val biabRawType = if (arrayIndex == -1) biabType else biabType.substring(0, arrayIndex)
 
+        if (biabType.startsWith(IO__TYPE__STAC))
+            return CWL__IO__TYPE_DIRECTORY
+
         // All mime types
         if (biabType.contains('/')) {
             return "$CWL__IO__TYPE_FILE$arraySuffix"
@@ -490,9 +500,11 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
 
     private fun metadataToCWL(stepMetadata: StepMetadata): String {
         return buildString {
-            appendLine("label: ${stepMetadata.name}")
-            val docEntries = mutableListOf<String>()
+            stepMetadata.name?.let {
+                appendLine("label: ${stepMetadata.name}")
+            }
 
+            val docEntries = mutableListOf<String>()
             stepMetadata.description?.let {
                 docEntries.add("Description:\n${it.replaceIndent(indent(2))}")
             }
