@@ -89,7 +89,14 @@ class CWLFactoryTest {
 
     @Test
     fun `given there is no metadata object_then IO still generated`() {
-        testWorkflow("forCWL/simpleSTAC")
+        val toTest = File(noHPCContext.pipelinesRoot, "forCWL/simpleSTAC.json")
+        File(noHPCContext.pipelinesRoot, "forCWL/simpleSTAC.json.noValidate")
+            .copyTo(toTest)
+        try {
+            testWorkflow("forCWL/simpleSTAC")
+        } finally {
+            toTest.delete()
+        }
     }
 
     fun validateCWL(cwlFile: File) {
