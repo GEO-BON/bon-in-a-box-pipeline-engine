@@ -7,6 +7,7 @@ import org.geobon.utils.SystemCall
 import org.geobon.utils.assertMultilineEquals
 import org.geobon.utils.noHPCContext
 import org.geobon.utils.scriptsRoot
+import org.geobon.utils.withProductionPaths
 import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -27,8 +28,8 @@ class CWLFactoryTest {
 
     @AfterTest
     fun cleanup() {
-        cwlFile?.delete()
-        templateFile?.delete()
+//        cwlFile?.delete()
+//        templateFile?.delete()
         pathToSteps.deleteRecursively()
     }
 
@@ -89,6 +90,8 @@ class CWLFactoryTest {
 
     @Test
     fun `given there is no metadata object_then IO still generated`() {
+        // This test case should only happen in a WIP or when debugging.
+        // A GitHub action validates that all pipelines commited to repo have metadata.
         val toTest = File(noHPCContext.pipelinesRoot, "forCWL/simpleSTAC.json")
         File(noHPCContext.pipelinesRoot, "forCWL/simpleSTAC.json.noValidate")
             .copyTo(toTest)
