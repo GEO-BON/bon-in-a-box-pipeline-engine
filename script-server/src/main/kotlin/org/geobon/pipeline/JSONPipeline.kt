@@ -214,25 +214,25 @@ class JSONPipeline (
             val inputs = inputsToConstants(inputsJSON, pipelineJSON)
 
             // Extract metadata to object
-            val metadata = pipelineJSON.optJSONObject(METADATA)?.let { metadata ->
-                // Transfer IO from main body to metadata (like in script descriptions)
-                metadata.append(INPUTS, pipelineJSON.optJSONObject(INPUTS))
-                metadata.append(OUTPUTS, pipelineJSON.optJSONObject(OUTPUTS))
+            val jsonMetadata = pipelineJSON.optJSONObject(METADATA, JSONObject())
 
-                val rawMetadata = metadata.toMap()
-                StepMetadata(
-                    IOMetadata.mapFromRawMetadata(rawMetadata, INPUTS, logger),
-                    IOMetadata.mapFromRawMetadata(rawMetadata, OUTPUTS, logger),
-                    metadata.opt(NAME)?.toString(),
-                    metadata.opt(DESCRIPTION)?.toString(),
-                    PersonMetadata.listFromRawMetadata(rawMetadata, AUTHORS),
-                    PersonMetadata.listFromRawMetadata(rawMetadata, REVIEWERS),
-                    ReferenceMetadata.listFromRawMetadata(rawMetadata),
-                    metadata.opt(LICENSE)?.toString(),
-                    metadata.opt(EXTERNAL_LINK)?.toString(),
-                    LifecycleMetadata.fromRawMetadata(rawMetadata)
-                )
-            }
+            // Transfer IO from main body to metadata (like in script descriptions)
+            jsonMetadata.append(INPUTS, pipelineJSON.optJSONObject(INPUTS))
+            jsonMetadata.append(OUTPUTS, pipelineJSON.optJSONObject(OUTPUTS))
+
+            val metadataMap = jsonMetadata.toMap()
+            val objMetadata = StepMetadata(
+                IOMetadata.mapFromRawMetadata(metadataMap, INPUTS, logger),
+                IOMetadata.mapFromRawMetadata(metadataMap, OUTPUTS, logger),
+                jsonMetadata.opt(NAME)?.toString(),
+                jsonMetadata.opt(DESCRIPTION)?.toString(),
+                PersonMetadata.listFromRawMetadata(metadataMap, AUTHORS),
+                PersonMetadata.listFromRawMetadata(metadataMap, REVIEWERS),
+                ReferenceMetadata.listFromRawMetadata(metadataMap),
+                jsonMetadata.opt(LICENSE)?.toString(),
+                jsonMetadata.opt(EXTERNAL_LINK)?.toString(),
+                LifecycleMetadata.fromRawMetadata(metadataMap)
+            )
 
             return JSONPipeline(
                 stepId,
@@ -240,7 +240,7 @@ class JSONPipeline (
                 steps,
                 inputs,
                 outputs,
-                metadata
+                objMetadata
             )
         }
 

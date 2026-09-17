@@ -7,6 +7,7 @@ package org.geobon.cwl
 
 object CWLTypes {
     const val CWL__IO__TYPE_STRING = "string"
+    const val CWL__IO__TYPE_ARRAY = "array"
     const val CWL__IO__TYPE_ENUM = "enum"
     const val CWL__IO__TYPE_FILE = "File"
     const val CWL__IO__TYPE_BOOLEAN = "boolean"
