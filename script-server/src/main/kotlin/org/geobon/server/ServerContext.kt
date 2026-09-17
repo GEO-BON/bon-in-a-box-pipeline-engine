@@ -30,13 +30,20 @@ open class ServerContext(
         val outputRoot
             get() = File(System.getenv("OUTPUT_LOCATION"))
 
-        // CONDA_PACK_DIR points this at storage shared by every session. Without it,
-        // the default is per-user and, on Kubernetes, rebuilt on every run.
-        val condaPackDir: File? = when {
-            System.getenv("CONDA_PACK_ENABLED").let { it.isNullOrBlank() || it == "false" } -> null
-            else -> System.getenv("CONDA_PACK_DIR")?.takeIf { it.isNotBlank() }?.let(::File)
-                ?: File(outputRoot, "_envs")
-        }
+        /**
+         * Storage for packed conda environments, reused between instances.
+         */
+        val condaPackDir =
+            if (System.getenv("CONDA_PACK_ENABLED") != "true") {
+                null
+            } else {
+                System.getenv("CONDA_PACK_DIR").let { explicitCondaPackDir ->
+                    if (explicitCondaPackDir.isNotBlank())
+                        File(explicitCondaPackDir)
+                    else // Default location inside output folder
+                        File(outputRoot, "_envs")
+                }
+            }
 
         val condaPackURL:String? = System.getenv("CONDA_PACK_URL")
     }

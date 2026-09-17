@@ -61,8 +61,7 @@ class K8sConnection {
 			"/runner.env",
 			hostPathType = "FileOrCreate"
 		),
-		// Shared by every session, so an environment built once is reused everywhere.
-		// Kept out of requiredEnvVars: deployments that don't set it must keep working.
+		// Shared by every session, so an environment built once is reused everywhere. Optional.
 		CONDA_PACK(
 			System.getenv("K8S_SHARED_CONDA_PACK_HOST_PATH") ?: "/mnt/biab-shared/conda-pack",
 			"/conda-pack"
