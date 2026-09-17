@@ -14,11 +14,12 @@ import org.junit.Test
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class HPCTest {
     lateinit var hpc: HPC
     lateinit var serverContext: ServerContext
-    val retrieveSyncInterval = 10000L
+    val retrieveSyncInterval = 10.seconds
 
     @Before
     fun setup() {
@@ -248,7 +249,7 @@ class HPCTest {
         val run1 = mockRun(step1, "run command")
 
 
-        coEvery { hpc.connection.runCommand(any(), any(), any()) } coAnswers { delay(5000); }
+        coEvery { hpc.connection.runCommand(any(), any(), any()) } coAnswers { delay(5.seconds); }
         coEvery { hpc.connection.syncFiles(any(), any(), any()) } just runs
 
         val job1 = hpc.syncCondaEnvironment(run0, condaEnvName, logFile, syncCommand)

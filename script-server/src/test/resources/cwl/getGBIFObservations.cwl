@@ -242,7 +242,7 @@ inputs:
     doc: Root folder for scripts. Use this to override the image's scripts while debugging.
 
 outputs:
-  observations_file:
+  observations_file_out:
     type: File
     label: Observations
     doc: Output file with observations
@@ -256,7 +256,7 @@ outputs:
           return { class: "File", location: "file://" + value };
         }
 
-  total_records:
+  total_records_out:
     type: int
     label: Total number of occurrences
     doc: Total number of GBIF occurrences in csv file
@@ -270,7 +270,7 @@ outputs:
           return parseInt(value);
         }
 
-  gbif_doi:
+  gbif_doi_out:
     type: string
     label: DOI of GBIF download
     doc: DOI of GBIF download. Used for citing downloaded data.

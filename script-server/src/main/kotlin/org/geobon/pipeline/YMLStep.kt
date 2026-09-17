@@ -6,8 +6,8 @@ import org.geobon.script.Description.AUTHORS
 import org.geobon.script.Description.DESCRIPTION
 import org.geobon.script.Description.EXTERNAL_LINK
 import org.geobon.script.Description.INPUTS
-import org.geobon.script.Description.IO__TYPE_OPTIONS
-import org.geobon.script.Description.IO__TYPE_TEXT
+import org.geobon.script.Description.IO__TYPE__OPTIONS
+import org.geobon.script.Description.IO__TYPE__TEXT
 import org.geobon.script.Description.LICENSE
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
@@ -94,7 +94,7 @@ abstract class YMLStep(
                     inputPipe.type == "int" && expectedType == "float" -> ""
 
                     // options to text accepted
-                    inputPipe.type == IO__TYPE_OPTIONS && expectedType == IO__TYPE_TEXT -> ""
+                    inputPipe.type == IO__TYPE__OPTIONS && expectedType == IO__TYPE__TEXT -> ""
 
                     // Non-array to single-element array accepted
                     expectedType.endsWith("[]") && inputPipe.type == expectedType.dropLast(2) -> {
@@ -130,9 +130,9 @@ abstract class YMLStep(
 
         try { // Validation
             // Check that the selected option is one of the defined options
-            inputs.filter { (_, pipe) -> pipe.type == IO__TYPE_OPTIONS }.forEach { (key, _) ->
+            inputs.filter { (_, pipe) -> pipe.type == IO__TYPE__OPTIONS }.forEach { (key, _) ->
                 metadata.inputs[key]?.let { inputDefinition ->
-                    if(inputDefinition.type != IO__TYPE_TEXT) { // Ignore options to text conversion
+                    if(inputDefinition.type != IO__TYPE__TEXT) { // Ignore options to text conversion
                         val options = inputDefinition.options
                             ?: throw RuntimeException("$yamlFile: No options found for input parameter $key.")
 

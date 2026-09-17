@@ -11,6 +11,7 @@ import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 
 class CWLFactoryTest {
 
@@ -52,6 +53,16 @@ class CWLFactoryTest {
     }
 
     @Test
+    fun `test single script with options array`() {
+        testSingleStep(File(File(noHPCContext.scriptsRoot, "helloWorld"), "helloR.yml"))
+    }
+
+    @Test
+    fun `test single script with STAC output`() {
+        testSingleStep(File(cwlScripts, "createCollection.yml"))
+    }
+
+    @Test
     fun `test simple pipeline`() {
         testWorkflow("userInput")
     }
@@ -76,13 +87,27 @@ class CWLFactoryTest {
         testWorkflow("aggregateOutputsAndConstant")
     }
 
+    @Test
+    fun `given there is no metadata object_then IO still generated`() {
+        // This test case should only happen in a WIP or when debugging.
+        // A GitHub action validates that all pipelines commited to repo have metadata.
+        val toTest = File(noHPCContext.pipelinesRoot, "forCWL/simpleSTAC.json")
+        File(noHPCContext.pipelinesRoot, "forCWL/simpleSTAC.json.noValidate")
+            .copyTo(toTest)
+        try {
+            testWorkflow("forCWL/simpleSTAC")
+        } finally {
+            toTest.delete()
+        }
+    }
+
     fun validateCWL(cwlFile: File) {
         // cwl validation: not necessary for the test but very useful when developing!
         if (hasRunner) {
             val validationResult = SystemCall().runBlocking(
                 listOf("cwl-runner", "--validate", cwlFile.absolutePath),
                 mergeErrors = true,
-                timeoutAmount = 10
+                timeout = 10.seconds
             )
             println(validationResult.output)
             assertTrue(validationResult.success, "CWL Validation failed")
@@ -95,7 +120,7 @@ class CWLFactoryTest {
             val validationResult = SystemCall().runBlocking(
                 listOf("cwl-runner", "--make-template", cwlFile.absolutePath),
                 mergeErrors = false,
-                timeoutAmount = 10
+                timeout = 10.seconds
             )
             assertTrue(validationResult.success, "Make template failed")
             templateFile = File(cwlFile.parentFile.absolutePath, "${cwlFile.nameWithoutExtension}_template.yml")
