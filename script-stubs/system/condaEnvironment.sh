@@ -213,8 +213,12 @@ function useLocalPack {
             condaPackExtracted="$condaPackWriteable/$condaEnvName"
         fi
 
-        # Check for an unzipped folder locally
-        if [ -d "$condaPackExtracted" ] && [ -f "$condaPackExtracted/bin/conda-unpack" ] && [ -f "$condaPackExtracted/bin/activate" ]; then
+        # Written only once conda-unpack has returned. Testing for bin/ instead would
+        # accept a tree that tar has only partly written, or one left by a pod that
+        # died before its prefixes were rewritten.
+        # conda-unpack bakes in the path it runs at, so it cannot be staged elsewhere
+        # and renamed into place: the lock is what protects this.
+        if [ -f "$condaPackExtracted/.unpacked" ]; then
             echo "    Already unpacked."
         else
             # Unpack
@@ -228,6 +232,7 @@ function useLocalPack {
             mamba activate base || return 1
             $condaPackExtracted/bin/conda-unpack || return 1
             mamba deactivate # base
+            touch "$condaPackExtracted/.unpacked" || return 1
 
             echo "    Done."
         fi
@@ -258,7 +263,14 @@ else
     # A second lock on the whole folder happens inside the activateSubEnvironment
     # function to prevent two different sub-environments from doing transactions
     # at the same time.
-    lockFile="/conda-env-yml/$condaEnvName.lock"
+    # On Kubernetes each run is its own pod, so a lock under /conda-env-yml is
+    # pod-local and serialises nothing. When the pack directory is shared and
+    # writable, the lock has to live there instead.
+    if [[ "$condaPackWriteable" != "$tmpPackDir" ]]; then
+        lockFile="$condaPackWriteable/$condaEnvName.lock"
+    else
+        lockFile="/conda-env-yml/$condaEnvName.lock"
+    fi
     exec {lockfd}>>"$lockFile" ; assertSuccess
     trap 'exec {lockfd}>&- 2>/dev/null || true' EXIT INT TERM HUP
     flock --verbose -x "$lockfd" ; assertSuccess

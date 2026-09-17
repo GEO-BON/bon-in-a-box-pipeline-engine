@@ -30,9 +30,20 @@ open class ServerContext(
         val outputRoot
             get() = File(System.getenv("OUTPUT_LOCATION"))
 
+        /**
+         * Storage for packed conda environments, reused between instances.
+         */
         val condaPackDir =
-            if (System.getenv("CONDA_PACK_ENABLED").let { it.isNullOrBlank() || it == "false" }) null
-            else File(outputRoot, "_envs")
+            if (System.getenv("CONDA_PACK_ENABLED") != "true") {
+                null
+            } else {
+                System.getenv("CONDA_PACK_DIR").let { explicitCondaPackDir ->
+                    if (explicitCondaPackDir.isNotBlank())
+                        File(explicitCondaPackDir)
+                    else // Default location inside output folder
+                        File(outputRoot, "_envs")
+                }
+            }
 
         val condaPackURL:String? = System.getenv("CONDA_PACK_URL")
     }
