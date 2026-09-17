@@ -144,6 +144,9 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             buildString {
                 var indent = 3
                 if(definition.isArray()) {
+                    // This passes validation but is not supported by the runner,
+                    // see https://github.com/common-workflow-language/cwltool/issues/821
+                    // TODO: implement a workaround with a string[]
                     append("\n${indent(indent)}type: $CWL__IO__TYPE_ARRAY")
                     append("\n${indent(indent)}items:")
                     indent++
@@ -483,7 +486,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         val biabRawType = if (arrayIndex == -1) biabType else biabType.substring(0, arrayIndex)
 
         if (biabType.startsWith(IO__TYPE__STAC))
-            return CWL__IO__TYPE_DIRECTORY
+            return "$CWL__IO__TYPE_DIRECTORY$arraySuffix"
 
         // All mime types
         if (biabType.contains('/')) {
