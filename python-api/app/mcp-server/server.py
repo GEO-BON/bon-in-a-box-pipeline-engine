@@ -1,5 +1,6 @@
 import asyncio
 import httpx
+import logging
 from fastmcp import FastMCP
 import yaml
 import json
@@ -540,8 +541,37 @@ async def tool_budget():
     )
 
 
+class HealthProbeFilter(logging.Filter):
+    """Drop compose's own healthcheck from uvicorn's access log.
+
+    That check GETs /mcp every interval for the life of the container, and a bare GET
+    is answered 406 by design -- the MCP app wants an SSE Accept header. The 406 IS
+    the healthy answer, so the line carries no information, and at one every few
+    seconds it is the only thing in `docker logs biab-python-api` on an instance
+    nobody is using. Filtered here rather than by turning uvicorn's access log off
+    entirely, because real MCP traffic on this port is worth seeing.
+
+    uvicorn logs these with args (client_addr, method, path, http_version, status);
+    see the access_logger.info call in uvicorn/protocols/http/h11_impl.py. Matching on
+    all of them, loopback included, keeps a genuine 406 from a real client visible.
+    """
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        args = record.args
+        if not isinstance(args, tuple) or len(args) < 5:
+            return True
+        client, method, path, _version, status = args[:5]
+        return not (
+            status == 406
+            and method == "GET"
+            and path == "/mcp"
+            and str(client).startswith("127.0.0.1")
+        )
+
+
 if __name__ == "__main__":
     if "--tool-budget" in sys.argv:
         asyncio.run(tool_budget())
     else:
+        logging.getLogger("uvicorn.access").addFilter(HealthProbeFilter())
         mcp.run(transport="http", host="0.0.0.0", port=8002)
