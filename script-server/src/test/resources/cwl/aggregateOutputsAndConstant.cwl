@@ -155,7 +155,7 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [randomness]
+    out: [randomness_out]
 
 
   0in1out.yml@1:
@@ -167,14 +167,14 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [randomness]
+    out: [randomness_out]
 
 
   assertArray.yml@3:
     run: commandLineTools/assertArray.cwl
     in:
       array:
-        source: [0in1out.yml@0/randomness, 0in1out.yml@1/randomness]
+        source: [0in1out.yml@0/randomness_out, 0in1out.yml@1/randomness_out]
         linkMerge: merge_flattened
         valueFrom: $(self.concat([12, 13]))
       runFolder:
@@ -183,13 +183,13 @@ steps:
       environment: environment
       condaPackURL: condaPackURL
       scripts_root: scripts_root
-    out: [the_same]
+    out: [the_same_out]
 
 
 outputs:
-  assertArray.yml@3|the_same:
+  assertArray.yml@3|the_same_out:
     type: int[]
     label: Same value
     doc: The same array as in the inputs. But this crashes if not an array
-    outputSource: assertArray.yml@3/the_same
+    outputSource: assertArray.yml@3/the_same_out
 

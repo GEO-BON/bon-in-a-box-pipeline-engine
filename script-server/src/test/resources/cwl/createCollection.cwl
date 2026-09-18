@@ -7,15 +7,15 @@ class: CommandLineTool
 # envFolder will keep conda environments between runs.
 # environment file is necessary when the script requires credentials.
 
-label: Python Example
+label: TIFF to STAC Collection
 doc:
   - |
     Description:
-    Sample python script that increments a number.
-  - "Lifecycle tag: Example. Testing lifecycle messages."
+    Converts GeoTIFF files into a STAC collection. A STAC collection is JSON file aggregating spatial temporal data in the form of geospatial files and their metadata.
+  - "Lifecycle tag: Core."
   - |
     Authors:
-    Jean-Michel Lord (https://orcid.org/0009-0007-3826-1125)
+    Laetitia Tremblay (laetitia.tremblay@mcgill.ca)
 
 
 requirements:
@@ -106,7 +106,10 @@ arguments:
     cat > "$OUTPUT_LOCATION/input.json" <<'JSON'
     ${
       return JSON.stringify({
-        some_int: inputs.some_int,
+        tiff_files: (inputs.tiff_files || []).map(function(file) { return file.path; }),
+        collection_name: inputs.collection_name,
+        collection_description: inputs.collection_description,
+        collection_license: inputs.collection_license,
       }, null, 2);
     }
     JSON
@@ -114,8 +117,12 @@ arguments:
     echo "Inputs:" | tee -a $log
     cat $OUTPUT_LOCATION/input.json | tee -a $log
 
-    source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "pythonbase" \
-    "" /conda-envs $(inputs.condaPackURL) >> "$log" 2>&1
+    source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "forCWL__createCollection" \
+    "channels: [conda-forge]
+    dependencies: [pystac, gdal, jsonschema, rasterio, shapely, pyproj, geopandas, rasterstats,
+      numpy]
+    name: forCWL__createCollection
+    " /conda-envs $(inputs.condaPackURL) >> "$log" 2>&1
 
     python3 \
       $SCRIPT_STUBS_LOCATION/system/scriptWrapper.py \
@@ -130,7 +137,7 @@ arguments:
       cp -a "$OUTPUT_LOCATION"/. "$(runtime.outdir)"/
     fi
 
-    source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh pythonbase /conda-envs >> "$log" 2>&1
+    source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh forCWL__createCollection /conda-envs >> "$log" 2>&1
 
     exit "$scriptExitCode"
 
@@ -138,11 +145,28 @@ inputs:
   #################
   # Script inputs #
   #################
-  some_int:
-    type: int?
-    label: Some int
-    doc: A number that we will increment
-    default: 3
+  tiff_files:
+    type: File[]?
+    label: GeoTIFF files
+    doc: GeoTIFFs to be added to the collection
+
+  collection_name:
+    type: string?
+    label: Collection Name
+    doc: Name of the STAC collection to be created. The collection name should be unique, using lowercase letters and hyphens only. Default is "biab-collection".
+    default: biab-collection
+
+  collection_description:
+    type: string?
+    label: Collection Description
+    doc: Description of the STAC collection to be created.
+    default: A STAC collection created from GeoTIFF files.
+
+  collection_license:
+    type: string?
+    label: Collection License
+    doc: License for the STAC collection to be created. Default is "CC-BY".
+    default: CC-BY
 
 
 
@@ -186,25 +210,28 @@ inputs:
   scriptPath:
     type: string
     doc: Path to the script, relative to scripts root.
-    default: helloWorld/helloPython.py
+    default: forCWL/createCollection.py
 
   scripts_root:
     type: Directory?
     doc: Root folder for scripts. Use this to override the image's scripts while debugging.
 
 outputs:
-  increment_out:
-    type: int
-    label: A number (input++)
-    doc: bla bla
+  stac_collection_out:
+    type: Directory
+    label: STAC Collection
+    doc: >
+      JSON file representing a STAC collection containing the provided GeoTIFFs
+      The official MIME type is application/json however, we use application/stac+json to indicate that this is a STAC catalog and differentiate from other json files.
     outputBinding:
       glob: "output.json"
       loadContents: true
       outputEval: |
         ${
-          var value = extractOutput(self, "increment");
+          var value = extractOutput(self, "stac_collection");
           if (value === null) return null;
-          return parseInt(value);
+          value = value.substring(0, value.lastIndexOf('/'));
+          return { class: "Directory", location: "file://" + value };
         }
 
 

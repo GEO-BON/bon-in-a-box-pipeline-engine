@@ -26,7 +26,7 @@ data class IOMetadata(
         definition[Description.IO__DESCRIPTION].toString(),
         definition[Description.IO__WEIGHT].toString().toIntOrNull(),
         definition[Description.IO__EXAMPLE],
-        (definition[Description.IO__TYPE_OPTIONS] as? Iterable<*>)?.let { options ->
+        (definition[Description.IO__TYPE__OPTIONS] as? Iterable<*>)?.let { options ->
             options.map { it.toString() }
         }
     )

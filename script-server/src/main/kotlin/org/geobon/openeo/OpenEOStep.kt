@@ -36,7 +36,7 @@ import org.geobon.script.Description.IO__DESCRIPTION
 import org.geobon.script.Description.IO__EXAMPLE
 import org.geobon.script.Description.IO__LABEL
 import org.geobon.script.Description.IO__TYPE
-import org.geobon.script.Description.IO__TYPE_OPTIONS
+import org.geobon.script.Description.IO__TYPE__OPTIONS
 import org.geobon.script.Description.LICENSE
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
@@ -280,9 +280,9 @@ class OpenEOStep: ScriptStep {
 
                 when {
                     schema?.optJSONArray(UDP__INPUT__ENUM) != null -> {
-                        input[IO__TYPE] = IO__TYPE_OPTIONS
+                        input[IO__TYPE] = IO__TYPE__OPTIONS
                         val enum = schema.optJSONArray(UDP__INPUT__ENUM)!!
-                        input[IO__TYPE_OPTIONS] = (0 until enum.length()).map { enum.getString(it) }
+                        input[IO__TYPE__OPTIONS] = (0 until enum.length()).map { enum.getString(it) }
                     }
 
                     rawType == "array" -> {
@@ -291,8 +291,8 @@ class OpenEOStep: ScriptStep {
 
                         val itemsEnum = items.optJSONArray(UDP__INPUT__ENUM)
                         if (itemsEnum != null) {
-                            input[IO__TYPE] = "$IO__TYPE_OPTIONS[]"
-                            input[IO__TYPE_OPTIONS] = (0 until itemsEnum.length()).map { itemsEnum.getString(it) }
+                            input[IO__TYPE] = "$IO__TYPE__OPTIONS[]"
+                            input[IO__TYPE__OPTIONS] = (0 until itemsEnum.length()).map { itemsEnum.getString(it) }
                         } else {
                             val itemType = items.optJSONArray("anyOf")?.let { anyOf ->
                                 (0 until anyOf.length()).firstNotNullOfOrNull {
