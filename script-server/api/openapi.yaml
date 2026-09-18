@@ -374,9 +374,9 @@ paths:
         off is an answer, not an error. Every flag has positive polarity, so true always
         means the feature works, whatever the polarity of the variable behind it.
 
-        myFilesEnabled and antivirus* describe python-api, which is what acts on them;
-        they are reported here because script-server has no way to query python-api, so
-        the deployment sets both containers identically.
+        myFilesEnabled, chatEnabled and antivirus* describe python-api, which is what
+        acts on them; they are reported here because script-server has no way to query
+        python-api, so the deployment sets both containers identically.
 
         Not exposed to the chat assistant: it is absent from GENERATED_TOOLS_KEPT in
         python-api/app/mcp-server/server.py, and belongs in the system prompt rather
@@ -394,6 +394,7 @@ paths:
                   - savePipelineToServer
                   - condaPackEnabled
                   - myFilesEnabled
+                  - chatEnabled
                   - antivirusEnabled
                 properties:
                   runsEnabled:
@@ -408,6 +409,12 @@ paths:
                   myFilesEnabled:
                     type: boolean
                     description: False when DISABLE_MY_FILES makes the file manager read-only.
+                  chatEnabled:
+                    type: boolean
+                    description: >
+                      False when DISABLE_CHAT hides the assistant from the UI and skips
+                      the chat bridge. The MCP server runs either way, so this says
+                      nothing about MCP availability.
                   antivirusEnabled:
                     type: boolean
                     description: >
@@ -425,6 +432,7 @@ paths:
                   savePipelineToServer: true
                   condaPackEnabled: true
                   myFilesEnabled: true
+                  chatEnabled: true
                   antivirusEnabled: true
                   antivirusReachable: true
   /api/versions:

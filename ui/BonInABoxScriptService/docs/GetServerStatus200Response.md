@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **savePipelineToServer** | **Boolean** | False when SAVE_PIPELINE_TO_SERVER denies the save API. | 
 **condaPackEnabled** | **Boolean** | Whether conda environments are cached with conda-pack. | 
 **myFilesEnabled** | **Boolean** | False when DISABLE_MY_FILES makes the file manager read-only. | 
+**chatEnabled** | **Boolean** | False when DISABLE_CHAT hides the assistant from the UI and skips the chat bridge. The MCP server runs either way, so this says nothing about MCP availability.  | 
 **antivirusEnabled** | **Boolean** | Whether uploads are scanned. When false they are saved unscanned; when true an unscannable upload is refused rather than saved.  | 
 **antivirusReachable** | **Boolean** | Whether the scanner currently answers, or null when antivirus is off. False here means uploads are being refused, because the scan path fails closed.  | [optional] 
 

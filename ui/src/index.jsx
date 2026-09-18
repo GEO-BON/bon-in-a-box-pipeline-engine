@@ -149,6 +149,22 @@ function NotFound() {
   );
 }
 
+/**
+ * The assistant, or the 404 page when DISABLE_CHAT is set on this instance.
+ *
+ * The gate lives here rather than in the route table because `router` below is built
+ * at module scope, where there is no context to read. Rendering NotFound -- the very
+ * component the "*" route uses -- rather than dropping the route keeps that decision
+ * out of the router entirely.
+ *
+ * Note that this hides the chat, not the MCP server: DISABLE_CHAT leaves that running
+ * for MCP clients, which do not come through this bundle at all.
+ */
+function ChatPage() {
+  const { chatEnabled } = useContext(uiContext);
+  return chatEnabled ? <Chat /> : <NotFound />;
+}
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -165,7 +181,7 @@ const router = createBrowserRouter([
   {
     path: "chat",
     element: (
-      <Layout right={<Chat />} />
+      <Layout right={<ChatPage />} />
     ),
   },
   {
@@ -271,6 +287,7 @@ function App() {
     runsEnabled: features.data?.runsEnabled ?? true,
     savePipelineToServer: features.data?.savePipelineToServer ?? true,
     condaPackEnabled: features.data?.condaPackEnabled ?? true,
+    chatEnabled: features.data?.chatEnabled ?? false,
     antivirusEnabled: features.data?.antivirusEnabled ?? false,
     antivirusReachable: features.data?.antivirusReachable ?? null,
   };

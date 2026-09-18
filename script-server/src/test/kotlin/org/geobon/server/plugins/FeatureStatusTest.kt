@@ -15,9 +15,9 @@ import kotlin.test.*
  * GET /api/status, the one place the UI learns which optional features are on.
  *
  * The flags behind it use three different conventions -- BLOCK_RUNS is the string
- * "true", SAVE_PIPELINE_TO_SERVER is the string "deny", DISABLE_MY_FILES inverts -- so
- * what these tests really pin is that all of them come out with positive polarity:
- * `true` always means the feature works.
+ * "true", SAVE_PIPELINE_TO_SERVER is the string "deny", DISABLE_MY_FILES and
+ * DISABLE_CHAT invert -- so what these tests really pin is that all of them come out
+ * with positive polarity: `true` always means the feature works.
  */
 class FeatureStatusTest {
 
@@ -38,7 +38,8 @@ class FeatureStatusTest {
 
     @Test
     fun `defaults report every feature as available`() = testApplication {
-        // No BLOCK_RUNS, no SAVE_PIPELINE_TO_SERVER, no DISABLE_MY_FILES set.
+        // No BLOCK_RUNS, no SAVE_PIPELINE_TO_SERVER, no DISABLE_MY_FILES, no
+        // DISABLE_CHAT set.
         application { scriptModule() }
 
         client.get("/api/status").apply {
@@ -48,6 +49,7 @@ class FeatureStatusTest {
             assertTrue(getBoolean("runsEnabled"))
             assertTrue(getBoolean("savePipelineToServer"))
             assertTrue(getBoolean("myFilesEnabled"))
+            assertTrue(getBoolean("chatEnabled"))
         }
     }
 
@@ -75,6 +77,16 @@ class FeatureStatusTest {
         withEnvironment("DISABLE_MY_FILES", "TRUE", OverrideMode.SetOrOverride) {
             application { scriptModule() }
             assertFalse(status().getBoolean("myFilesEnabled"))
+        }
+    }
+
+    @Test
+    fun `a disabled chat is reported, inverted`() = testApplication {
+        // python-api owns this one as well: startup.sh reads it to skip the chat
+        // bridge, while deliberately leaving the MCP server up.
+        withEnvironment("DISABLE_CHAT", "TRUE", OverrideMode.SetOrOverride) {
+            application { scriptModule() }
+            assertFalse(status().getBoolean("chatEnabled"))
         }
     }
 

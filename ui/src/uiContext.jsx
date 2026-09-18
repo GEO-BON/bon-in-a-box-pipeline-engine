@@ -12,12 +12,17 @@ import { createContext } from "react";
  * Defaults are the permissive ones, matching index.jsx: a UI that cannot read the flags
  * behaves as it did before they existed, and the server still enforces every one of
  * them regardless of what is rendered here.
+ *
+ * chatEnabled is the exception, and defaults closed for the reason given in index.jsx:
+ * a Chat link is worth withholding until the instance confirms it, rather than
+ * offering one that may 404.
  */
 export const uiContext = createContext({
   disableMyFiles: false,
   runsEnabled: true,
   savePipelineToServer: true,
   condaPackEnabled: true,
+  chatEnabled: false,
   antivirusEnabled: false,
   antivirusReachable: null,
 });

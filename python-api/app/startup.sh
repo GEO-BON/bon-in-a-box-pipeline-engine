@@ -37,7 +37,18 @@ gunicorn -k uvicorn.workers.UvicornWorker titiler.application.main:app --bind 0.
 #     property used to come from putting the bridge in its own Sablier group.
 #
 # No OLLAMA_URL means no assistant at all, rather than one that fails on every message.
-if [ -n "$OLLAMA_URL" ]; then
+# DISABLE_CHAT=true does the same on purpose, for a deployment that has an Ollama to
+# point at but does not want to offer chat; script-server reports it to the UI as
+# chatEnabled:false so the nav entry goes away with the endpoint.
+#
+# Either way the MCP server above stays up. It is not part of the chat: MCP clients
+# reach it directly, and the bridge is only one of its consumers.
+#
+# Lowercased before comparing, because the two other readers of this variable are
+# case-insensitive -- main_api.py's DISABLE_MY_FILES does `.lower() == "true"` and
+# FeatureStatus.kt uses ignoreCase -- and a DISABLE_CHAT=True that hid the UI while
+# leaving the bridge running would be a confusing half-state to debug.
+if [ -n "$OLLAMA_URL" ] && [ "$(printf '%s' "$DISABLE_CHAT" | tr '[:upper:]' '[:lower:]')" != "true" ]; then
   (
     # The bridge connects to its MCP servers once, at startup, and gives up if they
     # are not there. In separate containers depends_on/service_healthy covered this;

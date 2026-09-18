@@ -75,6 +75,3 @@ src/model/RenameItemRequest.js
 src/model/UploadFile200Response.js
 src/model/UploadFile400Response.js
 src/model/UploadFile413Response.js
-test/model/GetServerStatus200Response.spec.js
-test/model/UploadFile400Response.spec.js
-test/model/UploadFile413Response.spec.js

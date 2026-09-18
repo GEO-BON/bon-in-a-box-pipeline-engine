@@ -519,7 +519,7 @@ No authorization required
 
 Returns which optional features are enabled on this instance.
 
-Distinct from /api/systemStatus, which reports whether the server is misconfigured and is the UI&#39;s boot gate. This one never fails: a feature being off is an answer, not an error. Every flag has positive polarity, so true always means the feature works, whatever the polarity of the variable behind it. myFilesEnabled and antivirus* describe python-api, which is what acts on them; they are reported here because script-server has no way to query python-api, so the deployment sets both containers identically. Not exposed to the chat assistant: it is absent from GENERATED_TOOLS_KEPT in python-api/app/mcp-server/server.py, and belongs in the system prompt rather than in a tool if the assistant ever needs it. 
+Distinct from /api/systemStatus, which reports whether the server is misconfigured and is the UI&#39;s boot gate. This one never fails: a feature being off is an answer, not an error. Every flag has positive polarity, so true always means the feature works, whatever the polarity of the variable behind it. myFilesEnabled, chatEnabled and antivirus* describe python-api, which is what acts on them; they are reported here because script-server has no way to query python-api, so the deployment sets both containers identically. Not exposed to the chat assistant: it is absent from GENERATED_TOOLS_KEPT in python-api/app/mcp-server/server.py, and belongs in the system prompt rather than in a tool if the assistant ever needs it. 
 
 ### Example
 

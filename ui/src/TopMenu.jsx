@@ -24,14 +24,16 @@ import getUserInfo from './utils/getUserInfo.js';
 
 function TopMenu() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
-    const { disableMyFiles, savePipelineToServer } = React.useContext(uiContext);
+    const { disableMyFiles, savePipelineToServer, chatEnabled } = React.useContext(uiContext);
     const [userInfo, setUserInfo] = React.useState({ name: 'FirstName' });
 
     const pages = [
     { title: 'Home', link: '/' },
     { title: 'Run a script', link: '/script-form' },
     { title: 'Run a pipeline', link: '/pipeline-form' },
-    { title: 'Chat', link: '/chat' },
+    // This one array feeds both the mobile menu and the desktop bar below, so
+    // dropping the entry here is all it takes to hide chat in both.
+    ...(chatEnabled ? [{ title: 'Chat', link: '/chat' }] : []),
     { title: savePipelineToServer ? 'Pipeline editor' : 'Pipeline inspector', link: '/pipeline-editor' },
     { title: 'History', link: '/history' },
     { title: 'Info', link: '/info' }

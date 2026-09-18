@@ -26,11 +26,12 @@ class GetServerStatus200Response {
      * @param savePipelineToServer {Boolean} False when SAVE_PIPELINE_TO_SERVER denies the save API.
      * @param condaPackEnabled {Boolean} Whether conda environments are cached with conda-pack.
      * @param myFilesEnabled {Boolean} False when DISABLE_MY_FILES makes the file manager read-only.
+     * @param chatEnabled {Boolean} False when DISABLE_CHAT hides the assistant from the UI and skips the chat bridge. The MCP server runs either way, so this says nothing about MCP availability. 
      * @param antivirusEnabled {Boolean} Whether uploads are scanned. When false they are saved unscanned; when true an unscannable upload is refused rather than saved. 
      */
-    constructor(runsEnabled, savePipelineToServer, condaPackEnabled, myFilesEnabled, antivirusEnabled) { 
+    constructor(runsEnabled, savePipelineToServer, condaPackEnabled, myFilesEnabled, chatEnabled, antivirusEnabled) { 
         
-        GetServerStatus200Response.initialize(this, runsEnabled, savePipelineToServer, condaPackEnabled, myFilesEnabled, antivirusEnabled);
+        GetServerStatus200Response.initialize(this, runsEnabled, savePipelineToServer, condaPackEnabled, myFilesEnabled, chatEnabled, antivirusEnabled);
     }
 
     /**
@@ -38,11 +39,12 @@ class GetServerStatus200Response {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj, runsEnabled, savePipelineToServer, condaPackEnabled, myFilesEnabled, antivirusEnabled) { 
+    static initialize(obj, runsEnabled, savePipelineToServer, condaPackEnabled, myFilesEnabled, chatEnabled, antivirusEnabled) { 
         obj['runsEnabled'] = runsEnabled;
         obj['savePipelineToServer'] = savePipelineToServer;
         obj['condaPackEnabled'] = condaPackEnabled;
         obj['myFilesEnabled'] = myFilesEnabled;
+        obj['chatEnabled'] = chatEnabled;
         obj['antivirusEnabled'] = antivirusEnabled;
     }
 
@@ -68,6 +70,9 @@ class GetServerStatus200Response {
             }
             if (data.hasOwnProperty('myFilesEnabled')) {
                 obj['myFilesEnabled'] = ApiClient.convertToType(data['myFilesEnabled'], 'Boolean');
+            }
+            if (data.hasOwnProperty('chatEnabled')) {
+                obj['chatEnabled'] = ApiClient.convertToType(data['chatEnabled'], 'Boolean');
             }
             if (data.hasOwnProperty('antivirusEnabled')) {
                 obj['antivirusEnabled'] = ApiClient.convertToType(data['antivirusEnabled'], 'Boolean');
@@ -98,7 +103,7 @@ class GetServerStatus200Response {
 
 }
 
-GetServerStatus200Response.RequiredProperties = ["runsEnabled", "savePipelineToServer", "condaPackEnabled", "myFilesEnabled", "antivirusEnabled"];
+GetServerStatus200Response.RequiredProperties = ["runsEnabled", "savePipelineToServer", "condaPackEnabled", "myFilesEnabled", "chatEnabled", "antivirusEnabled"];
 
 /**
  * False when BLOCK_RUNS makes this a results-only server.
@@ -123,6 +128,12 @@ GetServerStatus200Response.prototype['condaPackEnabled'] = undefined;
  * @member {Boolean} myFilesEnabled
  */
 GetServerStatus200Response.prototype['myFilesEnabled'] = undefined;
+
+/**
+ * False when DISABLE_CHAT hides the assistant from the UI and skips the chat bridge. The MCP server runs either way, so this says nothing about MCP availability. 
+ * @member {Boolean} chatEnabled
+ */
+GetServerStatus200Response.prototype['chatEnabled'] = undefined;
 
 /**
  * Whether uploads are scanned. When false they are saved unscanned; when true an unscannable upload is refused rather than saved. 

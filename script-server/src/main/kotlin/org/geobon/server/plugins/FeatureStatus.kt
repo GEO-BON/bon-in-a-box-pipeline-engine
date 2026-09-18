@@ -12,7 +12,7 @@ import java.net.Socket
  * one is the UI's boot gate and reports whether the server is *misconfigured*. Here,
  * "the feature is off" is an answer rather than an error, so this never fails.
  *
- * Two of these flags belong to python-api, which is what acts on them. They are
+ * Three of these flags belong to python-api, which is what acts on them. They are
  * reported here because script-server has no way to ask python-api anything -- no HTTP
  * client, no configured base URL, and Containers.kt reaches it by `docker exec`, which
  * does not exist on Kubernetes. The deployment therefore has to set them identically on
@@ -22,7 +22,8 @@ import java.net.Socket
  * Everything is reported with POSITIVE polarity -- `true` always means the feature
  * works -- whatever the polarity of the variable behind it. Three different conventions
  * feed this: BLOCK_RUNS is the string "true", SAVE_PIPELINE_TO_SERVER is the string
- * "deny", DISABLE_MY_FILES inverts, and CONDA_PACK_ENABLED is anything-but-false.
+ * "deny", DISABLE_MY_FILES and DISABLE_CHAT invert, and CONDA_PACK_ENABLED is
+ * anything-but-false.
  */
 object FeatureStatus {
 
@@ -56,6 +57,12 @@ object FeatureStatus {
             "condaPackEnabled" to (condaPackDir != null),
             // python-api's, parsed the way python-api parses it.
             "myFilesEnabled" to !System.getenv("DISABLE_MY_FILES").equals("true", ignoreCase = true),
+            // python-api's too: startup.sh reads it to skip the chat bridge. Only the
+            // bridge -- the MCP server on 8002 keeps running, since it serves MCP
+            // clients directly and the bridge is merely one of them. Needs no line in
+            // compose.yml for the same reason DISABLE_MY_FILES does not: both services
+            // already read the same runner.env.
+            "chatEnabled" to !System.getenv("DISABLE_CHAT").equals("true", ignoreCase = true),
             "antivirusEnabled" to antivirusEnabled,
             // null, not false, when antivirus is off: "not configured" and "configured
             // but not answering" are different states and only the second is a problem.
