@@ -31,6 +31,12 @@ services:
       HPC_SSH_CONFIG_FILE: /run/secrets/hpc_ssh_config_file
       HPC_SSH_KEY: /run/secrets/hpc_ssh_key
       HPC_KNOWN_HOSTS_FILE: /run/secrets/hpc_known_hosts_file
+      # ⚠️ python-api's flag, repeated here only so GET /api/status can report the
+      # whole feature set from one endpoint -- script-server cannot ask python-api
+      # anything. It MUST match the value on python-api below, or the UI reports a
+      # confident lie about this instance. DISABLE_MY_FILES needs no line: both
+      # services already read the same runner.env above.
+      CLAMAV_ADDRESS: ${CLAMAV_ADDRESS:-}
     secrets:
       - hpc_ssh_key
       - hpc_known_hosts_file
@@ -38,18 +44,79 @@ services:
 
   python-api: # Serves Titiler and a FastAPI app to serve country and region names and geometries
     container_name: biab-python-api
+    env_file: # added this to fetch the DISABLE_MY_FILES variable in /pipeline-repo/runner.env
+      - ${PIPELINE_REPO_PATH}/runner.env
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
+      - ${PIPELINE_REPO_PATH}/userdata:/data/userdata:rw  # for user uploads, used in "/manage-files"
+
     user: ${MY_UID}:${DOCKER_GID}
     environment:
       PORT: 8000
       WORKERS_PER_CORE: 1
       TITILER_API_CORS_ORIGINS: "*"
+      USERDATA_ROOT: /data/userdata/files
+      DISABLE_MY_FILES: ${DISABLE_MY_FILES}
+      # The chat bridge, started by startup.sh as a fourth process here rather than as
+      # a container of its own: it holds no model and no GPU, so it was a whole
+      # container -- and, on Kubernetes, a whole pod per session -- to run an HTTP
+      # client. Unset OLLAMA_URL disables the assistant entirely.
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11435}
+      # Covers the bridge's non-streaming call to Ollama and its health check.
+      #
+      # NOTE: it does NOT reach the streaming chat path. `stream_ollama` in the bridge
+      # builds its client with a hardcoded `timeout=None`, so /api/chat with
+      # stream:true has no timeout at all and this value never applies to it. It stays
+      # for the paths it does cover; the broken stream that results is handled by
+      # bridge/sitecustomize.py rather than prevented here.
+      OLLAMA_PROXY_TIMEOUT: 600000
+      # The shared clamd. Blank -- the default -- means uploads are saved WITHOUT
+      # being scanned; set, main_api.py fails CLOSED and an unreachable scanner
+      # refuses the upload. See the antivirus block in main_api.py.
+      CLAMAV_ADDRESS: ${CLAMAV_ADDRESS:-}
     expose:
       - "8000"
       - "8001"
+      - "8002"
+      - "8003"
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    # Watches 8002, the MCP server, because that is what the chat bridge has to find.
+    # The bridge connects once at startup and never retries: lose that race and it comes
+    # up with zero tools and stays that way, which reads to the user as an assistant
+    # that has forgotten how to do anything. startup.sh backgrounds the MCP server
+    # behind titiler and builds its toolset from the OpenAPI spec, so it is reliably the
+    # last to listen -- hence the long start_period, during which failures do not count
+    # against retries.
+    #
+    # Now that the bridge runs inside this container, the race is startup.sh's to lose
+    # and it waits on 8002 itself. This check is left as the outside view of the same
+    # condition: it is what tells you from `docker compose ps` that the assistant's
+    # backend is up.
+    #
+    # 406 is the MCP app refusing a bare GET, which is the answer we want: it proves the
+    # right server is listening, so the check only needs curl to reach it, not to be
+    # given a status it likes.
+    #
+    # This does make the container report unhealthy if the MCP server dies, which
+    # startup.sh deliberately treats as non-fatal. Nothing acts on that: gateway keeps
+    # the short form of depends_on and starts regardless, and compose does not restart
+    # on unhealthy. The tiler, the region API and the file manager go on serving
+    # exactly as before.
+    healthcheck:
+      test: ["CMD", "curl", "-s", "-o", "/dev/null", "http://localhost:8002/mcp"]
+      # Two cadences, because the question changes once the answer is known. While the
+      # container is still starting, every 5s: the MCP server builds its toolset from
+      # the OpenAPI spec and is reliably the last thing to listen, so a tight loop is
+      # what makes `docker compose ps` go healthy promptly. After that, every 5 minutes
+      # -- nothing acts on this check (see below), so probing an already-healthy server
+      # six times a minute buys nothing and costs a log line each time. Docker has no
+      # exponential backoff; start_interval/interval is the whole of the mechanism.
+      interval: 5m
+      start_interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
 
   runner-conda:
     container_name: biab-runner-conda

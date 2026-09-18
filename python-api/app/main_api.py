@@ -1,11 +1,21 @@
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, APIRouter, HTTPException, Response, File, UploadFile, Query, Request, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from pathlib import Path
 import duckdb
 import os
 import json
+import json
 import geopandas as gpd
 import pandas as pd
+import shutil
+from dotenv import load_dotenv
+
+# for file scanning
+from clamav_client.clamd import BufferTooLongError, ClamdNetworkSocket
+from fastapi.concurrency import run_in_threadpool
+
+
 
 app = FastAPI()
 
@@ -64,6 +74,55 @@ def regions_list(country_iso:str):
     json_str = names.to_json(orient='records')
     return Response(content=json_str, media_type='application/json')
 
+@app.get("/region/country_region_bbox")
+def country_region_bbox(type: str = 'country', id: str = "", crs: str = 'EPSG:4326', output_format: str = 'bbox'):
+    if type == 'country':
+        reg = ddb.sql("SELECT *, ST_AsText(geometry) AS geom FROM read_parquet(?) WHERE adm0_src=?", params=[countries_parquet, id]).df()
+        if( reg.empty ):
+            raise HTTPException(status_code=404, detail="Country ID not found")
+    elif type == 'region':
+        reg = ddb.sql("SELECT *, ST_AsText(geometry) AS geom FROM read_parquet(?) WHERE adm1_src=?", params=[regions_parquet, id]).df()
+        if( reg.empty ):
+            raise HTTPException(status_code=404, detail="Region ID not found")
+        country = ddb.sql("SELECT adm0_src, geometry_bbox FROM read_parquet(?) WHERE adm0_src=?", params=[countries_parquet, reg["adm0_src"].iloc[0]]).df()
+    else:
+        raise HTTPException(status_code=400, detail="Invalid type parameter. Must be 'country' or 'region'.")
+
+    gs = gpd.GeoSeries.from_wkt(reg["geom"], crs="EPSG:4326")
+    del reg["geom"]
+    gdf = gpd.GeoDataFrame(reg, geometry=gs, crs="EPSG:4326")
+    gdf = gdf.to_crs(crs)
+    bbox = gdf.total_bounds
+    if output_format == 'bbox':
+        return {"bbox": bbox.tolist(), "crs": crs}
+    elif output_format == 'chooser_input':
+        if(type=='country'):
+            country_bb4326 = reg["geometry_bbox"].iloc[0]
+        elif(type=='region'):
+            region_bb4326 = reg["geometry_bbox"].iloc[0]
+            country_bb4326 = country["geometry_bbox"].iloc[0]
+        return {"CRS": 
+                {"CRSBboxWGS84": "", 
+                 "authority": crs.split(':')[0], 
+                 "code": crs.split(':')[1], 
+                 "proj4Def": gdf.crs.to_proj4(), 
+                 "unit": gdf.crs.axis_info[0].unit_name, 
+                 "wktDef": gdf.crs.to_wkt()},
+                 "bbox": bbox.tolist(),
+                 "country": {
+                     "ISO3": reg["adm0_src"].iloc[0], 
+                     "englishName": reg["adm0_name"].iloc[0], 
+                     "bboxWGS84": [country_bb4326["xmin"], country_bb4326["ymin"], country_bb4326["xmax"], country_bb4326["ymax"]]},
+                 "region": type=='region' and {
+                     "ISO3": reg["adm1_src"].iloc[0],
+                     "englishName": reg["adm1_name"].iloc[0],
+                     "bboxWGS84": [region_bb4326["xmin"], region_bb4326["ymin"], region_bb4326["xmax"], region_bb4326["ymax"]]
+                 } or {}
+        }
+    else:
+        raise HTTPException(status_code=400, detail="Invalid output_format parameter. Must be 'bbox' or 'chooser_input'.")
+
+
 @app.get("/region/geometry")
 def region_geometry(type: str = 'country', id: str = ""):
     if type == 'country':
@@ -85,3 +144,370 @@ def region_geometry(type: str = 'country', id: str = ""):
     gdf.to_file(file_path, driver='GPKG', layer='country_region', overwrite=True)
     return FileResponse(file_path, media_type="application/geopackage+sqlite3", filename="%s.gpkg" % fname)
 
+# --- Antivirus -------------------------------------------------------------
+# clamd used to run inside this container. It is a shared service now: on the cluster
+# one container on the dispatcher VM serves every session, and locally it is whatever
+# CLAMAV_ADDRESS names, or nothing at all. Its signature set is ~1.5GB resident and
+# identical everywhere, so one copy replaces one per awake session.
+#
+# UNSET DISABLES SCANNING ENTIRELY, and that is a supported configuration -- a laptop,
+# a CI run, an instance whose uploads are not exposed to anyone else. Uploads are then
+# saved exactly as they were before any of this existed.
+#
+# SET, IT FAILS CLOSED. A configured clamd that cannot be reached REFUSES the upload.
+# This is the opposite of what this code used to do: it caught every exception, logged
+# a line nobody reads, and saved the file anyway -- so the only two outcomes were
+# "clean" and "unscanned but saved", and an operator who had configured antivirus had
+# no way to tell which one they were in. The cost is that a clamd outage is now an
+# upload outage for every session at once; GET /api/status reports both the
+# configuration and the reachability so that is visible before a user finds out.
+CLAMAV_DEFAULT_PORT = 3310
+# An upload holds a request open for the whole scan. Bounded so that a host which
+# blackholes rather than refuses returns 503 instead of hanging the request forever --
+# without this the fail-closed path is worse than the failure it replaces.
+CLAMAV_TIMEOUT_SECONDS = 60.0
+
+
+def _parse_clamav_address(address: str):
+    """`host[:port]` -> `(host, port)`. None when unset or unparseable."""
+    if not address:
+        return None
+    if "://" in address:
+        # clamd speaks its own line protocol, not HTTP. Worth naming explicitly
+        # because OLLAMA_URL, the setting this one is modelled on, IS a URL -- and
+        # without this the scheme would be parsed as part of the hostname and every
+        # upload would fail closed against a host that cannot resolve.
+        print(
+            f"[clamav] CLAMAV_ADDRESS={address!r} has a URL scheme; clamd is not HTTP. "
+            f"Use host:port, e.g. {address.split('://', 1)[1]!r}. "
+            "ANTIVIRUS IS DISABLED, uploads will not be scanned",
+            flush=True,
+        )
+        return None
+    host, sep, port = address.rpartition(":")
+    if not sep:
+        return address, CLAMAV_DEFAULT_PORT
+    try:
+        return host, int(port)
+    except ValueError:
+        # Disabled rather than half-configured, and loud about it: a typo must never
+        # become "antivirus on, pointed at nothing", which under fail-closed would
+        # refuse every upload on the instance.
+        print(
+            f"[clamav] CLAMAV_ADDRESS={address!r} is not host[:port] -- "
+            "ANTIVIRUS IS DISABLED, uploads will not be scanned",
+            flush=True,
+        )
+        return None
+
+
+CLAMAV_ADDRESS = os.environ.get("CLAMAV_ADDRESS", "").strip()
+CLAMAV_ENDPOINT = _parse_clamav_address(CLAMAV_ADDRESS)
+ANTIVIRUS_ENABLED = CLAMAV_ENDPOINT is not None
+print(
+    f"[clamav] scanning uploads via {CLAMAV_ADDRESS}"
+    if ANTIVIRUS_ENABLED
+    else "[clamav] no CLAMAV_ADDRESS -- uploads are NOT scanned",
+    flush=True,
+)
+
+
+def _clamav_client() -> ClamdNetworkSocket:
+    host, port = CLAMAV_ENDPOINT
+    return ClamdNetworkSocket(host=host, port=port, timeout=CLAMAV_TIMEOUT_SECONDS)
+
+
+def _sync_scan(fileobj) -> dict:
+    """Stream one upload to clamd. Runs in a threadpool worker; the socket is sync."""
+    result = _clamav_client().instream(fileobj)
+    print(f"[clamav] result for upload: {result}", flush=True)
+    return result
+
+
+async def scan_file_buffer(file: UploadFile = File(...)) -> UploadFile:
+    """FastAPI dependency: scan an incoming multipart file before it is written.
+
+    The file object is handed to clamd as a stream rather than read into memory
+    first. That is not a micro-optimisation: the gateway accepts 10G bodies, and
+    `await file.read()` put the whole of one on the heap. UploadFile.file is a
+    SpooledTemporaryFile that spills to disk, and instream() reads it in chunks, which
+    is what lets the session pod run with a 1Gi limit.
+    """
+    if not ANTIVIRUS_ENABLED:
+        return file
+
+    await file.seek(0)
+    try:
+        result = await run_in_threadpool(_sync_scan, file.file)
+    except BufferTooLongError as exc:
+        # The client knew the limit and refused to send. Distinct from an outage, and
+        # answering 503 would send an operator looking in the wrong place.
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail="File is larger than the antivirus can scan, so it was refused. "
+                   "Raise StreamMaxLength on the scanner to allow it.",
+        ) from exc
+    except Exception as exc:
+        # FAIL CLOSED. 503 rather than 500: this is "the file was not scanned", not
+        # "your request was malformed".
+        #
+        # The message names both causes on purpose. Measured against a real clamd:
+        # when a stream exceeds StreamMaxLength the SERVER closes the connection
+        # mid-send, which arrives here as BrokenPipeError, not BufferTooLongError --
+        # indistinguishable from clamd having died. Claiming "unavailable" outright
+        # would be wrong half the time, and the half it is wrong about is the one an
+        # operator can actually fix.
+        print(f"[clamav] scan failed against {CLAMAV_ADDRESS}: {exc!r}", flush=True)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="The upload could not be scanned, so it was refused. Either the "
+                   "antivirus is unreachable, or the file exceeds the scanner's "
+                   "StreamMaxLength. See GET /api/status and the python-api log.",
+        ) from exc
+    finally:
+        await file.seek(0)
+
+    status_type, detail = (result or {}).get("stream", (None, None))
+    if status_type == "FOUND":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Malware detected! File blocked by antivirus: {detail}",
+        )
+    if status_type == "ERROR":
+        # clamd answered, but did not scan. The old code only looked for FOUND, so
+        # this fell through as though the file were clean.
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File could not be scanned by the antivirus: {detail}",
+        )
+    return file
+
+#################################################
+####    BACKEND FOR FILE MANAGEMENT SYSTEM    ###
+#################################################
+
+fm_router = APIRouter(prefix="/fm-api")
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+STORAGE_ROOT = Path(os.environ.get("USERDATA_ROOT", "./storage"))
+STORAGE_ROOT.mkdir(parents=True, exist_ok=True)
+# disables everything if set to true
+DISABLE_MY_FILES = os.environ.get("DISABLE_MY_FILES", "false").lower() == "true"
+
+def check_if_disabled():
+    if DISABLE_MY_FILES:
+        raise HTTPException(status_code=403, detail="Cannot load files. This instance is read-only")
+
+def resolve(id: str) -> Path:
+    return STORAGE_ROOT / id.lstrip("/")
+
+def to_id(path: Path) -> str:
+    return "/" + str(path.relative_to(STORAGE_ROOT)).replace("\\", "/")
+
+def list_dir(target: Path):
+    items = []
+    for path in target.glob("*"):
+        is_dir = path.is_dir()
+        item = {
+            "id": to_id(path),
+            "value": path.name,
+            "type": "folder" if is_dir else "file",
+            "size": path.stat().st_size if path.is_file() else 0,
+        }
+        # treat folders as lazy-loaded assets
+        if is_dir:
+            item["lazy"] = True
+            
+        items.append(item)
+    return items
+
+# loading root files
+@fm_router.get("/is_disabled")
+def get_root_files():
+    return {"disabled": DISABLE_MY_FILES}
+
+# loading root files
+@fm_router.get("/files")
+def get_root_files():
+    check_if_disabled()
+    return list_dir(STORAGE_ROOT)
+
+# endpoint to fetch ALL files + folders (not just root ones)
+def get_file_info(path: Path) -> dict:
+    is_dir = path.is_dir()
+    item = {
+        "id": to_id(path),
+        "value": path.name,
+        "type": "folder" if is_dir else "file",
+        "size": path.stat().st_size if path.is_file() else 0,
+    }
+    if is_dir:
+        item["lazy"] = True
+    return item
+
+@fm_router.get("/files/all")
+def get_all_files():
+    check_if_disabled()
+    items = []
+    for path in STORAGE_ROOT.rglob("*"):
+        items.append(get_file_info(path))
+    return items
+
+# method for lazy-loaded folders
+@fm_router.get("/files/{id:path}")
+def get_subfolder_files(id: str):
+    check_if_disabled()
+    clean_id = id.lstrip("/")   # stripping double slashes
+    target = resolve(clean_id)
+    if not target.exists() or not target.is_dir():
+        return []
+    return list_dir(target)
+
+# creating a file/folder
+@fm_router.post("/files/{id:path}")
+async def create_item(id: str, request: Request):
+    check_if_disabled()
+    raw = await request.body()
+    body = json.loads(raw)
+    name = body.get("name")
+    item_type = body.get("type")
+    if not name or not item_type:
+        raise HTTPException(400, "'type' and 'name' parameters must be provided.")
+    dest = resolve(id) / name
+    if item_type == "folder":
+        dest.mkdir(parents=True, exist_ok=True)
+    else:
+        dest.touch(exist_ok=True)
+    return {"result": {"id": to_id(dest), "name": dest.name, "type": item_type}}
+
+# renaming a folder
+@fm_router.put("/files/{id:path}")
+async def rename_item(id: str, request: Request):
+    check_if_disabled()
+    raw = await request.body()
+    body = json.loads(raw)
+    if body.get("operation") != "rename":
+        raise HTTPException(400, "Unsupported operation")
+    source = resolve(id)
+    if not source.exists():
+        raise HTTPException(404, "Not found")
+    new_path = source.parent / body["name"]
+    source.rename(new_path)
+    return {"result": {"id": to_id(new_path), "name": new_path.name}}
+
+# moving or copying a file
+@fm_router.put("/files")
+async def move_or_copy(request: Request):
+    check_if_disabled()
+    raw = await request.body()
+    body = json.loads(raw)
+    operation = body.get("operation")  # "move" or "copy"
+    target_dir = resolve(body["target"])
+    target_dir.mkdir(parents=True, exist_ok=True)
+    results = []
+    for item_id in body.get("ids", []):
+        src = resolve(item_id)
+        dest = target_dir / src.name
+        if operation == "move":
+            src.rename(dest)
+        else:   # operation == "copy"
+            (shutil.copytree if src.is_dir() else shutil.copy2)(src, dest)
+        results.append({"id": to_id(dest), "name": dest.name})
+    return {"result": results}
+
+# deleting a file
+@fm_router.delete("/files")
+async def delete_items(request: Request):
+    check_if_disabled()
+    raw = await request.body()
+    body = json.loads(raw)
+    for item_id in body.get("ids", []):
+        target = resolve(item_id)
+        if target.is_dir():
+            shutil.rmtree(target, ignore_errors=True)
+        elif target.exists():
+            target.unlink()
+    return {"status": "success"}
+
+# uploading a file 
+@fm_router.post("/upload")
+# modified the signature, before it was : `file: UploadFile = File(...)`
+async def upload_file(id: str = Query("/"), file: UploadFile = Depends(scan_file_buffer)):
+    check_if_disabled()
+    dest_folder = resolve(id)
+    dest_folder.mkdir(parents=True, exist_ok=True)
+    dest_file = dest_folder / file.filename
+    with dest_file.open("wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    return {"id": to_id(dest_file), "value": file.filename}
+
+# get total storage used
+@fm_router.get("/info")
+def get_info():
+    check_if_disabled()
+    total, used, free = shutil.disk_usage(STORAGE_ROOT)
+    return {"stats": {"total": total, "used": used, "free": free}}
+
+app.include_router(fm_router)
+
+
+# --- Assistant -------------------------------------------------------------
+# The chat assistant's system prompt.
+#
+# This exists because ollama-mcp-bridge has no notion of a system prompt of its
+# own: it forwards whatever `messages` the client sends. So the guidance has to
+# ride in as messages[0] from the UI, and the UI has to get it from somewhere.
+#
+# Serving it here keeps it single-sourced with the MCP server's own copy of the
+# file (mcp-server/assistant-role.md) rather than duplicating the text into the
+# React bundle, where it would drift the first time anyone edited it.
+#
+# It used to be three files concatenated -- the role, a full API guide and a
+# documentation guide, about 5.7 KB in every request. That is now one routing
+# table of a dozen lines: the procedure for each kind of question lives in
+# mcp-server/modes/ and reaches the model as the result of its `start_task` call,
+# so a conversation carries the one procedure it needs instead of all five.
+ASSISTANT_PROMPT_DIR = Path(__file__).parent / "mcp-server"
+
+# The guides address services by the names they answer to INSIDE the compose network.
+# A browser cannot resolve any of them, so every viewer and form link the model is
+# told to hand the user would be dead on arrival -- and in the per-session deployment
+# there is no single right host to hardcode instead, since each user is on their own
+# subdomain. Rewriting them to whichever origin served the request is what makes the
+# links work in dev, on the shared instance, and in a session alike.
+_INTERNAL_ORIGINS = (
+    "http://biab-script-server:8080",
+    "http://biab-python-api:8001",
+    "http://biab-python-api:8000",
+    "http://swagger_ui:8080",
+    "http://localhost",
+)
+
+
+def _read_prompt_part(name: str) -> str:
+    path = ASSISTANT_PROMPT_DIR / name
+    try:
+        return path.read_text().strip()
+    except OSError as exc:
+        print(f"WARNING: assistant prompt part {path} unreadable: {exc}", flush=True)
+        return ""
+
+
+@app.get("/assistant/prompt")
+def assistant_prompt(request: Request):
+    """System prompt for the chat assistant, assembled from the MCP server's guides.
+
+    The origin is taken from the request rather than configured, because in the
+    per-session deployment every user reaches their own engine on their own
+    subdomain -- a hardcoded host would hand every user someone else's links.
+    """
+    origin = str(request.base_url).rstrip("/")
+    forwarded_host = request.headers.get("x-forwarded-host")
+    if forwarded_host:
+        proto = request.headers.get("x-forwarded-proto", "https")
+        origin = f"{proto}://{forwarded_host}"
+
+    prompt = _read_prompt_part("assistant-role.md")
+    for internal in _INTERNAL_ORIGINS:
+        prompt = prompt.replace(internal, origin)
+    return {"prompt": prompt}

@@ -62,6 +62,33 @@ fun Application.configureRouting() {
             return@get
         }
 
+        /**
+         * Which optional features this instance has switched on.
+         *
+         * Separate from /api/systemStatus above, which is unchanged and stays the UI's
+         * boot gate: that one answers text/plain and 503s with a configuration message
+         * the UI puts on screen (isStarting() in ui/src/index.jsx deliberately lets 503
+         * through for exactly that). This one is JSON and never fails -- "the feature is
+         * off" is an answer, not an error -- and it does not call SystemStatus.check(),
+         * whose mkdirs() side effect has no business running on a polled endpoint.
+         *
+         * See FeatureStatus for why two of these flags are python-api's.
+         */
+        get("/api/status") {
+            // The map, NOT gson.toJson(map) -- exactly like every other object route
+            // here. Responding with the serialized String makes Ktor send it as
+            // text/plain, and the bytes look perfect in curl, which is what made this
+            // cost an afternoon: the generated JS client dispatches on Content-Type,
+            // so superagent leaves a text/plain body unparsed, ApiClient.deserialize
+            // falls back to response.text, and GetServerStatus200Response
+            // .constructFromObject reads its fields off a *string* -- every
+            // hasOwnProperty is false, every flag comes out undefined, and index.jsx
+            // falls back to the permissive default for all of them. The UI ignores
+            // SAVE_PIPELINE_TO_SERVER=deny while this endpoint reports it faithfully.
+            // `the response is JSON, not a JSON string in a text body` pins it.
+            call.respond(FeatureStatus.asMap())
+        }
+
         get("/{type}/list") {
             val type = call.parameters["type"]
             val roots: List<File>

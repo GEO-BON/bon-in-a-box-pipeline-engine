@@ -192,6 +192,49 @@ In addition to these services,
 - `scripts` folder contains all the scripts that can be run.
 - `output` folder contains all script results.
 
+#### Antivirus scanning of user uploads
+
+**Off by default.** Files uploaded through "My Files" are scanned only when
+`CLAMAV_ADDRESS` names a reachable `clamd`; with it unset — which is what a plain
+`docker compose` run gets — uploads are saved without being scanned.
+
+To switch it on locally, run a scanner and point at it:
+
+```bash
+docker run -d --name clamav -p 3310:3310 clamav/clamav:stable
+CLAMAV_ADDRESS=127.0.0.1:3310 ./server-up.sh
+```
+
+`GET /api/status` reports both whether it is configured and whether it currently
+answers, so you can tell the two apart without attempting an upload.
+
+**It fails closed.** Once configured, an upload that cannot be scanned is *refused*,
+not saved:
+
+| condition | response |
+| --- | --- |
+| malware found | `400` |
+| the client knows the file exceeds the scanner's limit | `413` |
+| scanner unreachable, **or** the file exceeds its `StreamMaxLength` | `503` |
+
+Those last two are one response on purpose: when a stream is too long, clamd closes the
+connection rather than replying, which is indistinguishable from the daemon having died.
+The message names both, and the python-api log has the underlying exception.
+
+This is the opposite of the old behaviour, which caught every error, logged a line, and
+saved the file anyway — so the only outcomes were "clean" and "unscanned but saved", and
+nothing distinguished them. The cost is that a `clamd` outage now stops uploads instead
+of silently passing them.
+
+> **clamd no longer runs inside python-api.** It used to, which meant its ~1.5 GB
+> signature set was resident in every session's pod for a database identical across all
+> of them. It is now a shared service — on the cluster, one container on the dispatcher
+> VM (see `bon-in-a-box-proxy-dispatch`); locally, whatever you point `CLAMAV_ADDRESS`
+> at. Nothing uses the old `clamav_data` volume any more, so reclaim its ~350 MB:
+> ```bash
+> docker volume rm bon-in-a-box_clamav_data      # bon-in-a-box_dev_clamav_data in dev
+> ```
+
 ### Restrict access to a BON in a Box instance
 In order to require authentication to access a BON in a Box instance,
 a simple http authentication can be configured in the host instance.

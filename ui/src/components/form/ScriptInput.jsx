@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Switch from "@mui/material/Switch";
@@ -7,6 +8,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 import AutoResizeTextArea from "./AutoResizeTextArea";
 import Choosers from "./Choosers";
+import { uiContext } from "../../uiContext.jsx";
+import FileBrowser from "../FileBrowser";
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
 export const CONSTANT_PLACEHOLDER = "Constant";
 
@@ -32,6 +35,29 @@ const smallPaddingNumeric = () => {
   };
 };
 
+// Joins the text field and the "Browse files" button into a single control:
+// the button stretches to the field's height and sits flush against it.
+const fileBrowserRow = {
+  display: "flex",
+  alignItems: "stretch",
+  "& .filebrowser": { display: "flex" },
+  "& .filebrowser .button-modal": {
+    margin: 0,
+    minHeight: 0,
+    height: "100%",
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+  },
+};
+
+// Squares off the right side of the field it is joined to
+const joinedTextField = {
+  "& .MuiOutlinedInput-root": {
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+};
+
 export default function ScriptInput({
   type,
   value,
@@ -45,6 +71,7 @@ export default function ScriptInput({
 }) {
   const [fieldValue, setFieldValue] = useState(value);
   const small = size == "small";
+  const { disableMyFiles } = useContext(uiContext);
 
   useEffect(() => {
     setFieldValue(value);
@@ -67,9 +94,10 @@ export default function ScriptInput({
 
       let optionsValue;
       if (multiple)
-        optionsValue = fieldValue ? optionObjects.filter((opt) => fieldValue.includes(opt.value)) : []
-      else
-        optionsValue = fieldValue || ""
+        optionsValue = fieldValue
+          ? optionObjects.filter((opt) => fieldValue.includes(opt.value))
+          : [];
+      else optionsValue = fieldValue || "";
 
       return (
         <Autocomplete
@@ -120,7 +148,7 @@ export default function ScriptInput({
           value={optionsValue}
           onChange={(event, newOptions) => {
             var newValue;
-            if (typeof newOptions.map === 'function') {
+            if (typeof newOptions.map === "function") {
               newValue = newOptions.map((option) => option?.value ?? option);
             } else {
               newValue = newOptions?.value ?? newOptions;
@@ -145,8 +173,8 @@ export default function ScriptInput({
         onValueUpdated(event.target.value.split(",").map((v) => v.trim()));
       }
     };
-
-    return (
+    const withFileBrowser = type.includes("/") && !disableMyFiles && !small;
+    const txtField = (
       <TextField
         multiline
         variant="outlined"
@@ -160,14 +188,36 @@ export default function ScriptInput({
         onBlur={onUpdateArray}
         slotProps={{ input: { style: small ? smallPadding() : null } }}
         onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
-        sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
+        sx={{
+          width: "100%",
+          maxWidth: small ? 220 : "500px",
+          ...(withFileBrowser ? joinedTextField : null),
+        }}
       />
     );
+    if (withFileBrowser) {
+      return (
+        <Box sx={fileBrowserRow}>
+          {txtField}
+          <FileBrowser
+            value={fieldValue}
+            multipleFiles={true}
+            onSelect={(files) => {
+              setFieldValue(files);
+              onValueUpdated(files);
+            }}
+          />
+        </Box>
+      );
+    } else {
+      return <>{txtField}</>;
+    }
   }
 
   switch (type.toLowerCase()) {
     case "boolean":
-      const booleanValue = fieldValue === undefined || fieldValue === null ? false : value
+      const booleanValue =
+        fieldValue === undefined || fieldValue === null ? false : value;
 
       return (
         <FormGroup size={size}>
@@ -239,25 +289,53 @@ export default function ScriptInput({
     case "crs":
     case "countryregion":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} value={value} updateValue={(value) => { onValueUpdated(value) }} />
+        <Choosers
+          inputId={passedProps.id}
+          inputDescription={{ type: type }}
+          value={value}
+          updateValue={(value) => {
+            onValueUpdated(value);
+          }}
+        />
       );
 
     case "bboxcrs": // deprecated
     case "crsbbox":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={size=='small'}/>
+        <Choosers
+          inputId={passedProps.id}
+          inputDescription={{ type: type, label: "Bounding Box" }}
+          value={value}
+          updateValue={(value) => {
+            onValueUpdated(value);
+          }}
+          leftLabel={false}
+          isCompact={size == "small"}
+        />
       );
 
     case "location":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Country, region, CRS and Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={size=='small'}/>
+        <Choosers
+          inputId={passedProps.id}
+          inputDescription={{
+            type: type,
+            label: "Country, region, CRS and Bounding Box",
+          }}
+          value={value}
+          updateValue={(value) => {
+            onValueUpdated(value);
+          }}
+          leftLabel={false}
+          isCompact={size == "small"}
+        />
       );
 
     default:
       // use null if empty or a string representation of null
       const updateValue = (e) =>
         onValueUpdated(
-          /^(null)?$/i.test(e.target.value) ? null : e.target.value
+          /^(null)?$/i.test(e.target.value) ? null : e.target.value,
         );
 
       const stringValue = fieldValue ? fieldValue.toString() : "";
@@ -270,18 +348,46 @@ export default function ScriptInput({
       };
 
       // Single line text fields
-      if (type.includes("/") /* assume MIME type, files have no line breaks */) {
-        return <TextField
-          type="text"
-          label=""
-          size={size}
-          {...props}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.ctrlKey) updateValue(e);
-          }}
-          slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
-          sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
-        />
+      if (
+        type.includes("/") /* assume MIME type, files have no line breaks */
+      ) {
+        const withFileBrowser = !disableMyFiles && !small;
+        const txtField = (
+          <TextField
+            type="text"
+            label=""
+            size={size}
+            {...props}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.ctrlKey) updateValue(e);
+            }}
+            slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
+            sx={{
+              width: "100%",
+              maxWidth: small ? 220 : "500px",
+              ...(withFileBrowser ? joinedTextField : null),
+            }}
+          />
+        );
+        if (withFileBrowser) {
+          return (
+            <Box sx={fileBrowserRow}>
+              {txtField}
+              <FileBrowser
+                multipleFiles={false}
+                onSelect={(files) => {
+                  // single-file mode still hands back an array
+                  const file = files[0] ?? null;
+                  setFieldValue(file);
+                  onValueUpdated(file);
+                }}
+                value={fieldValue}
+              />
+            </Box>
+          );
+        } else {
+          return <>{txtField}</>;
+        }
       }
 
       // Multiline text field
