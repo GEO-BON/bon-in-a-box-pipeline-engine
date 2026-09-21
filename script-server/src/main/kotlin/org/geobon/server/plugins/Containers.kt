@@ -1,6 +1,6 @@
 package org.geobon.server.plugins
 
-import org.geobon.utils.run
+import org.geobon.utils.runBlocking
 
 enum class Containers(
     val containerName: String,
@@ -48,17 +48,17 @@ enum class Containers(
 
 
     val version: String by lazy {
-        val result = (dockerCommand + versionCommand).run(showErrors = false)
+        val result = (dockerCommand + versionCommand).runBlocking(showErrors = false)
         if (result.isNullOrBlank()) "offline" else result
     }
 
     val environment: String by lazy {
-        (dockerCommand + envCommand).run(showErrors = false) ?: ""
+        (dockerCommand + envCommand).runBlocking(showErrors = false) ?: ""
     }
 
     val imageName: String by lazy {
         "docker inspect --format '{{.Config.Image}}' $containerName"
-            .run(showErrors = false)
+            .runBlocking(showErrors = false)
             ?.trim()
             ?: ""
     }

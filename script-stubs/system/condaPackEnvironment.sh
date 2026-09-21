@@ -22,12 +22,22 @@ function packEnvironment {
 }
 
 
-if [[ -d "$condaPackDir" ]]; then
+# No need to pack base environments, they are already in the docker
+if [[ "$condaEnvName" != "pythonbase" && "$condaEnvName" != "rbase"
+    # conda-pack directory must be provided and writable
+    && -n "$condaPackDir" && -d "$condaPackDir" && -w "$condaPackDir" ]]; then
+
     if mamba env list | grep -q "\b$condaEnvName\b"; then
         condaEnvFile="/conda-env-yml/$condaEnvName.yml"
         condaPackEnvFile=$condaPackDir/$condaEnvName.yml
         tar=$condaPackDir/$condaEnvName.tar
         zip=$tar.gz
+
+        # Queue packing of parallel scripts.
+        # Same lock file as in condaEnvironment.sh avoids the directory being
+        # edited while packing.
+        exec {lockfd}>>"$condaPackDir/$condaEnvName.lock"
+        flock -x "$lockfd"
 
         if [[ -f $condaPackEnvFile && -f "$zip" ]]; then
             if cmp -s "$condaPackEnvFile" "$condaEnvFile"; then
@@ -40,5 +50,7 @@ if [[ -d "$condaPackDir" ]]; then
         else
             packEnvironment
         fi
+
+        exec {lockfd}>&-
     fi
 fi

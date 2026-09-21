@@ -31,7 +31,7 @@
       },
       "dragHandle": ".dragHandle",
       "data": {
-        "type": "bboxCRS"
+        "type": "location"
       }
     }
   ],
@@ -55,7 +55,7 @@
     "pipeline@2": {
       "label": "bbox",
       "description": "Some bbox.",
-      "type": "bboxCRS",
+      "type": "location",
       "example": {
         "bbox": [
           -63.38435,
@@ -123,8 +123,8 @@
     }
   },
   "metadata": {
-    "name": "BBox CRS to Country conversion",
-    "description": "This pipeline features a valid BBoxCRS to Country object conversion",
+    "name": "Location to Country conversion",
+    "description": "This pipeline features a valid location to Country object conversion",
     "author": [
       {
         "name": "Jean-Michel Lord"

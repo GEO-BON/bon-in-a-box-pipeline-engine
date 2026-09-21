@@ -13,14 +13,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.outputRoot
 import org.geobon.server.RemoteSetupState
-import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.geobon.server.scriptModule
 import org.geobon.utils.CallResult
 import org.geobon.utils.SystemCall
+import org.geobon.utils.scriptsRoot
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.milliseconds
 
 class HPCConnectionTest {
 
@@ -136,7 +138,7 @@ class HPCConnectionTest {
                         break
                 }
 
-                delay(100)
+                delay(100.milliseconds)
             }
 
             client.get("/hpc/status").apply {
@@ -223,13 +225,14 @@ class HPCConnectionTest {
                 File(scriptsRoot, "HPCSyncTest.py"),
             )
             val systemCall = mockk<SystemCall>()
-            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
+            connection.allowSyncPaths(listOf(outputRoot, scriptsRoot, scriptStubsRoot))
 
             connection.syncFiles(toSync)
 
             verify {
-                systemCall.run(
+                systemCall.runBlocking(
                     match { cmdList ->
                         cmdList.find {
                             it.contains("rsync")
@@ -260,13 +263,14 @@ class HPCConnectionTest {
                 File(scriptsRoot, "somethingWrong.py"),
             )
             val systemCall = mockk<SystemCall>()
-            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
+            connection.allowSyncPaths(listOf(outputRoot, scriptsRoot, scriptStubsRoot))
 
             connection.syncFiles(toSync)
 
             verify { // somethingWrong.py should not be there
-                systemCall.run(
+                systemCall.runBlocking(
                     match { cmdList ->
                         cmdList.find {
                             it.contains("rsync")
@@ -294,13 +298,14 @@ class HPCConnectionTest {
                 File(scriptsRoot, "imLost.yml"),
             )
             val systemCall = mockk<SystemCall>()
-            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
+            connection.allowSyncPaths(listOf(outputRoot, scriptsRoot, scriptStubsRoot))
 
             connection.syncFiles(toSync)
 
             verify(exactly = 0) { // somethingWrong.py should not be there
-                systemCall.run(any(), any(), any(), any(), any())
+                systemCall.runBlocking(any(), any(), any(), any(), any())
             }
             confirmVerified(systemCall)
         }
@@ -311,8 +316,9 @@ class HPCConnectionTest {
         withEnvironment(testEnvironment) {
             createSshFiles()
             val systemCall = mockk<SystemCall>()
-            every { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
+            every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
+            connection.allowSyncPaths(listOf(outputRoot, scriptsRoot, scriptStubsRoot))
             connection.condaImage.state = RemoteSetupState.READY
             connection.juliaImage.state = RemoteSetupState.READY
             connection.prepare()
@@ -322,7 +328,7 @@ class HPCConnectionTest {
                 HPCRequirements("8G", 4, 1.hours)
             )
 
-            val sBatchList = outputRoot.listFiles { _, name -> name.endsWith(".sbatch") }
+            val sBatchList = outputRoot.listFiles { _, name -> name.endsWith(".sbatch") }!!
             assertEquals(1, sBatchList.size)
             val sBatchFile = sBatchList.first()
             val sBatchContent = sBatchFile.readText()

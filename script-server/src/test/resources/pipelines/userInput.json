@@ -117,13 +117,13 @@
   "outputs": {
     "helloWorld>helloPython.yml@2|increment": {
       "description": "bla bla",
-      "label": "A number (input++)",
+      "label": "Incremented once",
       "type": "int",
       "example": 4
     },
     "helloWorld>helloPython.yml@5|increment": {
       "description": "bla bla",
-      "label": "A number (input++)",
+      "label": "Incremented twice",
       "type": "int",
       "example": 4
     }

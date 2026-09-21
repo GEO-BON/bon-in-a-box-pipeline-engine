@@ -9,13 +9,15 @@ export default function InputType({ type }) {
 
 export const inputTypeToDisplay = (type) => {
   // Exceptions to the rules
-  switch (type) {
+  switch (type.toLowerCase()) {
     case 'boolean':
     case 'country':
-    case 'countryRegion':
-    case 'countryRegionCRS':
-    case 'CRS':
-    case 'bboxCRS':
+    case 'countryregion':
+    case 'countryregioncrs':
+    case 'crs':
+    case 'bboxcrs': // deprecated
+    case 'crsbbox':
+    case 'location':
       return null;
     case 'options[]':
       return 'multiple options';

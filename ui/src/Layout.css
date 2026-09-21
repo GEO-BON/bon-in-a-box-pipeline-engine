@@ -131,12 +131,6 @@ h2 {
   margin: 0 auto;
 }
 
-.title-container {
-  display: flex;
-  align-items: center;
-  gap: 35px;
-}
-
 .green-separator {
   display: block;
   height: 1px;
@@ -152,12 +146,16 @@ h2 {
   color: #DAECE5;
   font-weight: bold;
   font-size: 66px;
+  margin-bottom: 50px;
+  margin-top: 0px;
 }
 
-.home-page-subtitle {
+.home-page-pre-title {
   color: #ABD6C6;
   font-weight: bold;
-  font-size: 28px;
+  margin-top: 40px;
+  margin-bottom: 0px;
+  font-size: 48px;
 }
 
 .pipeline-columns {

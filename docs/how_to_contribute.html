@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.38">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -75,10 +78,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-7d53a38e1771e0164136871ee961ecee.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-c6dffefdb99efd576fc0d43d67924b8c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -443,7 +446,7 @@ author:
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">description</span><span class="kw">:</span><span class="at"> Occurence points from GBIF or uploaded by the user</span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">type</span><span class="kw">:</span><span class="at"> text/csv</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">example</span><span class="kw">:</span><span class="at"> </span><span class="ch">null</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying ‘country’ as input type will create a dropdown menu with a standardized list of countries from GeoNames. Selecting ‘bboxCRS’ will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:</p>
+<p>The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying ‘country’ as input type will create a dropdown menu with a standardized list of countries from GeoNames. Selecting ‘crsBbox’ will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 6%">
@@ -479,8 +482,13 @@ author:
 <td></td>
 </tr>
 <tr class="odd">
-<td>bboxCRS</td>
+<td>crsBbox</td>
 <td>Creates a button to open an interface that allows the user to specify a bounding box (geographical minima and maxima) based on an optional selection of country/region and on a CRS, or by clicking on the map to set the bounds of the area of interest for the analysis.</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>location</td>
+<td>Full location object. Creates a button to open an interface that allows the user to specify a country, region, coordinate reference system and bounding box (geographical minima and maxima)</td>
 <td></td>
 </tr>
 </tbody>
@@ -701,7 +709,12 @@ author:
 <span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> r-rredlist</span></span>
 <span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> r-ggplot2</span></span>
 <span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> r-sf</span></span>
-<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> r-terra</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> r-terra</span></span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a><span class="fu">compute</span><span class="kw">:</span><span class="co"> # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.</span></span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">hpc</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co"> # Optional, send to a HPC cluster if available. Defaults to false.</span></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">mem</span><span class="kw">:</span><span class="at"> 4Gi</span><span class="co"> # Hard cap for the memory usage, default 4Gi.</span></span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">cpus-per-task</span><span class="kw">:</span><span class="at"> </span><span class="dv">4</span><span class="co"> # Number of CPU  allocated, default 4.</span></span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">time</span><span class="kw">:</span><span class="at"> </span><span class="st">"02:00:00"</span><span class="co"> # Only when "hpc: true", maximum time allowed before the job is interrupted.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>YAML is a space sensitive format, so make sure all the tab sets are correct in the file.</p>
 <p>If inputs are outputs from a previous step in the pipeline, make sure to give the inputs and outputs the same name and they will be automatically linked in the pipeline.</p>
 </section>
@@ -741,7 +754,13 @@ author:
 <span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">channels</span><span class="kw">:</span><span class="co"> # programs that you need</span></span>
 <span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="co"> # list here</span></span>
 <span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">dependencies</span><span class="kw">:</span><span class="co"> # any packages that are dependent on a specfic version</span></span>
-<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="co"> # list here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="co"> # list here</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a><span class="fu">compute</span><span class="kw">:</span><span class="co"> # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">hpc</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span><span class="co"> # Optional, send to a HPC cluster if available. Defaults to false.</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">mem</span><span class="kw">:</span><span class="at"> 4Gi</span><span class="co"> # Hard cap for the memory usage, default 4Gi.</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">cpus-per-task</span><span class="kw">:</span><span class="at"> </span><span class="dv">4</span><span class="co"> # Number of CPU  allocated, default 4.</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">time</span><span class="kw">:</span><span class="at"> </span><span class="st">"02:00:00"</span><span class="co"> # Only when "hpc: true", maximum time allowed before the job is interrupted.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>See <a href="https://GitHub.com/GEO-BON/bon-in-a-box-pipelines/blob/main/scripts/helloWorld/helloR.R">example</a></p>
 </section>
 </section>
@@ -795,7 +814,7 @@ author:
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>landcover <span class="ot">&lt;-</span> <span class="fu">rast</span>(input<span class="sc">$</span>landcover_raster)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>And to project it using the CRS that the user specified:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>landcover_projected <span class="ot">&lt;-</span> <span class="fu">project</span>(landcover, input<span class="sc">$</span>crs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>When the inputs were entered through <a href="./selectors.html">preset selectors</a>, the values associated with the selected options are available as a list with values <a href="./selectors.html">described here</a>. For example, to access the bounding box of an selector with name study_area_bbox of type <code>BboxCRS</code>. The bounding box can be accessed through:</p>
+<p>When the inputs were entered through <a href="./selectors.html">preset selectors</a>, the values associated with the selected options are available as a list with values <a href="./selectors.html">described here</a>. For example, to access the bounding box of an selector with name study_area_bbox of type <code>crsBbox</code>. The bounding box can be accessed through:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>bbox <span class="ot">&lt;-</span> input<span class="sc">$</span>study_area_bbox<span class="sc">$</span>bbox</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>and the ID of the coordinate reference system of the bounding box, made of the authority and code:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>crs_id <span class="ot">&lt;-</span> <span class="fu">paste0</span>(input<span class="sc">$</span>study_area_bbox<span class="sc">$</span>CRS<span class="sc">$</span>authority,input<span class="sc">$</span>study_area_bbox<span class="sc">$</span>CRS<span class="sc">$</span>code)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>

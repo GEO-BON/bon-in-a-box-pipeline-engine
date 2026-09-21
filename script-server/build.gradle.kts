@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "org.geobon"
-version = "1.2.0"
+version = "1.3.0"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 }
@@ -55,6 +55,12 @@ tasks.test {
 tasks.register("runValidator", JavaExec::class) {
     description = "Validates that pipelines are well structured."
     mainClass.set("org.geobon.pipeline.Validator")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.register("exportCWL", JavaExec::class) {
+    description = "Exports all scripts and pipelines to Common Worlflow Language (CWL)."
+    mainClass.set("org.geobon.cwl.CWLExportMain")
     classpath = sourceSets["main"].runtimeClasspath
 }
 

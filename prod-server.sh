@@ -384,7 +384,7 @@ function up {
     for service in $savedContainerServices; do
         flag="--no-recreate" # By default, we keep runners unless they are updated
         if [[ $containersToDiscard == *"$service"* ]]; then
-            echo "  Discarding $service runner"
+            echo "  Discarding $service container"
             flag="--force-recreate"
         fi
 

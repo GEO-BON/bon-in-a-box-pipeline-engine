@@ -11,7 +11,6 @@ import org.geobon.script.Run
 import org.geobon.script.ScriptType
 import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
 import org.geobon.server.ServerContext.Companion.userDataRoot
 import java.io.File
 import java.util.concurrent.TimeoutException
@@ -165,7 +164,7 @@ class HPCRun(
         return """
             apptainer -q exec
                 --overlay ${image.overlayPath}${if(edit) "" else ":ro"}
-                -B ${hpcConnection.hpcScriptsRoot}:$scriptsRoot
+                -B ${hpcConnection.hpcScriptsRoot}:${context.serverContext.scriptsRoot}
                 -B ${hpcConnection.hpcScriptStubsRoot}:$scriptStubsRoot
                 -B ${hpcConnection.hpcOutputRoot}:$outputRoot
                 -B ${hpcConnection.hpcUserDataRoot}:$userDataRoot
