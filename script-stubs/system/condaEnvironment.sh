@@ -213,15 +213,11 @@ function useLocalPack {
             condaPackExtracted="$condaPackWriteable/$condaEnvName"
         fi
 
-        # Written only once conda-unpack has returned. Testing for bin/ instead would
-        # accept a tree that tar has only partly written, or one left by a pod that
-        # died before its prefixes were rewritten.
-        # conda-unpack bakes in the path it runs at, so it cannot be staged elsewhere
-        # and renamed into place: the lock is what protects this.
-        if [ -f "$condaPackExtracted/.unpacked" ]; then
+        # Unpack (only once)
+        unpackedFlag="$condaPackExtracted/.unpacked"
+        if [ -f "$unpackedFlag" ]; then
             echo "    Already unpacked."
         else
-            # Unpack
             echo "Unpacking conda-pack environment at $condaPackZip..."
             echo "    Extracting archive..."
             rm -rf $condaPackExtracted
@@ -232,7 +228,7 @@ function useLocalPack {
             mamba activate base || return 1
             $condaPackExtracted/bin/conda-unpack || return 1
             mamba deactivate # base
-            touch "$condaPackExtracted/.unpacked" || return 1
+            touch "$unpackedFlag" || return 1
 
             echo "    Done."
         fi
