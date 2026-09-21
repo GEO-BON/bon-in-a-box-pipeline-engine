@@ -285,11 +285,11 @@ export function PipelinePage({ runType }) {
     });
   };
 
-  const hadResultsRef = useRef(false);
+  const resultsPresentRef = useRef(false);
   useEffect(() => {
     if (
-      (resultsData != null && !hadResultsRef.current) ||
-      (httpError != null && !hadResultsRef.current)
+      (resultsData != null && !resultsPresentRef.current) ||
+      (httpError != null && !resultsPresentRef.current)
     ) {
       // The accordion collapse (triggered above) and PipelineResults' own
       // auto-expand-first-output scroll (FoldableOutput.jsx) both keep moving
@@ -319,10 +319,10 @@ export function PipelinePage({ runType }) {
         }
       };
       frameRequestId = requestAnimationFrame(waitForStableLayout);
-      hadResultsRef.current = true;
+      resultsPresentRef.current = true;
       return () => cancelAnimationFrame(frameRequestId);
     }
-    hadResultsRef.current = resultsData != null || httpError != null;
+    resultsPresentRef.current = resultsData != null || httpError != null;
   }, [resultsData, httpError]);
 
   const toggleAccord = useCallback(() => {
