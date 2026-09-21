@@ -1,11 +1,22 @@
 package org.geobon.openeo
 
-import org.geobon.openeo.OpenEODescription.UDP__INPUT__BOUNDING_BOX
-import org.geobon.openeo.OpenEODescription.CDSE
 import org.geobon.openeo.OpenEODescription.APEX__CONTACTS
 import org.geobon.openeo.OpenEODescription.APEX__CONTACT_HREF
 import org.geobon.openeo.OpenEODescription.APEX__CONTACT_LINKS
 import org.geobon.openeo.OpenEODescription.APEX__CONTACT_NAME
+import org.geobon.openeo.OpenEODescription.APEX__DESCRIPTION
+import org.geobon.openeo.OpenEODescription.APEX__HREF
+import org.geobon.openeo.OpenEODescription.APEX__LICENSE
+import org.geobon.openeo.OpenEODescription.APEX__LINKS
+import org.geobon.openeo.OpenEODescription.APEX__PROPERTIES
+import org.geobon.openeo.OpenEODescription.APEX__TITLE
+import org.geobon.openeo.OpenEODescription.APEX__TYPE
+import org.geobon.openeo.OpenEODescription.CDSE
+import org.geobon.openeo.OpenEODescription.CDSE__NAME
+import org.geobon.openeo.OpenEODescription.CDSE__SCRIPT
+import org.geobon.openeo.OpenEODescription.CDSE__URL
+import org.geobon.openeo.OpenEODescription.UDP__INPUTS
+import org.geobon.openeo.OpenEODescription.UDP__INPUT__BOUNDING_BOX
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__ENUM
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__ITEMS
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__NAME
@@ -13,22 +24,11 @@ import org.geobon.openeo.OpenEODescription.UDP__INPUT__SCHEMA
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__SUBTYPE
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__TITLE
 import org.geobon.openeo.OpenEODescription.UDP__INPUT__TYPE
-import org.geobon.openeo.OpenEODescription.APEX__DESCRIPTION
-import org.geobon.openeo.OpenEODescription.APEX__LICENSE
-import org.geobon.openeo.OpenEODescription.CDSE__NAME
-import org.geobon.openeo.OpenEODescription.CDSE__SCRIPT
-import org.geobon.openeo.OpenEODescription.APEX__TYPE
-import org.geobon.openeo.OpenEODescription.APEX__HREF
-import org.geobon.openeo.OpenEODescription.APEX__LINKS
-import org.geobon.openeo.OpenEODescription.UDP__INPUTS
-import org.geobon.openeo.OpenEODescription.APEX__PROPERTIES
-import org.geobon.openeo.OpenEODescription.APEX__TITLE
-import org.geobon.openeo.OpenEODescription.CDSE__URL
 import org.geobon.pipeline.ConstantPipe
 import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
-import org.geobon.script.Description.AUTHOR
+import org.geobon.script.Description.AUTHORS
 import org.geobon.script.Description.DESCRIPTION
 import org.geobon.script.Description.EXTERNAL_LINK
 import org.geobon.script.Description.INPUTS
@@ -36,14 +36,15 @@ import org.geobon.script.Description.IO__DESCRIPTION
 import org.geobon.script.Description.IO__EXAMPLE
 import org.geobon.script.Description.IO__LABEL
 import org.geobon.script.Description.IO__TYPE
-import org.geobon.script.Description.IO__TYPE_OPTIONS
+import org.geobon.script.Description.IO__TYPE__OPTIONS
 import org.geobon.script.Description.LICENSE
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
 import org.geobon.script.Description.SCRIPT
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
-import org.geobon.server.ServerContext.Companion.scriptsRoot
+import org.jetbrains.annotations.VisibleForTesting
+import org.json.JSONArray
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -56,20 +57,18 @@ import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.Duration
-import org.jetbrains.annotations.VisibleForTesting
-import org.json.JSONArray
 
 class OpenEOStep: ScriptStep {
     constructor(
         udpKey: String,
         stepId: StepId,
-        serverContext: ServerContext = ServerContext(),
+        serverContext: ServerContext,
         inputs: MutableMap<String, Pipe> = mutableMapOf()
-    ) : super(serverContext, updateYaml(udpKey), stepId, inputs)
+    ) : super(serverContext, updateYaml(serverContext, udpKey), stepId, inputs)
 
     init {
         // Fetching wrapper script to run openEO
-        scriptFile = File(scriptStubsRoot, "openEOWrapper.py")
+        metadata.script = File(scriptStubsRoot, "openEOWrapper.py")
     }
 
     private var url = ConstantPipe("text",  yamlParsed[SCRIPT].toString())
@@ -85,7 +84,7 @@ class OpenEOStep: ScriptStep {
         private val logger: Logger = LoggerFactory.getLogger("Server")
         private val openEOFolder = File(scriptStubsRoot, "openEO")
 
-        fun updateYaml(udpKey: String): File {
+        fun updateYaml(serverContext: ServerContext, udpKey: String): File {
             val options = DumperOptions()
             options.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
             val yamlFile = File(openEOFolder, "$udpKey.yml")
@@ -93,7 +92,7 @@ class OpenEOStep: ScriptStep {
                 yamlFile.parentFile.mkdirs()
 
                 try {
-                    yamlFile.writeText(Yaml(options).dump(getOpenEODescription(udpKey)))
+                    yamlFile.writeText(Yaml(options).dump(getOpenEODescription(serverContext, udpKey)))
                 } catch (e: Exception) {
                     logger.error("Error: ${e.message}")
                 }
@@ -101,8 +100,8 @@ class OpenEOStep: ScriptStep {
             return yamlFile
         }
 
-        fun getOpenEODescription(key: String): Map<String, Any> {
-            val sourceFile = File(scriptsRoot, "externalScripts.yaml")
+        fun getOpenEODescription(serverContext: ServerContext, key: String): Map<String, Any> {
+            val sourceFile = File(serverContext.scriptsRoot, "externalScripts.yaml")
             if (!sourceFile.exists()) throw FileNotFoundException("externalScripts.yaml not found")
 
             val yaml = Yaml()
@@ -207,27 +206,35 @@ class OpenEOStep: ScriptStep {
                         }
                 }
 
-                if (!authors.isNullOrEmpty()) {
-                    outputYaml[AUTHOR] = authors
-                } else {
-                    logger.warn("No authors found in catalog file...")
-                }
+        if (!authors.isNullOrEmpty()) {
+            outputYaml[AUTHORS] = authors
+        } else {
+            logger.warn("No authors found in catalog file...")
+        }
 
                 properties.opt(APEX__LICENSE)
                     ?.let { outputYaml[LICENSE] = it.toString() }
             }
 
-            //    val references = linkList
-            //        .filter { it.optString("type") != "application/vnd.openeo+json;type=process" }
-            //        .map { link ->
-            //            mapOf(
-            //                "href" to link.optString("href").takeIf { it.isNotEmpty() },
-            //                "rel" to link.optString("rel").takeIf { it.isNotEmpty() },
-            //                "type" to link.optString("type").takeIf { it.isNotEmpty() },
-            //                "title" to link.optString("title").takeIf { it.isNotEmpty() }
-            //            ).filterValues { it != null }
-            //        }
-            //    if (references.isNotEmpty()) outputYaml["references"] = references
+            val references = links
+                .filter { it.optString("rel") == "platform" }
+                .mapNotNull { link ->
+                    val title = link.optString("title")
+                    val href = link.optString("href")
+
+                    if (title.isNotBlank() && href.isNotBlank()) {
+                        mapOf(
+                            "text" to title,
+                            "link" to href
+                        )
+                    } else {
+                        null
+                    }
+                }
+
+            if (references.isNotEmpty()) {
+                outputYaml["references"] = references
+            }
 
             return outputYaml
         }
@@ -273,9 +280,9 @@ class OpenEOStep: ScriptStep {
 
                 when {
                     schema?.optJSONArray(UDP__INPUT__ENUM) != null -> {
-                        input[IO__TYPE] = IO__TYPE_OPTIONS
+                        input[IO__TYPE] = IO__TYPE__OPTIONS
                         val enum = schema.optJSONArray(UDP__INPUT__ENUM)!!
-                        input[IO__TYPE_OPTIONS] = (0 until enum.length()).map { enum.getString(it) }
+                        input[IO__TYPE__OPTIONS] = (0 until enum.length()).map { enum.getString(it) }
                     }
 
                     rawType == "array" -> {
@@ -284,8 +291,8 @@ class OpenEOStep: ScriptStep {
 
                         val itemsEnum = items.optJSONArray(UDP__INPUT__ENUM)
                         if (itemsEnum != null) {
-                            input[IO__TYPE] = "$IO__TYPE_OPTIONS[]"
-                            input[IO__TYPE_OPTIONS] = (0 until itemsEnum.length()).map { itemsEnum.getString(it) }
+                            input[IO__TYPE] = "$IO__TYPE__OPTIONS[]"
+                            input[IO__TYPE__OPTIONS] = (0 until itemsEnum.length()).map { itemsEnum.getString(it) }
                         } else {
                             val itemType = items.optJSONArray("anyOf")?.let { anyOf ->
                                 (0 until anyOf.length()).firstNotNullOfOrNull {
@@ -355,7 +362,7 @@ class OpenEOStep: ScriptStep {
                 .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
 
         private fun mapType(type: String, subtype: String?): String {
-            if (subtype == UDP__INPUT__BOUNDING_BOX) return "bboxCRS"
+            if (subtype == UDP__INPUT__BOUNDING_BOX) return "crsBBox"
 
             return when (Pair(type, subtype)) {
                 Pair("integer", null) -> "int"

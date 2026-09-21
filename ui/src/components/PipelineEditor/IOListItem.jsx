@@ -2,6 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
 import { ControlledTextArea } from "../form/AutoResizeTextArea";
 import ScriptInput from "../form/ScriptInput";
+import TextField from "@mui/material/TextField";
 
 
 
@@ -48,15 +49,28 @@ export function IOListItem({ io, id, valueEdited, setter, className, expand }) {
 
                             {io.type &&
                                 <>
-                                    <span className="example-tag">Example: </span>
-                                    <ScriptInput type={io.type}
-                                        className="example"
-                                        value={io.example}
-                                        options={io.options}
-                                        onValueUpdated={(value) => valueEdited(value, "example", io, setter)}
-                                        size="small"
-                                        keepWidth={true}
-                                    />
+                                    <div>
+                                        <label className="inline-label"><span>Type:&nbsp;</span>
+                                        <input className="type"
+                                            name="type"
+                                            defaultValue={io.type}
+                                            onBlur={e => valueEdited(e.target.value, "type", io, setter)}
+                                            onKeyDown={(e) => { if (e.ctrlKey) valueEdited(e.target.value, "type", io, setter) }}
+                                        />
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label className="inline-label"><span>Example:&nbsp;</span>
+                                            <ScriptInput type={io.type}
+                                                className="example"
+                                                value={io.example}
+                                                options={io.options}
+                                                onValueUpdated={(value) => valueEdited(value, "example", io, setter)}
+                                                size="small"
+                                                keepWidth={true}
+                                            />
+                                        </label>
+                                    </div>
                                 </>
                             }
                         </>}

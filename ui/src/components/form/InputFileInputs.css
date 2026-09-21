@@ -75,12 +75,12 @@
   font-weight: 700;
 }
 
-.CRSDescriptionLabel {
+.LocationDescriptionLabel {
   color: #999;
   font-weight: bold;
 }
 
-.CRSDescriptionValue {
+.LocationDescriptionValue {
   color: #333;
   font-weight: bold;
 }

@@ -2,9 +2,12 @@ package org.geobon.script
 
 import java.io.File
 
-enum class ScriptType {
+enum class ScriptType (val extension: String, val program: String) {
 
-    R, PYTHON, JULIA, SHELL;
+    R("R", "Rscript"),
+    PYTHON("py", "python3"),
+    JULIA("jl", "julia"),
+    SHELL("sh", "bash");
 
     companion object {
         fun fromFile(scriptFile: File): ScriptType {

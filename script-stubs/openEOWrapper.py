@@ -1,6 +1,7 @@
 import openeo
 import os
 import yaml
+import re
 from pathlib import Path
 from system.scriptWrapper import signal_handler
 
@@ -36,9 +37,27 @@ if (data['url'] is not None):
 else:
     biab_error_stop("Missing the process url.")
 
+# List of valid EPSG codes for openEO processes
+
+filepath = "/script-stubs/epsg.txt"
+
+def load_valid_epsg_codes(path):
+    text = Path(path).read_text(encoding="utf-8")
+    return {int(code) for code in re.findall(r"<(\d+)>", text)}
+
+valid_epsg_codes = load_valid_epsg_codes(filepath)
+
+
 # Set up inputs for process call
 inputs = dict(data)
 inputs.pop('url', None)
+
+if "epsg" in inputs.keys():
+    epsg = int(inputs["epsg"])
+    valid_epsg_codes = load_valid_epsg_codes(filepath)
+    if epsg not in valid_epsg_codes:
+        biab_error_stop(f"Invalid EPSG code: {epsg}. Please use a valid EPSG code from the list in epsg.txt. https://gist.github.com/JeroenVerstraelen/0a57950ce9828bbab1ef8614595d0e5c")
+
 
 # Check input types for special cases
 for key in input_info.keys():
@@ -49,6 +68,8 @@ for key in input_info.keys():
         crs_info = spatial_extent['CRS']
         crs = f"{crs_info['authority']}:{crs_info['code']}"
         epsg = int(crs.split(':')[1])
+        if epsg not in valid_epsg_codes:
+            biab_error_stop(f"*********************\nInvalid EPSG code: {epsg}. Please use a valid EPSG code from the list in epsg.txt. https://gist.github.com/JeroenVerstraelen/0a57950ce9828bbab1ef8614595d0e5c\n*********************")
         aoi = {"west": bbox[0], "south": bbox[1], "east": bbox[2], "north": bbox[3], "crs": epsg}
         inputs[key] = aoi
 
@@ -81,7 +102,8 @@ cube = connection.datacube_from_process(
 # Run UDP then reload output as a cube
 print("Starting UDP job to retrieve data cube...", flush=True)
 udp_job = cube.save_result(format="GTiff").create_job(
-    title="UDP"
+    title="UDP",
+    job_options={"do_extent_check": False}
 )
 
 # Signal handler will allow to write whatever outputs we have (in the finally clause below)

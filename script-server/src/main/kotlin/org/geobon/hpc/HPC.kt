@@ -1,16 +1,19 @@
 package org.geobon.hpc
 
 import kotlinx.coroutines.*
+import kotlinx.io.IOException
 import org.geobon.pipeline.ScriptStep
 import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 open class HPC (
     val connection: HPCConnection,
-    val retrieveSyncInterval: Long = 1000 * 60, // 1 minute
+    val retrieveSyncInterval: Duration = 1.minutes,
     val syncScope:CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 ) {
     val registeredSteps = WeakHashMap<ScriptStep, HPCRun?>()
@@ -54,7 +57,7 @@ open class HPC (
             condaSyncScope.launch {
                 try {
                     logFile.appendText("Lock acquired. Syncing conda environment towards HPC...\n")
-                    connection.runCommand(command, 60, logFile)
+                    connection.runCommand(command, 60.minutes, logFile)
                 } catch (t: Throwable) {
                     t.printStackTrace()
                     condaSyncJobs[condaEnvName]?.second?.let { runs ->
@@ -62,7 +65,10 @@ open class HPC (
                     }
                 } finally {
                     condaSyncJobs.remove(condaEnvName)
-                    logFile.appendText("Releasing lock.\n")
+
+                    // This try-catch block silences an error that occurred only when running tests.
+                    try { logFile.appendText("Releasing lock.\n") }
+                    catch (_: IOException) {}
                 }
             } to mutableListOf()
         }
@@ -143,7 +149,7 @@ open class HPC (
             } else {
                 resultsSyncJob = syncScope.launch {
                     var failCount = 0
-                    delay(10000) // Small delay to be able to see batch job submission log on first sync
+                    delay(10.seconds) // Small delay to be able to see batch job submission log on first sync
 
                     // This loop ensures only one sync runs at a time
                     // + use of coroutines and delay makes sure that no thread is reserved.

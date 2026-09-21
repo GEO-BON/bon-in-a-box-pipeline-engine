@@ -302,7 +302,7 @@
     "name": "0 in 2 out - parallel pipelines",
     "description": "Pipeline for automated tests",
     "lifecycle": {
-      "status": "reviewed",
+      "status": "example",
       "message": "bla bla"
     },
     "author": [

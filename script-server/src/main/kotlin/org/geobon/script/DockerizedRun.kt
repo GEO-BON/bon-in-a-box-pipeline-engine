@@ -112,7 +112,7 @@ class DockerizedRun( // Constructor used in single script run
 
             log(logger::info, "Launching on ${container.containerName} container...")
             ProcessBuilder(command)
-                .directory(ServerContext.scriptsRoot)
+                .directory(context.serverContext.scriptsRoot)
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectErrorStream(true) // Merges stderr into stdout
                 .start().also { process ->
@@ -121,7 +121,7 @@ class DockerizedRun( // Constructor used in single script run
                         // if the user cancels or if timeout delay expires.
                         val watchdog = launch {
                             try {
-                                delay(timeout.toLong(DurationUnit.MILLISECONDS))
+                                delay(timeout)
                                 throw TimeoutException("Timeout occurred after $timeout")
 
                             } catch (ex: Exception) {
