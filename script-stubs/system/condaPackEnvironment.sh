@@ -33,6 +33,12 @@ if [[ "$condaEnvName" != "pythonbase" && "$condaEnvName" != "rbase"
         tar=$condaPackDir/$condaEnvName.tar
         zip=$tar.gz
 
+        # Queue packing of parallel scripts.
+        # Same lock file as in condaEnvironment.sh avoids the directory being
+        # edited while packing.
+        exec {lockfd}>>"$condaPackDir/$condaEnvName.lock"
+        flock -x "$lockfd"
+
         if [[ -f $condaPackEnvFile && -f "$zip" ]]; then
             if cmp -s "$condaPackEnvFile" "$condaEnvFile"; then
                 echo "Conda-pack archive $zip already packed."
@@ -44,5 +50,7 @@ if [[ "$condaEnvName" != "pythonbase" && "$condaEnvName" != "rbase"
         else
             packEnvironment
         fi
+
+        exec {lockfd}>&-
     fi
 fi
