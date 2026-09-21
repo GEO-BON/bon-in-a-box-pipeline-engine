@@ -263,10 +263,10 @@ else
     # A second lock on the whole folder happens inside the activateSubEnvironment
     # function to prevent two different sub-environments from doing transactions
     # at the same time.
-    # On Kubernetes each run is its own pod, so a lock under /conda-env-yml is
-    # pod-local and serialises nothing. When the pack directory is shared and
-    # writable, the lock has to live there instead.
-    if [[ "$condaPackWriteable" != "$tmpPackDir" ]]; then
+    if [[ -d "$condaPackDir" ]]; then
+        # conda-pack installations may be shared across short-lived instances.
+        # Lock on $condaPackWriteable: its the shared pack folder when writable, 
+        # otherwise a fallback location in /tmp
         lockFile="$condaPackWriteable/$condaEnvName.lock"
     else
         lockFile="/conda-env-yml/$condaEnvName.lock"

@@ -33,11 +33,11 @@ if [[ "$condaEnvName" != "pythonbase" && "$condaEnvName" != "rbase"
         tar=$condaPackDir/$condaEnvName.tar
         zip=$tar.gz
 
-        # condaEnvironment.sh released its lock before the script ran, so on a shared
-        # directory two runs can reach here for the same environment at once and write
-        # the same tar. Same lock file, so they queue instead.
-        exec {packlockfd}>>"$condaPackDir/$condaEnvName.lock"
-        flock -x "$packlockfd"
+        # Queue packing of parallel scripts.
+        # Same lock file as in condaEnvironment.sh avoids the directory being
+        # edited while packing.
+        exec {lockfd}>>"$condaPackDir/$condaEnvName.lock"
+        flock -x "$lockfd"
 
         if [[ -f $condaPackEnvFile && -f "$zip" ]]; then
             if cmp -s "$condaPackEnvFile" "$condaEnvFile"; then
@@ -51,6 +51,6 @@ if [[ "$condaEnvName" != "pythonbase" && "$condaEnvName" != "rbase"
             packEnvironment
         fi
 
-        exec {packlockfd}>&-
+        exec {lockfd}>&-
     fi
 fi
