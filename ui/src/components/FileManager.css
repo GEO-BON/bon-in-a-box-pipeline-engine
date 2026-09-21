@@ -13,6 +13,10 @@
   button.wx-segment:has(.wxi-view-column) {
     display: none !important;
   }
+
+  .wx-no-info-wrapper {
+    padding-bottom: 30px;
+  }
 }
 
 /* didn't need the !important before -- why?  */
