@@ -44,11 +44,12 @@ services:
 
   python-api: # Serves Titiler and a FastAPI app to serve country and region names and geometries
     container_name: biab-python-api
-    env_file: # added this to fetch the DISABLE_MY_FILES variable in /pipeline-repo/runner.env
+    env_file:
       - ${PIPELINE_REPO_PATH}/runner.env
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
-      - ${PIPELINE_REPO_PATH}/userdata:/data/userdata:rw  # for user uploads, used in "/manage-files"
+      # userdata is writable for user uploads, used in "/manage-files"
+      - ${PIPELINE_REPO_PATH}/userdata:/data/userdata:rw  
 
     user: ${MY_UID}:${DOCKER_GID}
     environment:
@@ -56,11 +57,13 @@ services:
       WORKERS_PER_CORE: 1
       TITILER_API_CORS_ORIGINS: "*"
       USERDATA_ROOT: /data/userdata/files
+      # The shared clamd. Blank -- the default -- means uploads are saved WITHOUT
+      # being scanned; set, main_api.py fails CLOSED and an unreachable scanner
+      # refuses the upload. See the antivirus block in main_api.py.
+      CLAMAV_ADDRESS: ${CLAMAV_ADDRESS:-}
       DISABLE_MY_FILES: ${DISABLE_MY_FILES}
-      # The chat bridge, started by startup.sh as a fourth process here rather than as
-      # a container of its own: it holds no model and no GPU, so it was a whole
-      # container -- and, on Kubernetes, a whole pod per session -- to run an HTTP
-      # client. Unset OLLAMA_URL disables the assistant entirely.
+      # The chat bridge, started by startup.sh as a fourth process.
+      # Unset OLLAMA_URL disables the assistant entirely.
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11435}
       # Covers the bridge's non-streaming call to Ollama and its health check.
       #
@@ -70,10 +73,6 @@ services:
       # for the paths it does cover; the broken stream that results is handled by
       # bridge/sitecustomize.py rather than prevented here.
       OLLAMA_PROXY_TIMEOUT: 600000
-      # The shared clamd. Blank -- the default -- means uploads are saved WITHOUT
-      # being scanned; set, main_api.py fails CLOSED and an unreachable scanner
-      # refuses the upload. See the antivirus block in main_api.py.
-      CLAMAV_ADDRESS: ${CLAMAV_ADDRESS:-}
     expose:
       - "8000"
       - "8001"
