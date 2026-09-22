@@ -1,11 +1,6 @@
-import { useContext } from "react";
 import GreenSquares from "../img/greenSquares.png";
 import BigGreenBoxes from "../img/bigGreenSquares.png"
 import { LastNRuns } from "./RunHistory";
-import { uiContext } from '../uiContext.jsx';
-
-// temporary
-import FileBrowser from "./FileBrowser";
 
 export default function HomePage() {
     return (
