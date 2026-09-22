@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useReducer, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useReducer,
+  useCallback,
+  useRef,
+} from "react";
 
 import { PipelineForm } from "./form/PipelineForm";
 import { useParams } from "react-router-dom";
@@ -13,7 +19,7 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import Box from "@mui/material/Box";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown from "react-markdown";
 import { PageTitle } from "../Layout";
 
 const pipelineConfig = { extension: ".json", defaultFile: null };
@@ -36,7 +42,7 @@ function pipReducer(state, action) {
     case "url": {
       let selectionUrl = action.newDescriptionFile.substring(
         0,
-        action.newDescriptionFile.lastIndexOf(".")
+        action.newDescriptionFile.lastIndexOf("."),
       );
       return {
         lastAction: "url",
@@ -91,6 +97,8 @@ export function PipelinePage({ runType }) {
   const [pipelineMetadata, setPipelineMetadata] = useState(null);
   const [expandInputs, setExpandInputs] = useState(true);
 
+  const resultsRef = useRef(null);
+
   /**
    * String: Content of input.json for this run
    */
@@ -100,10 +108,8 @@ export function PipelinePage({ runType }) {
   const [pipStates, setPipStates] = useReducer(
     pipReducer,
     { runType, selectionUrl: pipeline, runHash },
-    pipInitialState
+    pipInitialState,
   );
-
-
 
   let pipelineOutputsTimeout;
   function loadPipelineOutputs() {
@@ -113,15 +119,21 @@ export function PipelinePage({ runType }) {
         pipStates.runId,
         (error, data, response) => {
           if (error) {
-            setHttpError(formatError(error, response, "while getting pipeline outputs from script server"));
+            setHttpError(
+              formatError(
+                error,
+                response,
+                "while getting pipeline outputs from script server",
+              ),
+            );
           } else {
             if (data.error) {
-              setHttpError(data.error.replaceAll("\n","\n\n"));
+              setHttpError(data.error.replaceAll("\n", "\n\n"));
               delete data.error;
             }
 
             let allOutputFoldersKnown = Object.values(data).every(
-              (val) => val !== ""
+              (val) => val !== "",
             );
             if (!allOutputFoldersKnown) {
               // try again later
@@ -129,10 +141,10 @@ export function PipelinePage({ runType }) {
             }
 
             setResultsData((previousData) =>
-              _lang.isEqual(previousData, data) ? previousData : data
+              _lang.isEqual(previousData, data) ? previousData : data,
             );
           }
-        }
+        },
       );
     } else {
       setResultsData(null);
@@ -140,39 +152,48 @@ export function PipelinePage({ runType }) {
   }
 
   function loadPipelineMetadata(choice, setExamples = true) {
-    if(!choice) {
-      setPipelineMetadata(null)
-      return
+    if (!choice) {
+      setPipelineMetadata(null);
+      return;
     }
 
     var callback = function (error, data, response) {
       if (error) {
-        setHttpError(formatError(error, response, "while loading pipeline metadata from script server"));
-        setPipelineMetadata(null)
+        setHttpError(
+          formatError(
+            error,
+            response,
+            "while loading pipeline metadata from script server",
+          ),
+        );
+        setPipelineMetadata(null);
       } else if (data) {
         setPipelineMetadata(data);
         if (setExamples) {
-          restoreDefaults(data)
+          restoreDefaults(data);
         }
       }
     };
     api.getInfo(runType, choice, callback);
   }
 
-  const restoreDefaults = useCallback(metadata => {
-    let inputExamples = {};
-    if (metadata && metadata.inputs) {
-      Object.keys(metadata.inputs).forEach((inputId) => {
-        let input = metadata.inputs[inputId];
-        if (input) {
-          const example = input.example;
-          inputExamples[inputId] = example === undefined ? null : example;
-        }
-      });
-    }
+  const restoreDefaults = useCallback(
+    (metadata) => {
+      let inputExamples = {};
+      if (metadata && metadata.inputs) {
+        Object.keys(metadata.inputs).forEach((inputId) => {
+          let input = metadata.inputs[inputId];
+          if (input) {
+            const example = input.example;
+            inputExamples[inputId] = example === undefined ? null : example;
+          }
+        });
+      }
 
-    setInputFileContent(inputExamples);
-  }, [setInputFileContent])
+      setInputFileContent(inputExamples);
+    },
+    [setInputFileContent],
+  );
 
   function loadPipelineInputs(pip, hash) {
     var inputJson =
@@ -219,10 +240,10 @@ export function PipelinePage({ runType }) {
 
     return () => {
       if (pipelineOutputsTimeout) {
-        clearTimeout(pipelineOutputsTimeout)
-        pipelineOutputsTimeout = null
+        clearTimeout(pipelineOutputsTimeout);
+        pipelineOutputsTimeout = null;
       }
-    }
+    };
   }, [pipStates]);
 
   useEffect(() => {
@@ -251,33 +272,77 @@ export function PipelinePage({ runType }) {
     setStoppable(false);
     api.stop(runType, pipStates.runId, (error, data, response) => {
       if (error) {
-        setHttpError(formatError(error, response, "in script server while stopping the pipeline"));
+        setHttpError(
+          formatError(
+            error,
+            response,
+            "in script server while stopping the pipeline",
+          ),
+        );
       } else {
         setHttpError("Cancelled by user");
       }
     });
   };
 
-  useEffect(()=>{
-    if(pipStates.runHash){
-      setExpandInputs(false)
-    }
-  },[pipStates.runHash])
+  const resultsPresentRef = useRef(false);
+  useEffect(() => {
+    if (
+      (resultsData != null && !resultsPresentRef.current) ||
+      (httpError != null && !resultsPresentRef.current)
+    ) {
+      // The accordion collapse (triggered above) and PipelineResults' own
+      // auto-expand-first-output scroll (FoldableOutput.jsx) both keep moving
+      // the layout above the results section for a bit after it mounts, so
+      // scrolling immediately targets a position that's stale by the time
+      // those animations finish. Wait for the section's position to settle
+      // before scrolling to it.
+      let frameRequestId; // valid for a single frame
+      let lastTop = null;
+      let stableFrames = 0;
+      const waitForStableLayout = () => {
+        const top = resultsRef.current?.getBoundingClientRect().top;
+        if (top === lastTop) {
+          stableFrames++;
+        } else {
+          stableFrames = 0;
+          lastTop = top;
+        }
 
-  const toggleAccord  = useCallback(() => {
-    setExpandInputs(prev => !prev);
-  }, [setExpandInputs])
+        if (stableFrames >= 5) {
+          resultsRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        } else {
+          frameRequestId = requestAnimationFrame(waitForStableLayout);
+        }
+      };
+      frameRequestId = requestAnimationFrame(waitForStableLayout);
+      resultsPresentRef.current = true;
+      return () => cancelAnimationFrame(frameRequestId);
+    }
+    resultsPresentRef.current = resultsData != null || httpError != null;
+  }, [resultsData, httpError]);
+
+  const toggleAccord = useCallback(() => {
+    setExpandInputs((prev) => !prev);
+  }, [setExpandInputs]);
 
   return (
     <>
       <PageTitle
         title={
-          pipelineMetadata?.name ? pipelineMetadata.name : runType === "pipeline" ? "Pipeline run" : "Script run"
+          pipelineMetadata?.name
+            ? pipelineMetadata.name
+            : runType === "pipeline"
+              ? "Pipeline run"
+              : "Script run"
         }
       />
       <div className="pipeline-page">
         <h2>{runType === "pipeline" ? "Pipeline" : "Script"} run</h2>
-        <Box className="inputsTop" >
+        <Box className="inputsTop">
           <Accordion expanded={expandInputs} onChange={toggleAccord}>
             <AccordionSummary
               className="outputTitle"
@@ -312,24 +377,26 @@ export function PipelinePage({ runType }) {
         )}
         {httpError && (
           <div style={{ marginTop: "20px", paddingBottom: "30px" }}>
-            <Alert severity="error" key="httpError" >
+            <Alert severity="error" key="httpError">
               <ReactMarkdown>{httpError}</ReactMarkdown>
             </Alert>
           </div>
         )}
         {pipelineMetadata && (
-          <PipelineResults
-            key="results"
-            pipelineMetadata={pipelineMetadata}
-            inputFileContent={inputFileContent}
-            resultsData={resultsData}
-            runningScripts={runningScripts}
-            setRunningScripts={setRunningScripts}
-            pipeline={pipeline}
-            runHash={runHash}
-            displayTimeStamp={pipStates.timestamp}
-            isPipeline={runType === "pipeline"}
-          />
+          <div ref={resultsRef}>
+            <PipelineResults
+              key="results"
+              pipelineMetadata={pipelineMetadata}
+              inputFileContent={inputFileContent}
+              resultsData={resultsData}
+              runningScripts={runningScripts}
+              setRunningScripts={setRunningScripts}
+              pipeline={pipeline}
+              runHash={runHash}
+              displayTimeStamp={pipStates.timestamp}
+              isPipeline={runType === "pipeline"}
+            />
+          </div>
         )}
       </div>
     </>
