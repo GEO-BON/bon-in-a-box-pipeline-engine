@@ -217,6 +217,10 @@ compute:
       required: true
       type: string
       regex: "^[0-9]+[GM]$"
+    mem-max:
+      required: false
+      type: string
+      regex: "^[0-9]+[GM]$"
     cpus-per-task:
       required: true
       type: integer

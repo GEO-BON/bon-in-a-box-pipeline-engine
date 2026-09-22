@@ -20,6 +20,10 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 
+/** Thrown when a Kubernetes job's pod was killed by the kernel OOM killer, so [KubernetesRun] can retry with more memory. */
+private class OomKilledException(jobName: String) :
+    RuntimeException("Kubernetes job '$jobName' was killed by the OOM killer.")
+
 class KubernetesRun(
     context: RunContext,
     scriptFile: File,
@@ -52,42 +56,55 @@ class KubernetesRun(
         val jobName = toJobName(context.runId)
 
         runCatching {
-            val command = buildScriptCommand(scriptType)
-            val job = connection.buildJob(jobName, command, scriptType, computeRequirements)
             val api = connection.createBatchApi()
             val coreApi = connection.createCoreApi()
 
-            // Use cached result if the job already succeeded; otherwise replace stale runs.
-            val jobAlreadySucceeded = try {
-                val existingStatus = api.readNamespacedJobStatus(jobName, namespace).execute().status
-                if ((existingStatus?.succeeded ?: 0) > 0) {
-                    log(logger::info, "Kubernetes job '$jobName' already succeeded, using cached result.")
-                    true
-                } else {
-                    log(logger::debug, "Found pre-existing failed Kubernetes job.")
-                    deleteJobAndWait(
-                        api = api,
-                        coreApi = coreApi,
-                        namespace = namespace,
-                        jobName = jobName,
-                        waitForOutput = false
-                    )
+            // Bumped up to computeRequirements.memMax (when set) each time a run is OOM-killed.
+            var currentRequirements = computeRequirements
+            while (true) {
+                val command = buildScriptCommand(scriptType)
+                val job = connection.buildJob(jobName, command, scriptType, currentRequirements)
+
+                // Use cached result if the job already succeeded; otherwise replace stale runs.
+                val jobAlreadySucceeded = try {
+                    val existingStatus = api.readNamespacedJobStatus(jobName, namespace).execute().status
+                    if ((existingStatus?.succeeded ?: 0) > 0) {
+                        log(logger::info, "Kubernetes job '$jobName' already succeeded, using cached result.")
+                        true
+                    } else {
+                        log(logger::debug, "Found pre-existing failed Kubernetes job.")
+                        deleteJobAndWait(
+                            api = api,
+                            coreApi = coreApi,
+                            namespace = namespace,
+                            jobName = jobName,
+                            waitForOutput = false
+                        )
+                        false
+                    }
+                } catch (ex: ApiException) {
+                    if (ex.code != 404) throw ex
                     false
                 }
-            } catch (ex: ApiException) {
-                if (ex.code != 404) throw ex
-                false
-            }
 
-            if (!jobAlreadySucceeded) {
-                log(logger::info, "Submitting job '$jobName' in namespace '$namespace'...")
+                if (jobAlreadySucceeded) break
+
+                log(logger::info, "Submitting job '$jobName' in namespace '$namespace' (mem=${currentRequirements?.mem ?: "default"})...")
                 val created = api.createNamespacedJob(namespace, job).execute()
                 log(
                     logger::debug,
                     "Job created, uid='${created.metadata?.uid}'."
                 )
 
-                waitForJobCompletion(api, coreApi, namespace, jobName, timeout)
+                try {
+                    waitForJobCompletion(api, coreApi, namespace, jobName, timeout)
+                    break
+                } catch (ex: OomKilledException) {
+                    val bumped = currentRequirements?.bumpMemOrNull()
+                        ?: throw ex
+                    log(logger::warn, "Job '$jobName' was OOM-killed; retrying with mem=${bumped.mem} (max ${bumped.memMax}).")
+                    currentRequirements = bumped
+                }
             }
 
             if (resultFile.exists()) {
@@ -115,6 +132,10 @@ class KubernetesRun(
                     val event = ex.message ?: ex.javaClass.name
                     log(logger::info, "$event: done.")
                     outputs[ERROR_KEY] = event
+                }
+
+                is OomKilledException -> {
+                    outputs[ERROR_KEY] = (ex.message ?: "Job was OOM-killed.").also { log(logger::warn, it) }
                 }
 
                 is ApiException -> {
@@ -182,6 +203,9 @@ class KubernetesRun(
                     }
 
                     if ((status?.failed ?: 0) > 0) {
+                        if (connection.wasOOMKilled(namespace, jobName)) {
+                            throw OomKilledException(jobName)
+                        }
                         throw RuntimeException("Kubernetes job '$jobName' failed.")
                     }
 
