@@ -7,6 +7,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 import AutoResizeTextArea from "./AutoResizeTextArea";
 import Choosers from "./Choosers";
+import StacChooser from "./Choosers/StacChooser";
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
 export const CONSTANT_PLACEHOLDER = "Constant";
 
@@ -251,6 +252,11 @@ export default function ScriptInput({
     case "location":
       return (
         <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Country, region, CRS and Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={size=='small'}/>
+      );
+
+    case "stac":
+      return (
+        <StacChooser inputId={passedProps.id} value={value} updateValue={(value) => { onValueUpdated(value) }} isCompact={size=='small'}/>
       );
 
     default:
