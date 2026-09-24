@@ -22,7 +22,7 @@ biab_inputs <- function(){
 
 # Add outputs throughout the script
 biab_output <- function(key, value){
-    biab_output_list[[ key ]] <<- value
+    biab_output_list[ key ] <<- list(value)
     cat("Output added for \"", key, "\"\n")
 }
 
