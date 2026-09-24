@@ -82,17 +82,19 @@ steps:
         NetworkAccess:
           networkAccess: true
         InlineJavascriptRequirement: { }
+        EnvVarRequirement:
+          envDef:
+            RUNNER_ENV_URI: $(inputs.environment)
       baseCommand: [ bash, -c ]
       arguments:
         - |
           echo "Preparing runner.env..."
-          runnerEnvURI="$(inputs.environment || '')"
           
-          if [[ "$runnerEnvURI" == http://* ||
-                  "$runnerEnvURI" == https://* ||
-                  "$runnerEnvURI" == file://* ]]; then
-            if ! curl -fsSL "$runnerEnvURI" -o runner.env; then
-              echo "ERROR: failed to download runner.env from $runnerEnvURI" >&2
+          if [[ "$RUNNER_ENV_URI" == http://* ||
+                  "$RUNNER_ENV_URI" == https://* ||
+                  "$RUNNER_ENV_URI" == file://* ]]; then
+            if ! curl -fsSL "$RUNNER_ENV_URI" -o runner.env; then
+              echo "ERROR: failed to download runner.env from $RUNNER_ENV_URI" >&2
               exit 1
             fi
             source runner.env
@@ -146,6 +148,7 @@ steps:
             CONDA_ENVS_PATH: /opt/conda/envs:/conda-env-yml/envs
             SCRIPT_STUBS_LOCATION: /script-stubs
             OUTPUT_LOCATION: "$(inputs.runFolderWrite ? inputs.runFolderWrite.path : runtime.outdir)"
+            CONDA_PACK_URL: $(inputs.condaPackURL)
       baseCommand: [bash, -c]
       arguments:
         - |
@@ -161,7 +164,7 @@ steps:
             
             echo "Exporting $condaEnvName..."
             source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh "$OUTPUT_LOCATION" "$condaEnvName" \
-              "$condaEnvYml" "$dedicatedEnvFolder" "$(inputs.condaPackURL)" --noActivate
+              "$condaEnvYml" "$dedicatedEnvFolder" "$CONDA_PACK_URL" --noActivate
             source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh "$condaEnvName" "$dedicatedEnvFolder"
             echo "Done."
           }
