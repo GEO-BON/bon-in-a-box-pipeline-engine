@@ -1366,7 +1366,7 @@ export default function PipelineEditor(props) {
                 }}
               />
 
-              <div className="react-flow__attribution bottom left previewMode">
+              <div className="react-flow__panel react-flow__attribution top left previewMode">
                   Currently in <strong>preview mode</strong>. Use a larger screen to edit.
               </div>
             </ReactFlow>

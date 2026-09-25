@@ -262,6 +262,9 @@ ul.pipeline-bullets li::before {
 .react-flow__attribution.bottom.right {
   border-bottom-right-radius: 10px;
 }
+.react-flow__attribution.top.left {
+  border-top-left-radius: 10px;
+}
 
 .fullScreenPopup {
   position: absolute;
@@ -808,7 +811,6 @@ h2.MuiDialogTitle-root {
     .previewMode {
         display: inline;
         color: #555 !important;
-        border-bottom-left-radius: 10px;
     }
 
     div.right-content main {
