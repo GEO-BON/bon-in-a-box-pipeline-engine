@@ -38,13 +38,14 @@ open class ServerContext(
                 null
             } else {
                 System.getenv("CONDA_PACK_DIR").let { explicitCondaPackDir ->
-                    if (explicitCondaPackDir.isNotBlank())
-                        File(explicitCondaPackDir)
-                    else // Default location inside output folder
+                    if (explicitCondaPackDir.isNullOrBlank())
+                        // Default location inside output folder
                         File(outputRoot, "_envs")
+                    else
+                        File(explicitCondaPackDir)
                 }
             }
 
-        val condaPackURL:String? = System.getenv("CONDA_PACK_URL")
+        val condaPackURL: String? = System.getenv("CONDA_PACK_URL")
     }
 }

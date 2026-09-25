@@ -23,8 +23,8 @@ class InfoLifecycle {
      * Constructs a new <code>InfoLifecycle</code>.
      * @alias module:model/InfoLifecycle
      */
-    constructor() { 
-        
+    constructor() {
+
         InfoLifecycle.initialize(this);
     }
 
@@ -33,7 +33,7 @@ class InfoLifecycle {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) { 
+    static initialize(obj) {
         obj['status'] = 'in_development';
     }
 
@@ -137,7 +137,19 @@ InfoLifecycle['StatusEnum'] = {
      * value: "example"
      * @const
      */
-    "example": "example"
+    "example": "example",
+
+    /**
+     * value: "stale"
+     * @const
+     */
+    "stale": "stale",
+
+    /**
+     * value: "subpipeline"
+     * @const
+     */
+    "subpipeline": "subpipeline"
 };
 
 

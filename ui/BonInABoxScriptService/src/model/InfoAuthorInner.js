@@ -23,8 +23,8 @@ class InfoAuthorInner {
      * Constructs a new <code>InfoAuthorInner</code>.
      * @alias module:model/InfoAuthorInner
      */
-    constructor() { 
-        
+    constructor() {
+
         InfoAuthorInner.initialize(this);
     }
 
@@ -33,7 +33,7 @@ class InfoAuthorInner {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) { 
+    static initialize(obj) {
     }
 
     /**

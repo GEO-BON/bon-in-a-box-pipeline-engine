@@ -23,8 +23,8 @@ class InfoCompute {
      * Constructs a new <code>InfoCompute</code>.
      * @alias module:model/InfoCompute
      */
-    constructor() { 
-        
+    constructor() {
+
         InfoCompute.initialize(this);
     }
 
@@ -33,7 +33,7 @@ class InfoCompute {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) { 
+    static initialize(obj) {
     }
 
     /**
@@ -87,7 +87,7 @@ class InfoCompute {
 
 
 /**
- * Whether this script is meant to be run on a HPC. If true, the script will be run on a HPC when configured, otherwise on kubernetes or locally. 
+ * Whether this script is meant to be run on a HPC. If true, the script will be run on a HPC when configured, otherwise on kubernetes or locally.
  * @member {Boolean} hpc
  */
 InfoCompute.prototype['hpc'] = undefined;
