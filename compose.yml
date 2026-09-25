@@ -53,13 +53,9 @@ services:
       USERDATA_ROOT: /data/userdata/files
       # Unset OLLAMA_URL disables the assistant entirely.
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11435}
-      # Covers the bridge's non-streaming call to Ollama and its health check.
+      # How long the bridge waits for Ollama to respond before giving up, in
+      # milliseconds (600000 = 10 min). Covers the non-streaming call and the health check.
       #
-      # NOTE: it does NOT reach the streaming chat path. `stream_ollama` in the bridge
-      # builds its client with a hardcoded `timeout=None`, so /api/chat with
-      # stream:true has no timeout at all and this value never applies to it. It stays
-      # for the paths it does cover; the broken stream that results is handled by
-      # bridge/sitecustomize.py rather than prevented here.
       OLLAMA_PROXY_TIMEOUT: 600000
     expose:
       - "8000" # Titiler
