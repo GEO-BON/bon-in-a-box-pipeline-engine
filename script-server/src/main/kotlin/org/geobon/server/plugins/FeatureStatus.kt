@@ -111,7 +111,7 @@ object FeatureStatus {
         return probeResult
     }
 
-    /** `host[:port]`, port optional. Mirrors _parse_clamav_address in main_api.py. */
+    /** `host[:port]`, port optional. Mirrors _parse_clamav_address in python-api/app/antivirus.py. */
     private fun parseAddress(address: String): Pair<String, Int> {
         val separator = address.lastIndexOf(':')
         if (separator < 0) return address to CLAMAV_DEFAULT_PORT
