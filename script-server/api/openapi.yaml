@@ -633,7 +633,7 @@ components:
           properties:
             status:
               type: string
-              enum: [in_development, in_review, reviewed, core, deprecated, example]
+              enum: [in_development, in_review, reviewed, core, deprecated, example, "stale", "subpipeline"]
               default: in_development
             message:
               type: string
