@@ -113,17 +113,96 @@ def _collection(catalog, collection):
     return found
 
 
+def _declared_assets(catalog, collection):
+    """The collection's item_assets declaration, or {} when it has none."""
+    return getattr(_collection(catalog, collection), "item_assets", None) or {}
+
+
 def _isoformat(value):
     return value.isoformat() if value is not None else None
 
 
-def _describe_asset(key, asset, sampled=None):
+def _is_cog(media_type):
+    """
+    Whether a media type names a Cloud Optimized GeoTIFF, the only format the
+    tiler previews and the scripts read. Parameters may come in any order, case
+    or spacing, so compare them as a set.
+    """
+    if not media_type:
+        return False
+    parts = {part.strip().lower().replace(" ", "") for part in media_type.split(";")}
+    return "image/tiff" in parts and "profile=cloud-optimized" in parts
+
+
+def _asset_fields(asset, declared=None):
+    """
+    An asset's fields as plain JSON, over what the collection's item_assets
+    declares for it. Catalogues put the raster and classification extensions in
+    either place, so the item's own fields win and the declaration fills gaps.
+    """
+    fields = declared.to_dict() if declared is not None else {}
+    fields.update(asset.to_dict())
+    return fields
+
+
+def _classes(fields):
+    """
+    The classes a categorical asset declares, as [{value, label, color}], or None.
+
+    Two extensions describe them: classification:classes (on the asset or its
+    first band) and the older file:values, which maps value lists to a summary.
+    """
+    bands = fields.get("raster:bands") or fields.get("bands") or [{}]
+    declared = fields.get("classification:classes") or bands[0].get("classification:classes")
+    if declared:
+        return [
+            {
+                "value": c.get("value"),
+                "label": c.get("description") or c.get("title") or c.get("name"),
+                "color": "#" + c["color_hint"] if c.get("color_hint") else None,
+            }
+            for c in declared
+        ]
+    values = fields.get("file:values")
+    if values:
+        return [{"value": v, "label": entry.get("summary"), "color": None} for entry in values for v in entry.get("values", [])]
+    return None
+
+
+def _kind(fields, classes):
+    """
+    Whether an asset is categorical or continuous, or None when the catalogue
+    doesn't say. A class list settles it. So does anything that marks a measured
+    quantity: a float data type, a scale or offset, a unit, or spectral bands.
+    An integer type alone doesn't: land cover and scaled temperatures are both
+    stored as integers.
+    """
+    if classes:
+        return "categorical"
+    if fields.get("eo:bands"):
+        return "continuous"
+    bands = fields.get("raster:bands") or fields.get("bands") or []
+    types = {band.get("data_type") for band in bands} - {None}
+    if types and all(t.startswith(("float", "cfloat")) for t in types):
+        return "continuous"
+    for band in bands:
+        if band.get("scale") not in (None, 1) or band.get("offset") not in (None, 0) or band.get("unit"):
+            return "continuous"
+    return None
+
+
+def _describe_asset(key, asset, sampled=None, declared=None):
+    fields = _asset_fields(asset, declared)
+    classes = _classes(fields)
     described = {
         "key": key,
         "title": asset.title or key,
-        "href": asset.href,
+        # item_assets definitions (ItemAssetDefinition) carry no href.
+        "href": getattr(asset, "href", None),
         "type": asset.media_type,
         "roles": asset.roles or [],
+        "kind": _kind(fields, classes),
+        "classes": classes,
     }
     if sampled is not None:
         # The href belongs to the sampled item, not to a user selection. Its URL
@@ -324,7 +403,7 @@ def items_list(catalog: str, collection: str, limit: int = 50, page: int = 1, fi
 @router.get("/assets_list")
 def assets_list(catalog: str, collection: str, item: str = "", date: str = ""):
     """
-    The assets of an item.
+    The Cloud Optimized GeoTIFF assets of an item. Other formats are left out.
 
     With no item, describe the assets the collection's items are expected to
     carry -- what the chooser needs for its "use all items" mode. The
@@ -341,7 +420,12 @@ def assets_list(catalog: str, collection: str, item: str = "", date: str = ""):
             found = _collection(catalog, collection).get_item(item)
         if found is None:
             raise HTTPException(status_code=404, detail="Item '%s' not found in '%s'" % (item, collection))
-        return [_describe_asset(key, asset) for key, asset in found.assets.items()]
+        declared = _declared_assets(catalog, collection)
+        return [
+            _describe_asset(key, asset, declared=declared.get(key))
+            for key, asset in found.assets.items()
+            if _is_cog(asset.media_type)
+        ]
 
     day = _assert_date(date) if date else ""
 
@@ -360,8 +444,15 @@ def assets_list(catalog: str, collection: str, item: str = "", date: str = ""):
             )
         raise HTTPException(status_code=404, detail="Collection '%s' has no items" % collection)
 
-    declared = getattr(_collection(catalog, collection), "item_assets", None)
+    declared = _declared_assets(catalog, collection)
     if declared:
-        return [_describe_asset(key, asset, sampled=sample) for key, asset in declared.items()]
-
-    return [_describe_asset(key, asset, sampled=sample) for key, asset in sample.assets.items()]
+        # Prefer the sample's own asset, which has the href the tiler needs;
+        # the declaration only fills in keys the sample happens to lack.
+        candidates = ((key, sample.assets.get(key, asset)) for key, asset in declared.items())
+    else:
+        candidates = sample.assets.items()
+    return [
+        _describe_asset(key, asset, sampled=sample, declared=declared.get(key))
+        for key, asset in candidates
+        if _is_cog(asset.media_type)
+    ]

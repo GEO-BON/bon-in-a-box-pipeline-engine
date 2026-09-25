@@ -42,7 +42,9 @@ async function getJson(path, params) {
     // Non-JSON error page, fall through to the generic message below.
   }
   if (!response.ok) {
-    throw new Error((body && body.detail) || `Request to ${path} failed (${response.status})`);
+    throw new Error(
+      (body && body.detail) || `Request to ${path} failed (${response.status})`,
+    );
   }
   return body;
 }
@@ -51,7 +53,8 @@ async function getJson(path, params) {
 function tilerMessage(body, status) {
   const detail = body && body.detail;
   if (typeof detail === "string") return detail;
-  if (Array.isArray(detail)) return detail.map((d) => d.msg || JSON.stringify(d)).join("; ");
+  if (Array.isArray(detail))
+    return detail.map((d) => d.msg || JSON.stringify(d)).join("; ");
   return `Tiler request failed (${status})`;
 }
 
@@ -65,7 +68,10 @@ function bandStatistics(body) {
   const bands = [];
   const visit = (node) => {
     if (!node || typeof node !== "object") return;
-    if (typeof node.percentile_2 === "number" && typeof node.percentile_98 === "number") {
+    if (
+      typeof node.percentile_2 === "number" &&
+      typeof node.percentile_98 === "number"
+    ) {
       bands.push(node);
     } else {
       Object.values(node).forEach(visit);
@@ -105,10 +111,17 @@ function selectionKey(selection) {
 /** How a selection reads in the lists, e.g. "all items on 2019-06-01". */
 function selectionScope(selection) {
   if (!selection.all_items) return selection.item;
-  return selection.date ? `all items on ${selection.date}` : "all items in the collection";
+  return selection.date
+    ? `all items on ${selection.date}`
+    : "all items in the collection";
 }
 
-export default function StacChooser({ inputId, value = null, updateValue = () => {}, isCompact = false }) {
+export default function StacChooser({
+  inputId,
+  value = null,
+  updateValue = () => {},
+  isCompact = false,
+}) {
   const [openModal, setOpenModal] = useState(false);
   const selections = asSelections(value);
 
@@ -119,15 +132,24 @@ export default function StacChooser({ inputId, value = null, updateValue = () =>
         endIcon={<TravelExploreIcon />}
         onClick={() => setOpenModal(true)}
         className="locationChooserButton"
-        style={{ marginBottom: "1rem", fontSize: "1rem", width: !isCompact && "500px" }}
+        style={{
+          marginBottom: "1rem",
+          fontSize: "1rem",
+          width: !isCompact && "500px",
+        }}
       >
-        {selections.length > 0 ? `Choose STAC assets (${selections.length})` : "Choose STAC assets"}
+        {selections.length > 0
+          ? `Choose STAC assets (${selections.length})`
+          : "Choose STAC assets"}
       </CustomButtonGreen>
       {selections.length > 0 && !isCompact && (
-        <div style={{ fontSize: "0.8rem", color: "#555", marginBottom: "0.5rem" }}>
+        <div
+          style={{ fontSize: "0.8rem", color: "#555", marginBottom: "0.5rem" }}
+        >
           {selections.map((selection) => (
             <div key={selectionKey(selection)}>
-              <b>{selection.collection}</b> / {selection.asset} — {selectionScope(selection)}
+              <b>{selection.collection}</b> / {selection.asset} —{" "}
+              {selectionScope(selection)}
             </div>
           ))}
         </div>
@@ -140,7 +162,10 @@ export default function StacChooser({ inputId, value = null, updateValue = () =>
       >
         <>
           {openModal && (
-            <StacBrowser key={`stac-browser-${inputId}`} {...{ value, updateValue, setOpenModal }} />
+            <StacBrowser
+              key={`stac-browser-${inputId}`}
+              {...{ value, updateValue, setOpenModal }}
+            />
           )}
         </>
       </Modal>
@@ -186,6 +211,9 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
   const [assets, setAssets] = useState([]);
   const [asset, setAsset] = useState(null);
   const [loadingAssets, setLoadingAssets] = useState(false);
+  // Whether the chosen asset holds classes rather than measurements. Starts from
+  // what the catalogue says, which it often doesn't, so the user can override it.
+  const [categorical, setCategorical] = useState(false);
 
   const [preview, setPreview] = useState(null);
   const [previewError, setPreviewError] = useState(null);
@@ -207,7 +235,9 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         setCatalogs(list);
         const restoring = toRestore.current;
         if (restoring && restoring.catalog) {
-          setCatalog(list.find((c) => c.url === restoring.catalog) || restoring.catalog);
+          setCatalog(
+            list.find((c) => c.url === restoring.catalog) || restoring.catalog,
+          );
         }
       })
       .catch((e) => !cancelled && setError(e.message));
@@ -233,7 +263,9 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         const restoring = toRestore.current;
         toRestore.current = null; // nothing further is restored
         if (restoring && restoring.collection) {
-          setCollection(list.find((c) => c.id === restoring.collection) || null);
+          setCollection(
+            list.find((c) => c.id === restoring.collection) || null,
+          );
         }
       })
       .catch((e) => !cancelled && setError(e.message))
@@ -264,11 +296,13 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         setCollectionCount(
           result.truncated
             ? null
-            : result.dates.reduce((total, d) => total + d.count, 0) + result.undated,
+            : result.dates.reduce((total, d) => total + d.count, 0) +
+                result.undated,
         );
         const restoring = dateToRestore.current;
         dateToRestore.current = null;
-        if (restoring) setDate(result.dates.find((d) => d.date === restoring) || null);
+        if (restoring)
+          setDate(result.dates.find((d) => d.date === restoring) || null);
       })
       // Browsing still works without dates, so report this next to the selector
       // rather than as an error over the whole chooser.
@@ -346,6 +380,10 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     };
   }, [catalog, collection, item, allItems, date]);
 
+  useEffect(() => {
+    setCategorical(Boolean(asset && asset.kind === "categorical"));
+  }, [asset]);
+
   // A preview belongs to one asset, so drop it as soon as the choice moves.
   useEffect(() => {
     previewRequest.current += 1; // abandons a render still in flight
@@ -366,12 +404,15 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
   );
 
   // In "all items" mode the assets, and so the preview, come from a sample item.
-  const previewItemUrl = asset && (allItems ? asset.item_url : item && item.url);
+  const previewItemUrl =
+    asset && (allItems ? asset.item_url : item && item.url);
 
   const expandedUrl =
     previewItemUrl &&
     `${TILER_URL}/stac/WebMercatorQuad/map.html?` +
-      (preview ? preview.params : new URLSearchParams({ url: previewItemUrl, assets: asset.key }));
+      (preview
+        ? preview.params
+        : new URLSearchParams({ url: previewItemUrl, assets: asset.key }));
 
   const loadPreview = async () => {
     const request = previewRequest.current;
@@ -381,7 +422,10 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     setPreviewError(null);
     try {
       // Kept with the image: the expanded view renders it the same way.
-      const params = new URLSearchParams({ url: previewItemUrl, assets: asset.key });
+      const params = new URLSearchParams({
+        url: previewItemUrl,
+        assets: asset.key,
+      });
 
       // Measured data renders black without a range, so scale on the asset's own
       // percentiles, as the result map does. A missing range is not fatal: byte
@@ -396,7 +440,9 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         // Leave the rescale out and let the tiler do what it can.
       }
       if (stale()) return;
-      bands.forEach((band) => params.append("rescale", `${band.percentile_2},${band.percentile_98}`));
+      bands.forEach((band) =>
+        params.append("rescale", `${band.percentile_2},${band.percentile_98}`),
+      );
       // A colormap only makes sense on a single band; a 3-band asset is RGB.
       if (bands.length === 1) params.set("colormap_name", PREVIEW_COLORMAP);
 
@@ -440,8 +486,13 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
       asset: asset.key,
       href: allItems ? null : asset.href,
       type: asset.type,
+      categorical,
     };
-    if (selections.some((existing) => selectionKey(existing) === selectionKey(entry))) {
+    if (
+      selections.some(
+        (existing) => selectionKey(existing) === selectionKey(entry),
+      )
+    ) {
       setError("That asset is already in the list.");
       return;
     }
@@ -455,12 +506,15 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
   // Null means unknown, in which case assume there are several.
   const tileCount = date ? date.count : collectionCount;
   // Nothing to stitch when the scope holds a single tile, so the option goes.
-  const canMosaic = tileCount === null || tileCount > 1;
+  const canMosaic =
+    (tileCount === null || tileCount > 1) && dates.length < collectionCount;
 
   // Mosaicking every tile yields one layer only if the tiles share a date, so a
   // collection spanning several dates has to be narrowed to one first.
   const needsDate = allItems && dates.length > 1 && !date;
-  const canAdd = Boolean(collection && asset && (item || allItems) && !needsDate);
+  const canAdd = Boolean(
+    collection && asset && (item || allItems) && !needsDate,
+  );
 
   // Picking a date with a lone tile hides the option, which must not stay on.
   useEffect(() => {
@@ -489,7 +543,11 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
       </h4>
 
       {error && (
-        <Alert severity="error" className="error" onClose={() => setError(null)}>
+        <Alert
+          severity="error"
+          className="error"
+          onClose={() => setError(null)}
+        >
           {error}
         </Alert>
       )}
@@ -501,16 +559,27 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
           value={catalog}
           size="small"
           sx={{ background: "#fff", borderRadius: "4px" }}
-          getOptionLabel={(option) => (typeof option === "string" ? option : option.label || "")}
-          isOptionEqualToValue={(option, selected) => option.url === catalogUrl(selected)}
+          getOptionLabel={(option) =>
+            typeof option === "string" ? option : option.label || ""
+          }
+          isOptionEqualToValue={(option, selected) =>
+            option.url === catalogUrl(selected)
+          }
           renderInput={(params) => (
-            <TextField {...params} label="Catalog (choose one, or paste a catalog URL)" />
+            <TextField
+              {...params}
+              label="Catalog (choose one, or paste a catalog URL)"
+            />
           )}
           onChange={(_, chosen) => setCatalog(chosen)}
           onBlur={(event) => {
             // freeSolo keeps typed text out of the value until it is committed.
             const typed = event.target.value.trim();
-            if (typed && typed !== catalogUrl(catalog) && !catalogs.some((c) => c.label === typed)) {
+            if (
+              typed &&
+              typed !== catalogUrl(catalog) &&
+              !catalogs.some((c) => c.label === typed)
+            ) {
               setCatalog(typed);
             }
           }}
@@ -566,9 +635,15 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
               disabled={!collection || loadingDates || dates.length === 0}
               loading={loadingDates}
               size="small"
-              sx={{ background: "#fff", borderRadius: "4px", marginBottom: "8px" }}
+              sx={{
+                background: "#fff",
+                borderRadius: "4px",
+                marginBottom: "8px",
+              }}
               getOptionLabel={(option) => option.date || ""}
-              isOptionEqualToValue={(option, selected) => option.date === selected.date}
+              isOptionEqualToValue={(option, selected) =>
+                option.date === selected.date
+              }
               renderOption={(props, option) => (
                 <li {...props} key={option.date}>
                   <ListItemText
@@ -580,7 +655,11 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label={loadingDates ? "Date" : `Date (${dates.length} in this collection)`}
+                  label={
+                    loadingDates
+                      ? "Date"
+                      : `Date (${dates.length} in this collection)`
+                  }
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -599,13 +678,27 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
               }}
             />
             {datesTruncated && (
-              <p style={{ fontSize: "11px", margin: "0px 0px 6px 5px", color: "#555" }}>
-                This collection is large, so only the dates of its first items are listed.
+              <p
+                style={{
+                  fontSize: "11px",
+                  margin: "0px 0px 6px 5px",
+                  color: "#555",
+                }}
+              >
+                This collection is large, so only the dates of its first items
+                are listed.
               </p>
             )}
             {datesError && (
-              <p style={{ fontSize: "11px", margin: "0px 0px 6px 5px", color: "#a33" }}>
-                Dates could not be listed ({datesError}). Every item is still browsable below.
+              <p
+                style={{
+                  fontSize: "11px",
+                  margin: "0px 0px 6px 5px",
+                  color: "#a33",
+                }}
+              >
+                Dates could not be listed ({datesError}). Every item is still
+                browsable below.
               </p>
             )}
           </>
@@ -658,12 +751,19 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
               }}
             >
               {loadingItems && (
-                <ListItemText style={{ padding: "8px" }} primary={<CircularProgress size="14px" />} />
+                <ListItemText
+                  style={{ padding: "8px" }}
+                  primary={<CircularProgress size="14px" />}
+                />
               )}
               {!loadingItems && items.length === 0 && (
                 <ListItemText
                   style={{ padding: "8px", color: "#888" }}
-                  primary={collection ? "No items match." : "Choose a collection first."}
+                  primary={
+                    collection
+                      ? "No items match."
+                      : "Choose a collection first."
+                  }
                 />
               )}
               {!loadingItems &&
@@ -673,16 +773,32 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                     selected={Boolean(item) && item.id === listed.id}
                     onClick={() => setItem(listed)}
                   >
-                    <ListItemText primary={listed.id} secondary={listed.datetime} />
+                    <ListItemText
+                      primary={listed.id}
+                      secondary={listed.datetime}
+                    />
                   </ListItemButton>
                 ))}
             </List>
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "6px" }}>
-              <CustomButtonGrey disabled={page <= 1 || loadingItems} onClick={() => setPage(page - 1)}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                marginTop: "6px",
+              }}
+            >
+              <CustomButtonGrey
+                disabled={page <= 1 || loadingItems}
+                onClick={() => setPage(page - 1)}
+              >
                 Previous
               </CustomButtonGrey>
               <span style={{ fontSize: "0.8rem" }}>Page {page}</span>
-              <CustomButtonGrey disabled={!hasNext || loadingItems} onClick={() => setPage(page + 1)}>
+              <CustomButtonGrey
+                disabled={!hasNext || loadingItems}
+                onClick={() => setPage(page + 1)}
+              >
                 Next
               </CustomButtonGrey>
             </div>
@@ -690,20 +806,33 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         )}
       </div>
 
-      <div style={{ ...paperStyle(true), display: "flex", gap: "12px", alignItems: "stretch" }}>
+      <div
+        style={{
+          ...paperStyle(true),
+          display: "flex",
+          gap: "12px",
+          alignItems: "stretch",
+        }}
+      >
         <div style={{ flex: "1 1 auto", minWidth: 0 }}>
           <Autocomplete
             options={assets}
             value={asset}
             disabled={(!item && !allItems) || loadingAssets}
             loading={loadingAssets}
+            noOptionsText="No Cloud Optimized GeoTIFF assets here"
             size="small"
             sx={{ background: "#fff", borderRadius: "4px" }}
             getOptionLabel={(option) => option.title || option.key || ""}
-            isOptionEqualToValue={(option, selected) => option.key === selected.key}
+            isOptionEqualToValue={(option, selected) =>
+              option.key === selected.key
+            }
             renderOption={(props, option) => (
               <li {...props} key={option.key}>
-                <ListItemText primary={option.title} secondary={option.type || option.key} />
+                <ListItemText
+                  primary={option.title}
+                  secondary={option.type || option.key}
+                />
               </li>
             )}
             renderInput={(params) => (
@@ -723,20 +852,67 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
             )}
             onChange={(_, chosen) => setAsset(chosen)}
           />
+          <FormControlLabel
+            disabled={!asset}
+            control={
+              <Checkbox
+                size="small"
+                checked={categorical}
+                onChange={(e) => setCategorical(e.target.checked)}
+              />
+            }
+            label={
+              <span style={{ fontSize: "0.8rem" }}>
+                Categorical layer (classes, not measurements)
+                {asset && asset.kind && (
+                  <span style={{ color: "#888" }}>
+                    {" "}
+                    — catalog says {asset.kind}
+                  </span>
+                )}
+              </span>
+            }
+            style={{ margin: "4px 0px 0px 0px" }}
+          />
           {needsDate && (
-            <p style={{ fontSize: "11px", margin: "4px 0px 2px 5px", color: "#a33" }}>
-              This collection spans {dates.length} dates. Choose one above, so that the tiles mosaic
-              into a single layer.
+            <p
+              style={{
+                fontSize: "11px",
+                margin: "4px 0px 2px 5px",
+                color: "#a33",
+              }}
+            >
+              This collection spans {dates.length} dates. Choose one above, so
+              that the tiles mosaic into a single layer.
             </p>
           )}
           {allItems && !needsDate && assets.length > 0 && (
-            <p style={{ fontSize: "11px", margin: "4px 0px 2px 5px", color: "#555" }}>
-              Asset names read from a sample item. The script receives the collection, the asset name
-              {date ? ` and the date ${date.date}` : ""}, and mosaics the tiles itself.
+            <p
+              style={{
+                fontSize: "11px",
+                margin: "4px 0px 2px 5px",
+                color: "#555",
+              }}
+            >
+              Asset names read from a sample item. The script receives the
+              collection, the asset name
+              {date ? ` and the date ${date.date}` : ""}, and mosaics the tiles
+              itself.
             </p>
           )}
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", marginTop: "8px" }}>
-            <CustomButtonGreen disabled={!canAdd} endIcon={<PlaylistAddIcon />} onClick={addSelection}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              marginTop: "8px",
+            }}
+          >
+            <CustomButtonGreen
+              disabled={!canAdd}
+              endIcon={<PlaylistAddIcon />}
+              onClick={addSelection}
+            >
               Add to selection
             </CustomButtonGreen>
             <CustomButtonGrey
@@ -786,9 +962,15 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
           {loadingPreview ? (
             <CircularProgress size="20px" />
           ) : previewError ? (
-            <span style={{ fontSize: "0.75rem", color: "#a33" }}>{previewError}</span>
+            <span style={{ fontSize: "0.75rem", color: "#a33" }}>
+              {previewError}
+            </span>
           ) : preview ? (
-            <img src={preview.url} alt={preview.label} style={{ maxWidth: "100%", maxHeight: "240px" }} />
+            <img
+              src={preview.url}
+              alt={preview.label}
+              style={{ maxWidth: "100%", maxHeight: "240px" }}
+            />
           ) : (
             <span style={{ fontSize: "0.75rem", color: "#888" }}>
               {!asset
@@ -809,7 +991,8 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         </h4>
         {selections.length === 0 ? (
           <p style={{ fontSize: "0.8rem", color: "#888", margin: "4px 5px" }}>
-            Nothing selected yet. Pick an item and an asset above, then use "Add to selection".
+            Nothing selected yet. Pick an item and an asset above, then use "Add
+            to selection".
           </p>
         ) : (
           <List dense style={{ maxHeight: "180px", overflowY: "auto" }}>
@@ -820,7 +1003,9 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                   <IconButton
                     edge="end"
                     aria-label={`Remove ${selection.asset}`}
-                    onClick={() => commit(selections.filter((_, i) => i !== index))}
+                    onClick={() =>
+                      commit(selections.filter((_, i) => i !== index))
+                    }
                   >
                     <DeleteIcon fontSize="small" />
                   </IconButton>
@@ -828,7 +1013,10 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
               >
                 <ListItemText
                   primary={`${selection.collection} / ${selection.asset}`}
-                  secondary={selectionScope(selection)}
+                  secondary={
+                    selectionScope(selection) +
+                    (selection.categorical ? " · categorical" : "")
+                  }
                 />
               </ListItem>
             ))}
@@ -837,7 +1025,9 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
       </div>
 
       <div>
-        <CustomButtonGreen onClick={() => setOpenModal(false)}>Accept</CustomButtonGreen>
+        <CustomButtonGreen onClick={() => setOpenModal(false)}>
+          Accept
+        </CustomButtonGreen>
         <CustomButtonGreen
           onClick={() => {
             commit([]);
