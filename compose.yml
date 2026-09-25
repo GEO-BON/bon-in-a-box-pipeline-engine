@@ -31,12 +31,6 @@ services:
       HPC_SSH_CONFIG_FILE: /run/secrets/hpc_ssh_config_file
       HPC_SSH_KEY: /run/secrets/hpc_ssh_key
       HPC_KNOWN_HOSTS_FILE: /run/secrets/hpc_known_hosts_file
-      # ⚠️ python-api's flag, repeated here only so GET /api/status can report the
-      # whole feature set from one endpoint -- script-server cannot ask python-api
-      # anything. It MUST match the value on python-api below, or the UI reports a
-      # confident lie about this instance. DISABLE_MY_FILES needs no line: both
-      # services already read the same runner.env above.
-      CLAMAV_ADDRESS: ${CLAMAV_ADDRESS:-}
     secrets:
       - hpc_ssh_key
       - hpc_known_hosts_file
@@ -57,11 +51,10 @@ services:
       WORKERS_PER_CORE: 1
       TITILER_API_CORS_ORIGINS: "*"
       USERDATA_ROOT: /data/userdata/files
-      # The shared clamd. Blank -- the default -- means uploads are saved WITHOUT
-      # being scanned; set, antivirus.py fails CLOSED and an unreachable scanner
-      # refuses the upload. See python-api/app/antivirus.py.
-      CLAMAV_ADDRESS: ${CLAMAV_ADDRESS:-}
-      DISABLE_MY_FILES: ${DISABLE_MY_FILES}
+      # CLAMAV_ADDRESS and DISABLE_MY_FILES come from runner.env (env_file above),
+      # which script-server reads too, so GET /api/status sees the same values.
+      # Don't repeat them here: an `environment:` entry overrides env_file, and a
+      # `docker compose` run without `--env-file runner.env` would blank them.
       # The chat bridge, started by startup.sh as a fourth process.
       # Unset OLLAMA_URL disables the assistant entirely.
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11435}

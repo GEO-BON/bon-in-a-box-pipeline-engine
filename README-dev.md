@@ -195,14 +195,19 @@ In addition to these services,
 ### Antivirus scanning of user uploads
 
 **Off by default.** Files uploaded through "My Files" are scanned only when
-`CLAMAV_ADDRESS` names a reachable `clamd`; with it unset — which is what a plain
-`docker compose` run gets — uploads are saved without being scanned.
+`CLAMAV_ADDRESS` in `runner.env` names a reachable `clamd`; with it unset, uploads
+are saved without being scanned.
 
-To switch it on locally, run a scanner and point at it:
+To switch it on locally, run a scanner:
 
 ```bash
 docker run -d --name clamav -p 3310:3310 clamav/clamav:stable
-CLAMAV_ADDRESS=127.0.0.1:3310 ./server-up.sh
+```
+
+then add it to `runner.env` and restart the server:
+
+```bash
+CLAMAV_ADDRESS=127.0.0.1:3310
 ```
 
 `GET /api/status` reports both whether it is configured and whether it currently

@@ -26,4 +26,4 @@ script-stubs/openEO
 
 /python-api/app/*duckdb*
 
-ui/dist/
+**/dist/
