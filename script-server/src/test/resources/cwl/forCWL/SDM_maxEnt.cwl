@@ -116,11 +116,11 @@ inputs:
   forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|fc:
     type: string[]?
     label: feature classes
-    doc: Vector of strings, feature classes for MaxEnt algorithm. Accepted values are combinations of L (linear), Q (quadratic), P (product), H (hinge) or T (threshold).
+    doc: Vector of strings, feature classes for MaxEnt algorithm. Accepted values are combinations of L (linear), Q (quadratic), P (product), H (hinge) or T (threshold, deprecated).
     default:
     - L
     - LQ
-    - LQHP
+    - LQH
 
   forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|rm:
     type: float[]?

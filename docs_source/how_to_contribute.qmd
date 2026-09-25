@@ -480,7 +480,7 @@ This file contains the id of the parameters that were specified in the yaml scri
 
 ``` json
 {
-    "fc": ["L", "LQ", "LQHP"],
+    "fc": ["L", "LQ", "LQH"],
     "method_select_params": "AUC",
     "n_folds": 2,
     "orientation_block": "lat_lon",
