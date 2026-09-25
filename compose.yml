@@ -43,7 +43,7 @@ services:
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
       # userdata is writable for user uploads, used in "/manage-files"
-      - ${PIPELINE_REPO_PATH}/userdata:/data/userdata:rw  
+      - ${PIPELINE_REPO_PATH}/userdata:/data/userdata:rw
 
     user: ${MY_UID}:${DOCKER_GID}
     environment:
@@ -51,11 +51,6 @@ services:
       WORKERS_PER_CORE: 1
       TITILER_API_CORS_ORIGINS: "*"
       USERDATA_ROOT: /data/userdata/files
-      # CLAMAV_ADDRESS and DISABLE_MY_FILES come from runner.env (env_file above),
-      # which script-server reads too, so GET /api/status sees the same values.
-      # Don't repeat them here: an `environment:` entry overrides env_file, and a
-      # `docker compose` run without `--env-file runner.env` would blank them.
-      # The chat bridge, started by startup.sh as a fourth process.
       # Unset OLLAMA_URL disables the assistant entirely.
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11435}
       # Covers the bridge's non-streaming call to Ollama and its health check.
@@ -67,22 +62,23 @@ services:
       # bridge/sitecustomize.py rather than prevented here.
       OLLAMA_PROXY_TIMEOUT: 600000
     expose:
-      - "8000"
-      - "8001"
-      - "8002"
-      - "8003"
+      - "8000" # Titiler
+      - "8001" # FastAPI main_api (regions, file manager, assistant)
+      - "8002" # MCP server
+      - "8003" # Ollama chat bridge
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-    # Bare GET should be refused by MCP server with 406 once all tooling loaded, 
-    # proving its listening. 
+    # Bare GET should be refused by MCP server with 406 once all tooling loaded,
+    # proving its listening.
     # This check tells you from `docker compose ps` that the assistant's backend is up.
     #
     # This does make the container report unhealthy if the MCP server dies, which
     # startup.sh deliberately treats as non-fatal. The rest of the python api will
     # continue working.
     healthcheck:
-      test: ["CMD", "curl", "-s", "-o", "/dev/null", "http://localhost:8002/mcp"]
+      test:
+        ["CMD", "curl", "-s", "-o", "/dev/null", "http://localhost:8002/mcp"]
       # First 90s, run every 5s (server is booting and should soon become healthy)
       # After that, run every 5 minutes.
       interval: 5m
