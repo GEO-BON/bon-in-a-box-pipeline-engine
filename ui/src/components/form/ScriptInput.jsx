@@ -68,9 +68,10 @@ export default function ScriptInput({
 
       let optionsValue;
       if (multiple)
-        optionsValue = fieldValue ? optionObjects.filter((opt) => fieldValue.includes(opt.value)) : []
-      else
-        optionsValue = fieldValue || ""
+        optionsValue = fieldValue
+          ? optionObjects.filter((opt) => fieldValue.includes(opt.value))
+          : [];
+      else optionsValue = fieldValue || "";
 
       return (
         <Autocomplete
@@ -121,7 +122,7 @@ export default function ScriptInput({
           value={optionsValue}
           onChange={(event, newOptions) => {
             var newValue;
-            if (typeof newOptions.map === 'function') {
+            if (typeof newOptions.map === "function") {
               newValue = newOptions.map((option) => option?.value ?? option);
             } else {
               newValue = newOptions?.value ?? newOptions;
@@ -168,7 +169,8 @@ export default function ScriptInput({
 
   switch (type.toLowerCase()) {
     case "boolean":
-      const booleanValue = fieldValue === undefined || fieldValue === null ? false : value
+      const booleanValue =
+        fieldValue === undefined || fieldValue === null ? false : value;
 
       return (
         <FormGroup size={size}>
@@ -240,30 +242,65 @@ export default function ScriptInput({
     case "crs":
     case "countryregion":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type }} value={value} updateValue={(value) => { onValueUpdated(value) }} />
+        <Choosers
+          inputId={passedProps.id}
+          inputDescription={{ type: type }}
+          value={value}
+          updateValue={(value) => {
+            onValueUpdated(value);
+          }}
+        />
       );
 
     case "bboxcrs": // deprecated
     case "crsbbox":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={size=='small'}/>
+        <Choosers
+          inputId={passedProps.id}
+          inputDescription={{ type: type, label: "Bounding Box" }}
+          value={value}
+          updateValue={(value) => {
+            onValueUpdated(value);
+          }}
+          leftLabel={false}
+          isCompact={size == "small"}
+        />
       );
 
     case "location":
       return (
-        <Choosers inputId={passedProps.id} inputDescription={{ type: type, label: "Country, region, CRS and Bounding Box" }} value={value} updateValue={(value) => { onValueUpdated(value) }} leftLabel={false} isCompact={size=='small'}/>
+        <Choosers
+          inputId={passedProps.id}
+          inputDescription={{
+            type: type,
+            label: "Country, region, CRS and Bounding Box",
+          }}
+          value={value}
+          updateValue={(value) => {
+            onValueUpdated(value);
+          }}
+          leftLabel={false}
+          isCompact={size == "small"}
+        />
       );
 
-    case "stac":
+    case "stac_assets[]":
       return (
-        <StacChooser inputId={passedProps.id} value={value} updateValue={(value) => { onValueUpdated(value) }} isCompact={size=='small'}/>
+        <StacChooser
+          inputId={passedProps.id}
+          value={value}
+          updateValue={(value) => {
+            onValueUpdated(value);
+          }}
+          isCompact={size == "small"}
+        />
       );
 
     default:
       // use null if empty or a string representation of null
       const updateValue = (e) =>
         onValueUpdated(
-          /^(null)?$/i.test(e.target.value) ? null : e.target.value
+          /^(null)?$/i.test(e.target.value) ? null : e.target.value,
         );
 
       const stringValue = fieldValue ? fieldValue.toString() : "";
@@ -276,18 +313,22 @@ export default function ScriptInput({
       };
 
       // Single line text fields
-      if (type.includes("/") /* assume MIME type, files have no line breaks */) {
-        return <TextField
-          type="text"
-          label=""
-          size={size}
-          {...props}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.ctrlKey) updateValue(e);
-          }}
-          slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
-          sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
-        />
+      if (
+        type.includes("/") /* assume MIME type, files have no line breaks */
+      ) {
+        return (
+          <TextField
+            type="text"
+            label=""
+            size={size}
+            {...props}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.ctrlKey) updateValue(e);
+            }}
+            slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
+            sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
+          />
+        );
       }
 
       // Multiline text field
