@@ -10,6 +10,8 @@ servers:
 tags:
   - name: placeholder
     description: We could use tags
+  - name: File manager
+    description: Functionalities added to handle the user's file management system.
 paths:
   /{type}/list:
     get:
@@ -363,6 +365,76 @@ paths:
                 type: string
                 x-content-type: text/plain
                 example: Output folder is improperly configured
+  /api/status:
+    get:
+      summary: Returns which optional features are enabled on this instance.
+      description: >
+        Distinct from /api/systemStatus, which reports whether the server is
+        misconfigured and is the UI's boot gate. This one never fails: a feature being
+        off is an answer, not an error. Every flag has positive polarity, so true always
+        means the feature works, whatever the polarity of the variable behind it.
+
+        myFilesEnabled, chatEnabled and antivirus* describe python-api, which is what
+        acts on them; they are reported here because script-server has no way to query
+        python-api, so the deployment sets both containers identically.
+
+        Not exposed to the chat assistant: it is absent from GENERATED_TOOLS_KEPT in
+        python-api/app/mcp-server/server.py, and belongs in the system prompt rather
+        than in a tool if the assistant ever needs it.
+      operationId: getServerStatus
+      responses:
+        "200":
+          description: The instance's feature flags.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - runsEnabled
+                  - savePipelineToServer
+                  - condaPackEnabled
+                  - myFilesEnabled
+                  - chatEnabled
+                  - antivirusEnabled
+                properties:
+                  runsEnabled:
+                    type: boolean
+                    description: False when BLOCK_RUNS makes this a results-only server.
+                  savePipelineToServer:
+                    type: boolean
+                    description: False when SAVE_PIPELINE_TO_SERVER denies the save API.
+                  condaPackEnabled:
+                    type: boolean
+                    description: Whether conda environments are cached with conda-pack.
+                  myFilesEnabled:
+                    type: boolean
+                    description: False when DISABLE_MY_FILES makes the file manager read-only.
+                  chatEnabled:
+                    type: boolean
+                    description: >
+                      False when DISABLE_CHAT hides the assistant from the UI and skips
+                      the chat bridge. The MCP server runs either way, so this says
+                      nothing about MCP availability.
+                  antivirusEnabled:
+                    type: boolean
+                    description: >
+                      Whether uploads are scanned. When false they are saved unscanned;
+                      when true an unscannable upload is refused rather than saved.
+                  antivirusReachable:
+                    type: boolean
+                    nullable: true
+                    description: >
+                      Whether the scanner currently answers, or null when antivirus is
+                      off. False here means uploads are being refused, because the scan
+                      path fails closed.
+                example:
+                  runsEnabled: true
+                  savePipelineToServer: true
+                  condaPackEnabled: true
+                  myFilesEnabled: true
+                  chatEnabled: true
+                  antivirusEnabled: true
+                  antivirusReachable: true
   /api/versions:
     get:
       summary: Returns the version of system components.
@@ -544,6 +616,62 @@ paths:
                     }
         "404":
           description: Country ID not found
+  /region/country_region_bbox:
+    get:
+      summary: Bounding box of a country or region, or the selector object a bboxCRS input takes
+      description: |
+        With `output_format=chooser_input`, returns the object that a `bboxCRS`,
+        `country`, `countryRegion`, `countryRegionCRS` or `CRS` input takes. Use what it
+        returns unchanged as that input's value.
+      operationId: getCountryRegionBbox
+      parameters:
+        - name: type
+          in: query
+          description: Whether `id` names a country (adm0) or a subnational region (adm1)
+          required: false
+          schema:
+            type: string
+            enum: [country, region]
+            default: country
+          example: country
+        - name: id
+          in: query
+          description: A code, not a name. ISO3 for a country (Colombia is COL), adm1_src for a region.
+          required: true
+          schema:
+            type: string
+          example: COL
+        - name: crs
+          in: query
+          description: CRS the bounding box is expressed in.
+          required: false
+          schema:
+            type: string
+            default: "EPSG:4326"
+        - name: output_format
+          in: query
+          description: |
+            `chooser_input` for the whole selector object, to fill in an input. `bbox` for
+            only the four numbers.
+          required: false
+          schema:
+            type: string
+            enum: [bbox, chooser_input]
+            default: bbox
+          example: chooser_input
+      responses:
+        "200":
+          description: |
+            The bounding box and its CRS, or -- with `output_format=chooser_input` -- the
+            selector object, whose `region` is empty when `type` is `country`.
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: Invalid type or output_format parameter
+        "404":
+          description: Country or region ID not found
   /region/geometry:
     get:
       summary: Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
@@ -581,6 +709,550 @@ paths:
                 format: binary
         "404":
           description: Region ID not found
+  /fm-api/is_disabled:
+    get:
+      summary: Returns whether the file manager is disabled or not.
+      tags: 
+        - File manager
+      operationId: isFileManagerDisabled
+      responses:
+        "200":
+          description: Returns a JSON object with a boolean property "disabled" indicating if the file manager is disabled.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  disabled:
+                    type: boolean
+                example:
+                  disabled: true
+  /fm-api/files:
+    get:
+      summary: Returns the list of root files and folders uploaded by the user.
+      tags: 
+        - File manager
+      operationId: getRootItems
+      responses:
+        "200":
+          description: Array with list of root files and folders.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - value
+                  - type
+                  - size
+                  properties:
+                    id:
+                      type: string
+                    value:
+                      type: string
+                    type:
+                      type: string
+                    size:
+                      type: integer
+                  example:
+                    id: "/test.txt"
+                    value: "test.txt"
+                    type: "file"
+                    size: 0
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
+    put:
+      summary: Moves or copies one or multiple files/folders.
+      tags: 
+        - File manager
+      operationId: moveCopyItem
+      requestBody: 
+        required: true
+        content: 
+          application/json:
+            schema: 
+              type: object
+              required: 
+              - operation
+              - target
+              - ids
+              properties: 
+                operation:
+                  type: string
+                  enum: [move, copy]
+                  description: The action to perform. Must be set to 'move' or 'copy'.
+                  example: "move"
+                target: 
+                  type: string
+                  description: The ID for the destination folder in where the files/folders will move into.
+                  example: "/folder1"
+                ids: 
+                  type: array
+                  description: An array containing the IDs of the files/folders that will be processed.
+                  items: 
+                    type: string
+                  example: ["/file1.txt", "/file2.txt"]
+      responses:
+        "200" :
+          description: Item was successfully copied/moved. It returns the updated file metadata.
+          content:
+            application/json: 
+              schema: 
+                type: object
+                properties: 
+                  result: 
+                    type: array 
+                    items:
+                      type: object 
+                      required: 
+                        - id
+                        - name
+                      properties: 
+                        id: 
+                          type: string
+                          example: "/folder1/file1.txt"
+                        name: 
+                          type: string
+                          example: "file1.txt"
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
+    delete: 
+      summary: Deletes a file or folder.
+      tags: 
+        - File manager
+      operationId: deleteItem
+      requestBody: 
+        required: true
+        content:
+          application/json: 
+            schema: 
+              type: object
+              required: 
+                - ids
+              properties: 
+                ids: 
+                  type: array
+                  description: An array containing the IDs of the files/folders that will be deleted.
+                  items: 
+                    type: string
+                  example: ["/file1.txt", "/file2.txt"]
+      responses: 
+        "200":
+          description: Array with list of root files and folders.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - status
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
+  /fm-api/files/all: 
+    get: 
+      summary: Returns the list of all files and folders uploaded by the user.
+      tags: 
+        - File manager
+      operationId: getAllItems
+      responses: 
+        "200": 
+          description: Array with list of all files and folders.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - id
+                    - value
+                    - type
+                    - size
+                  properties:
+                    id:
+                      type: string
+                    value:
+                      type: string
+                    type:
+                      type: string
+                    size:
+                      type: integer
+                  example:
+                    id: "/test.txt"
+                    value: "test.txt"
+                    type: "file"
+                    size: 0
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
+
+  /fm-api/files/{id}:
+    get:
+      summary: Returns the list of files and folders uploaded by the user under a specific subfolder.
+      tags: 
+        - File manager
+      operationId: getSubfolderItems
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The path of the parent folder contaning the files we want to get.
+          schema:
+            type: string
+            example: "/folder1"
+      responses:
+        "200":
+          description: Array with list of files and folders under a specific subfolder.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - id
+                  - value
+                  - type
+                  - size
+                  example:
+                    {
+                      "id": "/test.txt",
+                      "value": "test.txt",
+                      "type": "file",
+                      "size": 0
+                    }
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
+    post:
+      summary: Creates a file or folder.
+      tags: 
+        - File manager
+      operationId: createItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The parent folder path where the new item will be created.
+          schema:
+            type: string
+            example: "/folder1"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - type
+              properties:
+                name:
+                  type: string
+                  description: The name of the new file or folder.
+                  example: "new.txt"
+                type:
+                  type: string
+                  enum: [file, folder]
+                  description: The type of item to create.
+                  example: "file"
+      responses:
+        "200":
+          description: Item successfully created. Returns the metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    required:
+                      - id
+                      - name
+                      - type
+                    properties:
+                      id:
+                        type: string
+                        example: "/file1/new_document.txt"
+                      name:
+                        type: string
+                        example: "new_document.txt"
+                      type:
+                        type: string
+                        enum: [file, folder]
+                        example: "file"
+        "400":
+          description: Missing type or name parameters.
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
+
+    put:
+      summary: Renames a file or folder.
+      tags: 
+        - File manager
+      operationId: renameItem
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The current path/id of the file or folder that is being renamed.
+          schema:
+            type: string
+            example: "/old_name.txt"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - operation
+                - name
+              properties:
+                operation:
+                  type: string
+                  enum: [rename]
+                  description: The action to perform. Must be set to 'rename'.
+                  example: "rename"
+                name:
+                  type: string
+                  description: The new name for the file or folder (including its extension).
+                  example: "new_name.txt"
+      responses:
+        "200":
+          description: Item successfully renamed. It returns the updated file metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    required:
+                      - id
+                      - name
+                    properties:
+                      id:
+                        type: string
+                        example: "/new_name.txt"
+                      name:
+                        type: string
+                        example: "new_name.txt"
+        "400":
+          description: Unsupported operation.
+        "404":
+          description: The file or folder with that ID could not be found.
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
+
+  /fm-api/upload:
+    post: 
+      summary: Uploads a file to the user's profile.
+      tags: 
+        - File manager
+      operationId: uploadFile
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: The parent folder path where the new item will be uploaded.
+          schema:
+            type: string
+            example: "/folder1"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file that will be uploaded
+      responses:
+        "200": 
+          description: File is successfully uploaded. It returns the file's metadata.
+          content : 
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - value
+                properties:
+                  id:
+                    type: string
+                  value:
+                    type: string
+                example:
+                  id: "/uploaded_file.txt"
+                  value: "uploaded_file.txt"
+        "400":
+          description: >
+            The antivirus found malware in the file, which was refused and not saved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Malware detected! File blocked by antivirus: Eicar-Test-Signature"
+        "413":
+          description: >
+            The antivirus client refused to send a file larger than the scanner's
+            declared limit, so it was not saved. Raise StreamMaxLength on the scanner
+            to allow it. Note that a file over the limit is more often reported as 503,
+            because clamd closes the connection rather than replying.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        "503":
+          description: >
+            The upload could not be scanned, so it was refused rather than saved
+            unscanned. Either the scanner is unreachable -- GET /api/status reports that
+            as antivirusReachable false, before an upload is attempted -- or the file
+            exceeds its StreamMaxLength, which clamd signals by closing the connection
+            rather than replying. The python-api log distinguishes them.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
+
+  /fm-api/info:
+    get:
+      summary: Gets the total, used, and free storage.
+      tags: 
+        - File manager
+      operationId: getFileStorage
+      responses:
+        "200":
+          description: Successfully fetched the file manager storage information.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - stats
+                properties:
+                  stats:
+                    type: object
+                    required:
+                      - total
+                      - used
+                      - free
+                    properties:
+                      total:
+                        type: integer
+                      used:
+                        type: integer
+                      free:
+                        type: integer
+                example:
+                  stats:
+                    total: 494384795648
+                    used: 276180869120
+                    free: 218203926528
+        "403":
+          description: The file manager is disabled on this instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                example:
+                  detail: "Cannot load files. This instance is read-only"
+
 components:
   parameters:
     stepType:

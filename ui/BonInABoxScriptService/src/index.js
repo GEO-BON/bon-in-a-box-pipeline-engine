@@ -13,8 +13,18 @@
 
 
 import ApiClient from './ApiClient';
+import CreateItem200Response from './model/CreateItem200Response';
+import CreateItem200ResponseResult from './model/CreateItem200ResponseResult';
+import CreateItemRequest from './model/CreateItemRequest';
+import DeleteItem200Response from './model/DeleteItem200Response';
+import DeleteItemRequest from './model/DeleteItemRequest';
+import GetFileStorage200Response from './model/GetFileStorage200Response';
+import GetFileStorage200ResponseStats from './model/GetFileStorage200ResponseStats';
 import GetHPCStatus200ResponseValue from './model/GetHPCStatus200ResponseValue';
 import GetHistory200ResponseInner from './model/GetHistory200ResponseInner';
+import GetRootItems200ResponseInner from './model/GetRootItems200ResponseInner';
+import GetRootItems403Response from './model/GetRootItems403Response';
+import GetServerStatus200Response from './model/GetServerStatus200Response';
 import Info from './model/Info';
 import InfoAuthorInner from './model/InfoAuthorInner';
 import InfoCompute from './model/InfoCompute';
@@ -26,7 +36,18 @@ import InfoOutputsValue from './model/InfoOutputsValue';
 import InfoOutputsValueExample from './model/InfoOutputsValueExample';
 import InfoReferencesInner from './model/InfoReferencesInner';
 import InfoReviewerInner from './model/InfoReviewerInner';
+import IsFileManagerDisabled200Response from './model/IsFileManagerDisabled200Response';
+import MoveCopyItem200Response from './model/MoveCopyItem200Response';
+import MoveCopyItem200ResponseResultInner from './model/MoveCopyItem200ResponseResultInner';
+import MoveCopyItemRequest from './model/MoveCopyItemRequest';
+import RenameItem200Response from './model/RenameItem200Response';
+import RenameItem200ResponseResult from './model/RenameItem200ResponseResult';
+import RenameItemRequest from './model/RenameItemRequest';
+import UploadFile200Response from './model/UploadFile200Response';
+import UploadFile400Response from './model/UploadFile400Response';
+import UploadFile413Response from './model/UploadFile413Response';
 import DefaultApi from './api/DefaultApi';
+import FileManagerApi from './api/FileManagerApi';
 
 
 /**
@@ -68,6 +89,48 @@ export {
     ApiClient,
 
     /**
+     * The CreateItem200Response model constructor.
+     * @property {module:model/CreateItem200Response}
+     */
+    CreateItem200Response,
+
+    /**
+     * The CreateItem200ResponseResult model constructor.
+     * @property {module:model/CreateItem200ResponseResult}
+     */
+    CreateItem200ResponseResult,
+
+    /**
+     * The CreateItemRequest model constructor.
+     * @property {module:model/CreateItemRequest}
+     */
+    CreateItemRequest,
+
+    /**
+     * The DeleteItem200Response model constructor.
+     * @property {module:model/DeleteItem200Response}
+     */
+    DeleteItem200Response,
+
+    /**
+     * The DeleteItemRequest model constructor.
+     * @property {module:model/DeleteItemRequest}
+     */
+    DeleteItemRequest,
+
+    /**
+     * The GetFileStorage200Response model constructor.
+     * @property {module:model/GetFileStorage200Response}
+     */
+    GetFileStorage200Response,
+
+    /**
+     * The GetFileStorage200ResponseStats model constructor.
+     * @property {module:model/GetFileStorage200ResponseStats}
+     */
+    GetFileStorage200ResponseStats,
+
+    /**
      * The GetHPCStatus200ResponseValue model constructor.
      * @property {module:model/GetHPCStatus200ResponseValue}
      */
@@ -78,6 +141,24 @@ export {
      * @property {module:model/GetHistory200ResponseInner}
      */
     GetHistory200ResponseInner,
+
+    /**
+     * The GetRootItems200ResponseInner model constructor.
+     * @property {module:model/GetRootItems200ResponseInner}
+     */
+    GetRootItems200ResponseInner,
+
+    /**
+     * The GetRootItems403Response model constructor.
+     * @property {module:model/GetRootItems403Response}
+     */
+    GetRootItems403Response,
+
+    /**
+     * The GetServerStatus200Response model constructor.
+     * @property {module:model/GetServerStatus200Response}
+     */
+    GetServerStatus200Response,
 
     /**
      * The Info model constructor.
@@ -146,8 +227,74 @@ export {
     InfoReviewerInner,
 
     /**
+     * The IsFileManagerDisabled200Response model constructor.
+     * @property {module:model/IsFileManagerDisabled200Response}
+     */
+    IsFileManagerDisabled200Response,
+
+    /**
+     * The MoveCopyItem200Response model constructor.
+     * @property {module:model/MoveCopyItem200Response}
+     */
+    MoveCopyItem200Response,
+
+    /**
+     * The MoveCopyItem200ResponseResultInner model constructor.
+     * @property {module:model/MoveCopyItem200ResponseResultInner}
+     */
+    MoveCopyItem200ResponseResultInner,
+
+    /**
+     * The MoveCopyItemRequest model constructor.
+     * @property {module:model/MoveCopyItemRequest}
+     */
+    MoveCopyItemRequest,
+
+    /**
+     * The RenameItem200Response model constructor.
+     * @property {module:model/RenameItem200Response}
+     */
+    RenameItem200Response,
+
+    /**
+     * The RenameItem200ResponseResult model constructor.
+     * @property {module:model/RenameItem200ResponseResult}
+     */
+    RenameItem200ResponseResult,
+
+    /**
+     * The RenameItemRequest model constructor.
+     * @property {module:model/RenameItemRequest}
+     */
+    RenameItemRequest,
+
+    /**
+     * The UploadFile200Response model constructor.
+     * @property {module:model/UploadFile200Response}
+     */
+    UploadFile200Response,
+
+    /**
+     * The UploadFile400Response model constructor.
+     * @property {module:model/UploadFile400Response}
+     */
+    UploadFile400Response,
+
+    /**
+     * The UploadFile413Response model constructor.
+     * @property {module:model/UploadFile413Response}
+     */
+    UploadFile413Response,
+
+    /**
     * The DefaultApi service constructor.
     * @property {module:api/DefaultApi}
     */
-    DefaultApi
+    DefaultApi,
+
+    /**
+    * The FileManagerApi service constructor.
+    * @property {module:api/FileManagerApi}
+    */
+    FileManagerApi
 };

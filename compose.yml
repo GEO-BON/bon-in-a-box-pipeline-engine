@@ -38,18 +38,50 @@ services:
 
   python-api: # Serves Titiler and a FastAPI app to serve country and region names and geometries
     container_name: biab-python-api
+    env_file:
+      - ${PIPELINE_REPO_PATH}/runner.env
     volumes:
       - ${PIPELINE_REPO_PATH}/output:/output:ro
+      # userdata is writable for user uploads, used in "/manage-files"
+      - ${PIPELINE_REPO_PATH}/userdata:/data/userdata:rw
+
     user: ${MY_UID}:${DOCKER_GID}
     environment:
       PORT: 8000
       WORKERS_PER_CORE: 1
       TITILER_API_CORS_ORIGINS: "*"
+      USERDATA_ROOT: /data/userdata/files
+      # Unset OLLAMA_URL disables the assistant entirely.
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11435}
+      # How long the bridge waits for Ollama to respond before giving up, in
+      # milliseconds (600000 = 10 min). Covers the non-streaming call and the health check.
+      #
+      OLLAMA_PROXY_TIMEOUT: 600000
     expose:
-      - "8000"
-      - "8001"
+      - "8000" # Titiler
+      - "8001" # FastAPI main_api (regions, file manager, assistant)
+      - "8002" # MCP server
+      - "8003" # Ollama chat bridge
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+    # Bare GET should be refused by MCP server with 406 once all tooling loaded,
+    # proving its listening.
+    # This check tells you from `docker compose ps` that the assistant's backend is up.
+    #
+    # This does make the container report unhealthy if the MCP server dies, which
+    # startup.sh deliberately treats as non-fatal. The rest of the python api will
+    # continue working.
+    healthcheck:
+      test:
+        ["CMD", "curl", "-s", "-o", "/dev/null", "http://localhost:8002/mcp"]
+      # First 90s, run every 5s (server is booting and should soon become healthy)
+      # After that, run every 5 minutes.
+      interval: 5m
+      start_interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
 
   runner-conda:
     container_name: biab-runner-conda

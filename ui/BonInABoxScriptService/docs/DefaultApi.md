@@ -5,6 +5,7 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**getCountriesList**](DefaultApi.md#getCountriesList) | **GET** /region/countries_list | Returns the list of countries from FieldMaps.io with their ISO3 and English names
+[**getCountryRegionBbox**](DefaultApi.md#getCountryRegionBbox) | **GET** /region/country_region_bbox | Bounding box of a country or region, or the selector object a bboxCRS input takes
 [**getHPCStatus**](DefaultApi.md#getHPCStatus) | **GET** /hpc/status | Get status of HPC connection.
 [**getHistory**](DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 [**getInfo**](DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
@@ -14,6 +15,7 @@ Method | HTTP request | Description
 [**getPipeline**](DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
 [**getRegionGeometry**](DefaultApi.md#getRegionGeometry) | **GET** /region/geometry | Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
 [**getRegionsList**](DefaultApi.md#getRegionsList) | **GET** /region/regions_list | Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
+[**getServerStatus**](DefaultApi.md#getServerStatus) | **GET** /api/status | Returns which optional features are enabled on this instance.
 [**getSystemStatus**](DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 [**getVersions**](DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
 [**hpcPrepareGet**](DefaultApi.md#hpcPrepareGet) | **GET** /hpc/prepare | Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.
@@ -52,6 +54,59 @@ This endpoint does not need any parameter.
 ### Return type
 
 **[Object]**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## getCountryRegionBbox
+
+> Object getCountryRegionBbox(id, opts)
+
+Bounding box of a country or region, or the selector object a bboxCRS input takes
+
+With &#x60;output_format&#x3D;chooser_input&#x60;, returns the object that a &#x60;bboxCRS&#x60;, &#x60;country&#x60;, &#x60;countryRegion&#x60;, &#x60;countryRegionCRS&#x60; or &#x60;CRS&#x60; input takes. Use what it returns unchanged as that input&#39;s value. 
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+let id = "COL"; // String | A code, not a name. ISO3 for a country (Colombia is COL), adm1_src for a region.
+let opts = {
+  'type': "country", // String | Whether `id` names a country (adm0) or a subnational region (adm1)
+  'crs': "'EPSG:4326'", // String | CRS the bounding box is expressed in.
+  'outputFormat': "chooser_input" // String | `chooser_input` for the whole selector object, to fill in an input. `bbox` for only the four numbers. 
+};
+apiInstance.getCountryRegionBbox(id, opts, (error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**| A code, not a name. ISO3 for a country (Colombia is COL), adm1_src for a region. | 
+ **type** | **String**| Whether &#x60;id&#x60; names a country (adm0) or a subnational region (adm1) | [optional] [default to &#39;country&#39;]
+ **crs** | **String**| CRS the bounding box is expressed in. | [optional] [default to &#39;EPSG:4326&#39;]
+ **outputFormat** | **String**| &#x60;chooser_input&#x60; for the whole selector object, to fill in an input. &#x60;bbox&#x60; for only the four numbers.  | [optional] [default to &#39;bbox&#39;]
+
+### Return type
+
+**Object**
 
 ### Authorization
 
@@ -134,10 +189,10 @@ apiInstance.getHistory(opts, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **start** | **Number**| Start index for pagination | [optional]
- **limit** | **Number**| Limit the number of results | [optional]
- **keyword** | **String**| Filter search based on keyword. This applies to the script/pipeline names and their inputs. | [optional]
- **filterStatus** | [**[String]**](String.md)| Filter option based on pipeline status. The default value is \&quot;all\&quot; when null. | [optional]
+ **start** | **Number**| Start index for pagination | [optional] 
+ **limit** | **Number**| Limit the number of results | [optional] 
+ **keyword** | **String**| Filter search based on keyword. This applies to the script/pipeline names and their inputs. | [optional] 
+ **filterStatus** | [**[String]**](String.md)| Filter option based on pipeline status. The default value is \&quot;all\&quot; when null. | [optional] 
 
 ### Return type
 
@@ -181,8 +236,8 @@ apiInstance.getInfo(type, descriptionPath, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script, pipeline or openEO |
- **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
+ **type** | **String**| Script, pipeline or openEO | 
+ **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. | 
 
 ### Return type
 
@@ -264,7 +319,7 @@ apiInstance.getListOf(type, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script, pipeline or openEO |
+ **type** | **String**| Script, pipeline or openEO | 
 
 ### Return type
 
@@ -293,7 +348,7 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script, pipeline or openEO
-let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
+let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
 apiInstance.getOutputFolders(type, id, (error, data, response) => {
   if (error) {
     console.error(error);
@@ -308,8 +363,8 @@ apiInstance.getOutputFolders(type, id, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script, pipeline or openEO |
- **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  |
+ **type** | **String**| Script, pipeline or openEO | 
+ **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  | 
 
 ### Return type
 
@@ -352,7 +407,7 @@ apiInstance.getPipeline(descriptionPath, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
+ **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. | 
 
 ### Return type
 
@@ -398,7 +453,7 @@ apiInstance.getRegionGeometry(id, opts, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **id** | **String**| ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes |
+ **id** | **String**| ID of the region to get the geometry for (adm0_src or adm1_src), from the UN regions codes | 
  **type** | **String**| Type of region to get the geometry for (country or region) | [optional] [default to &#39;country&#39;]
 
 ### Return type
@@ -442,11 +497,52 @@ apiInstance.getRegionsList(countryIso, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **countryIso** | **String**| ISO3 code of the country to get the regions for (e.g. \&quot;CAN\&quot; for Canada) |
+ **countryIso** | **String**| ISO3 code of the country to get the regions for (e.g. \&quot;CAN\&quot; for Canada) | 
 
 ### Return type
 
 **[Object]**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## getServerStatus
+
+> GetServerStatus200Response getServerStatus()
+
+Returns which optional features are enabled on this instance.
+
+Distinct from /api/systemStatus, which reports whether the server is misconfigured and is the UI&#39;s boot gate. This one never fails: a feature being off is an answer, not an error. Every flag has positive polarity, so true always means the feature works, whatever the polarity of the variable behind it. myFilesEnabled, chatEnabled and antivirus* describe python-api, which is what acts on them; they are reported here because script-server has no way to query python-api, so the deployment sets both containers identically. Not exposed to the chat assistant: it is absent from GENERATED_TOOLS_KEPT in python-api/app/mcp-server/server.py, and belongs in the system prompt rather than in a tool if the assistant ever needs it. 
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+apiInstance.getServerStatus((error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**GetServerStatus200Response**](GetServerStatus200Response.md)
 
 ### Authorization
 
@@ -646,10 +742,10 @@ apiInstance.run(type, descriptionPath, opts, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script, pipeline or openEO |
- **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
- **callback** | **String**| Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully. | [optional]
- **body** | **String**| Content of input.json for this run | [optional]
+ **type** | **String**| Script, pipeline or openEO | 
+ **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. | 
+ **callback** | **String**| Optional callback url called upon pipeline completion, only if the call to /run responds 200 OK. When receiving the callback, check the outputs or the history to know if the pipeline completed successfully. | [optional] 
+ **body** | **String**| Content of input.json for this run | [optional] 
 
 ### Return type
 
@@ -693,8 +789,8 @@ apiInstance.savePipeline(filename, requestBody, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **filename** | **String**| The name of the JSON file (without extension). |
- **requestBody** | [**{String: Object}**](Object.md)| Content of pipeline.json to save |
+ **filename** | **String**| The name of the JSON file (without extension). | 
+ **requestBody** | [**{String: Object}**](Object.md)| Content of pipeline.json to save | 
 
 ### Return type
 
@@ -723,7 +819,7 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script, pipeline or openEO
-let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.
+let id = "id_example"; // String | Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run. 
 apiInstance.stop(type, id, (error, data, response) => {
   if (error) {
     console.error(error);
@@ -738,8 +834,8 @@ apiInstance.stop(type, id, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script, pipeline or openEO |
- **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  |
+ **type** | **String**| Script, pipeline or openEO | 
+ **id** | **String**| Where to find the pipeline or step outputs in ./output folder. It also acts as a handle to stop the run.  | 
 
 ### Return type
 

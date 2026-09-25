@@ -33,7 +33,7 @@ For the script-server (Kotlin code), IntelliJ Idea.
 1. Build the remaining images: `./dev-server.sh build`
 
 2. Start the development server: `./dev-server.sh up`
-    - If there is a container name conflict, run `./dev-server.sh clean`
+   - If there is a container name conflict, run `./dev-server.sh clean`
 
 This command enables:
 
@@ -83,48 +83,52 @@ gitGraph
 ```
 
 ### Creating a staging build
+
 1. Create a branch that ends with "staging" from the head of the main branch.
 2. Merge your changes to that branch. The docker hub GH action will trigger for branch main and any branch with name ending by "staging". The branch name is appended to the tag of the docker image. See
-    - [.github/workflows/docker_script-server.yml](.github/workflows/docker_ui.yml)
-    - [.github/workflows/docker_ui.yml](.github/workflows/docker_ui.yml)
+   - [.github/workflows/docker_script-server.yml](.github/workflows/docker_ui.yml)
+   - [.github/workflows/docker_ui.yml](.github/workflows/docker_ui.yml)
 3. **Caveat:** this only compiles the image where the paths were modified. For example, if `viewer` folder is modified, only the gateway will be rebuilt. However, the server will look for both images with the same prefix. In this case `script-server-staging` might not exist, or might be outdated. It is possible to launch the build of the script-server manually to make sure it exists and is up to date.
-    1. On github website, navigate to the Actions tab
-    2. open the desired action
-    3. Click on the arrow next to "run workflow"
-    4. Select the desired staging branch
-    5. Run workflow
-    6. Wait for completion
+   1. On github website, navigate to the Actions tab
+   2. open the desired action
+   3. Click on the arrow next to "run workflow"
+   4. Select the desired staging branch
+   5. Run workflow
+   6. Wait for completion
 4. It is now possible to test the staging prod servers by running `./server-up.sh <branchname>`. The launch script will look for this special tag in the docker hub.For example, `./server-up.sh staging` will download and use both "gateway-staging" and "script-server-staging" images.
 5. Send the above command to a few beta users.
 
 ### Public release
+
 1. Regenerate documentation by running `quarto render` in the docs_source folder.
 2. Merge to main
 
-    The changes are live as soon as they are merged to main branch: the dockers are built, pushed to the GitHub package registry ([server](https://github.com/orgs/GEO-BON/packages?repo_name=bon-in-a-box-pipeline-engine) and [runners](https://github.com/orgs/GEO-BON/packages?repo_name=bon-in-a-box-pipelines)), and next time someone starts the server, the new docker images will be pulled.
+   The changes are live as soon as they are merged to main branch: the dockers are built, pushed to the GitHub package registry ([server](https://github.com/orgs/GEO-BON/packages?repo_name=bon-in-a-box-pipeline-engine) and [runners](https://github.com/orgs/GEO-BON/packages?repo_name=bon-in-a-box-pipelines)), and next time someone starts the server, the new docker images will be pulled.
 
-    Old packages can be found on [GEO BON's Docker Hub](https://hub.docker.com/r/geobon/bon-in-a-box)
+   Old packages can be found on [GEO BON's Docker Hub](https://hub.docker.com/r/geobon/bon-in-a-box)
 
 3. Manually tag the version and create a release via GitHub. See [releases](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/releases).
 
 ### Versionning on the pipelines-result instance
+
 The `manage_output.py` script helps moving outputs from one instance to another. If the instances share a drive, it becomes even easier. Launch script with no arguments for syntax.
 
 For example, to copy **all** the pipelines of an instance somewhere else, use
+
 ```
 find -name pipelineOutput.json | \
     xargs -i dirname "{}" | \
     xargs -P $(nproc) -i ./manage_output.py {} copy /somewhere_else/output _2025-10-16
 ```
 
-It becomes much more complicated when diplaying runs that were made with different versions of the repository. In order to display pipeline results that were calculated with old versions of the script, the original metadata of the script must be kept. Create a subfolder in scripts, pipelines and outputs with an identifier (such as a date), then use the prefix option of manage_output.py to insert that prefix into the copied pipeline's paths. _The prefix must match exactly between all three folders._
+It becomes much more complicated when diplaying runs that were made with different versions of the repository. In order to display pipeline results that were calculated with old versions of the script, the original metadata of the script must be kept. Create a subfolder in scripts, pipelines and outputs with an identifier (such as a date), then use the prefix option of manage*output.py to insert that prefix into the copied pipeline's paths. \_The prefix must match exactly between all three folders.*
 
 In the subfolder, the pipeline json files need to be edited. This can be done with a find/replace in folder, followed by this jq command:
 
 Find: "descriptionFile": "<br>
-Replace: "descriptionFile": "_2025-10-16>
+Replace: "descriptionFile": "\_2025-10-16>
 
-``` bash
+```bash
 prefix='_2025-10-16>'
 
 find . -name '*.json' -print0 |
@@ -157,6 +161,7 @@ Yes, we all know problems occur in production that do not happen in dev mode. So
 4. Then run it with `.server/prod-server.sh command up`
 
    (`.server/prod-server.sh clean` might be needed if you get the usual name conflict error)
+
 5. Stop the process with ctrl+c unless you used -d option in the previous command.
 
 _Warning: Undo this by removing the symlink if you are to use `./server-up.sh` for a regular launch of the production servers, otherwise it will not checkout files in `.server` on branch change._
@@ -192,7 +197,48 @@ In addition to these services,
 - `scripts` folder contains all the scripts that can be run.
 - `output` folder contains all script results.
 
+### Antivirus scanning of user uploads
+
+**Off by default.** Files uploaded through "My Files" are scanned only when
+`CLAMAV_ADDRESS` in `runner.env` names a reachable `clamd`; with it unset, uploads
+are saved without being scanned.
+
+To switch it on locally, run a scanner:
+
+```bash
+docker run -d --name clamav -p 3310:3310 clamav/clamav:stable
+```
+
+then add it to `runner.env` and restart the server:
+
+```bash
+CLAMAV_ADDRESS=127.0.0.1:3310
+```
+
+`GET /api/status` reports both whether it is configured and whether it currently
+answers, so you can tell the two apart without attempting an upload.
+
+**It fails closed.** Once configured, an upload that fails with below codes is
+_refused_, not saved:
+
+| condition                                                          | response |
+| ------------------------------------------------------------------ | -------- |
+| malware found                                                      | `400`    |
+| the client knows the file exceeds the scanner's limit              | `413`    |
+| scanner unreachable, **or** the file exceeds its `StreamMaxLength` | `503`    |
+
+Those last two are one response on purpose: when a stream is too long, clamd closes the
+connection rather than replying, which is indistinguishable from the daemon having died.
+The message names both, and the python-api log has the underlying exception.
+
+> **clamd does not run inside python-api.** (This would mean its ~1.5 GB
+> signature would reside in every session's pod for a database identical across all
+> of them.) It is rather an external service, wherever you point `CLAMAV_ADDRESS`
+> at. In a K8s disctibuted setup, it's one container on the dispatcher
+> VM (see `bon-in-a-box-proxy-dispatch`).
+
 ### Restrict access to a BON in a Box instance
+
 In order to require authentication to access a BON in a Box instance,
 a simple http authentication can be configured in the host instance.
 For this, we assume that the host machine has a routing that redirects the outside traffic to the local BON in a Box instance. (This NGINX router
@@ -214,7 +260,8 @@ architecture-beta
 Follow these steps from the NGINX documentation: https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/
 
 In the NGINX configuration of the router, you should then have something like this:
-``` nginx
+
+```nginx
   # Uncomment this section to make a restricted instance
   # see https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-http-basic-authentication/
   auth_basic "Restricted BON in a Box instance";
@@ -236,7 +283,9 @@ flowchart TD
  success --> |No| Failed
  Failed --> |Add error flag|output
 ```
+
 Script artifacts:
+
 - input.json: Written by the script server before scripts run. Contains a map of input label => input value.
 - log file: cCntains the stdout of the script, plus a few additions from the script server (time, cache status, duration, ...)
 - .pid: This file is generated by the script-server and used to stop the process in case the pipeline is halted (cancelled by user, other script error or timeout reached).
@@ -281,7 +330,6 @@ flowchart
     resolve --> mamba
 
 ```
-
 
 ## OpenAPI specification
 
@@ -359,7 +407,9 @@ Since runner-conda and runner-julia run in a separate docker, when the user stop
 The PID file is called `.pid` and is located in the output folder of the run. It is deleted when the script completes. For details, see [ScriptRun.kt](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/blob/main/script-server/src/main/kotlin/org/geobon/script/ScriptRun.kt).
 
 ## Setting up Digital Research Alliance of Canada (DRAC) cluster connection
+
 To connect to the DRAC automation node, you will need
+
 - A valid account
 - Manual authorisation from tech support
 - The IP address of your server or PC can be obtained with `curl ifcfg.me`.
@@ -368,18 +418,19 @@ To connect to the DRAC automation node, you will need
 1. Follow [these instructions](https://docs.alliancecan.ca/wiki/Automation_in_the_context_of_multifactor_authentication/)
 2. Manually execute a command through SSH once to the automation node to accept the fingerprint of the HPC's. For example by running `ssh hpc-name "ls -l"`. This is mandatory since known_hosts will be used to connect.
 3. Create an ssh config file dedicated to BON in a Box, with the details for your HPC's automation node as such:
-    ```
-    host yourHPC
-      hostname robot.yourHPC.domain.edu
-      user yourUser
-      identitiesonly yes
-      requesttty no
-    ```
-3. Configure all the HPC_ environment variables in runner.env. (Make sure your runner.env contains all the HPC_ variables in the up-to-date runner-sample.env)
-4. Start the BON in a Box server normally.
-5. Check the info tag of the UI to see if the HPC connection is successful. If not, check the logs of the script-server for errors.
+   ```
+   host yourHPC
+     hostname robot.yourHPC.domain.edu
+     user yourUser
+     identitiesonly yes
+     requesttty no
+   ```
+4. Configure all the HPC* environment variables in runner.env. (Make sure your runner.env contains all the HPC* variables in the up-to-date runner-sample.env)
+5. Start the BON in a Box server normally.
+6. Check the info tag of the UI to see if the HPC connection is successful. If not, check the logs of the script-server for errors.
 
 ### HPC connection states
+
 ```mermaid
 stateDiagram-v2
     [*] --> NOT_CONFIGURED
@@ -390,18 +441,20 @@ stateDiagram-v2
 ```
 
 ### Specifying compute requirements
+
 A script can declare its resource requirements using the `compute` block in its `.yml` description file.
 These requirements are used by both HPC (SLURM) and Kubernetes backends.
 
-``` yml
+```yml
 compute:
-  mem: 30G          # Memory limit: number followed by G (gigabytes) or M (megabytes)
+  mem: 30G # Memory limit: number followed by G (gigabytes) or M (megabytes)
   cpus-per-task: 16 # Number of CPUs for this task
-  hpc: true         # Optional. Set to true to enable HPC (SLURM) execution (default: false)
-  time: "01:00:00"  # Required when hpc: true. Maximum time before timeout, see https://slurm.schedmd.com/sbatch.html#OPT_time.
+  hpc: true # Optional. Set to true to enable HPC (SLURM) execution (default: false)
+  time: "01:00:00" # Required when hpc: true. Maximum time before timeout, see https://slurm.schedmd.com/sbatch.html#OPT_time.
 ```
 
 The `mem` and `cpus-per-task` fields are used as resource limits regardless of the backend:
+
 - On **HPC**, they map to `#SBATCH --mem=` and `#SBATCH --cpus-per-task=`.
 - On **Kubernetes**, they map to container resource limits. When no `compute` block is present, default limits are applied.
 
@@ -410,6 +463,7 @@ It is recommended to check the documentation of the cluster that will receive th
 to tailor the requested resources to best fit its compute nodes specification.
 
 ### Flow
+
 The following diagram shows the states a script run undergoes when being sent to the HPC.
 
 ```mermaid
@@ -460,7 +514,9 @@ stateDiagram-v2
 ```
 
 ### Limitations
+
 The current implementation is basic, and has the following limitations:
+
 - Max 1 HPC-enabled script per pipeline. (In reality, one HPC task must not depend on the results of another, to avoid waiting forever for the batch to be sent.)
 - No UI support for batches in the pipeline editor.
 - Conda is supported, but: it is not possible for two HPC-enabled tasks to verify or edit the conda environment within the apptainer image at the same time. Only one writeable access can be granted to the overlay.
@@ -468,64 +524,65 @@ The current implementation is basic, and has the following limitations:
 - If a batch job fails _before it begins_, it will not be detected. Jobs will remain running untill cancelled manually.
 - Stopping a script through the BON in a Box UI does not cancel the job on the HPC.
 - Batches should be started via API call (for ex. a script sending curl calls). Example:
- ```python
- #!/usr/bin/env python3
+
+```python
+#!/usr/bin/env python3
 import requests
 
 loopParam = "pipeline@121"
 loopArray = [
-    ["Ambystoma laterale"],
-    ["Ambystoma jeffersonianum"],
-    ["Ambystoma texanum"],
-    ["Ambystoma tigrinum"],
-    ["Ambystoma barbouri"],
-    ["Plethodon cinereus"],
-    ["Plethodon richmondi"],
-    ["Eurycea bislineata"],
-    ["Eurycea longicauda"],
-    ["Hemidactylium scutatum"],
-    ["Desmognathus fuscus"],
-    ["Notophthalmus viridescens"],
-    ["Necturus maculosus"],
+   ["Ambystoma laterale"],
+   ["Ambystoma jeffersonianum"],
+   ["Ambystoma texanum"],
+   ["Ambystoma tigrinum"],
+   ["Ambystoma barbouri"],
+   ["Plethodon cinereus"],
+   ["Plethodon richmondi"],
+   ["Eurycea bislineata"],
+   ["Eurycea longicauda"],
+   ["Hemidactylium scutatum"],
+   ["Desmognathus fuscus"],
+   ["Notophthalmus viridescens"],
+   ["Necturus maculosus"],
 ]
 
 data = {
-    "SDM>runMaxent.yml@108|partition_type": "block",
-    "SDM>selectBackground.yml@40|method_background": "weighted_raster",
-    "SDM>selectBackground.yml@40|n_background": 30000,
-    "data>GBIFHeatmapFromSTAC.yml@139|taxa": "amphibians",
-    "data>getGBIFObservations>getGBIFObservations.yml@142|max_year": 2024,
-    "data>getGBIFObservations>getGBIFObservations.yml@142|min_year": 2010,
-    "data>loadFromStac.yml@144|collections_items": [
-        "chelsa-clim|bio1",
-        "chelsa-clim|bio2",
-        "chelsa-clim|bio3",
-        "chelsa-clim|bio4",
-        "chelsa-clim|bio5",
-        "chelsa-clim|bio6",
-    ],
-    "data>loadFromStac.yml@144|stac_url": "https://stac.geobon.org/",
-    "data>loadFromStac.yml@144|study_area": None,
-    "data>loadFromStac.yml@144|t0": None,
-    "data>loadFromStac.yml@144|t1": None,
-    "data>loadFromStac.yml@144|temporal_res": None,
-    "pipeline@121": ["Ambystoma laterale"],
-    "pipeline@128": 1000,
-    "pipeline@140": {
-        "CRS": {
-            "CRSBboxWGS84": [-93.17, 40.99, -54.75, 52.22],
-            "authority": "EPSG",
-            "code": 3175,
-            "name": "NAD83 / Great Lakes and St Lawrence Albers",
-            "proj4Def": "+proj=aea +lat_0=45.568977 +lon_0=-83.248627 +lat_1=42.122774 +lat_2=49.01518 +x_0=1000000 +y_0=1000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs",
-            "unit": "metre",
-            "wktDef": 'PROJCS["NAD83 / Great Lakes and St Lawrence Albers",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["latitude_of_center",45.568977],PARAMETER["longitude_of_center",-83.248627],PARAMETER["standard_parallel_1",42.122774],PARAMETER["standard_parallel_2",49.01518],PARAMETER["false_easting",1000000],PARAMETER["false_northing",1000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","3175"]]',
-        },
-        "bbox": [175523, 408483, 1719553, 1468175],
-        "country": None,
-        "region": None,
-    },
-    "pipeline@46": 5,
+   "SDM>runMaxent.yml@108|partition_type": "block",
+   "SDM>selectBackground.yml@40|method_background": "weighted_raster",
+   "SDM>selectBackground.yml@40|n_background": 30000,
+   "data>GBIFHeatmapFromSTAC.yml@139|taxa": "amphibians",
+   "data>getGBIFObservations>getGBIFObservations.yml@142|max_year": 2024,
+   "data>getGBIFObservations>getGBIFObservations.yml@142|min_year": 2010,
+   "data>loadFromStac.yml@144|collections_items": [
+       "chelsa-clim|bio1",
+       "chelsa-clim|bio2",
+       "chelsa-clim|bio3",
+       "chelsa-clim|bio4",
+       "chelsa-clim|bio5",
+       "chelsa-clim|bio6",
+   ],
+   "data>loadFromStac.yml@144|stac_url": "https://stac.geobon.org/",
+   "data>loadFromStac.yml@144|study_area": None,
+   "data>loadFromStac.yml@144|t0": None,
+   "data>loadFromStac.yml@144|t1": None,
+   "data>loadFromStac.yml@144|temporal_res": None,
+   "pipeline@121": ["Ambystoma laterale"],
+   "pipeline@128": 1000,
+   "pipeline@140": {
+       "CRS": {
+           "CRSBboxWGS84": [-93.17, 40.99, -54.75, 52.22],
+           "authority": "EPSG",
+           "code": 3175,
+           "name": "NAD83 / Great Lakes and St Lawrence Albers",
+           "proj4Def": "+proj=aea +lat_0=45.568977 +lon_0=-83.248627 +lat_1=42.122774 +lat_2=49.01518 +x_0=1000000 +y_0=1000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs",
+           "unit": "metre",
+           "wktDef": 'PROJCS["NAD83 / Great Lakes and St Lawrence Albers",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101],TOWGS84[0,0,0,0,0,0,0]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["latitude_of_center",45.568977],PARAMETER["longitude_of_center",-83.248627],PARAMETER["standard_parallel_1",42.122774],PARAMETER["standard_parallel_2",49.01518],PARAMETER["false_easting",1000000],PARAMETER["false_northing",1000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","3175"]]',
+       },
+       "bbox": [175523, 408483, 1719553, 1468175],
+       "country": None,
+       "region": None,
+   },
+   "pipeline@46": 5,
 }
 
 ## Update the link for target instance
@@ -533,11 +590,11 @@ url = "http://localhost/pipeline/SDM>SDM_maxEnt.json/run"
 headers = {"accept": "text/plain", "Content-Type": "text/plain"}
 
 for value in loopArray:
-    data_copy = data.copy()
-    data_copy[loopParam] = value
+   data_copy = data.copy()
+   data_copy[loopParam] = value
 
-    print(value)
-    response = requests.post(url, json=data_copy, headers=headers)
-    print(response)
-    print(response.text)
- ```
+   print(value)
+   response = requests.post(url, json=data_copy, headers=headers)
+   print(response)
+   print(response.text)
+```
