@@ -25,7 +25,9 @@
     "//react-router-dom": "client-side routing between UI pages.",
     "//react-select": "Searchable select input to choose the script/pipeline to run.",
     "//web-vitals": "Currently unused: frontend performance metrics. Was there in project template.",
-    "//proj4": "used to transform coordinates between different coordinate reference systems."
+    "//proj4": "used to transform coordinates between different coordinate reference systems.",
+    "//@svar-ui/react-filemanager": "provides a file manager UI component to select files from the server.",
+    "//@svar-ui/filemanager-data-provider": "provides a data provider for the file manager UI component to select files from the server."
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -65,7 +67,6 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.1",
     "@watergis/maplibre-gl-terradraw": "^1.12.2",
-    "dotenv": "^17.4.2",
     "vite": "^8.0.3"
   },
   "scripts": {

@@ -60,7 +60,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
   const [error, setError] = useState(null);
 
   const [fileNames, setfileNames] = useState([]);
-  const { disableMyFiles } = useContext(uiContext); // gets the value of the variable from runner.env
+  const { disableMyFiles } = useContext(uiContext);
 
   // const multipleFiles = true or false, will be passed on as a variable
 

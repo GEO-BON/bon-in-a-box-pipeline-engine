@@ -33,9 +33,6 @@ export default function FileManager() {
     }
 
     useEffect(() => {
-        // debugging 
-        // console.log({ DISABLE_MY_FILES });
-
         // captures backend responses
         Promise.all([restProvider.loadFiles(), restProvider.loadInfo()]).then(
             ([files, info]) => {
