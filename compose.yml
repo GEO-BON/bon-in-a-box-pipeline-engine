@@ -58,8 +58,8 @@ services:
       TITILER_API_CORS_ORIGINS: "*"
       USERDATA_ROOT: /data/userdata/files
       # The shared clamd. Blank -- the default -- means uploads are saved WITHOUT
-      # being scanned; set, main_api.py fails CLOSED and an unreachable scanner
-      # refuses the upload. See the antivirus block in main_api.py.
+      # being scanned; set, antivirus.py fails CLOSED and an unreachable scanner
+      # refuses the upload. See python-api/app/antivirus.py.
       CLAMAV_ADDRESS: ${CLAMAV_ADDRESS:-}
       DISABLE_MY_FILES: ${DISABLE_MY_FILES}
       # The chat bridge, started by startup.sh as a fourth process.

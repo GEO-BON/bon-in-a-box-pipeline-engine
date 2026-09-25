@@ -57,7 +57,7 @@ ENV PORT=8000
 ENV WEB_CONCURRENCY=1
 # No CLAMAV_* default on purpose. clamd is a shared service now, not a process in this
 # container, and an unset CLAMAV_ADDRESS means "no scanning" -- so a default here would
-# silently switch the feature on and point it at nothing. See app/main_api.py.
+# silently switch the feature on and point it at nothing. See app/antivirus.py.
 
 ARG BIAB_VERSION
 RUN echo $BIAB_VERSION > /version.txt

@@ -2,7 +2,7 @@
 
 # No ClamAV here any more. clamd used to run in this container -- its ~1.5GB signature
 # set resident in every session's pod, for a database identical across all of them --
-# and is now one shared service that main_api.py streams uploads to over the network.
+# and is now one shared service that antivirus.py streams uploads to over the network.
 # See CLAMAV_ADDRESS there.
 
 gunicorn -k uvicorn.workers.UvicornWorker titiler.application.main:app --bind 0.0.0.0:8000 --workers 1 &
@@ -45,7 +45,7 @@ gunicorn -k uvicorn.workers.UvicornWorker titiler.application.main:app --bind 0.
 # reach it directly, and the bridge is only one of its consumers.
 #
 # Lowercased before comparing, because the two other readers of this variable are
-# case-insensitive -- main_api.py's DISABLE_MY_FILES does `.lower() == "true"` and
+# case-insensitive -- file_manager.py's DISABLE_MY_FILES does `.lower() == "true"` and
 # FeatureStatus.kt uses ignoreCase -- and a DISABLE_CHAT=True that hid the UI while
 # leaving the bridge running would be a confusing half-state to debug.
 if [ -n "$OLLAMA_URL" ] && [ "$(printf '%s' "$DISABLE_CHAT" | tr '[:upper:]' '[:lower:]')" != "true" ]; then
