@@ -284,7 +284,7 @@ export default function ScriptInput({
         />
       );
 
-    case "stac_assets[]":
+    case "stac_assets":
       return (
         <StacChooser
           inputId={passedProps.id}
