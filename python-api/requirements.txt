@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+requests
+duckdb
+pandas
+geopandas
+pandas_geojson
+shapely
+pygadm
+fiona
+pystac-client
