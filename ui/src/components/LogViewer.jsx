@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useInterval } from '../UseInterval';
 import { isVisible } from '../utils/isVisible';
 
@@ -8,10 +8,10 @@ export function LogViewer({ address, autoUpdate }) {
   const logsRef = useRef();
   const logsEndRef = useRef();
 
-  function fetchLogs(intervalRef) {
+  function fetchLogs() {
     // Fetch the logs
     let start = new Blob([logs]).size;
-    fetch(address, {
+    return fetch(address, {
       headers: { 'range': `bytes=${start}-` },
     })
       .then(response => {
@@ -35,21 +35,42 @@ export function LogViewer({ address, autoUpdate }) {
         }
       })
       .catch(response => {
-        if(intervalRef) clearInterval(intervalRef);
         if(response.status !== 404) { // 404 error can be normal if script has no logs.
           setLogs(logs + "\n" + response.status + " (" + response.statusText + ")");
         }
+        throw response;
       });
 
   }
 
-  // First and last fetch (fetchLogs not a dependency since it depends on logs. This would make it loop.)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchLogs(), [autoUpdate])
-  // Auto-update
-  const interval = useInterval(() => {
-    fetchLogs(interval)
-  }, autoUpdate ? 1000 : null);
+  // Start fetching (fetchLogs not a dependency since it depends on logs. This would make it loop.)
+  useEffect(() => {
+    let timeout;
+    let cancelled = false;
+
+    let planNext = () => {
+      if (autoUpdate && !cancelled) {
+        timeout = setTimeout(runFetch, 1000);
+      }
+    }
+
+    let runFetch = () => {
+      fetchLogs()
+        .then(planNext)
+        .catch(planNext); // still keep polling after an error (e.g. 404 with no logs yet)
+    }
+
+    if (autoUpdate) {
+      runFetch();
+    }
+
+    return () => {
+      cancelled = true;
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    }
+  }, [autoUpdate])
 
   // Logs auto-scrolling
   useEffect(() => {
