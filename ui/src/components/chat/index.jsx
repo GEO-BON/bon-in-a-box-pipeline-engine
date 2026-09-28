@@ -18,7 +18,7 @@ const PROMPT_URL = import.meta.env.VITE_CHAT_PROMPT_URL || "/assistant/prompt";
 // alternation evicted the pinned model and loaded the other one. That is what the long
 // pause before the assistant started thinking actually was: not prefill, and not the
 // size of the prompt, but a model swap around every turn.
-const MODEL_NAME = import.meta.env.VITE_CHAT_MODEL || "qwen3.5:35b-a3b";
+const MODEL_NAME = import.meta.env.VITE_CHAT_MODEL || "qwen3.5:9b";
 
 // Strip tool-call JSON blocks and bridge-injected "Assistant:" prefixes that leak
 // through when the model emits tool calls as plain text instead of using Ollama's
@@ -108,7 +108,7 @@ export default function Chat() {
           model: MODEL_NAME,
           stream: true,
           // Ollama unloads an idle model after 5 minutes, and the next request pays
-          // 24 GB of reload before its first token -- during which the stream carries
+          // a full model reload before its first token -- during which the stream carries
           // no bytes at all. On a busy shared host that silence can outlast nginx's 600s
           // read timeout, and the turn dies mid-flight with nothing to show for it. Since
           // a conversation is a handful of turns separated by however long the user takes
