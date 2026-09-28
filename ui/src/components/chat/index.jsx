@@ -12,13 +12,13 @@ const PROMPT_URL = import.meta.env.VITE_CHAT_PROMPT_URL || "/assistant/prompt";
 // OLLAMA_MAX_LOADED_MODELS=1, so asking for a different tag evicts the resident one
 // on every alternation and destroys latency for everything else using it.
 //
-// `-ctx` is a Modelfile variant of qwen3.5:9b with the context size baked in, preloaded
-// and pinned -- `ollama ps` reports it as UNTIL: Forever. This default used to be the
-// bare `qwen3.5:9b`, which is a DIFFERENT tag, so every message evicted the pinned
-// 9.2 GB model, loaded the other one, and left whatever pins `-ctx` to swap it back.
-// That is what the long pause before the assistant started thinking actually was: not
-// prefill, and not the size of the prompt, but a model swap around every turn.
-const MODEL_NAME = import.meta.env.VITE_CHAT_MODEL || "qwen3.5:9b-ctx";
+// The shared instance serves this one tag to every client (qcbs-data-llm, qcbs-articles
+// and this UI), with the context size set server-side by OLLAMA_CONTEXT_LENGTH. It used
+// to be `qwen3.5:9b-ctx` here and bare `qwen3.5:9b` elsewhere -- DIFFERENT tags, so every
+// alternation evicted the pinned model and loaded the other one. That is what the long
+// pause before the assistant started thinking actually was: not prefill, and not the
+// size of the prompt, but a model swap around every turn.
+const MODEL_NAME = import.meta.env.VITE_CHAT_MODEL || "qwen3.5:35b-a3b";
 
 // Strip tool-call JSON blocks and bridge-injected "Assistant:" prefixes that leak
 // through when the model emits tool calls as plain text instead of using Ollama's
@@ -108,24 +108,27 @@ export default function Chat() {
           model: MODEL_NAME,
           stream: true,
           // Ollama unloads an idle model after 5 minutes, and the next request pays
-          // 9.2 GB of reload before its first token -- during which the stream carries
+          // 24 GB of reload before its first token -- during which the stream carries
           // no bytes at all. On a busy shared host that silence can outlast nginx's 600s
           // read timeout, and the turn dies mid-flight with nothing to show for it. Since
           // a conversation is a handful of turns separated by however long the user takes
           // to read an answer, the 5-minute default expires constantly, which is a good
           // part of why the assistant fails at random rather than consistently.
           //
+          // -1 keeps it loaded forever, matching OLLAMA_KEEP_ALIVE=-1 on the shared
+          // instance. A request's keep_alive REPLACES the server's, so any finite value
+          // here would unpin the model for every other client too.
+          //
           // This only asks; the host decides. Another model loaded by someone else can
-          // still evict this one, so it narrows the window rather than closing it -- the
-          // bridge patch in python-api/app/bridge/sitecustomize.py is what makes the eviction
-          // survivable when it does happen.
-          keep_alive: "60m",
+          // still evict this one -- the bridge patch in python-api/app/bridge/sitecustomize.py
+          // is what makes the eviction survivable when it does happen.
+          keep_alive: -1,
           // Sampling parameters only. num_ctx and num_batch are LOAD-time settings:
           // asking for values that differ from how the resident model was loaded makes
-          // Ollama stand up a new runner, which means reloading 9.2 GB -- the same cost
-          // as naming the wrong model, arrived at a different way. They were set here to
-          // 16384 and 64; the context size now comes from the pinned `-ctx` model itself
-          // (see MODEL_NAME), which is the only place that can set it without a reload.
+          // Ollama stand up a new runner, which means reloading the whole model -- the same
+          // cost as naming the wrong model, arrived at a different way. They were set here
+          // to 16384 and 64; the context size now comes from OLLAMA_CONTEXT_LENGTH on the
+          // shared instance, which is the only place that can set it without a reload.
           //
           // num_batch was also eight times below Ollama's default of 512, which slows
           // prefill on its own by splitting the prompt into far more forward passes.
