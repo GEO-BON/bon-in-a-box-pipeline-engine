@@ -18,7 +18,7 @@ export const inputTypeToDisplay = (type) => {
     case 'bboxcrs': // deprecated
     case 'crsbbox':
     case 'location':
-    case 'stac_assets[]':
+    case 'stac_asset[]':
       return null;
     case 'options[]':
       return 'multiple options';

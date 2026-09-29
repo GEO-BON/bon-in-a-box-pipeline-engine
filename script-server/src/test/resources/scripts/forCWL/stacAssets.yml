@@ -7,7 +7,7 @@ inputs:
   stac:
     label: STAC assets
     description: Assets chosen in the STAC chooser.
-    type: stac_assets[]
+    type: stac_asset[]
     example: null
 outputs:
   asset_count:

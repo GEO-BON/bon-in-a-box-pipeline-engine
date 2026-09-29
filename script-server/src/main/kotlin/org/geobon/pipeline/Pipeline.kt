@@ -196,7 +196,7 @@ open class Pipeline (
         ): ConstantPipe {
 
             return if (type.endsWith("[]")) {
-                // Lists of chooser objects, such as stac_assets[]
+                // Lists of chooser objects, such as stac_asset[]
                 ObjectInputDefinition.fromDef(type.removeSuffix("[]"))?.let { definition ->
                     return ConstantPipe(type, definition.readList(idForUser, obj.opt(valueProperty)))
                 }

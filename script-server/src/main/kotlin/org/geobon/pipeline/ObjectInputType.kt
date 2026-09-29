@@ -88,7 +88,7 @@ enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObje
     BBOX_CRS(LOCATION__TYPE__BBOX_CRS, COUNTRY_REGION_CRS_BBOX.requiredProperties),
 
     /* STAC chooser selection, pointing to one asset of a collection.
-      The chooser produces a list of them, received with type stac_assets[].
+      The chooser produces a list of them, received with type stac_asset[].
       catalog: https://stac.geobon.org
       collection: some-collection
       date: 2020-01-01 # day in scope, can be null

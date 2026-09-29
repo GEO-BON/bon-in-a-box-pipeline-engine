@@ -2,7 +2,7 @@
 title: "Description for selectors for specific input types."
 ---
 
-When specifying input types 'location', 'country', 'countryRegion', 'countryRegionCRS', 'CRS', 'crsBbox' or 'stac_assets[]', selectors are automatically created that facilitate the selection of those inputs. After being selected, those inputs appear in the `input.json` of the script or pipeline as objects with various parameters that will be available when loading then in R, Python or Julia.
+When specifying input types 'location', 'country', 'countryRegion', 'countryRegionCRS', 'CRS', 'crsBbox' or 'stac_asset[]', selectors are automatically created that facilitate the selection of those inputs. After being selected, those inputs appear in the `input.json` of the script or pipeline as objects with various parameters that will be available when loading then in R, Python or Julia.
 
 For example, the 'location' selector allows the user to define a bounding box by choosing a country, region and coordinate reference system. Here is an example of an object created through the selection of the Putumayo department in Colombia, in the Bogota 1975 / Colombia West zone reference system:
 
@@ -56,7 +56,7 @@ When using other selectors, the object create contains a subset of the location 
 
 ## STAC assets
 
-The `stac_assets[]` input type opens a STAC catalog browser. The user picks a catalog, a collection, then either a single item or all the tiles of the collection (on one date), and the asset to use. Several assets can be added to the selection, so the script receives a **list**, even when only one asset was chosen. A single selection has type `stac_assets`, for example to pass one asset from a script to the next.
+The `stac_asset[]` input type opens a STAC catalog browser. The user picks a catalog, a collection, then either a single item or all the tiles of the collection (on one date), and the asset to use. Several assets can be added to the selection, so the script receives a **list**, even when only one asset was chosen. A single selection has type `stac_assets`, for example to pass one asset from a script to the next.
 
 ``` {#stac_assets .yaml}
 - catalog: https://stac.geobon.org

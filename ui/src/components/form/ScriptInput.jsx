@@ -139,7 +139,7 @@ export default function ScriptInput({
   }
 
   // The STAC chooser produces a list of selections
-  if (type === "stac_assets[]") {
+  if (type === "stac_asset[]") {
     return (
       <StacChooser
         inputId={passedProps.id}
