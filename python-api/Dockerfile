@@ -15,7 +15,10 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR /app/
 
-RUN uv pip install fastapi "uvicorn[standard]" requests duckdb pandas geopandas pandas_geojson shapely pygadm fiona
+# Copied before the app so that editing app code doesn't invalidate the install layer.
+# Kept out of /app because compose.dev.yml bind-mounts ./python-api/app over it.
+COPY requirements.txt /tmp/requirements.txt
+RUN uv pip install -r /tmp/requirements.txt
 
 COPY app /app
 
