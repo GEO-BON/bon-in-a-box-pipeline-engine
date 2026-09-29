@@ -304,6 +304,7 @@ def collections_list(catalog: str):
                     "id": c.id,
                     "title": c.title or c.id,
                     "description": c.description,
+                    "url": c.get_self_href(),
                     "bbox": spatial[0] if spatial else None,
                     "interval": [_isoformat(t) for t in temporal[0]] if temporal else None,
                 }
@@ -322,18 +323,25 @@ def dates_list(catalog: str, collection: str):
     There is no standard way to ask a STAC API for this, so walk the items and
     count. The walk is capped at MAX_DATE_SCAN items; when it stops early the
     answer is marked truncated so the chooser can say the list is partial.
+
+    Also reports whether every item shares one bbox, i.e. a time series of one
+    area rather than tiles, where mosaicking makes no sense.
     """
 
     def load():
         counts = {}
         undated = 0
         truncated = False
+        extents = set()
         try:
             stream = _iter_items(catalog, collection, page_size=DATE_SCAN_PAGE_SIZE)
             for scanned, item in enumerate(stream):
                 if scanned >= MAX_DATE_SCAN:
                     truncated = True
                     break
+                if item.bbox:
+                    # Rounded so float noise doesn't split one extent in two.
+                    extents.add(tuple(round(v, 6) for v in item.bbox))
                 day = _item_day(item)
                 if day is None:
                     undated += 1
@@ -348,6 +356,7 @@ def dates_list(catalog: str, collection: str):
             "dates": [{"date": day, "count": counts[day]} for day in sorted(counts)],
             "undated": undated,
             "truncated": truncated,
+            "same_extent": len(extents) == 1 and (undated + sum(counts.values())) > 1,
         }
 
     return _cached(("dates", resolve_catalog(catalog), collection), load)

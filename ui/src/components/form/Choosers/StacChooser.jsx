@@ -13,6 +13,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ImageIcon from "@mui/icons-material/Image";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
@@ -30,7 +31,8 @@ const TILER_URL = window.location.origin + "/tiler";
 
 const ITEMS_PER_PAGE = 50;
 const PREVIEW_MAX_SIZE = 512;
-const PREVIEW_COLORMAP = "hot"; // matches the result map, see TiTilerLayer
+const PREVIEW_COLORMAP = "spectral"; // matches the result map, see TiTilerLayer
+const CATEGORICAL_COLORMAP = "tab20c"; // distinct colours for classes
 
 async function getJson(path, params) {
   const query = new URLSearchParams(params).toString();
@@ -79,6 +81,36 @@ function bandStatistics(body) {
   };
   visit(body);
   return bands;
+}
+
+/**
+ * The colour table embedded in an asset's file, from the tiler's /stac/info, or
+ * null. Tables are padded to 256 entries with one repeated colour. Values left
+ * out render transparent, so the padding and transparent entries are dropped to
+ * keep the tile URLs short.
+ */
+function embeddedColormap(body) {
+  const asset = body && Object.values(body)[0];
+  if (
+    !asset ||
+    !asset.colormap ||
+    !(asset.colorinterp || []).includes("palette")
+  )
+    return null;
+  const entries = Object.entries(asset.colormap);
+  const counts = {};
+  entries.forEach(([, rgba]) => {
+    const key = rgba.join();
+    counts[key] = (counts[key] || 0) + 1;
+  });
+  const padding = Object.keys(counts).reduce((a, b) =>
+    counts[a] >= counts[b] ? a : b,
+  );
+  const kept = entries.filter(
+    ([, rgba]) =>
+      rgba[3] !== 0 && (counts[padding] < 2 || rgba.join() !== padding),
+  );
+  return kept.length > 0 ? Object.fromEntries(kept) : null;
 }
 
 /** The catalog value can be a chosen option or a URL typed by the user. */
@@ -197,6 +229,8 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
   // Items in the whole collection, or null when the walk stopped early and the
   // true total is unknown (but certainly large).
   const [collectionCount, setCollectionCount] = useState(null);
+  // Every item covers the same area: a time series, not tiles to stitch.
+  const [sameExtent, setSameExtent] = useState(false);
   const [datesError, setDatesError] = useState(null);
   const [loadingDates, setLoadingDates] = useState(false);
 
@@ -214,6 +248,10 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
   // Whether the chosen asset holds classes rather than measurements. Starts from
   // what the catalogue says, which it often doesn't, so the user can override it.
   const [categorical, setCategorical] = useState(false);
+
+  // The colour table in the asset's file, if it has one. Used over any
+  // colormap we would pick.
+  const [palette, setPalette] = useState(null);
 
   const [preview, setPreview] = useState(null);
   const [previewError, setPreviewError] = useState(null);
@@ -283,6 +321,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     setDate(null);
     setDatesTruncated(false);
     setCollectionCount(null);
+    setSameExtent(false);
     setDatesError(null);
     if (!url || !collection) return;
 
@@ -293,6 +332,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         if (cancelled) return;
         setDates(result.dates);
         setDatesTruncated(result.truncated);
+        setSameExtent(Boolean(result.same_extent));
         setCollectionCount(
           result.truncated
             ? null
@@ -394,7 +434,16 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     setPreview(null);
     setPreviewError(null);
     setLoadingPreview(false);
-  }, [catalog, collection, item, itemsAreTiles, date, asset]);
+  }, [
+    catalog,
+    collection,
+    item,
+    itemsAreTiles,
+    date,
+    asset,
+    categorical,
+    palette,
+  ]);
 
   useEffect(
     () => () => {
@@ -407,12 +456,41 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
   const previewItemUrl =
     asset && (itemsAreTiles ? asset.item_url : item && item.url);
 
+  // A file with a colour table holds classes: its values index the table.
+  useEffect(() => {
+    setPalette(null);
+    if (!previewItemUrl) return;
+    let cancelled = false;
+    fetch(
+      `${TILER_URL}/stac/info?${new URLSearchParams({ url: previewItemUrl, assets: asset.key })}`,
+    )
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body) => {
+        const found = embeddedColormap(body);
+        if (cancelled || !found) return;
+        setPalette(found);
+        setCategorical(true);
+      })
+      .catch(() => {
+        // No table then; fall back to our own colormap.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [previewItemUrl, asset]);
+
   const expandedUrl =
     previewItemUrl &&
     `${TILER_URL}/stac/WebMercatorQuad/map.html?` +
       (preview
         ? preview.params
-        : new URLSearchParams({ url: previewItemUrl, assets: asset.key }));
+        : new URLSearchParams({
+            url: previewItemUrl,
+            assets: asset.key,
+            ...(palette
+              ? { colormap: JSON.stringify(palette) }
+              : categorical && { colormap_name: CATEGORICAL_COLORMAP }),
+          }));
 
   const loadPreview = async () => {
     const request = previewRequest.current;
@@ -427,24 +505,36 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         assets: asset.key,
       });
 
-      // Measured data renders black without a range, so scale on the asset's own
-      // percentiles, as the result map does. A missing range is not fatal: byte
-      // imagery renders fine without one.
-      let bands = [];
-      try {
-        const response = await fetch(
-          `${TILER_URL}/stac/statistics?${new URLSearchParams({ url: previewItemUrl, assets: asset.key })}`,
+      if (palette) {
+        // The file's own colour table maps raw values, so no rescale.
+        params.set("colormap", JSON.stringify(palette));
+      } else {
+        // Measured data renders black without a range, so scale on the asset's
+        // own percentiles, as the result map does. A missing range is not fatal:
+        // byte imagery renders fine without one.
+        let bands = [];
+        try {
+          const response = await fetch(
+            `${TILER_URL}/stac/statistics?${new URLSearchParams({ url: previewItemUrl, assets: asset.key })}`,
+          );
+          if (response.ok) bands = bandStatistics(await response.json());
+        } catch {
+          // Leave the rescale out and let the tiler do what it can.
+        }
+        if (stale()) return;
+        bands.forEach((band) =>
+          params.append(
+            "rescale",
+            `${band.percentile_2},${band.percentile_98}`,
+          ),
         );
-        if (response.ok) bands = bandStatistics(await response.json());
-      } catch {
-        // Leave the rescale out and let the tiler do what it can.
+        // A colormap only makes sense on a single band; a 3-band asset is RGB.
+        if (bands.length === 1)
+          params.set(
+            "colormap_name",
+            categorical ? CATEGORICAL_COLORMAP : PREVIEW_COLORMAP,
+          );
       }
-      if (stale()) return;
-      bands.forEach((band) =>
-        params.append("rescale", `${band.percentile_2},${band.percentile_98}`),
-      );
-      // A colormap only makes sense on a single band; a 3-band asset is RGB.
-      if (bands.length === 1) params.set("colormap_name", PREVIEW_COLORMAP);
 
       const rendered = await fetch(
         `${TILER_URL}/stac/preview.png?${params}&max_size=${PREVIEW_MAX_SIZE}`,
@@ -507,7 +597,9 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
   const tileCount = date ? date.count : collectionCount;
   // Nothing to stitch when the scope holds a single tile, so the option goes.
   const canMosaic =
-    (tileCount === null || tileCount > 1) && dates.length < collectionCount;
+    !sameExtent &&
+    (tileCount === null || tileCount > 1) &&
+    (collectionCount === null || dates.length < collectionCount);
 
   // Mosaicking every tile yields one layer only if the tiles share a date, so a
   // collection spanning several dates has to be narrowed to one first.
@@ -624,6 +716,46 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
             setFilter("");
           }}
         />
+        {collection && (collection.description || collection.url) && (
+          <p style={{ fontSize: "11px", margin: "4px 0px 0px 5px" }}>
+            {collection.description && (
+              <Tooltip
+                title={
+                  <div
+                    style={{
+                      whiteSpace: "pre-wrap",
+                      maxHeight: "300px",
+                      overflowY: "auto",
+                    }}
+                  >
+                    {collection.description}
+                  </div>
+                }
+                placement="bottom-start"
+                componentsProps={{ tooltip: { sx: { maxWidth: "500px" } } }}
+              >
+                <span
+                  style={{
+                    textDecoration: "underline dotted",
+                    cursor: "help",
+                  }}
+                >
+                  Description of this collection
+                </span>
+              </Tooltip>
+            )}
+            {collection.description && collection.url && " · "}
+            {collection.url && (
+              <a
+                href={collection.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                STAC collection
+              </a>
+            )}
+          </p>
+        )}
       </div>
 
       <div style={paperStyle(true)}>
@@ -801,6 +933,16 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
               >
                 Next
               </CustomButtonGrey>
+              {item && item.url && (
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: "11px", marginLeft: "auto" }}
+                >
+                  STAC item {item.id}
+                </a>
+              )}
             </div>
           </>
         )}
