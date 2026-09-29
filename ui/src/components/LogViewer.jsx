@@ -5,11 +5,12 @@ export function LogViewer({ address, autoUpdate }) {
   const [logs, setLogs] = useState("");
   const [logsAutoScroll, setLogsAutoScroll] = useState(true);
   const logsRef = useRef();
+  const logsSize = useRef(0);
   const logsEndRef = useRef();
 
   function fetchLogs() {
     // Fetch the logs
-    let start = new Blob([logs]).size;
+    let start = logsSize.current;
     return fetch(address, {
       headers: { 'range': `bytes=${start}-` },
     })
@@ -29,17 +30,10 @@ export function LogViewer({ address, autoUpdate }) {
             let visible = isVisible(logsEndRef.current, logsEndRef.current.parentNode);
             setLogsAutoScroll(visible);
           }
-
-          setLogs(logs + responseText);
+          logsSize.current += new Blob([responseText]).size;
+          setLogs(previousLogs => previousLogs + responseText);
         }
       })
-      .catch(response => {
-        if(response.status !== 404) { // 404 error can be normal if script has no logs.
-          setLogs(logs + "\n" + response.status + " (" + response.statusText + ")");
-        }
-        throw response;
-      });
-
   }
 
   // Start fetching (fetchLogs not a dependency since it depends on logs. This would make it loop.)
@@ -59,9 +53,7 @@ export function LogViewer({ address, autoUpdate }) {
         .catch(planNext); // still keep polling after an error (e.g. 404 with no logs yet)
     }
 
-    if (autoUpdate) {
-      runFetch();
-    }
+    runFetch();
 
     return () => {
       cancelled = true;
