@@ -12,7 +12,7 @@ def biab_inputs():
 # Add outputs throughout the script
 def biab_output(key, value):
 	biab_output_list[ key ] = value
-	print("Output added for \"", key, "\"\n")
+	print("Output added for \"", key, "\"", flush=True)
 
 # Non-breaking messages
 def biab_info(message):
