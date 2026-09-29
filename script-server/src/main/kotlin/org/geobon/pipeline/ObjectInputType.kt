@@ -5,6 +5,7 @@ import org.json.JSONObject
 /**
  * Enum type for special object that the pipeline engine can receive.
  * These objects are the result of a "chooser" UI that produces an object after an interaction with the user.
+ * Like other types, "[]" can be appended to receive a list of such objects.
  */
 enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObject) {
     /* Location choosers are all subsets of the full "location" object:
@@ -84,7 +85,31 @@ enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObje
         JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__CRS, LOCATION__BBOX)
     ),
     // Legacy, name was not descriptive of content. TODO: Remove in future version.
-    BBOX_CRS(LOCATION__TYPE__BBOX_CRS, COUNTRY_REGION_CRS_BBOX.requiredProperties);
+    BBOX_CRS(LOCATION__TYPE__BBOX_CRS, COUNTRY_REGION_CRS_BBOX.requiredProperties),
+
+    /* STAC chooser selection, pointing to one asset of a collection.
+      The chooser produces a list of them, received with type stac_assets[].
+      catalog: https://stac.geobon.org
+      collection: some-collection
+      date: 2020-01-01 # day in scope, can be null
+      item: some-item # null when items_are_tiles is true
+      items_are_tiles: false # true: the script mosaics all items of the collection (on that date)
+      asset: data
+      href: https://example.com/some-item/data.tif # null when items_are_tiles is true
+      type: image/tiff; application=geotiff; profile=cloud-optimized
+      categorical: false
+    */
+    STAC_ASSETS(STAC__TYPE__STAC_ASSETS, JSONObject().apply {
+        put(STAC__CATALOG, "text")
+        put(STAC__COLLECTION, "text")
+        put(STAC__DATE, "text")
+        put(STAC__ITEM, "text")
+        put(STAC__ITEMS_ARE_TILES, "boolean")
+        put(STAC__ASSET, "text")
+        put(STAC__HREF, "text")
+        put(STAC__TYPE, "text")
+        put(STAC__CATEGORICAL, "boolean")
+    });
 
     companion object {
         fun fromString(typeStr: String): ObjectInputType? {
@@ -123,3 +148,15 @@ const val LOCATION__CRS__NAME = "name"
 const val LOCATION__CRS__PROJ4_DEF = "proj4Def"
 const val LOCATION__CRS__UNIT = "unit"
 const val LOCATION__CRS__WKT_DEF = "wktDef"
+
+const val STAC__TYPE__STAC_ASSETS = "stac_assets"
+
+const val STAC__CATALOG = "catalog"
+const val STAC__COLLECTION = "collection"
+const val STAC__DATE = "date"
+const val STAC__ITEM = "item"
+const val STAC__ITEMS_ARE_TILES = "items_are_tiles"
+const val STAC__ASSET = "asset"
+const val STAC__HREF = "href"
+const val STAC__TYPE = "type"
+const val STAC__CATEGORICAL = "categorical"

@@ -138,6 +138,20 @@ export default function ScriptInput({
     }
   }
 
+  // The STAC chooser produces a list of selections
+  if (type === "stac_assets[]") {
+    return (
+      <StacChooser
+        inputId={passedProps.id}
+        value={value}
+        updateValue={(value) => {
+          onValueUpdated(value);
+        }}
+        isCompact={size == "small"}
+      />
+    );
+  }
+
   if (type.endsWith("[]")) {
     const onUpdateArray = (event) => {
       const newValue = event.target.value;
@@ -280,18 +294,6 @@ export default function ScriptInput({
             onValueUpdated(value);
           }}
           leftLabel={false}
-          isCompact={size == "small"}
-        />
-      );
-
-    case "stac_assets":
-      return (
-        <StacChooser
-          inputId={passedProps.id}
-          value={value}
-          updateValue={(value) => {
-            onValueUpdated(value);
-          }}
           isCompact={size == "small"}
         />
       );

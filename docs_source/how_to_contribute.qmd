@@ -192,6 +192,8 @@ The input type can also be set to a limited number of keywords that will automat
 +------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
 | location         | Full location object. Creates a button to open an interface that allows the user to specify a country, region, coordinate reference system and bounding box (geographical minima and maxima)                                                                               |                        |
 +------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
+| stac_assets[]    | Creates a button to open a STAC catalog browser, where the user picks assets (for example Cloud Optimized GeoTIFF layers) from one or more collections. The script receives a list of selections. See [STAC assets](selectors.qmd#stac-assets).                            |                        |
++------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
 
 Note that the use of these selectors will create objects that contain multiple elements. For example, the country selector will create an input object that contains the country name in English, the ISO3 code of the country, the ISO2 code, as well as the bounding box of that country, in longitude, latitude coordinates. [See the full list of those keys for each selector here](selectors.qmd).
 
@@ -802,6 +804,8 @@ In most cases, an output can only receive a value of the exact same type. This m
 +---------------+-----------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
 | options       | text                  | A script receiving a link to any geospatial collection on a STAC as a string can be restricted at pipeline level to a few selected options. |
 +---------------+-----------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+
+Chooser objects follow their own rule: an input accepts the output of another chooser type if it holds all the fields the input needs. For example, a `location` output can feed a `country` input. A `stac_assets[]` input receives only STAC selections: a `stac_assets[]` output, or a single `stac_assets` output wrapped into a list.
 
 ### Pipeline inputs and outputs
 

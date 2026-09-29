@@ -1,0 +1,16 @@
+script: stacAssets.py
+name: STAC assets
+description: Receives assets chosen in the STAC chooser.
+author:
+  - name: John Doe
+inputs:
+  stac:
+    label: STAC assets
+    description: Assets chosen in the STAC chooser.
+    type: stac_assets[]
+    example: null
+outputs:
+  asset_count:
+    label: Asset count
+    description: Number of assets received.
+    type: int
