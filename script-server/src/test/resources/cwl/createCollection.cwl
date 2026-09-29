@@ -97,6 +97,7 @@ requirements:
       SCRIPT_STUBS_LOCATION: /script-stubs
       USERDATA_LOCATION: /userdata
       OUTPUT_LOCATION: "$(inputs.runFolder ? inputs.runFolder.path : runtime.outdir)"
+      PYTHONUNBUFFERED: "1"
 
 baseCommand: ["bash", "-c"]
 arguments:
