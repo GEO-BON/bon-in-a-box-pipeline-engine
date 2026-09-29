@@ -103,14 +103,14 @@ function selectionKey(selection) {
     selection.catalog,
     selection.collection,
     selection.date || "",
-    selection.all_items ? "*" : selection.item,
+    selection.items_are_tiles ? "*" : selection.item,
     selection.asset,
   ].join("|");
 }
 
 /** How a selection reads in the lists, e.g. "all items on 2019-06-01". */
 function selectionScope(selection) {
-  if (!selection.all_items) return selection.item;
+  if (!selection.items_are_tiles) return selection.item;
   return selection.date
     ? `all items on ${selection.date}`
     : "all items in the collection";
@@ -202,7 +202,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
 
   const [items, setItems] = useState([]);
   const [item, setItem] = useState(null);
-  const [allItems, setAllItems] = useState(false);
+  const [itemsAreTiles, setitemsAreTiles] = useState(false);
   const [page, setPage] = useState(1);
   const [hasNext, setHasNext] = useState(false);
   const [filter, setFilter] = useState("");
@@ -316,7 +316,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
   // One page of items. Skipped in "all items" mode, where no item is listed.
   useEffect(() => {
     const url = catalogUrl(catalog);
-    if (!url || !collection || allItems) {
+    if (!url || !collection || itemsAreTiles) {
       setItems([]);
       setHasNext(false);
       return;
@@ -349,14 +349,14 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [catalog, collection, page, filter, allItems, date]);
+  }, [catalog, collection, page, filter, itemsAreTiles, date]);
 
   // Assets of the chosen item, or of a sample item in "all items" mode.
   useEffect(() => {
     const url = catalogUrl(catalog);
     setAssets([]);
     setAsset(null);
-    if (!url || !collection || (!item && !allItems)) return;
+    if (!url || !collection || (!item && !itemsAreTiles)) return;
 
     let cancelled = false;
     setLoadingAssets(true);
@@ -364,8 +364,8 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     getJson("assets_list", {
       catalog: url,
       collection: collection.id,
-      item: allItems ? "" : item.id,
-      date: allItems && date ? date.date : "",
+      item: itemsAreTiles ? "" : item.id,
+      date: itemsAreTiles && date ? date.date : "",
     })
       .then((list) => {
         if (cancelled) return;
@@ -378,7 +378,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     return () => {
       cancelled = true;
     };
-  }, [catalog, collection, item, allItems, date]);
+  }, [catalog, collection, item, itemsAreTiles, date]);
 
   useEffect(() => {
     setCategorical(Boolean(asset && asset.kind === "categorical"));
@@ -394,7 +394,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     setPreview(null);
     setPreviewError(null);
     setLoadingPreview(false);
-  }, [catalog, collection, item, allItems, date, asset]);
+  }, [catalog, collection, item, itemsAreTiles, date, asset]);
 
   useEffect(
     () => () => {
@@ -405,7 +405,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
 
   // In "all items" mode the assets, and so the preview, come from a sample item.
   const previewItemUrl =
-    asset && (allItems ? asset.item_url : item && item.url);
+    asset && (itemsAreTiles ? asset.item_url : item && item.url);
 
   const expandedUrl =
     previewItemUrl &&
@@ -479,12 +479,12 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     const entry = {
       catalog: catalogUrl(catalog),
       collection: collection.id,
-      // The day in scope: chosen alongside all_items, or the one the item covers.
-      date: allItems ? (date ? date.date : null) : itemDay(item),
-      item: allItems ? null : item.id,
-      all_items: allItems,
+      // The day in scope: chosen alongside items_are_tiles, or the one the item covers.
+      date: itemsAreTiles ? (date ? date.date : null) : itemDay(item),
+      item: itemsAreTiles ? null : item.id,
+      items_are_tiles: itemsAreTiles,
       asset: asset.key,
-      href: allItems ? null : asset.href,
+      href: itemsAreTiles ? null : asset.href,
       type: asset.type,
       categorical,
     };
@@ -511,14 +511,14 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
 
   // Mosaicking every tile yields one layer only if the tiles share a date, so a
   // collection spanning several dates has to be narrowed to one first.
-  const needsDate = allItems && dates.length > 1 && !date;
+  const needsDate = itemsAreTiles && dates.length > 1 && !date;
   const canAdd = Boolean(
-    collection && asset && (item || allItems) && !needsDate,
+    collection && asset && (item || itemsAreTiles) && !needsDate,
   );
 
   // Picking a date with a lone tile hides the option, which must not stay on.
   useEffect(() => {
-    if (!canMosaic) setAllItems(false);
+    if (!canMosaic) setitemsAreTiles(false);
   }, [canMosaic]);
 
   return (
@@ -708,10 +708,10 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
           <FormControlLabel
             control={
               <Checkbox
-                checked={allItems}
+                checked={itemsAreTiles}
                 disabled={!collection}
                 onChange={(e) => {
-                  setAllItems(e.target.checked);
+                  setitemsAreTiles(e.target.checked);
                   setItem(null);
                   setPage(1);
                 }}
@@ -727,7 +727,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
           />
         )}
 
-        {!allItems && (
+        {!itemsAreTiles && (
           <>
             <TextField
               label="Filter items by id"
@@ -818,7 +818,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
           <Autocomplete
             options={assets}
             value={asset}
-            disabled={(!item && !allItems) || loadingAssets}
+            disabled={(!item && !itemsAreTiles) || loadingAssets}
             loading={loadingAssets}
             noOptionsText="No Cloud Optimized GeoTIFF assets here"
             size="small"
@@ -886,7 +886,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
               that the tiles mosaic into a single layer.
             </p>
           )}
-          {allItems && !needsDate && assets.length > 0 && (
+          {itemsAreTiles && !needsDate && assets.length > 0 && (
             <p
               style={{
                 fontSize: "11px",
@@ -1033,7 +1033,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
             commit([]);
             setItem(null);
             setAsset(null);
-            setAllItems(false);
+            setitemsAreTiles(false);
             setDate(null);
             setPage(1);
             setFilter("");
