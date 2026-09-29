@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { isVisible } from '../utils/isVisible';
 
 export function LogViewer({ address, autoUpdate }) {
@@ -8,7 +8,7 @@ export function LogViewer({ address, autoUpdate }) {
   const logsSize = useRef(0);
   const logsEndRef = useRef();
 
-  function fetchLogs() {
+  const fetchLogs = useCallback(() => {
     // Fetch the logs
     let start = logsSize.current;
     return fetch(address, {
@@ -34,9 +34,9 @@ export function LogViewer({ address, autoUpdate }) {
           setLogs(previousLogs => previousLogs + responseText);
         }
       })
-  }
+  }, [address]);
 
-  // Start fetching (fetchLogs not a dependency since it depends on logs. This would make it loop.)
+  // Start fetching
   useEffect(() => {
     let timeout;
     let cancelled = false;
@@ -61,7 +61,7 @@ export function LogViewer({ address, autoUpdate }) {
         clearTimeout(timeout);
       }
     }
-  }, [autoUpdate])
+  }, [autoUpdate, fetchLogs])
 
   // Logs auto-scrolling
   useEffect(() => {
