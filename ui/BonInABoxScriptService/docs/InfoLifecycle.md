@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **status** | **String** |  | [optional] [default to &#39;in_development&#39;]
-**message** | **String** |  | [optional]
+**message** | **String** |  | [optional] 
 
 
 
