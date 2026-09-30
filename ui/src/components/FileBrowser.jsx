@@ -77,7 +77,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
 
   useEffect(() => {
     // loads all the files (from fastapi endpoint)
-    fetch("/fm-api/files/all")
+    fetch("/file-manager/files/all")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Error with the network response.");

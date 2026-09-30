@@ -5,7 +5,7 @@ import { Filemanager, WillowDark, getMenuOptions } from "@svar-ui/react-filemana
 import "@svar-ui/react-filemanager/all.css";
 import "./FileManager.css";
 
-const BackendServer = "/fm-api"; 
+const BackendServer = "/file-manager"; 
 const restProvider = new RestDataProvider(BackendServer);
 
 export default function FileManager() {

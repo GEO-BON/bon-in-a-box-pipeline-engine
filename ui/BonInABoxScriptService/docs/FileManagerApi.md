@@ -4,16 +4,16 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**createItem**](FileManagerApi.md#createItem) | **POST** /fm-api/files/{id} | Creates a file or folder.
-[**deleteItem**](FileManagerApi.md#deleteItem) | **DELETE** /fm-api/files | Deletes a file or folder.
-[**getAllItems**](FileManagerApi.md#getAllItems) | **GET** /fm-api/files/all | Returns the list of all files and folders uploaded by the user.
-[**getFileStorage**](FileManagerApi.md#getFileStorage) | **GET** /fm-api/info | Gets the total, used, and free storage.
-[**getRootItems**](FileManagerApi.md#getRootItems) | **GET** /fm-api/files | Returns the list of root files and folders uploaded by the user.
-[**getSubfolderItems**](FileManagerApi.md#getSubfolderItems) | **GET** /fm-api/files/{id} | Returns the list of files and folders uploaded by the user under a specific subfolder.
-[**isFileManagerDisabled**](FileManagerApi.md#isFileManagerDisabled) | **GET** /fm-api/is_disabled | Returns whether the file manager is disabled or not.
-[**moveCopyItem**](FileManagerApi.md#moveCopyItem) | **PUT** /fm-api/files | Moves or copies one or multiple files/folders.
-[**renameItem**](FileManagerApi.md#renameItem) | **PUT** /fm-api/files/{id} | Renames a file or folder.
-[**uploadFile**](FileManagerApi.md#uploadFile) | **POST** /fm-api/upload | Uploads a file to the user&#39;s profile.
+[**createItem**](FileManagerApi.md#createItem) | **POST** /file-manager/files/{id} | Creates a file or folder.
+[**deleteItem**](FileManagerApi.md#deleteItem) | **DELETE** /file-manager/files | Deletes a file or folder.
+[**getAllItems**](FileManagerApi.md#getAllItems) | **GET** /file-manager/files/all | Returns the list of all files and folders uploaded by the user.
+[**getFileStorage**](FileManagerApi.md#getFileStorage) | **GET** /file-manager/info | Gets the total, used, and free storage.
+[**getRootItems**](FileManagerApi.md#getRootItems) | **GET** /file-manager/files | Returns the list of root files and folders uploaded by the user.
+[**getSubfolderItems**](FileManagerApi.md#getSubfolderItems) | **GET** /file-manager/files/{id} | Returns the list of files and folders uploaded by the user under a specific subfolder.
+[**isFileManagerDisabled**](FileManagerApi.md#isFileManagerDisabled) | **GET** /file-manager/is_disabled | Returns whether the file manager is disabled or not.
+[**moveCopyItem**](FileManagerApi.md#moveCopyItem) | **PUT** /file-manager/files | Moves or copies one or multiple files/folders.
+[**renameItem**](FileManagerApi.md#renameItem) | **PUT** /file-manager/files/{id} | Renames a file or folder.
+[**uploadFile**](FileManagerApi.md#uploadFile) | **POST** /file-manager/upload | Uploads a file to the user&#39;s profile.
 
 
 

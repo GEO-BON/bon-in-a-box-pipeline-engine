@@ -139,16 +139,16 @@ Class | Method | HTTP request | Description
 *BonInABoxScriptService.DefaultApi* | [**run**](docs/DefaultApi.md#run) | **POST** /{type}/{descriptionPath}/run | Runs the script or pipeline matching &#x60;descriptionPath&#x60;.
 *BonInABoxScriptService.DefaultApi* | [**savePipeline**](docs/DefaultApi.md#savePipeline) | **POST** /pipeline/save/{filename} | Save a json file to the pipeline folder.
 *BonInABoxScriptService.DefaultApi* | [**stop**](docs/DefaultApi.md#stop) | **GET** /{type}/{id}/stop | Stop the specified pipeline run.
-*BonInABoxScriptService.FileManagerApi* | [**createItem**](docs/FileManagerApi.md#createItem) | **POST** /fm-api/files/{id} | Creates a file or folder.
-*BonInABoxScriptService.FileManagerApi* | [**deleteItem**](docs/FileManagerApi.md#deleteItem) | **DELETE** /fm-api/files | Deletes a file or folder.
-*BonInABoxScriptService.FileManagerApi* | [**getAllItems**](docs/FileManagerApi.md#getAllItems) | **GET** /fm-api/files/all | Returns the list of all files and folders uploaded by the user.
-*BonInABoxScriptService.FileManagerApi* | [**getFileStorage**](docs/FileManagerApi.md#getFileStorage) | **GET** /fm-api/info | Gets the total, used, and free storage.
-*BonInABoxScriptService.FileManagerApi* | [**getRootItems**](docs/FileManagerApi.md#getRootItems) | **GET** /fm-api/files | Returns the list of root files and folders uploaded by the user.
-*BonInABoxScriptService.FileManagerApi* | [**getSubfolderItems**](docs/FileManagerApi.md#getSubfolderItems) | **GET** /fm-api/files/{id} | Returns the list of files and folders uploaded by the user under a specific subfolder.
-*BonInABoxScriptService.FileManagerApi* | [**isFileManagerDisabled**](docs/FileManagerApi.md#isFileManagerDisabled) | **GET** /fm-api/is_disabled | Returns whether the file manager is disabled or not.
-*BonInABoxScriptService.FileManagerApi* | [**moveCopyItem**](docs/FileManagerApi.md#moveCopyItem) | **PUT** /fm-api/files | Moves or copies one or multiple files/folders.
-*BonInABoxScriptService.FileManagerApi* | [**renameItem**](docs/FileManagerApi.md#renameItem) | **PUT** /fm-api/files/{id} | Renames a file or folder.
-*BonInABoxScriptService.FileManagerApi* | [**uploadFile**](docs/FileManagerApi.md#uploadFile) | **POST** /fm-api/upload | Uploads a file to the user&#39;s profile.
+*BonInABoxScriptService.FileManagerApi* | [**createItem**](docs/FileManagerApi.md#createItem) | **POST** /file-manager/files/{id} | Creates a file or folder.
+*BonInABoxScriptService.FileManagerApi* | [**deleteItem**](docs/FileManagerApi.md#deleteItem) | **DELETE** /file-manager/files | Deletes a file or folder.
+*BonInABoxScriptService.FileManagerApi* | [**getAllItems**](docs/FileManagerApi.md#getAllItems) | **GET** /file-manager/files/all | Returns the list of all files and folders uploaded by the user.
+*BonInABoxScriptService.FileManagerApi* | [**getFileStorage**](docs/FileManagerApi.md#getFileStorage) | **GET** /file-manager/info | Gets the total, used, and free storage.
+*BonInABoxScriptService.FileManagerApi* | [**getRootItems**](docs/FileManagerApi.md#getRootItems) | **GET** /file-manager/files | Returns the list of root files and folders uploaded by the user.
+*BonInABoxScriptService.FileManagerApi* | [**getSubfolderItems**](docs/FileManagerApi.md#getSubfolderItems) | **GET** /file-manager/files/{id} | Returns the list of files and folders uploaded by the user under a specific subfolder.
+*BonInABoxScriptService.FileManagerApi* | [**isFileManagerDisabled**](docs/FileManagerApi.md#isFileManagerDisabled) | **GET** /file-manager/is_disabled | Returns whether the file manager is disabled or not.
+*BonInABoxScriptService.FileManagerApi* | [**moveCopyItem**](docs/FileManagerApi.md#moveCopyItem) | **PUT** /file-manager/files | Moves or copies one or multiple files/folders.
+*BonInABoxScriptService.FileManagerApi* | [**renameItem**](docs/FileManagerApi.md#renameItem) | **PUT** /file-manager/files/{id} | Renames a file or folder.
+*BonInABoxScriptService.FileManagerApi* | [**uploadFile**](docs/FileManagerApi.md#uploadFile) | **POST** /file-manager/upload | Uploads a file to the user&#39;s profile.
 
 
 ## Documentation for Models

@@ -80,7 +80,7 @@ if [ -n "$OLLAMA_URL" ] && [ "$(printf '%s' "$DISABLE_CHAT" | tr '[:upper:]' '[:
   ) &
 fi
 
-# main_api last and in the foreground: it serves /fm-api/, /region/ and the
+# main_api last and in the foreground: it serves /file-manager/, /region/ and the
 # assistant's prompt, it is what the UI calls on load, and it is the port the
 # Kubernetes readiness probe watches. The container should live exactly as long as
 # this does.

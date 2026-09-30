@@ -89,7 +89,7 @@ export default class FileManagerApi {
       let accepts = ['application/json'];
       let returnType = CreateItem200Response;
       return this.apiClient.callApi(
-        '/fm-api/files/{id}', 'POST',
+        '/file-manager/files/{id}', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -130,7 +130,7 @@ export default class FileManagerApi {
       let accepts = ['application/json'];
       let returnType = DeleteItem200Response;
       return this.apiClient.callApi(
-        '/fm-api/files', 'DELETE',
+        '/file-manager/files', 'DELETE',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -166,7 +166,7 @@ export default class FileManagerApi {
       let accepts = ['application/json'];
       let returnType = [GetRootItems200ResponseInner];
       return this.apiClient.callApi(
-        '/fm-api/files/all', 'GET',
+        '/file-manager/files/all', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -202,7 +202,7 @@ export default class FileManagerApi {
       let accepts = ['application/json'];
       let returnType = GetFileStorage200Response;
       return this.apiClient.callApi(
-        '/fm-api/info', 'GET',
+        '/file-manager/info', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -238,7 +238,7 @@ export default class FileManagerApi {
       let accepts = ['application/json'];
       let returnType = [GetRootItems200ResponseInner];
       return this.apiClient.callApi(
-        '/fm-api/files', 'GET',
+        '/file-manager/files', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -280,7 +280,7 @@ export default class FileManagerApi {
       let accepts = ['application/json'];
       let returnType = [Object];
       return this.apiClient.callApi(
-        '/fm-api/files/{id}', 'GET',
+        '/file-manager/files/{id}', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -316,7 +316,7 @@ export default class FileManagerApi {
       let accepts = ['application/json'];
       let returnType = IsFileManagerDisabled200Response;
       return this.apiClient.callApi(
-        '/fm-api/is_disabled', 'GET',
+        '/file-manager/is_disabled', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -357,7 +357,7 @@ export default class FileManagerApi {
       let accepts = ['application/json'];
       let returnType = MoveCopyItem200Response;
       return this.apiClient.callApi(
-        '/fm-api/files', 'PUT',
+        '/file-manager/files', 'PUT',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -404,7 +404,7 @@ export default class FileManagerApi {
       let accepts = ['application/json'];
       let returnType = RenameItem200Response;
       return this.apiClient.callApi(
-        '/fm-api/files/{id}', 'PUT',
+        '/file-manager/files/{id}', 'PUT',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );
@@ -452,7 +452,7 @@ export default class FileManagerApi {
       let accepts = ['application/json'];
       let returnType = UploadFile200Response;
       return this.apiClient.callApi(
-        '/fm-api/upload', 'POST',
+        '/file-manager/upload', 'POST',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );

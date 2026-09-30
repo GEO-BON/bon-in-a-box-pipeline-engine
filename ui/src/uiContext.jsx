@@ -3,7 +3,7 @@ import { createContext } from "react";
 /**
  * Instance-wide facts the whole tree may need: which optional features are on.
  *
- * Populated in index.jsx from /fm-api/is_disabled (the file manager, which is also
+ * Populated in index.jsx from /file-manager/is_disabled (the file manager, which is also
  * python-api's liveness probe) and /api/features (everything else). Consumers destructure
  * off it, so the default has to be an object with the same shape -- it used to be the
  * string 'false', which made every `const { disableMyFiles } = useContext(uiContext)`

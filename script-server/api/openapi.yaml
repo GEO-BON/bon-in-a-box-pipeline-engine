@@ -364,18 +364,9 @@ paths:
     get:
       summary: Returns which optional features are enabled on this instance.
       description: >
-        Distinct from /api/systemStatus, which reports whether the server is
-        misconfigured and is the UI's boot gate. This one never fails: a feature being
-        off is an answer, not an error. Every flag has positive polarity, so true always
-        means the feature works, whatever the polarity of the variable behind it.
-
-        myFilesEnabled, chatEnabled and antivirus* describe python-api, which is what
-        acts on them; they are reported here because script-server has no way to query
-        python-api, so the deployment sets both containers identically.
-
-        Not exposed to the chat assistant: it is absent from GENERATED_TOOLS_KEPT in
-        python-api/app/mcp-server/server.py, and belongs in the system prompt rather
-        than in a tool if the assistant ever needs it.
+        Never fails: true means the feature is on, false means it is off.
+        Server health is reported by /api/systemStatus instead.
+        myFilesEnabled, chatEnabled and antivirus* mirror python-api's settings.
       operationId: getServerStatus
       responses:
         "200":
@@ -704,7 +695,7 @@ paths:
                 format: binary
         "404":
           description: Region ID not found
-  /fm-api/is_disabled:
+  /file-manager/is_disabled:
     get:
       summary: Returns whether the file manager is disabled or not.
       tags: 
@@ -722,7 +713,7 @@ paths:
                     type: boolean
                 example:
                   disabled: true
-  /fm-api/files:
+  /file-manager/files:
     get:
       summary: Returns the list of root files and folders uploaded by the user.
       tags: 
@@ -875,7 +866,7 @@ paths:
                     type: string
                 example:
                   detail: "Cannot load files. This instance is read-only"
-  /fm-api/files/all: 
+  /file-manager/files/all: 
     get: 
       summary: Returns the list of all files and folders uploaded by the user.
       tags: 
@@ -921,7 +912,7 @@ paths:
                 example:
                   detail: "Cannot load files. This instance is read-only"
 
-  /fm-api/files/{id}:
+  /file-manager/files/{id}:
     get:
       summary: Returns the list of files and folders uploaded by the user under a specific subfolder.
       tags: 
@@ -1106,7 +1097,7 @@ paths:
                 example:
                   detail: "Cannot load files. This instance is read-only"
 
-  /fm-api/upload:
+  /file-manager/upload:
     post: 
       summary: Uploads a file to the user's profile.
       tags: 
@@ -1202,7 +1193,7 @@ paths:
                 example:
                   detail: "Cannot load files. This instance is read-only"
 
-  /fm-api/info:
+  /file-manager/info:
     get:
       summary: Gets the total, used, and free storage.
       tags: 

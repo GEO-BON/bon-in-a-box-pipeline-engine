@@ -10,7 +10,7 @@ from antivirus import scan_file_buffer
 ####    BACKEND FOR FILE MANAGEMENT SYSTEM    ###
 #################################################
 
-fm_router = APIRouter(prefix="/fm-api")
+fm_router = APIRouter(prefix="/file-manager")
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 STORAGE_ROOT = Path(os.environ.get("USERDATA_ROOT", "./storage"))
