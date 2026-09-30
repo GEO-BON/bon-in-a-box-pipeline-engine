@@ -18,7 +18,7 @@ import os
 # a line nobody reads, and saved the file anyway -- so the only two outcomes were
 # "clean" and "unscanned but saved", and an operator who had configured antivirus had
 # no way to tell which one they were in. The cost is that a clamd outage is now an
-# upload outage for every session at once; GET /api/status reports both the
+# upload outage for every session at once; GET /api/features reports both the
 # configuration and the reachability so that is visible before a user finds out.
 CLAMAV_DEFAULT_PORT = 3310
 # An upload holds a request open for the whole scan. Bounded so that a host which
@@ -121,7 +121,7 @@ async def scan_file_buffer(file: UploadFile = File(...)) -> UploadFile:
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="The upload could not be scanned, so it was refused. Either the "
                    "antivirus is unreachable, or the file exceeds the scanner's "
-                   "StreamMaxLength. See GET /api/status and the python-api log.",
+                   "StreamMaxLength. See GET /api/features and the python-api log.",
         ) from exc
     finally:
         await file.seek(0)

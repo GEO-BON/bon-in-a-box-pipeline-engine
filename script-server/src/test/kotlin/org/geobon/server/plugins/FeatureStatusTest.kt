@@ -12,7 +12,7 @@ import org.json.JSONObject
 import kotlin.test.*
 
 /**
- * GET /api/status, the one place the UI learns which optional features are on.
+ * GET /api/features, the one place the UI learns which optional features are on.
  *
  * The flags behind it use three different conventions -- BLOCK_RUNS is the string
  * "true", SAVE_PIPELINE_TO_SERVER is the string "deny", DISABLE_MY_FILES and
@@ -34,7 +34,7 @@ class FeatureStatusTest {
     }
 
     private suspend fun ApplicationTestBuilder.status(): JSONObject =
-        JSONObject(client.get("/api/status").bodyAsText())
+        JSONObject(client.get("/api/features").bodyAsText())
 
     @Test
     fun `defaults report every feature as available`() = testApplication {
@@ -42,7 +42,7 @@ class FeatureStatusTest {
         // DISABLE_CHAT set.
         application { scriptModule() }
 
-        client.get("/api/status").apply {
+        client.get("/api/features").apply {
             assertEquals(HttpStatusCode.OK, status)
         }
         with(status()) {
@@ -115,7 +115,7 @@ class FeatureStatusTest {
         // index.jsx defaults each one to permissive, so `deny` is silently ignored.
         assertEquals(
             ContentType.Application.Json,
-            client.get("/api/status").contentType()?.withoutParameters()
+            client.get("/api/features").contentType()?.withoutParameters()
         )
     }
 

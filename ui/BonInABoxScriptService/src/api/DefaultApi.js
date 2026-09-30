@@ -541,7 +541,7 @@ export default class DefaultApi {
       let accepts = ['application/json'];
       let returnType = GetServerStatus200Response;
       return this.apiClient.callApi(
-        '/api/status', 'GET',
+        '/api/features', 'GET',
         pathParams, queryParams, headerParams, formParams, postBody,
         authNames, contentTypes, accepts, returnType, null, callback
       );

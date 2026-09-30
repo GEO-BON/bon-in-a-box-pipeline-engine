@@ -215,7 +215,7 @@ then add it to `runner.env` and restart the server:
 CLAMAV_ADDRESS=127.0.0.1:3310
 ```
 
-`GET /api/status` reports both whether it is configured and whether it currently
+`GET /api/features` reports both whether it is configured and whether it currently
 answers, so you can tell the two apart without attempting an upload.
 
 **It fails closed.** Once configured, an upload that fails with below codes is

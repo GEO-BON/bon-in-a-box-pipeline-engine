@@ -360,7 +360,7 @@ paths:
                 type: string
                 x-content-type: text/plain
                 example: Output folder is improperly configured
-  /api/status:
+  /api/features:
     get:
       summary: Returns which optional features are enabled on this instance.
       description: >
@@ -1179,7 +1179,7 @@ paths:
         "503":
           description: >
             The upload could not be scanned, so it was refused rather than saved
-            unscanned. Either the scanner is unreachable -- GET /api/status reports that
+            unscanned. Either the scanner is unreachable -- GET /api/features reports that
             as antivirusReachable false, before an upload is attempted -- or the file
             exceeds its StreamMaxLength, which clamd signals by closing the connection
             rather than replying. The python-api log distinguishes them.

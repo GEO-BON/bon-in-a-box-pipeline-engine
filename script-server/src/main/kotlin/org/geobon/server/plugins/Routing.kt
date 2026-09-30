@@ -74,7 +74,7 @@ fun Application.configureRouting() {
          *
          * See FeatureStatus for why two of these flags are python-api's.
          */
-        get("/api/status") {
+        get("/api/features") {
             // The map, NOT gson.toJson(map) -- exactly like every other object route
             // here. Responding with the serialized String makes Ktor send it as
             // text/plain, and the bytes look perfect in curl, which is what made this

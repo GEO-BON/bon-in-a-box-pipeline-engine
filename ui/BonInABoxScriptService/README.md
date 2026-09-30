@@ -131,7 +131,7 @@ Class | Method | HTTP request | Description
 *BonInABoxScriptService.DefaultApi* | [**getPipeline**](docs/DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
 *BonInABoxScriptService.DefaultApi* | [**getRegionGeometry**](docs/DefaultApi.md#getRegionGeometry) | **GET** /region/geometry | Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
 *BonInABoxScriptService.DefaultApi* | [**getRegionsList**](docs/DefaultApi.md#getRegionsList) | **GET** /region/regions_list | Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
-*BonInABoxScriptService.DefaultApi* | [**getServerStatus**](docs/DefaultApi.md#getServerStatus) | **GET** /api/status | Returns which optional features are enabled on this instance.
+*BonInABoxScriptService.DefaultApi* | [**getServerStatus**](docs/DefaultApi.md#getServerStatus) | **GET** /api/features | Returns which optional features are enabled on this instance.
 *BonInABoxScriptService.DefaultApi* | [**getSystemStatus**](docs/DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 *BonInABoxScriptService.DefaultApi* | [**getVersions**](docs/DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
 *BonInABoxScriptService.DefaultApi* | [**hpcPrepareGet**](docs/DefaultApi.md#hpcPrepareGet) | **GET** /hpc/prepare | Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.

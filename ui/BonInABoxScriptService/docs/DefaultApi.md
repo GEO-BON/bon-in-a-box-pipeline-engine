@@ -15,7 +15,7 @@ Method | HTTP request | Description
 [**getPipeline**](DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
 [**getRegionGeometry**](DefaultApi.md#getRegionGeometry) | **GET** /region/geometry | Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
 [**getRegionsList**](DefaultApi.md#getRegionsList) | **GET** /region/regions_list | Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
-[**getServerStatus**](DefaultApi.md#getServerStatus) | **GET** /api/status | Returns which optional features are enabled on this instance.
+[**getServerStatus**](DefaultApi.md#getServerStatus) | **GET** /api/features | Returns which optional features are enabled on this instance.
 [**getSystemStatus**](DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 [**getVersions**](DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
 [**hpcPrepareGet**](DefaultApi.md#hpcPrepareGet) | **GET** /hpc/prepare | Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.

@@ -6,7 +6,7 @@ import java.net.InetSocketAddress
 import java.net.Socket
 
 /**
- * Which optional features this instance has switched on, for `GET /api/status`.
+ * Which optional features this instance has switched on, for `GET /api/features`.
  *
  * Deliberately separate from [SystemStatus], which answers a different question: that
  * one is the UI's boot gate and reports whether the server is *misconfigured*. Here,
