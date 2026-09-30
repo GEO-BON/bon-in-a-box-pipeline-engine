@@ -5,9 +5,9 @@ import {
   FoldableOutputContextProvider,
 } from "./FoldableOutput";
 
-import Error from "@mui/icons-material/Error";
-import Warning from "@mui/icons-material/Warning";
-import Info from "@mui/icons-material/Info";
+import ErrorIcon from "@mui/icons-material/Error";
+import WarningIcon from "@mui/icons-material/Warning";
+import InfoIcon from "@mui/icons-material/Info";
 
 import Box from "@mui/material/Box";
 
@@ -310,7 +310,8 @@ export function DelayedResult({
         .catch((response) => {
           clearInterval(interval);
           setOutputData({
-            error: response.status + " (" + response.statusText + ")",
+            error: (response instanceof Error) ? response.message :
+              response.status + " (" + response.statusText + ")"
           });
         });
 
@@ -376,9 +377,9 @@ export function DelayedResult({
 
       icon = (
         <>
-          {outputData.error && <Error color="error" />}
-          {(outputData.warning || isEmptyObject(scriptMetadata)) && <Warning color="warning" />}
-          {outputData.info && <Info color="info" />}
+          {outputData.error && <ErrorIcon color="error" />}
+          {(outputData.warning || isEmptyObject(scriptMetadata)) && <WarningIcon color="warning" />}
+          {outputData.info && <InfoIcon color="info" />}
         </>
       );
       inline = skippedMessage && <i>{skippedMessage}</i>;
