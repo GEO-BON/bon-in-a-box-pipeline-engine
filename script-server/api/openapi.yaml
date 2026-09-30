@@ -8,8 +8,6 @@ servers:
   - url: http://localhost/
     description: script service
 tags:
-  - name: placeholder
-    description: We could use tags
   - name: File manager
     description: Functionalities added to handle the user's file management system.
 paths:
@@ -167,7 +165,6 @@ paths:
                     Use "Save to clipboard" and submit file through git.
   /{type}/{descriptionPath}/info:
     get:
-      tags: []
       summary: Get metadata about this script or pipeline.
       operationId: getInfo
       parameters:
@@ -253,7 +250,6 @@ paths:
           description: Pipeline not found
   /{type}/{descriptionPath}/run:
     post:
-      tags: []
       summary: Runs the script or pipeline matching `descriptionPath`.
       operationId: run
       parameters:
@@ -300,7 +296,6 @@ paths:
 
   /{type}/{id}/outputs:
     get:
-      tags: []
       summary: Get the output folders of the scripts composing this pipeline
       operationId: getOutputFolders
       parameters:
