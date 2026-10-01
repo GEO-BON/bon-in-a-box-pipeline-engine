@@ -57,7 +57,11 @@ const MenuProps = {
 
 export default function FileBrowser({ multipleFiles, onSelect, value }) {
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
+  // start from the current value, dropping unconfirmed edits from a previous opening
+  const handleOpen = () => {
+    setfileNames(value ? toFileIds(value) : []);
+    setOpen(true);
+  };
   const handleClose = () => setOpen(false);
 
   const [data, setData] = useState(null);
@@ -187,10 +191,10 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
           <Button
             className="filebrowser-select-button"
             variant="contained"
-            disabled={fileNames.length === 0}
             onClick={() => {
               if (onSelect) {
                 // if this function is passed on as a parameter
+                // an empty selection clears the value
                 onSelect(fileNames.map((item) => PATH_PREFIX + item));
               }
               handleClose();
