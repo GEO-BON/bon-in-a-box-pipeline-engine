@@ -50,7 +50,7 @@ services:
       PORT: 8000
       WORKERS_PER_CORE: 1
       TITILER_API_CORS_ORIGINS: "*"
-      USERDATA_ROOT: /data/userdata/files
+      USERDATA_ROOT: /data/userdata
       # Unset OLLAMA_URL disables the assistant entirely.
       OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11435}
       # How long the bridge waits for Ollama to respond before giving up, in
