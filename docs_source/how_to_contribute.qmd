@@ -304,7 +304,7 @@ conda:
 
 ## Julia
 
-Conda dependency management is not available in Julia. There is a central project at /julia_depot/.
+Conda dependency management is not available in Julia. There is a central project at /julia_depot/. To install packages, use `biab_ensure_package(["Pkg1", "Pkg2"])` at the top of your script, which holds back concurrent scripts during installation.
 :::
 
 For more information, refer to the [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually).

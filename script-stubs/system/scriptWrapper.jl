@@ -1,5 +1,45 @@
-using JSON
 using Pkg
+using FileWatching.Pidfile
+
+# Replaces this process (same PID, so the .pid file stays valid) with a fresh run of the wrapper.
+function biab_restart()
+    println("Restarting Julia to load the newly installed packages...")
+    flush(stdout); flush(stderr)
+    args = String[Base.julia_cmd().exec..., "--project=$(dirname(Base.active_project()))", abspath(PROGRAM_FILE), ARGS...]
+    GC.@preserve args begin
+        argv = Ptr{UInt8}[pointer.(args)..., C_NULL]
+        ccall(:execv, Cint, (Cstring, Ptr{Ptr{UInt8}}), args[1], argv)
+    end
+    error("Failed to restart Julia")
+end
+
+# Installs missing packages in the shared project; the lock serializes concurrent scripts.
+# Restarts Julia after an install, since already-loaded packages cannot be swapped for the new versions.
+function biab_ensure_package(pkgs::AbstractVector{<:AbstractString})
+    missing_pkgs() = filter(p -> !haskey(Pkg.project().dependencies, p), pkgs)
+    installed = false
+
+    if !isempty(missing_pkgs())
+        lock_path = joinpath(first(DEPOT_PATH), "biab_pkg_install.lock")
+        mkpidlock(lock_path; wait=true, stale_age=120) do # 120 seconds
+            # Another script may have installed them while we were waiting.
+            to_add = missing_pkgs()
+            if !isempty(to_add)
+                println("Installing missing Julia packages: $to_add")
+                Pkg.add(to_add)
+                Pkg.precompile()
+                installed = true
+            end
+        end
+    end
+
+    # Restart outside the lock so it is released first.
+    installed && biab_restart()
+end
+biab_ensure_package(pkg::AbstractString) = biab_ensure_package([pkg])
+
+biab_ensure_package("JSON")
+using JSON
 
 output_folder = ARGS[1]
 script_file_path = ARGS[2]
@@ -54,7 +94,14 @@ function on_exit()
     direct_deps = filter(x -> x[2].is_direct_dep, deps)
     open(joinpath(output_folder, "dependencies.txt"), "w") do file
         for (uuid, pkg) in direct_deps
-            write(file, "$(pkg.name) $(pkg.version)")
+            write(file, "$(pkg.name) $(pkg.version)\n")
+        end
+    end
+
+    # Exact package versions used by this run, to reproduce it later.
+    for path in (Base.active_project(), Base.active_manifest())
+        if path !== nothing && isfile(path)
+            cp(path, joinpath(output_folder, basename(path)); force=true)
         end
     end
     try print(" done.\n") catch; end
