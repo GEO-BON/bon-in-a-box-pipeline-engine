@@ -1,17 +1,59 @@
 using Pkg
 using FileWatching.Pidfile
+using SHA
 
 # Replaces this process (same PID, so the .pid file stays valid) with a fresh run of the wrapper.
-function biab_restart()
-    println("Restarting Julia to load the newly installed packages...")
+function biab_restart(reason; project_dir=dirname(Base.active_project()))
+    println("Restarting Julia $reason...")
     flush(stdout); flush(stderr)
-    args = String[Base.julia_cmd().exec..., "--project=$(dirname(Base.active_project()))", abspath(PROGRAM_FILE), ARGS...]
+    args = String[Base.julia_cmd().exec..., "--project=$project_dir", abspath(PROGRAM_FILE), ARGS...]
     GC.@preserve args begin
         argv = Ptr{UInt8}[pointer.(args)..., C_NULL]
         ccall(:execv, Cint, (Cstring, Ptr{Ptr{UInt8}}), args[1], argv)
     end
     error("Failed to restart Julia")
 end
+
+# A script with a Project.toml next to it runs in its own environment in the depot, seeded from
+# that Project.toml and its Manifest. The copy is refreshed only when the source files change.
+function biab_ensure_script_environment(script_file_path)
+    script_dir = dirname(abspath(script_file_path))
+    isfile(joinpath(script_dir, "Project.toml")) || return
+
+    env_dir = joinpath(first(DEPOT_PATH), "environments", "biab", replace(strip(script_dir, '/'), '/' => '_'))
+    files = filter(f -> f == "Project.toml" || occursin(r"^Manifest(-v[\d.]+)?\.toml$", f), readdir(script_dir))
+    buf = IOBuffer()
+    for f in files
+        write(buf, f, read(joinpath(script_dir, f)))
+    end
+    digest = bytes2hex(sha256(take!(buf)))
+
+    stamp = joinpath(env_dir, ".source_sha256")
+    # The stamp is written last, so a matching stamp means the install completed.
+    up_to_date() = isfile(stamp) && read(stamp, String) == digest
+    in_env = abspath(dirname(Base.active_project())) == abspath(env_dir)
+
+    if !up_to_date()
+        mkpath(dirname(env_dir))
+        mkpidlock(joinpath(first(DEPOT_PATH), "biab_pkg_install.lock"); wait=true, stale_age=120) do
+            if !up_to_date()
+                println("Preparing Julia environment for $script_dir")
+                rm(env_dir; recursive=true, force=true)
+                mkpath(env_dir)
+                for f in files
+                    cp(joinpath(script_dir, f), joinpath(env_dir, f))
+                end
+                Pkg.activate(env_dir)
+                Pkg.instantiate()
+                write(stamp, digest)
+            end
+        end
+    end
+
+    in_env || biab_restart("in the environment of this script"; project_dir=env_dir)
+end
+
+biab_ensure_script_environment(ARGS[2])
 
 # Installs missing packages in the shared project; the lock serializes concurrent scripts.
 # Restarts Julia after an install, since already-loaded packages cannot be swapped for the new versions.
@@ -34,7 +76,7 @@ function biab_ensure_package(pkgs::AbstractVector{<:AbstractString})
     end
 
     # Restart outside the lock so it is released first.
-    installed && biab_restart()
+    installed && biab_restart("to load the newly installed packages")
 end
 biab_ensure_package(pkg::AbstractString) = biab_ensure_package([pkg])
 
