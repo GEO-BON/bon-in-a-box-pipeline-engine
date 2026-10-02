@@ -30,12 +30,17 @@ const style = {
 // Files are listed by id, but selected values are paths under this prefix.
 const PATH_PREFIX = "/userdata";
 
-const toFileId = (path) =>
-  path.startsWith(PATH_PREFIX) ? path.slice(PATH_PREFIX.length) : path;
-
+// Only paths under the prefix can be shown as selected in the browser. Anything
+// else (e.g. a pipeline default pointing elsewhere) is ignored rather than
+// prefixed again on selection.
 const toFileIds = (value) => {
-  const paths = typeof value === "string" ? value.split(",") : value;
-  return paths.map((path) => toFileId(path.trim()));
+  if (value === null || value === undefined) return [];
+  const paths = Array.isArray(value) ? value : String(value).split(",");
+  return paths
+    .filter((path) => typeof path === "string")
+    .map((path) => path.trim())
+    .filter((path) => path.startsWith(PATH_PREFIX + "/"))
+    .map((path) => path.slice(PATH_PREFIX.length));
 };
 
 const MenuProps = {
@@ -66,13 +71,16 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
 
   const handleChange = (event) => {
     const { value } = event.target;
-    setfileNames(typeof value === "string" ? value.split(",") : value); // saves all fileIDs under an array
+    // saves all fileIDs under an array
+    setfileNames(
+      Array.isArray(value) ? value : multipleFiles ? value.split(",") : [value],
+    );
   };
 
   // Strip the prefix so the incoming value matches the file ids in the list,
   // otherwise nothing shows as selected and the prefix gets added twice.
   useEffect(() => {
-    setfileNames(value ? toFileIds(value) : []);
+    setfileNames(toFileIds(value));
   }, [value]);
 
   useEffect(() => {
@@ -136,7 +144,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
             <Select
               className="file-select-chip"
               multiple={multipleFiles} // makes this multi-select
-              value={fileNames}
+              value={multipleFiles ? fileNames : (fileNames[0] ?? "")}
               onChange={handleChange}
               input={<OutlinedInput label="File(s)" />}
               MenuProps={MenuProps}
