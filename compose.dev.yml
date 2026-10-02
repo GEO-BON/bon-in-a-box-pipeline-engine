@@ -56,6 +56,14 @@ services:
         BIAB_VERSION: "dev"
     volumes:
       - ./python-api/app:/app:rw
+      # The MCP server builds its whole toolset from this. Mounted at the same path
+      # the published image bakes it into.
+      - ./script-server/api/openapi.yaml:/app/mcp-server/openapi.yaml:ro
+      # Corpus for the assistant's search_documentation tool, read once at startup.
+      # Mounted from the Quarto output rather than copied, so 
+      # `quarto render docs_source` + restart python-api
+      # is enough to see new documentation in the chat.
+      - ./docs/search.json:/app/mcp-server/docs-search.json:ro
 
   gateway:
     image: nginxinc/nginx-unprivileged

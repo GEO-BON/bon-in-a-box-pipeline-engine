@@ -24,8 +24,8 @@ class InfoOutputsValue {
      * Constructs a new <code>InfoOutputsValue</code>.
      * @alias module:model/InfoOutputsValue
      */
-    constructor() {
-
+    constructor() { 
+        
         InfoOutputsValue.initialize(this);
     }
 
@@ -34,7 +34,7 @@ class InfoOutputsValue {
      * This method is used by the constructors of any subclasses, in order to implement multiple inheritance (mix-ins).
      * Only for internal use.
      */
-    static initialize(obj) {
+    static initialize(obj) { 
     }
 
     /**
