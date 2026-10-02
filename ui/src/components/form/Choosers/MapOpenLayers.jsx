@@ -69,7 +69,7 @@ export default function MapOpenLayers({
   const [oldCRS, setOldCRS] = useState(null);
   const [showSpinner, setShowSpinner] = useState(false);
   var featureId = 0;
-  const maptilerkey = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
+  const mapTilerKey = atob("MkpQT25DZlJhRFlJcmd2TUNzWVI=");
 
   const clearLayers = () => {
     if (draw) {
@@ -271,7 +271,7 @@ export default function MapOpenLayers({
             new Layer({
               source: new Source({
                 attributions: ["Carto"],
-                url: `https://api.maptiler.com/maps/dataviz-v4-dark/256/{z}/{x}/{y}.png?key=${maptilerkey}`,
+                url: `https://api.maptiler.com/maps/dataviz-v4-dark/256/{z}/{x}/{y}.png?key=${mapTilerKey}`,
               }),
               projection: `EPSG:3857`,
             }),
