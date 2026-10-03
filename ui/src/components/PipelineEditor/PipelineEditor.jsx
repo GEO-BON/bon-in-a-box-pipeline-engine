@@ -32,6 +32,7 @@ import IONode from "./IONode";
 import ConstantNode from "./ConstantNode";
 import UserInputNode from "./UserInputNode";
 import PopupMenu from "./PopupMenu";
+import PipelineMenu from "../PipelineMenu";
 import { layoutElements } from "./react-flow-utils/Layout";
 import { highlightConnectedEdges } from "./react-flow-utils/HighlightConnectedEdges";
 import {
@@ -105,6 +106,7 @@ export default function PipelineEditor(props) {
   const [toolTip, setToolTip] = useState(null);
   const [popupMenuPos, setPopupMenuPos] = useState({ x: 0, y: 0 });
   const [popupMenuOptions, setPopupMenuOptions] = useState();
+  const [serverPipelineMap, setServerPipelineMap] = useState(null); // set while the "Load from server" dialog is open
   const [modal, setModal] = useState(null);
   const [alertSeverity, setAlertSeverity] = useState("");
   const [alertTitle, setAlertTitle] = useState("");
@@ -822,8 +824,6 @@ export default function PipelineEditor(props) {
     event.stopPropagation();
     event.preventDefault();
 
-    setPopupMenuPos({ x: event.clientX, y: event.clientY });
-
     api.getListOf("pipeline", (error, pipelineMap, response) => {
       if (error) {
         showAlert(
@@ -832,19 +832,18 @@ export default function PipelineEditor(props) {
           getErrorString(error, response)
         )
       } else {
-        let options = {};
-        Object.entries(pipelineMap).forEach(([descriptionFile, pipelineName]) =>
-          (options[descriptionFile + ' (' + pipelineName + ')'] = () => {
-            if (hasUnsavedChanges) {
-              setModal("unsavedLoadFromServer:" + descriptionFile)
-            } else {
-              loadFromServer(descriptionFile)
-            }
-          })
-        );
-        setPopupMenuOptions(options);
+        setServerPipelineMap(pipelineMap);
       }
     });
+  };
+
+  const onPipelineChosenFromServer = (descriptionFile) => {
+    setServerPipelineMap(null);
+    if (hasUnsavedChanges) {
+      setModal("unsavedLoadFromServer:" + descriptionFile)
+    } else {
+      loadFromServer(descriptionFile)
+    }
   };
 
   const onLoadFromLocalStorage = (descriptionFile) => {
@@ -1372,6 +1371,27 @@ export default function PipelineEditor(props) {
         optionMapping={popupMenuOptions}
         onPopupMenuHide={onPopupMenuHide}
       />
+
+      <Dialog
+        open={serverPipelineMap != null}
+        onClose={() => setServerPipelineMap(null)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Load pipeline from server</DialogTitle>
+        <DialogContent>
+          <PipelineMenu
+            pipelineMap={serverPipelineMap}
+            value={currentFileName}
+            onChange={onPipelineChosenFromServer}
+            inline
+            autoFocus
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setServerPipelineMap(null)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

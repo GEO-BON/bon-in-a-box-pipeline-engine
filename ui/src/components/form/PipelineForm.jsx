@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import Select from "react-select";
 import InputFileInput from "./InputFileInput";
 import { useNavigate } from "react-router-dom";
-import { GeneralDescription, getFolderAndName } from "../StepDescription";
+import { GeneralDescription } from "../StepDescription";
+import PipelineMenu from "../PipelineMenu";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { CustomButtonGreen } from "../CustomMUI";
 import { formatError } from "../HttpErrors";
@@ -24,9 +24,8 @@ export function PipelineForm({
 }) {
   const formRef = useRef();
   const navigate = useNavigate();
-  const [pipelineOptions, setPipelineOptions] = useState([]);
+  const [pipelineMap, setPipelineMap] = useState();
   const [validationError, setValidationError] = useState();
-
 
   function clearPreviousRequest() {
     setHttpError(null);
@@ -48,7 +47,13 @@ export function PipelineForm({
     var callback = function (error, runId, response) {
       if (error) {
         // Server / connection errors. Data will be undefined.
-        setHttpError(formatError(error, response, "while launching pipeline on script server"));
+        setHttpError(
+          formatError(
+            error,
+            response,
+            "while launching pipeline on script server",
+          ),
+        );
       } else if (runId) {
         const parts = runId.split(">");
         let runHash = parts.at(-1);
@@ -59,7 +64,13 @@ export function PipelineForm({
 
         navigate("/" + runType + "-form/" + pipelineForUrl + "/" + runHash);
       } else {
-        setHttpError(formatError("Server returned empty result", null, "while getting run ID from script server"));
+        setHttpError(
+          formatError(
+            "Server returned empty result",
+            null,
+            "while getting run ID from script server",
+          ),
+        );
       }
     };
 
@@ -71,70 +82,73 @@ export function PipelineForm({
 
   // Applied only once when first loaded
   useEffect(() => {
-    // Load list of scripts/pipelines into pipelineOptions
+    // Load list of scripts/pipelines into pipelineMap
     api.getListOf(runType, (error, data, response) => {
       if (error) {
         console.error(error);
       } else {
-        let newOptions = [];
-        Object.entries(data).forEach(([descriptionFile, pipelineName]) => {
-          newOptions.push({
-            label: getFolderAndName(descriptionFile, pipelineName),
-            value: descriptionFile,
-          });
-        });
-        setPipelineOptions(newOptions);
+        setPipelineMap(data);
       }
     });
-  }, [runType, setPipelineOptions]);
+  }, [runType, setPipelineMap]);
 
-  return pipelineOptions.length > 0 &&
-    <form
-      ref={formRef}
-      onSubmit={handleSubmit}
-      acceptCharset="utf-8"
-      className="inputForm"
-    >
-      <Select
-        id="pipelineChoice"
-        name="pipelineChoice"
-        className="blackText"
-        options={pipelineOptions}
-        value={pipelineOptions.find(
-          (o) => o.value === pipStates.descriptionFile
-        )}
-        placeholder="Type or select from list..."
-        menuPortalTarget={document.body}
-        onChange={(v) => handlePipelineChange(v.label, v.value)}
-      />
-      <br />
-      {pipelineMetadata && (
-        <GeneralDescription
-          ymlPath={pipStates.descriptionFile}
-          metadata={pipelineMetadata}
+  return (
+    pipelineMap && Object.keys(pipelineMap).length > 0 && (
+      <form
+        ref={formRef}
+        onSubmit={handleSubmit}
+        acceptCharset="utf-8"
+        className="inputForm"
+      >
+        <PipelineMenu
+          id="pipelineChoice"
+          name="pipelineChoice"
+          pipelineMap={pipelineMap}
+          value={pipStates.descriptionFile}
+          placeholder={
+            runType === "pipeline"
+              ? "Search or select a pipeline..."
+              : "Search or select a script..."
+          }
+          onChange={(descriptionFile, name) => handlePipelineChange(name, descriptionFile)}
         />
-      )}
-      <CaptchaGate size={pipelineMetadata ? "large" : "small"}>
+        <br />
         {pipelineMetadata && (
-          <>
-            <InputFileInput
-              metadata={pipelineMetadata}
-              inputFileContent={inputFileContent}
-              setInputFileContent={setInputFileContent}
-              setValidationError={setValidationError}
-              restoreDefaults={restoreDefaults}
-            />
-            <br />
-            {validationError && <Alert severity="error">
-              Error parsing YAML input.<br />
-              {validationError}
-            </Alert>}
-            <SpamField />
-            <CustomButtonGreen type="submit" disabled={validationError != null} variant="contained">
-              {runType === "pipeline" ? "Run pipeline" : "Run script"}
-            </CustomButtonGreen>
-          </>
+          <GeneralDescription
+            ymlPath={pipStates.descriptionFile}
+            metadata={pipelineMetadata}
+          />
         )}
-      </CaptchaGate>
-    </form>
+        <CaptchaGate size={pipelineMetadata ? "large" : "small"}>
+          {pipelineMetadata && (
+            <>
+              <InputFileInput
+                metadata={pipelineMetadata}
+                inputFileContent={inputFileContent}
+                setInputFileContent={setInputFileContent}
+                setValidationError={setValidationError}
+                restoreDefaults={restoreDefaults}
+              />
+              <br />
+              {validationError && (
+                <Alert severity="error">
+                  Error parsing YAML input.
+                  <br />
+                  {validationError}
+                </Alert>
+              )}
+              <SpamField />
+              <CustomButtonGreen
+                type="submit"
+                disabled={validationError != null}
+                variant="contained"
+              >
+                {runType === "pipeline" ? "Run pipeline" : "Run script"}
+              </CustomButtonGreen>
+            </>
+          )}
+        </CaptchaGate>
+      </form>
+    )
+  );
 }
