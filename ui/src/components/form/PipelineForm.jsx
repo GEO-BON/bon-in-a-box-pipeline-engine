@@ -139,6 +139,9 @@ export function PipelineForm({
             isPipeline ? setShowAllPipelines : undefined
           }
           backgroundMode="dark"
+          togglePosition="top"
+          label={isPipeline ? "Pipeline" : "Script"}
+          inputId="pipelineChoiceInput"
         />
         <br />
         {pipelineMetadata && (

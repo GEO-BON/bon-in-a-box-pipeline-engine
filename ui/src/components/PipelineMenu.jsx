@@ -51,7 +51,11 @@ export function lifecycleListOpts(showAll) {
  * @param inline when true, the list is always open and laid out below the search box
  *               (e.g. inside a dialog) instead of floating over the page
  * @param showAllPipelines state of the "Show in development or experimental pipelines" checkbox
- * @param onShowAllPipelinesChange when given, the checkbox is displayed below the menu
+ * @param onShowAllPipelinesChange when given, the checkbox is displayed with the menu
+ * @param togglePosition "top" puts the checkbox in a header row above the menu, next to `label`;
+ *                       "bottom" puts it below the menu
+ * @param label field label shown in the header row when togglePosition is "top"
+ * @param backgroundMode "dark" when displayed on a dark background
  * @param selectProps any other react-select prop (placeholder, autoFocus, etc.)
  */
 export default function PipelineMenu({
@@ -62,6 +66,8 @@ export default function PipelineMenu({
   showAllPipelines = false,
   onShowAllPipelinesChange,
   backgroundMode = "light",
+  togglePosition = "bottom",
+  label,
   ...selectProps
 }) {
   const options = useMemo(
@@ -73,44 +79,94 @@ export default function PipelineMenu({
     ? options.flatMap((group) => group.options).find((o) => o.value === value)
     : null;
 
+  const textColor = backgroundMode === "dark" ? "white" : "black";
+
+  const toggle = onShowAllPipelinesChange && (
+    <FormControlLabel
+      title="Also list pipelines that have not been reviewed: in development, examples, stale, etc."
+      sx={{
+        m: 0,
+        color: textColor,
+        opacity: 0.85,
+        "& .MuiFormControlLabel-label": { fontSize: "0.8rem" },
+      }}
+      control={
+        <Checkbox
+          size="small"
+          checked={showAllPipelines}
+          onChange={(e) => onShowAllPipelinesChange(e.target.checked)}
+          sx={{
+            p: 0.5,
+            color: textColor,
+            "&.Mui-checked": {
+              color:
+                backgroundMode === "dark"
+                  ? "var(--biab-green-light)"
+                  : "var(--biab-green-main)",
+            },
+          }}
+        />
+      }
+      label="Show in development or experimental pipelines"
+    />
+  );
+
+  const select = (
+    <Select
+      className="blackText"
+      options={options}
+      value={selectedOption}
+      placeholder="Search or select a pipeline..."
+      menuPortalTarget={inline ? null : document.body}
+      menuIsOpen={inline || undefined}
+      maxMenuHeight={inline ? 450 : 420}
+      styles={inline ? inlineSelectStyles : selectStyles}
+      filterOption={filterOption}
+      formatGroupLabel={formatGroupLabel}
+      formatOptionLabel={formatOptionLabel}
+      onChange={(v) => v && onChange(v.value, v.label)}
+      {...selectProps}
+    />
+  );
+
+  if (togglePosition === "top") {
+    // Header row: field label on the left, filter on the right, right above the menu
+    return (
+      <div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "4px 16px",
+            marginBottom: "4px",
+          }}
+        >
+          {label && (
+            <label
+              htmlFor={selectProps.inputId}
+              style={{
+                color: "#fff",
+                fontSize: "1.25rem",
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+              }}
+            >
+              {label}
+            </label>
+          )}
+          {toggle}
+        </div>
+        {select}
+      </div>
+    );
+  }
+
   return (
     <>
-      <Select
-        className="blackText"
-        options={options}
-        value={selectedOption}
-        placeholder="Search or select a pipeline..."
-        menuPortalTarget={inline ? null : document.body}
-        menuIsOpen={inline || undefined}
-        maxMenuHeight={inline ? 450 : 420}
-        styles={inline ? inlineSelectStyles : selectStyles}
-        filterOption={filterOption}
-        formatGroupLabel={formatGroupLabel}
-        formatOptionLabel={formatOptionLabel}
-        onChange={(v) => v && onChange(v.value, v.label)}
-        {...selectProps}
-      />
-      {onShowAllPipelinesChange && (
-        <FormControlLabel
-          sx={{
-            mt: 0.5,
-            "& .MuiFormControlLabel-label": { fontSize: "0.85rem" },
-            color: backgroundMode === "dark" ? "white" : "black",
-          }}
-          control={
-            <Checkbox
-              size="small"
-              checked={showAllPipelines}
-              onChange={(e) => onShowAllPipelinesChange(e.target.checked)}
-              sx={{
-                color: backgroundMode === "dark" ? "white" : "black",
-                "&.Mui-checked": { color: "var(--biab-green-main)" },
-              }}
-            />
-          }
-          label="Show in development or experimental pipelines"
-        />
-      )}
+      {select}
+      {toggle && <div style={{ marginTop: "4px" }}>{toggle}</div>}
     </>
   );
 }
