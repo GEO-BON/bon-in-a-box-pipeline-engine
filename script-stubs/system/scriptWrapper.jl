@@ -20,7 +20,7 @@ function biab_ensure_script_environment(script_file_path)
     script_dir = dirname(abspath(script_file_path))
     isfile(joinpath(script_dir, "Project.toml")) || return
 
-    env_dir = joinpath(first(DEPOT_PATH), "environments", "biab", replace(strip(script_dir, '/'), '/' => '_'))
+    env_dir = joinpath(first(DEPOT_PATH), "environments", "biab", bytes2hex(sha256(script_dir)))
     files = filter(f -> f == "Project.toml" || occursin(r"^Manifest(-v[\d.]+)?\.toml$", f), readdir(script_dir))
     buf = IOBuffer()
     for f in files
