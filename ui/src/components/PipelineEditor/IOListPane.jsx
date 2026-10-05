@@ -75,7 +75,7 @@ export const IOListPane = ({
             setList={setInputList}
             editSession={editSession}
             selectedNodes={selectedNodes}
-            extractId={toInputId}
+            getIOId={toInputId}
             expandItems={!areItemsCollapsed}
           />
         )}
@@ -91,7 +91,7 @@ export const IOListPane = ({
             setList={setOutputList}
             editSession={editSession}
             selectedNodes={selectedNodes}
-            extractId={toOutputId}
+            getIOId={toOutputId}
             expandItems={!areItemsCollapsed}
           />
         )}
@@ -100,9 +100,9 @@ export const IOListPane = ({
   );
 };
 
-function IOList({ list, setList, editSession, selectedNodes, extractId, expandItems }) {
+function IOList({ list, setList, editSession, selectedNodes, getIOId, expandItems }) {
 
-  const idList = list.map((input) => extractId(input));
+  const idList = list.map((input) => getIOId(input));
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -113,7 +113,7 @@ function IOList({ list, setList, editSession, selectedNodes, extractId, expandIt
 
   const handleDragEnd = useCallback(
     (event) => {
-      reorder(event, setList, extractId);
+      reorder(event, setList, getIOId);
     },
     [setList]
   );
@@ -152,13 +152,13 @@ function IOList({ list, setList, editSession, selectedNodes, extractId, expandIt
   </div>
 }
 
-function reorder(event, setItems, getItemId) {
+function reorder(event, setItems, getIOId) {
   const { active, over } = event;
 
   if (active && over && active.id !== over.id) {
     setItems((items) => {
-      const oldIndex = items.findIndex((item) => getItemId(item) === active.id);
-      const newIndex = items.findIndex((item) => getItemId(item) === over.id);
+      const oldIndex = items.findIndex((item) => getIOId(item) === active.id);
+      const newIndex = items.findIndex((item) => getIOId(item) === over.id);
       return arrayMove(items, oldIndex, newIndex);
     });
   }

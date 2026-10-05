@@ -89,7 +89,7 @@
     }
   ],
   "inputs": {
-    "pipeline@3": {
+    "pipeline@3|inputId": {
       "label": "Some int",
       "description": "A number that we will increment",
       "type": "int",
