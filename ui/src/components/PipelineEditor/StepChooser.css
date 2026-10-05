@@ -17,6 +17,8 @@ aside.stepChooser .description {
 .dndnode {
     min-height: 20px;
     padding: 4px;
+    padding-left: 14px;
+    padding-right: 14px;
     border: 1px solid #83829b;
     border-radius: 4px;
     margin-bottom: 10px;
@@ -79,7 +81,7 @@ aside.stepChooser .description {
     border-bottom: 1px solid #1a192b;
 }
 
-.search-container {
+.stepChooser .search-container {
     margin-bottom: 15px;
     margin-right: 20px;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useEffect } from "react";
 import L from "leaflet";
 import { useMap } from "react-leaflet";
 
@@ -6,18 +6,14 @@ import { useMap } from "react-leaflet";
  *
  * @param props
  */
-function GeoJSONLayer(props) {
-  const { geojsonOutput, setGeojson } = props;
-  const emptyFC = {
-    type: "FeatureCollection",
-    features: [],
-  };
+function GeoJSONLayer({ geojsonOutput }) {
+
   const map = useMap();
   useEffect(() => {
     if (geojsonOutput.features.length !== 0) {
       const markerStyle = {
         radius: 2.5,
-        fillColor: "#ff7800",
+        fillColor: "#00f",
         color: "#000",
         weight: 1,
         opacity: 0.3,
@@ -40,7 +36,7 @@ function GeoJSONLayer(props) {
                 return markerStyle;
               default:
                 return {
-                  color: "#ff7800",
+                  color: "#00f",
                   weight: 5,
                   opacity: 0.7,
                   fillOpacity: 0.3,
@@ -54,9 +50,6 @@ function GeoJSONLayer(props) {
       if (bounds.isValid()) {
         map.fitBounds(bounds);
       }
-    }
-    return () => {
-      setGeojson(emptyFC);
     };
   }, [geojsonOutput, map]);
 

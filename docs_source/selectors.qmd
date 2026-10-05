@@ -2,11 +2,11 @@
 title: "Description for selectors for specific input types."
 ---
 
-When specifying input types 'country', 'countryRegion', 'countryRegionCRS', 'CRS' or 'bboxCRS', selectors are automatically created that facilitate the selection of those inputs. After being selected, those inputs appear in the `input.json` of the script or pipeline as objects with various parameters that will be available when loading then in R, Python or Julia.
+When specifying input types 'location', 'country', 'countryRegion', 'countryRegionCRS', 'CRS' or 'crsBbox', selectors are automatically created that facilitate the selection of those inputs. After being selected, those inputs appear in the `input.json` of the script or pipeline as objects with various parameters that will be available when loading then in R, Python or Julia.
 
-For example, the bboxCRS selector allows the user to specify a country, region and coordinate reference system to define a bounding box. The bounding box can also be selected manually, without first selecting a country or region. Here is an example of an object created through the selection of the Putumayo department in Colombia, in the Bogota 1975 / Colombia West zone reference system:
+For example, the 'location' selector allows the user to define a bounding box by choosing a country, region and coordinate reference system. Here is an example of an object created through the selection of the Putumayo department in Colombia, in the Bogota 1975 / Colombia West zone reference system:
 
-``` {#bboxCRS .yaml}
+``` {#location .yaml}
 bbox:
   - 983337
   - 428305
@@ -52,4 +52,4 @@ Here is the meaning of each key.
 | regionGID          | region  | Identifier of the region in GADM                                                                 |
 | countryEnglishName | region  | English name of the country within which this region is.                                                                                       |
 
-When using other selectors, the object create contains a subset of the bboxCRS selector. For example, the countryRegion selector will only contain the country and region sections, and countryRegionCRS will contain all but the bbox section.
+When using other selectors, the object create contains a subset of the location selector. For example, the countryRegion selector will only contain the country and region sections, and countryRegionCRS will contain all but the bbox section.

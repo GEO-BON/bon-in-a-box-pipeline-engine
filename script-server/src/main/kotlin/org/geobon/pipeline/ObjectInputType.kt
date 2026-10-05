@@ -6,9 +6,8 @@ import org.json.JSONObject
  * Enum type for special object that the pipeline engine can receive.
  * These objects are the result of a "chooser" UI that produces an object after an interaction with the user.
  */
-@Suppress("EnumEntryName") // we want their names to match with the incoming types
-enum class ObjectInputType(val typeStr:String, val requiredProperties: JSONObject) {
-    /* Location choosers are all parent. Here is the full bboxCRS object:
+enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObject) {
+    /* Location choosers are all subsets of the full "location" object:
       CRS:
         CRSBboxWGS84:
           - -180
@@ -46,37 +45,81 @@ enum class ObjectInputType(val typeStr:String, val requiredProperties: JSONObjec
         regionID: 97560089B46292059412713
         regionName: Tirol
     */
-    BBOX_CRS("bboxCRS", JSONObject().apply {
-        put("country", JSONObject().apply {
-            put("ISO3", "*")
-            put("bboxWGS84", "*")
-            put("englishName", "*")
+    COUNTRY_REGION_CRS_BBOX(LOCATION__TYPE__LOCATION, JSONObject().apply {
+        put(LOCATION__COUNTRY, JSONObject().apply {
+            put(LOCATION__COUNTRY__ISO3, "text")
+            put(LOCATION__COUNTRY__BBOX_WGS84, "float[]")
+            put(LOCATION__COUNTRY__ENGLISH_NAME, "text")
         })
-        put("region", JSONObject().apply {
-            put("bboxWGS84", "*")
-            put("countryEnglishName", "*")
-            put("regionID", "*")
-            put("regionName", "*")
+        put(LOCATION__REGION, JSONObject().apply {
+            put(LOCATION__REGION__BBOX_WGS84, "float[]")
+            put(LOCATION__REGION__COUNTRY_ENGLISH_NAME, "text")
+            put(LOCATION__REGION__REGION_ID, "text")
+            put(LOCATION__REGION__REGION_NAME, "text")
         })
-        put("CRS", JSONObject().apply {
-            put("CRSBboxWGS84", "*")
-            put("authority", "*")
-            put("code", "*")
-            put("name", "*")
-            put("proj4Def", "*")
-            put("unit", "*")
-            put("wktDef", "*")
+        put(LOCATION__CRS, JSONObject().apply {
+            put(LOCATION__CRS__CRS_BBOX_WGS84, "float[]")
+            put(LOCATION__CRS__AUTHORITY, "text")
+            put(LOCATION__CRS__CODE, "int")
+            put(LOCATION__CRS__NAME, "text")
+            put(LOCATION__CRS__PROJ4_DEF, "text")
+            put(LOCATION__CRS__UNIT, "text")
+            put(LOCATION__CRS__WKT_DEF, "text")
         })
-        put("bbox", "*")
+        put(LOCATION__BBOX, "float[]")
     }),
-    COUNTRY("country", JSONObject(BBOX_CRS.requiredProperties, "country")),
-    COUNTRY_REGION("countryRegion", JSONObject(BBOX_CRS.requiredProperties, "country", "region")),
-    CRS("CRS", JSONObject(BBOX_CRS.requiredProperties, "CRS")),
-    COUNTRY_REGION_CRS("countryRegionCRS", JSONObject(BBOX_CRS.requiredProperties, "country", "region", "CRS"));
+
+    COUNTRY(LOCATION__TYPE__COUNTRY, JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__COUNTRY)),
+    COUNTRY_REGION(
+        LOCATION__TYPE__COUNTRY_REGION,
+        JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__COUNTRY, LOCATION__REGION)
+    ),
+    CRS(LOCATION__TYPE__CRS, JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__CRS)),
+    COUNTRY_REGION_CRS(
+        LOCATION__TYPE__COUNTRY_REGION_CRS,
+        JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__COUNTRY, LOCATION__REGION, LOCATION__CRS)
+    ),
+    CRS_BBOX(
+        LOCATION__TYPE__CRS_BBOX,
+        JSONObject(COUNTRY_REGION_CRS_BBOX.requiredProperties, LOCATION__CRS, LOCATION__BBOX)
+    ),
+    // Legacy, name was not descriptive of content. TODO: Remove in future version.
+    BBOX_CRS(LOCATION__TYPE__BBOX_CRS, COUNTRY_REGION_CRS_BBOX.requiredProperties);
 
     companion object {
         fun fromString(typeStr: String): ObjectInputType? {
-            return ObjectInputType.entries.find { it.typeStr == typeStr }
+            val lowercaseType = typeStr.lowercase()
+            return ObjectInputType.entries.find { it.typeStr.lowercase() == lowercaseType }
         }
     }
 }
+
+const val LOCATION__TYPE__LOCATION = "location"
+const val LOCATION__TYPE__CRS_BBOX = "crsBBox"
+const val LOCATION__TYPE__BBOX_CRS = "bboxCRS" // legacy
+const val LOCATION__TYPE__COUNTRY = "country"
+const val LOCATION__TYPE__COUNTRY_REGION = "countryRegion"
+const val LOCATION__TYPE__CRS = "CRS"
+const val LOCATION__TYPE__COUNTRY_REGION_CRS = "countryRegionCRS"
+
+const val LOCATION__BBOX = "bbox"
+const val LOCATION__COUNTRY = "country"
+const val LOCATION__REGION = "region"
+const val LOCATION__CRS = "CRS"
+
+const val LOCATION__COUNTRY__ISO3 = "ISO3"
+const val LOCATION__COUNTRY__BBOX_WGS84 = "bboxWGS84"
+const val LOCATION__COUNTRY__ENGLISH_NAME = "englishName"
+
+const val LOCATION__REGION__BBOX_WGS84 = "bboxWGS84"
+const val LOCATION__REGION__COUNTRY_ENGLISH_NAME = "countryEnglishName"
+const val LOCATION__REGION__REGION_ID = "regionID"
+const val LOCATION__REGION__REGION_NAME = "regionName"
+
+const val LOCATION__CRS__CRS_BBOX_WGS84 = "CRSBboxWGS84"
+const val LOCATION__CRS__AUTHORITY = "authority"
+const val LOCATION__CRS__CODE = "code"
+const val LOCATION__CRS__NAME = "name"
+const val LOCATION__CRS__PROJ4_DEF = "proj4Def"
+const val LOCATION__CRS__UNIT = "unit"
+const val LOCATION__CRS__WKT_DEF = "wktDef"

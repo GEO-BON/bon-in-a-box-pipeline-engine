@@ -1,0 +1,70 @@
+script: selectBackground.R
+name: Background Points
+description: "This script creates a set of pseudo-absences/background points."
+author:
+  - name: Sarah Valentin
+    identifier: https://orcid.org/0000-0002-9028-681X
+  - name: Dat Nguyen
+
+inputs:
+  presence:
+    label: presence
+    description: Dataframe, presence data.
+    type: text/tab-separated-values
+    example: "/scripts/SDM/selectBackground_presence.tsv"
+  extent:
+    label: extent
+    description: shapefile, representing a study extent
+    type: application/dbf
+    example: "/scripts/SDM/extentToBbox_extent.shp"
+  method_background:
+    label: method background
+    description: method used to sample background points
+    type: options
+    options:
+      - random
+      - inclusion_buffer
+      - weighted_raster
+      - unweighted_raster
+      - thickening
+    example: random
+  n_background:
+    label: number of background points
+    description: number of background points
+    type: int
+    example: 10000
+  predictors:
+    label: predictors
+    description: raster, predictors variables
+    type: image/tiff;application=geotiff[]
+    example: "/scripts/filtering/cleanCoordinates_predictors.tif"
+  raster:
+    label: raster file
+    description: taxa-specific raster of sampling, used in weighted_raster and unweighted_raster methods
+    type: image/tiff;application=geotiff
+    example: "/scripts/data/heatmapGBIF-reptiles.tif"
+outputs:
+  n_background:
+    label: nb background
+    description: number of background points selected
+    type: int
+    example: 20000
+  background:
+    label: background
+    description: TSV file containing a table with background points.
+    type: text/tab-separated-values
+    example:
+conda:
+  channels:
+    - conda-forge
+    - r
+  dependencies:
+    - r-rjson
+    - r-terra
+    - r-dplyr
+    - r-raster
+    - r-CoordinateCleaner
+    - r-stars
+    - r-rstac
+    - r-gdalcubes
+

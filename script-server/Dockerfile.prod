@@ -1,15 +1,30 @@
-FROM eclipse-temurin:21-jre AS base-image
+ARG COMPOSE_VERSION=5.1.4
+ARG DOCKER_VERSION=29.5.3
 
-#INSTALL DOCKER CLI
-ENV DOCKER_VERSION=29.1.2
+FROM gradle:9.5-jdk26 AS builder
+
+# Docker CLI https://download.docker.com/linux/static/stable/x86_64/
+# Extracted here since the target image does not have
+ARG DOCKER_VERSION
 RUN curl -sfL -o docker.tgz "https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz" && \
   tar -xzf docker.tgz docker/docker --strip=1 && \
   mv docker /usr/local/bin && \
   rm docker.tgz
 
-#INSTALL DOCKER COMPOSE
-RUN curl -L "https://github.com/docker/compose/releases/download/v2.3.3/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
-RUN chmod 755 /usr/local/bin/docker-compose
+COPY . /home/gradle/project
+WORKDIR /home/gradle/project
+RUN gradle assemble
+
+FROM eclipse-temurin:26-jre
+
+# Docker compose https://github.com/docker/compose/releases
+ARG COMPOSE_VERSION
+ADD --chmod=755 \
+    https://github.com/docker/compose/releases/download/v${COMPOSE_VERSION}/docker-compose-linux-x86_64 \
+    /usr/local/bin/docker-compose
+
+COPY --from=builder /usr/local/bin/docker /usr/local/bin/docker
+
 RUN chmod 755 /usr/local/bin/docker
 
 RUN set -ex; \
@@ -17,14 +32,6 @@ RUN set -ex; \
     apt-get install -y --no-install-recommends rsync; \
     apt-get clean all;
 
-## This image builds the server code
-FROM gradle:9.0-jdk21 AS builder
-COPY . /home/gradle/project
-WORKDIR /home/gradle/project
-RUN gradle assemble
-
-## This takes the build server and puts in on the R-script enabled image
-FROM base-image
 COPY --from=builder /home/gradle/project/build/libs/biab-script-server-all.jar /root/biab-script-server.jar
 
 RUN chmod 755 /root

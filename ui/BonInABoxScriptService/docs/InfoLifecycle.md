@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **status** | **String** |  | [optional] [default to &#39;in_development&#39;]
-**message** | **String** |  | [optional] 
+**message** | **String** |  | [optional]
 
 
 
@@ -18,9 +18,15 @@ Name | Type | Description | Notes
 
 * `reviewed` (value: `"reviewed"`)
 
+* `core` (value: `"core"`)
+
 * `deprecated` (value: `"deprecated"`)
 
 * `example` (value: `"example"`)
+
+* `stale` (value: `"stale"`)
+
+* `subpipeline` (value: `"subpipeline"`)
 
 
 

@@ -16,7 +16,7 @@ internal class ObjectInputDefinitionTest {
 
     @Test // AI generated
     fun whenTypeConversionHasSupersetPayload_whenValidated_thenAccepted() {
-        assertTrue(canAcceptOutputOf(ObjectInputType.COUNTRY, ObjectInputType.BBOX_CRS))
+        assertTrue(canAcceptOutputOf(ObjectInputType.COUNTRY, ObjectInputType.COUNTRY_REGION_CRS_BBOX))
     }
 
     @Test // AI generated

@@ -2,10 +2,10 @@ package org.geobon.pipeline
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
-import org.geobon.pipeline.Pipeline.Companion.createRootPipeline
-import org.geobon.server.ServerContext
 import org.geobon.utils.noHPCContext
+import org.geobon.utils.scriptsRoot
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
@@ -226,7 +226,7 @@ internal class PipelineTest {
     fun `given a pipeline passing bbox to country_when validated and ran_then step receives the full object`() = runTest {
         val pipeline = createRootPipeline(
             noHPCContext,
-            "bboxToCountry.json",
+            "locationToCountry.json",
             """
                 {
                   "pipeline@2": {
@@ -285,7 +285,7 @@ internal class PipelineTest {
         try {
             createRootPipeline(
                 noHPCContext,
-                "countryToBbox.json",
+                "countryToLocation.json",
                 """
                     {
                       "pipeline@4": {
@@ -306,7 +306,7 @@ internal class PipelineTest {
             fail("Invalid conversion produced no exception.")
         } catch (ex: RuntimeException) {
             assertContains(ex.message!!, "Wrong type for input ")
-            assertContains(ex.message!!, """expected "bboxCRS" but "country" was received""")
+            assertContains(ex.message!!, """expected "location" but "country" was received""")
         }
     }
 
@@ -443,7 +443,7 @@ internal class PipelineTest {
     fun `given a mini pipeline_when ran_then outputs generated`() = runTest {
         val pipeline = createMiniPipelineFromScript(
             noHPCContext,
-            File(ServerContext.scriptsRoot, "helloWorld/helloPython.yml"),
+            File(scriptsRoot, "helloWorld/helloPython.yml"),
             "helloWorld>helloPython.yml",
             """{ "some_int": "7" }"""
         )
@@ -462,7 +462,7 @@ internal class PipelineTest {
         assertFailsWith<RuntimeException> {
             createMiniPipelineFromScript(
                 noHPCContext,
-                File(ServerContext.scriptsRoot, "helloWorld/helloPython.yml"),
+                File(scriptsRoot, "helloWorld/helloPython.yml"),
                 "helloWorld>helloPython.yml",
                 """{ "bad_key": "7" }"""
             )

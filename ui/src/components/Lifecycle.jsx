@@ -51,6 +51,17 @@ export function LifecycleChip({ lifecycle }) {
       displayText = "Example";
       title = "For testing and training purpose only. Does not perform any real analysis."
       break;
+    case 'subpipeline':
+      chipStyle.backgroundColor = '#ffa9c6';
+      displayText = "subpipeline";
+      title = "A pipeline that is meant to be part of larger pipelines."
+      break;
+    case 'stale':
+      chipStyle.backgroundColor = '#5d5d5d';
+      chipStyle.color = 'white';
+      displayText = "Stale";
+      title = "Not maintained."
+      break;
     case 'none': // used when script not found on server
       return null;
     default:

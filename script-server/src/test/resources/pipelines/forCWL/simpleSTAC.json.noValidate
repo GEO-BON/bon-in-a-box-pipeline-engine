@@ -1,0 +1,179 @@
+{
+  "nodes": [
+    {
+      "id": "72",
+      "type": "io",
+      "position": {
+        "x": 197.6015625,
+        "y": 202.3125
+      },
+      "data": {
+        "descriptionFile": "forCWL>simpleSTAC>loadFromStac.yml"
+      }
+    },
+    {
+      "id": "73",
+      "type": "io",
+      "position": {
+        "x": 624.6015625,
+        "y": 210.3125
+      },
+      "data": {
+        "descriptionFile": "forCWL>simpleSTAC>createCollection.yml"
+      }
+    },
+    {
+      "id": "74",
+      "type": "output",
+      "position": {
+        "x": 1118.6015625,
+        "y": 212.3125
+      },
+      "data": {
+        "label": "Output"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "72",
+      "sourceHandle": "rasters",
+      "target": "73",
+      "targetHandle": "tiff_files",
+      "id": "xy-edge__72rasters-73tiff_files"
+    },
+    {
+      "source": "73",
+      "sourceHandle": "stac_collection",
+      "target": "74",
+      "id": "xy-edge__73stac_collection-74"
+    }
+  ],
+  "inputs": {
+    "forCWL>simpleSTAC>loadFromStac.yml@72|bbox_crs": {
+      "description": "Object containing the chosen bounding box and CRS.",
+      "label": "Bounding box and CRS",
+      "type": "crsBBox",
+      "weight": 0,
+      "example": null
+    },
+    "forCWL>simpleSTAC>loadFromStac.yml@72|stac_url": {
+      "description": "URL of the STAC catalog.",
+      "label": "STAC URL",
+      "type": "text",
+      "example": "https://stac.geobon.org/",
+      "weight": 1
+    },
+    "forCWL>simpleSTAC>loadFromStac.yml@72|collections_items": {
+      "description": "Vector of strings. To pull specific collection items, input the collection name followed by '|' followed by item id (e.g. \"chelsa-clim|bio1\"). To extract a whole collection, type the collection name only (e.g. \"chelsa-clim\"). To pull collection items by date, write the collection name and provide a start date, end date, and temporal resolution. If pulling a layer that is tiled (e.g. https://stac.geobon.org/viewer/gfw-lossyear/_80N_180W), enter the collection name (e.g. gfw-lossyear), bounding box and time range if the layer is a time series, and the script will assemble the tiles into a continuous layer automatically.)",
+      "label": "STAC collection items",
+      "type": "text[]",
+      "example": [
+        "chelsa-clim|bio1",
+        "chelsa-clim|bio2"
+      ],
+      "weight": 2
+    },
+    "forCWL>simpleSTAC>loadFromStac.yml@72|t0": {
+      "description": "Start date for time series layers. Can be in the format YYYY or YYYY-MM-DD. Leave blank if extracting items by name or to extract layers from all available dates.",
+      "label": "Start date",
+      "type": "text",
+      "weight": 3,
+      "example": null
+    },
+    "forCWL>simpleSTAC>loadFromStac.yml@72|t1": {
+      "description": "End date for time series layers. Can be in the format YYYY or YYYY-MM-DD. Leave blank if extracting items by name or to extract layers from all available dates.",
+      "label": "End date",
+      "type": "text",
+      "weight": 4,
+      "example": null
+    },
+    "forCWL>simpleSTAC>loadFromStac.yml@72|temporal_res": {
+      "description": "Temporal resolution to use when querying STAC items by date, in the format (\"P\", time interval, and time unit, e.g. \"P1Y\" is yearly, \"P1M\" is montly, and \"P1D\" is daily). Leave blank if not querying by date or if extracting layers from all available dates. If the temporal resolution is coarser than the temporal resolution of the time series, the layers will be aggregated with the aggregation method chosen below.",
+      "label": "Temporal resolution",
+      "type": "text",
+      "weight": 5,
+      "example": null
+    },
+    "forCWL>simpleSTAC>loadFromStac.yml@72|spatial_res": {
+      "description": "Integer, spatial resolution of the rasters in the same units as the coordinate reference system (meters for projected reference systems and degrees for reference systems in lat long). If this is left blank it will attempt to use the native resolution of the rasters, however the input CRS units must match the units of the native resolution. If the spatial resolution is coarser than the native resolution of the rasters, the layers will be resampled with the resampling method chosen below.",
+      "label": "Spatial resolution",
+      "type": "float",
+      "example": 0.00833,
+      "weight": 6
+    },
+    "forCWL>simpleSTAC>loadFromStac.yml@72|resampling": {
+      "description": "Resampling method used when rescaling and/or reprojecting the raster layers. Will be ignored if no resampling occurs. See [gdalwarp](https://gdal.org/en/latest/programs/gdalwarp.html) for description.",
+      "label": "Resampling method",
+      "type": "options",
+      "options": [
+        "near",
+        "bilinear",
+        "average",
+        "mode",
+        "cubic",
+        "cubicspline",
+        "lanczos",
+        "rms",
+        "min",
+        "max",
+        "sum",
+        "med",
+        "q1",
+        "q3"
+      ],
+      "example": "near",
+      "weight": 7
+    },
+    "forCWL>simpleSTAC>loadFromStac.yml@72|aggregation": {
+      "description": "Method used to aggregate items when layers combining over time. Will be ignored if no aggregation occurs.",
+      "label": "Aggregation method",
+      "type": "options",
+      "options": [
+        "first",
+        "min",
+        "max",
+        "mean",
+        "median"
+      ],
+      "example": "first",
+      "weight": 8
+    },
+    "forCWL>simpleSTAC>loadFromStac.yml@72|study_area": {
+      "description": "Polygon of study area used to mask output layers, in geopackage format.",
+      "label": "Study area",
+      "type": "application/geopackage+sqlite3",
+      "weight": 9,
+      "example": null
+    },
+    "forCWL>simpleSTAC>createCollection.yml@73|collection_name": {
+      "description": "Name of the STAC collection to be created. The collection name should be unique, using lowercase letters and hyphens only. Default is \"biab-collection\".",
+      "label": "Collection Name",
+      "type": "text",
+      "example": "biab-collection",
+      "weight": 10
+    },
+    "forCWL>simpleSTAC>createCollection.yml@73|collection_description": {
+      "description": "Description of the STAC collection to be created.",
+      "label": "Collection Description",
+      "type": "text",
+      "example": "A STAC collection created from GeoTIFF files.",
+      "weight": 11
+    },
+    "forCWL>simpleSTAC>createCollection.yml@73|collection_license": {
+      "description": "License for the STAC collection to be created. Default is \"CC-BY\".",
+      "label": "Collection License",
+      "type": "text",
+      "example": "CC-BY",
+      "weight": 12
+    }
+  },
+  "outputs": {
+    "forCWL>simpleSTAC>createCollection.yml@73|stac_collection": {
+      "description": "JSON file representing a STAC collection containing the provided GeoTIFFs\nThe official MIME type is application/json however, we use application/stac+json to indicate that this is a STAC catalog and differentiate from other json files.",
+      "label": "STAC Collection",
+      "type": "application/stac+json",
+      "weight": 0
+    }
+  }
+}

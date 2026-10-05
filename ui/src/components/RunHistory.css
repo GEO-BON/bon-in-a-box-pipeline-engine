@@ -1,0 +1,30 @@
+.history .search-container {
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.step-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #83829b;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    background: #fcfcfc url('../../img/magnifying-glass.svg') no-repeat right 12px center;
+}
+
+.history .step-search-input {
+    max-width: 400px;
+}
+
+.step-search-input:focus {
+    outline: none;
+    border-color: var(--biab-green-main, #4caf50);
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.step-search-input:not(:placeholder-shown) {
+    background-image: none;
+}
+

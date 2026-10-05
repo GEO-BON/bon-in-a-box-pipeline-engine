@@ -25,8 +25,8 @@ export const layoutElements = (nodes, edges, callback) => {
   graph.children = nodes.map((node) => {
     let elkjsNode = {
       id: node.id,
-      width: node.width,
-      height: node.height,
+      width: node.measured?.width,
+      height: node.measured?.height,
     };
 
     if (node.type === "io") {

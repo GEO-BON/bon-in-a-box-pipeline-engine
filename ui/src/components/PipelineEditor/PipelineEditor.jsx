@@ -1,6 +1,5 @@
-import "react-flow-renderer/dist/style.css";
 import { getErrorString } from "../HttpErrors";
-import "react-flow-renderer/dist/theme-default.css";
+import '@xyflow/react/dist/base.css';
 import "./Editor.css";
 import {
   TextField,
@@ -17,7 +16,8 @@ import {
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useBlocker } from "react-router-dom";
-import ReactFlow, {
+import {
+  ReactFlow,
   ReactFlowProvider,
   addEdge,
   useNodesState,
@@ -26,7 +26,7 @@ import ReactFlow, {
   Controls,
   MiniMap,
   Position,
-} from "react-flow-renderer/nocss";
+} from "@xyflow/react";
 
 import IONode from "./IONode";
 import ConstantNode from "./ConstantNode";
@@ -235,9 +235,9 @@ export default function PipelineEditor(props) {
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
 
       // Offset from pointer event to canvas
-      const position = reactFlowInstance.project({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
       });
 
       // Approx offset so the node appears near the input.
@@ -277,9 +277,9 @@ export default function PipelineEditor(props) {
       const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
 
       // Offset from pointer event to canvas
-      const position = reactFlowInstance.project({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
       });
 
       // Approx offset so the node appears near the output.
@@ -348,10 +348,13 @@ export default function PipelineEditor(props) {
         return;
       }
 
-      const position = reactFlowInstance.project({
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
+      const position = reactFlowInstance.screenToFlowPosition({
+        x: event.clientX,
+        y: event.clientY,
       });
+
+      position.x -= 100
+      position.y -= 20
 
       const newNode = {
         id: getId(),
@@ -495,6 +498,30 @@ export default function PipelineEditor(props) {
   useEffect(() => {
     refreshInputList(nodes, edges);
   }, [nodes, edges, refreshInputList]);
+
+  // Propagate the data type change to user inputs
+  useEffect(() => {
+    if (reactFlowInstance) {
+      setNodes((nodes) => {
+        let changed = false;
+        let newNodes = [...nodes];
+
+        inputList.forEach((input) => {
+          const node = reactFlowInstance.getNode(input.nodeId);
+          if (node && node.type === "userInput" && node.data.type !== input.type) {
+            changed = true;
+            newNodes = newNodes.map((prevNode) =>
+              prevNode.id === input.nodeId
+                ? { ...prevNode, data: { ...prevNode.data, type: input.type } }
+                : prevNode
+            )
+          }
+        })
+
+        return changed ? newNodes : nodes
+      })
+    }
+  }, [inputList, reactFlowInstance]);
 
   /**
    * Refresh the list of outputs on edge change.
@@ -643,7 +670,7 @@ export default function PipelineEditor(props) {
       delete node.selected;
       delete node.dragging;
       delete node.positionAbsolute;
-      delete node.width;
+      delete node.measured;
       delete node.height;
       if (node.type === "userInput" || node.type === "constant")
         delete node.data.label;
@@ -1273,6 +1300,8 @@ export default function PipelineEditor(props) {
               onNodesDelete={onNodesDelete}
               deleteKeyCode={['Backspace', 'Delete']}
               onMouseDownCapture={onPopupMenuHide}
+              reconnectRadius="100"
+              panActivationKeyCode={null} // default here blocks the pace key in metadata pane
             >
               {toolTip && <div className="tooltip">{toolTip}</div>}
 

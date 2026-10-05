@@ -6,6 +6,7 @@ import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.geobon.pipeline.outputRoot
 import org.json.JSONObject
+import org.json.JSONArray
 import java.io.File
 import kotlin.test.*
 
@@ -112,6 +113,21 @@ class ApplicationTest {
                 }""".trimIndent(),
                 File(folder, "output.json").readText()
             )
+        }
+    }
+
+    @Test
+    fun testUDPFileExtraction() = testApplication {
+        application { scriptModule() }
+        client.get("/openEO/list").apply {
+            assertEquals(HttpStatusCode.OK, status)
+
+            val result = bodyAsText()
+            val jsonResult = JSONObject(result)
+
+            assertEquals(3, jsonResult.length())
+            assertTrue(jsonResult.has("UDP2.udp"))
+            assertEquals("udp1", jsonResult.getString("UDP1.udp"))
         }
     }
 

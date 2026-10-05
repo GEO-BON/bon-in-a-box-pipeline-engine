@@ -1,0 +1,10 @@
+CDSE:
+  UDP1.udp:
+    name: udp1
+    url: https://somewhere.com/udp1.json
+  UDP2.udp:
+    name: udp2
+    url: https://somewhere.com/udp2.json
+  UDP3.udp:
+    name: udp3
+    url: https://somewhere.com/udp3.json

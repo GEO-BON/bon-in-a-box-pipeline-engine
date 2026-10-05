@@ -1,4 +1,5 @@
 package org.geobon.server.plugins
+import org.geobon.server.ServerContext.Companion.condaPackDir
 import java.io.File
 
 class SystemStatus {
@@ -16,6 +17,16 @@ class SystemStatus {
             errorMessage = "Output folder cannot be accessed. Check if folder exists and permissions allow to read and write with the current user."
 	        return false
 	    }
+
+        condaPackDir?.apply {
+            mkdirs()
+            if (!exists()) {
+                errorMessage = "Conda-pack folder could not be created. \n" +
+                        "Create the folder manually or set CONDA_PACK_ENABLED=false in runner.env to disable it."
+                return false
+            }
+        }
+
         return true
     }
 }

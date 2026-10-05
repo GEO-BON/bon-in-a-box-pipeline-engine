@@ -1,5 +1,6 @@
 #!/bin/python3
 import os, sys, json, signal
+from pathlib import Path
 
 biab_output_list = {}
 
@@ -11,7 +12,7 @@ def biab_inputs():
 # Add outputs throughout the script
 def biab_output(key, value):
 	biab_output_list[ key ] = value
-	print("Output added for \"", key, "\"\n")
+	print("Output added for \"", key, "\"")
 
 # Non-breaking messages
 def biab_info(message):
@@ -27,7 +28,7 @@ def biab_error_stop(errorMessage):
 
 # Signal handler will allow to write whatever outputs we have (in the finally clause below)
 def signal_handler(sig, frame):
-    print('Handling termination signal', flush=True)
+    print('Handling termination signal')
     biab_output_list[ "error" ] = "Script run has received a stop signal before completion.\nThis is usually due to a timeout or cancellation."
     sys.exit(0)
 
@@ -40,6 +41,10 @@ if __name__ == "__main__":
 	output_folder = os.path.abspath(sys.argv[1])
 	script_path = os.path.abspath(sys.argv[2])
 
+	# Updating the pid file for the python process
+	file_path = Path(output_folder)/".pid"
+	file_path.write_text(f"{os.getpid()}")
+
 	# Add script dir to sys.path
 	script_dir = os.path.dirname(os.path.abspath(script_path))
 	sys.path.insert(0, script_dir)
@@ -51,12 +56,13 @@ if __name__ == "__main__":
 		raise
 	finally: # Write the output.json file
 		if biab_output_list:
-			print("Writing outputs to BON in a Box...", flush=True)
+			print("Writing outputs to BON in a Box...")
 			with open(output_folder + "/output.json", "w") as outfile:
-				outfile.write(json.dumps(biab_output_list, indent = 2))
+				json.dump(biab_output_list, outfile, indent = 2)
+				outfile.flush()
 
 		# Capture dependencies for this run
-		print("Writing dependencies to file...", flush=True)
+		print("Writing dependencies to file...")
 		os.system("/opt/conda/bin/pip freeze > " + output_folder + "/dependencies.txt")
-		print(" done.", flush=True)
+		print(" done.")
 

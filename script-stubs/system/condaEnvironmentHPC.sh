@@ -1,7 +1,9 @@
 #!/bin/bash
 outputFolder=$1
 condaEnvName=$2
-condaEnvFileSrc=$3
+
+# File that we use to compare the new yml file with the previous one.
+condaEnvFileNew=$3
 
 pidFile="$outputFolder/.pid"
 
@@ -22,28 +24,28 @@ function activateSubEnvironment {
 
     mamba env list | grep " $condaEnvName "
     if [[ $? -eq 0 ]] ; then
-        if cmp -s "$condaEnvFile" "$condaEnvFileSrc"; then
+        if cmp -s "$condaEnvFile" "$condaEnvFileNew"; then
             echo "Conda environment $condaEnvName exists with the same dependencies."
-            rm "$condaEnvFileSrc" ; assertSuccess
+            rm "$condaEnvFileNew" ; assertSuccess
         else
             echo "Updating existing conda environment $condaEnvName..."
-            mamba env update -y -f "$condaEnvFileSrc"
+            mamba env update -y -f "$condaEnvFileNew"
             if [[ $? -eq 0 ]] ; then
-                mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
+                mv "$condaEnvFileNew" "$condaEnvFile" ; assertSuccess
                 echo "Updated successfully."
             fi
         fi
     else
         echo "Creating new conda environment $condaEnvName..."
-        mamba env create -y -f "$condaEnvFileSrc" 2>&1
+        mamba env create -y -f "$condaEnvFileNew" 2>&1
 
         if [[ $? -eq 0 ]] ; then
-            mv "$condaEnvFileSrc" "$condaEnvFile" ; assertSuccess
+            mv "$condaEnvFileNew" "$condaEnvFile" ; assertSuccess
             echo "Created successfully."
         fi
     fi
 
-    if [ -f "$condaEnvFileSrc" ]; then
+    if [ -f "$condaEnvFileNew" ]; then
         echo "Cleaning up after failure..."
         mamba remove -qy -n $condaEnvName --all > /dev/null 2>&1
         echo -e "FAILED" ; exit 1

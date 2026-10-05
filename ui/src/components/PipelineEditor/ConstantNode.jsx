@@ -1,10 +1,10 @@
-import { Handle, Position } from "react-flow-renderer/nocss";
+import { Handle, Position } from "@xyflow/react";
 import ScriptInput from "../form/ScriptInput";
 
 // props content, see https://reactflow.dev/docs/api/nodes/custom-nodes/#passed-prop-types
 export default function ConstantNode({ id, data, type }) {
   return (
-    <div className={`constant constant-${data.type}`}>
+    <div className={`constant constant-${data.type.toLowerCase()}`}>
       <div className="dragHandle behindInput"></div>
       <table>
         <tbody>

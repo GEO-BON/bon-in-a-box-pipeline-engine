@@ -253,4 +253,217 @@ class HistoryTest {
         }
     }
 
+    @Test
+    fun givenFilteredLongHistory_whenGettingHistory_thenPaging() = testApplication {
+        application { scriptModule() }
+
+        for(i in 0..8) {
+            client.post("/pipeline/1in1out_1step.json/run") { setBody("{helloWorld>helloPython.yml@0|some_int: $i}") }
+                .apply { assertEquals(HttpStatusCode.OK, status) }
+            client.post("/script/assertText.yml/run") { setBody("""{input: "Iteration $i"}""") }
+                .apply { assertEquals(HttpStatusCode.OK, status) }
+        }
+
+        client.get("/api/history?start=0&limit=5&keyword=1in1out").apply {
+            assertEquals(HttpStatusCode.PartialContent, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(5, responseArray.length(), "First page is full, 5 items")
+            assertContains(response, "some_int\":8")
+            assertContains(response, "some_int\":7")
+            assertContains(response, "some_int\":6")
+            assertContains(response, "some_int\":5")
+            assertContains(response, "some_int\":4")
+            assertFalse(response.contains("some_int\":3"))
+            assertFalse(response.contains("some_int\":2"))
+            assertFalse(response.contains("some_int\":1"))
+            assertFalse(response.contains("some_int\":0"))
+        }
+
+        client.get("/api/history?start=5&limit=5&keyword=1in1out").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(4, responseArray.length(), "Second page has only 4 items")
+            assertFalse(response.contains("some_int\":8"))
+            assertFalse(response.contains("some_int\":7"))
+            assertFalse(response.contains("some_int\":6"))
+            assertFalse(response.contains("some_int\":5"))
+            assertFalse(response.contains("some_int\":4"))
+            assertContains(response, "some_int\":3")
+            assertContains(response, "some_int\":2")
+            assertContains(response, "some_int\":1")
+            assertContains(response, "some_int\":0")
+        }
+
+        // Getting all items (no range specified)
+        client.get("/api/history?keyword=1in1out").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(9, responseArray.length(), "")
+            assertContains(response, "some_int\":8")
+            assertContains(response, "some_int\":7")
+            assertContains(response, "some_int\":6")
+            assertContains(response, "some_int\":5")
+            assertContains(response, "some_int\":4")
+            assertContains(response, "some_int\":3")
+            assertContains(response, "some_int\":2")
+            assertContains(response, "some_int\":1")
+            assertContains(response, "some_int\":0")
+        }
+
+        // Getting all items (page is longer than items)
+        client.get("/api/history?start=0&limit=10&keyword=1in1out").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(9, responseArray.length(), "")
+            assertContains(response, "some_int\":8")
+            assertContains(response, "some_int\":7")
+            assertContains(response, "some_int\":6")
+            assertContains(response, "some_int\":5")
+            assertContains(response, "some_int\":4")
+            assertContains(response, "some_int\":3")
+            assertContains(response, "some_int\":2")
+            assertContains(response, "some_int\":1")
+            assertContains(response, "some_int\":0")
+        }
+
+        // Getting all items (page has exact items length)
+        client.get("/api/history?start=0&limit=9&keyword=1in1out").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(9, responseArray.length(), "")
+            assertContains(response, "some_int\":8")
+            assertContains(response, "some_int\":7")
+            assertContains(response, "some_int\":6")
+            assertContains(response, "some_int\":5")
+            assertContains(response, "some_int\":4")
+            assertContains(response, "some_int\":3")
+            assertContains(response, "some_int\":2")
+            assertContains(response, "some_int\":1")
+            assertContains(response, "some_int\":0")
+        }
+
+        // Exactly out of range
+        client.get("/api/history?start=9&limit=9&keyword=1in1out").apply {
+            assertEquals(HttpStatusCode.RequestedRangeNotSatisfiable, status)
+            val response = bodyAsText()
+            println(response)
+        }
+
+        // Out of range
+        client.get("/api/history?start=10&limit=10&keyword=1in1out").apply {
+            assertEquals(HttpStatusCode.RequestedRangeNotSatisfiable, status)
+            val response = bodyAsText()
+            println(response)
+        }
+    }
+
+    @Test
+    fun givenHistory_whenSearching_getMatchingResults() = testApplication {
+        application { scriptModule() }
+
+        for (i in 1000..1002) {
+            client.post("/pipeline/helloWorld.json/run") {
+                setBody("{\"helloWorld>helloPython.yml@0|some_int\":$i}")
+            }.apply { assertEquals(HttpStatusCode.OK, status) }
+        }
+
+        for (i in 1000..1002) {
+            client.post("/script/helloWorld>helloPython.yml/run") {
+                setBody("{\"some_int\":$i}")
+            }.apply { assertEquals(HttpStatusCode.OK, status) }
+        }
+
+        client.post("/pipeline/0in1out_1step.json/run") {
+            setBody("{}")
+        }.apply { assertEquals(HttpStatusCode.OK, status) }
+
+        client.get("/api/history?keyword=helloPython").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(6, responseArray.length(), "All pipeline and script runs should be returned")
+            assertFalse(response.contains("0in1out_1step"))
+        }
+
+        client.get("/api/history?keyword=1000").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(2, responseArray.length(), "2 runs with 1000 as input should be returned")
+            assertFalse(response.contains("0in1out_1step"))
+        }
+
+        client.get("/api/history?keyword=nonexistent").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals("[]", bodyAsText())
+        }
+    }
+
+    @Test
+    fun givenHistory_whenFiltering_getMatchingResults() = testApplication {
+        application { scriptModule() }
+
+        client.post("/pipeline/assertNull.json/run") {
+            setBody("""{"assertNull.yml@0|input": hello}""")
+        }.apply {
+            assertEquals(HttpStatusCode.OK, status)
+        }
+
+        for (i in 0..2) {
+            client.post("/pipeline/helloWorld.json/run") {
+                setBody("{\"helloWorld>helloPython.yml@0|some_int\":$i}")
+            }.apply { assertEquals(HttpStatusCode.OK, status) }
+        }
+
+        client.get("/api/history?filterStatus=all").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(4, responseArray.length(), "Should display all 4 runs regardless of status.")
+        }
+
+        client.get("/api/history?filterStatus=completed").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(3, responseArray.length(), "Should display all 3 runs that have completed.")
+            assertContains(response, """"status":"completed"""")
+        }
+
+        client.get("/api/history?filterStatus=error").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(1, responseArray.length(), "Should display the one run that has an error.")
+            assertContains(response, """"status":"error"""")
+        }
+
+        client.get("/api/history?filterStatus=none").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(0, responseArray.length(), "Should display nothing.")
+        }
+
+        client.get("/api/history?filterStatus=error&filterStatus=completed").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(4, responseArray.length(), "Should display both the runs that have status complete and status error.")
+            assertContains(response, """"status":"error"""")
+            assertContains(response, """"status":"completed"""")
+        }
+
+        client.get("/api/history").apply {
+            val response = bodyAsText()
+            val responseArray = JSONArray(response)
+            assertEquals(HttpStatusCode.OK, status)
+            assertEquals(4, responseArray.length(), "Should display all runs by default.")
+        }
+    }
 }

@@ -17,8 +17,10 @@ export function fetchStepDescription(descriptionFileLocation, callback) {
   }
 
   api.getInfo(
-    // We know that Pipeline descriptions are json and Scripts are yaml...
-    descriptionFileLocation.endsWith(".json") ? "pipeline" : "script",
+    // We know that Pipeline descriptions are json, Scripts are yaml and openEO scripts are udps...
+    descriptionFileLocation.endsWith(".json") ? "pipeline"
+      : descriptionFileLocation.endsWith(".udp") ? "openEO"
+        : "script",
     descriptionFileLocation,
     (error, callbackData, response) => {
       if (error) {

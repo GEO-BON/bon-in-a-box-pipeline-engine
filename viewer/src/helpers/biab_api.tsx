@@ -79,11 +79,11 @@ export const createPipeline4Display = async (pipeline_run_id: string) => {
           const output = getScriptOutput(p);
           if (script in pro) {
             const script_run_output_path = pro[script];
-            return await GetScriptOutputs(script_run_output_path).then(
+            return await GetScriptOutputs(script_run_output_path).then( // TODO: Should not call GetScriptOutputs multiple times, use scriptDescriptionStore from the "ui" folder
               (out: any) => {
                 return {
                   ...po.outputs[p],
-                  outputs: `${out[output]}`,
+                  outputs: `${out[output]}`, // TODO should be out[output] && `${out[output]}` to avoid having "undefined" strings
                 };
               }
             );

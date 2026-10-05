@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 **license** | **String** |  | [optional]
 **externalLink** | **String** |  | [optional]
 **timeout** | **Number** |  | [optional]
-**hpc** | [**InfoHpc**](InfoHpc.md) |  | [optional]
+**compute** | [**InfoCompute**](InfoCompute.md) |  | [optional]
 **inputs** | [**{String: InfoInputsValue}**](InfoInputsValue.md) |  | [optional]
 **outputs** | [**{String: InfoOutputsValue}**](InfoOutputsValue.md) |  | [optional]
 **references** | [**[InfoReferencesInner]**](InfoReferencesInner.md) |  | [optional]

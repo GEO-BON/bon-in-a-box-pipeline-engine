@@ -1,11 +1,11 @@
 
-import { getConnectedEdges } from 'react-flow-renderer/nocss';
+import { getConnectedEdges } from '@xyflow/react';
 
 /**
  * Given a list of nodes, get the list of upstream node directly connected to these nodes.
- * 
- * @param {import('react-flow-renderer/nocss').Node[]} nodes 
- * @param {import('react-flow-renderer/nocss').ReactFlowInstance} reactFlowInstance 
+ *
+ * @param {import('@xyflow/react').Node[]} nodes
+ * @param {import('@xyflow/react').ReactFlowInstance} reactFlowInstance
  */
 export const getUpstreamNodes = (nodes, reactFlowInstance) => {
     const nodeIds = nodes.map(n => n.id)
@@ -16,7 +16,7 @@ export const getUpstreamNodes = (nodes, reactFlowInstance) => {
 
 /**
  * Given a list of edges, find the list of nodes that are connected upstream.
- * 
+ *
  * @param {Edge[]} edges Edges that we look for.
  * @param {Node[]} allNodes All nodes of the graph
  */
@@ -27,9 +27,9 @@ export const getUpstreamNodesFromEdges = (edges, allNodes) => {
 
 /**
  * Given a list of nodes, get the list of downstream node directly connected to these nodes.
- * 
- * @param {import('react-flow-renderer/nocss').Node[]} nodes 
- * @param {import('react-flow-renderer/nocss').ReactFlowInstance} reactFlowInstance 
+ *
+ * @param {import('@xyflow/react').Node[]} nodes
+ * @param {import('@xyflow/react').ReactFlowInstance} reactFlowInstance
  */
  export const getDownstreamNodes = (nodes, reactFlowInstance) => {
     const nodeIds = nodes.map(n => n.id)
@@ -40,7 +40,7 @@ export const getUpstreamNodesFromEdges = (edges, allNodes) => {
 
 /**
  * Given a list of edges, find the list of nodes that are connected upstream.
- * 
+ *
  * @param {Edge[]} edges Edges that we look for.
  * @param {Node[]} allNodes All nodes of the graph
  */

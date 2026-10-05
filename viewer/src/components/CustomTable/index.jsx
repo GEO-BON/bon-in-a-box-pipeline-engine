@@ -61,7 +61,7 @@ export default function CustomTable({ tableData }) {
   };
 
   return (
-    <Paper style={{ height: "100%", width: "100%", padding: "30px" }}>
+    <Paper style={{ width: "80vw", height: "80vh", padding: "30px" }}>
       <TableVirtuoso
         data={filteredData}
         fixedHeaderContent={headerContent}

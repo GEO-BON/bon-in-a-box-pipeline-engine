@@ -6,7 +6,7 @@ docs/GetHPCStatus200ResponseValue.md
 docs/GetHistory200ResponseInner.md
 docs/Info.md
 docs/InfoAuthorInner.md
-docs/InfoHpc.md
+docs/InfoCompute.md
 docs/InfoInputsValue.md
 docs/InfoInputsValueExample.md
 docs/InfoInputsValueExampleOneOfInner.md
@@ -24,7 +24,7 @@ src/model/GetHPCStatus200ResponseValue.js
 src/model/GetHistory200ResponseInner.js
 src/model/Info.js
 src/model/InfoAuthorInner.js
-src/model/InfoHpc.js
+src/model/InfoCompute.js
 src/model/InfoInputsValue.js
 src/model/InfoInputsValueExample.js
 src/model/InfoInputsValueExampleOneOfInner.js
@@ -33,4 +33,3 @@ src/model/InfoOutputsValue.js
 src/model/InfoOutputsValueExample.js
 src/model/InfoReferencesInner.js
 src/model/InfoReviewerInner.js
-test/model/InfoHpc.spec.js

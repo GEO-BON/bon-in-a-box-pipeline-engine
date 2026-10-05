@@ -41,7 +41,8 @@ outputs:
     description: bla bla
     type: int
     example: 4
-hpc:
+compute:
+  hpc: true
   mem: 1G
   cpus-per-task: 1
   time: "3:00"

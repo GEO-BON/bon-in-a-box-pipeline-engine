@@ -109,7 +109,7 @@ abstract class Step(
     }
 
     companion object {
-        const val DEFAULT_IN = "defaultInput"
-        const val DEFAULT_OUT = "defaultOutput"
+        const val DEFAULT_IN = "default_input"
+        const val DEFAULT_OUT = "default_output"
     }
 }

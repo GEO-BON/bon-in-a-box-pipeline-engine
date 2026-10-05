@@ -15,7 +15,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 /**
  * Runs a function, making sure that the exceptions that happen throughout its execution get reported.
  */
-fun<T> runReliably(
+fun <T> runReliably(
     testBody: () -> T,
 ): T {
     val oldHandler = Thread.getDefaultUncaughtExceptionHandler()
@@ -47,8 +47,7 @@ fun<T> runReliably(
 @OptIn(ExperimentalCoroutinesApi::class)
 fun runReliableTest(
     context: CoroutineContext = EmptyCoroutineContext,
-    dispatchTimeoutMs: Long = 30_000L,
     testBody: suspend TestScope.() -> Unit
 ) = runReliably {
-    runTest(context, dispatchTimeoutMs, testBody)
+    runTest(context, testBody = testBody)
 }

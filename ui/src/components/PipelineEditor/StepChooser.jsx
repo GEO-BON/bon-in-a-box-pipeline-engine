@@ -67,6 +67,7 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
 export default function StepChooser(_) {
   const [scriptFiles, setScriptFiles] = useState([]);
   const [pipelineFiles, setPipelineFiles] = useState([]);
+  const [udpFiles, setUdpFiles] = useState([]);
   const [selectedStep, setSelectedStep] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchKeywords, setSearchKeywords] = useState([]);
@@ -95,7 +96,16 @@ export default function StepChooser(_) {
         setScriptFiles(scriptList);
       }
     });
-  }, [setPipelineFiles, setScriptFiles]);
+
+    api.getListOf("openEO", (error, udpList, response) => {
+      if (error) {
+        console.warn("No UPDs found, hiding openEO branch");
+        setUdpFiles(null)
+      } else {
+        setUdpFiles(udpList);
+      }
+    });
+  }, [setPipelineFiles, setScriptFiles, setUdpFiles]);
 
   const onStepClick = useCallback(
     (descriptionFile) => {
@@ -154,9 +164,9 @@ export default function StepChooser(_) {
   // Memoized filtered results
   const filteredResults = useMemo(() => {
     if (searchKeywords.length > 0) {
-      return filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles);
+      return filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles, udpFiles);
     }
-  }, [searchKeywords, pipelineFiles, scriptFiles, filterAndRankResults]);
+  }, [searchKeywords, pipelineFiles, scriptFiles, udpFiles, filterAndRankResults]);
 
   /**
    *
@@ -297,6 +307,24 @@ export default function StepChooser(_) {
                     entry[1],
                   ])
                 )}
+              </div>
+            )}
+
+            {udpFiles && Object.keys(udpFiles).length > 0 && (
+              <div key="openEO">
+                <h3>openEO</h3>
+                {isValidElement(udpFiles) && udpFiles.type === HttpError ? udpFiles :
+                  Object.entries(udpFiles).map(([fileName, stepName]) => (
+                    <PipelineStep
+                      key={fileName}
+                      descriptionFile={fileName}
+                      fileName={fileName}
+                      selectedStep={selectedStep}
+                      stepName={stepName}
+                      onStepClick={onStepClick}
+                    />
+                  ))
+                }
               </div>
             )}
           </>
