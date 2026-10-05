@@ -441,7 +441,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             step.metadata.conda?.let { condaMetadata ->
                 if (!condaMetadata.isBaseEnv()) {
                     appendLine(3, "envFolder:")
-                    appendLine(4, "source: prepareEnvironments/envFolder")
+                    appendLine(4, "source: preparePackedEnvs/envFolder")
                     appendLine(
                         4,
                         """valueFrom: "$(self ? { class: 'Directory', location: self.location + '/${condaMetadata.name}' } : null)""""
@@ -465,7 +465,9 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             """.replaceIndent(indent(3))
             )
 
-            val passedInputs = listOf("environment", "condaPackURL", "scripts_root")
+            appendLine(3, "environment: prepareRunnerEnv/environmentFile")
+
+            val passedInputs = listOf("condaPackURL", "scripts_root")
             passedInputs.forEach {
                 appendLine(3, "$it: $it")
             }

@@ -82,16 +82,28 @@ requirements:
     envDef:
       CONDA_PKGS_DIRS: /conda-env-yml/pkgs
       CONDA_ENVS_PATH: /opt/conda/envs:/conda-env-yml/envs
+      CONDA_PACK_URL: $(inputs.condaPackURL)
       SCRIPT_LOCATION: /scripts
+      SCRIPT_PATH: $(inputs.scriptPath)
       SCRIPT_STUBS_LOCATION: /script-stubs
       USERDATA_LOCATION: /userdata
       OUTPUT_LOCATION: "$(inputs.runFolder ? inputs.runFolder.path : runtime.outdir)"
+      PYTHONUNBUFFERED: "1"
 
 baseCommand: ["bash", "-c"]
 arguments:
   - |
     log=$OUTPUT_LOCATION/logs.txt
     rm -f $log
+    touch "$log"
+    tail -f "$log" &
+    tailPid=$!
+    cleanupTail() {
+      kill "$tailPid" 2>/dev/null
+      wait "$tailPid" 2>/dev/null
+    }
+    trap cleanupTail EXIT
+
     mkdir -p /conda-env-yml/pkgs /conda-env-yml/envs
 
     cat > "$OUTPUT_LOCATION/input.json" <<'JSON'
@@ -101,23 +113,23 @@ arguments:
       }, null, 2);
     }
     JSON
-    echo "Running in $OUTPUT_LOCATION" | tee -a $log
-    echo "Inputs:" | tee -a $log
-    cat $OUTPUT_LOCATION/input.json | tee -a $log
+    echo "Running in $OUTPUT_LOCATION" >> "$log"
+    echo "Inputs:" >> "$log"
+    cat "$OUTPUT_LOCATION/input.json" >> "$log"
 
     source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "{{condaEnvName}}" \
-    "{{condaEnvYml}}" /conda-envs $(inputs.condaPackURL) >> "$log" 2>&1
+    "{{condaEnvYml}}" /conda-envs "$CONDA_PACK_URL" >> "$log" 2>&1
 
     {{program}} \
       $SCRIPT_STUBS_LOCATION/system/{{scriptWrapper}} \
       $OUTPUT_LOCATION \
-      $SCRIPT_LOCATION/$(inputs.scriptPath) \
-      2>&1 | tee -a $log
-    scriptExitCode=\${PIPESTATUS[0]}
-    echo "Script exited with code $scriptExitCode" | tee -a $log
-  
+      "$SCRIPT_LOCATION/$SCRIPT_PATH" \
+      >> "$log" 2>&1
+    scriptExitCode=$?
+    echo "Script exited with code $scriptExitCode" >> "$log"
+
     if [[ "$OUTPUT_LOCATION" != "$(runtime.outdir)" ]]; then
-      echo "Copying results from run folder to CWL output directory" | tee -a $log
+      echo "Copying results from run folder to CWL output directory" >> "$log"
       cp -a "$OUTPUT_LOCATION"/. "$(runtime.outdir)"/
     fi
 
