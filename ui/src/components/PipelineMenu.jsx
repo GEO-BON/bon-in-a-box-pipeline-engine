@@ -1,7 +1,45 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Select from "react-select";
+import { Checkbox, FormControlLabel } from "@mui/material";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import { getFolderAndName } from "./StepDescription";
+
+// Lifecycle statuses listed when in development / experimental pipelines are hidden
+export const REVIEWED_STATUSES = ["reviewed", "in_review"];
+
+const SHOW_ALL_STORAGE_KEY = "showAllPipelines";
+
+/**
+ * State of the "Show in development or experimental pipelines" checkbox,
+ * remembered in this browser.
+ */
+export function useShowAllPipelines() {
+  const [showAll, setShowAll] = useState(() => {
+    try {
+      return localStorage.getItem(SHOW_ALL_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const update = (value) => {
+    setShowAll(value);
+    try {
+      localStorage.setItem(SHOW_ALL_STORAGE_KEY, value);
+    } catch {
+      // Storage unavailable: the choice is just not remembered
+    }
+  };
+
+  return [showAll, update];
+}
+
+/**
+ * Options for api.getListOf, filtering on lifecycle status unless showAll is true.
+ */
+export function lifecycleListOpts(showAll) {
+  return showAll ? {} : { lifecycleStatus: REVIEWED_STATUSES };
+}
 
 /**
  * Searchable list of pipelines (or scripts), grouped by top-level folder.
@@ -11,31 +49,68 @@ import { getFolderAndName } from "./StepDescription";
  * @param onChange called with (descriptionFile, name) when a pipeline is chosen
  * @param inline when true, the list is always open and laid out below the search box
  *               (e.g. inside a dialog) instead of floating over the page
+ * @param showAllPipelines state of the "Show in development or experimental pipelines" checkbox
+ * @param onShowAllPipelinesChange when given, the checkbox is displayed below the menu
  * @param selectProps any other react-select prop (placeholder, autoFocus, etc.)
  */
-export default function PipelineMenu({ pipelineMap, value, onChange, inline = false, ...selectProps }) {
-  const options = useMemo(() => groupOptionsByFolder(pipelineMap || {}), [pipelineMap]);
+export default function PipelineMenu({
+  pipelineMap,
+  value,
+  onChange,
+  inline = false,
+  showAllPipelines = false,
+  onShowAllPipelinesChange,
+  backgroundMode = "light",
+  ...selectProps
+}) {
+  const options = useMemo(
+    () => groupOptionsByFolder(pipelineMap || {}),
+    [pipelineMap],
+  );
 
   const selectedOption = value
     ? options.flatMap((group) => group.options).find((o) => o.value === value)
     : null;
 
   return (
-    <Select
-      className="blackText"
-      options={options}
-      value={selectedOption}
-      placeholder="Search or select a pipeline..."
-      menuPortalTarget={inline ? null : document.body}
-      menuIsOpen={inline || undefined}
-      maxMenuHeight={inline ? 450 : 420}
-      styles={inline ? inlineSelectStyles : selectStyles}
-      filterOption={filterOption}
-      formatGroupLabel={formatGroupLabel}
-      formatOptionLabel={formatOptionLabel}
-      onChange={(v) => v && onChange(v.value, v.label)}
-      {...selectProps}
-    />
+    <>
+      <Select
+        className="blackText"
+        options={options}
+        value={selectedOption}
+        placeholder="Search or select a pipeline..."
+        menuPortalTarget={inline ? null : document.body}
+        menuIsOpen={inline || undefined}
+        maxMenuHeight={inline ? 450 : 420}
+        styles={inline ? inlineSelectStyles : selectStyles}
+        filterOption={filterOption}
+        formatGroupLabel={formatGroupLabel}
+        formatOptionLabel={formatOptionLabel}
+        onChange={(v) => v && onChange(v.value, v.label)}
+        {...selectProps}
+      />
+      {onShowAllPipelinesChange && (
+        <FormControlLabel
+          sx={{
+            mt: 0.5,
+            "& .MuiFormControlLabel-label": { fontSize: "0.85rem" },
+            color: backgroundMode === "dark" ? "white" : "black",
+          }}
+          control={
+            <Checkbox
+              size="small"
+              checked={showAllPipelines}
+              onChange={(e) => onShowAllPipelinesChange(e.target.checked)}
+              sx={{
+                color: backgroundMode === "dark" ? "white" : "black",
+                "&.Mui-checked": { color: "var(--biab-green-main)" },
+              }}
+            />
+          }
+          label="Show in development or experimental pipelines"
+        />
+      )}
+    </>
   );
 }
 
@@ -79,7 +154,8 @@ function groupOptionsByFolder(pipelineMap) {
 // Search matches the name, the folder and the file name
 function filterOption(option, input) {
   if (!input) return true;
-  const haystack = `${option.data.fullLabel} ${option.data.folder} ${option.value}`.toLowerCase();
+  const haystack =
+    `${option.data.fullLabel} ${option.data.folder} ${option.value}`.toLowerCase();
   return input
     .toLowerCase()
     .split(/\s+/)
