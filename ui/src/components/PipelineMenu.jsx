@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import Select from "react-select";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import PipelineIcon from "../img/graphBullet.png";
 import { getFolderAndName } from "./StepDescription";
 
 // Lifecycle statuses listed when in development / experimental pipelines are hidden
@@ -172,7 +173,11 @@ function formatGroupLabel(group) {
         marginTop: "8px",
       }}
     >
-      <AccountTreeIcon sx={{ fontSize: "1rem" }} />
+      <img
+        src={PipelineIcon}
+        className="pipeline-icon"
+        style={{ width: "18px", height: "18px" }}
+      ></img>
       {group.label || "General"}
     </span>
   );
