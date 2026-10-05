@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import "./LeftPane.css";
 // images
 import BiaBLogo from "./img/boninabox_logo.jpg";
-import IconDashboard from "./img/icon-dashboard.png";
 import IconFiles from "./img/icon-gear.png";
 import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";
