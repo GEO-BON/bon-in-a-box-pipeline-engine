@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import Select from "react-select";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
@@ -6,34 +6,7 @@ import PipelineIcon from "../img/graphBullet.png";
 import { getFolderAndName } from "./StepDescription";
 
 // Lifecycle statuses listed when in development / experimental pipelines are hidden
-export const REVIEWED_STATUSES = ["reviewed", "in_review"];
-
-const SHOW_ALL_STORAGE_KEY = "showAllPipelines";
-
-/**
- * State of the "Show in development or experimental pipelines" checkbox,
- * remembered in this browser.
- */
-export function useShowAllPipelines() {
-  const [showAll, setShowAll] = useState(() => {
-    try {
-      return localStorage.getItem(SHOW_ALL_STORAGE_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
-
-  const update = (value) => {
-    setShowAll(value);
-    try {
-      localStorage.setItem(SHOW_ALL_STORAGE_KEY, value);
-    } catch {
-      // Storage unavailable: the choice is just not remembered
-    }
-  };
-
-  return [showAll, update];
-}
+export const REVIEWED_STATUSES = ["reviewed", "in_review", "example", "in_development"];
 
 /**
  * Options for api.getListOf, filtering on lifecycle status unless showAll is true.
@@ -55,7 +28,7 @@ export function lifecycleListOpts(showAll) {
  * @param togglePosition "top" puts the checkbox in a header row above the menu, next to `label`;
  *                       "bottom" puts it below the menu
  * @param label field label shown in the header row when togglePosition is "top"
- * @param backgroundMode "dark" when displayed on a dark background
+ * @param originPage "input-form | pipeline-editor" 
  * @param selectProps any other react-select prop (placeholder, autoFocus, etc.)
  */
 export default function PipelineMenu({
@@ -65,7 +38,7 @@ export default function PipelineMenu({
   inline = false,
   showAllPipelines = false,
   onShowAllPipelinesChange,
-  backgroundMode = "light",
+  originPage = "input-form",
   togglePosition = "bottom",
   label,
   ...selectProps
@@ -79,11 +52,11 @@ export default function PipelineMenu({
     ? options.flatMap((group) => group.options).find((o) => o.value === value)
     : null;
 
-  const textColor = backgroundMode === "dark" ? "white" : "black";
+  const textColor = originPage === "input-form" ? "white" : "black";
 
   const toggle = onShowAllPipelinesChange && (
     <FormControlLabel
-      title="Also list pipelines that have not been reviewed: in development, examples, stale, etc."
+      title="Also list pipelines that have not been reviewed: stale, subpipeline, etc."
       sx={{
         m: 0,
         color: textColor,
@@ -100,7 +73,7 @@ export default function PipelineMenu({
             color: textColor,
             "&.Mui-checked": {
               color:
-                backgroundMode === "dark"
+                originPage === "input-form"
                   ? "var(--biab-green-light)"
                   : "var(--biab-green-main)",
             },
