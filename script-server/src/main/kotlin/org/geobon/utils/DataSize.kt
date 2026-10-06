@@ -98,10 +98,11 @@ value class DataSize(val bytes: Long) : Comparable<DataSize> {
         const val GB = MB * 1000
         const val TB = GB * 1000
 
-        private val SIZE_PATTERN = Regex("""^\s*(\d+(?:\.\d*)?|\.\d+)\s*([a-zA-Z]*)\s*$""")
+        // Matches "1.1 KiB" as [1.1 KiB, 1.1, KiB]
+        private val SIZE_PATTERN = Regex("""^(\d+(?:\.\d*)?|\.\d+)\s*([a-zA-Z]*)$""")
 
         private fun parse(value: String): Long {
-            val match = SIZE_PATTERN.matchEntire(value)
+            val match = SIZE_PATTERN.matchEntire(value.trim())
                 ?: throw IllegalArgumentException("Invalid data size: '$value'")
             val amount = match.groupValues[1].toBigDecimal()
             val multiplier = when (match.groupValues[2].uppercase()) {
