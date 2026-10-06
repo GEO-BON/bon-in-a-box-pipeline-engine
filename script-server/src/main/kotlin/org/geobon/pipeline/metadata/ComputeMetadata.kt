@@ -5,6 +5,7 @@ import org.geobon.script.Description.COMPUTE__CPUS
 import org.geobon.script.Description.COMPUTE__DURATION
 import org.geobon.script.Description.COMPUTE__HPC
 import org.geobon.script.Description.COMPUTE__MEMORY
+import org.geobon.utils.DataSize
 
 data class ComputeMetadata(
     val hpc: Boolean = false,
@@ -12,6 +13,9 @@ data class ComputeMetadata(
     val cpusPerTask: Int,
     val time: String? = null
 ) {
+    val memParsed: DataSize
+        by lazy { DataSize(mem) }
+
     companion object {
         fun fromRawMetadata(rawMetadata: Map<String, Any>): ComputeMetadata? {
             if (!rawMetadata.containsKey(COMPUTE)) return null
