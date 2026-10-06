@@ -11,7 +11,7 @@ data class LifecycleMetadata(val status: Lifecycle, val message:String? = null) 
         REVIEWED("Reviewed"),
         CORE("Core"),
         EXAMPLE("Example"),
-        SUB_PIPELINE("subpipeline"), // only for pipelines
+        SUBPIPELINE("subpipeline"), // only for pipelines
         STALE("Stale"),
         DEPRECATED("Deprecated");
     }
