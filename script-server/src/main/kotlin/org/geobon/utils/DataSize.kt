@@ -44,11 +44,11 @@ value class DataSize(val bytes: Long) : Comparable<DataSize> {
     operator fun minus(other: DataSize): DataSize =
         DataSize(this.bytes - other.bytes)
 
-    operator fun times(factor: Long): DataSize =
-        DataSize(this.bytes * factor)
+    operator fun times(factor: Double): DataSize =
+        DataSize((this.bytes * factor).toLong())
 
-    operator fun div(divisor: Long): DataSize =
-        DataSize(this.bytes / divisor)
+    operator fun div(divisor: Double): DataSize =
+        DataSize((this.bytes / divisor).toLong())
 
     /**
      * Example usage: size.toLong(DataSize.Companion.MIB)

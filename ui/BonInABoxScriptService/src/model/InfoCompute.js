@@ -53,6 +53,9 @@ class InfoCompute {
             if (data.hasOwnProperty('mem')) {
                 obj['mem'] = ApiClient.convertToType(data['mem'], 'String');
             }
+            if (data.hasOwnProperty('mem-max')) {
+                obj['mem-max'] = ApiClient.convertToType(data['mem-max'], 'String');
+            }
             if (data.hasOwnProperty('cpus-per-task')) {
                 obj['cpus-per-task'] = ApiClient.convertToType(data['cpus-per-task'], 'Number');
             }
@@ -74,6 +77,10 @@ class InfoCompute {
             throw new Error("Expected the field `mem` to be a primitive type in the JSON string but got " + data['mem']);
         }
         // ensure the json data is a string
+        if (data['mem-max'] && !(typeof data['mem-max'] === 'string' || data['mem-max'] instanceof String)) {
+            throw new Error("Expected the field `mem-max` to be a primitive type in the JSON string but got " + data['mem-max']);
+        }
+        // ensure the json data is a string
         if (data['time'] && !(typeof data['time'] === 'string' || data['time'] instanceof String)) {
             throw new Error("Expected the field `time` to be a primitive type in the JSON string but got " + data['time']);
         }
@@ -93,10 +100,16 @@ class InfoCompute {
 InfoCompute.prototype['hpc'] = undefined;
 
 /**
- * Maximum amount of memory allowed before Out Of Memory exception occurs.
+ * Maximum amount of memory allowed before Out Of Memory (OOM) exception occurs.
  * @member {String} mem
  */
 InfoCompute.prototype['mem'] = undefined;
+
+/**
+ * Optional, if the job fails with OOM, the job's available memory will be increased up to this value.
+ * @member {String} mem-max
+ */
+InfoCompute.prototype['mem-max'] = undefined;
 
 /**
  * Number of CPUs for this task.
