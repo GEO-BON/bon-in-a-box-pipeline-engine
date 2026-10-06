@@ -20,6 +20,7 @@ import org.geobon.script.Description.IO__TYPE__STAC
 import org.geobon.script.Description.IO__TYPE__TEXT
 import org.geobon.server.ServerContext
 import org.geobon.utils.DataSize
+import org.geobon.utils.gibibytes
 import org.json.JSONObject
 import org.json.JSONWriter
 import org.yaml.snakeyaml.Yaml
@@ -570,8 +571,13 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             appendLine()
             appendLine(1, "ResourceRequirement:")
             // Capping the min value to 20G because that is the maximum openEO can offer.
-            appendLine(2, "ramMin: ${20000L.coerceAtMost(computeMetadata.memParsed.toLong(DataSize.MIB))}")
-            // appendLine(2, "ramMax: ${computeMetadata.mem}") TODO: Here would go the mem max from other PR.
+            appendLine(
+                2,
+                "ramMin: ${computeMetadata.memParsed.coerceAtMost(20.gibibytes).toLong(DataSize.MIB)}"
+            )
+            computeMetadata.memMaxParsed?.let {
+                appendLine(2, "ramMax: ${it.toLong(DataSize.MIB)}")
+            }
             appendLine(2, "coresMax: ${computeMetadata.cpusPerTask}")
         }
     }
