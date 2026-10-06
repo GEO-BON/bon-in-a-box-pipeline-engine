@@ -569,9 +569,10 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         return buildString {
             appendLine()
             appendLine(1, "ResourceRequirement:")
-            appendLine(2, "ramMin: ${computeMetadata.memParsed.toLong(DataSize.MIB)}")
+            // Capping the min value to 20G because that is the maximum openEO can offer.
+            appendLine(2, "ramMin: ${20000L.coerceAtMost(computeMetadata.memParsed.toLong(DataSize.MIB))}")
             // appendLine(2, "ramMax: ${computeMetadata.mem}") TODO: Here would go the mem max from other PR.
-            appendLine(2, "coresMin: ${computeMetadata.cpusPerTask}")
+            appendLine(2, "coresMax: ${computeMetadata.cpusPerTask}")
         }
     }
 }
