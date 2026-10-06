@@ -32,7 +32,7 @@ import IONode from "./IONode";
 import ConstantNode from "./ConstantNode";
 import UserInputNode from "./UserInputNode";
 import PopupMenu from "./PopupMenu";
-import PipelineMenu, { useShowAllPipelines, lifecycleListOpts } from "../PipelineMenu";
+import PipelineMenu, { lifecycleListOpts } from "../PipelineMenu";
 import { layoutElements } from "./react-flow-utils/Layout";
 import { highlightConnectedEdges } from "./react-flow-utils/HighlightConnectedEdges";
 import {
@@ -108,7 +108,7 @@ export default function PipelineEditor(props) {
   const [popupMenuOptions, setPopupMenuOptions] = useState();
   const [loadDialogOpen, setLoadDialogOpen] = useState(false);
   const [serverPipelineMap, setServerPipelineMap] = useState(null); // pipelines listed in the "Load from server" dialog
-  const [showAllPipelines, setShowAllPipelines] = useShowAllPipelines();
+  const [showAllPipelines, setShowAllPipelines] = useState(false);
   const [modal, setModal] = useState(null);
   const [alertSeverity, setAlertSeverity] = useState("");
   const [alertTitle, setAlertTitle] = useState("");
@@ -1400,6 +1400,7 @@ export default function PipelineEditor(props) {
             inline
             autoFocus
             showAllPipelines={showAllPipelines}
+            originPage="pipeline-editor"
             onShowAllPipelinesChange={onShowAllPipelinesChange}
           />
         </DialogContent>

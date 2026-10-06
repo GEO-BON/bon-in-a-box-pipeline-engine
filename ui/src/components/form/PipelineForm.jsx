@@ -2,10 +2,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import InputFileInput from "./InputFileInput";
 import { useNavigate } from "react-router-dom";
 import { GeneralDescription } from "../StepDescription";
-import PipelineMenu, {
-  useShowAllPipelines,
-  lifecycleListOpts,
-} from "../PipelineMenu";
+import PipelineMenu, { lifecycleListOpts } from "../PipelineMenu";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { CustomButtonGreen } from "../CustomMUI";
 import { formatError } from "../HttpErrors";
@@ -28,7 +25,7 @@ export function PipelineForm({
   const formRef = useRef();
   const navigate = useNavigate();
   const [pipelineMap, setPipelineMap] = useState();
-  const [showAllPipelines, setShowAllPipelines] = useShowAllPipelines();
+  const [showAllPipelines, setShowAllPipelines] = useState(false);
   const isPipeline = runType === "pipeline";
   const [validationError, setValidationError] = useState();
 
@@ -138,7 +135,7 @@ export function PipelineForm({
           onShowAllPipelinesChange={
             isPipeline ? setShowAllPipelines : undefined
           }
-          backgroundMode="dark"
+          originPage="input-form"
           togglePosition="top"
           label={isPipeline ? "Pipeline" : "Script"}
           inputId="pipelineChoiceInput"
