@@ -898,6 +898,15 @@ h2.MuiDialogTitle-root {
     margin-right: 0;
   }
 
+  .pipeline-page .locationChooserButton {
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
   div.left-pane {
     display: none;
   }
