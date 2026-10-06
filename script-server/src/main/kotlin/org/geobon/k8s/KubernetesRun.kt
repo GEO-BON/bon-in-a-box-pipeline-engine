@@ -5,7 +5,7 @@ import io.kubernetes.client.openapi.apis.BatchV1Api
 import io.kubernetes.client.openapi.apis.CoreV1Api
 import kotlinx.coroutines.*
 import org.geobon.pipeline.RunContext
-import org.geobon.script.ComputeRequirements
+import org.geobon.pipeline.metadata.ComputeMetadata
 import org.geobon.script.Run
 import org.geobon.script.ScriptType
 import org.geobon.server.ServerContext
@@ -26,7 +26,7 @@ class KubernetesRun(
     private val timeout: Duration = DEFAULT_TIMEOUT,
     private val condaEnvName: String? = null,
     private val condaEnvYml: String? = null,
-    private val computeRequirements: ComputeRequirements? = null
+    private val computeRequirements: ComputeMetadata? = null
 ) : Run(scriptFile, context) {
 
     companion object {
