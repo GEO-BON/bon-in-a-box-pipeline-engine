@@ -89,7 +89,7 @@ requirements:
       USERDATA_LOCATION: /userdata
       OUTPUT_LOCATION: "$(inputs.runFolder ? inputs.runFolder.path : runtime.outdir)"
       PYTHONUNBUFFERED: "1"
-
+{{resources}}
 baseCommand: ["bash", "-c"]
 arguments:
   - |
