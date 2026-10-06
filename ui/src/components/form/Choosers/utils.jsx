@@ -4,7 +4,7 @@ import proj4 from "proj4";
 import { DefaultApi } from "bon_in_a_box_script_service";
 export const api = new DefaultApi();
 
-const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
+const key = atob("MkpQT25DZlJhRFlJcmd2TUNzWVI=");
 
 const supportedProjections = [
   "longlat",
