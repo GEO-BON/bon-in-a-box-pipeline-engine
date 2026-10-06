@@ -106,13 +106,13 @@ value class DataSize(val bytes: Long) : Comparable<DataSize> {
             val amount = match.groupValues[1].toBigDecimal()
             val multiplier = when (match.groupValues[2].uppercase()) {
                 "", "B", "BYTE", "BYTES" -> 1L
-                "K", "KIB", "KIBIBYTE", "KIBIBYTES" -> KIB
+                "K", "KI", "KIB", "KIBIBYTE", "KIBIBYTES" -> KIB
                 "KB", "KILOBYTE", "KILOBYTES" -> KB
-                "M", "MIB", "MEBIBYTE", "MEBIBYTES" -> MIB
+                "M", "MI", "MIB", "MEBIBYTE", "MEBIBYTES" -> MIB
                 "MB", "MEGABYTE", "MEGABYTES" -> MB
-                "G", "GIB", "GIBIBYTE", "GIBIBYTES" -> GIB
+                "G", "GI", "GIB", "GIBIBYTE", "GIBIBYTES" -> GIB
                 "GB", "GIGABYTE", "GIGABYTES" -> GB
-                "T", "TIB", "TEBIBYTE", "TEBIBYTES" -> TIB
+                "T", "TI", "TIB", "TEBIBYTE", "TEBIBYTES" -> TIB
                 "TB", "TERABYTE", "TERABYTES" -> TB
                 else -> throw IllegalArgumentException("Unknown data size unit in '$value'")
             }
