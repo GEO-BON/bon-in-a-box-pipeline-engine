@@ -12,12 +12,14 @@ import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_INT
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_LONG
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
 import org.geobon.pipeline.*
+import org.geobon.pipeline.metadata.ComputeMetadata
 import org.geobon.pipeline.metadata.IOMetadata
 import org.geobon.pipeline.metadata.StepMetadata
 import org.geobon.script.Description.IO__TYPE__OPTIONS
 import org.geobon.script.Description.IO__TYPE__STAC
 import org.geobon.script.Description.IO__TYPE__TEXT
 import org.geobon.server.ServerContext
+import org.geobon.utils.DataSize
 import org.json.JSONObject
 import org.json.JSONWriter
 import org.yaml.snakeyaml.Yaml
@@ -54,7 +56,8 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             "condaEnvYml" to condaEnvYml,
             "program" to step.scriptType.program,
             "scriptWrapper" to "scriptWrapper.${step.scriptType.extension}",
-            "metadata" to metadataToCWL(step.metadata)
+            "metadata" to metadataToCWL(step.metadata),
+            "resources" to toCWL(step.metadata.compute)
         )
 
         // Load the step template
@@ -570,6 +573,21 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
                     }
                 }
             }
+        }
+    }
+
+
+    private fun toCWL(computeMetadata: ComputeMetadata?): String {
+        if(computeMetadata == null)
+            return ""
+
+        return buildString {
+            appendLine()
+            appendLine(1, "ResourceRequirement:")
+            // Capping the min value to 20G because that is the maximum openEO can offer.
+            appendLine(2, "ramMin: ${20000L.coerceAtMost(computeMetadata.memParsed.toLong(DataSize.MIB))}")
+            // appendLine(2, "ramMax: ${computeMetadata.mem}") TODO: Here would go the mem max from other PR.
+            appendLine(2, "coresMax: ${computeMetadata.cpusPerTask}")
         }
     }
 }

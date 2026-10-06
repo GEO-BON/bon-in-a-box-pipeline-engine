@@ -46,6 +46,7 @@ abstract class YMLStep(
         yamlParsed[EXTERNAL_LINK]?.toString(),
         ReferenceMetadata.listFromRawMetadata(yamlParsed),
         CondaMetadata.fromRawMetadata(serverContext, yamlFile, yamlParsed),
+        ComputeMetadata.fromRawMetadata(yamlParsed),
         (yamlParsed[TIMEOUT] as? Int)?.minutes ?: DEFAULT_TIMEOUT
     )
 ) : Step(

@@ -548,17 +548,14 @@ internal class HPCStepTest {
         every { hpc.register(any()) } just runs
         val inputFile = File(outputRoot, "someFile.csv")
         inputFile.writeText("a,b,c,d,e\n1,2,3,4,5")
-        val step = ScriptStep(
-            mockContext, badFile, StepId("HPCBadTimeTest.yml", "1"),
-            mutableMapOf(
-                "someFile" to ConstantPipe("text/csv", inputFile.absolutePath),
-                "someInt" to ConstantPipe("int", 10)
-            )
-        )
-        every { hpc.unregister(any()) } just runs
-
         val ex = assertThrows<RuntimeException> {
-            step.execute()
+            ScriptStep(
+                mockContext, badFile, StepId("HPCBadTimeTest.yml", "1"),
+                mutableMapOf(
+                    "someFile" to ConstantPipe("text/csv", inputFile.absolutePath),
+                    "someInt" to ConstantPipe("int", 10)
+                )
+            )
         }
 
         // The error message should redirect to the SLURM documentation on time formats
