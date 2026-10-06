@@ -17,7 +17,7 @@ class ScriptMetadata (
     externalLink: String? = null,
     references: List<ReferenceMetadata>? = null,
     val conda: CondaMetadata? = null,
-    // TODO: compute requirements
+    val compute: ComputeMetadata? = null,
     val timeout: Duration = DEFAULT_TIMEOUT,
 ) : StepMetadata(inputs, outputs, name, description, authors, reviewers, references, license, externalLink, lifecycle) {
     companion object {
