@@ -704,8 +704,12 @@ components:
                 If true, the script will be run on a HPC when configured, otherwise on kubernetes or locally.
             mem:
               type: string
+              example: 10G
+              description: Maximum amount of memory allowed before Out Of Memory (OOM) exception occurs.
+            mem-max:
+              type: string
               example: 30G
-              description: Maximum amount of memory allowed before Out Of Memory exception occurs.
+              description: Optional, if the job fails with OOM, the job's available memory will be increased up to this value.
             cpus-per-task:
               type: integer
               example: 16
