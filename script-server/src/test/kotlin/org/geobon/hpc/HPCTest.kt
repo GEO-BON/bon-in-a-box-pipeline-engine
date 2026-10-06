@@ -11,6 +11,7 @@ import org.geobon.utils.createMockHPCContext
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -255,7 +256,10 @@ class HPCTest {
         val job1 = hpc.syncCondaEnvironment(run0, condaEnvName, logFile, syncCommand)
         val job2 = hpc.syncCondaEnvironment(run1, condaEnvName, logFile, syncCommand)
 
-        assertTrue(job1 === job2)
+        assertSame(job1, job2)
+
+        job1.cancel()
+        job2.cancel()
     }
 
     @Test
@@ -287,12 +291,15 @@ class HPCTest {
             throw RuntimeException("This is an error message")
         }
 
-        hpc.syncCondaEnvironment(run1, condaEnvName, logFile, command)
-        hpc.syncCondaEnvironment(run2, condaEnvName, logFile, command)
+        val job1 = hpc.syncCondaEnvironment(run1, condaEnvName, logFile, command)
+        val job2 = hpc.syncCondaEnvironment(run2, condaEnvName, logFile, command)
 
-        Thread.sleep(200) // This would not work delay(2000)
+        Thread.sleep(200) // This would not work: delay(2000)
 
         verify { run1.fail(any()) }
         verify { run2.fail(any()) }
+
+        job1.join()
+        job2.join()
     }
 }
