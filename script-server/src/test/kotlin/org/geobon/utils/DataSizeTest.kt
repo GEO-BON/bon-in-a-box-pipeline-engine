@@ -46,6 +46,7 @@ class DataSizeTest {
         assertEquals(DataSize(DataSize.GB), DataSize("1 GB"))
         assertEquals(DataSize((1.5 * DataSize.MB).toLong()), DataSize("1.5 megabytes"))
         assertEquals(DataSize(512), DataSize("512 B"))
+        assertEquals(DataSize(512), DataSize("512"))
         assertFailsWith<IllegalArgumentException> { DataSize("2XB") }
     }
 
