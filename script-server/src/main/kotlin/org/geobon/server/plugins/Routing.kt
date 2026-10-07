@@ -129,9 +129,8 @@ fun Application.configureRouting() {
                     if (file.extension == extension) {
                         val relativePath = file.relativeTo(root).path.replace('/', FILE_SEPARATOR)
 
-                        var name: String? = null
-                        if (file.extension == "yml") { // Scripts
-                            name = try {
+                        val name = if (file.extension == "yml") { // Scripts
+                            try {
                                 val lineStart = "name: "
                                 file.useLines { sequence ->
                                     sequence.find { l -> l.startsWith(lineStart) }?.substring(lineStart.length)
@@ -145,7 +144,6 @@ fun Application.configureRouting() {
                             } catch (_: Exception) { // Invalid JSON or IO error
                                 null
                             }
-                            name = metadata?.optString(METADATA__NAME)?.takeIf { it.isNotEmpty() }
 
                             if (lifecycleFilter != null) {
                                 val status = metadata
@@ -154,6 +152,8 @@ fun Application.configureRouting() {
                                     ?: LifecycleMetadata.Lifecycle.IN_DEVELOPMENT
                                 if (status.name.uppercase() !in lifecycleFilter) return@forEach
                             }
+
+                            metadata?.optString(METADATA__NAME)?.takeIf { it.isNotEmpty() }
                         }
                         possible[relativePath] = name ?: file.name // Fallback on file name
                     }
