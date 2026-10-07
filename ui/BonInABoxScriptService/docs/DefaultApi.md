@@ -182,6 +182,7 @@ apiInstance.getInfo(type, descriptionPath, (error, data, response) => {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **type** | **String**| Script, pipeline or openEO |
+ **lifecycleStatus** | [**[String]**](String.md)| Only list steps with one of these lifecycle statuses. Steps without a status are considered in_development. Lists everything when omitted. Currently applies to pipelines only. | [optional]
  **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
 
 ### Return type
@@ -239,7 +240,7 @@ No authorization required
 
 ## getListOf
 
-> {String: String} getListOf(type)
+> {String: String} getListOf(type, opts)
 
 Get a list of available steps of given type and their names.
 
@@ -250,7 +251,10 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script, pipeline or openEO
-apiInstance.getListOf(type, (error, data, response) => {
+let opts = {
+  'lifecycleStatus': ["null"] // [String] | Only list steps with one of these lifecycle statuses. Steps without a status are considered in_development. Lists everything when omitted. Currently applies to pipelines only.
+};
+apiInstance.getListOf(type, opts, (error, data, response) => {
   if (error) {
     console.error(error);
   } else {
