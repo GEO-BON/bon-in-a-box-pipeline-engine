@@ -80,7 +80,7 @@ export default function PipelineMenu({
           }}
         />
       }
-      label="Show in development or experimental pipelines"
+      label="Show stale pipelines, subpipelines, etc."
     />
   );
 
