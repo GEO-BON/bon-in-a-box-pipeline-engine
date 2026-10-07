@@ -570,10 +570,12 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         return buildString {
             appendLine()
             appendLine(1, "ResourceRequirement:")
-            // Capping the min value to 20G because that is the maximum openEO can offer.
+            // Capping the min value:
+            // 6 Gi to be able to run it locally
+            // 20 Gi is the maximum openEO can offer
             appendLine(
                 2,
-                "ramMin: ${computeMetadata.memParsed.coerceAtMost(20.gibibytes).toLong(DataSize.MIB)}"
+                "ramMin: ${computeMetadata.memParsed.coerceAtMost(6.gibibytes).toLong(DataSize.MIB)}"
             )
             computeMetadata.memMaxParsed?.let {
                 appendLine(2, "ramMax: ${it.toLong(DataSize.MIB)}")
