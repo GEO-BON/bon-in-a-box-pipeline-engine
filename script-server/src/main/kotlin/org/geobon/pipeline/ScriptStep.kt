@@ -4,7 +4,6 @@ import org.geobon.hpc.HPCRequirements
 import org.geobon.hpc.HPCRun
 import org.geobon.k8s.KubernetesRun
 import org.geobon.script.*
-import org.geobon.script.Description.COMPUTE
 import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext
 import org.geobon.utils.fromSlurm
@@ -70,36 +69,20 @@ open class ScriptStep : YMLStep {
                     // Optional specific conda environment for this script
 
 
-                    val computeSection = yamlParsed[COMPUTE]
-                    val computeRequirements = if (computeSection is Map<*, *>) {
-                        val mem = computeSection[Description.COMPUTE__MEMORY] as? String
-                            ?: throw RuntimeException("compute ${Description.COMPUTE__MEMORY} parameter is not formatted as expected. \nExample: 30G \nGot: ${computeSection[Description.COMPUTE__MEMORY]}")
-                        val cpus = computeSection[Description.COMPUTE__CPUS] as? Int
-                            ?: throw RuntimeException("compute ${Description.COMPUTE__CPUS} parameter should be an int. Got: ${computeSection[Description.COMPUTE__CPUS]}")
-                        ComputeRequirements(mem, cpus)
-                    } else null
+                    val computeMetadata = metadata.compute
 
-                    if (computeSection is Map<*, *> && computeSection[Description.COMPUTE__HPC] == true && shouldUseHPC()) {
-                        val durationString = computeSection[Description.COMPUTE__DURATION]
-                            ?: throw RuntimeException("compute ${Description.COMPUTE__DURATION} parameter missing.")
-
-                        if (durationString !is String) {
-                            throw RuntimeException(
-                                """
-                                compute parameter ${Description.COMPUTE__DURATION} must be expressed as a string, for example "1:30:00".
-                                See [SLURM documentation](https://slurm.schedmd.com/sbatch.html#OPT_time) for accepted formats.
-                            """.trimIndent()
-                            )
-                        }
-                        val duration = Duration.fromSlurm(durationString)
+                    if (computeMetadata?.hpc == true && shouldUseHPC()) {
+                        val duration = Duration.fromSlurm(
+                            requireNotNull(computeMetadata.time) { "compute time is required when hpc is true" }
+                        )
 
                         HPCRun(
                             context,
                             scriptFile,
                             inputs,
                             HPCRequirements(
-                                computeRequirements!!.mem,
-                                computeRequirements.cpus,
+                                computeMetadata.mem,
+                                computeMetadata.cpusPerTask,
                                 duration
                             ),
                             condaEnvName,
@@ -112,7 +95,7 @@ open class ScriptStep : YMLStep {
                             metadata.timeout,
                             condaEnvName,
                             condaEnvYml,
-                            computeRequirements
+                            computeMetadata
                         )
                     } else {
                         DockerizedRun(
