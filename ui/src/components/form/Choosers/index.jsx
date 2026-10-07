@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, lazy, useReducer, Suspense } from "react";
 import Grid from "@mui/material/Grid";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import CropIcon from "@mui/icons-material/Crop";
 const MapOpenLayers = lazy(() => import("./MapOpenLayers"));
 import CountryRegionMenu from "./CountryRegionMenu";
@@ -117,7 +118,8 @@ function Chooser({
   const showBBox = ["bboxcrs", "crsbbox", "location"].includes(
     type.toLowerCase(),
   );
-  const showMap = showBBox;
+  const isPhone = useMediaQuery("(max-width: 599px)");
+  const showMap = showBBox && !isPhone;
   const showCountry = [
     "country",
     "countryregion",
@@ -203,16 +205,16 @@ function Chooser({
     <div
       className="location-chooser-modal"
       style={{
-        width: showMap ? "90%" : "auto",
-        height: showMap ? "90%" : "auto",
-        position: showMap ? "absolute" : "relative",
-        top: showMap ? "50%" : "auto",
-        left: showMap ? "50%" : "auto",
-        transform: showMap ? "translate(-50%, -50%)" : "",
-        backgroundColor: showMap ? "#fff" : "none",
-        padding: showMap ? "20px" : "0px",
+        width: showBBox ? "90%" : "auto",
+        height: showBBox ? "90%" : "auto",
+        position: showBBox ? "absolute" : "relative",
+        top: showBBox ? "50%" : "auto",
+        left: showBBox ? "50%" : "auto",
+        transform: showBBox ? "translate(-50%, -50%)" : "",
+        backgroundColor: showBBox ? "#fff" : "none",
+        padding: showBBox ? (isPhone ? "0px" : "20px") : "0px",
         borderRadius: "8px",
-        margin: showMap ? "0px auto" : "0px",
+        margin: showBBox ? "0px auto" : "0px",
       }}
     >
       <Grid container spacing={0} sx={{ height: "100%" }}>
@@ -221,14 +223,14 @@ function Chooser({
           size={{ xs: showMap ? 3 : 12 }}
           sx={{
             padding: "10px",
-            height: showMap ? "100%" : "auto",
+            height: showBBox ? "100%" : "auto",
             overflowY: type === "bboxCRS"
               || type.toLowerCase() === "crsbbox"
               || type.toLowerCase() === "location"
               ? "scroll" : "visible",
           }}
         >
-          {showBBox && (
+          {showMap && (
             <>
               <CustomButtonGreen
                 onClick={() => {
@@ -250,7 +252,7 @@ function Chooser({
                 showAcceptButton: ["country", "countryRegion"].includes(type)
                   ? false
                   : true,
-                dialog: showMap,
+                dialog: showBBox,
                 value,
               }}
             />
@@ -260,7 +262,7 @@ function Chooser({
               {...{
                 states,
                 dispatch,
-                dialog: showMap,
+                dialog: showBBox,
                 showBBox,
                 value,
               }}
@@ -276,7 +278,7 @@ function Chooser({
               }}
             />
           )}
-          {showMap && (
+          {showBBox && (
             <div>
               <CustomButtonGreen
                 onClick={() => {
