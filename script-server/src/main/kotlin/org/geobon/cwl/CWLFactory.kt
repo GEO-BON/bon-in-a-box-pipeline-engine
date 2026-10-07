@@ -578,6 +578,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             computeMetadata.memMaxParsed?.let {
                 appendLine(2, "ramMax: ${it.toLong(DataSize.MIB)}")
             }
+            appendLine(2, "coresMin: 2")
             appendLine(2, "coresMax: ${computeMetadata.cpusPerTask}")
         }
     }
