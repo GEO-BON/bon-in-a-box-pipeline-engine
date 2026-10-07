@@ -20,6 +20,7 @@ import org.geobon.script.Description.IO__TYPE__STAC
 import org.geobon.script.Description.IO__TYPE__TEXT
 import org.geobon.server.ServerContext
 import org.geobon.utils.DataSize
+import org.geobon.utils.gibibytes
 import org.json.JSONObject
 import org.json.JSONWriter
 import org.yaml.snakeyaml.Yaml
@@ -569,10 +570,24 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         return buildString {
             appendLine()
             appendLine(1, "ResourceRequirement:")
-            // Capping the min value to 20G because that is the maximum openEO can offer.
-            appendLine(2, "ramMin: ${20000L.coerceAtMost(computeMetadata.memParsed.toLong(DataSize.MIB))}")
-            // appendLine(2, "ramMax: ${computeMetadata.mem}") TODO: Here would go the mem max from other PR.
-            appendLine(2, "coresMax: ${computeMetadata.cpusPerTask}")
+
+            // Capping the min value:
+            // 6 Gi to be able to run it locally
+            // 20 Gi is the maximum openEO can offer
+            // This hard-coded defaults allow running tests with small areas.
+            // However, if a step **always** needs the memory we specified, this can be a problem.
+            val ramMin = computeMetadata.memParsed.coerceAtMost(6.gibibytes)
+            appendLine(
+                2,
+                "ramMin: ${ramMin.toLong(DataSize.MIB)}"
+            )
+            computeMetadata.memMaxParsed?.let {
+                if(ramMin < it)
+                    appendLine(2, "ramMax: ${it.toLong(DataSize.MIB)}")
+            }
+            appendLine(2, "coresMin: 2")
+            if(2 < computeMetadata.cpusPerTask)
+                appendLine(2, "coresMax: ${computeMetadata.cpusPerTask}")
         }
     }
 }
