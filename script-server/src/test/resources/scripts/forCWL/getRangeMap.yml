@@ -50,7 +50,8 @@ conda:
 compute:
   hpc: false
   mem: 1G
-  cpus-per-task: 2
+  mem-max: 16G
+  cpus-per-task: 4
 references:
   - text: Mammal Diversity Database. (2020). Mammal Diversity Database (Version 1.2) [Data set]. Zenodo.
     link: http://doi.org/10.5281/zenodo.4139818
