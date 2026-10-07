@@ -119,6 +119,10 @@ function Chooser({
     type.toLowerCase(),
   );
   const isPhone = useMediaQuery("(max-width: 599px)");
+  const hasPhoneSpacing = useMediaQuery(
+    "(max-width: 599px), (max-width: 1000px) and (max-height: 549px) and (orientation: landscape)",
+  );
+  const compactSpacing = showBBox && hasPhoneSpacing;
   const showMap = showBBox && !isPhone;
   const showCountry = [
     "country",
@@ -212,7 +216,8 @@ function Chooser({
         left: showBBox ? "50%" : "auto",
         transform: showBBox ? "translate(-50%, -50%)" : "",
         backgroundColor: showBBox ? "#fff" : "none",
-        padding: showBBox ? (isPhone ? "0px" : "20px") : "0px",
+        padding: showBBox ? (isPhone ? "0px" : compactSpacing ? "8px" : "20px") : "0px",
+        "--chooser-card-margin": compactSpacing ? "4px" : "10px",
         borderRadius: "8px",
         margin: showBBox ? "0px auto" : "0px",
       }}
@@ -222,7 +227,9 @@ function Chooser({
           className="inputGrid"
           size={{ xs: showMap ? 3 : 12 }}
           sx={{
-            padding: "10px",
+            padding: compactSpacing ? "4px" : "10px",
+            // Balance the modal's extra 8px on the left when the map is beside the form.
+            paddingRight: compactSpacing && showMap ? "12px" : undefined,
             height: showBBox ? "100%" : "auto",
             overflowY: type === "bboxCRS"
               || type.toLowerCase() === "crsbbox"
