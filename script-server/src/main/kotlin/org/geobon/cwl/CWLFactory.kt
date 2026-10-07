@@ -570,15 +570,20 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         return buildString {
             appendLine()
             appendLine(1, "ResourceRequirement:")
+
             // Capping the min value:
             // 6 Gi to be able to run it locally
             // 20 Gi is the maximum openEO can offer
+            // This hard-coded defaults allow running tests with small areas.
+            // However, if a step **always** needs the memory we specified, this can be a problem.
+            val ramMin = computeMetadata.memParsed.coerceAtMost(6.gibibytes)
             appendLine(
                 2,
-                "ramMin: ${computeMetadata.memParsed.coerceAtMost(6.gibibytes).toLong(DataSize.MIB)}"
+                "ramMin: ${ramMin.toLong(DataSize.MIB)}"
             )
             computeMetadata.memMaxParsed?.let {
-                appendLine(2, "ramMax: ${it.toLong(DataSize.MIB)}")
+                if(ramMin < it)
+                    appendLine(2, "ramMax: ${it.toLong(DataSize.MIB)}")
             }
             appendLine(2, "coresMin: 2")
             appendLine(2, "coresMax: ${computeMetadata.cpusPerTask}")
