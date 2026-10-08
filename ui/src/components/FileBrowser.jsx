@@ -73,12 +73,19 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
 
   // const multipleFiles = true or false, will be passed on as a variable
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // The Select always runs in multiple mode so clicking a selected file unselects it.
+  // In single mode, keep only the newly clicked file and close the menu.
   const handleChange = (event) => {
     const { value } = event.target;
-    // saves all fileIDs under an array
-    setfileNames(
-      Array.isArray(value) ? value : multipleFiles ? value.split(",") : [value],
-    );
+    const ids = typeof value === "string" ? value.split(",") : value; // saves all fileIDs under an array
+    if (multipleFiles) {
+      setfileNames(ids);
+    } else {
+      setfileNames(ids.filter((id) => !fileNames.includes(id)));
+      setMenuOpen(false);
+    }
   };
 
   // Strip the prefix so the incoming value matches the file ids in the list,
@@ -147,14 +154,17 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
             <InputLabel>File(s)</InputLabel>
             <Select
               className="file-select-chip"
-              multiple={multipleFiles} // makes this multi-select
-              value={multipleFiles ? fileNames : (fileNames[0] ?? "")}
+              multiple
+              value={fileNames}
               onChange={handleChange}
+              open={menuOpen}
+              onOpen={() => setMenuOpen(true)}
+              onClose={() => setMenuOpen(false)}
               input={<OutlinedInput label="File(s)" />}
               MenuProps={MenuProps}
               renderValue={(selected) => {
                 if (!multipleFiles) {
-                  return selected;
+                  return selected[0];
                 }
                 return (
                   <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
