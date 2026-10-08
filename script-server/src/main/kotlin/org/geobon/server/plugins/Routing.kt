@@ -14,6 +14,7 @@ import org.geobon.openeo.OpenEOStep.Companion.updateYaml
 import org.geobon.pipeline.*
 import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
+import org.geobon.pipeline.metadata.LifecycleMetadata
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.json.JSONException
@@ -141,6 +142,12 @@ fun Application.configureRouting() {
                 }
             }
 
+            // Optional filter on lifecycle status (pipelines only). Steps without a status are considered in development.
+            val lifecycleFilter = call.request.queryParameters.getAll("lifecycleStatus")
+                ?.map { it.uppercase() }
+                ?.toSet()
+                ?.takeIf { it.isNotEmpty() }
+
             // TODO: This is accessing many files and should not be done at every call.
             // But if we cache, when do we refresh?
             val possible = mutableMapOf<String, String>()
@@ -149,17 +156,31 @@ fun Application.configureRouting() {
                     if (file.extension == extension) {
                         val relativePath = file.relativeTo(root).path.replace('/', FILE_SEPARATOR)
 
-                        val name = try {
-                            if (file.extension == "yml") { // Scripts
+                        var name: String? = null
+                        if (file.extension == "yml") { // Scripts
+                            name = try {
                                 val lineStart = "name: "
                                 file.useLines { sequence ->
                                     sequence.find { l -> l.startsWith(lineStart) }?.substring(lineStart.length)
                                 }
-                            } else { // Pipelines
-                                JSONObject(file.readText()).getJSONObject(METADATA).getString(METADATA__NAME)
+                            } catch (_: Exception) { // IO error
+                                null
                             }
-                        } catch (_: Exception) { // Expected to throw if no metadata or no name attribute in JSON, or IO error.
-                            null
+                        } else { // Pipelines
+                            val metadata = try {
+                                JSONObject(file.readText()).optJSONObject(METADATA)
+                            } catch (_: Exception) { // Invalid JSON or IO error
+                                null
+                            }
+                            name = metadata?.optString(METADATA__NAME)?.takeIf { it.isNotEmpty() }
+
+                            if (lifecycleFilter != null) {
+                                val status = metadata
+                                    ?.let { LifecycleMetadata.fromRawMetadata(it.toMap()) }
+                                    ?.status
+                                    ?: LifecycleMetadata.Lifecycle.IN_DEVELOPMENT
+                                if (status.name.uppercase() !in lifecycleFilter) return@forEach
+                            }
                         }
                         possible[relativePath] = name ?: file.name // Fallback on file name
                     }

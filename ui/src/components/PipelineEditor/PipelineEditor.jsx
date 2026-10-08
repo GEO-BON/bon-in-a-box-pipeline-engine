@@ -32,7 +32,7 @@ import IONode from "./IONode";
 import ConstantNode from "./ConstantNode";
 import UserInputNode from "./UserInputNode";
 import PopupMenu from "./PopupMenu";
-import PipelineMenu from "../PipelineMenu";
+import PipelineMenu, { useShowAllPipelines, lifecycleListOpts } from "../PipelineMenu";
 import { layoutElements } from "./react-flow-utils/Layout";
 import { highlightConnectedEdges } from "./react-flow-utils/HighlightConnectedEdges";
 import {
@@ -107,7 +107,9 @@ export default function PipelineEditor(props) {
   const [toolTip, setToolTip] = useState(null);
   const [popupMenuPos, setPopupMenuPos] = useState({ x: 0, y: 0 });
   const [popupMenuOptions, setPopupMenuOptions] = useState();
-  const [serverPipelineMap, setServerPipelineMap] = useState(null); // set while the "Load from server" dialog is open
+  const [loadDialogOpen, setLoadDialogOpen] = useState(false);
+  const [serverPipelineMap, setServerPipelineMap] = useState(null); // pipelines listed in the "Load from server" dialog
+  const [showAllPipelines, setShowAllPipelines] = useShowAllPipelines();
   const [modal, setModal] = useState(null);
   const [alertSeverity, setAlertSeverity] = useState("");
   const [alertTitle, setAlertTitle] = useState("");
@@ -824,12 +826,10 @@ export default function PipelineEditor(props) {
     }
   };
 
-  const onLoadFromServerBtnClick = (event) => {
-    event.stopPropagation();
-    event.preventDefault();
-
-    api.getListOf("pipeline", (error, pipelineMap, response) => {
+  const fetchServerPipelines = (showAll, onSuccess) => {
+    api.getListOf("pipeline", lifecycleListOpts(showAll), (error, pipelineMap, response) => {
       if (error) {
+        setLoadDialogOpen(false);
         showAlert(
           'error',
           'Error loading the pipeline list',
@@ -837,12 +837,25 @@ export default function PipelineEditor(props) {
         )
       } else {
         setServerPipelineMap(pipelineMap);
+        if (onSuccess) onSuccess();
       }
     });
   };
 
+  const onLoadFromServerBtnClick = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+
+    fetchServerPipelines(showAllPipelines, () => setLoadDialogOpen(true));
+  };
+
+  const onShowAllPipelinesChange = (showAll) => {
+    setShowAllPipelines(showAll);
+    fetchServerPipelines(showAll);
+  };
+
   const onPipelineChosenFromServer = (descriptionFile) => {
-    setServerPipelineMap(null);
+    setLoadDialogOpen(false);
     if (hasUnsavedChanges) {
       setModal("unsavedLoadFromServer:" + descriptionFile)
     } else {
@@ -1022,7 +1035,7 @@ export default function PipelineEditor(props) {
   }, [showAlert, setCurrentFileName, setSavedJSON, onLoadFlow])
 
   const saveFileToServer = useCallback((descriptionFile) => {
-    api.getListOf("pipeline", (error, pipelineList, response) => {
+    api.getListOf("pipeline", {}, (error, pipelineList, response) => {
       if (error) {
         showAlert(
           'error',
@@ -1381,8 +1394,8 @@ export default function PipelineEditor(props) {
       />
 
       <Dialog
-        open={serverPipelineMap != null}
-        onClose={() => setServerPipelineMap(null)}
+        open={loadDialogOpen}
+        onClose={() => setLoadDialogOpen(false)}
         fullWidth
         maxWidth="sm"
       >
@@ -1394,10 +1407,12 @@ export default function PipelineEditor(props) {
             onChange={onPipelineChosenFromServer}
             inline
             autoFocus
+            showAllPipelines={showAllPipelines}
+            onShowAllPipelinesChange={onShowAllPipelinesChange}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setServerPipelineMap(null)}>Cancel</Button>
+          <Button onClick={() => setLoadDialogOpen(false)}>Cancel</Button>
         </DialogActions>
       </Dialog>
     </div>

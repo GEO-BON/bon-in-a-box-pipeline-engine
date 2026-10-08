@@ -1,8 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import InputFileInput from "./InputFileInput";
 import { useNavigate } from "react-router-dom";
 import { GeneralDescription } from "../StepDescription";
-import PipelineMenu from "../PipelineMenu";
+import PipelineMenu, {
+  useShowAllPipelines,
+  lifecycleListOpts,
+} from "../PipelineMenu";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { CustomButtonGreen } from "../CustomMUI";
 import { formatError } from "../HttpErrors";
@@ -25,6 +28,8 @@ export function PipelineForm({
   const formRef = useRef();
   const navigate = useNavigate();
   const [pipelineMap, setPipelineMap] = useState();
+  const [showAllPipelines, setShowAllPipelines] = useShowAllPipelines();
+  const isPipeline = runType === "pipeline";
   const [validationError, setValidationError] = useState();
 
   function clearPreviousRequest() {
@@ -80,20 +85,36 @@ export function PipelineForm({
     api.run(runType, pipStates.descriptionFile, opts, callback);
   };
 
-  // Applied only once when first loaded
+  // Load list of scripts/pipelines into pipelineMap.
+  // Pipelines are filtered on lifecycle status unless the user asked to see them all.
   useEffect(() => {
-    // Load list of scripts/pipelines into pipelineMap
-    api.getListOf(runType, (error, data, response) => {
+    const opts = isPipeline ? lifecycleListOpts(showAllPipelines) : {};
+    api.getListOf(runType, opts, (error, data, response) => {
       if (error) {
         console.error(error);
       } else {
         setPipelineMap(data);
       }
     });
-  }, [runType, setPipelineMap]);
+  }, [runType, isPipeline, showAllPipelines, setPipelineMap]);
+
+  // Keep the current pipeline in the list even if it is filtered out (e.g. opened from a link)
+  const displayedPipelineMap = useMemo(() => {
+    const current = pipStates.descriptionFile;
+    if (
+      !pipelineMap ||
+      !current ||
+      current in pipelineMap ||
+      !pipelineMetadata?.name
+    ) {
+      return pipelineMap;
+    }
+    return { ...pipelineMap, [current]: pipelineMetadata.name };
+  }, [pipelineMap, pipStates.descriptionFile, pipelineMetadata]);
 
   return (
-    pipelineMap && Object.keys(pipelineMap).length > 0 && (
+    displayedPipelineMap &&
+    (isPipeline || Object.keys(displayedPipelineMap).length > 0) && (
       <form
         ref={formRef}
         onSubmit={handleSubmit}
@@ -103,14 +124,21 @@ export function PipelineForm({
         <PipelineMenu
           id="pipelineChoice"
           name="pipelineChoice"
-          pipelineMap={pipelineMap}
+          pipelineMap={displayedPipelineMap}
           value={pipStates.descriptionFile}
           placeholder={
             runType === "pipeline"
               ? "Search or select a pipeline..."
               : "Search or select a script..."
           }
-          onChange={(descriptionFile, name) => handlePipelineChange(name, descriptionFile)}
+          onChange={(descriptionFile, name) =>
+            handlePipelineChange(name, descriptionFile)
+          }
+          showAllPipelines={showAllPipelines}
+          onShowAllPipelinesChange={
+            isPipeline ? setShowAllPipelines : undefined
+          }
+          backgroundMode="dark"
         />
         <br />
         {pipelineMetadata && (
