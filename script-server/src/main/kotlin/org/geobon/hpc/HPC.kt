@@ -34,7 +34,7 @@ open class HPC (
     /**
      * Stops background work and releases the conda sync thread.
      * Does not cancel [syncScope] itself, since it may be provided (and owned) by the caller.
-     * This was necessary for the tests to properly end without intefering with the subsequent ones.
+     * This was necessary for the tests to properly end without interfering with the subsequent ones.
      */
     override fun close() {
         synchronized(syncScope) {
