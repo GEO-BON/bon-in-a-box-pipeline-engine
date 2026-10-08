@@ -28,6 +28,8 @@ import org.geobon.pipeline.ConstantPipe
 import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
+import org.geobon.pipeline.metadata.ScriptMetadata
+import org.geobon.pipeline.metadata.ScriptMetadataFactory
 import org.geobon.script.Description.AUTHORS
 import org.geobon.script.Description.DESCRIPTION
 import org.geobon.script.Description.EXTERNAL_LINK
@@ -63,13 +65,16 @@ class OpenEOStep: ScriptStep {
         udpKey: String,
         stepId: StepId,
         serverContext: ServerContext,
-        inputs: MutableMap<String, Pipe> = mutableMapOf()
-    ) : super(serverContext, updateYaml(serverContext, udpKey), stepId, inputs)
+        inputs: MutableMap<String, Pipe> = mutableMapOf(),
+        yamlFile: File = updateYaml(serverContext, udpKey)
+    ) : super(
+        serverContext,
+        yamlFile,
+        stepId,
+        inputs,
+        OpenEOMetadataFactory(yamlFile)
+    )
 
-    init {
-        // Fetching wrapper script to run openEO
-        metadata.script = File(scriptStubsRoot, "openEOWrapper.py")
-    }
 
     private var url = ConstantPipe("text",  yamlParsed[SCRIPT].toString())
 
@@ -225,7 +230,7 @@ class OpenEOStep: ScriptStep {
                     if (title.isNotBlank() && href.isNotBlank()) {
                         mapOf(
                             "text" to title,
-                            "link" to href
+                            "link" to if(href.startsWith("../")) null else href,
                         )
                     } else {
                         null
@@ -374,5 +379,26 @@ class OpenEOStep: ScriptStep {
                 else -> type
             }
         }
+    }
+}
+
+class OpenEOMetadataFactory(yamlFile:File) : ScriptMetadataFactory(yamlFile) {
+
+    override fun create(yamlParsed: Map<String, Any>, serverContext: ServerContext, logger: Logger): ScriptMetadata {
+        val modifiedMap = yamlParsed.toMutableMap()
+        modifiedMap[SCRIPT] = openEOWrapper
+        return super.create(
+            modifiedMap,
+            serverContext,
+            logger
+        )
+    }
+
+    override fun getScriptFile(yamlParsed: Map<String, Any>): File {
+        return openEOWrapper
+    }
+
+    companion object {
+        private val openEOWrapper = File(scriptStubsRoot, "openEOWrapper.py")
     }
 }

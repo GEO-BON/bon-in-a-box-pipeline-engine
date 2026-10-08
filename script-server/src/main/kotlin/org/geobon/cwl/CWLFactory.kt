@@ -49,7 +49,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
 
         val replacements = mapOf<String, String>(
             "docker-tag" to (runnerTag ?: "latest"),
-            "scriptPath" to step.scriptFile.relativeTo(serverContext.scriptsRoot).path,
+            "scriptPath" to step.metadata.script.relativeTo(serverContext.scriptsRoot).path,
             "inputs" to toCWL(step.inputDefinitions, true),
             "inputsProperties" to generateInputProperties(step.inputDefinitions),
             "outputs" to toCWL(step.outputDefinitions, false),
