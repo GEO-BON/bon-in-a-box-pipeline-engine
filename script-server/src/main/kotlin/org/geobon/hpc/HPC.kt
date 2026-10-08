@@ -15,7 +15,7 @@ open class HPC (
     val connection: HPCConnection,
     val retrieveSyncInterval: Duration = 1.minutes,
     val syncScope:CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-) {
+) : AutoCloseable {
     val registeredSteps = WeakHashMap<ScriptStep, HPCRun?>()
     val runningSteps = WeakHashMap<ScriptStep, HPCRun>()
     val condaSyncJobs = ConcurrentHashMap<String, Pair<Job, MutableList<HPCRun>>>()
@@ -30,6 +30,20 @@ open class HPC (
     var resultsSyncJob: Job? = null
 
     constructor() : this(HPCConnection())
+
+    /**
+     * Stops background work and releases the conda sync thread.
+     * Does not cancel [syncScope] itself, since it may be provided (and owned) by the caller.
+     * This was necessary for the tests to properly end without intefering with the subsequent ones.
+     */
+    override fun close() {
+        synchronized(syncScope) {
+            resultsSyncJob?.cancel("HPC closed.")
+            resultsSyncJob = null
+        }
+        condaSyncScope.cancel("HPC closed.")
+        condaSyncDispatcher.close()
+    }
 
     fun register(step: ScriptStep) {
         synchronized(registeredSteps){
@@ -49,7 +63,7 @@ open class HPC (
     }
 
     fun syncCondaEnvironment(run: HPCRun, condaEnvName:String, logFile: File, command: String): Job {
-        if(condaSyncJobs.contains(condaEnvName)) {
+        if(condaSyncJobs.containsKey(condaEnvName)) {
             logFile.appendText("Conda sync for $condaEnvName already in progress, launched by another script.\n")
         }
 
@@ -58,6 +72,9 @@ open class HPC (
                 try {
                     logFile.appendText("Lock acquired. Syncing conda environment towards HPC...\n")
                     connection.runCommand(command, 60.minutes, logFile)
+                } catch (e: CancellationException) {
+                    // Cancelled on purpose (e.g. shutdown): this is not a sync failure.
+                    throw e
                 } catch (t: Throwable) {
                     t.printStackTrace()
                     condaSyncJobs[condaEnvName]?.second?.let { runs ->
