@@ -44,6 +44,7 @@ import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
 import org.geobon.script.Description.SCRIPT
 import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.openEOYmlRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.jetbrains.annotations.VisibleForTesting
 import org.json.JSONArray
@@ -54,6 +55,9 @@ import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileNotFoundException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption.ATOMIC_MOVE
+import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -87,17 +91,20 @@ class OpenEOStep: ScriptStep {
     companion object {
 
         private val logger: Logger = LoggerFactory.getLogger("Server")
-        private val openEOFolder = File(scriptStubsRoot, "openEO")
 
         fun updateYaml(serverContext: ServerContext, udpKey: String): File {
             val options = DumperOptions()
             options.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
-            val yamlFile = File(openEOFolder, "$udpKey.yml")
+            val yamlFile = File(openEOYmlRoot, "$udpKey.yml")
             if (!yamlFile.exists()) {
                 yamlFile.parentFile.mkdirs()
 
                 try {
-                    yamlFile.writeText(Yaml(options).dump(getOpenEODescription(serverContext, udpKey)))
+                    val content = Yaml(options).dump(getOpenEODescription(serverContext, udpKey))
+                    // Write then move, so concurrent readers never see a partial file
+                    val tmpFile = File.createTempFile("$udpKey.", ".tmp", yamlFile.parentFile)
+                    tmpFile.writeText(content)
+                    Files.move(tmpFile.toPath(), yamlFile.toPath(), ATOMIC_MOVE, REPLACE_EXISTING)
                 } catch (e: Exception) {
                     logger.error("Error: ${e.message}")
                 }

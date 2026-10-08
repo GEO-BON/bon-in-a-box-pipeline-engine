@@ -133,7 +133,7 @@ class OpenEOStepTest {
     fun scriptFileIsOpenEOWrapperTest() {
         // A pre-written description stops updateYaml from fetching the catalog over the network
         val udpKey = "scriptFileTest.udp"
-        val yamlFile = File(ServerContext.scriptStubsRoot, "openEO/$udpKey.yml")
+        val yamlFile = File(ServerContext.openEOYmlRoot, "$udpKey.yml")
         yamlFile.parentFile.mkdirs()
         yamlFile.writeText(
             """
@@ -148,6 +148,8 @@ class OpenEOStepTest {
 
         try {
             val step = OpenEOStep(udpKey, StepId("testStep", "nodeId"), noHPCContext)
+
+            assertEquals(yamlFile, OpenEOStep.updateYaml(noHPCContext, udpKey))
 
             assertEquals(File(ServerContext.scriptStubsRoot, "openEOWrapper.py"), step.metadata.script)
             assertEquals("", step.validateStep())

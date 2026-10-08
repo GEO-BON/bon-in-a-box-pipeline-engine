@@ -9,7 +9,7 @@ log_level = "warning"
 
 # Accessing yaml file to extract input types
 script_name = Path(output_folder).parent.name
-yaml_path = Path("/script-stubs/openEO")/f"{script_name}.yml"
+yaml_path = Path(os.getenv("OUTPUT_LOCATION", "/output"))/".local/openEO"/f"{script_name}.yml"
 
 with open(yaml_path) as f:
     yaml_file = yaml.safe_load(f)

@@ -1,0 +1,69 @@
+script: https://raw.githubusercontent.com/ESA-APEx/apex_algorithms/184bd41069defabd328348f54232d6ae362775fc/algorithm_catalog/obsgession/udp_obsgession_w23_lai/openeo_udp/udp_obsgession_w23_lai.json
+external_link: https://algorithm-catalogue.apex.esa.int/apps/udp_obsgession_w23_lai
+name: Leaf Area Index
+description: |-
+  ### Temperate forests optimized Leaf-Area-Index (LAI) product based on Sentinel-2 (EBV-enabling product)
+
+  Provides leaf area index (LAI) at 10m resolution from 2015 onwards for temperate forests.
+
+  This script runs on openEO.
+author:
+- name: Marcel Buchhorn
+  identifier: https://www.vito.be/
+license: MIT
+references:
+- text: CDSE openEO federation
+  link: null
+inputs:
+  spatial_extent:
+    label: Bounding Box
+    description: |-
+      The AOI should be set as an openEO BBOX dict. It defines the boundaries of the area of interest.
+              The coordinates are given in the order of west, south, east, north in EPSG:3035. Please make sure to pass the coordinates in meter and not in degree.
+    type: crsBBox
+    example: null
+  start_date:
+    label: Start Date
+    description: Start date of the observation period in format YYYY-MM-DD.
+    type: text
+    example: null
+  end_date:
+    label: End Date
+    description: End date of the observation period in format YYYY-MM-DD.
+    type: text
+    example: null
+  binning_period:
+    label: Binning Period
+    description: The temporal binning period. Please have a look at openeo documentation
+      of the process aggregate_temporal_period for more information
+    type: options
+    options:
+    - day
+    - week
+    - dekad
+    - month
+    - season
+    - year
+    example: month
+  temp_aggregator:
+    label: Temp Aggregator
+    description: The temporal aggregation function. Please have a look at openeo documentation
+      of the process aggregate_temporal_period for more information
+    type: options
+    options:
+    - min
+    - max
+    - mean
+    - median
+    example: mean
+outputs:
+  output_rasters:
+    label: Output raster
+    description: Output raster of the process, generated from the output datacube.
+    type: image/tiff;application=geotiff[]
+conda:
+  channels:
+  - conda-forge
+  dependencies:
+  - openeo
+  - pyyaml
