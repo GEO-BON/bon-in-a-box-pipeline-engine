@@ -4,6 +4,9 @@ import org.geobon.openeo.OpenEOStep.Companion.addCondaEnv
 import org.geobon.openeo.OpenEOStep.Companion.addOutputs
 import org.geobon.openeo.OpenEOStep.Companion.convertInputs
 import org.geobon.openeo.OpenEOStep.Companion.convertMetadata
+import org.geobon.pipeline.StepId
+import org.geobon.server.ServerContext
+import org.geobon.utils.noHPCContext
 import org.json.JSONObject
 import java.io.File
 import kotlin.test.*
@@ -123,6 +126,33 @@ class OpenEOStepTest {
         }
         assertFailsWith<IllegalArgumentException> {
             convertInputs(JSONObject("{}"))
+        }
+    }
+
+    @Test
+    fun scriptFileIsOpenEOWrapperTest() {
+        // A pre-written description stops updateYaml from fetching the catalog over the network
+        val udpKey = "scriptFileTest.udp"
+        val yamlFile = File(ServerContext.scriptStubsRoot, "openEO/$udpKey.yml")
+        yamlFile.parentFile.mkdirs()
+        yamlFile.writeText(
+            """
+        script: https://example.com/some/process.json
+        name: Test UDP
+        outputs:
+          output_rasters:
+            label: Output raster
+            type: image/tiff;application=geotiff[]
+        """.trimIndent()
+        )
+
+        try {
+            val step = OpenEOStep(udpKey, StepId("testStep", "nodeId"), noHPCContext)
+
+            assertEquals(File(ServerContext.scriptStubsRoot, "openEOWrapper.py"), step.metadata.script)
+            assertEquals("", step.validateStep())
+        } finally {
+            yamlFile.delete()
         }
     }
 }
