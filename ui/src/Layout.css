@@ -857,6 +857,56 @@ h2.MuiDialogTitle-root {
 }
 
 @media (max-width: 600px) {
+  .pipeline-page {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+  .pipeline-page .inputsTop .MuiAccordionDetails-root {
+    margin-left: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .pipeline-page .inputsTop .inputForm {
+    padding-top: 0;
+    padding-left: 0;
+    padding-right: 0;
+    min-width: 0;
+  }
+
+  .pipeline-page .inputsTop .inputForm > .stepDescription {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .pipeline-page .inputFormDiv,
+  .pipeline-page .inputFileForm {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .pipeline-page .inputFieldCard {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .pipeline-page .inputFieldBody {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .pipeline-page .locationChooserButton {
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
   div.left-pane {
     display: none;
   }

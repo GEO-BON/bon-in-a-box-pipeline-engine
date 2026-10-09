@@ -182,13 +182,16 @@ export default function CountryRegionMenu({
           background: "#fff",
           color: "#fff",
           borderRadius: "4px",
+          "& .MuiInputLabel-root:not(.MuiInputLabel-shrink)": {
+            maxWidth: "calc(100% - 52px)",
+          },
         }}
         getOptionLabel={(option) => {
           return option.label || "";
         }}
         value={selectedCountry}
         renderInput={(params) => (
-          <TextField size="small " {...params} label="Select country" />
+          <TextField {...params} size="small" label="Select country" />
         )}
         onChange={(event, value) => {
           setSelectedCountry(value);
@@ -208,6 +211,9 @@ export default function CountryRegionMenu({
               color: "#fff",
               borderRadius: "4px",
               marginBottom: "10px",
+              "& .MuiInputLabel-root:not(.MuiInputLabel-shrink)": {
+                maxWidth: "calc(100% - 52px)",
+              },
             }}
             getOptionLabel={(option) => {
               return option.label || "";
