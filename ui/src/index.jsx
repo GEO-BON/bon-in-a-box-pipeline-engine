@@ -21,12 +21,12 @@ import RunHistory from "./components/RunHistory";
 import Chat from "./components/chat";
 import { Spinner } from "./components/Spinner";
 import { HttpError } from "./components/HttpErrors";
-import FileManager from "./components/FileManager";
 import { uiContext } from "./uiContext.jsx";
 
 const PipelineEditor = lazy(() =>
   import("./components/PipelineEditor/PipelineEditor")
 );
+const FileManager = lazy(() => import("./components/FileManager"));
 
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { Alert } from "@mui/material";
@@ -121,7 +121,11 @@ function ManageFilesPage() {
   return (
     <>
       <PageTitle title="Manage files" />
-      {!disableMyFiles && <FileManager />}
+      {!disableMyFiles && (
+        <Suspense fallback={<Spinner />}>
+          <FileManager />
+        </Suspense>
+      )}
     </>
   );
 }

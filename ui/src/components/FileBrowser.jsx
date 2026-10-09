@@ -64,6 +64,24 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
   };
   const handleClose = () => setOpen(false);
 
+  const confirmSelection = () => {
+    if (onSelect) {
+      // if this function is passed on as a parameter
+      // an empty selection clears the value
+      onSelect(fileNames.map((item) => PATH_PREFIX + item));
+    }
+    handleClose();
+  };
+
+  // clicking beside the modal keeps the selection, Escape discards it
+  const handleModalClose = (event, reason) => {
+    if (reason === "backdropClick") {
+      confirmSelection();
+    } else {
+      handleClose();
+    }
+  };
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -145,7 +163,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
       <Modal
         className="filebrowser-modal-card"
         open={open}
-        onClose={handleClose}
+        onClose={handleModalClose}
       >
         <Box sx={style}>
           <Typography id="modal-modal-title">Select your file(s)</Typography>
@@ -201,14 +219,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
           <Button
             className="filebrowser-select-button"
             variant="contained"
-            onClick={() => {
-              if (onSelect) {
-                // if this function is passed on as a parameter
-                // an empty selection clears the value
-                onSelect(fileNames.map((item) => PATH_PREFIX + item));
-              }
-              handleClose();
-            }}
+            onClick={confirmSelection}
           >
             Use selected file{fileNames.length !== 1 ? "s" : ""}
           </Button>

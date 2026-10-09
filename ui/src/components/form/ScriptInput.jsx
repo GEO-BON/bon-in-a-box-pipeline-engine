@@ -71,7 +71,6 @@ export default function ScriptInput({
 }) {
   const [fieldValue, setFieldValue] = useState(value);
   const small = size == "small";
-  const { disableMyFiles } = useContext(uiContext);
 
   useEffect(() => {
     setFieldValue(value);
@@ -173,7 +172,7 @@ export default function ScriptInput({
         onValueUpdated(event.target.value.split(",").map((v) => v.trim()));
       }
     };
-    const withFileBrowser = type.includes("/") && !disableMyFiles && !small;
+    const withFileBrowser = type.includes("/") && !small;
     const txtField = (
       <TextField
         multiline
@@ -351,7 +350,7 @@ export default function ScriptInput({
       if (
         type.includes("/") /* assume MIME type, files have no line breaks */
       ) {
-        const withFileBrowser = !disableMyFiles && !small;
+        const withFileBrowser = !small;
         const txtField = (
           <TextField
             type="text"
