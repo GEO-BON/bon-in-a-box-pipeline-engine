@@ -11,6 +11,10 @@ import FormControl from "@mui/material/FormControl";
 import "./FileManager.css";
 import Chip from "@mui/material/Chip";
 import ListItemText from "@mui/material/ListItemText";
+import ListSubheader from "@mui/material/ListSubheader";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import SearchIcon from "@mui/icons-material/Search";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { uiContext } from "../uiContext.jsx";
@@ -44,6 +48,8 @@ const toFileIds = (value) => {
 };
 
 const MenuProps = {
+  // keep focus in the search field instead of the first file
+  autoFocus: false,
   // so that the file list doesn't cover the modal below
   slotProps: {
     paper: {
@@ -92,6 +98,12 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
   // const multipleFiles = true or false, will be passed on as a variable
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    setSearch("");
+  };
 
   // The Select always runs in multiple mode so clicking a selected file unselects it.
   // In single mode, keep only the newly clicked file and close the menu.
@@ -102,7 +114,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
       setfileNames(ids);
     } else {
       setfileNames(ids.filter((id) => !fileNames.includes(id)));
-      setMenuOpen(false);
+      closeMenu();
     }
   };
 
@@ -151,6 +163,14 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
 
   const all_fileIDs = findFileIDs(data);
 
+  // selected files stay listed so they can still be unchecked
+  const query = search.trim().toLowerCase();
+  const shownFileIDs = query
+    ? all_fileIDs.filter(
+        (id) => fileNames.includes(id) || id.toLowerCase().includes(query),
+      )
+    : all_fileIDs;
+
   return (
     <div className="filebrowser">
       <Button
@@ -177,7 +197,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
               onChange={handleChange}
               open={menuOpen}
               onOpen={() => setMenuOpen(true)}
-              onClose={() => setMenuOpen(false)}
+              onClose={closeMenu}
               input={<OutlinedInput label="File(s)" />}
               MenuProps={MenuProps}
               renderValue={(selected) => {
@@ -193,8 +213,34 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
                 );
               }}
             >
+              <ListSubheader sx={{ bgcolor: "background.paper", pt: 1 }}>
+                <TextField
+                  size="small"
+                  autoFocus
+                  fullWidth
+                  placeholder="Search files"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  // let the field get keys instead of the menu's type-to-select
+                  onKeyDown={(e) => {
+                    if (e.key !== "Escape") e.stopPropagation();
+                  }}
+                  slotProps={{
+                    input: {
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+              </ListSubheader>
+              {shownFileIDs.length === 0 && (
+                <MenuItem disabled>No matching files</MenuItem>
+              )}
               {/* for rendering the checkboxes */}
-              {all_fileIDs.map((fileId) => {
+              {shownFileIDs.map((fileId) => {
                 const selected = fileNames.includes(fileId);
                 const SelectionIcon = selected
                   ? CheckBoxIcon
