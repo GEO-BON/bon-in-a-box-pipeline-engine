@@ -41,7 +41,10 @@ open class HPC (
             resultsSyncJob?.cancel("HPC closed.")
             resultsSyncJob = null
         }
-        condaSyncScope.cancel("HPC closed.")
+        // Waits for the sync job (and its subprocess) to actually stop before releasing the thread.
+        val condaSyncJob = condaSyncScope.coroutineContext[Job]!!
+        condaSyncJob.cancel("HPC closed.")
+        runBlocking { condaSyncJob.join() }
         condaSyncDispatcher.close()
     }
 
