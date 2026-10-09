@@ -134,11 +134,6 @@ val Int.megabytes: DataSize get() = DataSize(this * MB)
 val Int.gigabytes: DataSize get() = DataSize(this * GB)
 val Int.terabytes: DataSize get() = DataSize(this * TB)
 
-val Int.kilobytes: DataSize get() = DataSize(this * KB)
-val Int.megabytes: DataSize get() = DataSize(this * MB)
-val Int.gigabytes: DataSize get() = DataSize(this * GB)
-val Int.terabytes: DataSize get() = DataSize(this * TB)
-
 val Long.kibibytes: DataSize get() = DataSize(this * KIB)
 val Long.mebibytes: DataSize get() = DataSize(this * MIB)
 val Long.gibibytes: DataSize get() = DataSize(this * GIB)
