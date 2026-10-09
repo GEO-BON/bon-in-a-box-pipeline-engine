@@ -616,7 +616,7 @@ paths:
           description: Country ID not found
   /region/country_region_bbox:
     get:
-      summary: Bounding box of a country or region, or the selector object a bboxCRS input takes
+      summary: Bounding box of a country or region, or the selector object a "location" input takes
       description: |
         With `output_format=chooser_input`, returns the object that a `bboxCRS`,
         `country`, `countryRegion`, `countryRegionCRS` or `CRS` input takes. Use what it

@@ -1139,6 +1139,11 @@ export default function PipelineEditor(props) {
       <h2 className="pipelineTitle">
         {title}
       </h2>
+      {!savePipelineToServer && (
+        <Alert severity="warning">
+          This instance is read-only
+        </Alert>
+      )}
       <div className="narrowWarning">
         <p>The pipeline engine cannot be used on a narrow display.</p>
         <p><strong>A computer is recommended for pipeline edition.</strong></p>
