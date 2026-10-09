@@ -1,0 +1,4 @@
+
+# Staged by the python-api workflow so the MCP server can bake in the toolset.
+# The source of truth is script-server/api/openapi.yaml.
+app/mcp-server/openapi.yaml

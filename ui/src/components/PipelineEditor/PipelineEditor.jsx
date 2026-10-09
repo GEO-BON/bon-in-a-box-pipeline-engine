@@ -14,7 +14,7 @@ import {
   DialogContentText,
 } from "@mui/material";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useContext } from "react";
 import { useBlocker } from "react-router-dom";
 import {
   ReactFlow,
@@ -52,6 +52,7 @@ import sleep from "../../utils/Sleep";
 import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
+import { uiContext } from "../../uiContext.jsx";
 
 import yaml, { YAMLException } from "js-yaml";
 import _lang from "lodash/lang";
@@ -113,6 +114,7 @@ export default function PipelineEditor(props) {
   const [alertSeverity, setAlertSeverity] = useState("");
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState();
+  const { savePipelineToServer } = useContext(uiContext);
 
   const showAlert = useCallback((severity, title, message) => {
     setAlertSeverity(severity)
@@ -135,6 +137,8 @@ export default function PipelineEditor(props) {
   const hideCurrentModal = useCallback(() => {
     setModal(null)
   }, [setModal])
+
+
 
   // We need this since the functions passed through node data retain their old selectedNodes state.
   // Note that the stratagem fails if trying to add edges from many sources at the same time.
@@ -1135,6 +1139,11 @@ export default function PipelineEditor(props) {
       <h2 className="pipelineTitle">
         {title}
       </h2>
+      {!savePipelineToServer && (
+        <Alert severity="warning">
+          This instance is read-only
+        </Alert>
+      )}
       <div className="narrowWarning">
         <p>The pipeline engine cannot be used on a narrow display.</p>
         <p><strong>A computer is recommended for pipeline edition.</strong></p>
@@ -1327,8 +1336,12 @@ export default function PipelineEditor(props) {
                   Load from server
                 </button>
                 <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
-                <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
-                <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
+                {savePipelineToServer && (
+                  <>
+                    <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
+                    <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save as...</button>
+                  </>            
+                )}
               </div>
 
               <Controls />
@@ -1370,7 +1383,7 @@ export default function PipelineEditor(props) {
                 }}
               />
 
-              <div className="react-flow__attribution bottom left previewMode">
+              <div className="react-flow__panel react-flow__attribution top left previewMode">
                   Currently in <strong>preview mode</strong>. Use a larger screen to edit.
               </div>
             </ReactFlow>

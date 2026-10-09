@@ -3,22 +3,17 @@ import BigGreenBoxes from "../img/bigGreenSquares.png"
 import { LastNRuns } from "./RunHistory";
 
 export default function HomePage() {
-
     return (
-        <div
-            style={{background: `url(${BigGreenBoxes})`,
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "left bottom",
-            backgroundSize: "500px",
-            overflow: "show",
-            paddingBottom: "225px"}}>
+        <div className="homepage-background-images"
+            style={{
+                background: `url(${BigGreenBoxes}), url(${GreenSquares})`,
+                backgroundRepeat: "no-repeat, no-repeat",
+                backgroundPosition: "left bottom, right top",
+                backgroundSize: "500px, 256px",
+                overflow: "show",
+                paddingBottom: "225px",
+            }}>
         <div>
-            <img
-                src={GreenSquares}
-                alt="Green Squares"
-                style={{ width: '225px', height: 'auto', float: "right", alignContent: "right", marginRight : "-30px"}}
-            />
-
             <div className="home-page-content">
                 <div className="title-container">
                     <h1 className="home-page-pre-title"
@@ -143,7 +138,8 @@ export default function HomePage() {
                 <LastNRuns n={4} />
             </div>
 
+
         </div>
 
-      );
+    );
 }
