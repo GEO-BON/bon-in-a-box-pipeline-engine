@@ -63,6 +63,11 @@ class CWLFactoryTest {
     }
 
     @Test
+    fun `test single script with STAC assets input`() {
+        testSingleStep(File(cwlScripts, "stacAssets.yml"))
+    }
+
+    @Test
     fun `test simple pipeline`() {
         testWorkflow("userInput")
     }

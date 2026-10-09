@@ -138,9 +138,9 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
     }
 
     private fun toCWL(key: String, definition: IOMetadata, isInput: Boolean, outputPipe: Output? = null): String {
-        // Location chooser objects need to be exploded in CWL
-        ObjectInputDefinition.fromDef(definition.type)?.let {
-            return toCWL(key, definition, it.requiredProperties, isInput)
+        // Chooser objects, and lists of them, need to be exploded in CWL
+        ObjectInputDefinition.fromDef(definition.type.removeSuffix("[]"))?.let {
+            return toCWL(key, definition, it.requiredProperties, isInput, definition.isArray())
         }
 
         val typeName = typeToCWL(definition.type)
@@ -266,11 +266,15 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         }
     }
 
+    /**
+     * @param isList true to write an array of those records
+     */
     private fun toCWL(
         key: String,
         definition: IOMetadata,
         schema: JSONObject,
-        isInput: Boolean
+        isInput: Boolean,
+        isList: Boolean = false
     ): String {
         return buildString {
             val cwlKey = if(isInput) key else "$key$OUTPUT_SUFFIX"
@@ -288,13 +292,19 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
                 appendLine(2, "doc: ${definition.description}")
             }
 
+            // Records of a list are nested one level deeper, under "items".
+            val depth = if (isList) 1 else 0
+            appendLine(2, "type:")
+            if (isList) {
+                appendLine(3, "type: $CWL__IO__TYPE_ARRAY")
+                appendLine(3, "items:")
+            }
             appendLine(
                 """
-                    type:
-                      type: record
-                      name: ${definition.type}
-                      fields:
-                """.replaceIndent(indent(2))
+                    type: record
+                    name: ${definition.type.removeSuffix("[]")}
+                    fields:
+                """.replaceIndent(indent(3 + depth))
             )
 
             // Creating a CWL "record" for the input objects.
@@ -307,7 +317,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
                                 name: ${subKey}Definition
                                 type: record
                                 fields:
-                        """.replaceIndent(indent(3))
+                        """.replaceIndent(indent(3 + depth))
                     )
 
                     section.keys().forEach { fieldKey ->
@@ -316,19 +326,20 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
                                 """
                                     - name: $fieldKey
                                       type: ${typeToCWL(fieldType)}?
-                                """.replaceIndent(indent(5))
+                                """.replaceIndent(indent(5 + depth))
                             )
                         }
                     }
 
 
                 } ?: schema.optString(subKey)?.let { propertyType ->
-                    // If no depth, just output as separate IO
+                    // If no depth, just output as separate IO.
+                    // Fields of listed objects can be null.
                     appendLine(
                         """
                             - name: $subKey
-                              type: ${typeToCWL(propertyType)}
-                        """.replaceIndent(indent(3))
+                              type: ${typeToCWL(propertyType)}${if (isList) "?" else ""}
+                        """.replaceIndent(indent(3 + depth))
                     )
                 }
             }
@@ -352,7 +363,11 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             is Output -> (pipe.step as? UserInput)?.id?.toString()
                 ?: pipe.getId().run { "$step/$inputOrOutput$OUTPUT_SUFFIX" }
 
-            is ConstantPipe -> "{ default: ${pipe.value} }"
+            is ConstantPipe -> "{ default: ${
+                // Lists of chooser objects must be written as JSON, not with Kotlin's toString
+                if (ObjectInputDefinition.fromDef(pipe.type.removeSuffix("[]")) != null) JSONWriter.valueToString(pipe.value)
+                else pipe.value
+            } }"
 
             else -> throw UnsupportedOperationException("Exporting ${pipe.javaClass.name} inputs to CWL is not yet supported.")
         }

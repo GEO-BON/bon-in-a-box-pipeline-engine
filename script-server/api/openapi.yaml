@@ -592,8 +592,355 @@ paths:
                 format: binary
         "404":
           description: Region ID not found
+  /stac/catalogs_list:
+    get:
+      summary: Returns the STAC catalogs offered by default in the STAC chooser
+      operationId: getStacCatalogsList
+      responses:
+        "200":
+          description: Array of configured catalogs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                      description: Short name, usable as the `catalog` parameter of the other /stac endpoints.
+                    label:
+                      type: string
+                    url:
+                      type: string
+                example:
+                  [
+                    {
+                      "key": "geobon",
+                      "label": "GEO BON STAC",
+                      "url": "https://stac.geobon.org",
+                    },
+                  ]
+  /stac/collections_list:
+    get:
+      summary: Returns all the collections of a STAC catalog
+      description: Results are cached for 5 minutes.
+      operationId: getStacCollectionsList
+      parameters:
+        - $ref: "#/components/parameters/stacCatalog"
+      responses:
+        "200":
+          description: Array of collections, sorted by title.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    title:
+                      type: string
+                      description: The collection's title, or its id when it has none.
+                    description:
+                      type: string
+                      nullable: true
+                    url:
+                      type: string
+                      nullable: true
+                      description: URL of the STAC collection.
+                    bbox:
+                      type: array
+                      nullable: true
+                      items:
+                        type: number
+                    interval:
+                      type: array
+                      nullable: true
+                      description: Start and end of the temporal extent. Either may be null (open-ended).
+                      items:
+                        type: string
+                        format: date-time
+                        nullable: true
+                example:
+                  [
+                    {
+                      "id": "chelsa-clim",
+                      "title": "CHELSA Climatologies",
+                      "description": "CHELSA Climatologies",
+                      "url": "https://stac.geobon.org/collections/chelsa-clim",
+                      "bbox": [-180, -90, 180, 90],
+                      "interval": ["1981-01-01T00:00:00+00:00", "2010-12-31T00:00:00+00:00"],
+                    },
+                  ]
+        "400":
+          $ref: "#/components/responses/stacError"
+        "502":
+          $ref: "#/components/responses/stacError"
+  /stac/dates_list:
+    get:
+      summary: Returns the distinct dates of the items of a collection, with the number of items on each
+      description: |
+        Walks the items of the collection, stopping after 5000 of them. Results are cached for 5 minutes.
+      operationId: getStacDatesList
+      parameters:
+        - $ref: "#/components/parameters/stacCatalog"
+        - $ref: "#/components/parameters/stacCollection"
+      responses:
+        "200":
+          description: Dates covered by the collection.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dates:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                        count:
+                          type: integer
+                  undated:
+                    type: integer
+                    description: Number of items without a date.
+                  truncated:
+                    type: boolean
+                    description: True when the walk stopped early, so the list is partial.
+                  same_extent:
+                    type: boolean
+                    description: True when all the items share one bounding box (a time series rather than tiles).
+                example:
+                  {
+                    "dates": [{ "date": "2019-06-01", "count": 12 }],
+                    "undated": 0,
+                    "truncated": false,
+                    "same_extent": false,
+                  }
+        "400":
+          $ref: "#/components/responses/stacError"
+        "404":
+          $ref: "#/components/responses/stacError"
+        "502":
+          $ref: "#/components/responses/stacError"
+  /stac/items_list:
+    get:
+      summary: Returns one page of items from a collection
+      operationId: getStacItemsList
+      parameters:
+        - $ref: "#/components/parameters/stacCatalog"
+        - $ref: "#/components/parameters/stacCollection"
+        - name: limit
+          in: query
+          description: Number of items per page.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: page
+          in: query
+          description: Page number, starting at 1.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: filter
+          in: query
+          description: Keep only the items whose id contains this text (case-insensitive).
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/stacDate"
+      responses:
+        "200":
+          description: A page of items.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        datetime:
+                          type: string
+                          format: date-time
+                          nullable: true
+                          description: The item's datetime, or its start_datetime when it covers a period.
+                        bbox:
+                          type: array
+                          nullable: true
+                          items:
+                            type: number
+                        url:
+                          type: string
+                          nullable: true
+                          description: URL of the STAC item.
+                  page:
+                    type: integer
+                  has_next:
+                    type: boolean
+                example:
+                  {
+                    "items":
+                      [
+                        {
+                          "id": "item-1",
+                          "datetime": "2019-06-01T00:00:00+00:00",
+                          "bbox": [-80, 45, -57, 62],
+                          "url": "https://stac.geobon.org/collections/my-collection/items/item-1",
+                        },
+                      ],
+                    "page": 1,
+                    "has_next": false,
+                  }
+        "400":
+          $ref: "#/components/responses/stacError"
+        "404":
+          $ref: "#/components/responses/stacError"
+        "502":
+          $ref: "#/components/responses/stacError"
+  /stac/assets_list:
+    get:
+      summary: Returns the Cloud Optimized GeoTIFF assets of an item, or of the items of a collection
+      description: |
+        Other formats are left out. Without `item`, describes the assets the
+        collection's items carry, from its item_assets declaration or from a
+        sample item (taken from `date` when given).
+      operationId: getStacAssetsList
+      parameters:
+        - $ref: "#/components/parameters/stacCatalog"
+        - $ref: "#/components/parameters/stacCollection"
+        - name: item
+          in: query
+          description: Id of the item. Leave empty to describe the assets of the whole collection.
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/stacDate"
+      responses:
+        "200":
+          description: Array of assets.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+                    title:
+                      type: string
+                    href:
+                      type: string
+                      nullable: true
+                    type:
+                      type: string
+                      description: Media type.
+                    roles:
+                      type: array
+                      items:
+                        type: string
+                    kind:
+                      type: string
+                      nullable: true
+                      enum: [categorical, continuous, null]
+                      description: Null when the catalog does not say.
+                    classes:
+                      type: array
+                      nullable: true
+                      items:
+                        type: object
+                        properties:
+                          value:
+                            type: number
+                          label:
+                            type: string
+                            nullable: true
+                          color:
+                            type: string
+                            nullable: true
+                            example: "#419bdf"
+                    sampled_from:
+                      type: string
+                      description: Only without `item`. Id of the sample item.
+                    item_url:
+                      type: string
+                      description: Only without `item`. URL of the sample item.
+                example:
+                  [
+                    {
+                      "key": "data",
+                      "title": "Land cover",
+                      "href": "https://example.org/landcover.tif",
+                      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+                      "roles": ["data"],
+                      "kind": "categorical",
+                      "classes": [{ "value": 1, "label": "Water", "color": "#419bdf" }],
+                    },
+                  ]
+        "400":
+          $ref: "#/components/responses/stacError"
+        "404":
+          $ref: "#/components/responses/stacError"
+        "502":
+          $ref: "#/components/responses/stacError"
 components:
+  responses:
+    stacError:
+      description: |
+        400 for a bad parameter or a catalog URL that is not public,
+        404 for a collection or item not found,
+        502 when the catalog could not be read.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              detail:
+                type: string
+          example:
+            detail: Collection 'abc' not found in this catalog
   parameters:
+    stacCatalog:
+      name: catalog
+      in: query
+      description: Key of a configured catalog (see /stac/catalogs_list), or the URL of any public STAC catalog.
+      required: true
+      schema:
+        type: string
+      examples:
+        key:
+          value: geobon
+        url:
+          value: https://stac.geobon.org
+    stacCollection:
+      name: collection
+      in: query
+      description: Id of the collection.
+      required: true
+      schema:
+        type: string
+    stacDate:
+      name: date
+      in: query
+      description: Keep only the items of this UTC day (YYYY-MM-DD).
+      required: false
+      schema:
+        type: string
+        format: date
     stepType:
       name: type
       in: path
