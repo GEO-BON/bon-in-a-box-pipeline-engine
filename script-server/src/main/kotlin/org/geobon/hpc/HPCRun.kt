@@ -3,6 +3,7 @@ package org.geobon.hpc
 import dev.vishna.watchservice.KWatchEvent
 import dev.vishna.watchservice.asWatchChannel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.consumeEach
 import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.RunContext
@@ -60,7 +61,12 @@ class HPCRun(
         }
 
         var output: MutableMap<String, Any>? = null
-        val watchChannel = context.outputFolder.asWatchChannel()
+        // The watcher may still be sending events when we close the channel on success. This is expected,
+        // so the resulting exception must not reach the default handler (it would fail the tests).
+        val watchScope = CoroutineScope(SupervisorJob() + CoroutineExceptionHandler { _, t ->
+            if (t !is ClosedSendChannelException) logger.warn("File watcher error", t)
+        })
+        val watchChannel = context.outputFolder.asWatchChannel(scope = watchScope)
         try {
             coroutineScope {
                 val condaEnvFile = if (condaEnvName != null && condaEnvYml != null) {
@@ -151,6 +157,7 @@ class HPCRun(
             resultFile.writeText(RunContext.gson.toJson(output))
         } finally {
             watchChannel.close()
+            watchScope.cancel()
         }
 
         return flagError(output ?: mapOf())
