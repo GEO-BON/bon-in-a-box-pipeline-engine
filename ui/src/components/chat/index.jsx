@@ -7,6 +7,31 @@ import "./style.css";
 // already script-server's -- see http-proxy/conf.d-prod/ngnix.conf.
 const CHAT_URL = import.meta.env.VITE_CHAT_URL || "/llm/api/chat";
 const PROMPT_URL = import.meta.env.VITE_CHAT_PROMPT_URL || "/assistant/prompt";
+// ollama-mcp-bridge's /health: 200 when Ollama is up, 503 when not, and a tool count
+// that is 0 when it could not connect to the MCP server.
+const HEALTH_URL =
+  import.meta.env.VITE_CHAT_HEALTH_URL || CHAT_URL.replace(/\/api\/chat$/, "/health");
+
+// Returns null when the assistant is usable, otherwise a message saying why not.
+async function checkAvailability() {
+  let res;
+  try {
+    res = await fetch(HEALTH_URL);
+  } catch {
+    return "The chat assistant is unavailable: it could not be reached. Please try again later.";
+  }
+  const body = await res.json().catch(() => null);
+  if (res.status === 503 && body?.ollama_status) {
+    return "The chat assistant is unavailable: the language model server cannot be reached. Please try again later.";
+  }
+  if (!res.ok) {
+    return "The chat assistant is unavailable right now. It may still be starting up. Please try again in a minute.";
+  }
+  if (!body?.tools) {
+    return "The chat assistant is unavailable: it could not connect to the engine's MCP server. Please try again later.";
+  }
+  return null;
+}
 
 // Must name a model already resident in the shared Ollama. That instance runs with
 // OLLAMA_MAX_LOADED_MODELS=1, so asking for a different tag evicts the resident one
@@ -41,6 +66,31 @@ function cleanContent(text) {
     .trim();
 }
 
+// Turn a failed request into something a user can act on, instead of "HTTP 502".
+function friendlyError(err) {
+  const status = err?.status;
+  if (status === 502 || status === 503 || status === 504) {
+    return "The assistant is unavailable right now. It may be starting up or busy with another request. Please try again in a minute.";
+  }
+  if (status === 429) {
+    return "The assistant is handling too many requests. Please wait a moment and try again.";
+  }
+  if (status === 408) {
+    return "The assistant took too long to respond. Try again, or ask a narrower question.";
+  }
+  if (status >= 500) {
+    return "The assistant ran into a problem on the server. Please try again shortly.";
+  }
+  if (status >= 400) {
+    return "The request to the assistant could not be processed. Please reload the page and try again.";
+  }
+  // fetch() rejects with a TypeError when the network or connection fails.
+  if (err instanceof TypeError) {
+    return "Could not reach the assistant. Check your connection and try again.";
+  }
+  return "Something went wrong while generating the answer. Please try again.";
+}
+
 export default function Chat() {
   const [messages, setMessages] = useState([
     {
@@ -55,6 +105,23 @@ export default function Chat() {
   // show. Without this the composer just looks frozen.
   const [waiting, setWaiting] = useState(false);
   const bottomRef = useRef(null);
+  // undefined while checking, null when available, otherwise the reason it is not.
+  const [unavailable, setUnavailable] = useState(undefined);
+
+  async function recheck() {
+    setUnavailable(undefined);
+    setUnavailable(await checkAvailability());
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+    checkAvailability().then((reason) => {
+      if (!cancelled) setUnavailable(reason);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Fetched rather than inlined so it stays single-sourced with the MCP server's
   // guides, and so its links point at this instance. ollama-mcp-bridge has no system
@@ -144,7 +211,11 @@ export default function Chat() {
           messages: outgoing,
         }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        const httpErr = new Error(`HTTP ${res.status}`);
+        httpErr.status = res.status;
+        throw httpErr;
+      }
 
       const reader = res.body.getReader();
       // {stream:true} so multi-byte UTF-8 chars split across packets decode correctly.
@@ -221,9 +292,11 @@ export default function Chat() {
         ];
       });
     } catch (err) {
+      // Keep the raw error in the console for debugging.
+      console.error("Chat request failed:", err);
       setMessages((m) => [
         ...m.slice(0, -1),
-        { role: "assistant", content: `Error: ${err.message}` },
+        { role: "assistant", content: `_${friendlyError(err)}_` },
       ]);
     } finally {
       setLoading(false);
@@ -274,18 +347,30 @@ export default function Chat() {
             this may queue behind another session.
           </div>
         )}
+        {unavailable && (
+          <div className="chat-unavailable">
+            {unavailable}
+            <button className="chat-retry" onClick={recheck}>
+              Retry
+            </button>
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
       <div className="chat-input-row">
         <input
           className="chat-input"
           value={input}
-          placeholder="Ask the Biodiversity Evaluation Engine for information or to run a pipeline..."
+          placeholder={
+            unavailable
+              ? "The chat assistant is unavailable"
+              : "Ask the Biodiversity Evaluation Engine for information or to run a pipeline..."
+          }
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
-          disabled={loading}
+          disabled={loading || !!unavailable}
         />
-        <button className="chat-send" onClick={send} disabled={loading}>
+        <button className="chat-send" onClick={send} disabled={loading || !!unavailable}>
           {loading ? "…" : "Send"}
         </button>
       </div>

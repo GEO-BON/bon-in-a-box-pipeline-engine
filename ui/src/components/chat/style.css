@@ -105,6 +105,27 @@
   text-align: center;
 }
 
+.chat-unavailable {
+  align-self: center;
+  margin: 8px 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #fbeaea;
+  color: #8a2c2c;
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.chat-retry {
+  margin-left: 10px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #8a2c2c;
+  background: transparent;
+  color: #8a2c2c;
+  cursor: pointer;
+}
+
 .thinking-block {
   margin-bottom: 8px;
   font-size: 0.82em;
