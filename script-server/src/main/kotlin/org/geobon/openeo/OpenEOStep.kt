@@ -393,7 +393,7 @@ class OpenEOMetadataFactory(yamlFile:File) : ScriptMetadataFactory(yamlFile) {
 
     override fun create(yamlParsed: Map<String, Any>, serverContext: ServerContext, logger: Logger): ScriptMetadata {
         val modifiedMap = yamlParsed.toMutableMap()
-        modifiedMap[SCRIPT] = openEOWrapper
+        modifiedMap[SCRIPT] = openEOWrapper.relativeTo(scriptStubsRoot)
         return super.create(
             modifiedMap,
             serverContext,

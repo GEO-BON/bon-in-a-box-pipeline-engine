@@ -97,7 +97,7 @@ fun Application.configureRouting() {
 
                     if (udpList.isEmpty()) {
                         call.respondText(
-                            text = "No UPD files were found on this server.",
+                            text = "No UDP files were found on this server.",
                             status = HttpStatusCode.NotFound
                         )
                     } else {

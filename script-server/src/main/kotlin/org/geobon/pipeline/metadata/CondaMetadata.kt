@@ -3,6 +3,7 @@ package org.geobon.pipeline.metadata
 import org.geobon.script.Description.CONDA
 import org.geobon.script.Description.CONDA__NAME
 import org.geobon.script.Description.SCRIPT
+import org.geobon.script.Run
 import org.geobon.script.ScriptType
 import org.geobon.server.ServerContext
 import org.yaml.snakeyaml.Yaml
@@ -19,10 +20,23 @@ data class CondaMetadata(
             // If available, return specific environment for script
             if (rawMetadata.containsKey(CONDA)) {
                 rawMetadata[CONDA]?.let { condaSection ->
-                    val condaEnvName = yamlFile.relativeTo(serverContext.scriptsRoot).path
+                    val baseName = when {
+                            yamlFile.absolutePath.startsWith(serverContext.scriptsRoot.absolutePath) ->
+                                yamlFile.relativeTo(serverContext.scriptsRoot).path
+                            yamlFile.absolutePath.startsWith(ServerContext.scriptStubsRoot.absolutePath) ->
+                                yamlFile.relativeTo(ServerContext.scriptStubsRoot).path
+                            yamlFile.absolutePath.startsWith(ServerContext.openEOYmlRoot.absolutePath) ->
+                                // This is an exception case, since all openEO steps share the same executing script.
+                                // The many converted UDP -> YAML files must share the same conda env.
+                                rawMetadata[SCRIPT].toString()
+                            else -> throw RuntimeException("Unexpected script location ${yamlFile.parent}")
+                    }
+
+                    val condaEnvName = baseName
                         .replace("/", "__")
                         .replace(' ', '_')
                         .removeSuffix(".yml")
+                        .replace('.', '_')
 
                     try {
                         @Suppress("UNCHECKED_CAST")
