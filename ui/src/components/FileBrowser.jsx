@@ -13,6 +13,7 @@ import Chip from "@mui/material/Chip";
 import ListItemText from "@mui/material/ListItemText";
 import ListSubheader from "@mui/material/ListSubheader";
 import TextField from "@mui/material/TextField";
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
@@ -166,7 +167,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
         onClick={handleOpen}
         disabled={disableMyFiles}
       >
-        Browse files
+        <NoteAddIcon />
       </Button>
       <Modal
         className="filebrowser-modal-card"
