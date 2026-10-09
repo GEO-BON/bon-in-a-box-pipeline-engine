@@ -375,9 +375,13 @@ paths:
     get:
       summary: Returns which optional features are enabled on this instance.
       description: >
-        Never fails: true means the feature is on, false means it is off.
-        Server health is reported by /api/systemStatus instead.
-        myFilesEnabled, chatEnabled and antivirus* mirror python-api's settings.
+        Lists the optional features of this server and whether each one is turned on.
+        This call always succeeds. For each flag, true means the feature is available
+        and false means it was turned off by the server's configuration (environment
+        variables, usually set in runner.env). To check whether the server is healthy,
+        use /api/systemStatus instead.
+        myFilesEnabled and chatEnabled describe features handled by the python-api
+        service, so the same variables must be set for both services.
       operationId: getServerStatus
       responses:
         "200":
@@ -392,46 +396,43 @@ paths:
                   - condaPackEnabled
                   - myFilesEnabled
                   - chatEnabled
-                  - antivirusEnabled
                 properties:
                   runsEnabled:
                     type: boolean
-                    description: False when BLOCK_RUNS makes this a results-only server.
+                    description: >
+                      Whether users can run scripts and pipelines. False when
+                      BLOCK_RUNS=true in runner.env, which makes this a results-only server where
+                      existing results can be viewed but nothing new can be run.
                   savePipelineToServer:
                     type: boolean
-                    description: False when SAVE_PIPELINE_TO_SERVER denies the save API.
+                    description: >
+                      Whether pipelines can be saved directly to the server from the
+                      editor. False when SAVE_PIPELINE_TO_SERVER=deny in runner.env; users must then
+                      copy the pipeline to the clipboard and submit it through git.
                   condaPackEnabled:
                     type: boolean
-                    description: Whether conda environments are cached with conda-pack.
+                    description: >
+                      Whether conda environments are packed with conda-pack and cached,
+                      so they can be reused instead of rebuilt. Controlled by
+                      CONDA_PACK_ENABLED in runner.env (true to turn it on). Read once at server start.
                   myFilesEnabled:
                     type: boolean
-                    description: False when DISABLE_MY_FILES makes the file manager read-only.
+                    description: >
+                      Whether users can upload and manage their own files in the file
+                      manager. False when DISABLE_MY_FILES=true in runner.env, which makes the file
+                      manager read-only.
                   chatEnabled:
                     type: boolean
                     description: >
-                      False when DISABLE_CHAT hides the assistant from the UI and skips
-                      the chat bridge. The MCP server runs either way, so this says
-                      nothing about MCP availability.
-                  antivirusEnabled:
-                    type: boolean
-                    description: >
-                      Whether uploads are scanned. When false they are saved unscanned;
-                      when true an unscannable upload is refused rather than saved.
-                  antivirusReachable:
-                    type: boolean
-                    nullable: true
-                    description: >
-                      Whether the scanner currently answers, or null when antivirus is
-                      off. False here means uploads are being refused, because the scan
-                      path fails closed.
+                      Whether the AI assistant is shown in the UI. False when
+                      DISABLE_CHAT=true in runner.env. The MCP server keeps running either way, so
+                      this flag does not tell whether MCP is available.
                 example:
                   runsEnabled: true
                   savePipelineToServer: true
                   condaPackEnabled: true
                   myFilesEnabled: true
                   chatEnabled: true
-                  antivirusEnabled: true
-                  antivirusReachable: true
   /api/versions:
     get:
       summary: Returns the version of system components.
@@ -1181,8 +1182,7 @@ paths:
         "503":
           description: >
             The upload could not be scanned, so it was refused rather than saved
-            unscanned. Either the scanner is unreachable -- GET /api/features reports that
-            as antivirusReachable false, before an upload is attempted -- or the file
+            unscanned. Either the scanner is unreachable or the file
             exceeds its StreamMaxLength, which clamd signals by closing the connection
             rather than replying. The python-api log distinguishes them.
           content:

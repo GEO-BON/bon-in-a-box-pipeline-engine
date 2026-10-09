@@ -91,19 +91,6 @@ class FeatureStatusTest {
     }
 
     @Test
-    fun `antivirus off reports null reachability, not false`() = testApplication {
-        withEnvironment("CLAMAV_ADDRESS", null, OverrideMode.SetOrOverride) {
-            application { scriptModule() }
-            with(status()) {
-                assertFalse(getBoolean("antivirusEnabled"))
-                // "not configured" and "configured but not answering" are different
-                // states, and only the second is a problem worth showing anyone.
-                assertTrue(isNull("antivirusReachable"))
-            }
-        }
-    }
-
-    @Test
     fun `the response is JSON, not a JSON string in a text body`() = testApplication {
         application { scriptModule() }
 
@@ -117,18 +104,5 @@ class FeatureStatusTest {
             ContentType.Application.Json,
             client.get("/api/features").contentType()?.withoutParameters()
         )
-    }
-
-    @Test
-    fun `an unreachable scanner is configured but not reachable`() = testApplication {
-        // Port 1 on loopback: nothing listens, so the probe fails fast rather than
-        // depending on a real clamd being available to the test suite.
-        withEnvironment("CLAMAV_ADDRESS", "127.0.0.1:1", OverrideMode.SetOrOverride) {
-            application { scriptModule() }
-            with(status()) {
-                assertTrue(getBoolean("antivirusEnabled"))
-                assertFalse(getBoolean("antivirusReachable"))
-            }
-        }
     }
 }

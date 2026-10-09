@@ -523,7 +523,7 @@ No authorization required
 
 Returns which optional features are enabled on this instance.
 
-Never fails: true means the feature is on, false means it is off. Server health is reported by /api/systemStatus instead. myFilesEnabled, chatEnabled and antivirus* mirror python-api&#39;s settings. 
+Lists the optional features of this server and whether each one is turned on. This call always succeeds. For each flag, true means the feature is available and false means it was turned off by the server&#39;s configuration (environment variables, usually set in runner.env). To check whether the server is healthy, use /api/systemStatus instead. myFilesEnabled and chatEnabled describe features handled by the python-api service, so the same variables must be set for both services. 
 
 ### Example
 

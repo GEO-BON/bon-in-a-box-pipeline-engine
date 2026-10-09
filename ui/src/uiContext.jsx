@@ -23,6 +23,4 @@ export const uiContext = createContext({
   savePipelineToServer: true,
   condaPackEnabled: true,
   chatEnabled: false,
-  antivirusEnabled: false,
-  antivirusReachable: null,
 });

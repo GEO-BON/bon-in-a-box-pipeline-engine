@@ -288,8 +288,6 @@ function App() {
     savePipelineToServer: features.data?.savePipelineToServer ?? true,
     condaPackEnabled: features.data?.condaPackEnabled ?? true,
     chatEnabled: features.data?.chatEnabled ?? false,
-    antivirusEnabled: features.data?.antivirusEnabled ?? false,
-    antivirusReachable: features.data?.antivirusReachable ?? null,
   };
 
   return (

@@ -78,18 +78,6 @@
       //expect(instance).to.be();
     });
 
-    it('should have the property antivirusEnabled (base name: "antivirusEnabled")', function() {
-      // uncomment below and update the code to test the property antivirusEnabled
-      //var instance = new BonInABoxScriptService.GetServerStatus200Response();
-      //expect(instance).to.be();
-    });
-
-    it('should have the property antivirusReachable (base name: "antivirusReachable")', function() {
-      // uncomment below and update the code to test the property antivirusReachable
-      //var instance = new BonInABoxScriptService.GetServerStatus200Response();
-      //expect(instance).to.be();
-    });
-
   });
 
 }));
