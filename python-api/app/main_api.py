@@ -7,6 +7,7 @@ import os
 import json
 import geopandas as gpd
 import pandas as pd
+from pyproj import CRS, Transformer
 from dotenv import load_dotenv
 
 from file_manager import fm_router
@@ -71,39 +72,41 @@ def regions_list(country_iso:str):
 
 @app.get("/region/country_region_bbox")
 def country_region_bbox(type: str = 'country', id: str = "", crs: str = 'EPSG:4326', output_format: str = 'bbox'):
+    # geometry_bbox only, never the geometry: the UK's polygon alone is ~50MB of WKT and
+    # ~800MB of RAM, enough to OOM-kill this container and the chat bridge running in it.
     if type == 'country':
-        reg = ddb.sql("SELECT *, ST_AsText(geometry) AS geom FROM read_parquet(?) WHERE adm0_src=?", params=[countries_parquet, id]).df()
+        reg = ddb.sql("SELECT adm0_src, adm0_name, geometry_bbox FROM read_parquet(?) WHERE adm0_src=?", params=[countries_parquet, id]).df()
         if( reg.empty ):
             raise HTTPException(status_code=404, detail="Country ID not found")
     elif type == 'region':
-        reg = ddb.sql("SELECT *, ST_AsText(geometry) AS geom FROM read_parquet(?) WHERE adm1_src=?", params=[regions_parquet, id]).df()
+        reg = ddb.sql("SELECT adm0_src, adm0_name, adm1_src, adm1_name, geometry_bbox FROM read_parquet(?) WHERE adm1_src=?", params=[regions_parquet, id]).df()
         if( reg.empty ):
             raise HTTPException(status_code=404, detail="Region ID not found")
         country = ddb.sql("SELECT adm0_src, geometry_bbox FROM read_parquet(?) WHERE adm0_src=?", params=[countries_parquet, reg["adm0_src"].iloc[0]]).df()
     else:
         raise HTTPException(status_code=400, detail="Invalid type parameter. Must be 'country' or 'region'.")
 
-    gs = gpd.GeoSeries.from_wkt(reg["geom"], crs="EPSG:4326")
-    del reg["geom"]
-    gdf = gpd.GeoDataFrame(reg, geometry=gs, crs="EPSG:4326")
-    gdf = gdf.to_crs(crs)
-    bbox = gdf.total_bounds
+    bb4326 = reg["geometry_bbox"].iloc[0]
+    target_crs = CRS.from_user_input(crs)
+    # Densified edges, so the reprojected box still contains the whole area.
+    bbox = Transformer.from_crs("EPSG:4326", target_crs, always_xy=True).transform_bounds(
+        bb4326["xmin"], bb4326["ymin"], bb4326["xmax"], bb4326["ymax"], densify_pts=21)
     if output_format == 'bbox':
-        return {"bbox": bbox.tolist(), "crs": crs}
+        return {"bbox": list(bbox), "crs": crs}
     elif output_format == 'chooser_input':
         if(type=='country'):
-            country_bb4326 = reg["geometry_bbox"].iloc[0]
+            country_bb4326 = bb4326
         elif(type=='region'):
-            region_bb4326 = reg["geometry_bbox"].iloc[0]
+            region_bb4326 = bb4326
             country_bb4326 = country["geometry_bbox"].iloc[0]
         return {"CRS": 
                 {"CRSBboxWGS84": "", 
                  "authority": crs.split(':')[0], 
                  "code": crs.split(':')[1], 
-                 "proj4Def": gdf.crs.to_proj4(), 
-                 "unit": gdf.crs.axis_info[0].unit_name, 
-                 "wktDef": gdf.crs.to_wkt()},
-                 "bbox": bbox.tolist(),
+                 "proj4Def": target_crs.to_proj4(), 
+                 "unit": target_crs.axis_info[0].unit_name, 
+                 "wktDef": target_crs.to_wkt()},
+                 "bbox": list(bbox),
                  "country": {
                      "ISO3": reg["adm0_src"].iloc[0], 
                      "englishName": reg["adm0_name"].iloc[0], 
