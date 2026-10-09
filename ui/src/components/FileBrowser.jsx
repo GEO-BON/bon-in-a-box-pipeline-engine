@@ -19,18 +19,6 @@ import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { uiContext } from "../uiContext.jsx";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "var(--grey)",
-  borderRadius: "8px",
-  boxShadow: 24,
-  p: 4,
-};
-
 // Files are listed by id, but selected values are paths under this prefix.
 const PATH_PREFIX = "/userdata";
 
@@ -185,7 +173,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
         open={open}
         onClose={handleModalClose}
       >
-        <Box sx={style}>
+        <Box className="filebrowser-modal-box">
           <Typography id="modal-modal-title">Select your file(s)</Typography>
 
           <FormControl sx={{ m: 1, width: 300 }}>
