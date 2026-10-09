@@ -18,11 +18,11 @@ class DataSizeTest {
     fun givenDataSizes_whenUsingArithmeticOperators_thenResultIsComputedInBytes() {
         assertEquals(15.bytes, 10.bytes + 5.bytes)
         assertEquals(5.bytes, 10.bytes - 5.bytes)
-        assertEquals(40.bytes, 10.bytes * 4)
-        assertEquals(10.bytes, 40.bytes / 4)
+        assertEquals(40.bytes, 10.bytes * 4.0)
+        assertEquals(10.bytes, 40.bytes / 4.0)
 
-        assertEquals(512.mebibytes * 2, 1.gibibytes)
-        assertEquals(1.kibibytes / 2, 512.bytes)
+        assertEquals(512.mebibytes * 2.0, 1.gibibytes)
+        assertEquals(1.kibibytes / 2.0, 512.bytes)
     }
 
     @Test
@@ -46,6 +46,7 @@ class DataSizeTest {
         assertEquals(DataSize(DataSize.GB), DataSize("1 GB"))
         assertEquals(DataSize((1.5 * DataSize.MB).toLong()), DataSize("1.5 megabytes"))
         assertEquals(DataSize(512), DataSize("512 B"))
+        assertEquals(DataSize(512), DataSize("512"))
         assertFailsWith<IllegalArgumentException> { DataSize("2XB") }
     }
 

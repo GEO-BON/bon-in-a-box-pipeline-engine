@@ -44,11 +44,11 @@ value class DataSize(val bytes: Long) : Comparable<DataSize> {
     operator fun minus(other: DataSize): DataSize =
         DataSize(this.bytes - other.bytes)
 
-    operator fun times(factor: Long): DataSize =
-        DataSize(this.bytes * factor)
+    operator fun times(factor: Double): DataSize =
+        DataSize((this.bytes * factor).toLong())
 
-    operator fun div(divisor: Long): DataSize =
-        DataSize(this.bytes / divisor)
+    operator fun div(divisor: Double): DataSize =
+        DataSize((this.bytes / divisor).toLong())
 
     /**
      * Example usage: size.toLong(DataSize.Companion.MIB)
@@ -98,10 +98,11 @@ value class DataSize(val bytes: Long) : Comparable<DataSize> {
         const val GB = MB * 1000
         const val TB = GB * 1000
 
-        private val SIZE_PATTERN = Regex("""^\s*(\d+(?:\.\d*)?|\.\d+)\s*([a-zA-Z]*)\s*$""")
+        // Matches "1.1 KiB" as [1.1 KiB, 1.1, KiB]
+        private val SIZE_PATTERN = Regex("""^(\d+(?:\.\d*)?|\.\d+)\s*([a-zA-Z]*)$""")
 
         private fun parse(value: String): Long {
-            val match = SIZE_PATTERN.matchEntire(value)
+            val match = SIZE_PATTERN.matchEntire(value.trim())
                 ?: throw IllegalArgumentException("Invalid data size: '$value'")
             val amount = match.groupValues[1].toBigDecimal()
             val multiplier = when (match.groupValues[2].uppercase()) {
@@ -126,7 +127,7 @@ val Number.bytes: DataSize get() = DataSize(this.toLong())
 val Int.kibibytes: DataSize get() = DataSize(this * KIB)
 val Int.mebibytes: DataSize get() = DataSize(this * MIB)
 val Int.gibibytes: DataSize get() = DataSize(this * GIB)
-val Int.tebibytes: DataSize get() = DataSize(bytes = this * TIB)
+val Int.tebibytes: DataSize get() = DataSize(this * TIB)
 
 val Int.kilobytes: DataSize get() = DataSize(this * KB)
 val Int.megabytes: DataSize get() = DataSize(this * MB)
@@ -136,7 +137,7 @@ val Int.terabytes: DataSize get() = DataSize(this * TB)
 val Long.kibibytes: DataSize get() = DataSize(this * KIB)
 val Long.mebibytes: DataSize get() = DataSize(this * MIB)
 val Long.gibibytes: DataSize get() = DataSize(this * GIB)
-val Long.tebibytes: DataSize get() = DataSize(bytes = this * TIB)
+val Long.tebibytes: DataSize get() = DataSize(this * TIB)
 
 val Long.kilobytes: DataSize get() = DataSize(this * KB)
 val Long.megabytes: DataSize get() = DataSize(this * MB)
@@ -156,7 +157,7 @@ val Float.terabytes: DataSize get() = DataSize((toDouble() * TB).toLong())
 val Double.kibibytes: DataSize get() = DataSize((this * KIB).toLong())
 val Double.mebibytes: DataSize get() = DataSize((this * MIB).toLong())
 val Double.gibibytes: DataSize get() = DataSize((this * GIB).toLong())
-val Double.tebibytes: DataSize get() = DataSize(bytes = (this * TIB).toLong())
+val Double.tebibytes: DataSize get() = DataSize((this * TIB).toLong())
 
 val Double.kilobytes: DataSize get() = DataSize((this * KB).toLong())
 val Double.megabytes: DataSize get() = DataSize((this * MB).toLong())

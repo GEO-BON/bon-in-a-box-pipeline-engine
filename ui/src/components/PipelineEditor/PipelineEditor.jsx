@@ -32,6 +32,7 @@ import IONode from "./IONode";
 import ConstantNode from "./ConstantNode";
 import UserInputNode from "./UserInputNode";
 import PopupMenu from "./PopupMenu";
+import PipelineMenu, { lifecycleListOpts } from "../PipelineMenu";
 import { layoutElements } from "./react-flow-utils/Layout";
 import { highlightConnectedEdges } from "./react-flow-utils/HighlightConnectedEdges";
 import {
@@ -105,6 +106,9 @@ export default function PipelineEditor(props) {
   const [toolTip, setToolTip] = useState(null);
   const [popupMenuPos, setPopupMenuPos] = useState({ x: 0, y: 0 });
   const [popupMenuOptions, setPopupMenuOptions] = useState();
+  const [loadDialogOpen, setLoadDialogOpen] = useState(false);
+  const [serverPipelineMap, setServerPipelineMap] = useState(null); // pipelines listed in the "Load from server" dialog
+  const [showAllPipelines, setShowAllPipelines] = useState(false);
   const [modal, setModal] = useState(null);
   const [alertSeverity, setAlertSeverity] = useState("");
   const [alertTitle, setAlertTitle] = useState("");
@@ -818,33 +822,41 @@ export default function PipelineEditor(props) {
     }
   };
 
-  const onLoadFromServerBtnClick = (event) => {
-    event.stopPropagation();
-    event.preventDefault();
-
-    setPopupMenuPos({ x: event.clientX, y: event.clientY });
-
-    api.getListOf("pipeline", (error, pipelineMap, response) => {
+  const fetchServerPipelines = (showAll, onSuccess) => {
+    api.getListOf("pipeline", lifecycleListOpts(showAll), (error, pipelineMap, response) => {
       if (error) {
+        setLoadDialogOpen(false);
         showAlert(
           'error',
           'Error loading the pipeline list',
           getErrorString(error, response)
         )
       } else {
-        let options = {};
-        Object.entries(pipelineMap).forEach(([descriptionFile, pipelineName]) =>
-          (options[descriptionFile + ' (' + pipelineName + ')'] = () => {
-            if (hasUnsavedChanges) {
-              setModal("unsavedLoadFromServer:" + descriptionFile)
-            } else {
-              loadFromServer(descriptionFile)
-            }
-          })
-        );
-        setPopupMenuOptions(options);
+        setServerPipelineMap(pipelineMap);
+        if (onSuccess) onSuccess();
       }
     });
+  };
+
+  const onLoadFromServerBtnClick = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+
+    fetchServerPipelines(showAllPipelines, () => setLoadDialogOpen(true));
+  };
+
+  const onShowAllPipelinesChange = (showAll) => {
+    setShowAllPipelines(showAll);
+    fetchServerPipelines(showAll);
+  };
+
+  const onPipelineChosenFromServer = (descriptionFile) => {
+    setLoadDialogOpen(false);
+    if (hasUnsavedChanges) {
+      setModal("unsavedLoadFromServer:" + descriptionFile)
+    } else {
+      loadFromServer(descriptionFile)
+    }
   };
 
   const onLoadFromLocalStorage = (descriptionFile) => {
@@ -1019,7 +1031,7 @@ export default function PipelineEditor(props) {
   }, [showAlert, setCurrentFileName, setSavedJSON, onLoadFlow])
 
   const saveFileToServer = useCallback((descriptionFile) => {
-    api.getListOf("pipeline", (error, pipelineList, response) => {
+    api.getListOf("pipeline", {}, (error, pipelineList, response) => {
       if (error) {
         showAlert(
           'error',
@@ -1372,6 +1384,30 @@ export default function PipelineEditor(props) {
         optionMapping={popupMenuOptions}
         onPopupMenuHide={onPopupMenuHide}
       />
+
+      <Dialog
+        open={loadDialogOpen}
+        onClose={() => setLoadDialogOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Load pipeline from server</DialogTitle>
+        <DialogContent>
+          <PipelineMenu
+            pipelineMap={serverPipelineMap}
+            value={currentFileName}
+            onChange={onPipelineChosenFromServer}
+            inline
+            autoFocus
+            showAllPipelines={showAllPipelines}
+            originPage="pipeline-editor"
+            onShowAllPipelinesChange={onShowAllPipelinesChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setLoadDialogOpen(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

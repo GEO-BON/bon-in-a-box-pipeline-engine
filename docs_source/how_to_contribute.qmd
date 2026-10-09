@@ -306,7 +306,9 @@ conda:
 
 ## Julia
 
-Conda dependency management is not available in Julia. There is a central project at /julia_depot/.
+Conda dependency management is not available in Julia. There is a central project at /julia_depot/. To install packages, use `biab_ensure_package(["Pkg1", "Pkg2"])` at the top of your script, which holds back concurrent scripts during installation. Packages added this way are not version-pinned and are shared by all scripts using the central project.
+
+For reproducible and isolated dependencies, place a `Project.toml` and its `Manifest.toml` in the same folder as your script. The script then runs in its own environment, created from these files. You can generate them by running the script once and copying the `Project.toml` and `Manifest.toml` found in its output folder.
 :::
 
 For more information, refer to the [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#create-env-file-manually).
@@ -397,7 +399,8 @@ conda: # Optional, only needed if you need packages not in the central environme
     - r-terra
 compute: # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.
   hpc: false # Optional, send to a HPC cluster if available. Defaults to false.
-  mem: 4Gi # Hard cap for the memory usage, default 4Gi.
+  mem: 4Gi # Cap for the memory usage, default 4Gi.
+  mem-max: 64Gi # Optional, if the job fails with OOM, the job's available memory will be increased up to this value.
   cpus-per-task: 4 # Number of CPU  allocated, default 4.
   time: "02:00:00" # Only when "hpc: true", maximum time allowed before the job is interrupted.
 ```
