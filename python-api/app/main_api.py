@@ -99,12 +99,14 @@ def country_region_bbox(type: str = 'country', id: str = "", crs: str = 'EPSG:43
         elif(type=='region'):
             region_bb4326 = bb4326
             country_bb4326 = country["geometry_bbox"].iloc[0]
-        return {"CRS": 
+        # None when the CRS has no authority match (e.g. a custom proj4 string).
+        auth = target_crs.to_authority()
+        return {"CRS":
                 {
                  "name": target_crs.name,
-                 "CRSBboxWGS84": "", 
-                 "authority": crs.split(':')[0], 
-                 "code": crs.split(':')[1], 
+                 "CRSBboxWGS84": "",
+                 "authority": auth[0] if auth else "",
+                 "code": auth[1] if auth else "",
                  "proj4Def": target_crs.to_proj4(), 
                  "unit": target_crs.axis_info[0].unit_name, 
                  "wktDef": target_crs.to_wkt()},

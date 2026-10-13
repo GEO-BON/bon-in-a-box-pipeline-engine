@@ -1140,7 +1140,7 @@ export default function PipelineEditor(props) {
         {title}
       </h2>
       {!savePipelineToServer && (
-        <Alert severity="warning">
+        <Alert severity="warning" sx={{ width: '350px', marginBottom: '10px', padding: '10px 2px', borderRadius: '10px' }}>
           This instance is read-only
         </Alert>
       )}
