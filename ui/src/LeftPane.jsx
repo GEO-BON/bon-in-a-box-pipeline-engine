@@ -33,7 +33,6 @@ export default function LeftPane({ leftContent }) {
           {leftContent && savePipelineToServer && <>{leftContent}</>}
           {(!leftContent || !savePipelineToServer) && (
             <>
-              <div className="divider"></div>
               {/* doesn't render if this is a READ ONLY environment */}
               {!disableMyFiles && (
                 <NavLink className="left-pane-link" to="/manage-files">
@@ -41,6 +40,7 @@ export default function LeftPane({ leftContent }) {
                   My files
                 </NavLink>
               )}
+              <div className="divider"></div>
               <NavLink
                 className="left-pane-link"
                 target="_blank"
