@@ -16,6 +16,7 @@ import org.geobon.pipeline.JSONPipeline.Companion.createRootPipeline
 import org.geobon.pipeline.Pipeline.Companion.createMiniPipelineFromScript
 import org.geobon.pipeline.metadata.LifecycleMetadata
 import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.openEOYmlRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.json.JSONException
 import org.json.JSONObject
@@ -96,7 +97,7 @@ fun Application.configureRouting() {
 
                     if (udpList.isEmpty()) {
                         call.respondText(
-                            text = "No UPD files were found on this server.",
+                            text = "No UDP files were found on this server.",
                             status = HttpStatusCode.NotFound
                         )
                     } else {
@@ -235,13 +236,13 @@ fun Application.configureRouting() {
             logger.info("${call.parameters["type"]}: $descriptionPath\nFolder: $pipelineOutputFolder\nBody: $inputFileContent")
 
             // Validate the existence of the file
-            val descriptionFile = File(
-                if (singleScript)
-                    if (descriptionPath.startsWith("openEO>")) scriptStubsRoot
-                    else serverContext.scriptsRoot
-                else serverContext.pipelinesRoot,
-                descriptionPath.replace(FILE_SEPARATOR, '/')
-            )
+            val descriptionFile =
+                if (singleScript && descriptionPath.startsWith("openEO>"))
+                    File(openEOYmlRoot, descriptionPath.removePrefix("openEO>").replace(FILE_SEPARATOR, '/'))
+                else File(
+                    if (singleScript) serverContext.scriptsRoot else serverContext.pipelinesRoot,
+                    descriptionPath.replace(FILE_SEPARATOR, '/')
+                )
             if (!descriptionFile.exists()) {
                 call.respondText(
                     text = "Script $descriptionPath not found on this server.".also { logger.warn(it) },
