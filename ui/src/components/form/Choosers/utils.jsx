@@ -87,7 +87,7 @@ export const paperStyle = (dialog) => {
       borderRadius: "10px",
       border: "1px solid #aaa",
       padding: "10px",
-      margin: "10px",
+      margin: "var(--chooser-card-margin, 10px)",
       boxShadow: "2px 2px 4px #999",
     };
   } else {
