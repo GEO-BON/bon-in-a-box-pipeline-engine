@@ -28,6 +28,7 @@ export default function Choosers({
   isCompact = false,
 }) {
   const [openModal, setOpenModal] = useState(false);
+  const isPhone = useMediaQuery("(max-width: 599px)");
 
   const type = inputDescription.type;
 
@@ -37,65 +38,68 @@ export default function Choosers({
     </h4>
   )
 
-    if ("bboxCRS" === type || "crsbbox" === type.toLowerCase() || "location" === type) {
-      return (
-        <div className="chooserFieldBody">
-          {label}
-          <CustomButtonGreen
-            variant="contained"
-            endIcon={<CropFreeIcon />}
-            onClick={() => {
-              setOpenModal(true);
-            }}
-            onClose={() => {
-              setOpenModal(false);
-            }}
-            className="locationChooserButton"
-            style={{ marginBottom: "1rem", fontSize: "1rem", width: !isCompact && "500px" }}
-          >
-            {`Choose ${inputDescription.label}`}
-          </CustomButtonGreen>
-          {value && !isCompact && <LocationDescription location={value} />}
-          <Modal
-            key={`modal-chooser-div-${inputId}`}
-            open={openModal}
-            onClose={() => {
-              setOpenModal(false);
-            }}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <>
-              {openModal && (
-                <Chooser
-                  key={`choosers-modal-div-${inputId}`}
-                  {...{
-                    setOpenModal,
-                    inputDescription,
-                    value,
-                    updateValue,
-                  }}
-                />
-              )}
-            </>
-          </Modal>
-        </div>
-      );
-    }
+  if (!isPhone
+    && ("bboxCRS" === type || "crsbbox" === type.toLowerCase() || "location" === type)
+  ) {
     return (
       <div className="chooserFieldBody">
         {label}
-        <Chooser
-          key={`choosers-div-${inputId}`}
-          {...{
-            setOpenModal,
-            inputDescription,
-            value,
-            updateValue,
+        <CustomButtonGreen
+          variant="contained"
+          endIcon={<CropFreeIcon />}
+          onClick={() => {
+            setOpenModal(true);
           }}
-        />
+          onClose={() => {
+            setOpenModal(false);
+          }}
+          className="locationChooserButton"
+          style={{ marginBottom: "1rem", fontSize: "1rem", width: !isCompact && "500px" }}
+        >
+          {`Choose ${inputDescription.label}`}
+        </CustomButtonGreen>
+        {value && !isCompact && <LocationDescription location={value} />}
+        <Modal
+          key={`modal-chooser-div-${inputId}`}
+          open={openModal}
+          onClose={() => {
+            setOpenModal(false);
+          }}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <>
+            {openModal && (
+              <Chooser
+                key={`choosers-modal-div-${inputId}`}
+                {...{
+                  setOpenModal,
+                  inputDescription,
+                  value,
+                  updateValue,
+                }}
+              />
+            )}
+          </>
+        </Modal>
       </div>
     );
+  }
+
+  return (
+    <div className="chooserFieldBody">
+      {label}
+      <Chooser
+        key={`choosers-div-${inputId}`}
+        {...{
+          setOpenModal,
+          inputDescription,
+          value,
+          updateValue,
+        }}
+      />
+    </div>
+  );
 }
 
 function Chooser({
@@ -122,8 +126,8 @@ function Chooser({
   const hasPhoneSpacing = useMediaQuery(
     "(max-width: 599px), (max-width: 1000px) and (max-height: 549px) and (orientation: landscape)",
   );
-  const compactSpacing = showBBox && hasPhoneSpacing;
   const showMap = showBBox && !isPhone;
+  const isModal = showMap
   const showCountry = [
     "country",
     "countryregion",
@@ -209,17 +213,17 @@ function Chooser({
     <div
       className="location-chooser-modal"
       style={{
-        width: showBBox ? "90%" : "auto",
-        height: showBBox ? "90%" : "auto",
-        position: showBBox ? "absolute" : "relative",
-        top: showBBox ? "50%" : "auto",
-        left: showBBox ? "50%" : "auto",
-        transform: showBBox ? "translate(-50%, -50%)" : "",
-        backgroundColor: showBBox ? "#fff" : "none",
-        padding: showBBox ? (isPhone ? "0px" : compactSpacing ? "8px" : "20px") : "0px",
-        "--chooser-card-margin": compactSpacing ? "4px" : "10px",
-        borderRadius: "8px",
-        margin: showBBox ? "0px auto" : "0px",
+        width: isModal ? "90%" : "auto",
+        height: isModal ? "90%" : "auto",
+        position: isModal ? "absolute" : "relative",
+        top: isModal ? "50%" : "auto",
+        left: isModal ? "50%" : "auto",
+        transform: isModal ? "translate(-50%, -50%)" : "",
+        backgroundColor: isModal ? "#fff" : "none",
+        padding: isModal ? (hasPhoneSpacing ? "8px" : "20px") : "0px",
+        "--chooser-card-margin": hasPhoneSpacing ? "4px" : "10px",
+        borderRadius: hasPhoneSpacing ? "0px" :  "8px",
+        margin: isModal ? "0px auto" : "0px",
       }}
     >
       <Grid container spacing={0} sx={{ height: "100%" }}>
@@ -227,10 +231,8 @@ function Chooser({
           className="inputGrid"
           size={{ xs: showMap ? 3 : 12 }}
           sx={{
-            padding: compactSpacing ? "4px" : "10px",
-            // Balance the modal's extra 8px on the left when the map is beside the form.
-            paddingRight: compactSpacing && showMap ? "12px" : undefined,
-            height: showBBox ? "100%" : "auto",
+            padding: hasPhoneSpacing ? "0" : "10px",
+            height: isModal ? "100%" : "auto",
             overflowY: type === "bboxCRS"
               || type.toLowerCase() === "crsbbox"
               || type.toLowerCase() === "location"
@@ -285,7 +287,7 @@ function Chooser({
               }}
             />
           )}
-          {showBBox && (
+          {isModal && (
             <div>
               <CustomButtonGreen
                 onClick={() => {
