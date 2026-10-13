@@ -64,6 +64,13 @@ fun Application.configureRouting() {
             return@get
         }
 
+        /**
+         * Which optional features this instance has switched on.
+         */
+        get("/api/features") {
+            call.respond(FeatureStatus.asMap())
+        }
+
         get("/{type}/list") {
             val type = call.parameters["type"]
             val roots: List<File>

@@ -153,6 +153,11 @@ export function PipelineResults({
   } else return null;
 }
 
+// A 200 with HTML where a JSON file was expected comes from a proxy, not the file.
+function isHtml(response) {
+  return response.ok && (response.headers.get("Content-Type") || "").includes("text/html");
+}
+
 function EnvironmentInfo({folder}) {
   const [environmentData, setEnvironmentData] = useState(null);
 
@@ -238,12 +243,14 @@ export function DelayedResult({
         if (scriptMetadata.inputs) {
           fetch("/output/" + folder + "/input.json")
             .then((response) => {
+              // HTML is a proxy page, not the file: leave inputData unset to retry.
+              if (isHtml(response)) return null;
               if (response.ok) return response.json();
 
               return Promise.reject(response);
             })
             .then((json) => {
-              setInputData(json);
+              if (json !== null) setInputData(json);
             })
             .catch((response) => {
               setInputData({
@@ -261,6 +268,12 @@ export function DelayedResult({
       // Fetch the output
       fetch("/output/" + folder + "/output.json?t=" + displayTimeStamp)
         .then((response) => {
+          if (isHtml(response)) {
+            // e.g. a proxy waiting page while the instance restarts
+            console.log("Output file answered with HTML: retrying...");
+            return Promise.resolve(null);
+          }
+
           if (response.ok) {
             response.text()
               .then((text) => {
