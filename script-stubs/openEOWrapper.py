@@ -9,7 +9,7 @@ log_level = "warning"
 
 # Accessing yaml file to extract input types
 script_name = Path(output_folder).parent.name
-yaml_path = Path("/script-stubs/openEO")/f"{script_name}.yml"
+yaml_path = Path(os.getenv("OUTPUT_LOCATION", "/output"))/".local/openEO"/f"{script_name}.yml"
 
 with open(yaml_path) as f:
     yaml_file = yaml.safe_load(f)
@@ -62,7 +62,7 @@ if "epsg" in inputs.keys():
 # Check input types for special cases
 for key in input_info.keys():
     # bboxCRS
-    if input_info[key] == "bboxCRS":
+    if input_info[key] == "crsBBox":
         spatial_extent = data.get(key) if data.get(key) else biab_error_stop("Something went wrong. Yaml does not match input.json. Please contact the BON in a Box team.")
         bbox = spatial_extent['bbox']
         crs_info = spatial_extent['CRS']

@@ -249,10 +249,13 @@ export default class DefaultApi {
     /**
      * Get a list of available steps of given type and their names.
      * @param {module:model/String} type Script, pipeline or openEO
+     * @param {Object} opts Optional parameters
+     * @param {Array.<module:model/String>} [lifecycleStatus] Only list steps with one of these lifecycle statuses. Steps without a status are considered in_development. Lists everything when omitted. Currently applies to pipelines only.
      * @param {module:api/DefaultApi~getListOfCallback} callback The callback function, accepting three arguments: error, data, response
      * data is of type: {@link Object.<String, {String: String}>}
      */
-    getListOf(type, callback) {
+    getListOf(type, opts, callback) {
+      opts = opts || {};
       let postBody = null;
       // verify the required parameter 'type' is set
       if (type === undefined || type === null) {
@@ -263,6 +266,7 @@ export default class DefaultApi {
         'type': type
       };
       let queryParams = {
+        'lifecycleStatus': this.apiClient.buildCollectionParam(opts['lifecycleStatus'], 'multi')
       };
       let headerParams = {
       };

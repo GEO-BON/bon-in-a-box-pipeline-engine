@@ -254,6 +254,41 @@ class ApplicationTest {
     }
 
     @Test
+    fun testPipelineListLifecycleFilter() = testApplication {
+        application { scriptModule() }
+
+        // helloWorld.json has status "example", 0in1out_1step.json has no lifecycle (considered in development)
+        client.get("/pipeline/list?lifecycleStatus=example").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val jsonResult = JSONObject(bodyAsText())
+            assertTrue(jsonResult.has("helloWorld.json"))
+            assertFalse(jsonResult.has("0in1out_1step.json"))
+        }
+
+        client.get("/pipeline/list?lifecycleStatus=reviewed&lifecycleStatus=in_review").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val jsonResult = JSONObject(bodyAsText())
+            assertFalse(jsonResult.has("helloWorld.json"))
+            assertFalse(jsonResult.has("0in1out_1step.json"))
+        }
+
+        client.get("/pipeline/list?lifecycleStatus=in_development").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val jsonResult = JSONObject(bodyAsText())
+            assertFalse(jsonResult.has("helloWorld.json"))
+            assertTrue(jsonResult.has("0in1out_1step.json"))
+        }
+
+        // Without the filter, everything is listed
+        client.get("/pipeline/list").apply {
+            assertEquals(HttpStatusCode.OK, status)
+            val jsonResult = JSONObject(bodyAsText())
+            assertTrue(jsonResult.has("helloWorld.json"))
+            assertTrue(jsonResult.has("0in1out_1step.json"))
+        }
+    }
+
+    @Test
     fun testIgnoreTrailingSlash() = testApplication {
         application { scriptModule() }
 

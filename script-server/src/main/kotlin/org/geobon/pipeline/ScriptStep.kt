@@ -3,10 +3,12 @@ package org.geobon.pipeline
 import org.geobon.hpc.HPCRequirements
 import org.geobon.hpc.HPCRun
 import org.geobon.k8s.KubernetesRun
+import org.geobon.pipeline.metadata.ScriptMetadataFactory
 import org.geobon.script.*
 import org.geobon.server.RemoteSetupState
 import org.geobon.server.ServerContext
 import org.geobon.utils.fromSlurm
+import org.jetbrains.annotations.VisibleForTesting
 import java.io.File
 import kotlin.time.Duration
 
@@ -17,8 +19,9 @@ open class ScriptStep : YMLStep {
         serverContext: ServerContext,
         yamlFile: File,
         stepId: StepId,
-        inputs: MutableMap<String, Pipe> = mutableMapOf()
-    ) : super(serverContext, yamlFile, stepId, inputs) {
+        inputs: MutableMap<String, Pipe> = mutableMapOf(),
+        metadataFactory: ScriptMetadataFactory = ScriptMetadataFactory(yamlFile),
+    ) : super(serverContext, yamlFile, stepId, inputs, metadataFactory = metadataFactory) {
         serverContext.hpc?.register(this)
     }
 
@@ -37,21 +40,21 @@ open class ScriptStep : YMLStep {
         inputs
     )
 
-    val scriptFile: File = metadata.script
     val scriptType
-        get() = ScriptType.fromFile(scriptFile)
+        get() = ScriptType.fromFile(metadata.script)
 
     val condaEnvName
         get() = metadata.conda?.name
     val condaEnvYml
         get() = metadata.conda?.yml
 
-    override fun validateStep(): String {
+    @VisibleForTesting
+    public override fun validateStep(): String {
         if (!yamlFile.exists())
             return "Description file not found: ${yamlFile.path}"
 
-        if (!scriptFile.exists()) {
-            return "Script file not found: ${scriptFile.relativeTo(serverContext.scriptsRoot)}\n"
+        if (!metadata.script.exists()) {
+            return "Script file not found: ${metadata.script.relativeTo(serverContext.scriptsRoot)}\n"
         }
 
         return ""
@@ -78,7 +81,7 @@ open class ScriptStep : YMLStep {
 
                         HPCRun(
                             context,
-                            scriptFile,
+                            metadata.script,
                             inputs,
                             HPCRequirements(
                                 computeMetadata.mem,
@@ -91,7 +94,7 @@ open class ScriptStep : YMLStep {
                     } else if(shouldUseK8s()) {
                         KubernetesRun(
                             context,
-                            scriptFile,
+                            metadata.script,
                             metadata.timeout,
                             condaEnvName,
                             condaEnvYml,
@@ -100,7 +103,7 @@ open class ScriptStep : YMLStep {
                     } else {
                         DockerizedRun(
                             context,
-                            scriptFile,
+                            metadata.script,
                             metadata.timeout,
                             condaEnvName,
                             condaEnvYml

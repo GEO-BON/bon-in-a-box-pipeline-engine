@@ -17,6 +17,17 @@ paths:
       operationId: getListOf
       parameters:
         - $ref: "#/components/parameters/stepType"
+        - name: lifecycleStatus
+          in: query
+          description: Only list steps with one of these lifecycle statuses.
+            Steps without a status are considered in_development.
+            Lists everything when omitted. Currently applies to pipelines only.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [in_development, in_review, reviewed, core, example, subpipeline, stale, deprecated]
       responses:
         "200":
           description: Map of step description files to their names.

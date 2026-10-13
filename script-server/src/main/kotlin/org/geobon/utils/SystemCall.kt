@@ -44,7 +44,8 @@ open class SystemCall(maxParallelism: Int? = null) {
         mergeErrors: Boolean = false,
         logger: Logger? = null,
         logFile: File? = null,
-        echo: Boolean = false
+        echo: Boolean = false,
+        killOnCancel: Boolean = false
     ): CallResult {
         suspend fun runImpl() : CallResult {
             if (echo) logger?.debug(call.joinToString(" "))
@@ -83,15 +84,22 @@ open class SystemCall(maxParallelism: Int? = null) {
                         }
                     }
 
-                    process.waitFor(timeout.inWholeMilliseconds, TimeUnit.MILLISECONDS)
+                    try {
+                        if (killOnCancel) {
+                            // Interrupts the wait when the coroutine is cancelled.
+                            runInterruptible { process.waitFor(timeout.inWholeMilliseconds, TimeUnit.MILLISECONDS) }
+                        } else {
+                            process.waitFor(timeout.inWholeMilliseconds, TimeUnit.MILLISECONDS)
+                        }
+                    } catch (e: CancellationException) {
+                        logger?.warn("Cancelled, stopping process.")
+                        terminate(process, logger)
+                        throw e
+                    }
+
                     if (process.isAlive) {
                         logger?.warn("Timeout reached, stopping process.")
-                        process.destroy()
-                        process.waitFor(30, TimeUnit.SECONDS)
-                        if (process.isAlive) {
-                            logger?.warn("Destroy timeout reached, killing process.")
-                            process.destroyForcibly()
-                        }
+                        terminate(process, logger)
                     }
                     outputJob.join()
                     errorJob?.join()
@@ -99,6 +107,8 @@ open class SystemCall(maxParallelism: Int? = null) {
 
                     CallResult(process.exitValue(), inputString.toString(), errorString.toString())
                 } catch (ex: Exception) {
+                    // Without killOnCancel, cancellation is reported through the CallResult as it always was.
+                    if (killOnCancel && ex is CancellationException) throw ex
                     ex.printStackTrace()
                     var message = ex.message ?: ex.javaClass.name
                     if (errorString.isNotBlank())
@@ -121,6 +131,19 @@ open class SystemCall(maxParallelism: Int? = null) {
 
         return processLimit?.withPermit { runImpl() }
             ?: runImpl() // Bypass semaphore when there is no process limit
+    }
+
+    /** Asks the process to stop, and kills it if it did not within 30 seconds. */
+    private suspend fun terminate(process: Process, logger: Logger?) {
+        process.destroy()
+        // Must complete even when the calling coroutine is cancelled.
+        withContext(NonCancellable) {
+            runInterruptible { process.waitFor(30, TimeUnit.SECONDS) }
+        }
+        if (process.isAlive) {
+            logger?.warn("Destroy timeout reached, killing process.")
+            process.destroyForcibly()
+        }
     }
 
     private suspend fun logAll(
