@@ -2,12 +2,11 @@ package org.geobon.server.plugins
 
 import org.geobon.server.ServerContext
 import org.slf4j.LoggerFactory
-import java.io.File
 
 private val logger = LoggerFactory.getLogger("Cleanup")
 
 fun cleanupOnBoot() {
-    val openEOFolder = File(ServerContext.scriptStubsRoot, "openEO")
+    val openEOFolder = ServerContext.openEOYmlRoot
 
     if (openEOFolder.exists()) {
         val deleted = openEOFolder.deleteRecursively()

@@ -30,6 +30,10 @@ open class ServerContext(
         val outputRoot
             get() = File(System.getenv("OUTPUT_LOCATION"))
 
+        // Generated openEO UDP descriptions
+        val openEOYmlRoot
+            get() = File(outputRoot, ".local/openEO")
+
         /**
          * Storage for packed conda environments, reused between instances.
          */

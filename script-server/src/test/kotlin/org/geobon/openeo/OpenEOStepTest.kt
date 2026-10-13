@@ -5,6 +5,7 @@ import org.geobon.openeo.OpenEOStep.Companion.addOutputs
 import org.geobon.openeo.OpenEOStep.Companion.convertInputs
 import org.geobon.openeo.OpenEOStep.Companion.convertMetadata
 import org.geobon.pipeline.StepId
+import org.geobon.pipeline.outputRoot
 import org.geobon.server.ServerContext
 import org.geobon.utils.noHPCContext
 import org.json.JSONObject
@@ -13,6 +14,20 @@ import kotlin.test.*
 
 
 class OpenEOStepTest {
+
+    @BeforeTest
+    fun setupOutputFolder() {
+        with(outputRoot) {
+            assertTrue(!exists())
+            mkdirs()
+            assertTrue(exists())
+        }
+    }
+
+    @AfterTest
+    fun removeOutputFolder() {
+        assertTrue(outputRoot.deleteRecursively())
+    }
 
     private fun loadTestResource(filename: String): JSONObject {
         val file = File("src/test/resources/openeo/$filename")
@@ -133,7 +148,7 @@ class OpenEOStepTest {
     fun scriptFileIsOpenEOWrapperTest() {
         // A pre-written description stops updateYaml from fetching the catalog over the network
         val udpKey = "scriptFileTest.udp"
-        val yamlFile = File(ServerContext.scriptStubsRoot, "openEO/$udpKey.yml")
+        val yamlFile = File(ServerContext.openEOYmlRoot, "$udpKey.yml")
         yamlFile.parentFile.mkdirs()
         yamlFile.writeText(
             """
@@ -143,14 +158,23 @@ class OpenEOStepTest {
           output_rasters:
             label: Output raster
             type: image/tiff;application=geotiff[]
+        conda:
+          channels:
+            - conda-forge
+          dependencies:
+            - something
         """.trimIndent()
         )
 
         try {
             val step = OpenEOStep(udpKey, StepId("testStep", "nodeId"), noHPCContext)
 
+            assertEquals(yamlFile, OpenEOStep.updateYaml(noHPCContext, udpKey))
+
             assertEquals(File(ServerContext.scriptStubsRoot, "openEOWrapper.py"), step.metadata.script)
             assertEquals("", step.validateStep())
+
+            assertEquals("openEOWrapper_py", step.metadata.conda?.name)
         } finally {
             yamlFile.delete()
         }
