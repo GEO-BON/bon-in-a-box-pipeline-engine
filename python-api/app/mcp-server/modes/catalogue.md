@@ -10,8 +10,8 @@ Call `find_step`. Answer from what it returns and nothing else.
   `script` if they asked for scripts specifically.
 
 What is installed differs between instances. Never name a pipeline that did not come back
-from `find_step`, and never describe one from memory — deprecated steps are already
-filtered out of its results, so a name you supply yourself may be one that was removed.
+from `find_step`, and never describe one from memory — deprecated, stale, example
+and subpipeline steps are already filtered out of its results, so a name you supply yourself may be one that was removed.
 
 **Do not run anything in this mode.** Listing what exists is the whole answer. If the user
 then picks one, that is a new question: call `start_task` again with kind `step_details`

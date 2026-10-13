@@ -98,6 +98,13 @@ const GREETING = {
   content: "Hi! How can I assist you with the Biodiversity Evaluation Engine today?",
 };
 
+// Shown under the greeting until the user asks something.
+const EXAMPLE_QUESTIONS = [
+  "What pipelines are available for protected areas?",
+  "What are the inputs needed to run ProtConn?",
+  "Run Biodiversity Intactness for Albania",
+];
+
 function loadMessages() {
   let saved;
   try {
@@ -176,8 +183,8 @@ export default function Chat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  async function send() {
-    const question = input.trim();
+  async function send(text = input) {
+    const question = text.trim();
     if (!question || loading) return;
     setInput("");
     // Capture conversation history before adding the new turn. Slice off the initial
@@ -379,6 +386,15 @@ export default function Chat() {
             </div>
           </div>
         ))}
+        {messages.length === 1 && !unavailable && (
+          <div className="chat-examples">
+            {EXAMPLE_QUESTIONS.map((q) => (
+              <button key={q} className="chat-example" onClick={() => send(q)}>
+                {q}
+              </button>
+            ))}
+          </div>
+        )}
         {waiting && (
           <div className="chat-waiting">
             Waiting for the assistant — the model handles one request at a time, so
@@ -408,7 +424,7 @@ export default function Chat() {
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
           disabled={loading || !!unavailable}
         />
-        <button className="chat-send" onClick={send} disabled={loading || !!unavailable}>
+        <button className="chat-send" onClick={() => send()} disabled={loading || !!unavailable}>
           {loading ? "…" : "Send"}
         </button>
       </div>

@@ -45,17 +45,20 @@ FETCH_CONCURRENCY = 8
 
 STEP_TYPES = ("pipeline", "script")
 
+# Lifecycle statuses kept out of listings and search (see .github/pipelineValidationSchema.yml).
+HIDDEN_STATUSES = {"deprecated", "stale", "example", "subpipeline"}
+
 
 class Step:
-    __slots__ = ("type", "path", "name", "summary", "description", "deprecated")
+    __slots__ = ("type", "path", "name", "summary", "description", "hidden")
 
-    def __init__(self, type, path, name, description, deprecated):
+    def __init__(self, type, path, name, description, hidden):
         self.type = type
         self.path = path
         self.name = name
         self.description = description or ""
         self.summary = _one_line(self.description)
-        self.deprecated = deprecated
+        self.hidden = hidden
 
     def as_line(self):
         line = f"- {self.name} ({self.type}) — path: {self.path}"
@@ -82,7 +85,7 @@ def _one_line(description):
     return ""
 
 
-def _is_deprecated(info, name):
+def _is_hidden(info, name):
     """Whether to keep this step out of results.
 
     `lifecycle.status` is the structured signal and is what the UI reads. The substring
@@ -91,7 +94,7 @@ def _is_deprecated(info, name):
     and still catches a few.
     """
     lifecycle = info.get("lifecycle")
-    if isinstance(lifecycle, dict) and str(lifecycle.get("status", "")).lower() == "deprecated":
+    if isinstance(lifecycle, dict) and str(lifecycle.get("status", "")).lower() in HIDDEN_STATUSES:
         return True
     return "deprecated" in f"{name} {info.get('description') or ''}".lower()
 
@@ -121,7 +124,7 @@ class StepIndex:
         are left out on purpose: 28 pipelines with a sentence each is most of a context
         window, and the follow-up question is always about one of them.
         """
-        listed = [s for s in self.steps if s.type == type and not s.deprecated]
+        listed = [s for s in self.steps if s.type == type and not s.hidden]
         if not listed:
             return f"No {type}s are installed on this instance."
         lines = [f"- {s.name} — path: {s.path}" for s in sorted(listed, key=lambda s: s.name)]
@@ -146,7 +149,7 @@ class StepIndex:
 
         matches = []
         for _, step in self.index.rank(query_tokens):
-            if step.deprecated or (type and step.type != type):
+            if step.hidden or (type and step.type != type):
                 continue
             matches.append(step)
             if len(matches) == max_results:
@@ -186,7 +189,7 @@ async def _fetch_type(client, type, semaphore):
                 print(f"[steps] no info for {type} {path!r}: {exc}", file=sys.stderr)
                 info = {}
         name = info.get("name") or listed_name or path
-        return Step(type, path, name, info.get("description"), _is_deprecated(info, name))
+        return Step(type, path, name, info.get("description"), _is_hidden(info, name))
 
     return await asyncio.gather(*(one(path, name) for path, name in names.items()))
 

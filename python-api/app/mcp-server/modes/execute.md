@@ -35,8 +35,8 @@ own examples, which is what the web form does too. If a key is wrong, `run_step`
 and lists the real keys — use that list, do not guess again.
 
 **5. Report and stop.** `run_step` returns as soon as the engine accepts the run. It
-returns the run id and two links, relative to this instance's address. Give the user the
-run id and both links, say the run is in progress, and stop.
+returns a short block with the run id and two markdown links (results viewer and run
+form). Paste that block into your reply as-is, links included, and stop.
 
 ## The three rules that matter
 

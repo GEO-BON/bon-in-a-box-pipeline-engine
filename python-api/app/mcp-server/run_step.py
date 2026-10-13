@@ -25,6 +25,7 @@ same defaults the web form starts from.
 """
 
 import json
+from urllib.parse import quote
 
 # Both are what the UI builds: see RunHistory.jsx for the form link and
 # PipelineResults.jsx for the viewer link. Paths only -- this server has no reliable way
@@ -150,17 +151,20 @@ def launch_summary(step_type, run_id, notes):
     lines = []
     if notes:
         lines.append("Inputs: " + " ".join(notes))
+    # Encode spaces and brackets, which would end a markdown link early.
+    form = quote(FORM_PATH.format(step_type=step_type, step_path=step_path, run_hash=run_hash), safe="/>@")
+    viewer = quote(VIEWER_PATH.format(run_id=run_id), safe="/>@")
     lines += [
         "The run has STARTED. It is not finished -- do not wait for it and do not "
         "check on it; the user follows it in the interface. It is also already "
         "launched: do NOT call `run_step` again for this request, whatever the input "
         "notes above say. Anything above worth correcting is worth telling the user "
         "about, and is not a reason to start the pipeline a second time.",
-        f"runId: {run_id}",
-        "Form (relative to this instance's address): "
-        + FORM_PATH.format(step_type=step_type, step_path=step_path, run_hash=run_hash),
-        "Viewer (relative to this instance's address): "
-        + VIEWER_PATH.format(run_id=run_id),
-        "Give the user the runId and these links now, then stop.",
+        "Copy the block below into your reply exactly as written, links included, then stop.",
+        "",
+        # Markdown links: the chat renders them, and relative paths resolve to this instance.
+        f"Run `{run_id}` has started.",
+        f"- [View the results]({viewer})",
+        f"- [Open the run form]({form})",
     ]
     return "\n".join(lines)
