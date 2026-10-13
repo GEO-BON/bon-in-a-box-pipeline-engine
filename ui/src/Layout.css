@@ -907,6 +907,15 @@ h2.MuiDialogTitle-root {
     overflow-wrap: anywhere;
   }
 
+  .pipeline-page ul {
+    padding-left: 1rem;
+  }
+
+  .pipeline-page blockquote {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
   div.left-pane {
     display: none;
   }
