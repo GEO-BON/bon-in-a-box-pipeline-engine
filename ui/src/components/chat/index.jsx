@@ -141,6 +141,7 @@ export default function Chat() {
   // show. Without this the composer just looks frozen.
   const [waiting, setWaiting] = useState(false);
   const bottomRef = useRef(null);
+  const inputRef = useRef(null);
   // undefined while checking, null when available, otherwise the reason it is not.
   const [unavailable, setUnavailable] = useState(undefined);
 
@@ -183,8 +184,14 @@ export default function Chat() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  async function send(text = input) {
-    const question = text.trim();
+  // Put the example in the input so the user can edit it before sending.
+  function pickExample(q) {
+    setInput(q);
+    inputRef.current?.focus();
+  }
+
+  async function send() {
+    const question = input.trim();
     if (!question || loading) return;
     setInput("");
     // Capture conversation history before adding the new turn. Slice off the initial
@@ -389,7 +396,7 @@ export default function Chat() {
         {messages.length === 1 && !unavailable && (
           <div className="chat-examples">
             {EXAMPLE_QUESTIONS.map((q) => (
-              <button key={q} className="chat-example" onClick={() => send(q)}>
+              <button key={q} className="chat-example" onClick={() => pickExample(q)}>
                 {q}
               </button>
             ))}
@@ -422,9 +429,10 @@ export default function Chat() {
           }
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
+          ref={inputRef}
           disabled={loading || !!unavailable}
         />
-        <button className="chat-send" onClick={() => send()} disabled={loading || !!unavailable}>
+        <button className="chat-send" onClick={send} disabled={loading || !!unavailable}>
           {loading ? "…" : "Send"}
         </button>
       </div>
