@@ -1,6 +1,6 @@
 .file-manager {
-  margin-top: 24px;
-  height: 100%;
+  padding-top: 24px;
+  height: calc(100% - 24px);
 
   .wx-toolbar.wx-5PZQQztG {
     padding: 12px;
