@@ -40,6 +40,8 @@ class ScriptMetadata (
     }
 }
 
+
+// TODO: This Factory should in turn call a StepFactory. The StepFactory should be used in JSONPipeline.
 open class ScriptMetadataFactory (private val yamlFile: File) {
 
     open fun create(

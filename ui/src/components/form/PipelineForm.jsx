@@ -110,8 +110,7 @@ export function PipelineForm({
   }, [pipelineMap, pipStates.descriptionFile, pipelineMetadata]);
 
   return (
-    displayedPipelineMap &&
-    (isPipeline || Object.keys(displayedPipelineMap).length > 0) && (
+    displayedPipelineMap && Object.keys(displayedPipelineMap).length > 0 && (
       <form
         ref={formRef}
         onSubmit={handleSubmit}

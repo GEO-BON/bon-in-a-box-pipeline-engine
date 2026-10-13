@@ -2,6 +2,7 @@ package org.geobon.hpc
 
 import io.mockk.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.RunContext
 import org.geobon.pipeline.ScriptStep
@@ -39,6 +40,7 @@ class HPCTest {
 
     @After
     fun tearDown() {
+        hpc.close()
         assertTrue(outputRoot.deleteRecursively())
     }
 
@@ -170,6 +172,7 @@ class HPCTest {
     @Test
     fun `given waiting for results_when unregisters_then stop waiting`() = runTest {
         // Building an HPC instance that uses the runTest context.
+        hpc.close()
         hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
         every { hpc.connection.sendJobs(any(), any(), any(), any()) } just runs
         coEvery { hpc.connection.retrieveFiles(allAny()) } just runs
@@ -198,6 +201,7 @@ class HPCTest {
     @Test
     fun `given waiting for results_when fails to sync 10 times_then stops and outputs an error`() = runTest {
         // Building an HPC instance that uses the runTest context.
+        hpc.close()
         hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
         every { hpc.connection.sendJobs(any(), any(), any(), any()) } just runs
         coEvery { hpc.connection.retrieveFiles(allAny()) } throws RuntimeException("Sync problem")
@@ -260,10 +264,12 @@ class HPCTest {
 
         job1.cancel()
         job2.cancel()
+        runBlocking { job1.join() }
     }
 
     @Test
     fun `given conda sync fails_when command throws exception_then all registered steps with same environment fail`() = runTest {
+        hpc.close()
         hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
         every { hpc.connection.sendJobs(any(), any(), any(), any()) } just runs
         coEvery { hpc.connection.retrieveFiles(allAny()) } just runs

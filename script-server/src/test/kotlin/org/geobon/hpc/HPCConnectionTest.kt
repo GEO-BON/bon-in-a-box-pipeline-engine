@@ -6,6 +6,8 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import io.mockk.confirmVerified
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -225,14 +227,15 @@ class HPCConnectionTest {
                 File(scriptsRoot, "HPCSyncTest.py"),
             )
             val systemCall = mockk<SystemCall>()
+            coEvery { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
             every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
             connection.allowSyncPaths(listOf(outputRoot, scriptsRoot, scriptStubsRoot))
 
             connection.syncFiles(toSync)
 
-            verify {
-                systemCall.runBlocking(
+            coVerify {
+                systemCall.run(
                     match { cmdList ->
                         cmdList.find {
                             it.contains("rsync")
@@ -242,7 +245,7 @@ class HPCConnectionTest {
                                     && it.contains("${scriptsRoot.absolutePath}/HPCSyncTest.py")
                                     && it.contains("HPC-name:${connection.hpcRoot}/")
                         } !== null
-                    },  any(), any(), any(), any()
+                    }, any(), any(), any(), any(), any(), any(), any()
                 )
             }
             confirmVerified(systemCall)
@@ -263,14 +266,15 @@ class HPCConnectionTest {
                 File(scriptsRoot, "somethingWrong.py"),
             )
             val systemCall = mockk<SystemCall>()
+            coEvery { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
             every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
             connection.allowSyncPaths(listOf(outputRoot, scriptsRoot, scriptStubsRoot))
 
             connection.syncFiles(toSync)
 
-            verify { // somethingWrong.py should not be there
-                systemCall.runBlocking(
+            coVerify { // somethingWrong.py should not be there
+                systemCall.run(
                     match { cmdList ->
                         cmdList.find {
                             it.contains("rsync")
@@ -279,7 +283,7 @@ class HPCConnectionTest {
                                     && it.contains("${scriptsRoot.absolutePath}/1in1out.py")
                                     && it.contains("HPC-name:${connection.hpcRoot}")
                         } != null
-                    }, any(), any(), any(), any()
+                    }, any(), any(), any(), any(), any(), any(), any()
                 )
             }
             confirmVerified(systemCall)
@@ -298,14 +302,15 @@ class HPCConnectionTest {
                 File(scriptsRoot, "imLost.yml"),
             )
             val systemCall = mockk<SystemCall>()
+            coEvery { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
             every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
             connection.allowSyncPaths(listOf(outputRoot, scriptsRoot, scriptStubsRoot))
 
             connection.syncFiles(toSync)
 
-            verify(exactly = 0) { // somethingWrong.py should not be there
-                systemCall.runBlocking(any(), any(), any(), any(), any())
+            coVerify(exactly = 0) { // somethingWrong.py should not be there
+                systemCall.run(any(), any(), any(), any(), any(), any(), any(), any())
             }
             confirmVerified(systemCall)
         }
@@ -316,6 +321,7 @@ class HPCConnectionTest {
         withEnvironment(testEnvironment) {
             createSshFiles()
             val systemCall = mockk<SystemCall>()
+            coEvery { systemCall.run(allAny()) }.answers { CallResult(0, "Everything went well") }
             every { systemCall.runBlocking(allAny()) }.answers { CallResult(0, "Everything went well") }
             val connection = HPCConnection(systemCall = systemCall)
             connection.allowSyncPaths(listOf(outputRoot, scriptsRoot, scriptStubsRoot))
