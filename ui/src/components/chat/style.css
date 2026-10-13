@@ -15,6 +15,24 @@
   border-bottom: 1px solid #333;
   background: #425b54;
   color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-new {
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #fff;
+  background: transparent;
+  color: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chat-new:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .chat-messages {

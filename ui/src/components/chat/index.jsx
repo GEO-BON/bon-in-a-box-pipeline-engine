@@ -91,13 +91,42 @@ function friendlyError(err) {
   return "Something went wrong while generating the answer. Please try again.";
 }
 
+// The conversation is kept in localStorage so it survives leaving the chat tab.
+const STORAGE_KEY = "bee-chat-messages";
+const GREETING = {
+  role: "assistant",
+  content: "Hi! How can I assist you with the Biodiversity Evaluation Engine today?",
+};
+
+function loadMessages() {
+  let saved;
+  try {
+    saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  } catch {
+    // Missing or unreadable storage: start fresh.
+  }
+  if (!Array.isArray(saved) || saved.length === 0) return [GREETING];
+  // The user left before the first token arrived.
+  const last = saved.at(-1);
+  if (last.role === "assistant" && !last.content) {
+    saved[saved.length - 1] = {
+      ...last,
+      content: "_This answer was interrupted. Please ask again._",
+    };
+  }
+  return saved;
+}
+
 export default function Chat() {
-  const [messages, setMessages] = useState([
-    {
-      role: "assistant",
-      content: "Hi! How can I assist you with the Biodiversity Evaluation Engine today?",
-    },
-  ]);
+  const [messages, setMessages] = useState(loadMessages);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch {
+      // Storage full or blocked; the conversation just won't persist.
+    }
+  }, [messages]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   // True between sending and the first token: the shared Ollama runs with
@@ -306,7 +335,16 @@ export default function Chat() {
 
   return (
     <div className="chat-container">
-      <div className="chat-header">Biodiversity Evaluation Engine Assistant</div>
+      <div className="chat-header">
+        Biodiversity Evaluation Engine Assistant
+        <button
+          className="chat-new"
+          onClick={() => setMessages([GREETING])}
+          disabled={loading}
+        >
+          New chat
+        </button>
+      </div>
       <div className="chat-messages">
         {messages.map((m, i) => (
           <div key={i} className={`chat-message ${m.role}`}>
