@@ -100,7 +100,9 @@ def country_region_bbox(type: str = 'country', id: str = "", crs: str = 'EPSG:43
             region_bb4326 = bb4326
             country_bb4326 = country["geometry_bbox"].iloc[0]
         return {"CRS": 
-                {"CRSBboxWGS84": "", 
+                {
+                 "name": target_crs.name,
+                 "CRSBboxWGS84": "", 
                  "authority": crs.split(':')[0], 
                  "code": crs.split(':')[1], 
                  "proj4Def": target_crs.to_proj4(), 
