@@ -425,7 +425,7 @@ paths:
                     type: boolean
                     description: >
                       Whether the AI assistant is shown in the UI. False when
-                      DISABLE_CHAT=true in runner.env. The MCP server keeps running either way, so
+                      OLLAMA_URL is not set or DISABLE_CHAT=true in runner.env. The MCP server keeps running either way, so
                       this flag does not tell whether MCP is available.
                 example:
                   runsEnabled: true

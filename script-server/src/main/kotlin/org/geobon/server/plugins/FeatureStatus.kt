@@ -19,8 +19,8 @@ import org.geobon.server.ServerContext.Companion.condaPackDir
  * Everything is reported with POSITIVE polarity -- `true` always means the feature
  * works -- whatever the polarity of the variable behind it. Three different conventions
  * feed this: BLOCK_RUNS is the string "true", SAVE_PIPELINE_TO_SERVER is the string
- * "deny", DISABLE_MY_FILES and DISABLE_CHAT invert, and CONDA_PACK_ENABLED is
- * anything-but-false.
+ * "deny", DISABLE_MY_FILES and DISABLE_CHAT invert, CONDA_PACK_ENABLED is
+ * anything-but-false, and the chat also needs OLLAMA_URL to be set.
  */
 object FeatureStatus {
 
@@ -36,11 +36,11 @@ object FeatureStatus {
         "condaPackEnabled" to (condaPackDir != null),
         // python-api's, parsed the way python-api parses it.
         "myFilesEnabled" to !System.getenv("DISABLE_MY_FILES").equals("true", ignoreCase = true),
-        // python-api's too: startup.sh reads it to skip the chat bridge. Only the
-        // bridge -- the MCP server on 8002 keeps running, since it serves MCP
-        // clients directly and the bridge is merely one of them. Needs no line in
-        // compose.yml for the same reason DISABLE_MY_FILES does not: both services
-        // already read the same runner.env.
-        "chatEnabled" to !System.getenv("DISABLE_CHAT").equals("true", ignoreCase = true),
+        // python-api's too: startup.sh skips the chat bridge when OLLAMA_URL is blank
+        // or DISABLE_CHAT is true. Only the bridge -- the MCP server on 8002 keeps
+        // running, since it serves MCP clients directly. Both services read the same
+        // runner.env, so no line in compose.yml is needed.
+        "chatEnabled" to (!System.getenv("OLLAMA_URL").isNullOrBlank()
+                && !System.getenv("DISABLE_CHAT").equals("true", ignoreCase = true)),
     )
 }
