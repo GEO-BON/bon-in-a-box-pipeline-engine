@@ -142,9 +142,9 @@ class HPCConnection(
 
                         // Create other mount endpoints
                         // and dummy runner.env file (we might need a real one in the future, but this just removes the "not found" warnings)
-                        val callResult = systemCall.runBlocking(
+                        val callResult = systemCall.run(
                             sshCommand + "mkdir -p $hpcScriptsRoot && mkdir -p $hpcOutputRoot && mkdir -p $hpcUserDataRoot && touch $hpcRoot/runner.env",
-                            timeout = 1.minutes, logger = logger, mergeErrors = true
+                            timeout = 1.minutes, logger = logger, mergeErrors = true, killOnCancel = true
                         )
 
                         scriptsStatus.state = if (callResult.success) {
@@ -216,7 +216,7 @@ class HPCConnection(
                     apptainerImage.imagePath = "$hpcRoot/$apptainerImageName"
                     val overlayName = "${container.containerName}_overlay-${overlaySizeGB}GB.ext3"
                     apptainerImage.overlayPath = "$hpcRoot/$overlayName"
-                    val callResult = systemCall.runBlocking(
+                    val callResult = systemCall.run(
                         sshCommand +
                             """
                                 if [ -f ${apptainerImage.imagePath} ] && [ -f ${apptainerImage.overlayPath} ]; then
@@ -257,7 +257,7 @@ class HPCConnection(
                                     fi
                                 fi
                             """.trimIndent(),
-                        timeout = 20.minutes, logger = logger
+                        timeout = 20.minutes, logger = logger, killOnCancel = true
                     )
 
                     if (callResult.output.isNotBlank())
@@ -355,7 +355,7 @@ class HPCConnection(
 
                     // files are relative to our root:
                     val toDeleteAbsolute = toDelete.map { file -> File(hpcRoot, file.absolutePath.removePrefix("/")).absolutePath }
-                    systemCall.runBlocking(sshCommand +  "rm -rf ${toDeleteAbsolute.joinToString(" ")}", logFile = logFile)
+                    systemCall.run(sshCommand +  "rm -rf ${toDeleteAbsolute.joinToString(" ")}", logFile = logFile, killOnCancel = true)
                 }
 
                 logFile?.appendText("""
@@ -366,12 +366,13 @@ class HPCConnection(
                     .trimIndent()
                     .also { logger.debug(it) })
 
-                val result = systemCall.runBlocking(
+                val result = systemCall.run(
                     listOf(
                         "bash", "-c",
                         """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' --mkpath --files-from=- -r / $sshConfig:$hpcRoot/"""
                     ),
-                    timeout = 10.minutes
+                    timeout = 10.minutes,
+                    killOnCancel = true
                 )
                 // Log file was already sent, should not append to local log file now unless there is a problem.
                 if (!result.success) {
@@ -482,12 +483,13 @@ class HPCConnection(
 
             logger.debug("Syncing from HPC:\n$filesString\n")
 
-            val result = systemCall.runBlocking(
+            val result = systemCall.run(
                 listOf(
                     "bash", "-c",
                     """echo "$filesString" | rsync -e 'ssh -F $configPath -i $sshKeyPath -o UserKnownHostsFile=$knownHostsPath' -p --chmod=Da+rx,Fa+r --mkpath --files-from=- -r $sshConfig:$hpcRoot/ / """
                 ),
-                timeout = 10.minutes
+                timeout = 10.minutes,
+                killOnCancel = true
             )
 
             if (!result.success) {
@@ -505,18 +507,17 @@ class HPCConnection(
             throw RuntimeException("Cannot run commands on HPC when not configured.")
         }
 
-        withContext(Dispatchers.IO) {
-            val callResult = systemCall.runBlocking(
-                sshCommand + command,
-                timeout = timeout,
-                logger = logger,
-                logFile = logFile
-            )
+        val callResult = systemCall.run(
+            sshCommand + command,
+            timeout = timeout,
+            logger = logger,
+            logFile = logFile,
+            killOnCancel = true
+        )
 
-            if (!callResult.success) {
-                logger.debug(callResult.output)
-                throw RuntimeException(callResult.error)
-            }
+        if (!callResult.success) {
+            logger.debug(callResult.output)
+            throw RuntimeException(callResult.error)
         }
     }
 

@@ -1,17 +1,17 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useInterval } from '../UseInterval';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { isVisible } from '../utils/isVisible';
 
 export function LogViewer({ address, autoUpdate }) {
   const [logs, setLogs] = useState("");
   const [logsAutoScroll, setLogsAutoScroll] = useState(true);
   const logsRef = useRef();
+  const logsSize = useRef(0);
   const logsEndRef = useRef();
 
-  function fetchLogs(intervalRef) {
+  const fetchLogs = useCallback(() => {
     // Fetch the logs
-    let start = new Blob([logs]).size;
-    fetch(address, {
+    let start = logsSize.current;
+    return fetch(address, {
       headers: { 'range': `bytes=${start}-` },
     })
       .then(response => {
@@ -30,26 +30,38 @@ export function LogViewer({ address, autoUpdate }) {
             let visible = isVisible(logsEndRef.current, logsEndRef.current.parentNode);
             setLogsAutoScroll(visible);
           }
-
-          setLogs(logs + responseText);
+          logsSize.current += new Blob([responseText]).size;
+          setLogs(previousLogs => previousLogs + responseText);
         }
       })
-      .catch(response => {
-        if(intervalRef) clearInterval(intervalRef);
-        if(response.status !== 404) { // 404 error can be normal if script has no logs.
-          setLogs(logs + "\n" + response.status + " (" + response.statusText + ")");
-        }
-      });
+  }, [address]);
 
-  }
+  // Start fetching
+  useEffect(() => {
+    let timeout;
+    let cancelled = false;
 
-  // First and last fetch (fetchLogs not a dependency since it depends on logs. This would make it loop.)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => fetchLogs(), [autoUpdate])
-  // Auto-update
-  const interval = useInterval(() => {
-    fetchLogs(interval)
-  }, autoUpdate ? 1000 : null);
+    let planNext = () => {
+      if (autoUpdate && !cancelled) {
+        timeout = setTimeout(runFetch, 1000);
+      }
+    }
+
+    let runFetch = () => {
+      fetchLogs()
+        .then(planNext)
+        .catch(planNext); // still keep polling after an error (e.g. 404 with no logs yet)
+    }
+
+    runFetch();
+
+    return () => {
+      cancelled = true;
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    }
+  }, [autoUpdate, fetchLogs])
 
   // Logs auto-scrolling
   useEffect(() => {

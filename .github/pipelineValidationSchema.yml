@@ -17,7 +17,7 @@ metadata:
         - schema:
             status:
               type: string
-              allowed: ["in_development", "in_review", "reviewed", "core", "example"]
+              allowed: ["in_development", "in_review", "reviewed", "core", "example", "subpipeline"]
               required: true
             message:
               type: string
@@ -25,7 +25,7 @@ metadata:
         - schema:
             status:
               type: string
-              allowed: ["deprecated"]
+              allowed: ["deprecated", "stale"]
               required: true
             message:
               type: string

@@ -2,7 +2,7 @@ script: sleep.py
 name: Sleep
 description: Uses sleep command to wait
 lifecycle:
-  status: in_development
+  status: stale
   message: bla bla
 author:
   - name: Jean-Michel Lord

@@ -30,10 +30,26 @@ open class ServerContext(
         val outputRoot
             get() = File(System.getenv("OUTPUT_LOCATION"))
 
-        val condaPackDir =
-            if (System.getenv("CONDA_PACK_ENABLED").let { it.isNullOrBlank() || it == "false" }) null
-            else File(outputRoot, "_envs")
+        // Generated openEO UDP descriptions
+        val openEOYmlRoot
+            get() = File(outputRoot, ".local/openEO")
 
-        val condaPackURL:String? = System.getenv("CONDA_PACK_URL")
+        /**
+         * Storage for packed conda environments, reused between instances.
+         */
+        val condaPackDir =
+            if (System.getenv("CONDA_PACK_ENABLED") != "true") {
+                null
+            } else {
+                System.getenv("CONDA_PACK_DIR").let { explicitCondaPackDir ->
+                    if (explicitCondaPackDir.isNullOrBlank())
+                        // Default location inside output folder
+                        File(outputRoot, "_envs")
+                    else
+                        File(explicitCondaPackDir)
+                }
+            }
+
+        val condaPackURL: String? = System.getenv("CONDA_PACK_URL")
     }
 }

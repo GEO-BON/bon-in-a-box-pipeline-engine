@@ -1,0 +1,125 @@
+package org.geobon.server.plugins
+
+import io.kotest.extensions.system.OverrideMode
+import io.kotest.extensions.system.withEnvironment
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.server.testing.*
+import org.geobon.pipeline.outputRoot
+import org.geobon.server.scriptModule
+import org.json.JSONObject
+import kotlin.test.*
+
+/**
+ * GET /api/features, the one place the UI learns which optional features are on.
+ *
+ * The flags behind it use three different conventions -- BLOCK_RUNS is the string
+ * "true", SAVE_PIPELINE_TO_SERVER is the string "deny", DISABLE_MY_FILES and
+ * DISABLE_CHAT invert -- so what these tests really pin is that all of them come out
+ * with positive polarity: `true` always means the feature works. The chat also needs
+ * OLLAMA_URL, so it is the one feature that is off by default.
+ */
+class FeatureStatusTest {
+
+    @BeforeTest
+    fun setupOutputFolder() {
+        with(outputRoot) {
+            if (!exists()) mkdirs()
+        }
+    }
+
+    @AfterTest
+    fun removeOutputFolder() {
+        outputRoot.deleteRecursively()
+    }
+
+    private suspend fun ApplicationTestBuilder.status(): JSONObject =
+        JSONObject(client.get("/api/features").bodyAsText())
+
+    @Test
+    fun `defaults report every feature as available, except chat`() = testApplication {
+        // No BLOCK_RUNS, no SAVE_PIPELINE_TO_SERVER, no DISABLE_MY_FILES, no
+        // DISABLE_CHAT, no OLLAMA_URL set.
+        withEnvironment("OLLAMA_URL", null, OverrideMode.SetOrOverride) {
+            application { scriptModule() }
+
+            client.get("/api/features").apply {
+                assertEquals(HttpStatusCode.OK, status)
+            }
+            with(status()) {
+                assertTrue(getBoolean("runsEnabled"))
+                assertTrue(getBoolean("savePipelineToServer"))
+                assertTrue(getBoolean("myFilesEnabled"))
+                assertFalse(getBoolean("chatEnabled"))
+            }
+        }
+    }
+
+    @Test
+    fun `chat is enabled when OLLAMA_URL is set`() = testApplication {
+        withEnvironment("OLLAMA_URL", "http://ollama:11434", OverrideMode.SetOrOverride) {
+            application { scriptModule() }
+            assertTrue(status().getBoolean("chatEnabled"))
+        }
+    }
+
+    @Test
+    fun `a blank OLLAMA_URL disables chat`() = testApplication {
+        withEnvironment("OLLAMA_URL", " ", OverrideMode.SetOrOverride) {
+            application { scriptModule() }
+            assertFalse(status().getBoolean("chatEnabled"))
+        }
+    }
+
+    @Test
+    fun `blocked runs are reported`() = testApplication {
+        withEnvironment("BLOCK_RUNS", "true", OverrideMode.SetOrOverride) {
+            application { scriptModule() }
+            assertFalse(status().getBoolean("runsEnabled"))
+        }
+    }
+
+    @Test
+    fun `denied pipeline saving is reported`() = testApplication {
+        // The sentinel really is "deny", not a boolean -- see the save route.
+        withEnvironment("SAVE_PIPELINE_TO_SERVER", "deny", OverrideMode.SetOrOverride) {
+            application { scriptModule() }
+            assertFalse(status().getBoolean("savePipelineToServer"))
+        }
+    }
+
+    @Test
+    fun `a read-only file manager is reported, inverted`() = testApplication {
+        // python-api owns this flag; script-server only reports it, and must invert it
+        // the same way python-api parses it (case-insensitively).
+        withEnvironment("DISABLE_MY_FILES", "TRUE", OverrideMode.SetOrOverride) {
+            application { scriptModule() }
+            assertFalse(status().getBoolean("myFilesEnabled"))
+        }
+    }
+
+    @Test
+    fun `a disabled chat is reported, inverted`() = testApplication {
+        // python-api owns this one as well: startup.sh reads it to skip the chat
+        // bridge, while deliberately leaving the MCP server up.
+        withEnvironment(
+            mapOf("DISABLE_CHAT" to "TRUE", "OLLAMA_URL" to "http://ollama:11434"),
+            OverrideMode.SetOrOverride
+        ) {
+            application { scriptModule() }
+            assertFalse(status().getBoolean("chatEnabled"))
+        }
+    }
+
+    @Test
+    fun `the response is JSON, not a JSON string in a text body`() = testApplication {
+        application { scriptModule() }
+
+        // Ensure that the UI receives JSON or else it will discard the results.
+        assertEquals(
+            ContentType.Application.Json,
+            client.get("/api/features").contentType()?.withoutParameters()
+        )
+    }
+}

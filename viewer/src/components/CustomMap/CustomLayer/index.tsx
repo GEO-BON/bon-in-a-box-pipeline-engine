@@ -28,7 +28,7 @@ function CustomLayer(props: any) {
   } = props;
   const [basemap, setBasemap] = useState("dark");
 
-  const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
+  const key = atob("MkpQT25DZlJhRFlJcmd2TUNzWVI=");
 
   const basemaps: any = {
     osm: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",

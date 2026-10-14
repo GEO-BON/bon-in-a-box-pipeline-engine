@@ -28,6 +28,8 @@ import org.geobon.pipeline.ConstantPipe
 import org.geobon.pipeline.Pipe
 import org.geobon.pipeline.ScriptStep
 import org.geobon.pipeline.StepId
+import org.geobon.pipeline.metadata.ScriptMetadata
+import org.geobon.pipeline.metadata.ScriptMetadataFactory
 import org.geobon.script.Description.AUTHORS
 import org.geobon.script.Description.DESCRIPTION
 import org.geobon.script.Description.EXTERNAL_LINK
@@ -36,12 +38,13 @@ import org.geobon.script.Description.IO__DESCRIPTION
 import org.geobon.script.Description.IO__EXAMPLE
 import org.geobon.script.Description.IO__LABEL
 import org.geobon.script.Description.IO__TYPE
-import org.geobon.script.Description.IO__TYPE_OPTIONS
+import org.geobon.script.Description.IO__TYPE__OPTIONS
 import org.geobon.script.Description.LICENSE
 import org.geobon.script.Description.NAME
 import org.geobon.script.Description.OUTPUTS
 import org.geobon.script.Description.SCRIPT
 import org.geobon.server.ServerContext
+import org.geobon.server.ServerContext.Companion.openEOYmlRoot
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
 import org.jetbrains.annotations.VisibleForTesting
 import org.json.JSONArray
@@ -52,6 +55,9 @@ import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileNotFoundException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption.ATOMIC_MOVE
+import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -63,13 +69,16 @@ class OpenEOStep: ScriptStep {
         udpKey: String,
         stepId: StepId,
         serverContext: ServerContext,
-        inputs: MutableMap<String, Pipe> = mutableMapOf()
-    ) : super(serverContext, updateYaml(serverContext, udpKey), stepId, inputs)
+        inputs: MutableMap<String, Pipe> = mutableMapOf(),
+        yamlFile: File = updateYaml(serverContext, udpKey)
+    ) : super(
+        serverContext,
+        yamlFile,
+        stepId,
+        inputs,
+        OpenEOMetadataFactory(yamlFile)
+    )
 
-    init {
-        // Fetching wrapper script to run openEO
-        metadata.script = File(scriptStubsRoot, "openEOWrapper.py")
-    }
 
     private var url = ConstantPipe("text",  yamlParsed[SCRIPT].toString())
 
@@ -82,17 +91,20 @@ class OpenEOStep: ScriptStep {
     companion object {
 
         private val logger: Logger = LoggerFactory.getLogger("Server")
-        private val openEOFolder = File(scriptStubsRoot, "openEO")
 
         fun updateYaml(serverContext: ServerContext, udpKey: String): File {
             val options = DumperOptions()
             options.defaultFlowStyle = DumperOptions.FlowStyle.BLOCK
-            val yamlFile = File(openEOFolder, "$udpKey.yml")
+            val yamlFile = File(openEOYmlRoot, "$udpKey.yml")
             if (!yamlFile.exists()) {
                 yamlFile.parentFile.mkdirs()
 
                 try {
-                    yamlFile.writeText(Yaml(options).dump(getOpenEODescription(serverContext, udpKey)))
+                    val content = Yaml(options).dump(getOpenEODescription(serverContext, udpKey))
+                    // Write then move, so concurrent readers never see a partial file
+                    val tmpFile = File.createTempFile("$udpKey.", ".tmp", yamlFile.parentFile)
+                    tmpFile.writeText(content)
+                    Files.move(tmpFile.toPath(), yamlFile.toPath(), ATOMIC_MOVE, REPLACE_EXISTING)
                 } catch (e: Exception) {
                     logger.error("Error: ${e.message}")
                 }
@@ -225,7 +237,7 @@ class OpenEOStep: ScriptStep {
                     if (title.isNotBlank() && href.isNotBlank()) {
                         mapOf(
                             "text" to title,
-                            "link" to href
+                            "link" to if(href.startsWith("../")) null else href,
                         )
                     } else {
                         null
@@ -280,9 +292,9 @@ class OpenEOStep: ScriptStep {
 
                 when {
                     schema?.optJSONArray(UDP__INPUT__ENUM) != null -> {
-                        input[IO__TYPE] = IO__TYPE_OPTIONS
+                        input[IO__TYPE] = IO__TYPE__OPTIONS
                         val enum = schema.optJSONArray(UDP__INPUT__ENUM)!!
-                        input[IO__TYPE_OPTIONS] = (0 until enum.length()).map { enum.getString(it) }
+                        input[IO__TYPE__OPTIONS] = (0 until enum.length()).map { enum.getString(it) }
                     }
 
                     rawType == "array" -> {
@@ -291,8 +303,8 @@ class OpenEOStep: ScriptStep {
 
                         val itemsEnum = items.optJSONArray(UDP__INPUT__ENUM)
                         if (itemsEnum != null) {
-                            input[IO__TYPE] = "$IO__TYPE_OPTIONS[]"
-                            input[IO__TYPE_OPTIONS] = (0 until itemsEnum.length()).map { itemsEnum.getString(it) }
+                            input[IO__TYPE] = "$IO__TYPE__OPTIONS[]"
+                            input[IO__TYPE__OPTIONS] = (0 until itemsEnum.length()).map { itemsEnum.getString(it) }
                         } else {
                             val itemType = items.optJSONArray("anyOf")?.let { anyOf ->
                                 (0 until anyOf.length()).firstNotNullOfOrNull {
@@ -374,5 +386,26 @@ class OpenEOStep: ScriptStep {
                 else -> type
             }
         }
+    }
+}
+
+class OpenEOMetadataFactory(yamlFile:File) : ScriptMetadataFactory(yamlFile) {
+
+    override fun create(yamlParsed: Map<String, Any>, serverContext: ServerContext, logger: Logger): ScriptMetadata {
+        val modifiedMap = yamlParsed.toMutableMap()
+        modifiedMap[SCRIPT] = openEOWrapper.relativeTo(scriptStubsRoot)
+        return super.create(
+            modifiedMap,
+            serverContext,
+            logger
+        )
+    }
+
+    override fun getScriptFile(yamlParsed: Map<String, Any>): File {
+        return openEOWrapper
+    }
+
+    companion object {
+        private val openEOWrapper = File(scriptStubsRoot, "openEOWrapper.py")
     }
 }

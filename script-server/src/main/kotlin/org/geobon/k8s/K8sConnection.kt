@@ -10,7 +10,7 @@ import io.kubernetes.client.util.ClientBuilder
 import io.kubernetes.client.util.Config
 import io.kubernetes.client.util.KubeConfig
 import kotlinx.coroutines.*
-import org.geobon.script.ComputeRequirements
+import org.geobon.pipeline.metadata.ComputeMetadata
 import org.geobon.script.ScriptType
 import org.geobon.server.RemoteSetup
 import org.geobon.server.RemoteSetupState
@@ -60,6 +60,11 @@ class K8sConnection {
 			System.getenv("K8S_SHARED_RUNNER_ENV_HOST_PATH") ?: "/mnt/biab-shared/pipeline-repo/runner.env",
 			"/runner.env",
 			hostPathType = "FileOrCreate"
+		),
+		// Shared by every session, so an environment built once is reused everywhere. Optional.
+		CONDA_PACK(
+			System.getenv("K8S_SHARED_CONDA_PACK_HOST_PATH") ?: "/mnt/biab-shared/conda-pack",
+			"/conda-pack"
 		);
 
 		val mountName: String
@@ -258,7 +263,7 @@ class K8sConnection {
 		return map
 	}
 
-	fun buildJob(jobName: String, scriptCommand: String, scriptType: ScriptType, computeRequirements: ComputeRequirements? = null): V1Job {
+	fun buildJob(jobName: String, scriptCommand: String, scriptType: ScriptType, computeRequirements: ComputeMetadata? = null): V1Job {
 		// TODO: Utiliser org.geobon.utils.run.Containers mais en ajoutant la méthode pour obtenir l'image (voir HPCRun)
 		val image: String
 		val containerName: String
@@ -304,7 +309,7 @@ class K8sConnection {
 					.putRequestsItem("memory", Quantity("256Mi"))
 					.putRequestsItem("cpu", Quantity("500m"))
 					.putLimitsItem("memory", Quantity(computeRequirements?.mem ?: "4Gi"))
-					.putLimitsItem("cpu", Quantity(computeRequirements?.cpus?.toString() ?: "4"))
+					.putLimitsItem("cpu", Quantity(computeRequirements?.cpusPerTask?.toString() ?: "4"))
 			)
 			.volumeMounts(
 				Mount.entries.mapTo(mutableListOf()) { it.asVolumeMount }
@@ -333,6 +338,22 @@ class K8sConnection {
 					.backoffLimit(3)
 					.template(V1PodTemplateSpec().spec(podSpec))
 			)
+	}
+
+	/** True if any pod belonging to this job was killed by the kernel OOM killer. */
+	fun wasOOMKilled(namespace: String, jobName: String): Boolean {
+		return runCatching {
+			createCoreApi().listNamespacedPod(namespace)
+				.labelSelector("job-name=$jobName")
+				.execute()
+				.items
+				.any { pod ->
+					pod.status?.containerStatuses.orEmpty().any { status ->
+						status.state?.terminated?.reason == "OOMKilled"
+								|| status.lastState?.terminated?.reason == "OOMKilled"
+					}
+				}
+		}.getOrDefault(false)
 	}
 
 	fun describeJobPods(namespace: String, jobName: String) : String {

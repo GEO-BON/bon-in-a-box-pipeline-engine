@@ -53,6 +53,16 @@ class CWLFactoryTest {
     }
 
     @Test
+    fun `test single script with options array`() {
+        testSingleStep(File(File(noHPCContext.scriptsRoot, "helloWorld"), "helloR.yml"))
+    }
+
+    @Test
+    fun `test single script with STAC output`() {
+        testSingleStep(File(cwlScripts, "createCollection.yml"))
+    }
+
+    @Test
     fun `test simple pipeline`() {
         testWorkflow("userInput")
     }
@@ -75,6 +85,20 @@ class CWLFactoryTest {
     @Test
     fun `test many outputs and a constant aggregated into array input`() {
         testWorkflow("aggregateOutputsAndConstant")
+    }
+
+    @Test
+    fun `given there is no metadata object_then IO still generated`() {
+        // This test case should only happen in a WIP or when debugging.
+        // A GitHub action validates that all pipelines commited to repo have metadata.
+        val toTest = File(noHPCContext.pipelinesRoot, "forCWL/simpleSTAC.json")
+        File(noHPCContext.pipelinesRoot, "forCWL/simpleSTAC.json.noValidate")
+            .copyTo(toTest)
+        try {
+            testWorkflow("forCWL/simpleSTAC")
+        } finally {
+            toTest.delete()
+        }
     }
 
     fun validateCWL(cwlFile: File) {

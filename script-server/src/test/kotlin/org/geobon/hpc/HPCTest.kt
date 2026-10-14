@@ -2,6 +2,7 @@ package org.geobon.hpc
 
 import io.mockk.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.geobon.pipeline.RunContext
 import org.geobon.pipeline.ScriptStep
@@ -11,6 +12,7 @@ import org.geobon.utils.createMockHPCContext
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -38,6 +40,7 @@ class HPCTest {
 
     @After
     fun tearDown() {
+        hpc.close()
         assertTrue(outputRoot.deleteRecursively())
     }
 
@@ -169,6 +172,7 @@ class HPCTest {
     @Test
     fun `given waiting for results_when unregisters_then stop waiting`() = runTest {
         // Building an HPC instance that uses the runTest context.
+        hpc.close()
         hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
         every { hpc.connection.sendJobs(any(), any(), any(), any()) } just runs
         coEvery { hpc.connection.retrieveFiles(allAny()) } just runs
@@ -197,6 +201,7 @@ class HPCTest {
     @Test
     fun `given waiting for results_when fails to sync 10 times_then stops and outputs an error`() = runTest {
         // Building an HPC instance that uses the runTest context.
+        hpc.close()
         hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
         every { hpc.connection.sendJobs(any(), any(), any(), any()) } just runs
         coEvery { hpc.connection.retrieveFiles(allAny()) } throws RuntimeException("Sync problem")
@@ -255,11 +260,16 @@ class HPCTest {
         val job1 = hpc.syncCondaEnvironment(run0, condaEnvName, logFile, syncCommand)
         val job2 = hpc.syncCondaEnvironment(run1, condaEnvName, logFile, syncCommand)
 
-        assertTrue(job1 === job2)
+        assertSame(job1, job2)
+
+        job1.cancel()
+        job2.cancel()
+        runBlocking { job1.join() }
     }
 
     @Test
     fun `given conda sync fails_when command throws exception_then all registered steps with same environment fail`() = runTest {
+        hpc.close()
         hpc = HPC(createMockHPCContext().hpc!!.connection, retrieveSyncInterval, this)
         every { hpc.connection.sendJobs(any(), any(), any(), any()) } just runs
         coEvery { hpc.connection.retrieveFiles(allAny()) } just runs
@@ -287,12 +297,15 @@ class HPCTest {
             throw RuntimeException("This is an error message")
         }
 
-        hpc.syncCondaEnvironment(run1, condaEnvName, logFile, command)
-        hpc.syncCondaEnvironment(run2, condaEnvName, logFile, command)
+        val job1 = hpc.syncCondaEnvironment(run1, condaEnvName, logFile, command)
+        val job2 = hpc.syncCondaEnvironment(run2, condaEnvName, logFile, command)
 
-        Thread.sleep(200) // This would not work delay(2000)
+        Thread.sleep(200) // This would not work: delay(2000)
 
         verify { run1.fail(any()) }
         verify { run2.fail(any()) }
+
+        job1.join()
+        job2.join()
     }
 }

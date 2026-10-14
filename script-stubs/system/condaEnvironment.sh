@@ -213,11 +213,11 @@ function useLocalPack {
             condaPackExtracted="$condaPackWriteable/$condaEnvName"
         fi
 
-        # Check for an unzipped folder locally
-        if [ -d "$condaPackExtracted" ] && [ -f "$condaPackExtracted/bin/conda-unpack" ] && [ -f "$condaPackExtracted/bin/activate" ]; then
+        # Unpack (only once)
+        unpackedFlag="$condaPackExtracted/.unpacked"
+        if [ -f "$unpackedFlag" ]; then
             echo "    Already unpacked."
         else
-            # Unpack
             echo "Unpacking conda-pack environment at $condaPackZip..."
             echo "    Extracting archive..."
             rm -rf $condaPackExtracted
@@ -228,6 +228,7 @@ function useLocalPack {
             mamba activate base || return 1
             $condaPackExtracted/bin/conda-unpack || return 1
             mamba deactivate # base
+            touch "$unpackedFlag" || return 1
 
             echo "    Done."
         fi
@@ -258,7 +259,14 @@ else
     # A second lock on the whole folder happens inside the activateSubEnvironment
     # function to prevent two different sub-environments from doing transactions
     # at the same time.
-    lockFile="/conda-env-yml/$condaEnvName.lock"
+    if [[ -d "$condaPackDir" ]]; then
+        # conda-pack installations may be shared across short-lived instances.
+        # Lock on $condaPackWriteable: its the shared pack folder when writable, 
+        # otherwise a fallback location in /tmp
+        lockFile="$condaPackWriteable/$condaEnvName.lock"
+    else
+        lockFile="/conda-env-yml/$condaEnvName.lock"
+    fi
     exec {lockfd}>>"$lockFile" ; assertSuccess
     trap 'exec {lockfd}>&- 2>/dev/null || true' EXIT INT TERM HUP
     flock --verbose -x "$lockfd" ; assertSuccess

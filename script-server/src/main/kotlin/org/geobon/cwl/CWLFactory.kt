@@ -1,6 +1,7 @@
 package org.geobon.cwl
 
 
+import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_ARRAY
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_BOOLEAN
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_DIRECTORY
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_DOUBLE
@@ -11,11 +12,15 @@ import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_INT
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_LONG
 import org.geobon.cwl.CWLTypes.CWL__IO__TYPE_STRING
 import org.geobon.pipeline.*
+import org.geobon.pipeline.metadata.ComputeMetadata
 import org.geobon.pipeline.metadata.IOMetadata
 import org.geobon.pipeline.metadata.StepMetadata
-import org.geobon.script.Description.IO__TYPE_OPTIONS
-import org.geobon.script.Description.IO__TYPE_TEXT
+import org.geobon.script.Description.IO__TYPE__OPTIONS
+import org.geobon.script.Description.IO__TYPE__STAC
+import org.geobon.script.Description.IO__TYPE__TEXT
 import org.geobon.server.ServerContext
+import org.geobon.utils.DataSize
+import org.geobon.utils.gibibytes
 import org.json.JSONObject
 import org.json.JSONWriter
 import org.yaml.snakeyaml.Yaml
@@ -44,7 +49,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
 
         val replacements = mapOf<String, String>(
             "docker-tag" to (runnerTag ?: "latest"),
-            "scriptPath" to step.scriptFile.relativeTo(serverContext.scriptsRoot).path,
+            "scriptPath" to step.metadata.script.relativeTo(serverContext.scriptsRoot).path,
             "inputs" to toCWL(step.inputDefinitions, true),
             "inputsProperties" to generateInputProperties(step.inputDefinitions),
             "outputs" to toCWL(step.outputDefinitions, false),
@@ -52,7 +57,8 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             "condaEnvYml" to condaEnvYml,
             "program" to step.scriptType.program,
             "scriptWrapper" to "scriptWrapper.${step.scriptType.extension}",
-            "metadata" to metadataToCWL(step.metadata)
+            "metadata" to metadataToCWL(step.metadata),
+            "resources" to toCWL(step.metadata.compute)
         )
 
         // Load the step template
@@ -138,12 +144,22 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         }
 
         val typeName = typeToCWL(definition.type)
-        val type = if (definition.type.startsWith(IO__TYPE_OPTIONS)) {
+        val type = if (definition.type.startsWith(IO__TYPE__OPTIONS)) {
             buildString {
-                append("\n${indent(3)}type: $typeName")
-                append("\n${indent(3)}symbols:")
+                var indent = 3
+                if(definition.isArray()) {
+                    // This passes validation but is not supported by the runner,
+                    // see https://github.com/common-workflow-language/cwltool/issues/821
+                    // TODO: implement a workaround with a string[]
+                    append("\n${indent(indent)}type: $CWL__IO__TYPE_ARRAY")
+                    append("\n${indent(indent)}items:")
+                    indent++
+                }
+                append("\n${indent(indent)}type: $CWL__IO__TYPE_ENUM")
+                append("\n${indent(indent)}symbols:")
+                indent++
                 definition.options?.forEach {
-                    append("\n${indent(4)}- $it")
+                    append("\n${indent(indent)}- $it")
                 }
             }
         } else " $typeName${if (isInput) "?" else ""}"
@@ -168,7 +184,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             } else if (outputPipe != null) {
                 appendLine(2, "outputSource: ${toCWL(outputPipe)}")
 
-            } else {
+            } else { // JavaScript output evaluation
                 appendLine(
                     $$"""
                         outputBinding:
@@ -201,6 +217,12 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
 
                     typeName.startsWith(CWL__IO__TYPE_DIRECTORY) -> {
                         appendLine(indent, "if (value === null) return null;")
+
+                        // STAC output in Biab is folder/collection.json, but in CWL we want to output the whole folder
+                        if (definition.type.startsWith(IO__TYPE__STAC)) {
+                            appendLine(indent, "value = value.substring(0, value.lastIndexOf('/'));")
+                        }
+
                         appendLine(indent, """return { class: "Directory", location: "file://" + value };""")
                     }
 
@@ -423,7 +445,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             step.metadata.conda?.let { condaMetadata ->
                 if (!condaMetadata.isBaseEnv()) {
                     appendLine(3, "envFolder:")
-                    appendLine(4, "source: prepareEnvironments/envFolder")
+                    appendLine(4, "source: preparePackedEnvs/envFolder")
                     appendLine(
                         4,
                         """valueFrom: "$(self ? { class: 'Directory', location: self.location + '/${condaMetadata.name}' } : null)""""
@@ -447,7 +469,9 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             """.replaceIndent(indent(3))
             )
 
-            val passedInputs = listOf("environment", "condaPackURL", "scripts_root")
+            appendLine(3, "environment: prepareRunnerEnv/environmentFile")
+
+            val passedInputs = listOf("condaPackURL", "scripts_root")
             passedInputs.forEach {
                 appendLine(3, "$it: $it")
             }
@@ -467,6 +491,9 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
         val arraySuffix = if (arrayIndex == -1) "" else biabType.substring(arrayIndex)
         val biabRawType = if (arrayIndex == -1) biabType else biabType.substring(0, arrayIndex)
 
+        if (biabType.startsWith(IO__TYPE__STAC))
+            return "$CWL__IO__TYPE_DIRECTORY$arraySuffix"
+
         // All mime types
         if (biabType.contains('/')) {
             return "$CWL__IO__TYPE_FILE$arraySuffix"
@@ -474,17 +501,19 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
 
         // Primitives
         return when (biabRawType) {
-            IO__TYPE_TEXT -> CWL__IO__TYPE_STRING
-            IO__TYPE_OPTIONS -> CWL__IO__TYPE_ENUM
+            IO__TYPE__TEXT -> CWL__IO__TYPE_STRING
+            IO__TYPE__OPTIONS -> CWL__IO__TYPE_ENUM
             else -> biabRawType
         } + arraySuffix
     }
 
     private fun metadataToCWL(stepMetadata: StepMetadata): String {
         return buildString {
-            appendLine("label: ${stepMetadata.name}")
-            val docEntries = mutableListOf<String>()
+            stepMetadata.name?.let {
+                appendLine("label: ${stepMetadata.name}")
+            }
 
+            val docEntries = mutableListOf<String>()
             stepMetadata.description?.let {
                 docEntries.add("Description:\n${it.replaceIndent(indent(2))}")
             }
@@ -530,6 +559,37 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
                     }
                 }
             }
+        }
+    }
+
+
+    private fun toCWL(computeMetadata: ComputeMetadata?): String {
+        if(computeMetadata == null)
+            return ""
+
+        return buildString {
+            appendLine()
+            appendLine(1, "ResourceRequirement:")
+
+            // Capping the min value:
+            // 6 Gi to be able to run it locally
+            // 20 Gi is the maximum openEO can offer
+            // This hard-coded defaults allow running tests with small areas.
+            // However, if a step **always** needs the memory we specified, this can be a problem.
+            val ramMin = computeMetadata.memParsed.coerceAtMost(6.gibibytes)
+            appendLine(
+                2,
+                "ramMin: ${ramMin.toLong(DataSize.MIB)}"
+            )
+            computeMetadata.memMaxParsed?.let {
+                if(ramMin < it)
+                    appendLine(2, "ramMax: ${it.toLong(DataSize.MIB)}")
+            }
+
+            val coresMin = computeMetadata.cpusPerTask.coerceAtMost(2)
+            appendLine(2, "coresMin: $coresMin")
+            if(coresMin < computeMetadata.cpusPerTask)
+                appendLine(2, "coresMax: ${computeMetadata.cpusPerTask}")
         }
     }
 }

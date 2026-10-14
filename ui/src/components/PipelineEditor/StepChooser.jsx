@@ -76,7 +76,7 @@ export default function StepChooser(_) {
 
   // Applied only once when first loaded
   useEffect(() => {
-    api.getListOf("pipeline", (error, pipelineList, response) => {
+    api.getListOf("pipeline", {}, (error, pipelineList, response) => {
       if (error) {
         console.error(error);
         setPipelineFiles(<HttpError httpError={error} response={response} context="Unable to get list of pipelines" />)
@@ -87,7 +87,7 @@ export default function StepChooser(_) {
     });
 
     // Load list of scripts into scriptFileOptions
-    api.getListOf("script", (error, scriptList, response) => {
+    api.getListOf("script", {}, (error, scriptList, response) => {
       if (error) {
         console.error(error);
         setScriptFiles(<HttpError httpError={error} response={response} context="unable ot get list of scripts" />)
@@ -97,7 +97,7 @@ export default function StepChooser(_) {
       }
     });
 
-    api.getListOf("openEO", (error, udpList, response) => {
+    api.getListOf("openEO", {}, (error, udpList, response) => {
       if (error) {
         console.warn("No UPDs found, hiding openEO branch");
         setUdpFiles(null)

@@ -81,7 +81,7 @@ function prepareCommands {
     if [[ $symlink -eq 0 ]] ; then
         branch=$(git branch --show-current) # dev setup
     else
-        branch=$(git -C $SCRIPT_DIR config remote.origin.fetch | sed 's/.*remotes\/origin\///')
+        branch=$(git -C "$SCRIPT_DIR" config remote.origin.fetch | sed 's/.*remotes\/origin\///')
     fi
 
     # In "dev symlink" setup, just get the regular branch
@@ -162,8 +162,8 @@ function validate {
     validationScript=$(pwd)/.server/.github/pipelineValidationSchema.yml
     echo "Using schema: $schema"
     echo "Using validation script: $validationScript"
-    cd $(pwd)/pipelines
-    python3 $schema $validationScript
+    cd "$(pwd)/pipelines"
+    python3 "$schema" "$validationScript"
     flagErrors
 
     # Final assessment

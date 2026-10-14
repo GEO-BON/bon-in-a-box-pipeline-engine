@@ -114,7 +114,7 @@
     "name": "Subpipeline explicit input",
     "description": "Pipeline for automated tests",
     "lifecycle": {
-      "status": "in_development",
+      "status": "subpipeline",
       "message": "bla bla"
     },
     "author": [

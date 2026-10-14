@@ -4,7 +4,7 @@ import proj4 from "proj4";
 import { DefaultApi } from "bon_in_a_box_script_service";
 export const api = new DefaultApi();
 
-const key = atob("VTRoTkxXUkVOeFRhN0NmSFVVbk4=");
+const key = atob("MkpQT25DZlJhRFlJcmd2TUNzWVI=");
 
 const supportedProjections = [
   "longlat",
@@ -87,7 +87,7 @@ export const paperStyle = (dialog) => {
       borderRadius: "10px",
       border: "1px solid #aaa",
       padding: "10px",
-      margin: "10px",
+      margin: "var(--chooser-card-margin, 10px)",
       boxShadow: "2px 2px 4px #999",
     };
   } else {

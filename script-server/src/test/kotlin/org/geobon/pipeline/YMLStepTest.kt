@@ -2,6 +2,7 @@ package org.geobon.pipeline
 
 import io.mockk.every
 import io.mockk.mockk
+import org.geobon.pipeline.metadata.ComputeMetadata
 import org.geobon.utils.noHPCContext
 import java.io.File
 import kotlin.math.roundToInt
@@ -100,5 +101,50 @@ internal class YMLStepTest {
         val step = ResourceYml("scripts/assertText.yml", mutableMapOf("input" to correctInput))
 
         assertTrue(step.validateGraph().isEmpty())
+    }
+
+    @Test
+    fun computeMetadataParsesSchemaFieldsAndDefaults() {
+        // Only mem and CPU, others default
+        val metadata = ComputeMetadata.fromRawMetadata(
+            mapOf("compute" to mapOf("mem" to "24G", "cpus-per-task" to 12))
+        )
+
+        assertNotNull(metadata)
+        assertFalse(metadata.hpc)
+        assertEquals("24G", metadata.mem)
+        assertEquals(12, metadata.cpusPerTask)
+        assertNull(metadata.time)
+
+        // All variables
+        val hpcMetadata = ComputeMetadata.fromRawMetadata(
+            mapOf(
+                "compute" to mapOf(
+                    "hpc" to true,
+                    "mem" to "24G",
+                    "cpus-per-task" to 12,
+                    "time" to "1:30:00"
+                )
+            )
+        )
+        assertEquals("1:30:00", hpcMetadata?.time)
+
+        // Section there but empty
+        assertNull(ComputeMetadata.fromRawMetadata(emptyMap()))
+
+        // CPUs and memory required
+        assertFailsWith<RuntimeException> {
+            ComputeMetadata.fromRawMetadata(mapOf("compute" to mapOf("mem" to "24G")))
+        }
+        assertFailsWith<RuntimeException> {
+            ComputeMetadata.fromRawMetadata(mapOf("compute" to mapOf("cpus-per-task" to 4)))
+        }
+
+        // HPC requires duration
+        assertFailsWith<RuntimeException> {
+            ComputeMetadata.fromRawMetadata(
+                mapOf("compute" to mapOf("hpc" to true, "mem" to "24G", "cpus-per-task" to 12))
+            )
+        }
     }
 }

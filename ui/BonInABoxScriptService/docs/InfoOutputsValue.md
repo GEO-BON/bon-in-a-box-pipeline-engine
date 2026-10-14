@@ -11,6 +11,6 @@ Name | Type | Description | Notes
 **range** | **[Number]** |  | [optional] 
 **options** | **[String]** |  | [optional] 
 **properties** | **[String]** |  | [optional] 
-**example** | [**InfoInputsValueExample**](InfoInputsValueExample.md) |  | [optional] 
+**example** | [**InfoOutputsValueExample**](InfoOutputsValueExample.md) |  | [optional] 
 
 

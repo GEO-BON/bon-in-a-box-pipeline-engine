@@ -101,7 +101,7 @@
     "name": "Misplugged pipeline",
     "description": "This pipeline has two pipes plugged into the wrong input types.",
     "lifecycle": {
-      "status": "in_development",
+      "status": "stale",
       "message": "bla bla"
     },
     "author": [

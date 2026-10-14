@@ -873,13 +873,13 @@
       "weight": 4
     },
     "forCWL>SDM_maxEnt>SDM>runMaxent.yml@108|fc": {
-      "description": "Vector of strings, feature classes for MaxEnt algorithm. Accepted values are combinations of L (linear), Q (quadratic), P (product), H (hinge) or T (threshold).",
+      "description": "Vector of strings, feature classes for MaxEnt algorithm. Accepted values are combinations of L (linear), Q (quadratic), P (product), H (hinge) or T (threshold, deprecated).",
       "label": "feature classes",
       "type": "text[]",
       "example": [
         "L",
         "LQ",
-        "LQHP"
+        "LQH"
       ],
       "weight": 5
     },

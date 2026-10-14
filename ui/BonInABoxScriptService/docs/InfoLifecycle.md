@@ -24,6 +24,10 @@ Name | Type | Description | Notes
 
 * `example` (value: `"example"`)
 
+* `stale` (value: `"stale"`)
+
+* `subpipeline` (value: `"subpipeline"`)
+
 
 
 

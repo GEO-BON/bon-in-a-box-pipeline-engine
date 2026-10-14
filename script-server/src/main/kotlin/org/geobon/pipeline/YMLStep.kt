@@ -1,19 +1,9 @@
 package org.geobon.pipeline
 
-import org.geobon.pipeline.metadata.*
-import org.geobon.pipeline.metadata.ScriptMetadata.Companion.DEFAULT_TIMEOUT
-import org.geobon.script.Description.AUTHORS
-import org.geobon.script.Description.DESCRIPTION
-import org.geobon.script.Description.EXTERNAL_LINK
-import org.geobon.script.Description.INPUTS
-import org.geobon.script.Description.IO__TYPE_OPTIONS
-import org.geobon.script.Description.IO__TYPE_TEXT
-import org.geobon.script.Description.LICENSE
-import org.geobon.script.Description.NAME
-import org.geobon.script.Description.OUTPUTS
-import org.geobon.script.Description.REVIEWERS
-import org.geobon.script.Description.SCRIPT
-import org.geobon.script.Description.TIMEOUT
+import org.geobon.pipeline.metadata.ScriptMetadata
+import org.geobon.pipeline.metadata.ScriptMetadataFactory
+import org.geobon.script.Description.IO__TYPE__OPTIONS
+import org.geobon.script.Description.IO__TYPE__TEXT
 import org.geobon.script.Run
 import org.geobon.server.ServerContext
 import org.geobon.server.ServerContext.Companion.scriptStubsRoot
@@ -23,7 +13,6 @@ import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileNotFoundException
-import kotlin.time.Duration.Companion.minutes
 
 
 abstract class YMLStep(
@@ -33,27 +22,13 @@ abstract class YMLStep(
     inputs: MutableMap<String, Pipe> = mutableMapOf(),
     internal val logger: Logger = LoggerFactory.getLogger(yamlFile.name),
     protected val yamlParsed: Map<String, Any> = Yaml().load(yamlFile.readText()),
-    override val metadata: ScriptMetadata = ScriptMetadata(
-        File(yamlFile.parent, yamlParsed[SCRIPT].toString()),
-        IOMetadata.mapFromRawMetadata(yamlParsed, INPUTS, logger),
-        IOMetadata.mapFromRawMetadata(yamlParsed, OUTPUTS, logger),
-        yamlParsed[NAME]?.toString() ?: yamlFile.name,
-        yamlParsed[DESCRIPTION]?.toString(),
-        LifecycleMetadata.fromRawMetadata(yamlParsed),
-        PersonMetadata.listFromRawMetadata(yamlParsed, AUTHORS),
-        PersonMetadata.listFromRawMetadata(yamlParsed, REVIEWERS),
-        yamlParsed[LICENSE]?.toString(),
-        yamlParsed[EXTERNAL_LINK]?.toString(),
-        ReferenceMetadata.listFromRawMetadata(yamlParsed),
-        CondaMetadata.fromRawMetadata(serverContext, yamlFile, yamlParsed),
-        (yamlParsed[TIMEOUT] as? Int)?.minutes ?: DEFAULT_TIMEOUT
-    )
+    metadataFactory: ScriptMetadataFactory = ScriptMetadataFactory(yamlFile),
+    override val metadata: ScriptMetadata = metadataFactory.create(yamlParsed, serverContext, logger),
 ) : Step(
     stepId,
     inputs,
     metadata.outputs.mapValues { Output(it.value.type) }
 ) {
-
     /**
      * Context becomes set in onInputsReceived(), once the invocation inputs are known.
      */
@@ -94,7 +69,7 @@ abstract class YMLStep(
                     inputPipe.type == "int" && expectedType == "float" -> ""
 
                     // options to text accepted
-                    inputPipe.type == IO__TYPE_OPTIONS && expectedType == IO__TYPE_TEXT -> ""
+                    inputPipe.type == IO__TYPE__OPTIONS && expectedType == IO__TYPE__TEXT -> ""
 
                     // Non-array to single-element array accepted
                     expectedType.endsWith("[]") && inputPipe.type == expectedType.dropLast(2) -> {
@@ -130,9 +105,9 @@ abstract class YMLStep(
 
         try { // Validation
             // Check that the selected option is one of the defined options
-            inputs.filter { (_, pipe) -> pipe.type == IO__TYPE_OPTIONS }.forEach { (key, _) ->
+            inputs.filter { (_, pipe) -> pipe.type == IO__TYPE__OPTIONS }.forEach { (key, _) ->
                 metadata.inputs[key]?.let { inputDefinition ->
-                    if(inputDefinition.type != IO__TYPE_TEXT) { // Ignore options to text conversion
+                    if(inputDefinition.type != IO__TYPE__TEXT) { // Ignore options to text conversion
                         val options = inputDefinition.options
                             ?: throw RuntimeException("$yamlFile: No options found for input parameter $key.")
 

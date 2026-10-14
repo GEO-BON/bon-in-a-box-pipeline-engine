@@ -14,7 +14,7 @@ import {
   DialogContentText,
 } from "@mui/material";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useContext } from "react";
 import { useBlocker } from "react-router-dom";
 import {
   ReactFlow,
@@ -32,6 +32,7 @@ import IONode from "./IONode";
 import ConstantNode from "./ConstantNode";
 import UserInputNode from "./UserInputNode";
 import PopupMenu from "./PopupMenu";
+import PipelineMenu, { lifecycleListOpts } from "../PipelineMenu";
 import { layoutElements } from "./react-flow-utils/Layout";
 import { highlightConnectedEdges } from "./react-flow-utils/HighlightConnectedEdges";
 import {
@@ -51,6 +52,7 @@ import sleep from "../../utils/Sleep";
 import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
+import { uiContext } from "../../uiContext.jsx";
 
 import yaml, { YAMLException } from "js-yaml";
 import _lang from "lodash/lang";
@@ -105,10 +107,14 @@ export default function PipelineEditor(props) {
   const [toolTip, setToolTip] = useState(null);
   const [popupMenuPos, setPopupMenuPos] = useState({ x: 0, y: 0 });
   const [popupMenuOptions, setPopupMenuOptions] = useState();
+  const [loadDialogOpen, setLoadDialogOpen] = useState(false);
+  const [serverPipelineMap, setServerPipelineMap] = useState(null); // pipelines listed in the "Load from server" dialog
+  const [showAllPipelines, setShowAllPipelines] = useState(false);
   const [modal, setModal] = useState(null);
   const [alertSeverity, setAlertSeverity] = useState("");
   const [alertTitle, setAlertTitle] = useState("");
   const [alertMessage, setAlertMessage] = useState();
+  const { savePipelineToServer } = useContext(uiContext);
 
   const showAlert = useCallback((severity, title, message) => {
     setAlertSeverity(severity)
@@ -131,6 +137,8 @@ export default function PipelineEditor(props) {
   const hideCurrentModal = useCallback(() => {
     setModal(null)
   }, [setModal])
+
+
 
   // We need this since the functions passed through node data retain their old selectedNodes state.
   // Note that the stratagem fails if trying to add edges from many sources at the same time.
@@ -818,33 +826,41 @@ export default function PipelineEditor(props) {
     }
   };
 
-  const onLoadFromServerBtnClick = (event) => {
-    event.stopPropagation();
-    event.preventDefault();
-
-    setPopupMenuPos({ x: event.clientX, y: event.clientY });
-
-    api.getListOf("pipeline", (error, pipelineMap, response) => {
+  const fetchServerPipelines = (showAll, onSuccess) => {
+    api.getListOf("pipeline", lifecycleListOpts(showAll), (error, pipelineMap, response) => {
       if (error) {
+        setLoadDialogOpen(false);
         showAlert(
           'error',
           'Error loading the pipeline list',
           getErrorString(error, response)
         )
       } else {
-        let options = {};
-        Object.entries(pipelineMap).forEach(([descriptionFile, pipelineName]) =>
-          (options[descriptionFile + ' (' + pipelineName + ')'] = () => {
-            if (hasUnsavedChanges) {
-              setModal("unsavedLoadFromServer:" + descriptionFile)
-            } else {
-              loadFromServer(descriptionFile)
-            }
-          })
-        );
-        setPopupMenuOptions(options);
+        setServerPipelineMap(pipelineMap);
+        if (onSuccess) onSuccess();
       }
     });
+  };
+
+  const onLoadFromServerBtnClick = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+
+    fetchServerPipelines(showAllPipelines, () => setLoadDialogOpen(true));
+  };
+
+  const onShowAllPipelinesChange = (showAll) => {
+    setShowAllPipelines(showAll);
+    fetchServerPipelines(showAll);
+  };
+
+  const onPipelineChosenFromServer = (descriptionFile) => {
+    setLoadDialogOpen(false);
+    if (hasUnsavedChanges) {
+      setModal("unsavedLoadFromServer:" + descriptionFile)
+    } else {
+      loadFromServer(descriptionFile)
+    }
   };
 
   const onLoadFromLocalStorage = (descriptionFile) => {
@@ -1019,7 +1035,7 @@ export default function PipelineEditor(props) {
   }, [showAlert, setCurrentFileName, setSavedJSON, onLoadFlow])
 
   const saveFileToServer = useCallback((descriptionFile) => {
-    api.getListOf("pipeline", (error, pipelineList, response) => {
+    api.getListOf("pipeline", {}, (error, pipelineList, response) => {
       if (error) {
         showAlert(
           'error',
@@ -1123,6 +1139,11 @@ export default function PipelineEditor(props) {
       <h2 className="pipelineTitle">
         {title}
       </h2>
+      {!savePipelineToServer && (
+        <Alert severity="warning" sx={{ width: '250px', marginBottom: '10px', padding: '2px 15px', borderRadius: '10px' }}>
+          This instance is read-only
+        </Alert>
+      )}
       <div className="narrowWarning">
         <p>The pipeline engine cannot be used on a narrow display.</p>
         <p><strong>A computer is recommended for pipeline edition.</strong></p>
@@ -1315,8 +1336,12 @@ export default function PipelineEditor(props) {
                   Load from server
                 </button>
                 <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
-                <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
-                <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save As...</button>
+                {savePipelineToServer && (
+                  <>
+                    <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
+                    <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save as...</button>
+                  </>            
+                )}
               </div>
 
               <Controls />
@@ -1358,7 +1383,7 @@ export default function PipelineEditor(props) {
                 }}
               />
 
-              <div className="react-flow__attribution bottom left previewMode">
+              <div className="react-flow__panel react-flow__attribution top left previewMode">
                   Currently in <strong>preview mode</strong>. Use a larger screen to edit.
               </div>
             </ReactFlow>
@@ -1372,6 +1397,30 @@ export default function PipelineEditor(props) {
         optionMapping={popupMenuOptions}
         onPopupMenuHide={onPopupMenuHide}
       />
+
+      <Dialog
+        open={loadDialogOpen}
+        onClose={() => setLoadDialogOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Load pipeline from server</DialogTitle>
+        <DialogContent>
+          <PipelineMenu
+            pipelineMap={serverPipelineMap}
+            value={currentFileName}
+            onChange={onPipelineChosenFromServer}
+            inline
+            autoFocus
+            showAllPipelines={showAllPipelines}
+            originPage="pipeline-editor"
+            onShowAllPipelinesChange={onShowAllPipelinesChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setLoadDialogOpen(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

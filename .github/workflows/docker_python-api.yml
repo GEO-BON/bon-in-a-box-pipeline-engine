@@ -5,17 +5,20 @@ on:
     branches:
       - main
       - edge
-      - '*staging'
+      - "*staging"
     paths:
       - "python-api/**"
       - ".github/workflows/docker_python-api.yml"
+      - "script-server/api/openapi.yaml"
+      # Baked into this image as the assistant's documentation corpus, so a docs
+      # render has to produce a new image for the chat to see the new docs.
+      - "docs/search.json"
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: python-api
 
 jobs:
-
   prepare:
     runs-on: ubuntu-latest
     outputs:
@@ -33,7 +36,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v6
         with:
-          sparse-checkout: 'version.txt'
+          sparse-checkout: "version.txt"
           sparse-checkout-cone-mode: false
 
       - name: Read versions
@@ -104,6 +107,12 @@ jobs:
           labels: |
             org.opencontainers.image.licenses=GPL-v3
             org.opencontainers.image.title=BON in a Box Python API
+
+      - name: Stage the OpenAPI spec into the build context
+        run: cp script-server/api/openapi.yaml python-api/app/mcp-server/openapi.yaml
+
+      - name: Stage the documentation index into the build context
+        run: cp docs/search.json python-api/app/mcp-server/docs-search.json
 
       - name: Build and push Docker image
         id: push
