@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Switch from "@mui/material/Switch";
@@ -8,6 +9,8 @@ import Alert from "@mui/material/Alert";
 import AutoResizeTextArea from "./AutoResizeTextArea";
 import Choosers from "./Choosers";
 import StacChooser from "./Choosers/StacChooser";
+import { uiContext } from "../../uiContext.jsx";
+import FileBrowser from "../FileBrowser";
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
 export const CONSTANT_PLACEHOLDER = "Constant";
 
@@ -31,6 +34,29 @@ const smallPaddingNumeric = () => {
     paddingBottom: 0,
     paddingLeft: 10,
   };
+};
+
+// Joins the text field and the "Browse files" button into a single control:
+// the button stretches to the field's height and sits flush against it.
+const fileBrowserRow = {
+  display: "flex",
+  alignItems: "stretch",
+  "& .filebrowser": { display: "flex" },
+  "& .filebrowser .button-modal": {
+    margin: 0,
+    minHeight: 0,
+    height: "100%",
+    borderTopLeftRadius: 0,
+    borderBottomLeftRadius: 0,
+  },
+};
+
+// Squares off the right side of the field it is joined to
+const joinedTextField = {
+  "& .MuiOutlinedInput-root": {
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+  },
 };
 
 export default function ScriptInput({
@@ -161,8 +187,8 @@ export default function ScriptInput({
         onValueUpdated(event.target.value.split(",").map((v) => v.trim()));
       }
     };
-
-    return (
+    const withFileBrowser = type.includes("/") && !small;
+    const txtField = (
       <TextField
         multiline
         variant="outlined"
@@ -176,9 +202,30 @@ export default function ScriptInput({
         onBlur={onUpdateArray}
         slotProps={{ input: { style: small ? smallPadding() : null } }}
         onKeyDown={(e) => e.ctrlKey && onUpdateArray(e)}
-        sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
+        sx={{
+          width: "100%",
+          maxWidth: small ? 220 : "500px",
+          ...(withFileBrowser ? joinedTextField : null),
+        }}
       />
     );
+    if (withFileBrowser) {
+      return (
+        <Box sx={fileBrowserRow}>
+          {txtField}
+          <FileBrowser
+            value={fieldValue}
+            multipleFiles={true}
+            onSelect={(files) => {
+              setFieldValue(files);
+              onValueUpdated(files);
+            }}
+          />
+        </Box>
+      );
+    } else {
+      return <>{txtField}</>;
+    }
   }
 
   switch (type.toLowerCase()) {
@@ -318,7 +365,8 @@ export default function ScriptInput({
       if (
         type.includes("/") /* assume MIME type, files have no line breaks */
       ) {
-        return (
+        const withFileBrowser = !small;
+        const txtField = (
           <TextField
             type="text"
             label=""
@@ -328,9 +376,32 @@ export default function ScriptInput({
               if (e.key === "Enter" || e.ctrlKey) updateValue(e);
             }}
             slotProps={{ htmlInput: { style: small ? smallPadding() : null } }}
-            sx={{ width: "100%", maxWidth: small ? 220 : "500px" }}
+            sx={{
+              width: "100%",
+              maxWidth: small ? 220 : "500px",
+              ...(withFileBrowser ? joinedTextField : null),
+            }}
           />
         );
+        if (withFileBrowser) {
+          return (
+            <Box sx={fileBrowserRow}>
+              {txtField}
+              <FileBrowser
+                multipleFiles={false}
+                onSelect={(files) => {
+                  // single-file mode still hands back an array
+                  const file = files[0] ?? null;
+                  setFieldValue(file);
+                  onValueUpdated(file);
+                }}
+                value={fieldValue}
+              />
+            </Box>
+          );
+        } else {
+          return <>{txtField}</>;
+        }
       }
 
       // Multiline text field

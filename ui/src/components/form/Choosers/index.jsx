@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useState, lazy, useReducer, Suspense } from "react";
 import Grid from "@mui/material/Grid";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import CropIcon from "@mui/icons-material/Crop";
 const MapOpenLayers = lazy(() => import("./MapOpenLayers"));
 import CountryRegionMenu from "./CountryRegionMenu";
@@ -27,6 +28,7 @@ export default function Choosers({
   isCompact = false,
 }) {
   const [openModal, setOpenModal] = useState(false);
+  const isPhone = useMediaQuery("(max-width: 599px)");
 
   const type = inputDescription.type;
 
@@ -36,65 +38,68 @@ export default function Choosers({
     </h4>
   )
 
-    if ("bboxCRS" === type || "crsbbox" === type.toLowerCase() || "location" === type) {
-      return (
-        <div className="chooserFieldBody">
-          {label}
-          <CustomButtonGreen
-            variant="contained"
-            endIcon={<CropFreeIcon />}
-            onClick={() => {
-              setOpenModal(true);
-            }}
-            onClose={() => {
-              setOpenModal(false);
-            }}
-            className="locationChooserButton"
-            style={{ marginBottom: "1rem", fontSize: "1rem", width: !isCompact && "500px" }}
-          >
-            {`Choose ${inputDescription.label}`}
-          </CustomButtonGreen>
-          {value && !isCompact && <LocationDescription location={value} />}
-          <Modal
-            key={`modal-chooser-div-${inputId}`}
-            open={openModal}
-            onClose={() => {
-              setOpenModal(false);
-            }}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <>
-              {openModal && (
-                <Chooser
-                  key={`choosers-modal-div-${inputId}`}
-                  {...{
-                    setOpenModal,
-                    inputDescription,
-                    value,
-                    updateValue,
-                  }}
-                />
-              )}
-            </>
-          </Modal>
-        </div>
-      );
-    }
+  if (!isPhone
+    && ("bboxCRS" === type || "crsbbox" === type.toLowerCase() || "location" === type)
+  ) {
     return (
       <div className="chooserFieldBody">
         {label}
-        <Chooser
-          key={`choosers-div-${inputId}`}
-          {...{
-            setOpenModal,
-            inputDescription,
-            value,
-            updateValue,
+        <CustomButtonGreen
+          variant="contained"
+          endIcon={<CropFreeIcon />}
+          onClick={() => {
+            setOpenModal(true);
           }}
-        />
+          onClose={() => {
+            setOpenModal(false);
+          }}
+          className="locationChooserButton"
+          style={{ marginBottom: "1rem", fontSize: "1rem", width: !isCompact && "500px" }}
+        >
+          {`Choose ${inputDescription.label}`}
+        </CustomButtonGreen>
+        {value && !isCompact && <LocationDescription location={value} />}
+        <Modal
+          key={`modal-chooser-div-${inputId}`}
+          open={openModal}
+          onClose={() => {
+            setOpenModal(false);
+          }}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <>
+            {openModal && (
+              <Chooser
+                key={`choosers-modal-div-${inputId}`}
+                {...{
+                  setOpenModal,
+                  inputDescription,
+                  value,
+                  updateValue,
+                }}
+              />
+            )}
+          </>
+        </Modal>
       </div>
     );
+  }
+
+  return (
+    <div className="chooserFieldBody">
+      {label}
+      <Chooser
+        key={`choosers-div-${inputId}`}
+        {...{
+          setOpenModal,
+          inputDescription,
+          value,
+          updateValue,
+        }}
+      />
+    </div>
+  );
 }
 
 function Chooser({
@@ -117,7 +122,12 @@ function Chooser({
   const showBBox = ["bboxcrs", "crsbbox", "location"].includes(
     type.toLowerCase(),
   );
-  const showMap = showBBox;
+  const isPhone = useMediaQuery("(max-width: 599px)");
+  const hasPhoneSpacing = useMediaQuery(
+    "(max-width: 599px), (max-width: 1000px) and (max-height: 549px) and (orientation: landscape)",
+  );
+  const showMap = showBBox && !isPhone;
+  const isModal = showMap
   const showCountry = [
     "country",
     "countryregion",
@@ -203,16 +213,17 @@ function Chooser({
     <div
       className="location-chooser-modal"
       style={{
-        width: showMap ? "90%" : "auto",
-        height: showMap ? "90%" : "auto",
-        position: showMap ? "absolute" : "relative",
-        top: showMap ? "50%" : "auto",
-        left: showMap ? "50%" : "auto",
-        transform: showMap ? "translate(-50%, -50%)" : "",
-        backgroundColor: showMap ? "#fff" : "none",
-        padding: showMap ? "20px" : "0px",
-        borderRadius: "8px",
-        margin: showMap ? "0px auto" : "0px",
+        width: isModal ? "90%" : "auto",
+        height: isModal ? "90%" : "auto",
+        position: isModal ? "absolute" : "relative",
+        top: isModal ? "50%" : "auto",
+        left: isModal ? "50%" : "auto",
+        transform: isModal ? "translate(-50%, -50%)" : "",
+        backgroundColor: isModal ? "#fff" : "none",
+        padding: isModal ? (hasPhoneSpacing ? "8px" : "20px") : "0px",
+        "--chooser-card-margin": hasPhoneSpacing ? "4px" : "10px",
+        borderRadius: hasPhoneSpacing ? "0px" :  "8px",
+        margin: isModal ? "0px auto" : "0px",
       }}
     >
       <Grid container spacing={0} sx={{ height: "100%" }}>
@@ -220,15 +231,15 @@ function Chooser({
           className="inputGrid"
           size={{ xs: showMap ? 3 : 12 }}
           sx={{
-            padding: "10px",
-            height: showMap ? "100%" : "auto",
+            padding: hasPhoneSpacing ? "0" : "10px",
+            height: isModal ? "100%" : "auto",
             overflowY: type === "bboxCRS"
               || type.toLowerCase() === "crsbbox"
               || type.toLowerCase() === "location"
               ? "scroll" : "visible",
           }}
         >
-          {showBBox && (
+          {showMap && (
             <>
               <CustomButtonGreen
                 onClick={() => {
@@ -250,7 +261,7 @@ function Chooser({
                 showAcceptButton: ["country", "countryRegion"].includes(type)
                   ? false
                   : true,
-                dialog: showMap,
+                dialog: showBBox,
                 value,
               }}
             />
@@ -260,7 +271,7 @@ function Chooser({
               {...{
                 states,
                 dispatch,
-                dialog: showMap,
+                dialog: showBBox,
                 showBBox,
                 value,
               }}
@@ -276,7 +287,7 @@ function Chooser({
               }}
             />
           )}
-          {showMap && (
+          {isModal && (
             <div>
               <CustomButtonGreen
                 onClick={() => {

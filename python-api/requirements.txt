@@ -9,3 +9,5 @@ shapely
 pygadm
 fiona
 pystac-client
+python-multipart 
+clamav-client
