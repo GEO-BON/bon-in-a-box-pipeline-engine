@@ -24,6 +24,7 @@ proj4.defs([
   ],
 ]);
 
+
 export default async function CsvToGeojson(
   url: string,
   delimiter: string,
@@ -38,17 +39,6 @@ export default async function CsvToGeojson(
         row.pos[1] > -9999999 &&
         row.pos[1] < 99999999
       ) {
-        if (
-          row.pos[0] < 90 &&
-          row.pos[0] > -90 &&
-          row.pos[1] < 180 &&
-          row.pos[1] > -180
-        ) {
-          // Assuming coordinates are really in lat/long. Temporary fix until we include CRS in GEOJSON
-          crs = "EPSG:4326";
-        }
-
-        console.log("Using CRS", crs)
         const coords = proj4(
           crs,
           "EPSG:4326",
