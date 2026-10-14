@@ -12,8 +12,8 @@ import { useParams } from "react-router-dom";
 import CustomTable from "../CustomTable";
 import CsvToGeojson, {
   CsvToMapArray,
-  crsFromInputValue,
 } from "../../helpers/csv_processing";
+import { crsFromInputValue } from "../../helpers/utils";
 import { Item } from "./styles";
 import { GetPipelineRunInputs, GetJSON } from "../../helpers/biab_api";
 import _ from "underscore";
@@ -94,7 +94,8 @@ export default function Sidebar(props: any) {
     } else if (type.includes("geo+json")) {
       clearOtherLayers("geo+json");
       if (typeof output === "object") {
-        setGeojsonOutput(output);
+        // Defer so the layer clearing triggered above runs first
+        Promise.resolve().then(() => setGeojsonOutput({ ...output }));
       } else {
         GetJSON(output).then((res: any) => {
           setGeojsonOutput(res);

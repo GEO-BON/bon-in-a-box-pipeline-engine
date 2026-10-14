@@ -24,17 +24,6 @@ proj4.defs([
   ],
 ]);
 
-// Location chooser values (location, bboxCRS, crsBBox, CRS, countryRegionCRS) all carry a CRS object.
-export function crsFromInputValue(value: any): string | null {
-  const c = value?.CRS;
-  if (!c || typeof c !== "object") return null;
-  if (c.authority && c.code) {
-    const code = `${c.authority}:${c.code}`;
-    if (proj4.defs(code)) return code;
-  }
-  if (c.proj4Def) return c.proj4Def;
-  return null;
-}
 
 export default async function CsvToGeojson(
   url: string,
@@ -50,19 +39,8 @@ export default async function CsvToGeojson(
         row.pos[1] > -9999999 &&
         row.pos[1] < 99999999
       ) {
-        let rowCrs = crs;
-        if (
-          row.pos[0] < 90 &&
-          row.pos[0] > -90 &&
-          row.pos[1] < 180 &&
-          row.pos[1] > -180
-        ) {
-          // Assuming coordinates are really in lat/long. Temporary fix until we include CRS in GEOJSON
-          rowCrs = "EPSG:4326";
-        }
-
         const coords = proj4(
-          rowCrs,
+          crs,
           "EPSG:4326",
           row.pos.map((str: string) => parseFloat(str)).reverse()
         );
