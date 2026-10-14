@@ -10,6 +10,8 @@ import { Item } from "../styles";
 import _ from "underscore";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import Markdown from "markdown-to-jsx";
+import { LocationSummary } from "./LocationSummary";
+import { isLocationType, locationToGeojson } from "../../../helpers/location";
 import "../sidebar.css";
 
 export function PipelineOutput(props: any) {
@@ -38,6 +40,11 @@ export function PipelineOutput(props: any) {
   if (Array.isArray(arrayOutputs) && arrayOutputs.length === 1) {
     arrayOutputs = arrayOutputs[0];
   }
+
+  const locationGeojson =
+    isLocationType(outputObj?.type) && typeof outputObj.outputs === "object"
+      ? locationToGeojson(outputObj.outputs)
+      : null;
 
   const handleSelect = (value: string) => {
     setSelectedOutput(value);
@@ -375,6 +382,22 @@ export function PipelineOutput(props: any) {
                   Open in new Tab
                 </Link>
               </CustomButtonGreen>
+            )}
+          {isLocationType(outputObj?.type) &&
+            typeof outputObj.outputs === "object" && (
+              <>
+                <LocationSummary location={outputObj.outputs} />
+                {locationGeojson && (
+                  <CustomButtonGreen
+                    key={`but-${outputObj.label}`}
+                    onClick={(event: any) => {
+                      handleClick(event, locationGeojson, "geo+json/object");
+                    }}
+                  >
+                    See on map
+                  </CustomButtonGreen>
+                )}
+              </>
             )}
         </Item>
       )}

@@ -85,9 +85,13 @@ export default function Sidebar(props: any) {
       });
     } else if (type.includes("geo+json")) {
       clearOtherLayers("geo+json");
-      GetJSON(output).then((res: any) => {
-        setGeojsonOutput(res);
-      });
+      if (typeof output === "object") {
+        setGeojsonOutput(output);
+      } else {
+        GetJSON(output).then((res: any) => {
+          setGeojsonOutput(res);
+        });
+      }
     } else if (type.includes("geopackage")) {
       clearOtherLayers("geopackage");
       setGeoPackage(output);
@@ -322,7 +326,7 @@ export default function Sidebar(props: any) {
               </Grid>
               <Box>
                 <Typography color="secondary.light">
-                  Explore results from a BON in a Box analysis pipeline
+                  Explore results from a Biodiversity Evaluation Engine pipeline
                 </Typography>
               </Box>
               {pipelineTitle && (
