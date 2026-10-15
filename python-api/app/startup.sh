@@ -5,7 +5,7 @@
 # and is now one shared service that antivirus.py streams uploads to over the network.
 # See CLAMAV_ADDRESS there.
 
-gunicorn -k uvicorn.workers.UvicornWorker titiler.application.main:app --bind 0.0.0.0:8000 --workers 1 &
+gunicorn -k uvicorn.workers.UvicornWorker tiler_app:app --bind 0.0.0.0:8000 --workers 1 &
 
 # The MCP server backs the chat assistant only. It is backgrounded, and its death is
 # logged rather than fatal, because it used to be this script's foreground process:
