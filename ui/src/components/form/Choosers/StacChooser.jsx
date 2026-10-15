@@ -43,9 +43,10 @@ async function getJson(path, params) {
   } catch {
     // Non-JSON error page, fall through to the generic message below.
   }
-  if (!response.ok) {
+  if (!response.ok || body === null) {
     throw new Error(
-      (body && body.detail) || `Request to ${path} failed (${response.status})`,
+      (body && body.detail) ||
+        `Request to ${path} failed (${response.status}${response.ok ? ", not JSON" : ""})`,
     );
   }
   return body;
@@ -270,6 +271,9 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     getJson("catalogs_list")
       .then((list) => {
         if (cancelled) return;
+        if (!Array.isArray(list)) {
+          throw new Error("Unexpected catalogs_list response");
+        }
         setCatalogs(list);
         const restoring = toRestore.current;
         if (restoring && restoring.catalog) {
