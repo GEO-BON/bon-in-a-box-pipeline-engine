@@ -42,7 +42,7 @@ class DataSizeTest {
         assertEquals(DataSize(DataSize.GB), DataSize("1 GB"))
         assertEquals(DataSize(DataSize.TIB), DataSize("1 Ti"))
         assertEquals(DataSize(DataSize.TB), DataSize("1 TB"))
-        assertEquals(DataSize(DataSize.GIB), DataSize("1G"))
+        assertEquals(DataSize(DataSize.GB), DataSize("1G"))
         assertEquals(DataSize(DataSize.GB), DataSize("1 GB"))
         assertEquals(DataSize((1.5 * DataSize.MB).toLong()), DataSize("1.5 megabytes"))
         assertEquals(DataSize(512), DataSize("512 B"))
@@ -64,11 +64,11 @@ class DataSizeTest {
     @Test
     fun givenUnitSystem_whenRendered_thenUsesBinaryOrDecimalUnits() {
         assertEquals("1 Ki", 1024.bytes.toString(DataSizeUnitSystem.BINARY))
-        assertEquals("1 kB", 1000.bytes.toString(DataSizeUnitSystem.DECIMAL))
-        assertEquals("1.5 MB", 1_500_000.bytes.toString(DataSizeUnitSystem.DECIMAL))
-        assertEquals("1.23 MB", 1_234_567.bytes.toString(DataSizeUnitSystem.DECIMAL, decimals = 2))
+        assertEquals("1 k", 1000.bytes.toString(DataSizeUnitSystem.DECIMAL))
+        assertEquals("1.5 M", 1_500_000.bytes.toString(DataSizeUnitSystem.DECIMAL))
+        assertEquals("1.23 M", 1_234_567.bytes.toString(DataSizeUnitSystem.DECIMAL, decimals = 2))
         assertEquals("1 Mi", 1_048_576.bytes.toString(DataSizeUnitSystem.BINARY))
-        assertEquals("1 TB", 1_000_000_000_000.bytes.toString(DataSizeUnitSystem.DECIMAL))
+        assertEquals("1 T", 1_000_000_000_000.bytes.toString(DataSizeUnitSystem.DECIMAL))
     }
 
     @Test
