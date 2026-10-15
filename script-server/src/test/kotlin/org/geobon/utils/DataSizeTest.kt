@@ -34,15 +34,15 @@ class DataSizeTest {
 
     @Test
     fun givenSizeString_whenParsed_thenConvertsSupportedUnitsToBytes() {
-        assertEquals(DataSize(DataSize.KIB), DataSize("1 KiB"))
+        assertEquals(DataSize(DataSize.KIB), DataSize("1 Ki"))
         assertEquals(DataSize(DataSize.KB), DataSize("1 KB"))
-        assertEquals(DataSize(DataSize.MIB), DataSize("1 MiB"))
+        assertEquals(DataSize(DataSize.MIB), DataSize("1 Mi"))
         assertEquals(DataSize(DataSize.MB), DataSize("1 MB"))
-        assertEquals(DataSize(DataSize.GIB), DataSize("1 GiB"))
+        assertEquals(DataSize(DataSize.GIB), DataSize("1 Gi"))
         assertEquals(DataSize(DataSize.GB), DataSize("1 GB"))
-        assertEquals(DataSize(DataSize.TIB), DataSize("1 TiB"))
+        assertEquals(DataSize(DataSize.TIB), DataSize("1 Ti"))
         assertEquals(DataSize(DataSize.TB), DataSize("1 TB"))
-        assertEquals(DataSize(DataSize.GIB), DataSize("1G"))
+        assertEquals(DataSize(DataSize.GB), DataSize("1G"))
         assertEquals(DataSize(DataSize.GB), DataSize("1 GB"))
         assertEquals(DataSize((1.5 * DataSize.MB).toLong()), DataSize("1.5 megabytes"))
         assertEquals(DataSize(512), DataSize("512 B"))
@@ -54,21 +54,21 @@ class DataSizeTest {
     fun givenByteCounts_whenRendered_thenUsesExpectedReadableUnit() {
         assertEquals("0 B", 0.bytes.toString())
         assertEquals("1023 B", 1023.bytes.toString())
-        assertEquals("1 KiB", DataSize(DataSize.KIB).toString())
-        assertEquals("1.5 KiB", 1536.bytes.toString())
-        assertEquals("2 MiB", DataSize(2 * DataSize.MIB).toString())
-        assertEquals("3 GiB", DataSize(3 * DataSize.GIB).toString())
-        assertEquals("4 TiB", DataSize(4 * DataSize.TIB).toString())
+        assertEquals("1 Ki", DataSize(DataSize.KIB).toString())
+        assertEquals("1.5 Ki", 1536.bytes.toString())
+        assertEquals("2 Mi", DataSize(2 * DataSize.MIB).toString())
+        assertEquals("3 Gi", DataSize(3 * DataSize.GIB).toString())
+        assertEquals("4 Ti", DataSize(4 * DataSize.TIB).toString())
     }
 
     @Test
     fun givenUnitSystem_whenRendered_thenUsesBinaryOrDecimalUnits() {
-        assertEquals("1 KiB", 1024.bytes.toString(DataSizeUnitSystem.BINARY))
-        assertEquals("1 kB", 1000.bytes.toString(DataSizeUnitSystem.DECIMAL))
-        assertEquals("1.5 MB", 1_500_000.bytes.toString(DataSizeUnitSystem.DECIMAL))
-        assertEquals("1.23 MB", 1_234_567.bytes.toString(DataSizeUnitSystem.DECIMAL, decimals = 2))
-        assertEquals("1 MiB", 1_048_576.bytes.toString(DataSizeUnitSystem.BINARY))
-        assertEquals("1 TB", 1_000_000_000_000.bytes.toString(DataSizeUnitSystem.DECIMAL))
+        assertEquals("1 Ki", 1024.bytes.toString(DataSizeUnitSystem.BINARY))
+        assertEquals("1 k", 1000.bytes.toString(DataSizeUnitSystem.DECIMAL))
+        assertEquals("1.5 M", 1_500_000.bytes.toString(DataSizeUnitSystem.DECIMAL))
+        assertEquals("1.23 M", 1_234_567.bytes.toString(DataSizeUnitSystem.DECIMAL, decimals = 2))
+        assertEquals("1 Mi", 1_048_576.bytes.toString(DataSizeUnitSystem.BINARY))
+        assertEquals("1 T", 1_000_000_000_000.bytes.toString(DataSizeUnitSystem.DECIMAL))
     }
 
     @Test
