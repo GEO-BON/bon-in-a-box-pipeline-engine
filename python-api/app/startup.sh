@@ -5,7 +5,8 @@
 # and is now one shared service that antivirus.py streams uploads to over the network.
 # See CLAMAV_ADDRESS there.
 
-gunicorn -k uvicorn.workers.UvicornWorker tiler_app:app --bind 0.0.0.0:8000 --workers 1 &
+# Trust the proxy's X-Forwarded-Proto, so titiler's viewer links use https when the page does.
+gunicorn -k uvicorn.workers.UvicornWorker tiler_app:app --bind 0.0.0.0:8000 --workers 1 --forwarded-allow-ips '*' &
 
 # The MCP server backs the chat assistant only. It is backgrounded, and its death is
 # logged rather than fatal, because it used to be this script's foreground process:
