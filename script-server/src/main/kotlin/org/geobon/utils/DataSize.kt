@@ -14,10 +14,10 @@ import kotlin.math.round
 enum class DataSizeUnitSystem(val units: List<Pair<Long, String>>) {
     BINARY(
         listOf(
-            KIB to "KiB",
-            MIB to "MiB",
-            GIB to "GiB",
-            TIB to "TiB"
+            KIB to "Ki",
+            MIB to "Mi",
+            GIB to "Gi",
+            TIB to "Ti"
         )
     ),
     DECIMAL(
