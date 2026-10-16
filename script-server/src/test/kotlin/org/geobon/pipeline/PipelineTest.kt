@@ -388,7 +388,7 @@ internal class PipelineTest {
         val pipeline = createRootPipeline(
              noHPCContext,
             "pipelineInPipeline/userInputOutside.json",
-            """ {"pipeline@3":5} """
+            """ {"pipeline@3|inputId":5} """
         )
 
         val allOutputs = mutableMapOf<String, String>()
