@@ -7,6 +7,7 @@ import os
 import json
 import geopandas as gpd
 import pandas as pd
+from stac_api import router as stac_router
 from pyproj import CRS, Transformer
 from dotenv import load_dotenv
 
@@ -22,6 +23,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(stac_router)
 
 ddb = duckdb.connect()
 ddb.execute("SET home_directory='/app/ddb_home'")
