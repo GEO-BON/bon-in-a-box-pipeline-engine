@@ -85,13 +85,15 @@ function bandStatistics(body) {
 }
 
 /**
- * The colour table embedded in an asset's file, from the tiler's /stac/info, or
+ * The colour table embedded in an asset's file, from the tiler's /info, or
  * null. Tables are padded to 256 entries with one repeated colour. Values left
  * out render transparent, so the padding and transparent entries are dropped to
  * keep the tile URLs short.
  */
 function embeddedColormap(body) {
-  const asset = body && Object.values(body)[0];
+  // /stac/info nests by asset, /cog/info doesn't.
+  const asset =
+    body && ("colorinterp" in body ? body : Object.values(body)[0]);
   if (
     !asset ||
     !asset.colormap ||
@@ -118,6 +120,15 @@ function embeddedColormap(body) {
 function catalogUrl(catalog) {
   if (!catalog) return null;
   return typeof catalog === "string" ? catalog.trim() : catalog.url;
+}
+
+/**
+ * UNBL items point at Azure paths the tiler's /stac reader can't open without
+ * credentials, so its assets are read directly as COGs.
+ */
+function readsCogDirectly(catalog) {
+  const url = catalogUrl(catalog);
+  return Boolean(url && url.includes("unbiodiversitylab"));
 }
 
 /** The input holds a list, but tolerate a lone object from an older run. */
@@ -460,14 +471,21 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
   const previewItemUrl =
     asset && (itemsAreTiles ? asset.item_url : item && item.url);
 
+  // Where the tiler reads the asset from: the COG itself, or the STAC item.
+  const useCog = Boolean(readsCogDirectly(catalog) && asset && asset.href);
+  const tilerBase = `${TILER_URL}/${useCog ? "cog" : "stac"}`;
+  const sourceQuery = useCog
+    ? new URLSearchParams({ url: asset.href }).toString()
+    : previewItemUrl
+      ? new URLSearchParams({ url: previewItemUrl, assets: asset.key }).toString()
+      : null;
+
   // A file with a colour table holds classes: its values index the table.
   useEffect(() => {
     setPalette(null);
-    if (!previewItemUrl) return;
+    if (!sourceQuery) return;
     let cancelled = false;
-    fetch(
-      `${TILER_URL}/stac/info?${new URLSearchParams({ url: previewItemUrl, assets: asset.key })}`,
-    )
+    fetch(`${tilerBase}/info?${sourceQuery}`)
       .then((response) => (response.ok ? response.json() : null))
       .then((body) => {
         const found = embeddedColormap(body);
@@ -481,16 +499,15 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     return () => {
       cancelled = true;
     };
-  }, [previewItemUrl, asset]);
+  }, [tilerBase, sourceQuery]);
 
   const expandedUrl =
-    previewItemUrl &&
-    `${TILER_URL}/stac/WebMercatorQuad/map.html?` +
+    sourceQuery &&
+    `${tilerBase}/WebMercatorQuad/map.html?` +
       (preview
         ? preview.params
         : new URLSearchParams({
-            url: previewItemUrl,
-            assets: asset.key,
+            ...Object.fromEntries(new URLSearchParams(sourceQuery)),
             ...(palette
               ? { colormap: JSON.stringify(palette) }
               : categorical && { colormap_name: CATEGORICAL_COLORMAP }),
@@ -504,10 +521,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     setPreviewError(null);
     try {
       // Kept with the image: the expanded view renders it the same way.
-      const params = new URLSearchParams({
-        url: previewItemUrl,
-        assets: asset.key,
-      });
+      const params = new URLSearchParams(sourceQuery);
 
       if (palette) {
         // The file's own colour table maps raw values, so no rescale.
@@ -519,7 +533,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         let bands = [];
         try {
           const response = await fetch(
-            `${TILER_URL}/stac/statistics?${new URLSearchParams({ url: previewItemUrl, assets: asset.key })}`,
+            `${tilerBase}/statistics?${sourceQuery}`,
           );
           if (response.ok) bands = bandStatistics(await response.json());
         } catch {
@@ -541,7 +555,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
       }
 
       const rendered = await fetch(
-        `${TILER_URL}/stac/preview.png?${params}&max_size=${PREVIEW_MAX_SIZE}`,
+        `${tilerBase}/preview.png?${params}&max_size=${PREVIEW_MAX_SIZE}`,
       );
       if (!rendered.ok) {
         let body = null;
@@ -1062,7 +1076,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
               Add to selection
             </CustomButtonGreen>
             <CustomButtonGrey
-              disabled={!previewItemUrl || loadingPreview}
+              disabled={!sourceQuery || loadingPreview}
               endIcon={<ImageIcon />}
               onClick={loadPreview}
             >
@@ -1121,7 +1135,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
             <span style={{ fontSize: "0.75rem", color: "#888" }}>
               {!asset
                 ? "Choose an asset to preview it."
-                : previewItemUrl
+                : sourceQuery
                   ? 'Use "Preview" to render this asset.'
                   : "This catalog does not say where the item lives, so it cannot be previewed."}
             </span>
