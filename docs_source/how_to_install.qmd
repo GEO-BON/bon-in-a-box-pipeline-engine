@@ -83,6 +83,8 @@ Prerequisites:
 
     c.  Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g. GBIF or IUCN)
 
+        -   To browse the UN Biodiversity Lab catalogue in the STAC chooser, set `UNBL_API_KEY` to the key provided by UN Biodiversity Lab. It is optional: the catalogue currently answers without one. Restart the server after changing it.
+
     d.  Adjust any server option as you see fit (optional).
 
 2.  Using a Linux terminal (terminal on Mac, Git Bash or WSL on Windows), navigate to the folder of the cloned repository.
