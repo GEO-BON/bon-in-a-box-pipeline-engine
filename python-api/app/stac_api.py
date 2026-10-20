@@ -13,6 +13,7 @@ from datetime import timezone
 from functools import lru_cache
 from itertools import islice
 from urllib.parse import urlparse
+import os
 
 from fastapi import APIRouter, HTTPException
 from pystac_client import Client
@@ -23,8 +24,10 @@ router = APIRouter(prefix="/stac")
 # public catalogue URL, which goes through _assert_public_url below.
 STAC_CATALOGS = {
     "geobon": ("GEO BON STAC", "https://stac.geobon.org"),
-    "bq-io": ("Biodiversité Québec", "https://io.biodiversite-quebec.ca/stac2/"),
+    "unbl": ("UN Biodiversity Lab", "https://stac.api.unbiodiversitylab.org"),
     "planetary-computer": ("Planetary Computer", "https://planetarycomputer.microsoft.com/api/stac/v1"),
+    "bq-io": ("Biodiversité Québec", "https://io.biodiversite-quebec.ca/stac2/")
+
 }
 
 # Highest number of items a single page may request.
@@ -87,6 +90,9 @@ def resolve_catalog(catalog):
 
 @lru_cache(maxsize=16)
 def _open(url):
+    if "unbiodiversitylab" in url:
+        header = {"X-API-Key": os.environ.get("UNBL_API_KEY")}
+        return Client.open(url, headers=header)
     return Client.open(url)
 
 
@@ -131,7 +137,8 @@ def _is_cog(media_type):
     if not media_type:
         return False
     parts = {part.strip().lower().replace(" ", "") for part in media_type.split(";")}
-    return "image/tiff" in parts and "profile=cloud-optimized" in parts
+    return "image/tiff" in parts
+    #return "image/tiff" in parts and "profile=cloud-optimized" in parts
 
 
 def _asset_fields(asset, declared=None):
