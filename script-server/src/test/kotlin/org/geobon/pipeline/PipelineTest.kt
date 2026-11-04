@@ -457,6 +457,42 @@ internal class PipelineTest {
         assertContains(scriptOutputFile.readText(), "\"increment\": 8")
     }
 
+    private val stacScript = File(scriptsRoot, "forCWL/stacAssets.yml")
+    private val stacInputId = "forCWL>stacAssets.yml@1|stac"
+    private val stacSelections = """[
+        { "catalog": "https://stac.geobon.org", "collection": "some-collection", "date": "2020-01-01",
+          "item": "some-item", "items_are_tiles": false, "asset": "data",
+          "href": "https://example.com/some-item/data.tif", "type": "image/tiff", "categorical": false },
+        { "catalog": "https://stac.geobon.org", "collection": "some-collection", "date": "2020-01-01",
+          "item": null, "items_are_tiles": true, "asset": "data",
+          "href": null, "type": "image/tiff", "categorical": true }
+    ]"""
+
+    @Test
+    fun `given stac assets_when mini pipeline created_then input is a list of selections`() = runTest {
+        val pipeline = createMiniPipelineFromScript(
+            noHPCContext, stacScript, "forCWL>stacAssets.yml", """{ "stac": $stacSelections }"""
+        )
+
+        val value = pipeline.inputs[stacInputId]?.pull()
+        // Plain lists and maps, which RunContext hashes regardless of key order
+        assertIs<List<*>>(value)
+        assertEquals(2, value.size)
+        assertIs<Map<*, *>>(value[0])
+        assertEquals("some-item", (value[0] as Map<*, *>)["item"])
+        assertEquals(true, (value[1] as Map<*, *>)["items_are_tiles"])
+    }
+
+    @Test
+    fun `given stac assets with a missing field_when mini pipeline created_then exception occurs`() = runTest {
+        assertFailsWith<RuntimeException> {
+            createMiniPipelineFromScript(
+                noHPCContext, stacScript, "forCWL>stacAssets.yml",
+                """{ "stac": [{ "catalog": "https://stac.geobon.org", "collection": "some-collection" }] }"""
+            )
+        }
+    }
+
     @Test
     fun `given a mini pipeline_when ran with bad key_then exception occurs`() = runTest {
         assertFailsWith<RuntimeException> {
