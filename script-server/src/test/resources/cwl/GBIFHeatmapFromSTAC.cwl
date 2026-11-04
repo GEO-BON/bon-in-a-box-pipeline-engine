@@ -100,6 +100,9 @@ requirements:
       OUTPUT_LOCATION: "$(inputs.runFolder ? inputs.runFolder.path : runtime.outdir)"
       PYTHONUNBUFFERED: "1"
 
+  ResourceRequirement:
+    ramMin: 5120
+
 baseCommand: ["bash", "-c"]
 arguments:
   - |
