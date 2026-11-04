@@ -576,13 +576,17 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
             // BON in a Box default memory if 4 Gi. With the conda-pack overhead, we add 1 Gi for safety.
             ?: 5.gibibytes
 
-        // Maximum ram if specified capped to 20 Gi since this is the maximum openEO can offer.
-        // If unset and min was changed in above coerce, we set ramMax at the requested memory.
-        var ramMax = computeMetadata?.memMaxParsed?.coerceAtMost(20.gibibytes)
+
+        // Maximum ram if specified, otherwise
+        // if unset and min was changed in above coerce, we set ramMax at the requested memory before being coerced.
+        var ramMax = computeMetadata?.memMaxParsed
             ?: if (ramMin != computeMetadata?.memParsed) computeMetadata?.memParsed else null
 
+        // openEO: maximum ram if specified capped to 20 Gi since this is the maximum openEO can offer.
+        ramMax = ramMax?.coerceAtMost(20.gibibytes)
+
         val coresMin = computeMetadata?.cpusPerTask?.coerceAtMost(2)
-        // Cap coresMax to openEO's limit of 7. This is a bug in Calrissian.
+        // openEO: Cap coresMax to openEO's limit of 7. This is a bug in Calrissian.
         // See https://github.com/Duke-GCB/calrissian/issues/144 and https://github.com/ESA-APEx/projectmanagement/issues/180
         var coresMax = computeMetadata?.cpusPerTask?.coerceAtMost(7)
 
