@@ -210,17 +210,17 @@ compute:
   required: false
   type: dict
   schema:
-    hpc: 
+    hpc:
       required: false
       type: boolean
     mem:
       required: true
       type: string
-      regex: "^[0-9]+[GM]$"
+      regex: "^[0-9]+[GM]i?$"
     mem-max:
       required: false
       type: string
-      regex: "^[0-9]+[GM]$"
+      regex: "^[0-9]+[GM]i?$"
     cpus-per-task:
       required: true
       type: integer

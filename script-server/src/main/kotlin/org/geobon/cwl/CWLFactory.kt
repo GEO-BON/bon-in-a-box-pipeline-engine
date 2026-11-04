@@ -20,6 +20,7 @@ import org.geobon.script.Description.IO__TYPE__STAC
 import org.geobon.script.Description.IO__TYPE__TEXT
 import org.geobon.server.ServerContext
 import org.geobon.utils.DataSize
+import org.geobon.utils.bytes
 import org.geobon.utils.gibibytes
 import org.json.JSONObject
 import org.json.JSONWriter
@@ -564,32 +565,42 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
 
 
     private fun toCWL(computeMetadata: ComputeMetadata?): String {
-        if(computeMetadata == null)
-            return ""
+        // Capping the min value:
+        // 6 Gi to be able to run it locally
+        // This hard-coded defaults allow running tests with small areas.
+        // However, if a step **always** needs the memory we specified, this can be a problem.
+        val ramMin = computeMetadata?.memParsed?.coerceAtMost(6.gibibytes)
+            // If no resourceRequirements are set, we don't know what the tool will offer.
+            // cwltool default is 1Gi https://cwltool.readthedocs.io/en/latest/cli.html#cmdoption-cwltool-strict-memory-limit
+            // but other runtimes might have other values.
+            // BON in a Box default memory if 4 Gi. With the conda-pack overhead, we add 1 Gi for safety.
+            ?: 5.gibibytes
+
+
+        // Maximum ram if specified, otherwise
+        // if unset and min was changed in above coerce, we set ramMax at the requested memory before being coerced.
+        var ramMax = computeMetadata?.memMaxParsed
+            ?: if (ramMin != computeMetadata?.memParsed) computeMetadata?.memParsed else null
+
+        // openEO: maximum ram if specified capped to 20 Gi since this is the maximum openEO can offer.
+        ramMax = ramMax?.coerceAtMost(20.gibibytes)
+
+        val coresMin = computeMetadata?.cpusPerTask?.coerceAtMost(2)
+        // openEO: Cap coresMax to openEO's limit of 7. This is a bug in Calrissian.
+        // See https://github.com/Duke-GCB/calrissian/issues/144 and https://github.com/ESA-APEx/projectmanagement/issues/180
+        var coresMax = computeMetadata?.cpusPerTask?.coerceAtMost(7)
+
+        // Safeguard for CWL illegal values
+        if ((ramMax ?: 0.bytes) < (ramMin)) ramMax = null
+        if ((coresMax ?: 0) < (coresMin ?: 0)) coresMax = null
 
         return buildString {
             appendLine()
             appendLine(1, "ResourceRequirement:")
-
-            // Capping the min value:
-            // 6 Gi to be able to run it locally
-            // 20 Gi is the maximum openEO can offer
-            // This hard-coded defaults allow running tests with small areas.
-            // However, if a step **always** needs the memory we specified, this can be a problem.
-            val ramMin = computeMetadata.memParsed.coerceAtMost(6.gibibytes)
-            appendLine(
-                2,
-                "ramMin: ${ramMin.toLong(DataSize.MIB)}"
-            )
-            computeMetadata.memMaxParsed?.let {
-                if(ramMin < it)
-                    appendLine(2, "ramMax: ${it.toLong(DataSize.MIB)}")
-            }
-
-            val coresMin = computeMetadata.cpusPerTask.coerceAtMost(2)
-            appendLine(2, "coresMin: $coresMin")
-            if(coresMin < computeMetadata.cpusPerTask)
-                appendLine(2, "coresMax: ${computeMetadata.cpusPerTask}")
+            appendLine(2,"ramMin: ${ramMin.toLong(DataSize.MIB)}")
+            ramMax?.let { appendLine(2, "ramMax: ${ramMax.toLong(DataSize.MIB)}") }
+            coresMin?.let { appendLine(2, "coresMin: $coresMin") }
+            coresMax?.let { appendLine(2, "coresMax: $coresMax") }
         }
     }
 }
