@@ -3,52 +3,152 @@ title: "Peer review"
 format: html
 ---
 
-Each pipeline will be reviewed by 2-5 people for scientific rigor, usability, and generalizability. The contributor will suggest potential reviewers, and they will be contacted by the BON in a Box team. Additional reviewers will be chosen by the BON in a Box team. It is encouraged to have reviewers from both the academic and policy sphere (e.g. a government scientist). The contributor will specify whether the pipeline is a pipeline for reporting, a pipeline for BONs, or a sampling prioritization pipeline.
+To ensure that analytical pipelines available through the Biodiversity Evaluation Engine (BEE) are scientifically robust, reproducible, and accessible, BON in a Box has established a peer-review process for contributed pipelines.
 
-The pipelines will be reviewed based on the following criteria:
+The review process evaluates the scientific methodology, technical functionality, generalizability, documentation, and usability of each pipeline. It also provides an opportunity for researchers and practitioners to contribute their expertise to improving the tools available through BEE.
 
--   **Scientific rigor:** are the models scientifically robust and accurate? Is it supported by peer reviewed literature?
+Pipelines are typically reviewed by 2–5 experts with complementary scientific, technical, or practical expertise. Where possible, we aim to include reviewers from both the academic and biodiversity monitoring or policy communities.
 
--   **Generalizability:** does the pipeline work for different regions, species, scales, etc.? If not, are these limitations communicated clearly?
+## When is a pipeline ready for peer review?
 
--   **Code readability:** Is the code easy to read, understandable, and well documented?
+Before a pipeline is submitted for external review, the BON in a Box team works with contributors to ensure that it:
 
--   **Modularity:** Is the code divided into logical, modular steps where each script performs one task?
+- Meets the requirements outlined in the [Pipeline Standards](pipeline_standards.qmd).
 
--   **Data use:** Does the pipeline support both user data and publicly available data? Is this data loaded with an API or will it require updating? Are users able to easily access this data?
+- Runs successfully using the provided example inputs and default parameters.
 
--   **Functionality:** Does the pipeline run? Or are there bugs? 
+- Has undergone initial testing with different input data, parameters, and geographical contexts, where applicable.
 
--   **Documentation:** Is there metadata for both the individual scripts and the pipeline? Is there a markdown tutorial?
+- Produces scientifically reasonable results consistent with the underlying methodology.
 
--   **Usability:** Is the pipeline easy to use and understand for a non expert? Is there adequate guidance on how to parameterize it?
+- Includes input and output descriptions, documentation, and a user tutorial.
 
-The reviewers will test the pipeline with a number of data sets, species, and scales based on their expertise, and provide feedback. The reviewer will decide if the pipeline should be accepted with minor revisions, needs to be revised and resubmitted, or is not suitable for BON in a Box.
+- Has its code available in the BON in a Box GitHub repository, either in the main branch or in a development branch or pull request.
 
-### **When is a pipeline ready for peer review?**
+The BON in a Box team conducts initial testing and technical checks before inviting external reviewers. **External reviewers are then asked to conduct additional, independent testing** to evaluate the pipeline's functionality, scientific validity, and applicability across different contexts.
 
-Pipelines are ready for peer review when:
+## How does the peer-review process work?
 
--   The pipeline meets all of the [quality requirements](pipeline_standards.qmd)
+### 1. Reviewer selection
 
--   The pipeline runs without errors with the default parameters (examples passed into the YAML file), and with different inputs and outputs, including publicly available data or user data
+The pipeline contributor may suggest potential reviewers with relevant expertise. Additional reviewers will be identified by the BON in a Box team.
 
--   The pipeline has been tested with different parameters (geographical areas, ecosystems, scales, and species) and the results make sense
+We aim to select reviewers with complementary expertise across three areas:
+
+| Preferred reviewer type | Primary areas of expertise |
+|--------------------------|----------------------------------------------|
+| **Scientific expert** | Scientific methodology, assumptions, validation, and interpretation of results |
+| **Applied biodiversity monitoring expert** | Generalizability, usability, and relevance to biodiversity monitoring, conservation planning, and reporting |
+| **Technical expert** | Code quality, reproducibility, data handling, and pipeline functionality |
+
+These categories are intended to guide reviewer selection rather than establish rigid roles. Reviewers may have expertise in multiple areas, and are not expected to evaluate aspects outside their expertise.
+
+Reviewers are invited by the BON in a Box team and provided with the materials needed to evaluate the pipeline.
+
+### 2. Pipeline evaluation
+
+Reviewers are asked to evaluate the pipeline using a standardized review form, focusing on the following criteria:
+
+- **Scientific rigor:** Is the methodology scientifically supported and correctly implemented? Are the assumptions and limitations clearly communicated?
+
+- **Generalizability:** Can the pipeline be applied across different geographical areas, species, ecosystems, or scales, where appropriate?
+
+- **Functionality:** Does the pipeline run successfully and produce the expected outputs?
+
+- **Data use:** Are input datasets appropriate, accessible, and clearly documented? Can users provide their own data where relevant?
+
+- **Usability:** Are the inputs, parameters, and outputs understandable to users without extensive programming experience?
+
+- **Documentation:** Are the methodology, inputs, outputs, and interpretation of results adequately explained?
+
+- **Code quality:** Is the code readable, modular, reproducible, and appropriately documented?
+
+Reviewers are encouraged to focus on the criteria most relevant to their expertise. **They do not need to complete every section of the review form**, but should provide sufficient feedback to support an assessment of the pipeline.
+
+### 3. Review feedback and revisions
+
+Reviewers submit their completed review forms to the BON in a Box team, including identified issues, recommendations, and an overall assessment of the pipeline.
+
+The completed review forms serve as the formal record of the review. The BON in a Box team consolidates feedback and works with pipeline contributors to address reviewer comments.
+
+Specific technical changes, bugs, and requested improvements are tracked through GitHub issues or pull-request comments, allowing contributors and the BON in a Box team to document and monitor revisions.
+
+Depending on the extent of the revisions required, reviewers may be invited to reassess the pipeline before a final decision is made.
+
+### 4. Review outcome
+
+Following the review, a pipeline may be:
+
+- **Accepted with minor revisions:** The pipeline meets the main scientific and technical requirements, with only minor changes needed before publication.
+
+- **Revisions required:** More substantial changes are needed, and the pipeline may require additional review.
+
+- **Not accepted:** The pipeline does not currently meet the requirements for inclusion in BEE.
+
+The BON in a Box team coordinates the final decision based on reviewer feedback and the Pipeline Standards.
+
+## Instructions for reviewers
+
+Reviewers will receive a pipeline-specific review form containing the information and resources needed to complete their evaluation, including:
+
+- Instructions for accessing the pipeline through the online BEE platform.
+
+- Links to the relevant GitHub repository, branch, pull request, or source files.
+
+- Links to the pipeline description and supporting scientific documentation.
+
+- Any additional information or example datasets relevant to the review.
+
+Pipelines undergoing review will be available through the online BEE platform, so reviewers do not need to install BEE locally. The corresponding source code will be publicly accessible through GitHub, including pipelines that have not yet been merged into the main branch.
+
+### Step 1. Access BEE
+
+Reviewers can access BEE through the [online platform](https://auth.bee.geobon.org/).
+
+If you do not already have access, create a free [GEO BON account](https://members.geobon.org/) and follow the access instructions provided in your review form.
+
+### Step 2. Run the pipeline
+
+Locate the pipeline identified in your review form and run it using the provided example inputs and default parameters.
+
+Although the pipeline will have undergone initial testing by the BON in a Box team, reviewers are asked to independently verify that it runs successfully, produces the expected outputs, and provides clear input and output descriptions.
+
+### Step 3. Evaluate the methodology and documentation
+
+Review the pipeline description and relevant scientific references.
+
+Consider whether the methodology is appropriate, whether its assumptions and limitations are clearly explained, and whether the outputs are consistent with the intended application.
+
+### Step 4. Test different inputs and parameters
+
+Where possible, run the pipeline with different parameters, geographical areas, or datasets.
+
+We encourage reviewers to test the pipeline using data or study areas they are familiar with, as this can help identify unexpected results or methodological limitations that may not have been identified during initial testing.
+
+Document any errors, unexpected behaviour, or concerns in the review form.
+
+### Step 5. Review the code (where applicable)
+
+Reviewers with relevant programming experience are encouraged to examine the source code using the GitHub links provided in the review form.
+
+Code review may include checking the implementation of the scientific methodology, reproducibility, modularity, and error handling.
+
+Specific technical issues can be documented in the review form or raised directly through comments on the relevant GitHub pull request.
+
+### Step 6. Submit your review
+
+Complete the relevant sections of the review form, including your assessment of the pipeline, any recommended changes, and your overall recommendation.
+
+Reviewers are encouraged to provide detailed feedback within their areas of expertise but are not required to assess every aspect of the pipeline.
+
+Return the completed form to the BON in a Box team using the instructions provided with your review invitation.
 
 ## **Pipeline publication**
 
 When pipelines have been peer reviewed and are accepted, they will be published on [Zenodo](https://zenodo.org/) and given a DOI, which will be cited whenever the pipeline is used.
 
-## Instructions for reviewers
+## Review form
 
-Reviewers will need to install BON in a Box to test the pipeline. See the installation instructions [here](how_to_install.qmd).
-
-Download the pipeline review form to fill out while testing and reviewing the pipeline.
-
-1.  Run the pipeline with the default parameters and make sure that it works, that the pipeline, input, and output descriptions are clear, and that the outputs are useful. Users should be able to understand how to parameterize and run the pipeline using these descriptions.
-2.  Review the code in the GitHub pull request to make sure there are no errors and it is doing what it is supposed to (note: not all reviewers will be reviewing code, only reviewers that are familiar with the coding methods). If there are specific code issues, comment those directly in the pull request.
-3.  Read the markdown tutorial and evaluate it for clarity.
-4.  Test the pipeline several times with different parameters. If you have your own data on hand, test the pipeline with that data. It is preferential to test the data in areas or with parameters that you are familiar with so you can evaluate the accuracy of the results. If the pipeline crashes or there are incorrect results, make note of this in the pipeline review form.
-5.  Make a decision about whether the pipeline is ready to publish.
+Reviewers will receive a pipeline-specific review form with their invitation. The form includes the pipeline details, relevant links, evaluation criteria, and instructions for submitting feedback.
 
 #### [Download pipeline review form here](./peer_review_form.docx)

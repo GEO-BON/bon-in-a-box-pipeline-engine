@@ -3,32 +3,108 @@ title: "Contributing"
 format: html
 ---
 
-## Is your analysis pipeline a good fit?
+BON in a Box is a community-driven initiative that brings together scientific methods and expertise to support biodiversity monitoring and reporting.
 
-We are looking for pipelines that calculate biodiversity metrics that are relevant to policy and biodiversity reporting, such as Essential Biodiversity Variables (EBVs) and Indicators. These pipelines should be
+We welcome contributions from researchers, developers, and organizations interested in making biodiversity analyses more accessible, reproducible, and widely applicable.
 
--   open source, written in the coding languages R, Julia, or Python
+By contributing to the Biodiversity Evaluation Engine (BEE), you can help translate scientific research into practical tools that support biodiversity monitoring, conservation planning, and policy reporting.
 
--   relevant to many contexts (different species, countries, and regions)
+## Why contribute?
 
-## Steps for contributing
+Researchers around the world are developing methods to assess biodiversity change, but these methods are often difficult to access or apply beyond their original research context.
 
-We strongly encourage those who have created or are developing code to calculate Essential Biodiversity Variables or indicators to share it through BON in a Box. The purpose of the modeling tool is to have state of the art processing pipelines shared across the community, for the benefit of all. We recommend following these steps: 
+Contributing to BON in a Box helps make these methods available to a broader community while supporting open science, reproducibility, and collaboration.
 
-1.  Identify a workflow with a good potential for reuse by other organisations, and that can be mostly automated.
+Contributors can:
 
-2.  Draw a high-level view of the pipeline that identifies each step, the inputs and outputs, how the scripts are put together, and the format of the final results.
+- **Increase the impact of their research** by making analytical methods accessible to researchers, practitioners, and decision-makers.
 
-3.  Meet the BON in a Box team. We will help design the pipeline, ensuring that each step is modular, identifying scripts that are already in the modeling tool to avoid rewriting code, and finding places where the existing code would need to be modified. For example, using cloud-optimized approaches such as STAC and Parquet files instead of downloading large files during the pipeline’s execution.
+- **Support reproducible science** by sharing transparent, standardized analytical workflows.
 
-4.  Secure the resources. This could be the time of a graduate student or work study student. If applying for funding, include BON in a Box in your proposal as a tool.
+- **Collaborate with the GEO BON community** to improve and expand existing methods.
 
-5.  Create the pipeline following the steps below. We recommend starting with the simplest version and then adding complexity or features when needed.
+- **Support biodiversity monitoring and reporting** by helping countries and organizations calculate Essential Biodiversity Variables (EBVs) and biodiversity indicators.
 
-6.  When you feel that the pipeline is complete and you have verified that it meets the \[quality requirement standards\](pipeline_standards.qmd), you can submit the pipeline for peer review. While you are waiting, why not contribute by reviewing someone else’s contribution?
+## What can you contribute?
 
-7.  Once the reviews are complete, implement any necessary changes.
+We welcome several types of contributions, including:
 
-8.  If accepted, the pipeline will be published in BON in a Box and will receive a DOI for identification. Now, the pipeline can be used by others.
+- **New analytical pipelines:** Methods for calculating EBVs, biodiversity indicators, or other metrics relevant to biodiversity monitoring.
 
-**If you wish to contribute a pipeline, please email us at boninabox\@geobon.org.**
+- **Improvements to existing pipelines:** Updates to scientific methods, additional functionality, new data sources, or improvements to performance and usability.
+
+- **Individual scripts and technical contributions:** Reusable components, bug fixes, and improvements to the underlying platform.
+
+- **Documentation and testing:** Improvements that make BEE easier to understand, use, and maintain.
+
+### Is your analysis pipeline a good fit?
+
+We are particularly interested in pipelines that:
+
+- Calculate biodiversity metrics relevant to monitoring, conservation planning, and policy reporting.
+
+- Are open source and developed using supported programming languages, such as R, Python, or Julia.
+
+- Can be applied across different species, countries, regions, or monitoring contexts.
+
+- Can be automated and reproduced using clearly defined inputs, analytical steps, and outputs.
+
+Pipelines do not need to be fully developed or meet all technical requirements before you contact us. The BON in a Box team can help assess whether a proposed contribution is suitable and identify what may be needed for integration.
+
+For more details, see our [Pipeline Standards](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html).
+
+## How to contribute a pipeline
+
+We encourage contributors to get in touch early in the development process so that we can work together to make pipelines reusable, reproducible, and compatible with BEE.
+
+### Step 1. Get in touch
+
+Contact the BON in a Box team at [boninabox\@geobon.org](mailto:boninabox@geobon.org) to discuss your proposed contribution.
+
+We can help determine whether your method is a good fit, identify existing components that could be reused, and discuss the resources and technical support needed for integration.
+
+### Step 2. Design your pipeline
+
+Develop a high-level overview of the analytical workflow, including its inputs, processing steps, and expected outputs.
+
+The BON in a Box team can help identify opportunities to make the pipeline modular, generalizable, and compatible with existing BEE components.
+
+We recommend starting with a simple, functional version before adding more complex features.
+
+### Step 3. Develop and test
+
+Develop your pipeline following the [Pipeline Standards](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html), which outline requirements for documentation, reproducibility, usability, and technical integration.
+
+Contributors can work with the BON in a Box team to test their pipelines and ensure they function correctly within BEE.
+
+### Step 4. Peer review
+
+Once a pipeline is complete and meets the required standards, it can be submitted for peer review.
+
+The review process evaluates the scientific methodology, reproducibility, documentation, and usability of the pipeline.
+
+Contributors may be asked to make revisions based on reviewer feedback before the pipeline is accepted.
+
+For more information, see our [Peer Review Process](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/peer_review.html).
+
+### Step 5. Publication and continued development
+
+Once accepted, the pipeline can be published through BON in a Box and made available for use by the wider community.
+
+Published pipelines can receive a DOI, allowing the contribution to be identified and cited.
+
+Contributors are encouraged to continue improving their pipelines as new methods, datasets, and scientific knowledge become available.
+
+## Other ways to contribute
+
+You do not need to develop a complete analytical pipeline to contribute to BON in a Box.
+
+We also welcome contributions to existing pipelines, documentation, testing, and software development.
+
+You can explore our open-source repositories on the [GEO BON GitHub organization](https://github.com/GEO-BON) or contact the team to discuss opportunities to contribute.
+
+## Interested in contributing?
+
+Whether you have an existing analytical method, an idea for a new pipeline, or would like to support the development of BEE, we would be happy to hear from you.
+
+**Contact us at [boninabox\@geobon.org](mailto:boninabox@geobon.org) to discuss your contribution.**

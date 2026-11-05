@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.9.36">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,13 +12,10 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
+code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: 1.5em;}
-div.column{flex: auto;}
-@media screen {
-div.columns{gap: min(4vw, 1.5em);}
-div.column{overflow-x: auto;}
-}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -43,10 +40,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-845c23b38eaddc0f92fda52bfe77a8c8.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-602dfb0a92afd774e28d5a4761a4ce24.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-f9da83f35c8a9777c3928170ebd7038e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -101,12 +98,12 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./how_to_install.html"> 
-<span class="menu-text">Install</span></a>
+    <a class="nav-link" href="./how_to_use.html"> 
+<span class="menu-text">User guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./how_to_use.html"> 
-<span class="menu-text">User Guide</span></a>
+    <a class="nav-link" href="./how_to_install.html"> 
+<span class="menu-text">How to install</span></a>
   </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribute-a-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
@@ -124,6 +121,10 @@ ul.task-list li input[type="checkbox"] {
         <li>
     <a class="dropdown-item" href="./pipeline_standards.html">
  <span class="dropdown-text">Pipeline standards</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./openEO.html">
+ <span class="dropdown-text">openEO integration</span></a>
   </li>  
     </ul>
   </li>
@@ -149,9 +150,25 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#when-is-a-pipeline-ready-for-peer-review" id="toc-when-is-a-pipeline-ready-for-peer-review" class="nav-link active" data-scroll-target="#when-is-a-pipeline-ready-for-peer-review"><strong>When is a pipeline ready for peer review?</strong></a></li>
+  <li><a href="#when-is-a-pipeline-ready-for-peer-review" id="toc-when-is-a-pipeline-ready-for-peer-review" class="nav-link active" data-scroll-target="#when-is-a-pipeline-ready-for-peer-review">When is a pipeline ready for peer review?</a></li>
+  <li><a href="#how-does-the-peer-review-process-work" id="toc-how-does-the-peer-review-process-work" class="nav-link" data-scroll-target="#how-does-the-peer-review-process-work">How does the peer-review process work?</a>
+  <ul class="collapse">
+  <li><a href="#reviewer-selection" id="toc-reviewer-selection" class="nav-link" data-scroll-target="#reviewer-selection">1. Reviewer selection</a></li>
+  <li><a href="#pipeline-evaluation" id="toc-pipeline-evaluation" class="nav-link" data-scroll-target="#pipeline-evaluation">2. Pipeline evaluation</a></li>
+  <li><a href="#review-feedback-and-revisions" id="toc-review-feedback-and-revisions" class="nav-link" data-scroll-target="#review-feedback-and-revisions">3. Review feedback and revisions</a></li>
+  <li><a href="#review-outcome" id="toc-review-outcome" class="nav-link" data-scroll-target="#review-outcome">4. Review outcome</a></li>
+  </ul></li>
+  <li><a href="#instructions-for-reviewers" id="toc-instructions-for-reviewers" class="nav-link" data-scroll-target="#instructions-for-reviewers">Instructions for reviewers</a>
+  <ul class="collapse">
+  <li><a href="#step-1.-access-bee" id="toc-step-1.-access-bee" class="nav-link" data-scroll-target="#step-1.-access-bee">Step 1. Access BEE</a></li>
+  <li><a href="#step-2.-run-the-pipeline" id="toc-step-2.-run-the-pipeline" class="nav-link" data-scroll-target="#step-2.-run-the-pipeline">Step 2. Run the pipeline</a></li>
+  <li><a href="#step-3.-evaluate-the-methodology-and-documentation" id="toc-step-3.-evaluate-the-methodology-and-documentation" class="nav-link" data-scroll-target="#step-3.-evaluate-the-methodology-and-documentation">Step 3. Evaluate the methodology and documentation</a></li>
+  <li><a href="#step-4.-test-different-inputs-and-parameters" id="toc-step-4.-test-different-inputs-and-parameters" class="nav-link" data-scroll-target="#step-4.-test-different-inputs-and-parameters">Step 4. Test different inputs and parameters</a></li>
+  <li><a href="#step-5.-review-the-code-where-applicable" id="toc-step-5.-review-the-code-where-applicable" class="nav-link" data-scroll-target="#step-5.-review-the-code-where-applicable">Step 5. Review the code (where applicable)</a></li>
+  <li><a href="#step-6.-submit-your-review" id="toc-step-6.-submit-your-review" class="nav-link" data-scroll-target="#step-6.-submit-your-review">Step 6. Submit your review</a></li>
+  </ul></li>
   <li><a href="#pipeline-publication" id="toc-pipeline-publication" class="nav-link" data-scroll-target="#pipeline-publication"><strong>Pipeline publication</strong></a></li>
-  <li><a href="#instructions-for-reviewers" id="toc-instructions-for-reviewers" class="nav-link" data-scroll-target="#instructions-for-reviewers">Instructions for reviewers</a></li>
+  <li><a href="#review-form" id="toc-review-form" class="nav-link" data-scroll-target="#review-form">Review form</a></li>
   </ul>
 </nav>
     </div>
@@ -177,43 +194,140 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>Each pipeline will be reviewed by 2-5 people for scientific rigor, usability, and generalizability. The contributor will suggest potential reviewers, and they will be contacted by the BON in a Box team. Additional reviewers will be chosen by the BON in a Box team. It is encouraged to have reviewers from both the academic and policy sphere (e.g.&nbsp;a government scientist). The contributor will specify whether the pipeline is a pipeline for reporting, a pipeline for BONs, or a sampling prioritization pipeline.</p>
-<p>The pipelines will be reviewed based on the following criteria:</p>
+<p>To ensure that analytical pipelines available through the Biodiversity Evaluation Engine (BEE) are scientifically robust, reproducible, and accessible, BON in a Box has established a peer-review process for contributed pipelines.</p>
+<p>The review process evaluates the scientific methodology, technical functionality, generalizability, documentation, and usability of each pipeline. It also provides an opportunity for researchers and practitioners to contribute their expertise to improving the tools available through BEE.</p>
+<p>Pipelines are typically reviewed by 2–5 experts with complementary scientific, technical, or practical expertise. Where possible, we aim to include reviewers from both the academic and biodiversity monitoring or policy communities.</p>
+<section id="when-is-a-pipeline-ready-for-peer-review" class="level2">
+<h2 class="anchored" data-anchor-id="when-is-a-pipeline-ready-for-peer-review">When is a pipeline ready for peer review?</h2>
+<p>Before a pipeline is submitted for external review, the BON in a Box team works with contributors to ensure that it:</p>
 <ul>
-<li><p><strong>Scientific rigor:</strong> are the models scientifically robust and accurate? Is it supported by peer reviewed literature?</p></li>
-<li><p><strong>Generalizability:</strong> does the pipeline work for different regions, species, scales, etc.? If not, are these limitations communicated clearly?</p></li>
-<li><p><strong>Code readability:</strong> Is the code easy to read, understandable, and well documented?</p></li>
-<li><p><strong>Modularity:</strong> Is the code divided into logical, modular steps where each script performs one task?</p></li>
-<li><p><strong>Data use:</strong> Does the pipeline support both user data and publicly available data? Is this data loaded with an API or will it require updating? Are users able to easily access this data?</p></li>
-<li><p><strong>Functionality:</strong> Does the pipeline run? Or are there bugs?&nbsp;</p></li>
-<li><p><strong>Documentation:</strong> Is there metadata for both the individual scripts and the pipeline? Is there a markdown tutorial?</p></li>
-<li><p><strong>Usability:</strong> Is the pipeline easy to use and understand for a non expert? Is there adequate guidance on how to parameterize it?</p></li>
+<li><p>Meets the requirements outlined in the <a href="./pipeline_standards.html">Pipeline Standards</a>.</p></li>
+<li><p>Runs successfully using the provided example inputs and default parameters.</p></li>
+<li><p>Has undergone initial testing with different input data, parameters, and geographical contexts, where applicable.</p></li>
+<li><p>Produces scientifically reasonable results consistent with the underlying methodology.</p></li>
+<li><p>Includes input and output descriptions, documentation, and a user tutorial.</p></li>
+<li><p>Has its code available in the BON in a Box GitHub repository, either in the main branch or in a development branch or pull request.</p></li>
 </ul>
-<p>The reviewers will test the pipeline with a number of data sets, species, and scales based on their expertise, and provide feedback. The reviewer will decide if the pipeline should be accepted with minor revisions, needs to be revised and resubmitted, or is not suitable for BON in a Box.</p>
-<section id="when-is-a-pipeline-ready-for-peer-review" class="level3">
-<h3 class="anchored" data-anchor-id="when-is-a-pipeline-ready-for-peer-review"><strong>When is a pipeline ready for peer review?</strong></h3>
-<p>Pipelines are ready for peer review when:</p>
+<p>The BON in a Box team conducts initial testing and technical checks before inviting external reviewers. <strong>External reviewers are then asked to conduct additional, independent testing</strong> to evaluate the pipeline’s functionality, scientific validity, and applicability across different contexts.</p>
+</section>
+<section id="how-does-the-peer-review-process-work" class="level2">
+<h2 class="anchored" data-anchor-id="how-does-the-peer-review-process-work">How does the peer-review process work?</h2>
+<section id="reviewer-selection" class="level3">
+<h3 class="anchored" data-anchor-id="reviewer-selection">1. Reviewer selection</h3>
+<p>The pipeline contributor may suggest potential reviewers with relevant expertise. Additional reviewers will be identified by the BON in a Box team.</p>
+<p>We aim to select reviewers with complementary expertise across three areas:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 36%">
+<col style="width: 63%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Preferred reviewer type</th>
+<th>Primary areas of expertise</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Scientific expert</strong></td>
+<td>Scientific methodology, assumptions, validation, and interpretation of results</td>
+</tr>
+<tr class="even">
+<td><strong>Applied biodiversity monitoring expert</strong></td>
+<td>Generalizability, usability, and relevance to biodiversity monitoring, conservation planning, and reporting</td>
+</tr>
+<tr class="odd">
+<td><strong>Technical expert</strong></td>
+<td>Code quality, reproducibility, data handling, and pipeline functionality</td>
+</tr>
+</tbody>
+</table>
+<p>These categories are intended to guide reviewer selection rather than establish rigid roles. Reviewers may have expertise in multiple areas, and are not expected to evaluate aspects outside their expertise.</p>
+<p>Reviewers are invited by the BON in a Box team and provided with the materials needed to evaluate the pipeline.</p>
+</section>
+<section id="pipeline-evaluation" class="level3">
+<h3 class="anchored" data-anchor-id="pipeline-evaluation">2. Pipeline evaluation</h3>
+<p>Reviewers are asked to evaluate the pipeline using a standardized review form, focusing on the following criteria:</p>
 <ul>
-<li><p>The pipeline meets all of the <a href="./pipeline_standards.html">quality requirements</a></p></li>
-<li><p>The pipeline runs without errors with the default parameters (examples passed into the YAML file), and with different inputs and outputs, including publicly available data or user data</p></li>
-<li><p>The pipeline has been tested with different parameters (geographical areas, ecosystems, scales, and species) and the results make sense</p></li>
+<li><p><strong>Scientific rigor:</strong> Is the methodology scientifically supported and correctly implemented? Are the assumptions and limitations clearly communicated?</p></li>
+<li><p><strong>Generalizability:</strong> Can the pipeline be applied across different geographical areas, species, ecosystems, or scales, where appropriate?</p></li>
+<li><p><strong>Functionality:</strong> Does the pipeline run successfully and produce the expected outputs?</p></li>
+<li><p><strong>Data use:</strong> Are input datasets appropriate, accessible, and clearly documented? Can users provide their own data where relevant?</p></li>
+<li><p><strong>Usability:</strong> Are the inputs, parameters, and outputs understandable to users without extensive programming experience?</p></li>
+<li><p><strong>Documentation:</strong> Are the methodology, inputs, outputs, and interpretation of results adequately explained?</p></li>
+<li><p><strong>Code quality:</strong> Is the code readable, modular, reproducible, and appropriately documented?</p></li>
 </ul>
+<p>Reviewers are encouraged to focus on the criteria most relevant to their expertise. <strong>They do not need to complete every section of the review form</strong>, but should provide sufficient feedback to support an assessment of the pipeline.</p>
+</section>
+<section id="review-feedback-and-revisions" class="level3">
+<h3 class="anchored" data-anchor-id="review-feedback-and-revisions">3. Review feedback and revisions</h3>
+<p>Reviewers submit their completed review forms to the BON in a Box team, including identified issues, recommendations, and an overall assessment of the pipeline.</p>
+<p>The completed review forms serve as the formal record of the review. The BON in a Box team consolidates feedback and works with pipeline contributors to address reviewer comments.</p>
+<p>Specific technical changes, bugs, and requested improvements are tracked through GitHub issues or pull-request comments, allowing contributors and the BON in a Box team to document and monitor revisions.</p>
+<p>Depending on the extent of the revisions required, reviewers may be invited to reassess the pipeline before a final decision is made.</p>
+</section>
+<section id="review-outcome" class="level3">
+<h3 class="anchored" data-anchor-id="review-outcome">4. Review outcome</h3>
+<p>Following the review, a pipeline may be:</p>
+<ul>
+<li><p><strong>Accepted with minor revisions:</strong> The pipeline meets the main scientific and technical requirements, with only minor changes needed before publication.</p></li>
+<li><p><strong>Revisions required:</strong> More substantial changes are needed, and the pipeline may require additional review.</p></li>
+<li><p><strong>Not accepted:</strong> The pipeline does not currently meet the requirements for inclusion in BEE.</p></li>
+</ul>
+<p>The BON in a Box team coordinates the final decision based on reviewer feedback and the Pipeline Standards.</p>
+</section>
+</section>
+<section id="instructions-for-reviewers" class="level2">
+<h2 class="anchored" data-anchor-id="instructions-for-reviewers">Instructions for reviewers</h2>
+<p>Reviewers will receive a pipeline-specific review form containing the information and resources needed to complete their evaluation, including:</p>
+<ul>
+<li><p>Instructions for accessing the pipeline through the online BEE platform.</p></li>
+<li><p>Links to the relevant GitHub repository, branch, pull request, or source files.</p></li>
+<li><p>Links to the pipeline description and supporting scientific documentation.</p></li>
+<li><p>Any additional information or example datasets relevant to the review.</p></li>
+</ul>
+<p>Pipelines undergoing review will be available through the online BEE platform, so reviewers do not need to install BEE locally. The corresponding source code will be publicly accessible through GitHub, including pipelines that have not yet been merged into the main branch.</p>
+<section id="step-1.-access-bee" class="level3">
+<h3 class="anchored" data-anchor-id="step-1.-access-bee">Step 1. Access BEE</h3>
+<p>Reviewers can access BEE through the <a href="https://auth.bee.geobon.org/">online platform</a>.</p>
+<p>If you do not already have access, create a free <a href="https://members.geobon.org/">GEO BON account</a> and follow the access instructions provided in your review form.</p>
+</section>
+<section id="step-2.-run-the-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="step-2.-run-the-pipeline">Step 2. Run the pipeline</h3>
+<p>Locate the pipeline identified in your review form and run it using the provided example inputs and default parameters.</p>
+<p>Although the pipeline will have undergone initial testing by the BON in a Box team, reviewers are asked to independently verify that it runs successfully, produces the expected outputs, and provides clear input and output descriptions.</p>
+</section>
+<section id="step-3.-evaluate-the-methodology-and-documentation" class="level3">
+<h3 class="anchored" data-anchor-id="step-3.-evaluate-the-methodology-and-documentation">Step 3. Evaluate the methodology and documentation</h3>
+<p>Review the pipeline description and relevant scientific references.</p>
+<p>Consider whether the methodology is appropriate, whether its assumptions and limitations are clearly explained, and whether the outputs are consistent with the intended application.</p>
+</section>
+<section id="step-4.-test-different-inputs-and-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="step-4.-test-different-inputs-and-parameters">Step 4. Test different inputs and parameters</h3>
+<p>Where possible, run the pipeline with different parameters, geographical areas, or datasets.</p>
+<p>We encourage reviewers to test the pipeline using data or study areas they are familiar with, as this can help identify unexpected results or methodological limitations that may not have been identified during initial testing.</p>
+<p>Document any errors, unexpected behaviour, or concerns in the review form.</p>
+</section>
+<section id="step-5.-review-the-code-where-applicable" class="level3">
+<h3 class="anchored" data-anchor-id="step-5.-review-the-code-where-applicable">Step 5. Review the code (where applicable)</h3>
+<p>Reviewers with relevant programming experience are encouraged to examine the source code using the GitHub links provided in the review form.</p>
+<p>Code review may include checking the implementation of the scientific methodology, reproducibility, modularity, and error handling.</p>
+<p>Specific technical issues can be documented in the review form or raised directly through comments on the relevant GitHub pull request.</p>
+</section>
+<section id="step-6.-submit-your-review" class="level3">
+<h3 class="anchored" data-anchor-id="step-6.-submit-your-review">Step 6. Submit your review</h3>
+<p>Complete the relevant sections of the review form, including your assessment of the pipeline, any recommended changes, and your overall recommendation.</p>
+<p>Reviewers are encouraged to provide detailed feedback within their areas of expertise but are not required to assess every aspect of the pipeline.</p>
+<p>Return the completed form to the BON in a Box team using the instructions provided with your review invitation.</p>
+</section>
 </section>
 <section id="pipeline-publication" class="level2">
 <h2 class="anchored" data-anchor-id="pipeline-publication"><strong>Pipeline publication</strong></h2>
 <p>When pipelines have been peer reviewed and are accepted, they will be published on <a href="https://zenodo.org/">Zenodo</a> and given a DOI, which will be cited whenever the pipeline is used.</p>
 </section>
-<section id="instructions-for-reviewers" class="level2">
-<h2 class="anchored" data-anchor-id="instructions-for-reviewers">Instructions for reviewers</h2>
-<p>Reviewers will need to install BON in a Box to test the pipeline. See the installation instructions <a href="./how_to_install.html">here</a>.</p>
-<p>Download the pipeline review form to fill out while testing and reviewing the pipeline.</p>
-<ol type="1">
-<li>Run the pipeline with the default parameters and make sure that it works, that the pipeline, input, and output descriptions are clear, and that the outputs are useful. Users should be able to understand how to parameterize and run the pipeline using these descriptions.</li>
-<li>Review the code in the GitHub pull request to make sure there are no errors and it is doing what it is supposed to (note: not all reviewers will be reviewing code, only reviewers that are familiar with the coding methods). If there are specific code issues, comment those directly in the pull request.</li>
-<li>Read the markdown tutorial and evaluate it for clarity.</li>
-<li>Test the pipeline several times with different parameters. If you have your own data on hand, test the pipeline with that data. It is preferential to test the data in areas or with parameters that you are familiar with so you can evaluate the accuracy of the results. If the pipeline crashes or there are incorrect results, make note of this in the pipeline review form.</li>
-<li>Make a decision about whether the pipeline is ready to publish.</li>
-</ol>
+<section id="review-form" class="level2">
+<h2 class="anchored" data-anchor-id="review-form">Review form</h2>
+<p>Reviewers will receive a pipeline-specific review form with their invitation. The form includes the pipeline details, relevant links, evaluation criteria, and instructions for submitting feedback.</p>
 <section id="download-pipeline-review-form-here" class="level4">
 <h4 class="anchored" data-anchor-id="download-pipeline-review-form-here"><a href="./peer_review_form.docx">Download pipeline review form here</a></h4>
 
