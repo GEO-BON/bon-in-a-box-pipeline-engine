@@ -251,7 +251,7 @@ inputs:
 
 steps:
   prepareRunnerEnv:
-    doc: 
+    doc:
       Copy or download environment file (runner.env) into a CWL output.
       This step is a patch to go around issue https://github.com/common-workflow-language/cwltool/issues/1842.
     when: $(inputs.environment != null)
@@ -267,24 +267,29 @@ steps:
         EnvVarRequirement:
           envDef:
             RUNNER_ENV_URI: $(inputs.environment)
-      baseCommand: [ bash, -c ]
+      baseCommand: [ sh, -c ]
       arguments:
         - |
           echo "Preparing runner.env..."
-          
-          if [[ "$RUNNER_ENV_URI" == http://* ||
-                  "$RUNNER_ENV_URI" == https://* ||
-                  "$RUNNER_ENV_URI" == file://* ]]; then
-            if ! curl -fsSL "$RUNNER_ENV_URI" -o runner.env; then
-              echo "ERROR: failed to download runner.env from $RUNNER_ENV_URI" >&2
+
+          case "$RUNNER_ENV_URI" in
+            http://*|https://*|file://*)
+              if ! curl -fsSL "$RUNNER_ENV_URI" -o runner.env; then
+                echo "ERROR: failed to download runner.env from $RUNNER_ENV_URI" >&2
+                exit 1
+              fi
+
+              if ! . ./runner.env; then
+                echo "ERROR: failed to source runner.env" >&2
+                exit 1
+              fi
+              ;;
+            *)
+              echo "ERROR: environment file input, BON in a Box's "runner.env", was not provided as an URI." >&2
+              echo "Please use the format file:// or https://" >&2
               exit 1
-            fi
-            source runner.env
-          else
-            echo "ERROR: environment file input, BON in a Box's "runner.env", was not provided as an URI." >&2
-            echo "Please use the format file:// or https://" >&2
-            exit 1;
-          fi
+              ;;
+          esac
       inputs:
         environment:
           type: string
@@ -336,14 +341,14 @@ steps:
         - |
           echo "Exporting all environments"
           mkdir -p "$OUTPUT_LOCATION" "$CONDA_PKGS_DIRS" /conda-env-yml/envs
-          
+
           function getPackedEnv {
             condaEnvName=$1
             condaEnvYml=$2
             # We use a dedicated env folder to avoid copying the whole env folder between steps in a k8 context
             dedicatedEnvFolder=$(inputs.envFolderWrite.path)/$condaEnvName
             mkdir -p "$dedicatedEnvFolder"
-            
+
             echo "Exporting $condaEnvName..."
             source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh "$OUTPUT_LOCATION" "$condaEnvName" \
               "$condaEnvYml" "$dedicatedEnvFolder" "$CONDA_PACK_URL" --noActivate
