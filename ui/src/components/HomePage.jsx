@@ -1,8 +1,10 @@
 import GreenSquares from "../img/greenSquares.png";
 import BigGreenBoxes from "../img/bigGreenSquares.png"
 import { LastNRuns } from "./RunHistory";
+import { Trans, useTranslation } from "react-i18next";
 
 export default function HomePage() {
+    const { t } = useTranslation();
     return (
         <div className="homepage-background-images"
             style={{
@@ -19,23 +21,16 @@ export default function HomePage() {
                     <h1 className="home-page-pre-title"
                     >BON in a Box</h1>
                     <h1 className="home-page-title"
-                    >Biodiversity Evaluation Engine</h1>
+                    >{t("home.title")}</h1>
                 </div>
                 <p style={{
                     lineHeight: "1.75",
                     textAlign: "justify"
                 }} >
-                    The Biodiversity Evaluation Engine is an open tool aiming to enhance the capacity of
-                    Biodiversity Observation Networks and countries to report on biodiversity effectively.
-
-                    It connects individual analyses scripts into automated pipelines that convert data into
-                    Essential Biodiversity Variables (EBVs) and indicators.
-
-                    These community-built pipelines can analyze public or user datasets, and can be
-                    shared for auditability, reproducibility, and transparency.
+                    {t("home.description")}
                 </p>
                 <p>
-                    Developed by <a href="https://geobon.org">GEO BON</a>.
+                    <Trans i18nKey="home.developedBy" components={{ brand: <a href="https://geobon.org" /> }} />
                 </p>
             </div>
         </div>
@@ -43,7 +38,7 @@ export default function HomePage() {
         <div className="green-separator"></div>
         <div className="home-page-content" >
 
-            <div className="home-page-subtitle">FEATURED PIPELINES</div>
+            <div className="home-page-subtitle">{t("home.featured")}</div>
 
             <div className="pipeline-columns">
 
@@ -51,11 +46,11 @@ export default function HomePage() {
                 <ul className="pipeline-bullets"> {/* change to a dropdown menu (kinda) */}
                     <li className="dna-bullet">
                         <div className="home-tooltip right">
-                            Genetic Diversity Indicator
+                            {t("home.geneticDiversity")}
                             <div className="tooltip-wrapper">
                                 <div className="tooltiptext">
-                                    Are populations maintaining genetic diversity? <br></br>
-                                    <a href="https://boninabox.geobon.org/indicator?i=GeneticDiversity" target="_blank">More info</a>      |       <a href="/pipeline-form/GenesFromSpace>ToolComponents>GetIndicators>GFS_Indicators">Run pipeline</a>
+                                    {t("home.geneticQuestion")} <br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=GeneticDiversity" target="_blank">{t("home.moreInfo")}</a>      |       <a href="/pipeline-form/GenesFromSpace>ToolComponents>GetIndicators>GFS_Indicators">{t("home.runPipeline")}</a>
                                 </div>
                             </div>
                         </div>
@@ -63,22 +58,22 @@ export default function HomePage() {
                     </li>
                     <li className="paw-bullet">
                         <div className="home-tooltip right">
-                            Red List Index
+                            {t("home.redList")}
                             <div className="tooltip-wrapper">
                                 <div className="tooltiptext"
-                                    >Is there recovery of threatened species?<br></br>
-                                    <a href="https://boninabox.geobon.org/indicator?i=RLI" target="_blank">More info</a>      |       <a href="/pipeline-form/RLI_pipeline>IUCN_RLI_pipeline">Run pipeline</a>
+                                    >{t("home.redListQuestion")}<br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=RLI" target="_blank">{t("home.moreInfo")}</a>      |       <a href="/pipeline-form/RLI_pipeline>IUCN_RLI_pipeline">{t("home.runPipeline")}</a>
                                 </div>
                             </div>
                         </div>
                     </li>
                     <li className="graph-bullet">
                         <div className="home-tooltip right">
-                            Protected Connected Index
+                            {t("home.protectedConnected")}
                             <div className="tooltip-wrapper">
                                 <div className="tooltiptext"
-                                    >How much area is covered by well-connected protected areas?<br></br>
-                                    <a href="https://boninabox.geobon.org/indicator?i=ProtConn" target="_blank">More info</a>      |       <a href="/pipeline-form/Protconn-pipeline>ProtConn_pipeline">Run pipeline</a>
+                                    >{t("home.protectedQuestion")}<br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=ProtConn" target="_blank">{t("home.moreInfo")}</a>      |       <a href="/pipeline-form/Protconn-pipeline>ProtConn_pipeline">{t("home.runPipeline")}</a>
                                 </div>
                             </div>
                         </div>
@@ -90,11 +85,11 @@ export default function HomePage() {
             <div className="column">    {/* right column */}
                 <ul className="pipeline-bullets">
                 <li className="tree-bullet">
-                        <div className="home-tooltip left">Species Habitat Index
+                        <div className="home-tooltip left">{t("home.habitat")}
                             <div className="tooltip-wrapper">
                                 <div className="tooltiptext"
-                                    >Are species losing or gaining habitat? <br></br>
-                                    <a href="https://boninabox.geobon.org/indicator?i=SHI" target="_blank">More info</a>      |       <a href="/pipeline-form/SHI>SHI_GFW">Run pipeline</a>
+                                    >{t("home.habitatQuestion")} <br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=SHI" target="_blank">{t("home.moreInfo")}</a>      |       <a href="/pipeline-form/SHI>SHI_GFW">{t("home.runPipeline")}</a>
                                 </div>
                             </div>
                         </div>
@@ -103,11 +98,11 @@ export default function HomePage() {
 
                     <li className="world-bullet">
                         <div className="home-tooltip left">
-                            Species Distribution Models with Boosted Regression Trees
+                            {t("home.distribution")}
                             <div className="tooltip-wrapper">
                                 <div className="tooltiptext"
-                                    >Where are species likely to be?<br></br>
-                                    <a href="https://boninabox.geobon.org/indicator?i=SDM" target="_blank">More info</a>      |       <a href="/pipeline-form/SDM>SDM_BRT">Run pipeline</a>
+                                    >{t("home.distributionQuestion")}<br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=SDM" target="_blank">{t("home.moreInfo")}</a>      |       <a href="/pipeline-form/SDM>SDM_BRT">{t("home.runPipeline")}</a>
                                 </div>
                             </div>
                         </div>
@@ -117,11 +112,11 @@ export default function HomePage() {
 
                     <li className="leaf-bullet">
                         <div className="home-tooltip left">
-                            Biodiversity Intactness Index
+                            {t("home.intactness")}
                             <div className="tooltip-wrapper">
                                 <div className="tooltiptext"
-                                    >How much are species abundances changing?<br></br>
-                                    <a href="https://boninabox.geobon.org/indicator?i=BII" target="_blank">More info</a>      |       <a href="/pipeline-form/BII>BII">Run pipeline</a>
+                                    >{t("home.intactnessQuestion")}<br></br>
+                                    <a href="https://boninabox.geobon.org/indicator?i=BII" target="_blank">{t("home.moreInfo")}</a>      |       <a href="/pipeline-form/BII>BII">{t("home.runPipeline")}</a>
                                 </div>
                             </div>
                         </div>
@@ -129,7 +124,7 @@ export default function HomePage() {
                 </ul>
 
                 <p style={{ float: "right" }}>
-                    <a href="/pipeline-form">View All</a>
+                    <a href="/pipeline-form">{t("home.viewAll")}</a>
                 </p>
             </div>
 

@@ -20,26 +20,29 @@ import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";
 import { uiContext } from "./uiContext.jsx";
 import getUserInfo from "./utils/getUserInfo.js";
+import { useTranslation } from "react-i18next";
+import LanguageSelector from "./components/LanguageSelector";
 
 function TopMenu() {
+  const { t } = useTranslation();
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const { disableMyFiles, savePipelineToServer, chatEnabled } =
     React.useContext(uiContext);
   const [userInfo, setUserInfo] = React.useState({ name: "FirstName" });
 
   const pages = [
-    { title: "Home", link: "/" },
-    { title: "Run a script", link: "/script-form" },
-    { title: "Run a pipeline", link: "/pipeline-form" },
+    { title: t("navigation.home"), link: "/" },
+    { title: t("navigation.runScript"), link: "/script-form" },
+    { title: t("navigation.runPipeline"), link: "/pipeline-form" },
     // This one array feeds both the mobile menu and the desktop bar below, so
     // dropping the entry here is all it takes to hide chat in both.
-    ...(chatEnabled ? [{ title: "Chat", link: "/chat" }] : []),
+    ...(chatEnabled ? [{ title: t("navigation.chat"), link: "/chat" }] : []),
     {
-      title: savePipelineToServer ? "Pipeline editor" : "Pipeline inspector",
+      title: t(savePipelineToServer ? "navigation.editor" : "navigation.inspector"),
       link: "/pipeline-editor",
     },
-    { title: "History", link: "/history" },
-    { title: "Info", link: "/info" },
+    { title: t("navigation.history"), link: "/history" },
+    { title: t("navigation.info"), link: "/info" },
   ];
 
   React.useEffect(() => {
@@ -120,14 +123,14 @@ function TopMenu() {
             <img
               id="logo"
               src={BiaBLogo}
-              alt="BON in a Box logo"
+              alt={t("navigation.logo")}
               style={{ display: { xs: "block", sm: "none" } }}
             />
           </Box>
           <Box sx={{ flexGrow: 1, display: { xs: "flex", lg: "none" } }}>
             <IconButton
               size="large"
-              aria-label="hamburger menu"
+              aria-label={t("navigation.menu")}
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleOpenNavMenu}
@@ -154,10 +157,10 @@ function TopMenu() {
             >
               {pages.map((page) => (
                 <MenuItem
-                  key={`nav-sm-${page.title}`}
+                  key={`nav-sm-${page.link}`}
                   onClick={() => handleCloseNavMenu()}
                 >
-                  <NavLink key={page.title} to={page.link}>
+                  <NavLink to={page.link}>
                     {page.title}
                   </NavLink>
                 </MenuItem>
@@ -171,7 +174,7 @@ function TopMenu() {
                   key="Help"
                   to="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/"
                 >
-                  Help
+                  {t("navigation.help")}
                 </NavLink>
               </MenuItem>
             </Menu>
@@ -185,7 +188,7 @@ function TopMenu() {
           >
             {pages.map((page) => (
               <NavLink
-                key={`nav-lg-${page.title}`}
+                key={`nav-lg-${page.link}`}
                 className="navigation-bar-link"
                 to={page.link}
               >
@@ -201,18 +204,23 @@ function TopMenu() {
               flexWrap: "wrap",
             }}
           >
-            <div
+            <button
+              type="button"
               ref={toggleButtonRef}
               onClick={togglePopup}
               className="navigation-bar-profile-container"
+              aria-label={t("navigation.userMenu")}
+              aria-expanded={isPopupOpen}
+              aria-controls={shouldRender ? "user-menu" : undefined}
             >
-              <img className="navigation-bar-avatar" src={Avatar}></img>
+              <img className="navigation-bar-avatar" src={Avatar} alt="" />
               <p className="navigation-bar-profile">{userInfo.name}</p>
-            </div>
+            </button>
 
             {/* popup for user space */}
             {shouldRender && (
               <Box
+                id="user-menu"
                 ref={popupRef}
                 className={`navbar-profile-popup ${isPopupOpen ? "fade-in" : "fade-out"}`}
                 onAnimationEnd={handleAnimationEnd}
@@ -225,6 +233,9 @@ function TopMenu() {
                                 User space
                             </NavLink> */}
 
+                <LanguageSelector />
+                <div className="divider"></div>
+
                 {!disableMyFiles && (
                   <NavLink
                     to="/manage-files"
@@ -234,7 +245,7 @@ function TopMenu() {
                       src={IconFiles}
                       className="navbar-profile-popup-icon"
                     ></img>
-                    My files
+                    {t("navigation.files")}
                   </NavLink>
                 )}
 
@@ -246,7 +257,7 @@ function TopMenu() {
                     src={IconProfile}
                     className="navbar-profile-popup-icon"
                   ></img>
-                  GEO BON profile
+                  {t("navigation.profile")}
                 </NavLink>
 
                 <NavLink
@@ -268,7 +279,7 @@ function TopMenu() {
                     src={IconMembers}
                     className="navbar-profile-popup-icon"
                   ></img>
-                  Members
+                  {t("navigation.members")}
                 </NavLink>
 
                 <div className="divider"></div>
@@ -281,7 +292,7 @@ function TopMenu() {
                     src={IconLogout}
                     className="navbar-profile-popup-icon"
                   ></img>
-                  Log out
+                  {t("navigation.logout")}
                 </NavLink>
               </Box>
             )}
@@ -290,8 +301,9 @@ function TopMenu() {
               to="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/"
               target="_blank"
               className="navigation-bar-link help-link"
+              aria-label={t("navigation.help")}
             >
-              <HelpIcon alt="Help" style={{ width: "1.2em", height: "auto" }} />
+              <HelpIcon style={{ width: "1.2em", height: "auto" }} />
             </NavLink>
           </Box>
         </Toolbar>

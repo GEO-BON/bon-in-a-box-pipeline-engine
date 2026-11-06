@@ -29,6 +29,7 @@ import Warning from "@mui/icons-material/Warning";
 import yaml from "js-yaml";
 import debounce from "lodash.debounce";
 import FilterMenu from "./FilterMenu";
+import { useTranslation } from "react-i18next";
 
 
 export const api = new BonInABoxScriptService.DefaultApi();
@@ -155,28 +156,16 @@ export default function RunHistory() {
 }
 
 export const LastNRuns = ({ n }) => {
+  const { t } = useTranslation();
   const [lastRuns, setLastRuns] = useState(null);
 
   useEffect(() => {
     api.getHistory({ start: 0, limit: n }, (error, _, response) => {
-      let resp = null;
       if (!error && response && response.body) {
-        if (response.body.length > 0) {
-          resp = (
-            <Grid container spacing={3}>
-              {response.body.map((res, i) => (
-                <RunCard key={i} run={res} />
-              ))}
-            </Grid>
-          );
-        } else {
-          resp = <p>There are currently no runs to display.</p>
-        }
-
+        setLastRuns({ runs: response.body });
       } else {
-        resp = <p>Failed to retrieve latest runs.</p>
+        setLastRuns({ error: true });
       }
-      setLastRuns(resp);
     });
   }, [n]);
 
@@ -186,9 +175,13 @@ export const LastNRuns = ({ n }) => {
         className="home-page-subtitle"
         style={{ marginTop: "30px", marginBottom: "20px" }}
       >
-        LATEST RUNS
+        {t("home.latestRuns")}
       </div>
-      {lastRuns}
+      {lastRuns.error ? <p>{t("home.runsError")}</p> : lastRuns.runs.length === 0
+        ? <p>{t("home.noRuns")}</p>
+        : <Grid container spacing={3}>
+            {lastRuns.runs.map((run, i) => <RunCard key={i} run={run} />)}
+          </Grid>}
     </div>
   )
 };
@@ -269,6 +262,7 @@ const PreviousNext = (props) => {
 };
 
 const RunCard = (props) => {
+  const { t, i18n } = useTranslation();
   const { run } = props;
   const [expanded, setExpanded] = useState(false);
   const [desc, setDesc] = useState("");
@@ -323,7 +317,7 @@ const RunCard = (props) => {
                 </Avatar>
               }
               title={run.runId.substring(0, index)}
-              subheader={date.toLocaleString(navigator.language)}
+              subheader={date.toLocaleString(i18n.resolvedLanguage)}
             />
           </>
         </Tooltip>
@@ -334,22 +328,18 @@ const RunCard = (props) => {
             </Typography>
           </Tooltip>
           <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-            Status:{" "}
-            {status === "unavailable" && (
-              <>This pipeline is not available in the current branch</>
-            )}
-            {status !== "unavailable" && <>{status}</>}
+            {t("runCard.status", { status: status === "unavailable" ? t("runCard.unavailable") : status })}
           </Typography>
         </CardContent>
         <CardActions disableSpacing>
           {run.type === "pipeline" && status === "completed" && (
             <a href={`/viewer/${run.runId}`} target="_blank">
-              <CustomButtonGreen>See in viewer</CustomButtonGreen>
+              <CustomButtonGreen>{t("runCard.viewer")}</CustomButtonGreen>
             </a>
           )}
           {status !== "unavailable" && (
             <a href={debug_url} target="_blank">
-              <CustomButtonGreen>See in run UI</CustomButtonGreen>
+              <CustomButtonGreen>{t("runCard.runUi")}</CustomButtonGreen>
             </a>
           )}
 
@@ -357,7 +347,7 @@ const RunCard = (props) => {
             expand={expanded}
             onClick={handleExpandClick}
             aria-expanded={expanded}
-            aria-label="show more"
+            aria-label={t("runCard.showMore")}
           >
             <ExpandMoreIcon
               sx={{ fontSize: "1.2em", color: "var(--biab-green-trans-main)" }}
@@ -371,7 +361,7 @@ const RunCard = (props) => {
                 <ReactMarkdown>
                   {desc}
                 </ReactMarkdown>
-                <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>
+                <h3 style={{ color: "var(--biab-green-main)" }}>{t("runCard.inputs")}</h3>
                 <Table size="small">
                   <TableBody>
                     {Object.entries(run.inputs).map((i) => {
@@ -439,8 +429,9 @@ const RunCard = (props) => {
 // Either the whole script / pipeline is missing,
 // or the input does not exist anymore.
 const UnknownInputId = ({ id }) => {
+  const { t } = useTranslation();
   const warningIcon = (
-    <Tooltip title="Input description not found">
+    <Tooltip title={t("runCard.inputNotFound")}>
       <Warning
         color="warning"
         style={{ height: "1rem", transform: "translate(0, 0.15rem)" }}

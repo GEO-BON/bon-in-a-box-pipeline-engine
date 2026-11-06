@@ -40,10 +40,85 @@
     gap: 12px;
     font-weight: 700;
     align-content: center;
+    background: transparent;
+    border: 0;
+    font-family: inherit;
     border-radius: 15px;
     padding: 2px 12px;
     transition: all ease-in-out 0.3s;
     cursor: pointer;
+}
+
+.language-selector {
+    position: relative;
+    padding: 6px 16px;
+    color: var(--dark-blue);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.language-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 8px 2px 2px;
+    border: 0;
+    border-radius: 20px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.language-button:hover,
+.language-button[aria-expanded="true"] {
+    background-color: #E3E3E2;
+}
+
+.language-flag {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+}
+
+.language-triangle {
+    font-size: 10px;
+}
+
+.language-list {
+    margin: 4px 0 0;
+    padding: 4px;
+    list-style: none;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px #00000026;
+}
+
+.language-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.language-option:hover,
+.language-option:focus {
+    background-color: #E3E3E2;
+    outline: none;
+}
+
+.language-option[aria-selected="true"] {
+    font-weight: 700;
+}
+
+.language-storage-error {
+    display: block;
+    margin-top: 4px;
+    color: #8b0000;
+    font-size: 13px;
 }
 
 .navigation-bar-profile-container:hover {

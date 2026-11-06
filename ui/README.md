@@ -1,5 +1,49 @@
 # React + Vite
 
+## UI translation pilot
+
+The pilot translates the navigation, home page (including recent-run controls),
+and startup messages into English and French. The rest of the UI remains in
+English for now. Names, descriptions, statuses, errors, and other content
+supplied by APIs are not translated by the UI.
+
+The browser's preferred supported language is used by default, falling back to
+English. The language selector in the user menu (a round flag of the current
+language with a dropdown arrow) can override this; explicit choices are saved in
+the `biab.ui.language` localStorage key for this site and browser. Until a choice
+is made, nothing is saved and the language follows the browser. A storage error is
+shown to the user; the selected language still works until the page is reloaded.
+
+English source strings are in `src/locales/en/translation.json` and French
+translations are in `src/locales/fr/translation.json`. Use stable, descriptive
+keys, whole sentences, i18next interpolation, and CLDR plural forms. Do not
+translate API data or machine-readable values. `Trans` can preserve React
+components such as links in sentences; use a non-HTML placeholder name and
+verify that the link retains its text.
+
+### Weblate setup
+
+The self-hosted Weblate instance is separate from this application. Create a
+component for this repository with:
+
+- Format: i18next JSON file v4
+- File mask: `ui/src/locales/*/translation.json`
+- Source language: English; monolingual base file: `ui/src/locales/en/translation.json`
+- Target language: French (`fr`)
+- Review enabled, with authorized reviewers and i18next interpolation checks.
+
+Developers maintain English source strings; translators propose French text in
+Weblate. Require linguistic approval before merging translation updates into
+the deployment branch. Check the actual Weblate review, export and Git settings:
+enabling review alone must not be assumed to exclude unreviewed translations.
+Test a new translation and an English source change before using the workflow
+for releases. JSON does not carry translator descriptions, so add context in
+Weblate and maintain ecosystem terminology in its glossary.
+
+The French catalog is an initial draft for review. Weblate has not been
+connected or configured by the UI build. Translation updates are bundled by
+Vite and deployed with the application; Weblate is not a runtime dependency.
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -14,12 +58,12 @@ You will also see any lint errors in the console.
 
 ### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Runs the Vitest suite once. For a focused run, use
+`npm test -- src/i18n.test.jsx`.
 
 ### `npm run build`
 
-Builds the app for production to the `build` folder.\
+Builds the app for production to the `dist` folder.\
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
 The build is minified and the filenames include the hashes.\
@@ -66,3 +110,7 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+Language flags in `src/assets/flags/` are from
+[circle-flags](https://github.com/HatScripts/circle-flags) (MIT). Add one SVG and
+an entry in `LanguageSelector.jsx` when adding a language.

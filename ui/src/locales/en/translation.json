@@ -1,0 +1,67 @@
+{
+  "language": {
+    "label": "Language",
+    "storageError": "Your language preference could not be saved or read in this browser."
+  },
+  "navigation": {
+    "menu": "Open navigation menu",
+    "logo": "BON in a Box logo",
+    "home": "Home",
+    "runScript": "Run a script",
+    "runPipeline": "Run a pipeline",
+    "chat": "Chat",
+    "editor": "Pipeline editor",
+    "inspector": "Pipeline inspector",
+    "history": "History",
+    "info": "Info",
+    "help": "Help",
+    "files": "My files",
+    "profile": "GEO BON profile",
+    "userMenu": "User menu",
+    "members": "Members",
+    "portal": "Data portal",
+    "logout": "Log out",
+    "close": "Close"
+  },
+  "home": {
+    "title": "Biodiversity Evaluation Engine",
+    "description": "The Biodiversity Evaluation Engine is an open tool aiming to enhance the capacity of Biodiversity Observation Networks and countries to report on biodiversity effectively. It connects individual analyses scripts into automated pipelines that convert data into Essential Biodiversity Variables (EBVs) and indicators. These community-built pipelines can analyze public or user datasets, and can be shared for auditability, reproducibility, and transparency.",
+    "developedBy": "Developed by <brand>GEO BON</brand>.",
+    "featured": "FEATURED PIPELINES",
+    "geneticDiversity": "Genetic Diversity Indicator",
+    "geneticQuestion": "Are populations maintaining genetic diversity?",
+    "redList": "Red List Index",
+    "redListQuestion": "Is there recovery of threatened species?",
+    "protectedConnected": "Protected Connected Index",
+    "protectedQuestion": "How much area is covered by well-connected protected areas?",
+    "habitat": "Species Habitat Index",
+    "habitatQuestion": "Are species losing or gaining habitat?",
+    "distribution": "Species Distribution Models with Boosted Regression Trees",
+    "distributionQuestion": "Where are species likely to be?",
+    "intactness": "Biodiversity Intactness Index",
+    "intactnessQuestion": "How much are species abundances changing?",
+    "moreInfo": "More info",
+    "runPipeline": "Run pipeline",
+    "viewAll": "View All",
+    "latestRuns": "LATEST RUNS",
+    "noRuns": "There are currently no runs to display.",
+    "runsError": "Failed to retrieve latest runs."
+  },
+  "runCard": {
+    "status": "Status: {{status}}",
+    "unavailable": "This pipeline is not available in the current branch",
+    "viewer": "See in viewer",
+    "runUi": "See in run UI",
+    "showMore": "Show more",
+    "inputs": "Inputs",
+    "inputNotFound": "Input description not found"
+  },
+  "startup": {
+    "scriptServer": "Script server",
+    "fileService": "File service",
+    "offline_one": "{{service}} appears to be offline. If it is starting, it is not yet ready to respond — retrying every {{count}} second.",
+    "offline_other": "{{service}} appears to be offline. If it is starting, it is not yet ready to respond — retrying every {{count}} seconds.",
+    "error": "Error: {{details}}",
+    "loading": "Loading"
+  }
+}
