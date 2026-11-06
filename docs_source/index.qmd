@@ -10,9 +10,9 @@ The platform provides resources for developing Biodiversity Observation Networks
 
 # What is BON in a Box's Biodiversity Evaluation Engine (BEE)?
 
-The Biodiversity Evaluation Engine (BEE) is an open-source platform that brings together biodiversity data and scientific methods to calculate EBVs and indicators for biodiversity monitoring, conservation planning, and reporting.
+The Biodiversity Evaluation Engine (BEE) is an open-source platformx that brings together biodiversity data and scientific methods to calculate EBVs and indicators for biodiversity monitoring, conservation planning, and reporting.
 
-BEE makes scientific analyses more accessible by allowing users to run standardized and reproducible analytical workflows, known as *pipelines*, without needing to develop the underlying code themselves.
+BEE makes scientific analyses more accessible by allowing users to run standardized and reproducible analytical workflows without needing to develop the underlying code themselves. These automated workflows are called *pipelines*.
 
 Developed through contributions by the GEO BON scientific community, BEE integrates scientific expertise and methods from researchers around the world, enabling users to:
 
@@ -28,7 +28,7 @@ BEE supports biodiversity monitoring at local, national, and global scales, incl
 
 # Why do we need this platform?
 
-Scientists around the world are developing tools to create workflows to calculate essential biodiversity variables and indicators to report on biodiversity change. However, there are almost no platforms to share these workflows and tools, leading to duplication of effort. BON in a Box allows networks to share and enhance each other's work.
+Scientists around the world are developing tools to create workflows to calculate Essential Biodiversity Variables (EBVs) and indicators to report on biodiversity change. However, these initiatives happen in parallel, leading to duplication of effort. BON in a Box allows networks to re-use and enhance each other's work, by providing a platform to share workflows and tools.
 
 At the same time, countries and organizations responsible for biodiversity monitoring and reporting may lack the technical resources or expertise needed to implement these methods.
 
@@ -42,13 +42,13 @@ BEE connects biodiversity data with scientific methods to generate outputs that 
 
 Users can combine their own data with publicly available datasets, including species occurrences, protected areas, environmental variables, and Earth observation products.
 
-These data are processed through analytical pipelines to produce outputs such as species distribution maps, connectivity metrics, EBVs, and biodiversity indicators.
+These data are processed through automated analytical pipelines to produce outputs such as species distribution maps, connectivity metrics, EBVs, and biodiversity indicators.
 
 By providing transparent and reproducible methods, BEE supports consistent biodiversity assessments across regions and over time, while allowing users to incorporate data and information relevant to their local context.
 
 # What is a pipeline?
 
-A pipeline is a sequence of analytical steps that transforms input data into meaningful outputs for biodiversity monitoring and decision-making.
+A pipeline is an automated sequence of analytical steps that transforms input data into meaningful outputs for biodiversity monitoring and decision-making.
 
 Each pipeline brings together smaller, reusable components called *scripts*, which perform specific tasks such as downloading data, cleaning observations, running statistical models, or generating spatial outputs.
 

@@ -21,7 +21,7 @@ Before a pipeline is submitted for external review, the BON in a Box team works 
 
 - Produces scientifically reasonable results consistent with the underlying methodology.
 
-- Includes input and output descriptions, documentation, and a user tutorial.
+- Includes input and output descriptions, documentation, and a workflow description.
 
 - Has its code available in the BON in a Box GitHub repository, either in the main branch or in a development branch or pull request.
 
@@ -31,7 +31,7 @@ The BON in a Box team conducts initial testing and technical checks before invit
 
 ### 1. Reviewer selection
 
-The pipeline contributor may suggest potential reviewers with relevant expertise. Additional reviewers will be identified by the BON in a Box team.
+The pipeline contributor may suggest potential reviewers with relevant expertise. Additional reviewers will be identified by the BON in a Box team and GEO BON network.
 
 We aim to select reviewers with complementary expertise across three areas:
 
@@ -81,7 +81,7 @@ Following the review, a pipeline may be:
 
 - **Accepted with minor revisions:** The pipeline meets the main scientific and technical requirements, with only minor changes needed before publication.
 
-- **Revisions required:** More substantial changes are needed, and the pipeline may require additional review.
+- **Revisions required:** More substantial changes are needed, and the pipeline will require additional review.
 
 - **Not accepted:** The pipeline does not currently meet the requirements for inclusion in BEE.
 
@@ -145,7 +145,7 @@ Return the completed form to the BON in a Box team using the instructions provid
 
 ## **Pipeline publication**
 
-When pipelines have been peer reviewed and are accepted, they will be published on [Zenodo](https://zenodo.org/) and given a DOI, which will be cited whenever the pipeline is used.
+Peer reviewed and accepted pipelineswill be published on [Zenodo](https://zenodo.org/) and given a DOI, which will be cited whenever the pipeline is used.
 
 ## Review form
 

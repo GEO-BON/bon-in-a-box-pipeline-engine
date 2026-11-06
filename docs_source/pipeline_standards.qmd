@@ -56,7 +56,7 @@ Additionally, all analyses must be:
 
 - **Scalable:** Pipelines should be able to be calculated at different scales.
 
-- **Scientifically robust:** Pipelines should follow a method that has been published in the literature or verified in some way. Sometimes, pipeline and method development will happen concurrently but pipelines will keep the "experimental pipeline" tag until the science has been verified by independent experts. Ideally, models will be ground-truthed with independent data sources.
+- **Scientifically robust:** Pipelines should follow a method that has been published in the literature or verified in some way. Sometimes, pipeline and method development will happen concurrently but pipelines will keep the "In development" tag until the science has been verified by independent experts. Ideally, models will be ground-truthed with independent data sources.
 
 - **FAIR:** Findable, accessible, interoperable, and reproducible\*
 
@@ -77,8 +77,6 @@ BON in a Box is designed to run analyses with both publicly available data and d
 #### **Standards for publicly available input data:**
 
 - When using publicly available data, BON in a Box should use APIs when they are available so pipelines can be run with the most up to date data available.
-
-  - When processing GBIF data in a pipeline, the **GBIF download API** should be used to ensure reproducibility and citability, as it provides a download DOI for each run, and this doi script output must be included in the pipeline outputs. The "GBIF observations with download API" script should be used for basic GBIF data retrieval. 
 
 - Raster data should be in cloud optimized GeoTIFF (e.g. [STAC catalog](https://stacspec.org/en)) formats whenever possible. 
 
@@ -134,9 +132,9 @@ Code should adhere to the following requirements:
 
 - Scripts should be well annotated with descriptions of each step commented within the code
 
-- Scripts should check and validate that user inputs are properly entered and are in the expected format. Scripts should output informative messages and stop the execution with the biab_error_stop() function when invalid inputs are detected. 
+- Scripts should check and validate that user inputs are properly entered and are in the expected format. Scripts should output informative messages and stop the execution with the `biab_error_stop()` function when invalid inputs are detected. 
 
-  - For example, if someone misspells a country name and the country polygon is not found, write if(is.null(country_polygon)) { biab_error_stop("Country polygon not found. Check the spelling of the country name")
+  - For example, if someone misspells a country name and the country polygon is not found, write if(is.null(country_polygon)) { `biab_error_stop("Country polygon not found. Check the spelling of the country name")` }
 
 - Each main step of the script prints a log (console output) message so the user can know at what stage the analysis is. The contributor is encouraged to add additional information messages that will be added to the log:
 
@@ -170,11 +168,13 @@ Each script will be accompanied by a YAML description file (.yml format) that ha
 
 - For **primitive outputs**, such as text and numbers, use a primitive type (int, float, text). Refer to [the inputs section of the user documentation](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#inputs).
 
-- The example will autofill in the document. If the example is a file, make sure the file is in the appropriate folder (note the 'userdata' folder is local only and will not be pushed to GitHub) and the file path starts at that folder (e.g. /scripts/data/protected_area_file_example.gpkg). Note BON in a Box cannot access the whole computer so the root must be in the BON in a Box pipelines folder. Make sure the whole script runs with the chosen examples.
+- For **values**: The example value will automatically populate the corresponding input field in BEE. Ensure that the example is valid and uses the appropriate format.
+
+- For **files**: Users can upload files to the My Files section in BEE and then use the file chooser in the pipeline input form to select the appropriate file. If an example file is included in the pipeline, the file path should be specified correctly in the YAML description.
 
 ##### **Conda dependencies**
 
-Conda is a package, dependency, and environment management system that prevents scripts from encountering breaking changes when packages are updated. Conda environments should list all of the necessary packages and package versions should be specified when necessary. Conda sub-environments should only be specified when the required packages or package versions are not in the main environment.
+[Conda](https://anaconda.org/) is a package, dependency, and environment management system that prevents scripts from encountering breaking changes when packages are updated. Conda environments should list all of the necessary packages and package versions should be specified when necessary. Conda sub-environments should only be specified when the required packages or package versions are not in the main environment.
 
 ### **Documentation**
 
@@ -186,29 +186,15 @@ Each pipeline contains metadata, which can be edited in the right sliding pane o
 
 - The description of the pipeline, including a short description of the methods, any data it is using, the limitations of the pipeline, and if it is an indicator in the GBF, what kind of indicator it is and which targets/goals it is related to
 
-- The license of the pipeline (this is chosen by the user, see section on licensing below)
+- The license of the pipeline (this is chosen by the contributor, see section on licensing below)
 
 - The author(s) of the pipeline and their emails and ORCIDs
 
 - Any relevant references or links
 
-#### **Pipeline markdown tutorial**
+#### **Pipeline markdown description**
 
-Each pipeline should be accompanied by a tutorial in markdown format. This document should have the same name as the pipeline JSON file but with a .md extension and be contained in the same folder as the pipeline it describes. This tutorial should contain a more thorough description of the methods (around 2-3 paragraphs). The tutorial should provide guidance on how to parameterize the pipeline, and walk through a full example analysis. This document should also more thoroughly communicate the limitations of the pipeline in terms of the species, regions, and scales at which it is relevant. You can create the tutorial using [this template](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/pipelines/New-pipeline/pipeline-tutorial-template.md).
-
-### **Versioning**
-
-Creating pipelines to calculate Essential Biodiversity Variables and indicators is an iterative process, and pipelines will deprecate over time as methods are updated. Therefore, we will have a structured versioning system as pipelines are released. 
-
-Versioning will follow a semantic versioning style in the form of major.minor.patch.
-
-- Non peer-reviewed or stable pipelines should have versions starting with 0.\*
-
-- The first peer-reviewed stable version of the pipeline will be released as 1.0.0.
-
-- Minor bug fixes will be released continuously (e.g. 1.0.1).
-
-- Any major changes to methods or packages will be a scheduled major release (e.g. 2.0.0). The old pipeline will be labeled as deprecated but will still be available for backwards compatibility.
+Each pipeline should be accompanied by a description in markdown format that will be used for display on the [BON in a Box website](https://boninabox.geobon.org/). This document should have the same name as the pipeline JSON file but with a .md extension and be contained in the same folder as the pipeline it describes. This description should contain a more thorough description of the methods (around 2-3 paragraphs). The description should provide guidance on how to parameterize the pipeline, and walk through a full example analysis. This document should also more thoroughly communicate the limitations of the pipeline in terms of the species, regions, and scales at which it is relevant. You can create the description using [this template](https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/pipelines/New-pipeline/pipeline-tutorial-template.md).
 
 ### **Licensing**
 
