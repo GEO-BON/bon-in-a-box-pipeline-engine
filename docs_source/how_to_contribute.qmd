@@ -2,7 +2,27 @@
 title: "Instructions for adapting your code to an analysis pipeline"
 ---
 
-Analysis pipelines in BON in a Box are workflows that have been adapted to its pipelines framework. Here we will walk you through a few steps to adapt your code to run in BON in a Box.
+This guide provides step-by-step instructions for adapting an existing analytical workflow or developing a new pipeline for the Biodiversity Evaluation Engine (BEE).
+
+BEE supports pipelines developed in R, Python, Julia, and other supported languages. Pipelines are built from individual scripts that can be connected to create reproducible analytical workflows.
+
+The instructions below will guide you through preparing your code, defining inputs and outputs, building and testing your pipeline, and submitting it for review.
+
+**New to contributing?** We recommend first reading our [Contributing page](contributing.qmd) for an overview of the contribution process and our [Pipeline Standards](pipeline_standards.qmd) for the scientific and technical requirements.
+
+## Before you start
+
+To develop and test pipelines, you will need:
+
+- **A GitHub account:** Contributions are managed through the [BON in a Box pipelines repository](https://github.com/GEO-BON/bon-in-a-box-pipelines).
+
+- **A local installation of BEE:** Follow the [Installation Guide](how_to_install.qmd) to set up the platform on your computer.
+
+- **An analytical workflow:** This can be an existing script or a new method you would like to develop into a pipeline.
+
+- **A code editor:** Such as Visual Studio Code or RStudio, to develop and modify your scripts.
+
+Before beginning development, we recommend contacting the BON in a Box team to discuss your proposed pipeline and identify opportunities to reuse existing components.
 
 ## General GitHub contribution workflow
 
@@ -40,10 +60,6 @@ Contributors will follow the [GitHub flow](https://docs.github.com/en/get-starte
 
 Analysis workflows can be adapted to BON in a Box pipelines using a few simple steps. Once BON in a Box is installed on your computer, pipelines can be edited and run locally by creating files in your local BON-in-a-box folder cloned from the GitHub repository. Workflows can be written in a variety of languages, including R, Julia, and Python, and not all pipeline steps need to be in the same language.
 
-## Before you start
-
-Make sure that you are working in the right environment when running code in BON in a Box. This can be in your code editor of choice, such as Visual Studio Code opened to the BON in a Box pipelines folder cloned to your computer from GitHub, or an R Studio project set up with the BON in a Box GitHub repository. This will make it easier to pull and push to the GitHub repository later.
-
 ## Step 1: Plan your pipeline
 
 The first step is to sketch out what your pipeline will look like. This includes breaking up your workflow into logical steps that perform one task and could potentially be reused in other pipelines. Think of the inputs and outputs that you want each script to have and how you want to connect these into a full pipeline.
@@ -70,7 +86,7 @@ YAML files should begin with a name, description, and the authors of the script.
 
 Example:
 
-```
+```         
 script: script_name.R
 name: Script Name
 description: Describe what the script does
@@ -87,7 +103,7 @@ All input and output ids should follow the snake case naming conventions. Names 
 
 Here is an example where the inputs are a coordinate reference system and a distance, specified by the user:
 
-```
+```         
 inputs:
   crs:
     label: coordinate reference system for output
@@ -123,11 +139,11 @@ There are several different types of user inputs that can be specified in the YA
 | (any unknown type)               | Plain text                 |                                                                                   |
 +----------------------------------+----------------------------+-----------------------------------------------------------------------------------+
 
--   Note that the square brackets specify an array, where the user can input multiple values separated by a comma. This is useful if you want the analysis to run with several different parameters (e.g. for multiple species or with multiple raster bands).
+- Note that the square brackets specify an array, where the user can input multiple values separated by a comma. This is useful if you want the analysis to run with several different parameters (e.g. for multiple species or with multiple raster bands).
 
 ^1^options type requires an additional options attribute to be added with the available options.
 
-```
+```         
 options_example:
   label: Options example
   description: The user has to select between a fixed number of text options. Also called select or enum. The script receives the selected option as text.
@@ -141,23 +157,23 @@ options_example:
 
 The user inputs can also be file types if you want to upload a file or connect the script to a previous one that outputs a specific file type. There are several file types that you can specify:
 
-+----------------+--------------------------------+---------------------------------------------------------------------------+
-| File Type      | MIME type to use in the yaml   | Description                                                               |
-+================+================================+===========================================================================+
-| CSV            | text/csv                       | Comma separated values file format (.csv)                                 |
-+----------------+--------------------------------+---------------------------------------------------------------------------+
-| GeoJSON        | application/geo+json           | GeoJSON file format (.geojson)                                            |
-+----------------+--------------------------------+---------------------------------------------------------------------------+
-| GeoPackage     | application/geopackage+sqlite3 | GeoPackage file format (.gpkg)                                            |
-+----------------+--------------------------------+---------------------------------------------------------------------------+
-| GeoTIFF^2^     | image/tiff;application=geotiff | GeoTIFF file format (.tif)                                                |
-+----------------+--------------------------------+---------------------------------------------------------------------------+
-| Shapefile      | application/dbf                | Shapefile format (.shp)                                                   |
-+----------------+--------------------------------+---------------------------------------------------------------------------+
-| Text           | text/plain                     | Plain text output (no need to save as a format just output in the script) |
-+----------------+--------------------------------+---------------------------------------------------------------------------+
-| TSV            | text/tab-separated-values      | Tab separated values format (.tsv)                                        |
-+----------------+--------------------------------+---------------------------------------------------------------------------+
++-------------+--------------------------------+---------------------------------------------------------------------------+
+| File Type   | MIME type to use in the yaml   | Description                                                               |
++=============+================================+===========================================================================+
+| CSV         | text/csv                       | Comma separated values file format (.csv)                                 |
++-------------+--------------------------------+---------------------------------------------------------------------------+
+| GeoJSON     | application/geo+json           | GeoJSON file format (.geojson)                                            |
++-------------+--------------------------------+---------------------------------------------------------------------------+
+| GeoPackage  | application/geopackage+sqlite3 | GeoPackage file format (.gpkg)                                            |
++-------------+--------------------------------+---------------------------------------------------------------------------+
+| GeoTIFF^2^  | image/tiff;application=geotiff | GeoTIFF file format (.tif)                                                |
++-------------+--------------------------------+---------------------------------------------------------------------------+
+| Shapefile   | application/dbf                | Shapefile format (.shp)                                                   |
++-------------+--------------------------------+---------------------------------------------------------------------------+
+| Text        | text/plain                     | Plain text output (no need to save as a format just output in the script) |
++-------------+--------------------------------+---------------------------------------------------------------------------+
+| TSV         | text/tab-separated-values      | Tab separated values format (.tsv)                                        |
++-------------+--------------------------------+---------------------------------------------------------------------------+
 
 For example:
 
@@ -177,21 +193,23 @@ inputs:
 
 The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying 'country' as input type will create a dropdown menu with a standardized list of countries from GeoNames. Selecting 'crsBbox' will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:
 
-+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
-| Input name       | Description                                                                                                                                                                                                                                                                |                        |
-+==================+============================================================================================================================================================================================================================================================================+========================+
-| country          | Creates a selector (drop down menu) with a standardized list of countries. GeoNames is used as the reference for the country list.                                                                                                                                         |                        |
-+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
-| countryRegion    | Creates a selector (drop down menu) with a standardized list of regions (provinces, states, etc) within a selected country. GeoNames is used as the reference for the list of regions.                                                                                     |                        |
-+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
-| countryRegionCRS | Creates a selector (drop down menu) for choosing a coordinate reference system adapted for a specific country and/or region.                                                                                                                                               |                        |
-+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
-| CRS              | Creates a selector for specifying a coordinate reference system.                                                                                                                                                                                                           |                        |
-+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
-| crsBbox          | Creates a button to open an interface that allows the user to specify a bounding box (geographical minima and maxima) based on an optional selection of country/region and on a CRS, or by clicking on the map to set the bounds of the area of interest for the analysis. |                        |
-+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
-| location         | Full location object. Creates a button to open an interface that allows the user to specify a country, region, coordinate reference system and bounding box (geographical minima and maxima)                                                                               |                        |
-+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------------------------+
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+
+| Input name                                                                                                                                                                                                                                                              | Description                                                                                                                                                                                                                                                                |           |
++=========================================================================================================================================================================================================================================================================+============================================================================================================================================================================================================================================================================+===========+
+| country                                                                                                                                                                                                                                                                 | Creates a selector (drop down menu) with a standardized list of countries. GeoNames is used as the reference for the country list.                                                                                                                                         |           |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+
+| countryRegion                                                                                                                                                                                                                                                           | Creates a selector (drop down menu) with a standardized list of regions (provinces, states, etc) within a selected country. GeoNames is used as the reference for the list of regions.                                                                                     |           |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+
+| countryRegionCRS                                                                                                                                                                                                                                                        | Creates a selector (drop down menu) for choosing a coordinate reference system adapted for a specific country and/or region.                                                                                                                                               |           |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+
+| CRS                                                                                                                                                                                                                                                                     | Creates a selector for specifying a coordinate reference system.                                                                                                                                                                                                           |           |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+
+| crsBbox                                                                                                                                                                                                                                                                 | Creates a button to open an interface that allows the user to specify a bounding box (geographical minima and maxima) based on an optional selection of country/region and on a CRS, or by clicking on the map to set the bounds of the area of interest for the analysis. |           |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+
+| location                                                                                                                                                                                                                                                                | Full location object. Creates a button to open an interface that allows the user to specify a country, region, coordinate reference system and bounding box (geographical minima and maxima)                                                                               |           |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+
+| stac_asset\[\] \| Creates a button to open a STAC catalog browser, where the user picks assets (for example Cloud Optimized GeoTIFF layers) from one or more collections. The script receives a list of selections. See [STAC assets](selectors.qmd#stac-assets). \| \| |                                                                                                                                                                                                                                                                            |           |
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------+
 
 Note that the use of these selectors will create objects that contain multiple elements. For example, the country selector will create an input object that contains the country name in English, the ISO3 code of the country, the ISO2 code, as well as the bounding box of that country, in longitude, latitude coordinates. [See the full list of those keys for each selector here](selectors.qmd).
 
@@ -201,35 +219,35 @@ After specifying the inputs, you can specify the files that you want to output f
 
 There are also several types of outputs that can be created
 
-+--------------+--------------------------------+------------------------------+
-| File Type    | MIME type to use in the yaml   | UI rendering                 |
-+==============+================================+==============================+
-| CSV          | text/csv                       | HTML table (partial content) |
-+--------------+--------------------------------+------------------------------+
-| GeoJSON^2^   | application/geo+json           | Map                          |
-+--------------+--------------------------------+------------------------------+
-| GeoPackage   | application/geopackage+sqlite3 | Link                         |
-+--------------+--------------------------------+------------------------------+
-| GeoTIFF^3^   | image/tiff;application=geotiff | Map widget (leaflet)         |
-+--------------+--------------------------------+------------------------------+
-| HTML         | text/html                      | Open in new tab              |
-+--------------+--------------------------------+------------------------------+
-| JPG          | image/jpg                      | tag                          |
-+--------------+--------------------------------+------------------------------+
-| Shapefile    | application/dbf                | Link                         |
-+--------------+--------------------------------+------------------------------+
-| Text         | text/plain                     | Plain text                   |
-+--------------+--------------------------------+------------------------------+
-| TSV          | text/tab-separated-values      | HTML table (partial content) |
-+--------------+--------------------------------+------------------------------+
-|              | (any unknown type)             | Plain text or link           |
-+--------------+--------------------------------+------------------------------+
++---------------+--------------------------------+------------------------------+
+| File Type     | MIME type to use in the yaml   | UI rendering                 |
++===============+================================+==============================+
+| CSV           | text/csv                       | HTML table (partial content) |
++---------------+--------------------------------+------------------------------+
+| GeoJSON^2^    | application/geo+json           | Map                          |
++---------------+--------------------------------+------------------------------+
+| GeoPackage    | application/geopackage+sqlite3 | Link                         |
++---------------+--------------------------------+------------------------------+
+| GeoTIFF^3^    | image/tiff;application=geotiff | Map widget (leaflet)         |
++---------------+--------------------------------+------------------------------+
+| HTML          | text/html                      | Open in new tab              |
++---------------+--------------------------------+------------------------------+
+| JPG           | image/jpg                      | tag                          |
++---------------+--------------------------------+------------------------------+
+| Shapefile     | application/dbf                | Link                         |
++---------------+--------------------------------+------------------------------+
+| Text          | text/plain                     | Plain text                   |
++---------------+--------------------------------+------------------------------+
+| TSV           | text/tab-separated-values      | HTML table (partial content) |
++---------------+--------------------------------+------------------------------+
+|               | (any unknown type)             | Plain text or link           |
++---------------+--------------------------------+------------------------------+
 
 ^2^ GeoJSON coordinates *must* be in WGS 84. See [specification section 4](https://datatracker.ietf.org/doc/html/rfc7946#section-4) for details.
 
 ^3^ When used as an output, `image/tiff;application=geotiff` type allows an additional `range` attribute to be added with the min and max values that the tiff should hold. This will be used for display purposes.
 
-```
+```         
 map:
   label: My map
   description: Some map that shows something
@@ -240,7 +258,7 @@ map:
 
 Here is an example output:
 
-```
+```         
 outputs:
   result:
     label: Analysis result
@@ -277,7 +295,7 @@ Search for your package names on [anaconda](https://anaconda.org/). Packages tha
 
 Example of conda sub-environment for an R script:
 
-```
+```         
 conda: # Optional: if you script requires specific versions of packages.
   channels:
     - conda-forge # make sure to put conda forge first
@@ -293,7 +311,7 @@ conda: # Optional: if you script requires specific versions of packages.
 
 Example of conda sub-environment for a python script. You do not need to put anything after conda-forge or before the package names when specifying a conda environment for python.
 
-```
+```         
 conda:
   channels:
     - conda-forge
@@ -317,7 +335,7 @@ If you need a package that is not available in conda, such as one downloaded fro
 
 **In R,** concurrent installation of packages can be problematic (for example when running the same script multiple times in parallel). For this language only, you must use the function \`biab_ensure_package(...)\` that monitors the R locking mechanism to hold back the concurrent scripts during installation. Below is an example usage:\
 
-``` R
+``` r
 biab_ensure_package(
     "duckdbfs",
     version = "0.1.2",
@@ -644,17 +662,17 @@ biab_output("my_output", my_output_path)
 
 When modifying scripts in the `/scripts` folder, servers do not need to be restarted:
 
--   When modifying an existing script, simply save the file and re-run the script from the UI for the new version to be executed.
+- When modifying an existing script, simply save the file and re-run the script from the UI for the new version to be executed.
 
--   When adding or renaming scripts, refresh the browser page.
+- When adding or renaming scripts, refresh the browser page.
 
--   If your scripts depends on additional files or external dependencies that have been updated, the update will not be detected automatically. In that case, re-save the main script file - the one reference in the `.yml` file - to trigger a re-execution for the next runs (we use the saved date of the script file to trigger re-runs).
+- If your scripts depends on additional files or external dependencies that have been updated, the update will not be detected automatically. In that case, re-save the main script file - the one reference in the `.yml` file - to trigger a re-execution for the next runs (we use the saved date of the script file to trigger re-runs).
 
 When modifying pipelines in the `/pipelines` folder, servers do not need to be restarted:
 
--   In the pipeline editor, click save and run it again from the "pipeline run" page.
+- In the pipeline editor, click save and run it again from the "pipeline run" page.
 
--   When adding or renaming pipelines, refresh the browser page.
+- When adding or renaming pipelines, refresh the browser page.
 
 ### Script validation
 
@@ -795,6 +813,8 @@ The node will change as shown below, and the details will appear on the right pa
 In most cases, an output can only receive a value of the exact same type. This means that if you plug an output of type "text/csv" to an input of type "float", the system will display an error when saving the pipeline. However, there are exceptions where type conversions are allowed:
 
 +---------------+-----------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
+|               |                       |                                                                                                                                             |
++===============+=======================+=============================================================================================================================================+
 | # Source type | # Target type         | # Example                                                                                                                                   |
 +---------------+-----------------------+---------------------------------------------------------------------------------------------------------------------------------------------+
 | Any type      | An array of that type | When an array of GeoTIFFs is expected, a single GeoTIFF which is automatically wrapped in a single-element array.                           |
@@ -870,14 +890,14 @@ If you encounter further errors, please contact us on [Discourse](https://discou
 
 # When is your pipeline complete?
 
--   The pipeline is generalizable (for example can be used with other species, in other regions)
+- The pipeline is generalizable (for example can be used with other species, in other regions)
 
--   The pipeline meets all of the standards in the [quality control requirements](pipeline_standards.qmd)
+- The pipeline meets all of the standards in the [quality control requirements](pipeline_standards.qmd)
 
--   Each step has documentation for each input, output, references, etc. It should be easy enough to understand for a normal biologist (i.e. not a subject matter expert of this specific pipeline)
+- Each step has documentation for each input, output, references, etc. It should be easy enough to understand for a normal biologist (i.e. not a subject matter expert of this specific pipeline)
 
--   Each step validates its inputs for aberrations and its outputs for correctness. If an aberration is detected an "error" should be returned to halt the pipeline, or a "warning" to let it continue but alert the user.
+- Each step validates its inputs for aberrations and its outputs for correctness. If an aberration is detected an "error" should be returned to halt the pipeline, or a "warning" to let it continue but alert the user.
 
--   The GitHub actions pass.
+- The GitHub actions pass.
 
--   You have created a tutorial to go along with your pipeline, following \[this template\](<https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/pipelines/New-pipeline/pipeline-tutorial-template.md>).
+- You have created a tutorial to go along with your pipeline, following \[this template\](<https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/pipelines/New-pipeline/pipeline-tutorial-template.md>).
