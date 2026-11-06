@@ -28,9 +28,6 @@ import { Alert } from "@mui/material";
 import Warning from "@mui/icons-material/Warning";
 import yaml from "js-yaml";
 import debounce from "lodash.debounce";
-import filterIconWhite from "../img/filter-icon-white.svg"
-import filterIconGreen from "../img/filter-icon-green.svg"
-import { center } from "@turf/turf";
 import FilterMenu from "./FilterMenu";
 
 
@@ -43,8 +40,6 @@ export default function RunHistory() {
   let [inputValue, setInputValue] = useState("");
   let [filterStatus, setFilterStatus] = useState(null);
   let limit = 30;
-
-  const [activeFilters, setActiveFilters] = useState(null);
 
   const debouncedSetKeyword = useCallback(
     debounce((value) => {
