@@ -14,9 +14,9 @@ The instructions below will guide you through preparing your code, defining inpu
 
 To develop and test pipelines, you will need:
 
-- **A local installation of BEE:** Follow the [Installation Guide](how_to_install.qmd) to set up the platform on your computer.
-
 - **A GitHub account:** Contributions are managed through the [BON in a Box pipelines repository](https://github.com/GEO-BON/bon-in-a-box-pipelines).
+
+- **A local installation of BEE:** Follow the [Installation Guide](how_to_install.qmd) to set up the platform on your computer.
 
 - **An analytical workflow:** This can be an existing script or a new method you would like to develop into a pipeline.
 
