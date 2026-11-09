@@ -145,7 +145,7 @@ Return the completed form to the BON in a Box team using the instructions provid
 
 ## **Pipeline publication**
 
-Peer reviewed and accepted pipelineswill be published on [Zenodo](https://zenodo.org/) and given a DOI, which will be cited whenever the pipeline is used.
+Peer reviewed and accepted pipelines will be published on [Zenodo](https://zenodo.org/) and given a DOI, which will be cited whenever the pipeline is used.
 
 ## Review form
 
