@@ -115,3 +115,7 @@ Language flags in `src/assets/flags/` are from
 [circle-flags](https://github.com/HatScripts/circle-flags) (MIT). To add a
 language, create `src/locales/<code>/translation.json`, add its SVG flag, and add one
 entry to the list in `src/languages.js` (the only place languages are declared).
+
+`npm test` also checks the French catalog against the OQLF punctuation spacing rules
+(`src/locales/fr.typography.test.js`). 
+We could add similar tests for other languages.

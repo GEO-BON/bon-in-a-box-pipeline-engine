@@ -42,7 +42,7 @@ describe("language selection", () => {
     expect(screen.getByRole("link", { name: "GEO BON" }).getAttribute("href")).toBe("https://geobon.org");
     expect(localStorage.getItem(LANGUAGE_KEY)).toBeNull();
     pick("Language", "Français");
-    expect(screen.getByText("Moteur d'évaluation de la biodiversité")).toBeTruthy();
+    expect(screen.getByText("Moteur d’évaluation de la biodiversité")).toBeTruthy();
     expect(screen.getByRole("link", { name: "GEO BON" }).getAttribute("href")).toBe("https://geobon.org");
     expect(screen.getByText("API content")).toBeTruthy();
     expect(localStorage.getItem(LANGUAGE_KEY)).toBe("fr");
@@ -74,7 +74,7 @@ describe("language selection", () => {
     render(<HomePage />);
     languages.mockReturnValue(["fr-CA"]);
     fireEvent(window, new Event("languagechange"));
-    expect(screen.getByText("Moteur d'évaluation de la biodiversité")).toBeTruthy();
+    expect(screen.getByText("Moteur d’évaluation de la biodiversité")).toBeTruthy();
     expect(localStorage.getItem(LANGUAGE_KEY)).toBeNull();
     changePreference("en");
     fireEvent(window, new Event("languagechange"));

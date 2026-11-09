@@ -1,11 +1,11 @@
 {
   "language": {
     "label": "Langue",
-    "storageError": "Votre préférence linguistique n'a pas pu être enregistrée ou lue dans ce navigateur."
+    "storageError": "Votre préférence linguistique n’a pas pu être enregistrée ou lue dans ce navigateur."
   },
   "navigation": {
     "menu": "Ouvrir le menu de navigation",
-    "logo": "Logo BON in a Box",
+    "logo": "Logo de BON in a Box",
     "home": "Accueil",
     "runScript": "Exécuter un script",
     "runPipeline": "Exécuter un pipeline",
@@ -24,44 +24,44 @@
     "close": "Fermer"
   },
   "home": {
-    "title": "Moteur d'évaluation de la biodiversité",
-    "description": "Le moteur d'évaluation de la biodiversité est un outil ouvert qui vise à renforcer la capacité des réseaux d'observation de la biodiversité et des pays à rendre compte efficacement de la biodiversité. Il relie des scripts d'analyse individuels en pipelines automatisés qui convertissent les données en variables essentielles de biodiversité (VEB) et en indicateurs. Ces pipelines créés par la communauté peuvent analyser des jeux de données publics ou fournis par les utilisateurs et être partagés pour en faciliter l'auditabilité, la reproductibilité et la transparence.",
+    "title": "Moteur d’évaluation de la biodiversité",
+    "description": "Le moteur d’évaluation de la biodiversité est un outil ouvert qui vise à renforcer la capacité des réseaux d’observation de la biodiversité et des pays à rendre compte efficacement de la biodiversité. Il relie des scripts d’analyse individuels en pipelines automatisés qui convertissent les données en variables essentielles de biodiversité (VEB) et en indicateurs. Ces pipelines créés par la communauté peuvent analyser des jeux de données publics ou fournis par les utilisateurs et être partagés pour en faciliter l’auditabilité, la reproductibilité et la transparence.",
     "developedBy": "Développé par <brand>GEO BON</brand>.",
     "featured": "PIPELINES À LA UNE",
     "geneticDiversity": "Indicateur de diversité génétique",
-    "geneticQuestion": "Les populations maintiennent-elles leur diversité génétique ?",
+    "geneticQuestion": "Les populations maintiennent-elles leur diversité génétique ?",
     "redList": "Indice de la Liste rouge",
-    "redListQuestion": "Les espèces menacées se rétablissent-elles ?",
+    "redListQuestion": "Les espèces menacées se rétablissent-elles ?",
     "protectedConnected": "Indice de connectivité des aires protégées",
-    "protectedQuestion": "Quelle superficie est couverte par des aires protégées bien connectées ?",
-    "habitat": "Indice d'habitat des espèces",
-    "habitatQuestion": "Les espèces perdent-elles ou gagnent-elles de l'habitat ?",
+    "protectedQuestion": "Quelle superficie est couverte par des aires protégées bien connectées ?",
+    "habitat": "Indice d’habitat des espèces",
+    "habitatQuestion": "Les espèces perdent-elles ou gagnent-elles de l’habitat ?",
     "distribution": "Modèles de distribution des espèces par arbres de régression boostés",
-    "distributionQuestion": "Où les espèces sont-elles susceptibles de se trouver ?",
-    "intactness": "Indice d'intégrité de la biodiversité",
-    "intactnessQuestion": "Comment l'abondance des espèces évolue-t-elle ?",
-    "moreInfo": "Plus d'informations",
+    "distributionQuestion": "Où les espèces sont-elles susceptibles de se trouver ?",
+    "intactness": "Indice d’intégrité de la biodiversité",
+    "intactnessQuestion": "Comment l’abondance des espèces évolue-t-elle ?",
+    "moreInfo": "Plus d’informations",
     "runPipeline": "Exécuter le pipeline",
     "viewAll": "Tout afficher",
     "latestRuns": "EXÉCUTIONS RÉCENTES",
-    "noRuns": "Il n'y a actuellement aucune exécution à afficher.",
+    "noRuns": "Il n’y a actuellement aucune exécution à afficher.",
     "runsError": "Impossible de récupérer les dernières exécutions."
   },
   "runCard": {
-    "status": "État : {{status}}",
-    "unavailable": "Ce pipeline n'est pas disponible dans la branche actuelle",
+    "status": "État : {{status}}",
+    "unavailable": "Ce pipeline n’est pas disponible dans la branche actuelle",
     "viewer": "Voir dans la visionneuse",
-    "runUi": "Voir dans l'interface d'exécution",
+    "runUi": "Voir dans l’interface d’exécution",
     "showMore": "Afficher plus",
     "inputs": "Entrées",
-    "inputNotFound": "Description de l'entrée introuvable"
+    "inputNotFound": "Description de l’entrée introuvable"
   },
   "startup": {
     "scriptServer": "Le serveur de scripts",
     "fileService": "Le service de fichiers",
-    "offline_one": "{{service}} semble hors ligne. S'il est en cours de démarrage, il n'est pas encore prêt à répondre — nouvelle tentative toutes les {{count}} seconde.",
-    "offline_other": "{{service}} semble hors ligne. S'il est en cours de démarrage, il n'est pas encore prêt à répondre — nouvelle tentative toutes les {{count}} secondes.",
-    "error": "Erreur : {{details}}",
+    "offline_one": "{{service}} semble hors ligne. S’il est en cours de démarrage, il n’est pas encore prêt à répondre — nouvelle tentative toutes les {{count}} seconde.",
+    "offline_other": "{{service}} semble hors ligne. S’il est en cours de démarrage, il n’est pas encore prêt à répondre — nouvelle tentative toutes les {{count}} secondes.",
+    "error": "Erreur : {{details}}",
     "loading": "Chargement"
   }
 }

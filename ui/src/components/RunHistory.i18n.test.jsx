@@ -26,7 +26,7 @@ it("updates the empty state without refetching", async () => {
   render(<LastNRuns n={4} />);
   expect(screen.getByText("There are currently no runs to display.")).toBeTruthy();
   await act(() => i18n.changeLanguage("fr"));
-  expect(screen.getByText("Il n'y a actuellement aucune exécution à afficher.")).toBeTruthy();
+  expect(screen.getByText("Il n’y a actuellement aucune exécution à afficher.")).toBeTruthy();
   expect(api.getHistory).toHaveBeenCalledTimes(1);
 });
 
