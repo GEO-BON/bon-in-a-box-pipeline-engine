@@ -2,13 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { changePreference, getPreference } from "../i18n";
 
-import gb from "../assets/flags/gb.svg";
-import fr from "../assets/flags/fr.svg";
+import { DEFAULT_LANGUAGE, LANGUAGES, isSupportedLanguage } from "../languages";
 
-const FLAGS = { en: gb, fr };
-
-function Flag({ code }) {
-  return <img className="language-flag" src={FLAGS[code]} alt="" aria-hidden="true" />;
+function Flag({ language }) {
+  return <img className="language-flag" src={language.flag} alt="" aria-hidden="true" />;
 }
 
 export default function LanguageSelector() {
@@ -19,11 +16,8 @@ export default function LanguageSelector() {
   const rootRef = useRef(null);
   const buttonRef = useRef(null);
 
-  const options = [
-    { value: "en", label: "English" },
-    { value: "fr", label: "Français" },
-  ];
-  const current = i18n.resolvedLanguage === "fr" ? "fr" : "en";
+  const currentLanguageCode = isSupportedLanguage(i18n.resolvedLanguage) ? i18n.resolvedLanguage : DEFAULT_LANGUAGE;
+  const currentLanguageDef = LANGUAGES.find(({ code }) => code === currentLanguageCode);
 
   useEffect(() => {
     if (!open) return;
@@ -65,7 +59,7 @@ export default function LanguageSelector() {
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
-        <Flag code={current} />
+        <Flag language={currentLanguageDef} />
         <span className="language-triangle" aria-hidden="true">▼</span>
       </button>
       {open && (
@@ -75,24 +69,24 @@ export default function LanguageSelector() {
           aria-label={t("language.label")}
           onKeyDown={onListKeyDown}
         >
-          {options.map(({ value, label }) => (
+          {LANGUAGES.map((language) => (
             <li
-              key={value}
+              key={language.code}
               role="option"
               tabIndex={-1}
-              ref={(node) => value === current && node?.focus()}
+              ref={(node) => language.code === currentLanguageCode && node?.focus()}
               className="language-option"
-              aria-selected={value === current}
-              onClick={() => choose(value)}
+              aria-selected={language.code === currentLanguageCode}
+              onClick={() => choose(language.code)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
-                  choose(value);
+                  choose(language.code);
                 }
               }}
             >
-              <Flag code={value} />
-              {label}
+              <Flag language={language} />
+              {language.label}
             </li>
           ))}
         </ul>

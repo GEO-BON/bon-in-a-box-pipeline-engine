@@ -1,22 +1,21 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import en from "./locales/en/translation.json";
-import fr from "./locales/fr/translation.json";
+import { DEFAULT_LANGUAGE, LANGUAGES, isSupportedLanguage } from "./languages";
 
 export const LANGUAGE_KEY = "biab.ui.language";
 
 export function browserLanguage(languages = navigator.languages?.length ? navigator.languages : [navigator.language]) {
   for (const language of languages) {
     const base = language?.toLowerCase().split("-")[0];
-    if (base === "en" || base === "fr") return base;
+    if (isSupportedLanguage(base)) return base;
   }
-  return "en";
+  return DEFAULT_LANGUAGE;
 }
 
 export function readPreference() {
   try {
     const value = localStorage.getItem(LANGUAGE_KEY);
-    return { preference: value === "en" || value === "fr" ? value : "browser", error: false };
+    return { preference: isSupportedLanguage(value) ? value : "browser", error: false };
   } catch (error) {
     console.warn("Unable to read the language preference:", error);
     return { preference: "browser", error: true };
@@ -49,10 +48,10 @@ export function changePreference(preference) {
 }
 
 i18n.use(initReactI18next).init({
-  resources: { en: { translation: en }, fr: { translation: fr } },
+  resources: Object.fromEntries(LANGUAGES.map(({ code, translation }) => [code, { translation }])),
   lng: language,
-  fallbackLng: "en",
-  supportedLngs: ["en", "fr"],
+  fallbackLng: DEFAULT_LANGUAGE,
+  supportedLngs: LANGUAGES.map(({ code }) => code),
   initAsync: false,
   interpolation: { escapeValue: false },
 });

@@ -112,5 +112,6 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 
 Language flags in `src/assets/flags/` are from
-[circle-flags](https://github.com/HatScripts/circle-flags) (MIT). Add one SVG and
-an entry in `LanguageSelector.jsx` when adding a language.
+[circle-flags](https://github.com/HatScripts/circle-flags) (MIT). To add a
+language, create `src/locales/<code>/translation.json`, add its SVG flag, and add one
+entry to the list in `src/languages.js` (the only place languages are declared).
