@@ -53,16 +53,16 @@
   },
   "runCard": {
     "status": "État : {{status}}",
-    "unavailable": "Ce pipeline n’est pas disponible dans la branche actuelle",
-    "viewer": "Voir dans la visionneuse",
-    "runUi": "Voir dans l’interface d’exécution",
+    "unavailable": "Ce pipeline n’est pas disponible dans la branche Git actuelle",
+    "viewer": "Visionneuse",
+    "runUi": "Détails d’exécution",
     "showMore": "Afficher plus",
-    "inputs": "Entrées",
+    "inputs": "Paramètres",
     "inputNotFound": "Description de l’entrée introuvable"
   },
   "startup": {
-    "scriptServerOffline": "Le service de scripts semble hors ligne. S’il est en cours de démarrage, il n’est pas encore prêt à répondre — nouvelle tentative toutes les {{seconds}} secondes.",
-    "fileServiceOffline": "Le service de fichiers semble hors ligne. S’il est en cours de démarrage, il n’est pas encore prêt à répondre — nouvelle tentative toutes les {{seconds}} secondes.",
+    "scriptServerOffline": "Le service de scripts apparaît hors ligne. S’il est en cours de démarrage, il n’est pas encore prêt à répondre — nouvelle tentative toutes les {{seconds}} secondes.",
+    "fileServiceOffline": "Le service de fichiers apparaît hors ligne. S’il est en cours de démarrage, il n’est pas encore prêt à répondre — nouvelle tentative toutes les {{seconds}} secondes.",
     "error": "Erreur : {{details}}",
     "loading": "Chargement"
   },
@@ -71,8 +71,8 @@
     "versions": "Erreur lors de la récupération des informations de version",
     "k8sStatus": "Erreur lors de l’obtention de l’état de K8s",
     "k8sPrepare": "Erreur lors de la préparation de K8s",
-    "hpcStatus": "Erreur lors de l’obtention de l’état du HPC",
-    "hpcPrepare": "Erreur lors de la préparation du HPC",
+    "hpcStatus": "Erreur lors de l’obtention de l’état de l'ordinateur haute performance",
+    "hpcPrepare": "Erreur lors de la préparation de l'ordinateur haute performance",
     "pipelineList": "Impossible d’obtenir la liste des pipelines",
     "scriptList": "Impossible d’obtenir la liste des scripts"
   },
@@ -83,8 +83,8 @@
     "noMatch": "Aucune exécution ne correspond à votre recherche ou à votre filtre.",
     "none": "Il n’y a aucune exécution dans l’historique.",
     "emptyResponse": "Impossible de récupérer l’historique : réponse vide.",
-    "previous": "<< Page précédente",
-    "next": "Page suivante >>"
+    "previous": "Page précédente",
+    "next": "Page suivante"
   },
   "filter": {
     "button": "Filtrer",
@@ -96,22 +96,22 @@
     "cancelled": "Annulées"
   },
   "pipelineMenu": {
-    "showAllTooltip": "Lister aussi les pipelines qui n’ont pas été révisés : périmés, sous-pipelines, etc.",
-    "showAll": "Afficher les pipelines périmés, les sous-pipelines, etc.",
+    "showAllTooltip": "Lister tout les pipelines, incluant ceux déconseillés, les sous-pipelines, etc.",
+    "showAll": "Afficher les pipelines déconseillés, les sous-pipelines, etc.",
     "placeholder": "Rechercher ou sélectionner un pipeline…",
     "placeholderScript": "Rechercher ou sélectionner un script…",
     "noOptions": "Aucune option",
     "general": "Général"
   },
   "pipelinePage": {
-    "errorOutputs": "Erreur lors de l’obtention des sorties du pipeline depuis le serveur de scripts",
+    "errorOutputs": "Erreur lors de l’obtention des résultats du pipeline depuis le serveur de scripts",
     "errorMetadata": "Erreur lors du chargement des métadonnées du pipeline depuis le serveur de scripts",
-    "errorStop": "Erreur du serveur de scripts lors de l’arrêt du pipeline",
+    "errorStop": "Une erreur est survenue dans le serveur de scripts lors de l’arrêt du pipeline",
     "cancelledByUser": "Annulé par l’utilisateur",
     "pipelineRun": "Exécution du pipeline",
     "scriptRun": "Exécution du script",
     "inputForm": "Formulaire d’entrée",
-    "stop": "Arrêter"
+    "stop": "Arrêt"
   },
   "inputType": {
     "multipleOptions": "options multiples",
@@ -120,31 +120,31 @@
       "geojson": "geojson",
       "geopackage": "geopackage",
       "shapefile": "shapefile",
-      "csv": "valeurs séparées par des virgules",
-      "tsv": "valeurs séparées par des tabulations",
+      "csv": "de valeurs séparées par des virgules",
+      "tsv": "de valeurs séparées par des tabulations",
       "text": "texte",
-      "int": "entier",
+      "int": "nombre entier",
       "float": "nombre décimal"
     },
     "plural": {
-      "int": "entiers",
+      "int": "nombres entiers",
       "float": "nombres décimaux",
       "text": "textes"
     },
     "file": "chemin vers un fichier {{type}}",
     "files": "chemins vers des fichiers {{type}}",
-    "listOf": "liste séparée par des virgules de {{items}}",
-    "listOfOther": "liste séparée par des virgules de {{type}}"
+    "listOf": "liste de {{items}} séparée par des virgules",
+    "listOfOther": "liste de {{type}} séparée par des virgules"
   },
   "form": {
-    "inputForm": "Formulaire d’entrée",
-    "inputYaml": "Entrée YAML",
+    "inputForm": "Formulaire",
+    "inputYaml": "YAML",
     "noInputs": "Aucune entrée",
     "missingLabel": "Libellé manquant pour l’entrée « {{id}} »",
-    "notSnakeCase": "L’identifiant d’entrée {{id}} devrait être en snake_case",
+    "notSnakeCase": "L’identifiant d’entrée « {{id}} » devrait être en snake_case",
     "example": "Exemple : {{example}}",
     "missingDescription": "Description manquante pour l’entrée « {{id}} »",
-    "showLess": "Voir moins",
+    "showLess": "Réduire",
     "readMore": "Lire la suite",
     "yamlSyntax": "Syntaxe YAML : {{reason}}",
     "atLine": "À la ligne {{line}} : {{message}}",
@@ -172,12 +172,12 @@
     "cancel": "Annuler",
     "selectCountry": "Sélectionner un pays",
     "selectRegion": "Sélectionner une région",
-    "crsTitle": "Système de référence de coordonnées",
+    "crsTitle": "Système de Référence de Coordonnées (SRC)",
     "crsSearch": "Rechercher / sélectionner un SRC",
     "crsCode": "Ou saisir directement le code (p. ex. EPSG:4326)",
     "mapFailed": "Impossible de créer la carte pour {{crs}}",
-    "crsNotOnMap": "Ce SRC ne peut pas être affiché sur la carte. Le rectangle englobant peut quand même être saisi manuellement.",
-    "transformError": "Erreur lors de la transformation du rectangle englobant entre SRC",
+    "crsNotOnMap": "Ce système de référence de coordonnées ne peut pas être affiché sur la carte. Le rectangle englobant peut quand même être saisi manuellement.",
+    "transformError": "Erreur lors de la transformation du rectangle englobant entre systèmes de référence de coordonnées",
     "viewSource": "Voir la source",
     "hideSource": "Masquer la source",
     "country": "Pays :",
@@ -199,34 +199,34 @@
   },
   "results": {
     "title": "Résultats",
-    "seeInViewer": "Voir dans le visualiseur de résultats",
+    "seeInViewer": "Voir dans le visualiseur",
     "noOutput": "Aucune sortie",
     "detailed": "Résultats détaillés",
     "noEnvironment": "le fichier d’environnement n’a pas été créé",
-    "skippedUnnecessary": "Ignoré : inutile avec les paramètres donnés",
+    "skippedUnnecessary": "Ignoré : non requis avec les paramètres donnés",
     "skipped": "Ignoré",
-    "skippedFailure": "Ignoré à cause d’un échec précédent",
+    "skippedFailure": "Ignoré suite à un échec en amont",
     "aborted": "Abandonné",
-    "skippedStopped": "Ignoré à l’arrêt du pipeline",
+    "skippedStopped": "Ignoré lors de l’arrêt du pipeline",
     "cancelled": "Annulé",
-    "noInputs": "Aucune entrée",
-    "inputs": "Entrées",
-    "downloadInput": "Télécharger le fichier d’entrée",
+    "noInputs": "Aucun paramètre",
+    "inputs": "Paramètres",
+    "downloadInput": "Télécharger le fichier de paramètres",
     "environment": "Environnement",
     "running": "En cours d’exécution…",
-    "waiting": "En attente de la fin des étapes précédentes.",
+    "waiting": "En attente de résultats d'étapes précédentes.",
     "emptyString": "Chaîne vide",
     "missingMime": {
-      "input": "Type MIME manquant dans la description de l’entrée.",
+      "input": "Type MIME manquant dans la description du paramètre.",
       "output": "Type MIME manquant dans la description de la sortie."
     },
     "notInYml": {
-      "input": "L’entrée est introuvable dans le fichier de description YML de ce script.",
+      "input": "Le paramètre est introuvable dans le fichier de description YML de ce script.",
       "output": "La sortie est introuvable dans le fichier de description YML de ce script."
     },
     "notSnakeCase": "L’identifiant de sortie {{id}} devrait être en snake_case",
     "error": "Erreur",
-    "logs": "Journaux"
+    "logs": "Journaux d'exécution"
   },
   "fileBrowser": {
     "networkError": "Erreur dans la réponse du réseau.",
@@ -236,8 +236,8 @@
     "files": "Fichiers",
     "search": "Rechercher des fichiers",
     "noMatch": "Aucun fichier correspondant",
-    "useSelected_one": "Utiliser le fichier sélectionné",
-    "useSelected_other": "Utiliser les fichiers sélectionnés"
+    "useSelected_one": "Utiliser la sélection",
+    "useSelected_other": "Utiliser la sélection"
   },
   "description": {
     "identifierLogo": "Logo de l’identifiant",
@@ -247,14 +247,13 @@
     "notFound": "Le script est introuvable sur ce serveur. Les résultats bruts seront affichés.",
     "compute_one": "Calcul : utilise {{count}} cœur, limité à {{mem}} de mémoire.",
     "compute_other": "Calcul : utilise {{count}} cœurs, limités à {{mem}} de mémoire.",
-    "computeHpc_one": "Calcul : utilise {{count}} cœur, limité à {{mem}} de mémoire. Ce script peut s’exécuter sur un HPC, pour une durée maximale de {{time}}.",
-    "computeHpc_other": "Calcul : utilise {{count}} cœurs, limités à {{mem}} de mémoire. Ce script peut s’exécuter sur un HPC, pour une durée maximale de {{time}}.",
+    "computeHpc": "Ce script peut s’exécuter sur un HPC, pour une durée maximale de {{time}}.",
     "reviewedBy": "Révisé par :",
     "code": "Code :",
     "see": "Voir",
     "references": "Références :",
-    "inputs": "Entrées",
-    "outputs": "Sorties"
+    "inputs": "Paramètres",
+    "outputs": "Résultats"
   },
   "lifecycle": {
     "unknown": "Inconnu",

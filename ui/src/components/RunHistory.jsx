@@ -254,7 +254,7 @@ const PreviousNext = (props) => {
               setStart((prev) => Math.max(prev - limit, 0));
             }}
           >
-            {t("history.previous")}
+            {"<< " + t("history.previous")}
           </CustomButtonGrey>
         </Grid>
       )}
@@ -265,7 +265,7 @@ const PreviousNext = (props) => {
               setStart((prev) => prev + limit);
             }}
           >
-            {t("history.next")}
+            {t("history.next") + " >>"}
           </CustomButtonGrey>
         </Grid>
       )}

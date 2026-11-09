@@ -53,7 +53,7 @@
   },
   "runCard": {
     "status": "Status: {{status}}",
-    "unavailable": "This pipeline is not available in the current GIT branch",
+    "unavailable": "This pipeline is not available in the current Git branch",
     "viewer": "See in viewer",
     "runUi": "See in run UI",
     "showMore": "Show more",
@@ -83,8 +83,8 @@
     "noMatch": "No runs match your search or filter.",
     "none": "There are no runs in history.",
     "emptyResponse": "Could not retrieve history: empty response.",
-    "previous": "<< Previous page",
-    "next": "Next page >>"
+    "previous": "Previous page",
+    "next": "Next page"
   },
   "filter": {
     "button": "Filter",
@@ -96,7 +96,7 @@
     "cancelled": "Cancelled"
   },
   "pipelineMenu": {
-    "showAllTooltip": "Also list pipelines that have not been reviewed: stale, subpipeline, etc.",
+    "showAllTooltip": "List all pipelines, including stale, subpipeline, etc.",
     "showAll": "Show stale pipelines, subpipelines, etc.",
     "placeholder": "Search or select a pipeline...",
     "placeholderScript": "Search or select a script...",
@@ -141,7 +141,7 @@
     "inputYaml": "Input yaml",
     "noInputs": "No inputs",
     "missingLabel": "Missing label for input \"{{id}}\"",
-    "notSnakeCase": "Input id {{id}} should be a snake_case id",
+    "notSnakeCase": "Input id \"{{id}}\" should be a snake_case id",
     "example": "Example: {{example}}",
     "missingDescription": "Missing description for input \"{{id}}\"",
     "showLess": "Show less",
@@ -247,8 +247,7 @@
     "notFound": "Script was not found on this server. Raw results will be displayed.",
     "compute_one": "Compute: Uses {{count}} core capped to {{mem}} of memory.",
     "compute_other": "Compute: Uses {{count}} cores capped to {{mem}} of memory.",
-    "computeHpc_one": "Compute: Uses {{count}} core capped to {{mem}} of memory. This script can run on a HPC, with a maximum duration of {{time}}.",
-    "computeHpc_other": "Compute: Uses {{count}} cores capped to {{mem}} of memory. This script can run on a HPC, with a maximum duration of {{time}}.",
+    "computeHpc": "This script can run on a HPC, with a maximum duration of {{time}}.",
     "reviewedBy": "Reviewed by:",
     "code": "Code:",
     "see": "See",
