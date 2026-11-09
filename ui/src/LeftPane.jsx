@@ -37,7 +37,11 @@ export default function LeftPane({ leftContent }) {
             <>
               {/* doesn't render if this is a READ ONLY environment */}
               {!disableMyFiles && (
-                <NavLink className="left-pane-link" to="/manage-files">
+                <NavLink 
+                className="left-pane-link" 
+                to="/manage-files"
+                title={t("navigation.filesTitle")}
+                >
                   <img src={IconFiles} className="left-pane-icon"></img>
                   {t("navigation.files")}
                 </NavLink>
@@ -47,6 +51,7 @@ export default function LeftPane({ leftContent }) {
                 className="left-pane-link"
                 target="_blank"
                 to="https://discourse.geobon.org/"
+                title={t("navigation.discourseTitle")}
               >
                 <img src={IconDiscourse} className="left-pane-icon"></img>
                 Discourse
@@ -55,6 +60,7 @@ export default function LeftPane({ leftContent }) {
                 className="left-pane-link"
                 target="_blank"
                 to="https://members.geobon.org/pages/index"
+                title={t("navigation.membersTitle")}
               >
                 <img src={IconMembers} className="left-pane-icon"></img>
                 {t("navigation.members")}
@@ -63,6 +69,7 @@ export default function LeftPane({ leftContent }) {
                 className="left-pane-link"
                 target="_blank"
                 to="https://portal.geobon.org/datasets"
+                title={t("navigation.portalTitle")}
               >
                 <img src={IconEBV} className="left-pane-icon"></img>
                 {t("navigation.portal")}
