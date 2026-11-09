@@ -57,10 +57,8 @@
     "inputNotFound": "Description de l’entrée introuvable"
   },
   "startup": {
-    "scriptServer": "Le serveur de scripts",
-    "fileService": "Le service de fichiers",
-    "offline_one": "{{service}} semble hors ligne. S’il est en cours de démarrage, il n’est pas encore prêt à répondre — nouvelle tentative toutes les {{count}} seconde.",
-    "offline_other": "{{service}} semble hors ligne. S’il est en cours de démarrage, il n’est pas encore prêt à répondre — nouvelle tentative toutes les {{count}} secondes.",
+    "scriptServerOffline": "Le service de scripts semble hors ligne. S’il est en cours de démarrage, il n’est pas encore prêt à répondre — nouvelle tentative toutes les {{seconds}} secondes.",
+    "fileServiceOffline": "Le service de fichiers semble hors ligne. S’il est en cours de démarrage, il n’est pas encore prêt à répondre — nouvelle tentative toutes les {{seconds}} secondes.",
     "error": "Erreur : {{details}}",
     "loading": "Chargement"
   }

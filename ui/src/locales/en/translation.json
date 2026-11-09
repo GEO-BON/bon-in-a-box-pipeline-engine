@@ -57,10 +57,8 @@
     "inputNotFound": "Input description not found"
   },
   "startup": {
-    "scriptServer": "Script server",
-    "fileService": "File service",
-    "offline_one": "{{service}} appears to be offline. If it is starting, it is not yet ready to respond — retrying every {{count}} second.",
-    "offline_other": "{{service}} appears to be offline. If it is starting, it is not yet ready to respond — retrying every {{count}} seconds.",
+    "scriptServerOffline": "The script server appears to be offline. If it is starting, it is not yet ready to respond — retrying every {{seconds}} seconds.",
+    "fileServiceOffline": "The file service appears to be offline. If it is starting, it is not yet ready to respond — retrying every {{seconds}} seconds.",
     "error": "Error: {{details}}",
     "loading": "Loading"
   }

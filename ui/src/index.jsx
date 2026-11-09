@@ -267,10 +267,11 @@ function App() {
   if (status.pending) return staticRouter(<Spinner />);
 
   // Which check is failing decides the wording: "Script server is offline" is simply
-  // untrue when it is the file service that has not come up.
+  // untrue when it is the file service that has not come up. Each has its own whole
+  // sentence, since a translated fragment cannot be slotted into another language's grammar.
   const checks = [
-    { label: t("startup.scriptServer"), state: status },
-    { label: t("startup.fileService"), state: fileManager },
+    { offlineKey: "startup.scriptServerOffline", state: status },
+    { offlineKey: "startup.fileServiceOffline", state: fileManager },
   ];
   // A real failure outranks a not-up-yet one, so a configuration error is never
   // hidden behind a notice that says to keep waiting.
@@ -288,7 +289,7 @@ function App() {
   if (starting) {
     return staticRouter(
       <Alert severity="error" className="systemError">
-        {t("startup.offline", { service: starting.label, count: HEALTH_RETRY_MS / 1000 })}
+        {t(starting.offlineKey, { seconds: HEALTH_RETRY_MS / 1000 })}
       </Alert>
     );
   }
