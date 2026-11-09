@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 
+import { useTranslation } from "react-i18next";
 import "ol/ol.css";
 import Map from "ol/Map";
 import View from "ol/View";
@@ -62,6 +63,7 @@ export default function MapOpenLayers({
   message,
   setMessage,
 }) {
+  const { t } = useTranslation();
   const mapContainer = useRef(null);
   const [mapp, setMapp] = useState(null);
   const [draw, setDraw] = useState(null);
@@ -286,7 +288,7 @@ export default function MapOpenLayers({
         // Initialize oldCRS to trigger the bbox reprojection effect
         setOldCRS(states.CRS);
       } else {
-        setMessage(`Failed to create map for ${crsString}`);
+        setMessage(t("choosers.mapFailed", { crs: crsString }));
       }
     }
 
@@ -300,7 +302,7 @@ export default function MapOpenLayers({
         register(proj4);
         if (!get(crsCode) || !projectMap) {
           setMessage(
-            "This CRS cannot be shown on the map. The bounding box can still be entered manually.",
+            t("choosers.crsNotOnMap"),
           );
           return;
         } else {
@@ -436,7 +438,7 @@ export default function MapOpenLayers({
             setOldCRS(states.CRS);
           } catch (e) {
             console.error("Error transforming bbox:", e);
-            setMessage("Error transforming bounding box between CRS");
+            setMessage(t("choosers.transformError"));
           }
         } else if (states.CRS) {
           setOldCRS(states.CRS);

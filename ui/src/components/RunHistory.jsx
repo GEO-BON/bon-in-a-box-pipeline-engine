@@ -35,6 +35,7 @@ import { useTranslation } from "react-i18next";
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export default function RunHistory() {
+  const { t } = useTranslation();
   let [runHistory, setRunHistory] = useState(null);
   let [start, setStart] = useState(0);
   let [keyword, setKeyword] = useState("");
@@ -74,53 +75,18 @@ export default function RunHistory() {
     api.getHistory(request,
       (error, _, response) => {
         if (error) {
-          setRunHistory(
-            <Box sx={{ padding: "50px" }}>
-              <HttpError
-                httpError={error}
-                response={response}
-                context={"getting run history"}
-              />
-            </Box>
-          );
+          setRunHistory({ error, response });
         } else if (response && response.body.length === 0) {
-          setRunHistory(
-            <Box sx={{ padding: "5px" }}>
-              <h1>Previous runs</h1>
-              <Alert severity="info">
-                {keyword || filterStatus ? "No runs match your search or filter." : "There are no runs in history."}
-              </Alert>
-            </Box>
-          );
+          setRunHistory({ empty: true, filtered: Boolean(keyword || filterStatus) });
         } else if (response && response.body.length > 0) {
           const runs = response.body.sort((a, b) => {
             const aa = new Date(a.startTime);
             const bb = new Date(b.startTime);
             return bb - aa;
           });
-          setRunHistory(
-            <div id="pageTop">
-              <h1>Previous runs</h1>
-              <Grid container spacing={2}>
-                {runs.map((res, i) => (
-                  <RunCard key={i} run={res} />
-                ))}
-              </Grid>
-              <PreviousNext
-                start={start}
-                limit={limit}
-                runsLength={runs.length}
-                showNext={response.status === 206}
-                setStart={setStart}
-              />
-            </div>
-          );
+          setRunHistory({ runs, showNext: response.status === 206 });
         } else {
-          setRunHistory(
-            <Alert severity="warning">
-              Could not retrieve history: empty response.
-            </Alert>
-          );
+          setRunHistory({ noResponse: true });
         }
       });
   }, [start, limit, keyword, filterStatus]);
@@ -135,13 +101,58 @@ export default function RunHistory() {
       ?.scrollIntoView({ behavior: "smooth" });
   }, [start]);
 
+  const renderHistory = () => {
+    if (runHistory.error) {
+      return (
+        <Box sx={{ padding: "50px" }}>
+          <HttpError
+            error={runHistory.error}
+            response={runHistory.response}
+            message={t("history.gettingHistory")}
+          />
+        </Box>
+      );
+    }
+    if (runHistory.empty) {
+      return (
+        <Box sx={{ padding: "5px" }}>
+          <h1>{t("history.title")}</h1>
+          <Alert severity="info">
+            {runHistory.filtered ? t("history.noMatch") : t("history.none")}
+          </Alert>
+        </Box>
+      );
+    }
+    if (runHistory.noResponse) {
+      return <Alert severity="warning">{t("history.emptyResponse")}</Alert>;
+    }
+    return (
+      <div id="pageTop">
+        <h1>{t("history.title")}</h1>
+        <Grid container spacing={2}>
+          {runHistory.runs.map((res, i) => (
+            <RunCard key={i} run={res} />
+          ))}
+        </Grid>
+        <PreviousNext
+          start={start}
+          limit={limit}
+          runsLength={runHistory.runs.length}
+          showNext={runHistory.showNext}
+          setStart={setStart}
+        />
+      </div>
+    );
+  };
+
   return (
     <div className="history">
       <div className="search-container">
         <input
           type="search"
           className="step-search-input"
-          placeholder="Search history..."
+          placeholder={t("history.search")}
+          aria-label={t("history.search")}
           value={inputValue}
           onChange={(e) => {
             setInputValue(e.target.value);
@@ -150,7 +161,7 @@ export default function RunHistory() {
         />
         <FilterMenu onChange={handleFilterChange}></FilterMenu>
       </div>
-      {runHistory ? runHistory : <Spinner variant="light" />}
+      {runHistory ? renderHistory() : <Spinner variant="light" />}
     </div>
   );
 }
@@ -228,6 +239,7 @@ const ExpandMore = styled((props) => {
 
 const PreviousNext = (props) => {
   const { start, limit, runsLength, showNext, setStart } = props;
+  const { t } = useTranslation();
   return (
     <Grid
       container
@@ -242,7 +254,7 @@ const PreviousNext = (props) => {
               setStart((prev) => Math.max(prev - limit, 0));
             }}
           >
-            {"<< Previous page"}
+            {t("history.previous")}
           </CustomButtonGrey>
         </Grid>
       )}
@@ -253,7 +265,7 @@ const PreviousNext = (props) => {
               setStart((prev) => prev + limit);
             }}
           >
-            {"Next page >>"}
+            {t("history.next")}
           </CustomButtonGrey>
         </Grid>
       )}

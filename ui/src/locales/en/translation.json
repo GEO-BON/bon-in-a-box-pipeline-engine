@@ -65,5 +65,240 @@
     "fileServiceOffline": "The file service appears to be offline. If it is starting, it is not yet ready to respond — retrying every {{seconds}} seconds.",
     "error": "Error: {{details}}",
     "loading": "Loading"
+  },
+  "errors": {
+    "withDetails": "{{message}}: {{details}}",
+    "versions": "Error fetching version information",
+    "k8sStatus": "Error while getting K8s status",
+    "k8sPrepare": "Error while preparing K8s",
+    "hpcStatus": "Error while getting HPC status",
+    "hpcPrepare": "Error while preparing HPC",
+    "pipelineList": "Unable to get the list of pipelines",
+    "scriptList": "Unable to get the list of scripts"
+  },
+  "history": {
+    "title": "Previous runs",
+    "search": "Search history...",
+    "gettingHistory": "Error getting run history",
+    "noMatch": "No runs match your search or filter.",
+    "none": "There are no runs in history.",
+    "emptyResponse": "Could not retrieve history: empty response.",
+    "previous": "<< Previous page",
+    "next": "Next page >>"
+  },
+  "filter": {
+    "button": "Filter",
+    "apply": "Apply filters",
+    "all": "All",
+    "completed": "Completed",
+    "running": "Running",
+    "error": "Error",
+    "cancelled": "Cancelled"
+  },
+  "pipelineMenu": {
+    "showAllTooltip": "Also list pipelines that have not been reviewed: stale, subpipeline, etc.",
+    "showAll": "Show stale pipelines, subpipelines, etc.",
+    "placeholder": "Search or select a pipeline...",
+    "placeholderScript": "Search or select a script...",
+    "noOptions": "No options",
+    "general": "General"
+  },
+  "pipelinePage": {
+    "errorOutputs": "Error while getting pipeline outputs from script server",
+    "errorMetadata": "Error while loading pipeline metadata from script server",
+    "errorStop": "Error in script server while stopping the pipeline",
+    "cancelledByUser": "Cancelled by user",
+    "pipelineRun": "Pipeline run",
+    "scriptRun": "Script run",
+    "inputForm": "Input form",
+    "stop": "Stop"
+  },
+  "inputType": {
+    "multipleOptions": "multiple options",
+    "name": {
+      "geotiff": "geotiff",
+      "geojson": "geojson",
+      "geopackage": "geopackage",
+      "shapefile": "shapefile",
+      "csv": "comma separated values",
+      "tsv": "tab separated values",
+      "text": "text",
+      "int": "integer",
+      "float": "decimal number"
+    },
+    "plural": {
+      "int": "integers",
+      "float": "decimal numbers",
+      "text": "texts"
+    },
+    "file": "path to {{type}} file",
+    "files": "paths to {{type}} files",
+    "listOf": "comma-separated list of {{items}}",
+    "listOfOther": "comma-separated list of {{type}}s"
+  },
+  "form": {
+    "inputForm": "Input form",
+    "inputYaml": "Input yaml",
+    "noInputs": "No inputs",
+    "missingLabel": "Missing label for input \"{{id}}\"",
+    "notSnakeCase": "Input id {{id}} should be a snake_case id",
+    "example": "Example: {{example}}",
+    "missingDescription": "Missing description for input \"{{id}}\"",
+    "showLess": "Show less",
+    "readMore": "Read more",
+    "yamlSyntax": "YAML syntax: {{reason}}",
+    "atLine": "At line {{line}}: {{message}}",
+    "errorLaunch": "Error while launching pipeline on script server",
+    "emptyResult": "Server returned empty result",
+    "errorRunId": "Error while getting run ID from script server",
+    "pipeline": "Pipeline",
+    "script": "Script",
+    "yamlError": "Error parsing YAML input.",
+    "runPipeline": "Run pipeline",
+    "runScript": "Run script",
+    "noType": "Input does not declare a type!",
+    "optionsNotDefined": "Options not defined",
+    "arrayPlaceholder": "Array (comma-separated)",
+    "constantPlaceholder": "Constant"
+  },
+  "choosers": {
+    "boundingBox": "Bounding Box",
+    "location": "Country, region, CRS and Bounding Box",
+    "choose": "Choose {{label}}",
+    "draw": "Draw area of interest on map",
+    "orChoose": "or choose",
+    "accept": "Accept",
+    "clear": "Clear",
+    "cancel": "Cancel",
+    "selectCountry": "Select country",
+    "selectRegion": "Select region",
+    "crsTitle": "Coordinate reference system",
+    "crsSearch": "Search / Select CRS",
+    "crsCode": "Or enter code directly (e.g. EPSG:4326)",
+    "mapFailed": "Failed to create map for {{crs}}",
+    "crsNotOnMap": "This CRS cannot be shown on the map. The bounding box can still be entered manually.",
+    "transformError": "Error transforming bounding box between CRS",
+    "viewSource": "View Source",
+    "hideSource": "Hide Source",
+    "country": "Country:",
+    "region": "Region:",
+    "crs": "CRS:",
+    "boundingBoxLabel": "Bounding box:",
+    "minX": "Minimum X:",
+    "minY": "Minimum Y:",
+    "maxX": "Maximum X:",
+    "maxY": "Maximum Y:",
+    "minXLabel": "Minimum X",
+    "minYLabel": "Minimum Y",
+    "maxXLabel": "Maximum X",
+    "maxYLabel": "Maximum Y",
+    "countryRegion": "Country/Region",
+    "toponyms": "Reference for toponyms:",
+    "units": "Units: {{unit}}",
+    "notAvailable": "n/a"
+  },
+  "results": {
+    "title": "Results",
+    "seeInViewer": "See in results viewer",
+    "noOutput": "No output",
+    "detailed": "Detailed results",
+    "noEnvironment": "environment file was not created",
+    "skippedUnnecessary": "Skipped: not necessary with the given parameters",
+    "skipped": "Skipped",
+    "skippedFailure": "Skipped due to previous failure",
+    "aborted": "Aborted",
+    "skippedStopped": "Skipped when pipeline stopped",
+    "cancelled": "Cancelled",
+    "noInputs": "No inputs",
+    "inputs": "Inputs",
+    "downloadInput": "Download input file",
+    "environment": "Environment",
+    "running": "Running...",
+    "waiting": "Waiting for previous steps to complete.",
+    "emptyString": "Empty string",
+    "missingMime": {
+      "input": "Missing mime type in input description.",
+      "output": "Missing mime type in output description."
+    },
+    "notInYml": {
+      "input": "The input was not found in this script's YML description file.",
+      "output": "The output was not found in this script's YML description file."
+    },
+    "notSnakeCase": "Output id {{id}} should be a snake_case id",
+    "error": "Error",
+    "logs": "Logs"
+  },
+  "fileBrowser": {
+    "networkError": "Error with the network response.",
+    "loading": "Loading...",
+    "error": "Error: {{message}}",
+    "title": "Select your file(s)",
+    "files": "File(s)",
+    "search": "Search files",
+    "noMatch": "No matching files",
+    "useSelected_one": "Use selected file",
+    "useSelected_other": "Use selected files"
+  },
+  "description": {
+    "identifierLogo": "Identifier logo",
+    "goToProfile": "Go to profile",
+    "contribution": "Contribution: {{role}}",
+    "license": "License: {{license}}",
+    "notFound": "Script was not found on this server. Raw results will be displayed.",
+    "compute_one": "Compute: Uses {{count}} core capped to {{mem}} of memory.",
+    "compute_other": "Compute: Uses {{count}} cores capped to {{mem}} of memory.",
+    "computeHpc_one": "Compute: Uses {{count}} core capped to {{mem}} of memory. This script can run on a HPC, with a maximum duration of {{time}}.",
+    "computeHpc_other": "Compute: Uses {{count}} cores capped to {{mem}} of memory. This script can run on a HPC, with a maximum duration of {{time}}.",
+    "reviewedBy": "Reviewed by:",
+    "code": "Code:",
+    "see": "See",
+    "references": "References:",
+    "inputs": "Inputs",
+    "outputs": "Outputs"
+  },
+  "lifecycle": {
+    "unknown": "Unknown",
+    "in_development": {
+      "label": "In Development",
+      "title": "Should be used with caution."
+    },
+    "in_review": {
+      "label": "In Review",
+      "title": "Finalised by their authors and currently going through a formal peer-review process."
+    },
+    "reviewed": {
+      "label": "Reviewed",
+      "title": "Approved by an independent peer-review process. Use according to documented guidelines."
+    },
+    "core": {
+      "label": "Core",
+      "title": "A core component of the system, shared among many pipelines."
+    },
+    "deprecated": {
+      "label": "Deprecated",
+      "title": "For backwards compatibility only."
+    },
+    "example": {
+      "label": "Example",
+      "title": "For testing and training purpose only. Does not perform any real analysis."
+    },
+    "subpipeline": {
+      "label": "subpipeline",
+      "title": "A pipeline that is meant to be part of larger pipelines."
+    },
+    "stale": {
+      "label": "Stale",
+      "title": "Not maintained."
+    }
+  },
+  "captcha": {
+    "scriptFailed": "Failed to load reCAPTCHA script. Please refresh the page.",
+    "failed": "Verification failed. Are you a robot? Please try again.",
+    "endpointUnavailable": "Verification failed: reCAPTCHA verification endpoint not available.",
+    "error": "Verification error. Please refresh the page.",
+    "verifying": "Verifying access...",
+    "automatic": "This process is automatic. Please wait.",
+    "errorTitle": "Verification Error",
+    "retry": "Retry"
   }
 }

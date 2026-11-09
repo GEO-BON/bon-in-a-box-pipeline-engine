@@ -48,7 +48,7 @@
     "runPipeline": "Lancer",
     "viewAll": "Tout afficher",
     "latestRuns": "EXÉCUTIONS RÉCENTES",
-    "noRuns": "Il n’y a actuellement aucune exécution à afficher.",
+    "noRuns": "Il n’y a actuellement aucun résultat à afficher.",
     "runsError": "Impossible de récupérer les dernières exécutions."
   },
   "runCard": {
@@ -65,5 +65,240 @@
     "fileServiceOffline": "Le service de fichiers semble hors ligne. S’il est en cours de démarrage, il n’est pas encore prêt à répondre — nouvelle tentative toutes les {{seconds}} secondes.",
     "error": "Erreur : {{details}}",
     "loading": "Chargement"
+  },
+  "errors": {
+    "withDetails": "{{message}} : {{details}}",
+    "versions": "Erreur lors de la récupération des informations de version",
+    "k8sStatus": "Erreur lors de l’obtention de l’état de K8s",
+    "k8sPrepare": "Erreur lors de la préparation de K8s",
+    "hpcStatus": "Erreur lors de l’obtention de l’état du HPC",
+    "hpcPrepare": "Erreur lors de la préparation du HPC",
+    "pipelineList": "Impossible d’obtenir la liste des pipelines",
+    "scriptList": "Impossible d’obtenir la liste des scripts"
+  },
+  "history": {
+    "title": "Exécutions précédentes",
+    "search": "Rechercher dans l’historique…",
+    "gettingHistory": "Erreur lors de l’obtention de l’historique des exécutions",
+    "noMatch": "Aucune exécution ne correspond à votre recherche ou à votre filtre.",
+    "none": "Il n’y a aucune exécution dans l’historique.",
+    "emptyResponse": "Impossible de récupérer l’historique : réponse vide.",
+    "previous": "<< Page précédente",
+    "next": "Page suivante >>"
+  },
+  "filter": {
+    "button": "Filtrer",
+    "apply": "Appliquer les filtres",
+    "all": "Toutes",
+    "completed": "Terminées",
+    "running": "En cours",
+    "error": "En erreur",
+    "cancelled": "Annulées"
+  },
+  "pipelineMenu": {
+    "showAllTooltip": "Lister aussi les pipelines qui n’ont pas été révisés : périmés, sous-pipelines, etc.",
+    "showAll": "Afficher les pipelines périmés, les sous-pipelines, etc.",
+    "placeholder": "Rechercher ou sélectionner un pipeline…",
+    "placeholderScript": "Rechercher ou sélectionner un script…",
+    "noOptions": "Aucune option",
+    "general": "Général"
+  },
+  "pipelinePage": {
+    "errorOutputs": "Erreur lors de l’obtention des sorties du pipeline depuis le serveur de scripts",
+    "errorMetadata": "Erreur lors du chargement des métadonnées du pipeline depuis le serveur de scripts",
+    "errorStop": "Erreur du serveur de scripts lors de l’arrêt du pipeline",
+    "cancelledByUser": "Annulé par l’utilisateur",
+    "pipelineRun": "Exécution du pipeline",
+    "scriptRun": "Exécution du script",
+    "inputForm": "Formulaire d’entrée",
+    "stop": "Arrêter"
+  },
+  "inputType": {
+    "multipleOptions": "options multiples",
+    "name": {
+      "geotiff": "geotiff",
+      "geojson": "geojson",
+      "geopackage": "geopackage",
+      "shapefile": "shapefile",
+      "csv": "valeurs séparées par des virgules",
+      "tsv": "valeurs séparées par des tabulations",
+      "text": "texte",
+      "int": "entier",
+      "float": "nombre décimal"
+    },
+    "plural": {
+      "int": "entiers",
+      "float": "nombres décimaux",
+      "text": "textes"
+    },
+    "file": "chemin vers un fichier {{type}}",
+    "files": "chemins vers des fichiers {{type}}",
+    "listOf": "liste séparée par des virgules de {{items}}",
+    "listOfOther": "liste séparée par des virgules de {{type}}"
+  },
+  "form": {
+    "inputForm": "Formulaire d’entrée",
+    "inputYaml": "Entrée YAML",
+    "noInputs": "Aucune entrée",
+    "missingLabel": "Libellé manquant pour l’entrée « {{id}} »",
+    "notSnakeCase": "L’identifiant d’entrée {{id}} devrait être en snake_case",
+    "example": "Exemple : {{example}}",
+    "missingDescription": "Description manquante pour l’entrée « {{id}} »",
+    "showLess": "Voir moins",
+    "readMore": "Lire la suite",
+    "yamlSyntax": "Syntaxe YAML : {{reason}}",
+    "atLine": "À la ligne {{line}} : {{message}}",
+    "errorLaunch": "Erreur lors du lancement du pipeline sur le serveur de scripts",
+    "emptyResult": "Le serveur a renvoyé un résultat vide",
+    "errorRunId": "Erreur lors de l’obtention de l’identifiant d’exécution depuis le serveur de scripts",
+    "pipeline": "Pipeline",
+    "script": "Script",
+    "yamlError": "Erreur d’analyse de l’entrée YAML.",
+    "runPipeline": "Lancer le pipeline",
+    "runScript": "Lancer le script",
+    "noType": "L’entrée ne déclare pas de type !",
+    "optionsNotDefined": "Options non définies",
+    "arrayPlaceholder": "Tableau (séparé par des virgules)",
+    "constantPlaceholder": "Constante"
+  },
+  "choosers": {
+    "boundingBox": "Rectangle englobant",
+    "location": "Pays, région, SRC et rectangle englobant",
+    "choose": "Choisir : {{label}}",
+    "draw": "Dessiner la zone d’intérêt sur la carte",
+    "orChoose": "ou choisir",
+    "accept": "Accepter",
+    "clear": "Effacer",
+    "cancel": "Annuler",
+    "selectCountry": "Sélectionner un pays",
+    "selectRegion": "Sélectionner une région",
+    "crsTitle": "Système de référence de coordonnées",
+    "crsSearch": "Rechercher / sélectionner un SRC",
+    "crsCode": "Ou saisir directement le code (p. ex. EPSG:4326)",
+    "mapFailed": "Impossible de créer la carte pour {{crs}}",
+    "crsNotOnMap": "Ce SRC ne peut pas être affiché sur la carte. Le rectangle englobant peut quand même être saisi manuellement.",
+    "transformError": "Erreur lors de la transformation du rectangle englobant entre SRC",
+    "viewSource": "Voir la source",
+    "hideSource": "Masquer la source",
+    "country": "Pays :",
+    "region": "Région :",
+    "crs": "SRC :",
+    "boundingBoxLabel": "Rectangle englobant :",
+    "minX": "X minimum :",
+    "minY": "Y minimum :",
+    "maxX": "X maximum :",
+    "maxY": "Y maximum :",
+    "minXLabel": "X minimum",
+    "minYLabel": "Y minimum",
+    "maxXLabel": "X maximum",
+    "maxYLabel": "Y maximum",
+    "countryRegion": "Pays/région",
+    "toponyms": "Référence pour les toponymes :",
+    "units": "Unités : {{unit}}",
+    "notAvailable": "s. o."
+  },
+  "results": {
+    "title": "Résultats",
+    "seeInViewer": "Voir dans le visualiseur de résultats",
+    "noOutput": "Aucune sortie",
+    "detailed": "Résultats détaillés",
+    "noEnvironment": "le fichier d’environnement n’a pas été créé",
+    "skippedUnnecessary": "Ignoré : inutile avec les paramètres donnés",
+    "skipped": "Ignoré",
+    "skippedFailure": "Ignoré à cause d’un échec précédent",
+    "aborted": "Abandonné",
+    "skippedStopped": "Ignoré à l’arrêt du pipeline",
+    "cancelled": "Annulé",
+    "noInputs": "Aucune entrée",
+    "inputs": "Entrées",
+    "downloadInput": "Télécharger le fichier d’entrée",
+    "environment": "Environnement",
+    "running": "En cours d’exécution…",
+    "waiting": "En attente de la fin des étapes précédentes.",
+    "emptyString": "Chaîne vide",
+    "missingMime": {
+      "input": "Type MIME manquant dans la description de l’entrée.",
+      "output": "Type MIME manquant dans la description de la sortie."
+    },
+    "notInYml": {
+      "input": "L’entrée est introuvable dans le fichier de description YML de ce script.",
+      "output": "La sortie est introuvable dans le fichier de description YML de ce script."
+    },
+    "notSnakeCase": "L’identifiant de sortie {{id}} devrait être en snake_case",
+    "error": "Erreur",
+    "logs": "Journaux"
+  },
+  "fileBrowser": {
+    "networkError": "Erreur dans la réponse du réseau.",
+    "loading": "Chargement…",
+    "error": "Erreur : {{message}}",
+    "title": "Sélectionnez vos fichiers",
+    "files": "Fichiers",
+    "search": "Rechercher des fichiers",
+    "noMatch": "Aucun fichier correspondant",
+    "useSelected_one": "Utiliser le fichier sélectionné",
+    "useSelected_other": "Utiliser les fichiers sélectionnés"
+  },
+  "description": {
+    "identifierLogo": "Logo de l’identifiant",
+    "goToProfile": "Aller au profil",
+    "contribution": "Contribution : {{role}}",
+    "license": "Licence : {{license}}",
+    "notFound": "Le script est introuvable sur ce serveur. Les résultats bruts seront affichés.",
+    "compute_one": "Calcul : utilise {{count}} cœur, limité à {{mem}} de mémoire.",
+    "compute_other": "Calcul : utilise {{count}} cœurs, limités à {{mem}} de mémoire.",
+    "computeHpc_one": "Calcul : utilise {{count}} cœur, limité à {{mem}} de mémoire. Ce script peut s’exécuter sur un HPC, pour une durée maximale de {{time}}.",
+    "computeHpc_other": "Calcul : utilise {{count}} cœurs, limités à {{mem}} de mémoire. Ce script peut s’exécuter sur un HPC, pour une durée maximale de {{time}}.",
+    "reviewedBy": "Révisé par :",
+    "code": "Code :",
+    "see": "Voir",
+    "references": "Références :",
+    "inputs": "Entrées",
+    "outputs": "Sorties"
+  },
+  "lifecycle": {
+    "unknown": "Inconnu",
+    "in_development": {
+      "label": "En développement",
+      "title": "À utiliser avec prudence."
+    },
+    "in_review": {
+      "label": "En révision",
+      "title": "Finalisé par ses auteurs et en cours d’évaluation formelle par les pairs."
+    },
+    "reviewed": {
+      "label": "Révisé",
+      "title": "Approuvé par une évaluation indépendante par les pairs. À utiliser selon les directives documentées."
+    },
+    "core": {
+      "label": "Noyau",
+      "title": "Un composant central du système, partagé par de nombreux pipelines."
+    },
+    "deprecated": {
+      "label": "Obsolète",
+      "title": "Pour la rétrocompatibilité seulement."
+    },
+    "example": {
+      "label": "Exemple",
+      "title": "À des fins de test et de formation seulement. N’effectue aucune véritable analyse."
+    },
+    "subpipeline": {
+      "label": "sous-pipeline",
+      "title": "Un pipeline destiné à faire partie de pipelines plus grands."
+    },
+    "stale": {
+      "label": "Périmé",
+      "title": "Non maintenu."
+    }
+  },
+  "captcha": {
+    "scriptFailed": "Échec du chargement du script reCAPTCHA. Veuillez actualiser la page.",
+    "failed": "La vérification a échoué. Êtes-vous un robot ? Veuillez réessayer.",
+    "endpointUnavailable": "La vérification a échoué : le point de terminaison de vérification reCAPTCHA n’est pas disponible.",
+    "error": "Erreur de vérification. Veuillez actualiser la page.",
+    "verifying": "Vérification de l’accès…",
+    "automatic": "Ce processus est automatique. Veuillez patienter.",
+    "errorTitle": "Erreur de vérification",
+    "retry": "Réessayer"
   }
 }

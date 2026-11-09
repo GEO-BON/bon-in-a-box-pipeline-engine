@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import YAMLTextArea from "./YAMLTextArea";
 import { InputsDescription } from "../StepDescription";
 import "./InputFileInputs.css";
@@ -27,6 +28,7 @@ export default function InputFileInput({
   restoreDefaults,
 }) {
   const [selectedTab, setSelectedTab] = useState(0);
+  const { t } = useTranslation();
 
   const BTab = styled((props) => <Tab disableRipple {...props} />)(
     ({ theme }) => ({
@@ -60,8 +62,8 @@ export default function InputFileInput({
           marginLeft: "10px",
         }}
       >
-        <BTab label="Input form"></BTab>
-        <BTab label="Input yaml"></BTab>
+        <BTab label={t("form.inputForm")}></BTab>
+        <BTab label={t("form.inputYaml")}></BTab>
       </Tabs>
       {selectedTab == 0 && (
         <Box className="inputFormDiv">
@@ -93,7 +95,8 @@ export default function InputFileInput({
 }
 
 const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
-  if (!inputs) return <p>No Inputs</p>;
+  const { t } = useTranslation();
+  if (!inputs) return <p>{t("form.noInputs")}</p>;
 
   function updateInputFile(inputId, value) {
     setInputFileContent((oldContent) => {
@@ -124,14 +127,13 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                     className="error"
                     sx={{ margin: "0 10px 10px 10px" }}
                   >
-                    Missing label for input "{inputId}"
+                    {t("form.missingLabel", { id: inputId })}
                   </Alert>
                 )}
                 {!/^(.*\|)?[a-z0-9]+(?:_[a-z0-9]+)*$/.test(inputId) &&
                   !/pipeline@\d+$/.test(inputId) && (
                     <Alert severity="warning">
-                      Input id {inputId.replace(/^(.*\|)/, "")} should be a
-                      snake_case id
+                      {t("form.notSnakeCase", { id: inputId.replace(/^(.*\|)/, "") })}
                     </Alert>
                   )}
                 <div className="inputFieldBody">

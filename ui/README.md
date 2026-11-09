@@ -1,10 +1,11 @@
 # React + Vite
 
-## UI translation pilot
+## UI translation
 
-The pilot translates the navigation, home page (including recent-run controls),
-and startup messages into English and French. The rest of the UI remains in
-English for now. Names, descriptions, statuses, errors, and other content
+The UI translates the navigation, home page, startup messages and the main user
+journeys (pipeline/script selection, input forms, results, run history, file
+selection) into English and French. The pipeline editor, chat controls and
+remaining dialogs remain in English for now. Names, descriptions, statuses, errors, and other content
 supplied by APIs are not translated by the UI.
 
 The browser's preferred supported language is used by default, falling back to

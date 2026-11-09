@@ -1,5 +1,6 @@
 import "./StepChooser.css";
 
+import i18n from "../../i18n";
 import { isValidElement, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { PopupContentContext } from "../../Layout.jsx";
 
@@ -79,7 +80,7 @@ export default function StepChooser(_) {
     api.getListOf("pipeline", {}, (error, pipelineList, response) => {
       if (error) {
         console.error(error);
-        setPipelineFiles(<HttpError httpError={error} response={response} context="Unable to get list of pipelines" />)
+        setPipelineFiles(<HttpError error={error} response={response} message={i18n.t("errors.pipelineList")} />)
 
       } else {
         setPipelineFiles(pipelineList);
@@ -90,7 +91,7 @@ export default function StepChooser(_) {
     api.getListOf("script", {}, (error, scriptList, response) => {
       if (error) {
         console.error(error);
-        setScriptFiles(<HttpError httpError={error} response={response} context="unable ot get list of scripts" />)
+        setScriptFiles(<HttpError error={error} response={response} message={i18n.t("errors.scriptList")} />)
 
       } else {
         setScriptFiles(scriptList);

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import i18n from "../../i18n";
 import { Spinner } from "../Spinner";
 import { HttpError } from "../HttpErrors";
 import { isEmptyObject } from "../../utils/isEmptyObject";
@@ -23,7 +24,7 @@ export default function K8sStatus() {
     let timeout = null
     api.getK8sStatus((error, data, response) => {
       if (error) {
-        setErrorMessage(<HttpError error={error} response={response} context={"while getting K8s status"} />)
+        setErrorMessage(<HttpError error={error} response={response} message={i18n.t("errors.k8sStatus")} />)
         setStatus(null)
 
       } else {
@@ -48,7 +49,7 @@ export default function K8sStatus() {
   const connect = useCallback(() => {
     api.prepareK8s((error, data, response) => {
       if (error) {
-        setErrorMessage(<HttpError httpError={error} response={response} context={"while preparing K8s"} />)
+        setErrorMessage(<HttpError error={error} response={response} message={i18n.t("errors.k8sPrepare")} />)
         setStatus(null)
       } else {
         refreshStatus()

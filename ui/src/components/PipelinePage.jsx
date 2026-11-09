@@ -21,6 +21,7 @@ import Box from "@mui/material/Box";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ReactMarkdown from "react-markdown";
 import { PageTitle } from "../Layout";
+import { useTranslation } from "react-i18next";
 
 const pipelineConfig = { extension: ".json", defaultFile: null };
 const scriptConfig = {
@@ -90,6 +91,7 @@ function pipInitialState(init) {
 }
 
 export function PipelinePage({ runType }) {
+  const { t } = useTranslation();
   const [stoppable, setStoppable] = useState(null);
   const [runningScripts, setRunningScripts] = useState(new Set());
   const [resultsData, setResultsData] = useState(null);
@@ -123,7 +125,7 @@ export function PipelinePage({ runType }) {
               formatError(
                 error,
                 response,
-                "while getting pipeline outputs from script server",
+                t("pipelinePage.errorOutputs"),
               ),
             );
           } else {
@@ -163,7 +165,7 @@ export function PipelinePage({ runType }) {
           formatError(
             error,
             response,
-            "while loading pipeline metadata from script server",
+            t("pipelinePage.errorMetadata"),
           ),
         );
         setPipelineMetadata(null);
@@ -276,11 +278,11 @@ export function PipelinePage({ runType }) {
           formatError(
             error,
             response,
-            "in script server while stopping the pipeline",
+            t("pipelinePage.errorStop"),
           ),
         );
       } else {
-        setHttpError("Cancelled by user");
+        setHttpError(t("pipelinePage.cancelledByUser"));
       }
     });
   };
@@ -336,19 +338,19 @@ export function PipelinePage({ runType }) {
           pipelineMetadata?.name
             ? pipelineMetadata.name
             : runType === "pipeline"
-              ? "Pipeline run"
-              : "Script run"
+              ? t("pipelinePage.pipelineRun")
+              : t("pipelinePage.scriptRun")
         }
       />
       <div className="pipeline-page">
-        <h2>{runType === "pipeline" ? "Pipeline" : "Script"} run</h2>
+        <h2>{runType === "pipeline" ? t("pipelinePage.pipelineRun") : t("pipelinePage.scriptRun")}</h2>
         <Box className="inputsTop">
           <Accordion expanded={expandInputs} onChange={toggleAccord}>
             <AccordionSummary
               className="outputTitle"
               expandIcon={<ExpandMoreIcon />}
             >
-              Input form
+              {t("pipelinePage.inputForm")}
             </AccordionSummary>
             <AccordionDetails className="outputContent">
               <PipelineForm
@@ -372,7 +374,7 @@ export function PipelinePage({ runType }) {
             variant="contained"
             sx={{ margin: "10px 0 10px 0" }}
           >
-            Stop
+            {t("pipelinePage.stop")}
           </CustomButtonGreen>
         )}
         {httpError && (

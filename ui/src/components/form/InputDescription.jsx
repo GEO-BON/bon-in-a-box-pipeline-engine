@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { useState, useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
+import { useTranslation } from "react-i18next";
 import "./InputFileInputs.css";
 import _lang from "lodash/lang";
 import Alert from "@mui/material/Alert";
@@ -9,6 +10,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 
 export default function InputDescription({ description, inputId }) {
+  const { t } = useTranslation();
   const descriptionCollapseThreshold = 90; // px
   const descriptionCollapseTolerance = 30; // px
   const [expanded, setExpanded] = useState(false);
@@ -59,7 +61,7 @@ export default function InputDescription({ description, inputId }) {
           <div className="reactMarkdown"><ReactMarkdown>{description}</ReactMarkdown></div>
         ) : (
           <Alert severity="warning">
-            Missing description for input "{inputId}"
+            {t("form.missingDescription", { id: inputId })}
           </Alert>
         )}
       </div>
@@ -73,7 +75,7 @@ export default function InputDescription({ description, inputId }) {
           >
             {isExpanded ? (
               <>
-                Show less{" "}
+                {t("form.showLess")}{" "}
                 <ExpandLessIcon
                   sx={{
                     fontSize: "1.2rem",
@@ -84,7 +86,7 @@ export default function InputDescription({ description, inputId }) {
               </>
             ) : (
               <>
-                Read more{" "}
+                {t("form.readMore")}{" "}
                 <ExpandMoreIcon
                   sx={{
                     fontSize: "1.2rem",

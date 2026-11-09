@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react";
+import { useTranslation } from "react-i18next";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import Select from "@mui/material/Select";
@@ -51,6 +52,7 @@ const MenuProps = {
 };
 
 export default function FileBrowser({ multipleFiles, onSelect, value }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   // start from the current value, dropping unconfirmed edits from a previous opening
   const handleOpen = () => {
@@ -118,7 +120,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
     fetch("/file-manager/files/all")
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Error with the network response.");
+          throw new Error(t("fileBrowser.networkError"));
         }
         return response.json();
       })
@@ -133,11 +135,11 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <p>{t("fileBrowser.loading")}</p>;
   }
 
   if (error) {
-    return <p>Error: {error}</p>;
+    return <p>{t("fileBrowser.error", { message: error })}</p>;
   }
 
   // gets all the ids of all the files (in alphabetical order)
@@ -175,10 +177,10 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
         onClose={handleModalClose}
       >
         <Box className="filebrowser-modal-box">
-          <Typography id="modal-modal-title">Select your file(s)</Typography>
+          <Typography id="modal-modal-title">{t("fileBrowser.title")}</Typography>
 
           <FormControl sx={{ m: 1, width: 300 }}>
-            <InputLabel>File(s)</InputLabel>
+            <InputLabel>{t("fileBrowser.files")}</InputLabel>
             <Select
               className="file-select-chip"
               multiple
@@ -187,7 +189,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
               open={menuOpen}
               onOpen={() => setMenuOpen(true)}
               onClose={closeMenu}
-              input={<OutlinedInput label="File(s)" />}
+              input={<OutlinedInput label={t("fileBrowser.files")} />}
               MenuProps={MenuProps}
               renderValue={(selected) => {
                 if (!multipleFiles) {
@@ -207,7 +209,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
                   size="small"
                   autoFocus
                   fullWidth
-                  placeholder="Search files"
+                  placeholder={t("fileBrowser.search")}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   // let the field get keys instead of the menu's type-to-select
@@ -226,7 +228,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
                 />
               </ListSubheader>
               {shownFileIDs.length === 0 && (
-                <MenuItem disabled>No matching files</MenuItem>
+                <MenuItem disabled>{t("fileBrowser.noMatch")}</MenuItem>
               )}
               {/* for rendering the checkboxes */}
               {shownFileIDs.map((fileId) => {
@@ -256,7 +258,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
             variant="contained"
             onClick={confirmSelection}
           >
-            Use selected file{fileNames.length !== 1 ? "s" : ""}
+            {t("fileBrowser.useSelected", { count: fileNames.length })}
           </Button>
         </Box>
       </Modal>

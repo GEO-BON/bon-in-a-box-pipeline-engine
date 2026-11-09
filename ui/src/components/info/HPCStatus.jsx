@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import i18n from "../../i18n";
 import { Spinner } from "../Spinner";
 import { HttpError } from "../HttpErrors";
 import { isEmptyObject } from "../../utils/isEmptyObject";
@@ -23,7 +24,7 @@ export default function HPCStatus() {
     let timeout = null
     api.getHPCStatus((error, data, response) => {
       if (error) {
-        setErrorMessage(<HttpError error={error} response={response} context={"while getting HPC status"} />)
+        setErrorMessage(<HttpError error={error} response={response} message={i18n.t("errors.hpcStatus")} />)
         setStatus(null)
 
       } else {
@@ -51,7 +52,7 @@ export default function HPCStatus() {
   const connect = useCallback(() => {
     api.hpcPrepareGet((error, data, response) => {
       if (error) {
-        setErrorMessage(<HttpError httpError={error} response={response} context={"while preparing HPC"} />)
+        setErrorMessage(<HttpError error={error} response={response} message={i18n.t("errors.hpcPrepare")} />)
         setStatus(null)
       } else {
         refreshStatus()

@@ -21,7 +21,9 @@ import {
   transformCoordCRS,
 } from "./utils";
 
+import { useTranslation } from "react-i18next";
 export default function CRSMenu({ states, dispatch, value, dialog = false }) {
+  const { t } = useTranslation();
   const [CRSList, setCRSList] = useState(defaultCRSList);
   const p = `${value?.CRS?.authority}:${parseInt(value?.CRS?.code)}`;
   const savedCRSValue = value?.CRS
@@ -205,7 +207,7 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
     <div style={paperStyle(dialog)}>
       {dialog && (
         <h4 style={{ marginTop: "3px", marginBottom: "3px" }}>
-          Coordinate reference system
+          {t("choosers.crsTitle")}
         </h4>
       )}
       {searching && <CircularProgress size="14px" />}
@@ -231,7 +233,7 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Search / Select CRS"
+            label={t("choosers.crsSearch")}
             slotProps={{
               input: {
                 ...params.InputProps,
@@ -284,12 +286,12 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
           variant="outlined"
           size="small"
         >
-          Or enter code directly (e.g. EPSG:4326)
+          {t("choosers.crsCode")}
         </InputLabel>
         <OutlinedInput
           id="crs-code"
           value={inputValue}
-          label="Or enter code directly (e.g. EPSG:4326)"
+          label={t("choosers.crsCode")}
           variant="outlined"
           size="small"
           sx={{ width: "100%" }}
@@ -305,7 +307,7 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
           margin: "5px 0px 2px 5px",
         }}
       >
-        Units: {states.CRS && states.CRS?.unit ? states.CRS.unit : "n/a"}
+        {t("choosers.units", { unit: states.CRS && states.CRS?.unit ? states.CRS.unit : t("choosers.notAvailable") })}
       </div>
     </div>
   );

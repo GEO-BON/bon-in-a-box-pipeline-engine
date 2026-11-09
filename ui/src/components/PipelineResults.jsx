@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { StepResult, SingleIOResult } from "./StepResult";
 import {
   FoldableOutput,
@@ -39,6 +40,7 @@ export function PipelineResults({
   isPipeline,
   displayTimeStamp,
 }) {
+  const { t } = useTranslation();
   const [activeRenderer, setActiveRenderer] = useState({});
   const [pipelineOutputResults, setPipelineOutputResults] = useState({});
 
@@ -68,14 +70,14 @@ export function PipelineResults({
         >
           {isPipeline && runHash && (
             <>
-              <h2>Results</h2>
+              <h2>{t("results.title")}</h2>
               <a href={`/viewer/${pipeline}>${runHash}`} target="_blank">
                 <CustomButtonGreen
                   disabled={runningScripts.size > 0}
                   variant="contained"
                   sx={{ marginBottom: "10px" }}
                 >
-                  See in results viewer
+                  {t("results.seeInViewer")}
                 </CustomButtonGreen>
               </a>
             </>
@@ -107,7 +109,7 @@ export function PipelineResults({
                       } else if (runningScripts.size > 0) {
                         noValueStatus = <InlineSpinner />;
                       } else {
-                        noValueStatus = <span>No output</span>;
+                        noValueStatus = <span>{t("results.noOutput")}</span>;
                       }
                       return (
                         <div key={ioId} className="outputTitle">
@@ -130,7 +132,7 @@ export function PipelineResults({
                   })}
             </Box>
           )}
-          <h2>Detailed results</h2>
+          <h2>{t("results.detailed")}</h2>
           <Box className="resultsBox">
             {Object.entries(resultsData).map((entry) => {
               const [key, value] = entry;
@@ -159,6 +161,7 @@ function isHtml(response) {
 }
 
 function EnvironmentInfo({folder}) {
+  const { t } = useTranslation();
   const [environmentData, setEnvironmentData] = useState(null);
 
   useEffect(() => {
@@ -170,7 +173,7 @@ function EnvironmentInfo({folder}) {
             setEnvironmentData(json);
           });
       } else if (response.status == 404) {
-        setEnvironmentData({ error: "environment file was not created"});
+        setEnvironmentData({ error: t("results.noEnvironment")});
       } else {
         setEnvironmentData({ error: response.status + " (" + response.statusText + ")"});
 
@@ -194,6 +197,7 @@ export function DelayedResult({
   setPipelineOutputResults,
   displayTimeStamp,
 }) {
+  const { t } = useTranslation();
   const [inputData, setInputData] = useState(null);
   const [outputData, setOutputData] = useState(null);
   const [scriptMetadata, setScriptMetadata] = useState(null);
@@ -222,15 +226,15 @@ export function DelayedResult({
     if (folder) {
       if (folder === "skipped") {
         setOutputData({
-          info: "Skipped: not necessary with the given parameters",
+          info: t("results.skippedUnnecessary"),
         });
-        setSkippedMessage("Skipped");
+        setSkippedMessage(t("results.skipped"));
       } else if (folder === "aborted") {
-        setOutputData({ warning: "Skipped due to previous failure" });
-        setSkippedMessage("Aborted");
+        setOutputData({ warning: t("results.skippedFailure") });
+        setSkippedMessage(t("results.aborted"));
       } else if (folder === "cancelled") {
-        setOutputData({ warning: "Skipped when pipeline stopped" });
-        setSkippedMessage("Cancelled");
+        setOutputData({ warning: t("results.skippedStopped") });
+        setSkippedMessage(t("results.cancelled"));
       }
     }
     // Execute only when folder changes (omitting resultData on purpose)
@@ -259,7 +263,7 @@ export function DelayedResult({
             });
         } else {
           setInputData({
-            info: "No inputs",
+            info: t("results.noInputs"),
           });
         }
       }
@@ -355,11 +359,11 @@ export function DelayedResult({
     if (inputData) {
       inputsContent = (
         <FoldableOutput
-          title="Inputs"
+          title={t("results.inputs")}
           className="stepInputs"
           inlineExpanded={
-            <a href={`/output/${folder}/input.json`} title="Download input file" download>
-              <img alt="Downlad input file" src={downloadImg} className="file-download" />
+            <a href={`/output/${folder}/input.json`} title={t("results.downloadInput")} download>
+              <img alt={t("results.downloadInput")} src={downloadImg} className="file-download" />
             </a>
           }
         >
@@ -383,7 +387,7 @@ export function DelayedResult({
       );
 
       environmentContent = (
-        <FoldableOutput title="Environment" className="stepEnvironment">
+        <FoldableOutput title={t("results.environment")} className="stepEnvironment">
           <EnvironmentInfo folder={folder}/>
         </FoldableOutput>
       );
@@ -397,11 +401,11 @@ export function DelayedResult({
       );
       inline = skippedMessage && <i>{skippedMessage}</i>;
     } else {
-      outputsContent = <p>Running...</p>;
+      outputsContent = <p>{t("results.running")}</p>;
       icon = <InlineSpinner />;
     }
   } else {
-    outputsContent = <p>Waiting for previous steps to complete.</p>;
+    outputsContent = <p>{t("results.waiting")}</p>;
     className += " gray";
   }
 
