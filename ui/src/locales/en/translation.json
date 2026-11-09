@@ -49,7 +49,7 @@
   },
   "runCard": {
     "status": "Status: {{status}}",
-    "unavailable": "This pipeline is not available in the current branch",
+    "unavailable": "This pipeline is not available in the current GIT branch",
     "viewer": "See in viewer",
     "runUi": "See in run UI",
     "showMore": "Show more",
