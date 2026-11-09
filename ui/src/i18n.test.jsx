@@ -1,4 +1,4 @@
-// @vitest-environment jsdoms
+// @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import i18n, { browserLanguage, changePreference, getPreference, LANGUAGE_KEY, readPreference } from "./i18n";
