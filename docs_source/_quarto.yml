@@ -15,9 +15,11 @@ website:
     search: true
     left:
       - href: index.qmd
-      - href: how_to_install.qmd
+        text: About
       - href: how_to_use.qmd
-        text: User Guide
+        text: User guide
+      - href: how_to_install.qmd
+        text: How to install
       - text: Contribute a pipeline
         menu:
           - href: contributing.qmd
@@ -26,7 +28,10 @@ website:
             text: Contribution instructions
           - href: pipeline_standards.qmd
             text: Pipeline standards
-      - peer_review.qmd
+          - href: openEO.qmd
+            text: openEO integration
+      - href: peer_review.qmd
+        text: Peer review
     tools:
       - icon: box-arrow-up-right
         href: https://boninabox.geobon.org/

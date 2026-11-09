@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.11.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -74,14 +74,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href=".//BiaB_logo_small.png" rel="icon" type="image/png">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-602dfb0a92afd774e28d5a4761a4ce24.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-665ee2a288131b436dc9b19ef6dcd906.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -114,19 +115,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-fixed quarto-light">
+<body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">BON in a Box</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -136,12 +136,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./how_to_install.html"> 
-<span class="menu-text">Install</span></a>
+    <a class="nav-link" href="./how_to_use.html"> 
+<span class="menu-text">User guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./how_to_use.html"> 
-<span class="menu-text">User Guide</span></a>
+    <a class="nav-link" href="./how_to_install.html"> 
+<span class="menu-text">How to install</span></a>
   </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribute-a-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
@@ -160,6 +160,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="./pipeline_standards.html">
  <span class="dropdown-text">Pipeline standards</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="./openEO.html">
+ <span class="dropdown-text">openEO integration</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item">
@@ -172,6 +176,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a href="https://boninabox.geobon.org/" title="BON in a Box website" class="quarto-navigation-tool px-1" aria-label="BON in a Box website"><i class="bi bi-box-arrow-up-right"></i></a>
     <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/" title="BON in a Box GitHub" class="quarto-navigation-tool px-1" aria-label="BON in a Box GitHub"><i class="bi bi-github"></i></a>
 </div>
+            <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -180,14 +185,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#general-github-contribution-workflow" id="toc-general-github-contribution-workflow" class="nav-link active" data-scroll-target="#general-github-contribution-workflow">General GitHub contribution workflow</a></li>
+  <li><a href="#before-you-start" id="toc-before-you-start" class="nav-link active" data-scroll-target="#before-you-start">Before you start</a></li>
+  <li><a href="#general-github-contribution-workflow" id="toc-general-github-contribution-workflow" class="nav-link" data-scroll-target="#general-github-contribution-workflow">General GitHub contribution workflow</a></li>
   <li><a href="#how-to-write-a-script-video-tutorial" id="toc-how-to-write-a-script-video-tutorial" class="nav-link" data-scroll-target="#how-to-write-a-script-video-tutorial">How to write a script video tutorial</a></li>
   <li><a href="#how-to-create-a-pipeline-video-tutorial" id="toc-how-to-create-a-pipeline-video-tutorial" class="nav-link" data-scroll-target="#how-to-create-a-pipeline-video-tutorial">How to create a pipeline video tutorial</a></li>
-  <li><a href="#before-you-start" id="toc-before-you-start" class="nav-link" data-scroll-target="#before-you-start">Before you start</a></li>
   <li><a href="#step-1-plan-your-pipeline" id="toc-step-1-plan-your-pipeline" class="nav-link" data-scroll-target="#step-1-plan-your-pipeline">Step 1: Plan your pipeline</a></li>
   <li><a href="#step-2-break-up-your-scripts" id="toc-step-2-break-up-your-scripts" class="nav-link" data-scroll-target="#step-2-break-up-your-scripts">Step 2: Break up your scripts</a></li>
   <li><a href="#step-3-create-a-yaml-file" id="toc-step-3-create-a-yaml-file" class="nav-link" data-scroll-target="#step-3-create-a-yaml-file">Step 3: Create a YAML file</a>
@@ -220,7 +225,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content" tabindex="-1">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -241,7 +246,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>Analysis pipelines in BON in a Box are workflows that have been adapted to its pipelines framework. Here we will walk you through a few steps to adapt your code to run in BON in a Box.</p>
+<p>This guide provides step-by-step instructions for adapting an existing analytical workflow or developing a new pipeline for the Biodiversity Evaluation Engine (BEE).</p>
+<p>BEE supports pipelines developed in R, Python, Julia, and other supported languages. Pipelines are built from individual scripts that can be connected to create reproducible analytical workflows.</p>
+<p>The instructions below will guide you through preparing your code, defining inputs and outputs, building and testing your pipeline, and submitting it for review.</p>
+<p><strong>New to contributing?</strong> We recommend first reading our <a href="./contributing.html">Contributing page</a> for an overview of the contribution process and our <a href="./pipeline_standards.html">Pipeline Standards</a> for the scientific and technical requirements.</p>
+<section id="before-you-start" class="level2">
+<h2 class="anchored" data-anchor-id="before-you-start">Before you start</h2>
+<p>To develop and test pipelines, you will need:</p>
+<ul>
+<li><p><strong>A GitHub account:</strong> Contributions are managed through the <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines">BON in a Box pipelines repository</a>.</p></li>
+<li><p><strong>A local installation of BEE:</strong> Follow the <a href="./how_to_install.html">Installation Guide</a> to set up the platform on your computer.</p></li>
+<li><p><strong>An analytical workflow:</strong> This can be an existing script or a new method you would like to develop into a pipeline.</p></li>
+<li><p><strong>A code editor:</strong> Such as Visual Studio Code or RStudio, to develop and modify your scripts.</p></li>
+</ul>
+<p>Before beginning development, we recommend contacting the BON in a Box team to discuss your proposed pipeline and identify opportunities to reuse existing components.</p>
+</section>
 <section id="general-github-contribution-workflow" class="level2">
 <h2 class="anchored" data-anchor-id="general-github-contribution-workflow">General GitHub contribution workflow</h2>
 <p>Contributors will follow the <a href="https://docs.github.com/en/get-started/using-github/github-flow">GitHub flow</a> when contributing pipelines to BON in a Box. Contributors can follow these steps:</p>
@@ -269,10 +288,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="how-to-create-a-pipeline-video-tutorial">How to create a pipeline video tutorial</h2>
 <div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/LwncUuc4WeM" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 <p>Analysis workflows can be adapted to BON in a Box pipelines using a few simple steps. Once BON in a Box is installed on your computer, pipelines can be edited and run locally by creating files in your local BON-in-a-box folder cloned from the GitHub repository. Workflows can be written in a variety of languages, including R, Julia, and Python, and not all pipeline steps need to be in the same language.</p>
-</section>
-<section id="before-you-start" class="level2">
-<h2 class="anchored" data-anchor-id="before-you-start">Before you start</h2>
-<p>Make sure that you are working in the right environment when running code in BON in a Box. This can be in your code editor of choice, such as Visual Studio Code opened to the BON in a Box pipelines folder cloned to your computer from GitHub, or an R Studio project set up with the BON in a Box GitHub repository. This will make it easier to pull and push to the GitHub repository later.</p>
 </section>
 <section id="step-1-plan-your-pipeline" class="level2">
 <h2 class="anchored" data-anchor-id="step-1-plan-your-pipeline">Step 1: Plan your pipeline</h2>
@@ -385,9 +400,9 @@ author:
 <p>The user inputs can also be file types if you want to upload a file or connect the script to a previous one that outputs a specific file type. There are several file types that you can specify:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 13%">
-<col style="width: 25%">
-<col style="width: 59%">
+<col style="width: 11%">
+<col style="width: 26%">
+<col style="width: 61%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -448,11 +463,6 @@ author:
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">example</span><span class="kw">:</span><span class="at"> </span><span class="ch">null</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The input type can also be set to a limited number of keywords that will automatically generate standardized selectors adapted for the input type. For example, specifying ‘country’ as input type will create a dropdown menu with a standardized list of countries from GeoNames. Selecting ‘crsBbox’ will allow the user to define a bounding box from a country or by clicking on a map. Here is the current list of available selectors:</p>
 <table class="caption-top table">
-<colgroup>
-<col style="width: 6%">
-<col style="width: 85%">
-<col style="width: 7%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>Input name</th>
@@ -491,6 +501,11 @@ author:
 <td>Full location object. Creates a button to open an interface that allows the user to specify a country, region, coordinate reference system and bounding box (geographical minima and maxima)</td>
 <td></td>
 </tr>
+<tr class="odd">
+<td>stac_asset[] | Creates a button to open a STAC catalog browser, where the user picks assets (for example Cloud Optimized GeoTIFF layers) from one or more collections. The script receives a list of selections. See <a href="./selectors.html#stac-assets">STAC assets</a>. | |</td>
+<td></td>
+<td></td>
+</tr>
 </tbody>
 </table>
 <p>Note that the use of these selectors will create objects that contain multiple elements. For example, the country selector will create an input object that contains the country name in English, the ISO3 code of the country, the ISO2 code, as well as the bounding box of that country, in longitude, latitude coordinates. <a href="./selectors.html">See the full list of those keys for each selector here</a>.</p>
@@ -501,8 +516,8 @@ author:
 <p>There are also several types of outputs that can be created</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 18%">
-<col style="width: 41%">
+<col style="width: 19%">
+<col style="width: 40%">
 <col style="width: 38%">
 </colgroup>
 <thead>
@@ -1162,7 +1177,8 @@ author:
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -1171,8 +1187,69 @@ author:
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -1186,6 +1263,7 @@ author:
         interactiveBorder: 10,
         theme: 'quarto',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;
@@ -1348,44 +1426,54 @@ author:
           const lineIds = lines.map((line) => {
             return targetCell + "-" + line;
           })
-          let top = null;
-          let height = null;
-          let parent = null;
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
           if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
             }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
             }
+            placeBand(gutterDiv, el, lastEl);
             selectedAnnoteEl = annoteEl;
           }
         };
@@ -1483,6 +1571,9 @@ author:
       }
     }
   });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
   </script>
 </div> <!-- /content -->
 
