@@ -168,14 +168,14 @@ describe("translated UI", () => {
     expect(inputTypeToDisplay("float[]", t)).toBe(
       "liste séparée par des virgules de nombres décimaux",
     );
-    expect(inputTypeToDisplay("int", t)).toBe("entier");
+    expect(inputTypeToDisplay("int", t)).toBe("nombre entier");
     expect(inputTypeToDisplay("text", t)).toBe("texte");
     expect(inputTypeToDisplay("text[]", t)).toBe("liste séparée par des virgules de textes");
     expect(inputTypeToDisplay("text/plain", t)).toBe("chemin vers un fichier texte");
     expect(inputTypeToDisplay("text/plain[]", t)).toBe("liste séparée par des virgules de chemins vers des fichiers texte");
-    expect(inputTypeToDisplay("text/csv", t)).toBe("chemin vers un fichier valeurs séparées par des virgules");
+    expect(inputTypeToDisplay("text/csv", t)).toBe("chemin vers un fichier de valeurs séparées par des virgules");
     expect(inputTypeToDisplay("text/csv[]", t)).toBe(
-      "liste séparée par des virgules de chemins vers des fichiers valeurs séparées par des virgules",
+      "liste séparée par des virgules de chemins vers des fichiers de valeurs séparées par des virgules",
     );
     expect(inputTypeToDisplay("custom[]", t)).toBe("liste séparée par des virgules de custom");
     expect(inputTypeToDisplay("application/x-xpath", t)).toBe("chemin vers un fichier application/x-xpath");

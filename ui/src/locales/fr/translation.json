@@ -71,8 +71,8 @@
     "versions": "Erreur lors de la récupération des informations de version",
     "k8sStatus": "Erreur lors de l’obtention de l’état de K8s",
     "k8sPrepare": "Erreur lors de la préparation de K8s",
-    "hpcStatus": "Erreur lors de l’obtention de l’état de l'ordinateur haute performance",
-    "hpcPrepare": "Erreur lors de la préparation de l'ordinateur haute performance",
+    "hpcStatus": "Erreur lors de l’obtention de l’état de l’ordinateur haute performance",
+    "hpcPrepare": "Erreur lors de la préparation de l’ordinateur haute performance",
     "pipelineList": "Impossible d’obtenir la liste des pipelines",
     "scriptList": "Impossible d’obtenir la liste des scripts"
   },
@@ -133,8 +133,8 @@
     },
     "file": "chemin vers un fichier {{type}}",
     "files": "chemins vers des fichiers {{type}}",
-    "listOf": "liste de {{items}} séparée par des virgules",
-    "listOfOther": "liste de {{type}} séparée par des virgules"
+    "listOf": "liste séparée par des virgules de {{items}}",
+    "listOfOther": "liste séparée par des virgules de {{type}}"
   },
   "form": {
     "inputForm": "Formulaire",
@@ -214,7 +214,7 @@
     "downloadInput": "Télécharger le fichier de paramètres",
     "environment": "Environnement",
     "running": "En cours d’exécution…",
-    "waiting": "En attente de résultats d'étapes précédentes.",
+    "waiting": "En attente de résultats d’étapes précédentes.",
     "emptyString": "Chaîne vide",
     "missingMime": {
       "input": "Type MIME manquant dans la description du paramètre.",
@@ -226,7 +226,7 @@
     },
     "notSnakeCase": "L’identifiant de sortie {{id}} devrait être en snake_case",
     "error": "Erreur",
-    "logs": "Journaux d'exécution"
+    "logs": "Journaux d’exécution"
   },
   "fileBrowser": {
     "networkError": "Erreur dans la réponse du réseau.",

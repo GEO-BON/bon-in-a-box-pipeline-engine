@@ -50,6 +50,6 @@ it("updates run controls and date while preserving API-provided content", async 
   expect(screen.getByText("API pipeline name")).toBeTruthy();
   expect(screen.getByText("État : completed")).toBeTruthy();
   expect(screen.getByText(new Date(run.startTime).toLocaleString("fr"))).toBeTruthy();
-  expect(screen.getByRole("button", { name: "Voir dans la visionneuse" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Visionneuse" })).toBeTruthy();
   expect(api.getHistory).toHaveBeenCalledTimes(1);
 });
