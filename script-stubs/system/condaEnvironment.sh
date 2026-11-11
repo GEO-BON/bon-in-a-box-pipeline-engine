@@ -8,7 +8,7 @@ condaEnvName=$2
 condaEnvYml=$3
 condaEnvYmlDir="/conda-env-yml"
 if [[ ! -d "$condaEnvYmlDir" || ! -w "$condaEnvYmlDir" ]]; then
-    echo "Error: $condaEnvYmlDir is not a writable directory. Fallback on /tmp/conda-env-yml"
+    echo "Warning: $condaEnvYmlDir is not a writable directory. Fallback on /tmp/conda-env-yml"
     condaEnvYmlDir="/tmp/conda-env-yml"
 fi
 
