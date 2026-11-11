@@ -336,7 +336,7 @@ class KubernetesRun(
             val podsDeleted = coreApi.listNamespacedPod(namespace)
                 .labelSelector("job-name=$jobName")
                 .execute()
-                .items?.isEmpty() ?: true
+                .items.isEmpty()
 
             if (jobDeleted && podsDeleted) {
                 log(logger::debug, "Pod stopped.")
