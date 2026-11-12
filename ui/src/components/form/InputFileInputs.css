@@ -115,17 +115,6 @@
   border: 1px solid var(--biab-green-trans-main);
 }
 
-@media all and (max-width: 599px) {
-  table,
-  thead,
-  tbody,
-  th,
-  td,
-  tr {
-    display: block;
-  }
-}
-
 .inputColumnL {
   width: 35%;
 }
