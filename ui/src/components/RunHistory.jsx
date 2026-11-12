@@ -107,7 +107,7 @@ export default function RunHistory() {
               <h1>Previous runs</h1>
               <Grid container spacing={2}>
                 {runs.map((res, i) => (
-                  <RunCard key={i} run={res} />
+                  <RunCard key={i} run={res} history />
                 ))}
               </Grid>
               <PreviousNext
@@ -273,8 +273,41 @@ const PreviousNext = (props) => {
   );
 };
 
+const isHistoryLocation = (value, input) => {
+  const type = input?.type?.toLowerCase();
+  return value !== null && typeof value === "object" &&
+    !Array.isArray(value) && Array.isArray(value.bbox) &&
+    value.bbox.length === 4 &&
+    value.bbox.every((coordinate) =>
+      typeof coordinate === "number" || typeof coordinate === "string") &&
+    value.CRS !== null && typeof value.CRS === "object" &&
+    !Array.isArray(value.CRS) &&
+    (!type || ["location", "bboxcrs", "crsbbox"].includes(type));
+};
+
+const HistoryLocationSummary = ({ location }) => {
+  const crs = location.CRS;
+  const code = crs.code == null ? "" :
+    (crs.authority ? `${crs.authority}:` : "") + crs.code;
+
+  return (
+    <div className="history-location-summary">
+      <div><span>Country:</span> {location.country?.englishName}</div>
+      <div><span>Region:</span> {location.region?.regionName}</div>
+      <div><span>CRS:</span> {crs.name}{code && ` (${code})`}</div>
+      <div className="history-bbox-label">Bounding box:</div>
+      <ul>
+        <li>Minimum X: {location.bbox[0]}</li>
+        <li>Minimum Y: {location.bbox[1]}</li>
+        <li>Maximum X: {location.bbox[2]}</li>
+        <li>Maximum Y: {location.bbox[3]}</li>
+      </ul>
+    </div>
+  );
+};
+
 const RunCard = (props) => {
-  const { run } = props;
+  const { run, history = false } = props;
   const [expanded, setExpanded] = useState(false);
   const [desc, setDesc] = useState("");
   const [inputs, setInputs] = useState({});
@@ -309,7 +342,7 @@ const RunCard = (props) => {
     });
   }, [pipeline, run, setExpanded]);
   return (
-    <Grid size={{ md: 10, lg: 5 }}>
+    <Grid size={history ? { xs: 12, lg: 5 } : { md: 10, lg: 5 }} className={history ? "history-run-item" : undefined}>
       <Card
         sx={{
           width: "100%",
@@ -377,7 +410,7 @@ const RunCard = (props) => {
                   {desc}
                 </ReactMarkdown>
                 <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>
-                <Table size="small">
+                <Table size="small" className={history ? "history-inputs" : undefined}>
                   <TableBody>
                     {Object.entries(run.inputs).map((i) => {
                       const inputId = i[0];
@@ -403,7 +436,9 @@ const RunCard = (props) => {
                             <>
                               {(() => {
                                 // Format the value for the table, handle types
-                                if (Array.isArray(value)) {
+                                if (history && isHistoryLocation(value, inputs[inputId])) {
+                                  return <HistoryLocationSummary location={value} />;
+                                } else if (Array.isArray(value)) {
                                   return value.join(", ");
                                 } else if (
                                   typeof value === "object" &&
