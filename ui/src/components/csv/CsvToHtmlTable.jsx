@@ -2,7 +2,6 @@
  * Code adapted from https://github.com/marudhupandiyang/react-csv-to-table
  * For some reason NPM would not install this dependency.
  */
-import "./CsvToHtmlTable.css";
 
 export function parseCsvToRowsAndColumn(csvText, csvColumnDelimiter = '\t') {
     const rows = csvText.split('\n');
@@ -104,12 +103,10 @@ const CsvToHtmlTable = ({
   };
 
   return (
-    <div className="csv-table-container">
-      <table className={`csv-html-table ${tableClassName}`}>
-        {renderTableHeader(headerRow)}
-        {renderTableBody(rowsWithColumns)}
-      </table>
-    </div>
+    <table className={`csv-html-table ${tableClassName}`}>
+      {renderTableHeader(headerRow)}
+      {renderTableBody(rowsWithColumns)}
+    </table>
   );
 };
 
