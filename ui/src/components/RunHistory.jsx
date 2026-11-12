@@ -23,14 +23,11 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { styled } from "@mui/material/styles";
 import ReactMarkdown from "react-markdown";
-import { CustomButtonGreen, CustomButtonGrey, CustomSelect } from "./CustomMUI";
+import { CustomButtonGreen, CustomButtonGrey } from "./CustomMUI";
 import { Alert } from "@mui/material";
 import Warning from "@mui/icons-material/Warning";
 import yaml from "js-yaml";
 import debounce from "lodash.debounce";
-import filterIconWhite from "../img/filter-icon-white.svg"
-import filterIconGreen from "../img/filter-icon-green.svg"
-import { center } from "@turf/turf";
 import FilterMenu from "./FilterMenu";
 
 
@@ -144,7 +141,7 @@ export default function RunHistory() {
       <div className="search-container">
         <input
           type="search"
-          className="step-search-input"
+          className="history-search-input"
           placeholder="Search history..."
           value={inputValue}
           onChange={(e) => {
@@ -410,7 +407,7 @@ const RunCard = (props) => {
                   {desc}
                 </ReactMarkdown>
                 <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>
-                <Table size="small" className={history ? "history-inputs" : undefined}>
+                <Table size="small" className="history-inputs">
                   <TableBody>
                     {Object.entries(run.inputs).map((i) => {
                       const inputId = i[0];
@@ -436,7 +433,7 @@ const RunCard = (props) => {
                             <>
                               {(() => {
                                 // Format the value for the table, handle types
-                                if (history && isHistoryLocation(value, inputs[inputId])) {
+                                if (isHistoryLocation(value, inputs[inputId])) {
                                   return <HistoryLocationSummary location={value} />;
                                 } else if (Array.isArray(value)) {
                                   return value.join(", ");
