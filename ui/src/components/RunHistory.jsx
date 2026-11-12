@@ -168,9 +168,9 @@ export const LastNRuns = ({ n }) => {
       if (!error && response && response.body) {
         if (response.body.length > 0) {
           resp = (
-            <Grid container spacing={3}>
+            <Grid container spacing={3} className="latest-runs-grid">
               {response.body.map((res, i) => (
-                <RunCard key={i} run={res} />
+                <RunCard key={i} run={res} latest />
               ))}
             </Grid>
           );
@@ -307,7 +307,7 @@ const HistoryLocationSummary = ({ location }) => {
 };
 
 const RunCard = (props) => {
-  const { run, history = false } = props;
+  const { run, history = false, latest = false } = props;
   const [expanded, setExpanded] = useState(false);
   const [desc, setDesc] = useState("");
   const [inputs, setInputs] = useState({});
@@ -342,7 +342,7 @@ const RunCard = (props) => {
     });
   }, [pipeline, run, setExpanded]);
   return (
-    <Grid size={history ? { xs: 12, lg: 5 } : { md: 10, lg: 5 }} className={history ? "history-run-item" : undefined}>
+    <Grid size={history ? { xs: 12, lg: 5 } : latest ? { xs: 12, md: 10, lg: 5 } : { md: 10, lg: 5 }} className={history ? "history-run-item" : latest ? "latest-run-item" : undefined}>
       <Card
         sx={{
           width: "100%",

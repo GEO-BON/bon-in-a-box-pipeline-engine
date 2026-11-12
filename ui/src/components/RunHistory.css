@@ -46,6 +46,34 @@
 }
 
 @media (max-width: 1199px) {
+    .latest-runs-grid > .latest-run-item {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .latest-run-item > .MuiCard-root {
+        box-sizing: border-box;
+        overflow-wrap: anywhere;
+    }
+
+    .latest-runs-grid .MuiCardHeader-content {
+        min-width: 0;
+    }
+
+    .latest-runs-grid .MuiCardActions-root {
+        flex-wrap: wrap;
+    }
+
+    .latest-runs-grid .MuiCardActions-root > a {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .latest-runs-grid .MuiCardActions-root > a > button {
+        max-width: calc(100% - 10px);
+        white-space: normal;
+    }
+
     .history .step-search-input {
         min-width: 0;
         flex: 1;
