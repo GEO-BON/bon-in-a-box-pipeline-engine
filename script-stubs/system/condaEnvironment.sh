@@ -6,6 +6,11 @@ condaEnvName=$2
 
 # Raw content of the yml file
 condaEnvYml=$3
+condaEnvYmlDir="/conda-env-yml"
+if [[ ! -d "$condaEnvYmlDir" || ! -w "$condaEnvYmlDir" ]]; then
+    echo "Warning: $condaEnvYmlDir is not a writable directory. Fallback on /tmp/conda-env-yml"
+    condaEnvYmlDir="/tmp/conda-env-yml"
+fi
 
 # Temp directory for downloaded files, etc.
 tmpDir="/tmp/biab"
@@ -37,11 +42,11 @@ pidFile="$outputFolder/.pid"
 
 # Permanent file (container life span) where we save the dependencies
 # that were last used to update the conda environment.
-condaEnvFile="/conda-env-yml/$condaEnvName.yml"
+condaEnvFile="$condaEnvYmlDir/$condaEnvName.yml"
 
 # Temporary file that we use to compare the new yml file with the previous one.
 n=$RANDOM
-tmpYmlDir="$tmpDir/conda-env-yml"
+tmpYmlDir="$tmpDir/conda-env-yml-compare"
 condaEnvFileNew="$tmpYmlDir/$condaEnvName.$n.yml"
 
 function assertSuccess {
@@ -72,7 +77,7 @@ function prepareSubEnvironment {
 
         else
             echo "Updating existing conda environment $condaEnvName..."
-            flock --verbose /conda-env-yml/ mamba env update -y -f "$condaEnvFileNew" ; assertSuccess
+            flock --verbose $condaEnvYmlDir/ mamba env update -y -f "$condaEnvFileNew" ; assertSuccess
             if [[ $? -eq 0 ]] ; then
                 mv "$condaEnvFileNew" "$condaEnvFile" ; assertSuccess
                 echo "Updated successfully."
@@ -87,7 +92,7 @@ function prepareSubEnvironment {
 
     else
         echo "Creating new conda environment $condaEnvName..."
-        flock --verbose /conda-env-yml/ mamba env create -y -f "$condaEnvFileNew" ; assertSuccess
+        flock --verbose $condaEnvYmlDir/ mamba env create -y -f "$condaEnvFileNew" ; assertSuccess
         if [[ $? -eq 0 ]] ; then
             mv "$condaEnvFileNew" "$condaEnvFile" ; assertSuccess
             echo "Created successfully."
@@ -112,7 +117,7 @@ function activateSubEnvironment {
         echo "$condaEnvName activated"
     else
         echo "Activation failed, will attempt creating..."
-        flock --verbose /conda-env-yml/ mamba env create -y -f $condaEnvFile ; assertSuccess
+        flock --verbose $condaEnvYmlDir/ mamba env create -y -f $condaEnvFile ; assertSuccess
         mamba activate $condaEnvName ; assertSuccess
     fi
 }
@@ -136,7 +141,7 @@ function useCondaPack {
                 echo "    Local conda-pack yml file is outdated."
                 if [[ -w "$condaPackZip" ]]; then
                     rm -rf "$condaPackZip" "$condaPackDir/$condaEnvName" "$condaEnvFilePacked" ; assertSuccess
-                else 
+                else
                     echo "    Cannot delete: readonly file system."
                 fi
             fi
@@ -261,11 +266,11 @@ else
     # at the same time.
     if [[ -d "$condaPackDir" ]]; then
         # conda-pack installations may be shared across short-lived instances.
-        # Lock on $condaPackWriteable: its the shared pack folder when writable, 
+        # Lock on $condaPackWriteable: its the shared pack folder when writable,
         # otherwise a fallback location in /tmp
         lockFile="$condaPackWriteable/$condaEnvName.lock"
     else
-        lockFile="/conda-env-yml/$condaEnvName.lock"
+        lockFile="$condaEnvYmlDir/$condaEnvName.lock"
     fi
     exec {lockfd}>>"$lockFile" ; assertSuccess
     trap 'exec {lockfd}>&- 2>/dev/null || true' EXIT INT TERM HUP

@@ -94,7 +94,7 @@ class CWLFactory(val serverContext: ServerContext, val runnerTag:String? = null)
                         .distinctBy { it.name }
                         .filter { !it.isBaseEnv() }
                         .joinToString("\n\n") { condaMetadata ->
-                            """bash -c 'getPackedEnv "${condaMetadata.name}" "${condaMetadata.yml ?: ""}"'"""
+                            """bash -c 'getPackedEnv "${condaMetadata.name}" "${condaMetadata.yml ?: ""}"' || exit 1"""
                         }
                         .replaceIndent(indent(5))
         )
