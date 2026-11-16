@@ -448,6 +448,8 @@ inputs:
     doc:
       Optional. BON in a Box runner.env file, necessary for scripts requiring credentials.
       If not provided, an empty one will be used.
+      An example file is provided at https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env
+      Note that server configurations do not apply when running as CWL, hence only the top part of the file is relevant.
 
   #################################################################
   # The following inputs should not be changed in a regular setup #
