@@ -28,7 +28,9 @@ inputs:
 
   envFolder:
     type: Directory?
-    doc: Folder for conda-pack to export environments. This avoids downloading/resolving the same environment multiple times.
+    doc: Optional folder for conda-pack environments, allowing reuse between runs.
+      If omitted, environments are prepared in a CWL-managed temporary directory
+      and shared between steps for this run only.
 
   runFolder:
     type: Directory?
@@ -111,7 +113,6 @@ steps:
 
   # This step prepares the environments for all the following steps
   preparePackedEnvs:
-    when: $(inputs.envFolderWrite != null)
     run:
       class: CommandLineTool
       requirements:
@@ -124,7 +125,11 @@ steps:
           listing: |
             ${
               return [
-                { entry: inputs.envFolderWrite, writable: true },
+                {
+                  entry: inputs.envFolderWrite || { "class": "Directory", "listing": [] },
+                  entryname: "packed-envs",
+                  writable: true
+                },
                 {
                   entry: { "class": "Directory", "basename": "conda-env-yml", "listing": [] },
                   entryname: "/conda-env-yml",
@@ -132,7 +137,7 @@ steps:
                 }
               ].concat(
                 inputs.runFolderWrite
-                  ? [{ entry: inputs.runFolder, writable: true }]
+                  ? [{ entry: inputs.runFolderWrite, writable: true }]
                   : []
               );
             }
@@ -144,24 +149,25 @@ steps:
             CONDA_ENVS_PATH: /opt/conda/envs:/conda-env-yml/envs
             SCRIPT_STUBS_LOCATION: /script-stubs
             OUTPUT_LOCATION: "$(inputs.runFolderWrite ? inputs.runFolderWrite.path : runtime.outdir)"
+            PACKED_ENVS_LOCATION: "$(inputs.envFolderWrite ? inputs.envFolderWrite.path : runtime.outdir + '/packed-envs')"
             CONDA_PACK_URL: $(inputs.condaPackURL)
       baseCommand: [bash, -c]
       arguments:
         - |
           echo "Exporting all environments"
-          mkdir -p "$OUTPUT_LOCATION" "$CONDA_PKGS_DIRS" /conda-env-yml/envs
+          mkdir -p "$OUTPUT_LOCATION" "$CONDA_PKGS_DIRS" /conda-env-yml/envs || exit 1
 
           function getPackedEnv {
             condaEnvName=$1
             condaEnvYml=$2
             # We use a dedicated env folder to avoid copying the whole env folder between steps in a k8 context
-            dedicatedEnvFolder=$(inputs.envFolderWrite.path)/$condaEnvName
-            mkdir -p "$dedicatedEnvFolder"
+            dedicatedEnvFolder="$PACKED_ENVS_LOCATION/$condaEnvName"
+            mkdir -p "$dedicatedEnvFolder" || return 1
 
             echo "Exporting $condaEnvName..."
             source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh "$OUTPUT_LOCATION" "$condaEnvName" \
-              "$condaEnvYml" "$dedicatedEnvFolder" "$CONDA_PACK_URL" --noActivate
-            source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh "$condaEnvName" "$dedicatedEnvFolder"
+              "$condaEnvYml" "$dedicatedEnvFolder" "$CONDA_PACK_URL" --noActivate || return 1
+            source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh "$condaEnvName" "$dedicatedEnvFolder" || return 1
             echo "Done."
           }
           export -f getPackedEnv
@@ -178,8 +184,7 @@ steps:
         envFolder:
           type: Directory
           outputBinding:
-            glob: .
-            outputEval: $(inputs.envFolderWrite)
+            glob: packed-envs
     in:
       envFolderWrite: envFolder
       runFolder:
