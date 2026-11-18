@@ -127,8 +127,8 @@ services:
 
 secrets:
   hpc_ssh_key:
-    file: $HPC_SSH_KEY
+    file: ${HPC_SSH_KEY:-/dev/null}
   hpc_known_hosts_file:
-    file: $HPC_KNOWN_HOSTS_FILE
+    file: ${HPC_KNOWN_HOSTS_FILE:-/dev/null}
   hpc_ssh_config_file:
-    file: $HPC_SSH_CONFIG_FILE
+    file: ${HPC_SSH_CONFIG_FILE:-/dev/null}
