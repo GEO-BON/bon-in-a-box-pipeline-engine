@@ -46,24 +46,14 @@ requirements:
   InitialWorkDirRequirement:
     listing: |
       ${
-        return [
-          {
-            entry: { "class": "Directory", "basename": "conda-env-yml", "listing": [] },
-            entryname: "/conda-env-yml",
-            writable: true
-          }
-        ].concat(
+        return (
           inputs.envFolder
-            ? {
+            ? [{
                 entry: inputs.envFolder,
                 entryname: "/conda-envs",
                 writable: inputs.envFolderWritable
-              }
-            : { // fallback
-                entry: { "class": "Directory", "basename": "conda-envs", "listing": [] },
-                entryname: "/conda-envs",
-                writable: true
-              }
+              }]
+            : []
         ).concat(
           inputs.environment
             ? [{ entry: inputs.environment, entryname: "/runner.env" }]
@@ -88,21 +78,34 @@ requirements:
 
   EnvVarRequirement:
     envDef:
-      CONDA_PKGS_DIRS: /conda-env-yml/pkgs
-      CONDA_ENVS_PATH: /opt/conda/envs:/conda-env-yml/envs
+      CONDA_PKGS_DIRS: /tmp/conda-env-yml/pkgs
+      CONDA_ENVS_PATH: /opt/conda/envs:/tmp/conda-env-yml/envs
       CONDA_PACK_URL: $(inputs.condaPackURL)
       SCRIPT_LOCATION: /scripts
       SCRIPT_PATH: $(inputs.scriptPath)
       SCRIPT_STUBS_LOCATION: /script-stubs
       USERDATA_LOCATION: /userdata
       OUTPUT_LOCATION: "$(inputs.runFolder ? inputs.runFolder.path : runtime.outdir)"
+      PYTHONUNBUFFERED: "1"
+
+  ResourceRequirement:
+    ramMin: 5120
 
 baseCommand: ["bash", "-c"]
 arguments:
   - |
     log=$OUTPUT_LOCATION/logs.txt
     rm -f $log
-    mkdir -p /conda-env-yml/pkgs /conda-env-yml/envs
+    touch "$log"
+    tail -f "$log" &
+    tailPid=$!
+    cleanupTail() {
+      kill "$tailPid" 2>/dev/null
+      wait "$tailPid" 2>/dev/null
+    }
+    trap cleanupTail EXIT
+
+    mkdir -p /tmp/conda-env-yml/pkgs /tmp/conda-env-yml/envs
 
     cat > "$OUTPUT_LOCATION/input.json" <<'JSON'
     ${
@@ -111,9 +114,9 @@ arguments:
       }, null, 2);
     }
     JSON
-    echo "Running in $OUTPUT_LOCATION" | tee -a $log
-    echo "Inputs:" | tee -a $log
-    cat $OUTPUT_LOCATION/input.json | tee -a $log
+    echo "Running in $OUTPUT_LOCATION" >> "$log"
+    echo "Inputs:" >> "$log"
+    cat "$OUTPUT_LOCATION/input.json" >> "$log"
 
     source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh $OUTPUT_LOCATION "pythonbase" \
     "" /conda-envs "$CONDA_PACK_URL" >> "$log" 2>&1
@@ -122,12 +125,12 @@ arguments:
       $SCRIPT_STUBS_LOCATION/system/scriptWrapper.py \
       $OUTPUT_LOCATION \
       "$SCRIPT_LOCATION/$SCRIPT_PATH" \
-      2>&1 | tee -a $log
-    scriptExitCode=\${PIPESTATUS[0]}
-    echo "Script exited with code $scriptExitCode" | tee -a $log
-  
+      >> "$log" 2>&1
+    scriptExitCode=$?
+    echo "Script exited with code $scriptExitCode" >> "$log"
+
     if [[ "$OUTPUT_LOCATION" != "$(runtime.outdir)" ]]; then
-      echo "Copying results from run folder to CWL output directory" | tee -a $log
+      echo "Copying results from run folder to CWL output directory" >> "$log"
       cp -a "$OUTPUT_LOCATION"/. "$(runtime.outdir)"/
     fi
 
@@ -196,6 +199,8 @@ inputs:
     doc:
       Optional. BON in a Box runner.env file, necessary for scripts requiring credentials.
       If not provided, an empty one will be used.
+      An example file is provided at https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env
+      Note that server configurations do not apply when running as CWL, hence only the top part of the file is relevant.
 
   #################################################################
   # The following inputs should not be changed in a regular setup #
