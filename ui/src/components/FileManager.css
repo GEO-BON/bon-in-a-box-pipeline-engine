@@ -154,6 +154,25 @@ wx-content-wrapper.wx-RJbNonjJ {
     padding: 16px;
   }
 }
+
+/* Card three-dot menu in the top-right corner (all widths, grid and search
+   results), so the name gets the whole info row */
+.file-manager .wx-cards .wx-item {
+  position: relative;
+}
+
+.file-manager .wx-cards .wx-more {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+.file-manager .wx-cards .wx-folder-name,
+.file-manager .wx-cards .wx-file-name {
+  min-width: 0;
+  max-width: none;
+}
+
 @media (max-width: 768px) {
   .file-manager .wx-wrapper .wx-cards,
   .file-manager .wx-wrapper .wx-cards.wx-has-back-link {
@@ -197,14 +216,7 @@ wx-content-wrapper.wx-RJbNonjJ {
     height: clamp(36px, 68cqh, 80px);
   }
 
-  .file-manager .wx-wrapper .wx-cards .wx-folder-name,
-  .file-manager .wx-wrapper .wx-cards .wx-file-name {
-    min-width: 0;
-    max-width: none;
-  }
-
-  .file-manager .wx-wrapper .wx-cards .wx-more {
-    flex: none;
+  .file-manager .wx-cards .wx-more {
     width: 40px;
     height: 40px;
     justify-content: center;
