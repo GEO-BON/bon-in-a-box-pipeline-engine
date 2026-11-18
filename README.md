@@ -1,14 +1,14 @@
-# BON in a Box Pipeline Engine
+# BON in a Box Biodiversity Evaluation Engine (BEE)
 
-A pipeline engine to seamlessly run pipelines of scripts in R, Julia and Python, to transform data into valuable outputs.
+A Biodiversity Evaluation Engine to seamlessly run pipelines of scripts in R, Julia and Python, to transform data into valuable outputs.
 
-Originally developed for [BON in a Box](https://boninabox.geobon.org/) and meant to run with the scripts in [bon-in-a-box-pipelines repo](https://github.com/GEO-BON/bon-in-a-box-pipelines/), it can run with any compatible repo.
+An integral part of [BON in a Box](https://boninabox.geobon.org/) and meant to run with the scripts in [bon-in-a-box-pipelines repo](https://github.com/GEO-BON/bon-in-a-box-pipelines/), it can run with any compatible repo.
 
 [User documentation](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/): to run pipelines, edit pipelines, or add scripts;
 
 [Developer documentation](/README-dev.md): to develop server infrastructure or UI features.
 
-Please use the following citation to reference the BON in a Box pipeline engine:
+Please use the following citation to reference the BON in a Box Biodiversity Evaluation Engine:
 
 > Jory Griffith, Jean-Michel Lord, Michael D Catchen, Maria Isabel Arce-Plata,
 > F Guillaume Blanchet, Mathusan Chandramohan, M Camila Diaz-Corzo, Dominique
