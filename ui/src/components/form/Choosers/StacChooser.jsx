@@ -15,11 +15,13 @@ import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import DeleteIcon from "@mui/icons-material/Delete";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import ImageIcon from "@mui/icons-material/Image";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import { CustomButtonGreen, CustomButtonGrey } from "../../CustomMUI";
+import ReactMarkdown from "react-markdown";
 import { paperStyle } from "./utils";
 
 // Served by python-api (main_api.py -> stac_api.py), proxied by nginx.
@@ -215,6 +217,90 @@ export default function StacChooser({
     </div>
   );
 }
+
+// Shows the first two lines, with a toggle for the rest when it overflows.
+function CollapsibleDescription({ text }) {
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (el && !expanded) setOverflows(el.scrollHeight > el.clientHeight + 1);
+  }, [text, expanded]);
+
+  return (
+    <div style={{ marginTop: "2px", lineHeight: 1.4 }}>
+      <div
+        ref={ref}
+        style={
+          expanded
+            ? { maxHeight: "200px", overflowY: "auto" }
+            : { maxHeight: "2.8em", overflow: "hidden" }
+        }
+      >
+        <ReactMarkdown
+          components={{
+            p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} />,
+          }}
+        >
+          {text}
+        </ReactMarkdown>
+      </div>
+      {overflows && (
+        <span
+          role="button"
+          tabIndex={0}
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+          onClick={() => setExpanded(!expanded)}
+          onKeyDown={(e) => e.key === "Enter" && setExpanded(!expanded)}
+        >
+          {expanded ? "Show less ⌃" : "Show more ⌄"}
+        </span>
+      )}
+    </div>
+  );
+}
+
+const STAC_HELP = (
+  <div style={{ fontSize: "0.8rem", lineHeight: 1.45 }}>
+    <p style={{ margin: "0 0 6px" }}>
+      A STAC catalog is an online library of maps and satellite images. Work
+      from top to bottom:
+    </p>
+    <ol style={{ margin: 0, paddingLeft: "18px" }}>
+      <li>
+        <b>Catalog</b>: pick one from the list, or paste the web address of
+        another catalog.
+      </li>
+      <li>
+        <b>Collection</b>: pick a dataset. Open its description to learn what
+        it contains.
+      </li>
+      <li>
+        <b>Date</b>: if the collection covers several dates, pick one.
+      </li>
+      <li>
+        <b>Item</b>: pick one file from the list. Type in the filter box to
+        search by name. If the collection is split into tiles, tick
+        &quot;Mosaic&quot; to use all of them as one layer instead.
+      </li>
+      <li>
+        <b>Asset</b>: pick the layer you need, such as a band or a variable.
+        Tick &quot;Categorical&quot; if its values are classes (land cover
+        types, for example) rather than measurements.
+      </li>
+      <li>
+        Use <b>Preview</b> to check the layer, then <b>Add to selection</b>.
+        Repeat for as many layers as you need.
+      </li>
+    </ol>
+    <p style={{ margin: "6px 0 0" }}>
+      When you are done, press <b>Accept</b>. <b>Clear</b> empties the
+      selection, and <b>Cancel</b> closes the window without changes.
+    </p>
+  </div>
+);
 
 function StacBrowser({ value, updateValue, setOpenModal }) {
   const previousValue = useRef(value);
@@ -558,7 +644,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         try {
           body = await rendered.json();
         } catch {
-          // Not a JSON error page, fall through to the generic message.
+          // Not a JSON error page.
         }
         throw new Error(tilerMessage(body, rendered.status));
       }
@@ -573,7 +659,9 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         params: params.toString(),
       });
     } catch (e) {
-      if (!stale()) setPreviewError(e.message);
+      // Keep the tiler's reason in the console, show a plain message.
+      console.warn("Preview failed:", e.message);
+      if (!stale()) setPreviewError("Preview can't be loaded");
     } finally {
       if (!stale()) setLoadingPreview(false);
     }
@@ -627,6 +715,19 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
     if (!canMosaic) setitemsAreTiles(false);
   }, [canMosaic]);
 
+  // Clearly tiles: a chosen date with several of them, or one date for all.
+  const obviousMosaic =
+    canMosaic &&
+    (date ? date.count > 1 : dates.length === 1 && !datesTruncated);
+
+  // Tick it once per collection or date; the user can still untick it.
+  useEffect(() => {
+    if (!obviousMosaic) return;
+    setitemsAreTiles(true);
+    setItem(null);
+    setPage(1);
+  }, [obviousMosaic, collection, date]);
+
   return (
     <div
       className="location-chooser-modal"
@@ -644,8 +745,22 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         borderRadius: "8px",
       }}
     >
-      <h4 id="stac-chooser-title" style={{ marginTop: 0 }}>
+      <h4
+        id="stac-chooser-title"
+        style={{ marginTop: 0, display: "flex", alignItems: "center" }}
+      >
         Choose assets from a STAC catalog
+        <Tooltip
+          title={STAC_HELP}
+          placement="bottom-start"
+          enterTouchDelay={0}
+          leaveTouchDelay={20000}
+          componentsProps={{ tooltip: { sx: { maxWidth: "420px" } } }}
+        >
+          <IconButton size="small" aria-label="How to use this window">
+            <HelpOutlineIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
       </h4>
 
       {error && (
@@ -731,44 +846,23 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
           }}
         />
         {collection && (collection.description || collection.url) && (
-          <p style={{ fontSize: "11px", margin: "4px 0px 0px 5px" }}>
-            {collection.description && (
-              <Tooltip
-                title={
-                  <div
-                    style={{
-                      whiteSpace: "pre-wrap",
-                      maxHeight: "300px",
-                      overflowY: "auto",
-                    }}
-                  >
-                    {collection.description}
-                  </div>
-                }
-                placement="bottom-start"
-                componentsProps={{ tooltip: { sx: { maxWidth: "500px" } } }}
-              >
-                <span
-                  style={{
-                    textDecoration: "underline dotted",
-                    cursor: "help",
-                  }}
-                >
-                  Description of this collection
-                </span>
-              </Tooltip>
-            )}
-            {collection.description && collection.url && " · "}
+          <div style={{ fontSize: "11px", margin: "4px 0px 0px 5px" }}>
             {collection.url && (
               <a
                 href={collection.url}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                STAC collection
+                View STAC collection in API
               </a>
             )}
-          </p>
+            {collection.description && (
+              <CollapsibleDescription
+                key={collection.id}
+                text={collection.description}
+              />
+            )}
+          </div>
         )}
       </div>
 
@@ -934,19 +1028,23 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                 marginTop: "6px",
               }}
             >
-              <CustomButtonGrey
-                disabled={page <= 1 || loadingItems}
-                onClick={() => setPage(page - 1)}
-              >
-                Previous
-              </CustomButtonGrey>
-              <span style={{ fontSize: "0.8rem" }}>Page {page}</span>
-              <CustomButtonGrey
-                disabled={!hasNext || loadingItems}
-                onClick={() => setPage(page + 1)}
-              >
-                Next
-              </CustomButtonGrey>
+              {(page > 1 || hasNext) && (
+                <>
+                  <CustomButtonGrey
+                    disabled={page <= 1 || loadingItems}
+                    onClick={() => setPage(page - 1)}
+                  >
+                    Previous
+                  </CustomButtonGrey>
+                  <span style={{ fontSize: "0.8rem" }}>Page {page}</span>
+                  <CustomButtonGrey
+                    disabled={!hasNext || loadingItems}
+                    onClick={() => setPage(page + 1)}
+                  >
+                    Next
+                  </CustomButtonGrey>
+                </>
+              )}
               {item && item.url && (
                 <a
                   href={item.url}
@@ -978,7 +1076,11 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
             loading={loadingAssets}
             noOptionsText="No Cloud Optimized GeoTIFF assets here"
             size="small"
-            sx={{ background: "#fff", borderRadius: "4px" }}
+            sx={{
+              background: "#fff",
+              borderRadius: "4px",
+              "&:has(.Mui-disabled)": { opacity: 0.5 },
+            }}
             getOptionLabel={(option) => option.title || option.key || ""}
             isOptionEqualToValue={(option, selected) =>
               option.key === selected.key
