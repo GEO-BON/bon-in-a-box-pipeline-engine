@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import "./LeftPane.css";
 // images
-import BiaBLogo from "./img/boninabox_logo.jpg";
+import BiaBLogo from "./img/BON_in_a_Box_BEE.png";
 import IconFiles from "./img/icon-gear.png";
 import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";

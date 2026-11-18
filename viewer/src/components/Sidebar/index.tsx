@@ -10,7 +10,10 @@ import {
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import CustomTable from "../CustomTable";
-import CsvToGeojson, { CsvToMapArray } from "../../helpers/csv_processing";
+import CsvToGeojson, {
+  CsvToMapArray,
+} from "../../helpers/csv_processing";
+import { crsFromInputValue } from "../../helpers/utils";
 import { Item } from "./styles";
 import { GetPipelineRunInputs, GetJSON } from "../../helpers/biab_api";
 import _ from "underscore";
@@ -63,12 +66,17 @@ export default function Sidebar(props: any) {
       let crs = "EPSG:4326";
       GetPipelineRunInputs(pipeline_run_id).then((p: any) => {
         for (const m in pipelineData.pipeline_inputs_desc) {
+          const fromChooser = crsFromInputValue(p[m]);
+          if (fromChooser) {
+            crs = fromChooser;
+            break;
+          }
+          const label = (pipelineData.pipeline_inputs_desc[m].label ?? "").toLowerCase();
           if (
-            pipelineData.pipeline_inputs_desc[m].label.includes("proj") ||
-            pipelineData.pipeline_inputs_desc[m].label.includes("crs") ||
-            pipelineData.pipeline_inputs_desc[m].label
-              .toLowerCase()
-              .includes("coordinate reference system")
+            typeof p[m] === "string" &&
+            (label.includes("proj") ||
+              label.includes("crs") ||
+              label.includes("coordinate reference system"))
           ) {
             crs = p[m];
           }
@@ -85,9 +93,14 @@ export default function Sidebar(props: any) {
       });
     } else if (type.includes("geo+json")) {
       clearOtherLayers("geo+json");
-      GetJSON(output).then((res: any) => {
-        setGeojsonOutput(res);
-      });
+      if (typeof output === "object") {
+        // Defer so the layer clearing triggered above runs first
+        Promise.resolve().then(() => setGeojsonOutput({ ...output }));
+      } else {
+        GetJSON(output).then((res: any) => {
+          setGeojsonOutput(res);
+        });
+      }
     } else if (type.includes("geopackage")) {
       clearOtherLayers("geopackage");
       setGeoPackage(output);
@@ -322,7 +335,7 @@ export default function Sidebar(props: any) {
               </Grid>
               <Box>
                 <Typography color="secondary.light">
-                  Explore results from a BON in a Box analysis pipeline
+                  Explore results from a Biodiversity Evaluation Engine pipeline
                 </Typography>
               </Box>
               {pipelineTitle && (

@@ -47,24 +47,14 @@ requirements:
   InitialWorkDirRequirement:
     listing: |
       ${
-        return [
-          {
-            entry: { "class": "Directory", "basename": "conda-env-yml", "listing": [] },
-            entryname: "/conda-env-yml",
-            writable: true
-          }
-        ].concat(
+        return (
           inputs.envFolder
-            ? {
+            ? [{
                 entry: inputs.envFolder,
                 entryname: "/conda-envs",
                 writable: inputs.envFolderWritable
-              }
-            : { // fallback
-                entry: { "class": "Directory", "basename": "conda-envs", "listing": [] },
-                entryname: "/conda-envs",
-                writable: true
-              }
+              }]
+            : []
         ).concat(
           inputs.environment
             ? [{ entry: inputs.environment, entryname: "/runner.env" }]
@@ -89,8 +79,8 @@ requirements:
 
   EnvVarRequirement:
     envDef:
-      CONDA_PKGS_DIRS: /conda-env-yml/pkgs
-      CONDA_ENVS_PATH: /opt/conda/envs:/conda-env-yml/envs
+      CONDA_PKGS_DIRS: /tmp/conda-env-yml/pkgs
+      CONDA_ENVS_PATH: /opt/conda/envs:/tmp/conda-env-yml/envs
       CONDA_PACK_URL: $(inputs.condaPackURL)
       SCRIPT_LOCATION: /scripts
       SCRIPT_PATH: $(inputs.scriptPath)
@@ -98,6 +88,9 @@ requirements:
       USERDATA_LOCATION: /userdata
       OUTPUT_LOCATION: "$(inputs.runFolder ? inputs.runFolder.path : runtime.outdir)"
       PYTHONUNBUFFERED: "1"
+
+  ResourceRequirement:
+    ramMin: 5120
 
 baseCommand: ["bash", "-c"]
 arguments:
@@ -113,7 +106,7 @@ arguments:
     }
     trap cleanupTail EXIT
 
-    mkdir -p /conda-env-yml/pkgs /conda-env-yml/envs
+    mkdir -p /tmp/conda-env-yml/pkgs /tmp/conda-env-yml/envs
 
     cat > "$OUTPUT_LOCATION/input.json" <<'JSON'
     ${
@@ -185,6 +178,8 @@ inputs:
     doc:
       Optional. BON in a Box runner.env file, necessary for scripts requiring credentials.
       If not provided, an empty one will be used.
+      An example file is provided at https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env
+      Note that server configurations do not apply when running as CWL, hence only the top part of the file is relevant.
 
   #################################################################
   # The following inputs should not be changed in a regular setup #

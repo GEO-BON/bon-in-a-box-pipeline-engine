@@ -25,3 +25,5 @@ pipeline-repo
 /python-api/app/*duckdb*
 
 **/dist/
+
+**/*.quarto_ipynb

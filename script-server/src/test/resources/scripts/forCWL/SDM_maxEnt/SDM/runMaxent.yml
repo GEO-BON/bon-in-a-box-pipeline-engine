@@ -129,5 +129,5 @@ conda:
     - r-stringr
 compute:
   hpc: false
-  mem: 24G
+  mem: 24Gi
   cpus-per-task: 12

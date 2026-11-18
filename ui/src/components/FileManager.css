@@ -72,7 +72,10 @@ wx-content-wrapper.wx-RJbNonjJ {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 400px;
+    box-sizing: border-box;
+    width: min(464px, calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
     background-color: var(--grey);
     border-radius: 8px;
     box-shadow:
@@ -105,11 +108,49 @@ wx-content-wrapper.wx-RJbNonjJ {
   .MuiChip-root {
     background-color: #abd6c680;
     font-weight: 500;
+    max-width: 100%;
+    height: auto;
+    min-height: 32px;
+  }
+
+  .MuiSelect-select,
+  .MuiChip-label {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .MuiChip-label {
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
 
   #modal-modal-title {
     font-size: 20px;
     color: #1d7368;
     font-weight: 700;
+  }
+}
+
+/* The Select menu is rendered in a portal outside the modal. */
+.filebrowser-menu {
+  max-width: calc(100% - 32px);
+
+  .MuiMenuItem-root {
+    white-space: normal;
+  }
+
+  .MuiListItemText-root {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .MuiSvgIcon-root {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .filebrowser-modal-card .filebrowser-modal-box {
+    padding: 16px;
   }
 }
