@@ -179,8 +179,8 @@ wx-content-wrapper.wx-RJbNonjJ {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .file-manager .wx-wrapper .wx-cards .wx-back-item {
