@@ -93,7 +93,7 @@ Prerequisites:
 
     c.  Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g. GBIF or IUCN)
 
-        -   To browse the UN Biodiversity Lab catalogue in the STAC chooser, set `UNBL_API_KEY` to the key provided by UN Biodiversity Lab. It is optional: the catalogue currently answers without one, but it is needed to access the items in pipelines. 
+        -   To access the UN Biodiversity Lab catalogue in the STAC chooser, set `UNBL_API_KEY` to the key provided by UN Biodiversity Lab. The catalogue currently answers without one, but it is needed to access the items in pipelines. 
 
     d.  Adjust any server option as you see fit (optional).
 
