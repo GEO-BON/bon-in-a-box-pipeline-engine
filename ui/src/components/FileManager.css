@@ -43,6 +43,15 @@
       padding: 8px;
     }
 
+    /* Table view: narrow the Size column so Name gets the space.
+       SVAR hard-codes width: 100px inline (no columns prop), hence !important.
+       81px fits the widest formatSize() output, "1023.9 MB" (69px). */
+    .wx-list .wx-grid .wx-cell[aria-colindex="2"] {
+      width: 81px !important;
+      min-width: 81px !important;
+      padding-right: 4px;
+    }
+
     .wx-wrapper .wx-cards {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
