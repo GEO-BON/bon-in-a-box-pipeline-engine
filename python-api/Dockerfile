@@ -15,8 +15,10 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 WORKDIR /app/
 
-# added python-multipart and clamav-client
-RUN uv pip install fastapi "uvicorn[standard]" requests duckdb pandas geopandas pandas_geojson shapely pygadm fiona python-multipart clamav-client
+# Copied before the app so that editing app code doesn't invalidate the install layer.
+# Kept out of /app because compose.dev.yml bind-mounts ./python-api/app over it.
+COPY requirements.txt /tmp/requirements.txt
+RUN uv pip install -r /tmp/requirements.txt
 
 COPY app /app
 

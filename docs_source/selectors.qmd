@@ -2,7 +2,7 @@
 title: "Description for selectors for specific input types."
 ---
 
-When specifying input types 'location', 'country', 'countryRegion', 'countryRegionCRS', 'CRS' or 'crsBbox', selectors are automatically created that facilitate the selection of those inputs. After being selected, those inputs appear in the `input.json` of the script or pipeline as objects with various parameters that will be available when loading then in R, Python or Julia.
+When specifying input types 'location', 'country', 'countryRegion', 'countryRegionCRS', 'CRS', 'crsBbox' or 'stac_asset[]', selectors are automatically created that facilitate the selection of those inputs. After being selected, those inputs appear in the `input.json` of the script or pipeline as objects with various parameters that will be available when loading then in R, Python or Julia.
 
 For example, the 'location' selector allows the user to define a bounding box by choosing a country, region and coordinate reference system. Here is an example of an object created through the selection of the Putumayo department in Colombia, in the Bogota 1975 / Colombia West zone reference system:
 
@@ -53,3 +53,81 @@ Here is the meaning of each key.
 | countryEnglishName | region  | English name of the country within which this region is.                                                                                       |
 
 When using other selectors, the object create contains a subset of the location selector. For example, the countryRegion selector will only contain the country and region sections, and countryRegionCRS will contain all but the bbox section.
+
+## STAC assets
+
+The `stac_asset[]` input type opens a STAC catalog browser. The user picks a catalog, a collection, then either a single item or all the tiles of the collection (on one date), and the asset to use. Several assets can be added to the selection, so the script receives a **list**, even when only one asset was chosen. A single selection has type `stac_assets`, for example to pass one asset from a script to the next.
+
+``` {#stac_assets .yaml}
+- catalog: https://stac.geobon.org
+  collection: some-collection
+  date: "2020-01-01"
+  item: some-item
+  items_are_tiles: false
+  asset: data
+  href: https://example.com/some-item/data.tif
+  type: image/tiff; application=geotiff; profile=cloud-optimized
+  categorical: false
+- catalog: https://planetarycomputer.microsoft.com/api/stac/v1
+  collection: some-other-collection
+  date: "2020-01-01"
+  item: null
+  items_are_tiles: true
+  asset: data
+  href: null
+  type: image/tiff; application=geotiff; profile=cloud-optimized
+  categorical: true
+```
+
+| Key name    | Description                                                                                                                                     |
+|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| catalog     | URL of the STAC catalog.                                                                                                                        |
+| collection  | Identifier of the collection in that catalog.                                                                                                   |
+| date        | Day in scope, as `YYYY-MM-DD`. The day of the chosen item, or the date chosen along with `items_are_tiles`. Can be null.                              |
+| item        | Identifier of the chosen item. Null when `items_are_tiles` is true.                                                                                   |
+| items_are_tiles | When true, the script is expected to search the collection for all items (on `date`, if any) and mosaic their `asset` itself.                  |
+| asset       | Key of the asset within the item(s).                                                                                                            |
+| href        | Direct link to the asset of the chosen item. Null when `items_are_tiles` is true.                                                                     |
+| type        | Media type of the asset, as declared by the catalog.                                                                                            |
+| categorical | True if the asset holds classes (e.g. land cover) rather than measurements. Useful to choose a resampling method (nearest neighbour vs. bilinear). |
+
+### Planetary Computer assets
+
+Assets from Microsoft's Planetary Computer must be signed before they can be read. Signing works without a key, but with tight rate limits; to raise them, set `PLANETARY_COMPUTER_API_KEY` in `runner.env` and restart the server. It is then available to scripts as an environment variable.
+
+In Python, with the `planetary-computer` and `pystac-client` packages:
+
+``` python
+import os
+import planetary_computer
+from pystac_client import Client
+
+if os.environ.get("PLANETARY_COMPUTER_API_KEY"):
+    planetary_computer.settings.set_subscription_key(os.environ["PLANETARY_COMPUTER_API_KEY"])
+
+for selection in biab_inputs()["stac"]:
+    if selection["items_are_tiles"]:
+        catalog = Client.open(selection["catalog"], modifier=planetary_computer.sign_inplace)
+        items = catalog.search(collections=[selection["collection"]], datetime=selection["date"]).items()
+        hrefs = [item.assets[selection["asset"]].href for item in items]  # to be mosaicked
+    else:
+        hrefs = [planetary_computer.sign(selection["href"])]
+```
+
+In R, with the `rstac` package:
+
+``` r
+library(rstac)
+
+key <- Sys.getenv("PLANETARY_COMPUTER_API_KEY")
+sign_fn <- sign_planetary_computer(
+  headers = if (key != "") c("Ocp-Apim-Subscription-Key" = key)
+)
+
+selection <- input$stac[[1]]
+found <- stac(selection$catalog) |>
+  stac_search(collections = selection$collection, ids = selection$item) |>
+  post_request() |>
+  items_sign(sign_fn)
+href <- found$features[[1]]$assets[[selection$asset]]$href
+```
