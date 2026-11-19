@@ -1,5 +1,5 @@
 
-# BON in a Box Pipeline Engine
+# BON in a Box Biodiversity Evaluation Engine
 
 **Open-source software for running reproducible biodiversity analyses through the Biodiversity Evaluation Engine (BEE).**
 
