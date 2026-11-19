@@ -18,6 +18,71 @@
   .wx-no-info-wrapper {
     padding-bottom: 30px;
   }
+
+  /* Cards: menu in the top-right corner*/
+  .wx-cards {
+    .wx-item {
+      position: relative;
+    }
+
+    .wx-more {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+    }
+
+    .wx-folder-name,
+    .wx-file-name {
+      min-width: 0;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .wx-cards .wx-more {
+      padding: 8px;
+    }
+
+    .wx-wrapper .wx-cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding-inline: 0;
+
+     &.wx-has-back-link {
+        padding-inline: 0;
+      }
+
+      .wx-back-item {
+        grid-column: 1 / -1;
+      }
+
+      .wx-item {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 3;
+        margin: 0;
+      }
+
+      .wx-preview {
+        container-type: size;
+      }
+
+      .wx-preview i {
+        font-size: clamp(36px, 68cqh, 80px);
+      }
+
+      .wx-preview i::before {
+        line-height: 1;
+      }
+
+      .wx-file-icon .wx-card-preview {
+        width: auto;
+        height: clamp(36px, 68cqh, 80px);
+        aspect-ratio: 1;
+      }
+    }
+  }
 }
 
 /* didn't need the !important before -- why?  */
@@ -152,74 +217,5 @@ wx-content-wrapper.wx-RJbNonjJ {
 @media (max-width: 599px) {
   .filebrowser-modal-card .filebrowser-modal-box {
     padding: 16px;
-  }
-}
-
-/* Card three-dot menu in the top-right corner (all widths, grid and search
-   results), so the name gets the whole info row */
-.file-manager .wx-cards .wx-item {
-  position: relative;
-}
-
-.file-manager .wx-cards .wx-more {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-}
-
-.file-manager .wx-cards .wx-folder-name,
-.file-manager .wx-cards .wx-file-name {
-  min-width: 0;
-  max-width: none;
-}
-
-@media (max-width: 768px) {
-  .file-manager .wx-wrapper .wx-cards,
-  .file-manager .wx-wrapper .wx-cards.wx-has-back-link {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .file-manager .wx-wrapper .wx-cards .wx-back-item {
-    grid-column: 1 / -1;
-  }
-
-  .file-manager .wx-wrapper .wx-cards .wx-item {
-    width: 100%;
-    min-width: 0;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    margin: 0;
-  }
-
-  .file-manager .wx-wrapper .wx-cards .wx-preview {
-    min-height: 0;
-    container-type: size;
-  }
-
-  .file-manager .wx-wrapper .wx-cards .wx-preview i {
-    font-size: 40px;
-    font-size: clamp(36px, 68cqh, 80px);
-  }
-
-  .file-manager .wx-wrapper .wx-cards .wx-preview i::before {
-    line-height: 1;
-  }
-
-  .file-manager .wx-wrapper .wx-cards .wx-file-icon .wx-card-preview {
-    width: 40px;
-    height: 40px;
-    width: clamp(36px, 68cqh, 80px);
-    height: clamp(36px, 68cqh, 80px);
-  }
-
-  .file-manager .wx-cards .wx-more {
-    width: 40px;
-    height: 40px;
-    justify-content: center;
-    align-items: center;
   }
 }
