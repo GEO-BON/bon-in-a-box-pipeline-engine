@@ -32,7 +32,7 @@ class ObjectInputDefinition(val typeStr: String, val requiredProperties: JSONObj
             if (obj == null || !accepts(obj)) {
                 throw RuntimeException(
                     "Constant $idForUser: item #${i + 1} of $typeStr is missing required fields " +
-                            "${requiredProperties.keySet()}."
+                            "${requiredProperties.keySet().removeAll(obj.keySet())}."
                 )
             }
         }
