@@ -30,9 +30,9 @@ internal class ObjectInputDefinitionTest {
 
     @Test
     fun givenStacAssets_whenConnectedToLocationType_thenRejected() {
-        ObjectInputType.entries.filter { it != ObjectInputType.STAC_ASSETS }.forEach { location ->
-            assertFalse(canAcceptOutputOf(ObjectInputType.STAC_ASSETS, location), "stac_assets accepted ${location.typeStr}")
-            assertFalse(canAcceptOutputOf(location, ObjectInputType.STAC_ASSETS), "${location.typeStr} accepted stac_assets")
+        ObjectInputType.entries.filter { it != ObjectInputType.STAC_ASSET }.forEach { location ->
+            assertFalse(canAcceptOutputOf(ObjectInputType.STAC_ASSET, location), "stac_asset accepted ${location.typeStr}")
+            assertFalse(canAcceptOutputOf(location, ObjectInputType.STAC_ASSET), "${location.typeStr} accepted stac_asset")
         }
     }
 

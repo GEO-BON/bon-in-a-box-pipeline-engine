@@ -99,7 +99,7 @@ enum class ObjectInputType(val typeStr: String, val requiredProperties: JSONObje
       type: image/tiff; application=geotiff; profile=cloud-optimized
       categorical: false
     */
-    STAC_ASSETS(STAC__TYPE__STAC_ASSET, JSONObject().apply {
+    STAC_ASSET(STAC__TYPE__STAC_ASSET, JSONObject().apply {
         put(STAC__CATALOG, "text")
         put(STAC__COLLECTION, "text")
         put(STAC__DATE, "text")
