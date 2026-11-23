@@ -38,7 +38,7 @@ internal class ObjectInputDefinitionTest {
 
     @Test
     fun givenListOfValidObjects_whenRead_thenPlainListReturned() {
-        val stac = fromDef(STAC__TYPE__STAC_ASSETS)!!
+        val stac = fromDef(STAC__TYPE__STAC_ASSET)!!
         val read = stac.readList("stac", JSONArray().put(stacSelection()).put(stacSelection(itemsAreTiles = true)))
 
         assertNotNull(read)
@@ -50,20 +50,20 @@ internal class ObjectInputDefinitionTest {
 
     @Test
     fun givenLoneObject_whenReadAsList_thenListOfOne() {
-        val read = fromDef(STAC__TYPE__STAC_ASSETS)!!.readList("stac", stacSelection())
+        val read = fromDef(STAC__TYPE__STAC_ASSET)!!.readList("stac", stacSelection())
         assertEquals(1, read?.size)
     }
 
     @Test
     fun givenNull_whenReadAsList_thenNull() {
-        assertNull(fromDef(STAC__TYPE__STAC_ASSETS)!!.readList("stac", JSONObject.NULL))
+        assertNull(fromDef(STAC__TYPE__STAC_ASSET)!!.readList("stac", JSONObject.NULL))
     }
 
     @Test
     fun givenObjectMissingField_whenReadAsList_thenRejected() {
         val incomplete = stacSelection().apply { remove(STAC__ASSET) }
         assertFailsWith<RuntimeException> {
-            fromDef(STAC__TYPE__STAC_ASSETS)!!.readList("stac", JSONArray().put(stacSelection()).put(incomplete))
+            fromDef(STAC__TYPE__STAC_ASSET)!!.readList("stac", JSONArray().put(stacSelection()).put(incomplete))
         }
     }
 

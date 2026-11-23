@@ -149,7 +149,7 @@ inputs:
       type: array
       items:
         type: record
-        name: stac_assets
+        name: stac_asset
         fields:
         - name: date
           type: string?
