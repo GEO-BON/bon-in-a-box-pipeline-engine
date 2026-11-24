@@ -1,0 +1,110 @@
+---
+title: "Contribuer"
+format: html
+---
+
+BON in a Box est une initiative communautaire qui réunit des méthodes et des expertises scientifiques afin de soutenir le suivi de la biodiversité et la production de rapports.
+
+Nous accueillons les contributions des chercheurs, des développeurs et des organisations qui souhaitent rendre les analyses de la biodiversité plus accessibles, reproductibles et largement applicables.
+
+En contribuant au Biodiversity Evaluation Engine (BEE), vous pouvez aider à transformer la recherche scientifique en outils pratiques pour le suivi de la biodiversité, la planification de la conservation et la production de rapports destinés aux politiques publiques.
+
+## Pourquoi contribuer?
+
+Partout dans le monde, des chercheurs élaborent des méthodes pour évaluer les changements de la biodiversité, mais il est souvent difficile d'accéder à ces méthodes ou de les appliquer au-delà de leur contexte de recherche initial.
+
+Contribuer à BON in a Box rend ces méthodes accessibles à une communauté plus vaste et favorise la science ouverte, la reproductibilité et la collaboration.
+
+Les contributions permettent de :
+
+- **Accroître l'impact de la recherche** en rendant les méthodes analytiques accessibles aux chercheurs, aux praticiens et aux décideurs.
+
+- **Favoriser la reproductibilité scientifique** en partageant des flux de travail analytiques transparents et standardisés.
+
+- **Collaborer avec la communauté GEO BON** afin d'améliorer et d'élargir les méthodes existantes.
+
+- **Soutenir le suivi de la biodiversité et la production de rapports** en aidant les pays et les organisations à calculer des variables essentielles de biodiversité (EBV) et des indicateurs de biodiversité.
+
+## Que pouvez-vous apporter?
+
+Nous accueillons plusieurs types de contributions, notamment :
+
+- **De nouveaux pipelines analytiques :** des méthodes de calcul des EBV, d'indicateurs de biodiversité ou d'autres mesures utiles au suivi de la biodiversité.
+
+- **Des améliorations aux pipelines existants :** mises à jour des méthodes scientifiques, fonctionnalités supplémentaires, nouvelles sources de données ou améliorations des performances et de la facilité d'utilisation.
+
+- **Des scripts individuels et des contributions techniques :** composants réutilisables, corrections de bogues et améliorations de la plateforme sous-jacente.
+
+- **De la documentation et des tests :** améliorations qui facilitent la compréhension, l'utilisation et la maintenance du BEE.
+
+### Votre pipeline analytique est-il adapté?
+
+Nous nous intéressons particulièrement aux pipelines qui :
+
+- calculent des mesures de biodiversité utiles au suivi, à la planification de la conservation et à la production de rapports pour les politiques publiques;
+
+- sont libres et développés dans des langages de programmation pris en charge, comme R, Python ou Julia;
+
+- peuvent être appliqués à différentes espèces, dans différents pays et régions ou contextes de suivi;
+
+- peuvent être automatisés et reproduits à partir d'entrées, d'étapes analytiques et de sorties clairement définies.
+
+Il n'est pas nécessaire que les pipelines soient entièrement développés ou qu'ils satisfassent à toutes les exigences techniques avant que vous communiquiez avec nous. L'équipe de BON in a Box peut vous aider à déterminer si une contribution proposée est adaptée et à cerner les éléments nécessaires à son intégration.
+
+Pour en savoir plus, consultez nos [normes des pipelines](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html) (en anglais; voir aussi les [normes en français](pipeline_standards.qmd)).
+
+## Comment contribuer un pipeline
+
+Nous encourageons les contributeurs à communiquer avec nous tôt dans le processus de développement afin de rendre ensemble les pipelines réutilisables, reproductibles et compatibles avec le BEE.
+
+### Étape 1. Communiquer avec nous
+
+Communiquez avec l'équipe de BON in a Box à l'adresse [boninabox\@geobon.org](mailto:boninabox@geobon.org) pour discuter de votre contribution proposée.
+
+Nous pouvons vous aider à déterminer si votre méthode est adaptée, à repérer les composants existants qui pourraient être réutilisés et à discuter des ressources et du soutien technique nécessaires à son intégration.
+
+### Étape 2. Concevoir votre pipeline
+
+Élaborez une vue d'ensemble du flux de travail analytique, en précisant ses entrées, ses étapes de traitement et ses sorties attendues.
+
+L'équipe de BON in a Box peut vous aider à rendre le pipeline modulaire et généralisable, et à assurer sa compatibilité avec les composants existants du BEE.
+
+Nous recommandons de commencer par une version simple et fonctionnelle avant d'ajouter des fonctionnalités plus complexes.
+
+### Étape 3. Développer et tester
+
+Développez votre pipeline en suivant les [normes des pipelines](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html) (en anglais; voir aussi les [normes en français](pipeline_standards.qmd)), qui précisent les exigences en matière de documentation, de reproductibilité, de facilité d'utilisation et d'intégration technique.
+
+Les contributeurs peuvent travailler avec l'équipe de BON in a Box pour tester leurs pipelines et vérifier qu'ils fonctionnent correctement dans le BEE.
+
+### Étape 4. Évaluation par les pairs
+
+Une fois terminé et conforme aux normes requises, un pipeline peut être soumis à une évaluation par les pairs.
+
+Le processus d'évaluation porte sur la méthodologie scientifique, la reproductibilité, la documentation et la facilité d'utilisation du pipeline.
+
+Les contributeurs pourraient devoir apporter des révisions à la suite des commentaires des évaluateurs avant l'acceptation du pipeline.
+
+Pour en savoir plus, consultez notre [processus d'évaluation par les pairs](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/peer_review.html) (en anglais; voir aussi la [version française](peer_review.qmd)).
+
+### Étape 5. Publication et développement continu
+
+Une fois accepté, le pipeline peut être publié par l'intermédiaire de BON in a Box et mis à la disposition de l'ensemble de la communauté.
+
+Les pipelines publiés peuvent recevoir un DOI, ce qui permet d'identifier et de citer la contribution.
+
+Nous encourageons les contributeurs à continuer d'améliorer leurs pipelines au fur et à mesure que de nouvelles méthodes, de nouveaux jeux de données et de nouvelles connaissances scientifiques deviennent disponibles.
+
+## Autres façons de contribuer
+
+Il n'est pas nécessaire de développer un pipeline analytique complet pour contribuer à BON in a Box.
+
+Nous accueillons également les contributions aux pipelines existants, à la documentation, aux tests et au développement logiciel.
+
+Vous pouvez explorer nos dépôts libres au sein de l'[organisation GitHub de GEO BON](https://github.com/GEO-BON) ou communiquer avec l'équipe pour discuter des possibilités de contribution.
+
+## Envie de contribuer?
+
+Que vous disposiez d'une méthode analytique existante, d'une idée de nouveau pipeline ou que vous souhaitiez soutenir le développement du BEE, nous serions ravis d'échanger avec vous.
+
+**Communiquez avec nous à l'adresse [boninabox\@geobon.org](mailto:boninabox@geobon.org) pour discuter de votre contribution.**

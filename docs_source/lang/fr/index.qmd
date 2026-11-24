@@ -78,7 +78,7 @@ Contribuer au BEE peut aider à :
 
 Les pipelines proposés respectent des normes de qualité documentées; l'évaluation par les pairs contribue à la rigueur scientifique, à la facilité d'utilisation et à la généralisabilité des flux de travail publiés.
 
-Pour en savoir plus, consultez nos [directives de contribution](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html) et notre [processus d'évaluation par les pairs](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/peer_review.html) (en anglais; consulter également [la version française](peer_review.qmd)).
+Pour en savoir plus, consultez nos [directives de contribution](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html) (en anglais; voir aussi les [normes en français](pipeline_standards.qmd)) et notre [processus d'évaluation par les pairs](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/peer_review.html) (en anglais; voir aussi la [version française](peer_review.qmd)).
 
 # Comment citer {#how-to-cite}
 
