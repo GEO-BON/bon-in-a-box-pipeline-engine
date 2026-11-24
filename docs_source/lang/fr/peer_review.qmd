@@ -1,0 +1,156 @@
+---
+title: "Évaluation par les pairs"
+format: html
+---
+
+Lire cette page en [anglais](../peer_review.html).
+
+Pour garantir que les pipelines analytiques accessibles par l'intermédiaire du Biodiversity Evaluation Engine (BEE) sont scientifiquement rigoureux, reproductibles et accessibles, BON in a Box a établi un processus d'évaluation par les pairs pour les pipelines proposés.
+
+Le processus d'évaluation examine la méthodologie scientifique, la fonctionnalité technique, la généralisabilité, la documentation et la facilité d'utilisation de chaque pipeline. Il permet également aux chercheurs et aux praticiens de mettre leur expertise à contribution pour améliorer les outils disponibles dans le BEE.
+
+Les pipelines sont généralement évalués par 2 à 5 experts possédant des expertises scientifiques, techniques ou pratiques complémentaires. Dans la mesure du possible, nous cherchons à inclure des évaluateurs issus à la fois du milieu universitaire et des communautés de suivi de la biodiversité ou des politiques publiques.
+
+## Quand un pipeline est-il prêt pour l'évaluation par les pairs? {#when-is-a-pipeline-ready-for-peer-review}
+
+Avant qu'un pipeline soit soumis à une évaluation externe, l'équipe de BON in a Box travaille avec les contributeurs pour s'assurer qu'il :
+
+- Respecte les exigences décrites dans les [normes des pipelines](../pipeline_standards.html) (en anglais).
+
+- S'exécute correctement avec les exemples de données d'entrée fournis et les paramètres par défaut.
+
+- A fait l'objet de tests initiaux avec différentes données d'entrée, différents paramètres et différents contextes géographiques, le cas échéant.
+
+- Produit des résultats scientifiquement plausibles et conformes à la méthodologie sous-jacente.
+
+- Comprend des descriptions des entrées et des sorties, une documentation et une description du flux de travail.
+
+- Possède un code accessible dans le dépôt GitHub de BON in a Box, soit dans la branche principale, soit dans une branche de développement ou une pull request.
+
+L'équipe de BON in a Box effectue des tests initiaux et des vérifications techniques avant d'inviter des évaluateurs externes. **Les évaluateurs externes sont ensuite invités à effectuer des tests supplémentaires et indépendants** afin d'évaluer la fonctionnalité, la validité scientifique et l'applicabilité du pipeline dans différents contextes.
+
+## Comment fonctionne le processus d'évaluation par les pairs? {#how-does-the-peer-review-process-work}
+
+### 1. Sélection des évaluateurs {#reviewer-selection}
+
+Le contributeur du pipeline peut suggérer des évaluateurs potentiels possédant une expertise pertinente. L'équipe de BON in a Box et le réseau GEO BON détermineront d'autres évaluateurs.
+
+Nous cherchons à sélectionner des évaluateurs possédant des expertises complémentaires dans trois domaines :
+
+| Type d'évaluateur privilégié | Principaux domaines d'expertise |
+|--------------------------|----------------------------------------------|
+| **Expert scientifique** | Méthodologie scientifique, hypothèses, validation et interprétation des résultats |
+| **Expert en suivi appliqué de la biodiversité** | Généralisabilité, facilité d'utilisation et pertinence pour le suivi de la biodiversité, la planification de la conservation et la production de rapports |
+| **Expert technique** | Qualité du code, reproductibilité, traitement des données et fonctionnalité du pipeline |
+
+Ces catégories visent à guider la sélection des évaluateurs plutôt qu'à établir des rôles rigides. Les évaluateurs peuvent posséder une expertise dans plusieurs domaines et ne sont pas tenus d'évaluer les aspects qui dépassent leur expertise.
+
+Les évaluateurs sont invités par l'équipe de BON in a Box et reçoivent les documents nécessaires à l'évaluation du pipeline.
+
+### 2. Évaluation du pipeline {#pipeline-evaluation}
+
+Les évaluateurs sont invités à évaluer le pipeline à l'aide d'un formulaire d'évaluation standardisé, en se concentrant sur les critères suivants :
+
+- **Rigueur scientifique :** La méthodologie repose-t-elle sur des bases scientifiques et est-elle correctement mise en œuvre? Les hypothèses et les limites sont-elles clairement communiquées?
+
+- **Généralisabilité :** Le pipeline peut-il être appliqué à différentes régions géographiques, espèces, écosystèmes ou échelles, selon le cas?
+
+- **Fonctionnalité :** Le pipeline s'exécute-t-il correctement et produit-il les résultats attendus?
+
+- **Utilisation des données :** Les jeux de données d'entrée sont-ils appropriés, accessibles et clairement documentés? Les utilisateurs peuvent-ils fournir leurs propres données lorsque pertinent?
+
+- **Facilité d'utilisation :** Les entrées, les paramètres et les sorties sont-ils compréhensibles pour les utilisateurs sans expérience approfondie en programmation?
+
+- **Documentation :** La méthodologie, les entrées, les sorties et l'interprétation des résultats sont-elles expliquées de manière adéquate?
+
+- **Qualité du code :** Le code est-il lisible, modulaire, reproductible et documenté de manière adéquate?
+
+Les évaluateurs sont encouragés à se concentrer sur les critères les plus pertinents pour leur expertise. **Ils n'ont pas besoin de remplir toutes les sections du formulaire d'évaluation**, mais devraient fournir suffisamment de commentaires pour permettre une appréciation du pipeline.
+
+### 3. Commentaires et révisions {#review-feedback-and-revisions}
+
+Les évaluateurs soumettent leurs formulaires d'évaluation remplis à l'équipe de BON in a Box, en y indiquant les problèmes relevés, les recommandations et une évaluation globale du pipeline.
+
+Les formulaires d'évaluation remplis constituent le dossier officiel de l'évaluation. L'équipe de BON in a Box regroupe les commentaires et travaille avec les contributeurs du pipeline pour y répondre.
+
+Les changements techniques précis, les bogues et les améliorations demandées sont suivis au moyen d'issues GitHub ou de commentaires sur les pull requests, ce qui permet aux contributeurs et à l'équipe de BON in a Box de documenter et de suivre les révisions.
+
+Selon l'ampleur des révisions nécessaires, les évaluateurs peuvent être invités à réévaluer le pipeline avant qu'une décision finale soit prise.
+
+### 4. Résultat de l'évaluation {#review-outcome}
+
+À la suite de l'évaluation, un pipeline peut être :
+
+- **Accepté avec des révisions mineures :** Le pipeline répond aux principales exigences scientifiques et techniques; seuls des changements mineurs sont nécessaires avant sa publication.
+
+- **À réviser :** Des changements plus importants sont nécessaires et le pipeline devra faire l'objet d'une évaluation supplémentaire.
+
+- **Non accepté :** Le pipeline ne répond pas actuellement aux exigences pour être inclus dans le BEE.
+
+L'équipe de BON in a Box coordonne la décision finale en fonction des commentaires des évaluateurs et des normes des pipelines.
+
+## Instructions pour les évaluateurs {#instructions-for-reviewers}
+
+Les évaluateurs recevront un formulaire d'évaluation propre au pipeline contenant les informations et les ressources nécessaires pour effectuer leur évaluation, notamment :
+
+- Des instructions pour accéder au pipeline sur la plateforme BEE en ligne.
+
+- Des liens vers le dépôt GitHub, la branche, la pull request ou les fichiers sources pertinents.
+
+- Des liens vers la description du pipeline et la documentation scientifique connexe.
+
+- Toute information supplémentaire ou tout jeu de données d'exemple pertinent pour l'évaluation.
+
+Les pipelines en cours d'évaluation seront accessibles sur la plateforme BEE en ligne; les évaluateurs n'ont donc pas besoin d'installer le BEE localement. Le code source correspondant sera accessible au public sur GitHub, y compris pour les pipelines qui n'ont pas encore été fusionnés dans la branche principale.
+
+### Étape 1. Accéder au BEE {#step-1.-access-bee}
+
+Les évaluateurs peuvent accéder au BEE par la [plateforme en ligne](https://auth.bee.geobon.org/).
+
+Si vous n'avez pas déjà accès, créez un [compte GEO BON](https://members.geobon.org/) gratuit et suivez les instructions d'accès fournies dans votre formulaire d'évaluation.
+
+### Étape 2. Exécuter le pipeline {#step-2.-run-the-pipeline}
+
+Repérez le pipeline indiqué dans votre formulaire d'évaluation et exécutez-le avec les exemples de données d'entrée fournis et les paramètres par défaut.
+
+Bien que le pipeline ait fait l'objet de tests initiaux par l'équipe de BON in a Box, les évaluateurs sont invités à vérifier de façon indépendante qu'il s'exécute correctement, produit les résultats attendus et fournit des descriptions claires des entrées et des sorties.
+
+### Étape 3. Évaluer la méthodologie et la documentation {#step-3.-evaluate-the-methodology-and-documentation}
+
+Examinez la description du pipeline et les références scientifiques pertinentes.
+
+Vérifiez si la méthodologie est appropriée, si ses hypothèses et ses limites sont clairement expliquées et si les résultats sont conformes à l'application prévue.
+
+### Étape 4. Tester différentes entrées et différents paramètres {#step-4.-test-different-inputs-and-parameters}
+
+Dans la mesure du possible, exécutez le pipeline avec différents paramètres, régions géographiques ou jeux de données.
+
+Nous encourageons les évaluateurs à tester le pipeline avec des données ou des zones d'étude qu'ils connaissent, car cela peut aider à relever des résultats inattendus ou des limites méthodologiques qui n'auraient pas été détectés lors des tests initiaux.
+
+Consignez toute erreur, tout comportement inattendu ou toute préoccupation dans le formulaire d'évaluation.
+
+### Étape 5. Examiner le code (le cas échéant) {#step-5.-review-the-code-where-applicable}
+
+Les évaluateurs ayant une expérience pertinente en programmation sont encouragés à examiner le code source à l'aide des liens GitHub fournis dans le formulaire d'évaluation.
+
+L'examen du code peut comprendre la vérification de la mise en œuvre de la méthodologie scientifique, de la reproductibilité, de la modularité et de la gestion des erreurs.
+
+Les problèmes techniques précis peuvent être documentés dans le formulaire d'évaluation ou soulevés directement dans les commentaires de la pull request GitHub pertinente.
+
+### Étape 6. Soumettre votre évaluation {#step-6.-submit-your-review}
+
+Remplissez les sections pertinentes du formulaire d'évaluation, y compris votre appréciation du pipeline, les changements que vous recommandez et votre recommandation globale.
+
+Les évaluateurs sont encouragés à fournir des commentaires détaillés dans leurs domaines d'expertise, mais ne sont pas tenus d'évaluer tous les aspects du pipeline.
+
+Retournez le formulaire rempli à l'équipe de BON in a Box en suivant les instructions fournies avec votre invitation à évaluer le pipeline.
+
+## **Publication du pipeline** {#pipeline-publication}
+
+Les pipelines évalués par les pairs et acceptés seront publiés sur [Zenodo](https://zenodo.org/) et recevront un DOI, qui sera cité chaque fois que le pipeline sera utilisé.
+
+## Formulaire d'évaluation {#review-form}
+
+Les évaluateurs recevront avec leur invitation un formulaire d'évaluation propre au pipeline. Le formulaire comprend les détails du pipeline, les liens pertinents, les critères d'évaluation et les instructions pour soumettre des commentaires.
+
+#### [Télécharger le formulaire d'évaluation du pipeline ici](../peer_review_form.docx) (en anglais) {#download-pipeline-review-form-here}

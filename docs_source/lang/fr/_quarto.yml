@@ -1,0 +1,50 @@
+project:
+  type: website
+  output-dir: ../../../docs/fr
+
+lang: fr
+
+website:
+  title: BON in a Box
+  description: Documentation destinée aux utilisateurs et aux contributeurs de BON in a Box
+  favicon: ../BiaB_logo_small.png
+  navbar:
+    background: primary
+    search: true
+    left:
+      - href: index.qmd
+        text: À propos
+      - href: ../how_to_use.html
+        text: Guide d'utilisation (anglais)
+      - href: ../how_to_install.html
+        text: Installation (anglais)
+      - text: Contribuer un pipeline
+        menu:
+          - href: ../contributing.html
+            text: Vous souhaitez contribuer? (anglais)
+          - href: ../how_to_contribute.html
+            text: Instructions pour contribuer (anglais)
+          - href: ../pipeline_standards.html
+            text: Normes des pipelines (anglais)
+          - href: ../openEO.html
+            text: Intégration openEO (anglais)
+      - href: peer_review.qmd
+        text: Évaluation par les pairs
+    right:
+      - href: ../index.html
+        text: English
+    tools:
+      - icon: box-arrow-up-right
+        href: https://boninabox.geobon.org/
+        text: Site Web de BON in a Box
+      - icon: github
+        href: https://github.com/GEO-BON/bon-in-a-box-pipelines/
+        text: GitHub de BON in a Box
+
+format:
+  html:
+    theme: flatly
+    css: ../styles.css
+    toc: true
+
+editor: visual
