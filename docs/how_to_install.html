@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-665ee2a288131b436dc9b19ef6dcd906.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-887c0eefb0bd987f213c44d7542ba662.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -278,7 +278,10 @@ ul.task-list li input[type="checkbox"] {
 <ol type="a">
 <li><p>Find the file called <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env"><code>runner-sample.env</code></a></p></li>
 <li><p>Duplicate the file and rename the copy to <code>runner.env</code>.</p></li>
-<li><p>Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g.&nbsp;GBIF or IUCN)</p></li>
+<li><p>Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g.&nbsp;GBIF or IUCN)</p>
+<ul>
+<li>To access the UN Biodiversity Lab catalogue in the STAC chooser, set <code>UNBL_API_KEY</code> to the key provided by UN Biodiversity Lab. The catalogue currently answers without one, but it is needed to access the items in pipelines.</li>
+</ul></li>
 <li><p>Adjust any server option as you see fit (optional).</p></li>
 </ol></li>
 <li><p>Using a Linux terminal (terminal on Mac, Git Bash or WSL on Windows), navigate to the folder of the cloned repository.</p></li>
