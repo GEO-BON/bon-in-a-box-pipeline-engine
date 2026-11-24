@@ -1,10 +1,10 @@
-.history .search-container {
+.search-container {
     margin-top: 30px;
     display: flex;
     align-items: center;
 }
 
-.step-search-input {
+.history-search-input {
     width: 100%;
     padding: 8px 12px;
     border: 1px solid #83829b;
@@ -14,17 +14,133 @@
     background: #fcfcfc url('../../img/magnifying-glass.svg') no-repeat right 12px center;
 }
 
-.history .step-search-input {
+.history-search-input {
     max-width: 400px;
 }
 
-.step-search-input:focus {
+.history-search-input:focus {
     outline: none;
     border-color: var(--biab-green-main, #4caf50);
     box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 
-.step-search-input:not(:placeholder-shown) {
+.history-search-input:not(:placeholder-shown) {
     background-image: none;
 }
 
+.history-location-summary span,
+.history-bbox-label {
+    color: #777;
+    font-weight: bold;
+}
+
+.history-bbox-label {
+    margin-top: 1em;
+}
+
+.history-location-summary ul {
+    list-style: none;
+    padding-left: 0.5rem;
+    margin: 0.5em 0 0;
+    font-family: monospace;
+}
+
+@media (max-width: 768px) {
+    .latest-runs-grid > .latest-run-item {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .latest-run-item > .MuiCard-root {
+        box-sizing: border-box;
+        overflow-wrap: anywhere;
+    }
+
+    .latest-runs-grid .MuiCardHeader-content {
+        min-width: 0;
+    }
+
+    .latest-runs-grid .MuiCardActions-root {
+        flex-wrap: wrap;
+    }
+
+    .latest-runs-grid .MuiCardActions-root > a {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .latest-runs-grid .MuiCardActions-root > a > button {
+        max-width: calc(100% - 10px);
+        white-space: normal;
+    }
+
+    .history-search-input {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .search-container > :last-child {
+        flex-shrink: 0;
+    }
+
+    .history-run-item {
+        min-width: 0;
+    }
+
+    .history-run-item > .MuiCard-root {
+        box-sizing: border-box;
+        overflow-wrap: anywhere;
+    }
+
+    .MuiCardHeader-content {
+        min-width: 0;
+    }
+
+    .MuiCardActions-root {
+        flex-wrap: wrap;
+    }
+
+    .MuiCardActions-root > a {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .MuiCardActions-root > a > button {
+        max-width: calc(100% - 10px);
+        white-space: normal;
+    }
+
+    .history-inputs {
+        table-layout: fixed;
+        border: 1px solid rgba(224, 224, 224, 1);
+    }
+
+    .MuiCardContent-root pre {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        max-width: 100%;
+    }
+
+    .MuiCardContent-root img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .history-inputs,
+    .history-inputs tbody,
+    .history-inputs tr,
+    .history-inputs td {
+        display: block;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .history-inputs tr {
+        border: 1px solid rgba(224, 224, 224, 1);
+    }
+
+    .history-inputs td {
+        border: none;
+    }
+}

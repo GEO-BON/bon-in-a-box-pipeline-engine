@@ -23,7 +23,7 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { styled } from "@mui/material/styles";
 import ReactMarkdown from "react-markdown";
-import { CustomButtonGreen, CustomButtonGrey, CustomSelect } from "./CustomMUI";
+import { CustomButtonGreen, CustomButtonGrey } from "./CustomMUI";
 import { Alert } from "@mui/material";
 import Warning from "@mui/icons-material/Warning";
 import yaml from "js-yaml";
@@ -131,7 +131,7 @@ export default function RunHistory() {
         <h1>{t("history.title")}</h1>
         <Grid container spacing={2}>
           {runHistory.runs.map((res, i) => (
-            <RunCard key={i} run={res} />
+            <RunCard key={i} run={res} history />
           ))}
         </Grid>
         <PreviousNext
@@ -150,7 +150,7 @@ export default function RunHistory() {
       <div className="search-container">
         <input
           type="search"
-          className="step-search-input"
+          className="history-search-input"
           placeholder={t("history.search")}
           aria-label={t("history.search")}
           value={inputValue}
@@ -190,8 +190,8 @@ export const LastNRuns = ({ n }) => {
       </div>
       {lastRuns.error ? <p>{t("home.runsError")}</p> : lastRuns.runs.length === 0
         ? <p>{t("home.noRuns")}</p>
-        : <Grid container spacing={3}>
-            {lastRuns.runs.map((run, i) => <RunCard key={i} run={run} />)}
+        : <Grid container spacing={3} className="latest-runs-grid">
+            {lastRuns.runs.map((run, i) => <RunCard key={i} run={run} latest />)}
           </Grid>}
     </div>
   )
@@ -273,9 +273,42 @@ const PreviousNext = (props) => {
   );
 };
 
+const isHistoryLocation = (value, input) => {
+  const type = input?.type?.toLowerCase();
+  return value !== null && typeof value === "object" &&
+    !Array.isArray(value) && Array.isArray(value.bbox) &&
+    value.bbox.length === 4 &&
+    value.bbox.every((coordinate) =>
+      typeof coordinate === "number" || typeof coordinate === "string") &&
+    value.CRS !== null && typeof value.CRS === "object" &&
+    !Array.isArray(value.CRS) &&
+    (!type || ["location", "bboxcrs", "crsbbox"].includes(type));
+};
+
+const HistoryLocationSummary = ({ location }) => {
+  const crs = location.CRS;
+  const code = crs.code == null ? "" :
+    (crs.authority ? `${crs.authority}:` : "") + crs.code;
+
+  return (
+    <div className="history-location-summary">
+      <div><span>Country:</span> {location.country?.englishName}</div>
+      <div><span>Region:</span> {location.region?.regionName}</div>
+      <div><span>CRS:</span> {crs.name}{code && ` (${code})`}</div>
+      <div className="history-bbox-label">Bounding box:</div>
+      <ul>
+        <li>Minimum X: {location.bbox[0]}</li>
+        <li>Minimum Y: {location.bbox[1]}</li>
+        <li>Maximum X: {location.bbox[2]}</li>
+        <li>Maximum Y: {location.bbox[3]}</li>
+      </ul>
+    </div>
+  );
+};
+
 const RunCard = (props) => {
   const { t, i18n } = useTranslation();
-  const { run } = props;
+  const { run, history = false, latest = false } = props;
   const [expanded, setExpanded] = useState(false);
   const [desc, setDesc] = useState("");
   const [inputs, setInputs] = useState({});
@@ -310,7 +343,7 @@ const RunCard = (props) => {
     });
   }, [pipeline, run, setExpanded]);
   return (
-    <Grid size={{ md: 10, lg: 5 }}>
+    <Grid size={history ? { xs: 12, lg: 5 } : latest ? { xs: 12, md: 10, lg: 5 } : { md: 10, lg: 5 }} className={history ? "history-run-item" : latest ? "latest-run-item" : undefined}>
       <Card
         sx={{
           width: "100%",
@@ -374,7 +407,7 @@ const RunCard = (props) => {
                   {desc}
                 </ReactMarkdown>
                 <h3 style={{ color: "var(--biab-green-main)" }}>{t("runCard.inputs")}</h3>
-                <Table size="small">
+                <Table size="small" className="history-inputs">
                   <TableBody>
                     {Object.entries(run.inputs).map((i) => {
                       const inputId = i[0];
@@ -400,7 +433,9 @@ const RunCard = (props) => {
                             <>
                               {(() => {
                                 // Format the value for the table, handle types
-                                if (Array.isArray(value)) {
+                                if (isHistoryLocation(value, inputs[inputId])) {
+                                  return <HistoryLocationSummary location={value} />;
+                                } else if (Array.isArray(value)) {
                                   return value.join(", ");
                                 } else if (
                                   typeof value === "object" &&

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.11.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -39,14 +39,15 @@ ul.task-list li input[type="checkbox"] {
 <link href=".//BiaB_logo_small.png" rel="icon" type="image/png">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-602dfb0a92afd774e28d5a4761a4ce24.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-665ee2a288131b436dc9b19ef6dcd906.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -79,19 +80,18 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-fixed quarto-light">
+<body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">BON in a Box</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -101,12 +101,12 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./how_to_install.html" aria-current="page"> 
-<span class="menu-text">Install</span></a>
+    <a class="nav-link" href="./how_to_use.html"> 
+<span class="menu-text">User guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./how_to_use.html"> 
-<span class="menu-text">User Guide</span></a>
+    <a class="nav-link active" href="./how_to_install.html" aria-current="page"> 
+<span class="menu-text">How to install</span></a>
   </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribute-a-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
@@ -125,6 +125,10 @@ ul.task-list li input[type="checkbox"] {
     <a class="dropdown-item" href="./pipeline_standards.html">
  <span class="dropdown-text">Pipeline standards</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="./openEO.html">
+ <span class="dropdown-text">openEO integration</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item">
@@ -137,6 +141,7 @@ ul.task-list li input[type="checkbox"] {
     <a href="https://boninabox.geobon.org/" title="BON in a Box website" class="quarto-navigation-tool px-1" aria-label="BON in a Box website"><i class="bi bi-box-arrow-up-right"></i></a>
     <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/" title="BON in a Box GitHub" class="quarto-navigation-tool px-1" aria-label="BON in a Box GitHub"><i class="bi bi-github"></i></a>
 </div>
+            <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -145,20 +150,20 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
   <li><a href="#video-tutorial" id="toc-video-tutorial" class="nav-link active" data-scroll-target="#video-tutorial">Video tutorial</a></li>
-  <li><a href="#deploying-bon-in-a-box-locally" id="toc-deploying-bon-in-a-box-locally" class="nav-link" data-scroll-target="#deploying-bon-in-a-box-locally">Deploying BON in a Box locally</a>
+  <li><a href="#deploying-the-biodiversity-evaluation-engine-bee-locally" id="toc-deploying-the-biodiversity-evaluation-engine-bee-locally" class="nav-link" data-scroll-target="#deploying-the-biodiversity-evaluation-engine-bee-locally">Deploying the Biodiversity Evaluation Engine (BEE) locally</a>
   <ul class="collapse">
   <li><a href="#step-1-install-docker" id="toc-step-1-install-docker" class="nav-link" data-scroll-target="#step-1-install-docker">Step 1: Install Docker</a></li>
   <li><a href="#step-2-generate-ssh-key" id="toc-step-2-generate-ssh-key" class="nav-link" data-scroll-target="#step-2-generate-ssh-key">Step 2: Generate SSH Key</a></li>
   <li><a href="#step-3-clone-repository" id="toc-step-3-clone-repository" class="nav-link" data-scroll-target="#step-3-clone-repository">Step 3: Clone repository</a></li>
   <li><a href="#step-4-set-environment-file" id="toc-step-4-set-environment-file" class="nav-link" data-scroll-target="#step-4-set-environment-file">Step 4: Set environment file</a></li>
-  <li><a href="#step-5-opening-bon-in-a-box-in-the-browser" id="toc-step-5-opening-bon-in-a-box-in-the-browser" class="nav-link" data-scroll-target="#step-5-opening-bon-in-a-box-in-the-browser">Step 5: Opening BON in a Box in the browser</a></li>
-  <li><a href="#step-6-stopping-bon-in-a-box" id="toc-step-6-stopping-bon-in-a-box" class="nav-link" data-scroll-target="#step-6-stopping-bon-in-a-box">Step 6: Stopping BON in a Box</a></li>
-  <li><a href="#updating-bon-in-a-box" id="toc-updating-bon-in-a-box" class="nav-link" data-scroll-target="#updating-bon-in-a-box">Updating BON in a Box</a></li>
+  <li><a href="#step-5-opening-bee-in-the-browser" id="toc-step-5-opening-bee-in-the-browser" class="nav-link" data-scroll-target="#step-5-opening-bee-in-the-browser">Step 5: Opening BEE in the browser</a></li>
+  <li><a href="#step-6-stopping-bee" id="toc-step-6-stopping-bee" class="nav-link" data-scroll-target="#step-6-stopping-bee">Step 6: Stopping BEE</a></li>
+  <li><a href="#updating-bee" id="toc-updating-bee" class="nav-link" data-scroll-target="#updating-bee">Updating BEE</a></li>
   </ul></li>
   <li><a href="#deploying-the-servers-remotely" id="toc-deploying-the-servers-remotely" class="nav-link" data-scroll-target="#deploying-the-servers-remotely">Deploying BON in a Box on a server</a></li>
   <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a></li>
@@ -167,7 +172,7 @@ ul.task-list li input[type="checkbox"] {
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content" tabindex="-1">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -188,14 +193,21 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>The user interface allows the user to run and edit pipelines. You can access BON in a Box through the browser, but it accesses your local pipeline repository. The code for the scripts, however, is not edited through the UI but rather with a standard code editor such as VS Code or RStudio.</p>
+<p>The Biodiversity Evaluation Engine (BEE) can be accessed directly through our <a href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_use.html">online platform</a>, without installing any software. <strong>For most users, we recommend using the online version.</strong></p>
+<p>However, you may want to install BEE locally if you:</p>
+<ul>
+<li><p><strong>Want to contribute to BEE:</strong> Develop, test, or modify analytical pipelines, scripts, or other platform components.</p></li>
+<li><p><strong>Have data privacy or security concerns:</strong> Run analyses within your own computing environment rather than uploading sensitive data to the online platform.</p></li>
+<li><p><strong>Need a customized computing environment:</strong> Configure BEE for specific technical or institutional requirements.</p></li>
+</ul>
+<p>If you would like to run BEE locally, follow the installation instructions below.</p>
 <section id="video-tutorial" class="level2">
 <h2 class="anchored" data-anchor-id="video-tutorial">Video tutorial</h2>
 <div class="quarto-video ratio ratio-16x9"><iframe data-external="1" src="https://www.youtube.com/embed/h3T36nLvg1E" title="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe></div>
 </section>
-<section id="deploying-bon-in-a-box-locally" class="level2">
-<h2 class="anchored" data-anchor-id="deploying-bon-in-a-box-locally">Deploying BON in a Box locally</h2>
-<p>BON in a Box can be installed and ran on a local computer. While personal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can run them directly through BON in a Box in the user interface.</p>
+<section id="deploying-the-biodiversity-evaluation-engine-bee-locally" class="level2">
+<h2 class="anchored" data-anchor-id="deploying-the-biodiversity-evaluation-engine-bee-locally">Deploying the Biodiversity Evaluation Engine (BEE) locally</h2>
+<p>BEE can be installed and ran on a local computer. While personal computers have less computing power than servers, it is more convenient for pipeline development, or when working with small examples. Users adding scripts and creating pipelines on their local computer can run them directly through BEE in the user interface.</p>
 <p>Prerequisites:</p>
 <ul>
 <li><p>A GitHub account, and git installed on your computer</p></li>
@@ -286,22 +298,22 @@ ul.task-list li input[type="checkbox"] {
 <li><p>The startup script might prompt you for an update. Accepting it is recommended.</p></li>
 </ol>
 </section>
-<section id="step-5-opening-bon-in-a-box-in-the-browser" class="level3">
-<h3 class="anchored" data-anchor-id="step-5-opening-bon-in-a-box-in-the-browser">Step 5: Opening BON in a Box in the browser</h3>
+<section id="step-5-opening-bee-in-the-browser" class="level3">
+<h3 class="anchored" data-anchor-id="step-5-opening-bee-in-the-browser">Step 5: Opening BEE in the browser</h3>
 <ol type="1">
-<li><p>In a regular browser, type <a href="http://localhost/" class="uri">http://localhost/</a> to open BON in a Box</p></li>
+<li><p>In a regular browser, type <a href="http://localhost/" class="uri">http://localhost/</a> to open BEE</p></li>
 <li><p>Head to the ““Run a Pipeline” and select the one that interests you. See <a href="#running-a-script-or-pipeline">Running a script or pipeline</a> section.</p></li>
 </ol>
 </section>
-<section id="step-6-stopping-bon-in-a-box" class="level3">
-<h3 class="anchored" data-anchor-id="step-6-stopping-bon-in-a-box">Step 6: Stopping BON in a Box</h3>
+<section id="step-6-stopping-bee" class="level3">
+<h3 class="anchored" data-anchor-id="step-6-stopping-bee">Step 6: Stopping BEE</h3>
 <ol type="1">
 <li><p>Run <code>./server-down.sh</code> in the terminal to stop the server when done</p></li>
 <li><p>On Windows, to completely stop the processes, you might have to run <code>wsl --shutdown</code></p></li>
 </ol>
 </section>
-<section id="updating-bon-in-a-box" class="level3">
-<h3 class="anchored" data-anchor-id="updating-bon-in-a-box">Updating BON in a Box</h3>
+<section id="updating-bee" class="level3">
+<h3 class="anchored" data-anchor-id="updating-bee">Updating BEE</h3>
 <p>Each time that the server is started, the startup script will check for updates and propose them. Type <code>y</code> for yes or press enter to update.</p>
 <p>Accepting the updates are generally recommended, unless:</p>
 <ul>
@@ -327,8 +339,8 @@ In this case, defer the update until you can afford the time to start a run that
 </ul>
 <p>Server setup:</p>
 <ul>
-<li><p>The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BON in a Box installation.</p></li>
-<li><p>By default, BON in a Box listens for http. To enable https, we hide it behind a reverse proxy (documentation <a href="https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/">here</a>) and activate https with certbot (documentation <a href="https://certbot.eff.org/">here</a>).</p></li>
+<li><p>The outputs are precious, while the server machine can be re-generated anytime. Consider mounting an external backed-up drive to the output folder of your BEE installation.</p></li>
+<li><p>By default, BEE listens for http. To enable https, we hide it behind a reverse proxy (documentation <a href="https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/">here</a>) and activate https with certbot (documentation <a href="https://certbot.eff.org/">here</a>).</p></li>
 </ul>
 </section>
 <section id="troubleshooting" class="level1">
@@ -340,7 +352,7 @@ In this case, defer the update until you can afford the time to start a run that
 <li><p><strong>Docker crashes with Bad Gateway error</strong></p>
 <p>If you get an error that looks like <code>unable to get image 'ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia:mamba_update_staging': request returned 502 Bad Gateway for API route and version http://%2F%2F.%2Fpipe%2FdockerDesktopLinuxEngine/v1.49/images/ghcr.io/geo-bon/bon-in-a-box-pipelines/runner-julia:mamba_update_staging/json, check if the server supports the requested API version</code></p>
 <p><a href="https://github.com/docker/desktop-linux/issues/156">This discussion</a> suggests a few different causes for this type of error. One that proved to work with one of our users was to disable the “containerd image store” from the Docker Desktop settings.</p></li>
-<li><p><strong>BON in a Box is not visible on http://localhost</strong></p>
+<li><p><strong>BEE is not visible on http://localhost</strong></p>
 <p>Conflicting ports may be an issue if you are on a Mac, or have Apache or NGINX installed. To fix this, edit the runner.env file and specify a different port (<code>HTTP_PORT</code>). For example, if you set <code>HTTP_PORT=5522</code>, you can then access BON in a Box at http://localhost:5522.</p></li>
 <li><p><strong>On my Mac, a script is taking way too long</strong></p>
 <p>If there is a significant difference in the duration of the scripts compared to users on Linux or Windows, and you have a Mac with an Apple Silicon chip, enable the “Use Rosetta for x86_64/amd64 emulation on Apple Silicon” in Docker Desktop settings.</p>
@@ -350,7 +362,7 @@ In this case, defer the update until you can afford the time to start a run that
 </section>
 <section id="running-a-script-or-pipeline" class="level1">
 <h1>Running a script or pipeline</h1>
-<p>You now have an instance of BON in a Box deployed, either <a href="#deploying-the-servers-locally">locally</a> or <a href="#deploying-the-servers-remotely">remotely</a>, and you want to run your first script or pipeline.</p>
+<p>You now have an instance the BON in a Box Biodiversity Evaluation Engine installed locally, and you want to run your first script or pipeline.</p>
 <p>There is one page to run scripts, and one to run pipelines. Once there, select the script or pipelines from the dropdown and fill the form.</p>
 <p>The form might ask you for a file. In order to provide a file that you own locally, upload or copy it to the <code>userdata</code> folder. You can then refer to it with a url as such: <code>/userdata/myFile.shp</code>, or <code>/userdata/myFolder/myFile.shp</code> if there are subfolders.</p>
 
@@ -436,7 +448,8 @@ In this case, defer the update until you can afford the time to start a run that
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -445,8 +458,69 @@ In this case, defer the update until you can afford the time to start a run that
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -460,6 +534,7 @@ In this case, defer the update until you can afford the time to start a run that
         interactiveBorder: 10,
         theme: 'quarto',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;
@@ -622,44 +697,54 @@ In this case, defer the update until you can afford the time to start a run that
           const lineIds = lines.map((line) => {
             return targetCell + "-" + line;
           })
-          let top = null;
-          let height = null;
-          let parent = null;
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
           if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
             }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
             }
+            placeBand(gutterDiv, el, lastEl);
             selectedAnnoteEl = annoteEl;
           }
         };
@@ -757,6 +842,9 @@ In this case, defer the update until you can afford the time to start a run that
       }
     }
   });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
   </script>
 </div> <!-- /content -->
 

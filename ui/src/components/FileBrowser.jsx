@@ -43,6 +43,7 @@ const MenuProps = {
   // so that the file list doesn't cover the modal below
   slotProps: {
     paper: {
+      className: "filebrowser-menu",
       style: {
         maxHeight: 300,
         overflowY: "auto",
@@ -179,7 +180,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
         <Box className="filebrowser-modal-box">
           <Typography id="modal-modal-title">{t("fileBrowser.title")}</Typography>
 
-          <FormControl sx={{ m: 1, width: 300 }}>
+          <FormControl fullWidth>
             <InputLabel>{t("fileBrowser.files")}</InputLabel>
             <Select
               className="file-select-chip"

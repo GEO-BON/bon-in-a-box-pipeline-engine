@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.10.19">
+<meta name="generator" content="quarto-1.11.9">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -39,14 +39,15 @@ ul.task-list li input[type="checkbox"] {
 <link href=".//BiaB_logo_small.png" rel="icon" type="image/png">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-602dfb0a92afd774e28d5a4761a4ce24.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-665ee2a288131b436dc9b19ef6dcd906.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -79,19 +80,18 @@ ul.task-list li input[type="checkbox"] {
 <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="nav-fixed quarto-light">
+<body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a>
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">BON in a Box</span>
     </a>
   </div>
-            <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -101,12 +101,12 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./how_to_install.html"> 
-<span class="menu-text">Install</span></a>
+    <a class="nav-link" href="./how_to_use.html"> 
+<span class="menu-text">User guide</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./how_to_use.html"> 
-<span class="menu-text">User Guide</span></a>
+    <a class="nav-link" href="./how_to_install.html"> 
+<span class="menu-text">How to install</span></a>
   </li>  
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribute-a-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
@@ -125,6 +125,10 @@ ul.task-list li input[type="checkbox"] {
     <a class="dropdown-item" href="./pipeline_standards.html">
  <span class="dropdown-text">Pipeline standards</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="./openEO.html">
+ <span class="dropdown-text">openEO integration</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item">
@@ -137,6 +141,7 @@ ul.task-list li input[type="checkbox"] {
     <a href="https://boninabox.geobon.org/" title="BON in a Box website" class="quarto-navigation-tool px-1" aria-label="BON in a Box website"><i class="bi bi-box-arrow-up-right"></i></a>
     <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/" title="BON in a Box GitHub" class="quarto-navigation-tool px-1" aria-label="BON in a Box GitHub"><i class="bi bi-github"></i></a>
 </div>
+            <div id="quarto-search" class="" title="Search"></div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -145,17 +150,30 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#is-your-analysis-pipeline-a-good-fit" id="toc-is-your-analysis-pipeline-a-good-fit" class="nav-link active" data-scroll-target="#is-your-analysis-pipeline-a-good-fit">Is your analysis pipeline a good fit?</a></li>
-  <li><a href="#steps-for-contributing" id="toc-steps-for-contributing" class="nav-link" data-scroll-target="#steps-for-contributing">Steps for contributing</a></li>
+  <li><a href="#why-contribute" id="toc-why-contribute" class="nav-link active" data-scroll-target="#why-contribute">Why contribute?</a></li>
+  <li><a href="#what-can-you-contribute" id="toc-what-can-you-contribute" class="nav-link" data-scroll-target="#what-can-you-contribute">What can you contribute?</a>
+  <ul class="collapse">
+  <li><a href="#is-your-analysis-pipeline-a-good-fit" id="toc-is-your-analysis-pipeline-a-good-fit" class="nav-link" data-scroll-target="#is-your-analysis-pipeline-a-good-fit">Is your analysis pipeline a good fit?</a></li>
+  </ul></li>
+  <li><a href="#how-to-contribute-a-pipeline" id="toc-how-to-contribute-a-pipeline" class="nav-link" data-scroll-target="#how-to-contribute-a-pipeline">How to contribute a pipeline</a>
+  <ul class="collapse">
+  <li><a href="#step-1.-get-in-touch" id="toc-step-1.-get-in-touch" class="nav-link" data-scroll-target="#step-1.-get-in-touch">Step 1. Get in touch</a></li>
+  <li><a href="#step-2.-design-your-pipeline" id="toc-step-2.-design-your-pipeline" class="nav-link" data-scroll-target="#step-2.-design-your-pipeline">Step 2. Design your pipeline</a></li>
+  <li><a href="#step-3.-develop-and-test" id="toc-step-3.-develop-and-test" class="nav-link" data-scroll-target="#step-3.-develop-and-test">Step 3. Develop and test</a></li>
+  <li><a href="#step-4.-peer-review" id="toc-step-4.-peer-review" class="nav-link" data-scroll-target="#step-4.-peer-review">Step 4. Peer review</a></li>
+  <li><a href="#step-5.-publication-and-continued-development" id="toc-step-5.-publication-and-continued-development" class="nav-link" data-scroll-target="#step-5.-publication-and-continued-development">Step 5. Publication and continued development</a></li>
+  </ul></li>
+  <li><a href="#other-ways-to-contribute" id="toc-other-ways-to-contribute" class="nav-link" data-scroll-target="#other-ways-to-contribute">Other ways to contribute</a></li>
+  <li><a href="#interested-in-contributing" id="toc-interested-in-contributing" class="nav-link" data-scroll-target="#interested-in-contributing">Interested in contributing?</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content" tabindex="-1">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -176,28 +194,86 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="is-your-analysis-pipeline-a-good-fit" class="level2">
-<h2 class="anchored" data-anchor-id="is-your-analysis-pipeline-a-good-fit">Is your analysis pipeline a good fit?</h2>
-<p>We are looking for pipelines that calculate biodiversity metrics that are relevant to policy and biodiversity reporting, such as Essential Biodiversity Variables (EBVs) and Indicators. These pipelines should be</p>
+<p>BON in a Box is a community-driven initiative that brings together scientific methods and expertise to support biodiversity monitoring and reporting.</p>
+<p>We welcome contributions from researchers, developers, and organizations interested in making biodiversity analyses more accessible, reproducible, and widely applicable.</p>
+<p>By contributing to the Biodiversity Evaluation Engine (BEE), you can help translate scientific research into practical tools that support biodiversity monitoring, conservation planning, and policy reporting.</p>
+<section id="why-contribute" class="level2">
+<h2 class="anchored" data-anchor-id="why-contribute">Why contribute?</h2>
+<p>Researchers around the world are developing methods to assess biodiversity change, but these methods are often difficult to access or apply beyond their original research context.</p>
+<p>Contributing to BON in a Box helps make these methods available to a broader community while supporting open science, reproducibility, and collaboration.</p>
+<p>Contributors can:</p>
 <ul>
-<li><p>open source, written in the coding languages R, Julia, or Python</p></li>
-<li><p>relevant to many contexts (different species, countries, and regions)</p></li>
+<li><p><strong>Increase the impact of their research</strong> by making analytical methods accessible to researchers, practitioners, and decision-makers.</p></li>
+<li><p><strong>Support reproducible science</strong> by sharing transparent, standardized analytical workflows.</p></li>
+<li><p><strong>Collaborate with the GEO BON community</strong> to improve and expand existing methods.</p></li>
+<li><p><strong>Support biodiversity monitoring and reporting</strong> by helping countries and organizations calculate Essential Biodiversity Variables (EBVs) and biodiversity indicators.</p></li>
 </ul>
 </section>
-<section id="steps-for-contributing" class="level2">
-<h2 class="anchored" data-anchor-id="steps-for-contributing">Steps for contributing</h2>
-<p>We strongly encourage those who have created or are developing code to calculate Essential Biodiversity Variables or indicators to share it through BON in a Box. The purpose of the modeling tool is to have state of the art processing pipelines shared across the community, for the benefit of all. We recommend following these steps:&nbsp;</p>
-<ol type="1">
-<li><p>Identify a workflow with a good potential for reuse by other organisations, and that can be mostly automated.</p></li>
-<li><p>Draw a high-level view of the pipeline that identifies each step, the inputs and outputs, how the scripts are put together, and the format of the final results.</p></li>
-<li><p>Meet the BON in a Box team. We will help design the pipeline, ensuring that each step is modular, identifying scripts that are already in the modeling tool to avoid rewriting code, and finding places where the existing code would need to be modified. For example, using cloud-optimized approaches such as STAC and Parquet files instead of downloading large files during the pipeline’s execution.</p></li>
-<li><p>Secure the resources. This could be the time of a graduate student or work study student. If applying for funding, include BON in a Box in your proposal as a tool.</p></li>
-<li><p>Create the pipeline following the steps below. We recommend starting with the simplest version and then adding complexity or features when needed.</p></li>
-<li><p>When you feel that the pipeline is complete and you have verified that it meets the [quality requirement standards](pipeline_standards.qmd), you can submit the pipeline for peer review. While you are waiting, why not contribute by reviewing someone else’s contribution?</p></li>
-<li><p>Once the reviews are complete, implement any necessary changes.</p></li>
-<li><p>If accepted, the pipeline will be published in BON in a Box and will receive a DOI for identification. Now, the pipeline can be used by others.</p></li>
-</ol>
-<p><strong>If you wish to contribute a pipeline, please email us at boninabox@geobon.org.</strong></p>
+<section id="what-can-you-contribute" class="level2">
+<h2 class="anchored" data-anchor-id="what-can-you-contribute">What can you contribute?</h2>
+<p>We welcome several types of contributions, including:</p>
+<ul>
+<li><p><strong>New analytical pipelines:</strong> Methods for calculating EBVs, biodiversity indicators, or other metrics relevant to biodiversity monitoring.</p></li>
+<li><p><strong>Improvements to existing pipelines:</strong> Updates to scientific methods, additional functionality, new data sources, or improvements to performance and usability.</p></li>
+<li><p><strong>Individual scripts and technical contributions:</strong> Reusable components, bug fixes, and improvements to the underlying platform.</p></li>
+<li><p><strong>Documentation and testing:</strong> Improvements that make BEE easier to understand, use, and maintain.</p></li>
+</ul>
+<section id="is-your-analysis-pipeline-a-good-fit" class="level3">
+<h3 class="anchored" data-anchor-id="is-your-analysis-pipeline-a-good-fit">Is your analysis pipeline a good fit?</h3>
+<p>We are particularly interested in pipelines that:</p>
+<ul>
+<li><p>Calculate biodiversity metrics relevant to monitoring, conservation planning, and policy reporting.</p></li>
+<li><p>Are open source and developed using supported programming languages, such as R, Python, or Julia.</p></li>
+<li><p>Can be applied across different species, countries, regions, or monitoring contexts.</p></li>
+<li><p>Can be automated and reproduced using clearly defined inputs, analytical steps, and outputs.</p></li>
+</ul>
+<p>Pipelines do not need to be fully developed or meet all technical requirements before you contact us. The BON in a Box team can help assess whether a proposed contribution is suitable and identify what may be needed for integration.</p>
+<p>For more details, see our <a href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html">Pipeline Standards</a>.</p>
+</section>
+</section>
+<section id="how-to-contribute-a-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-contribute-a-pipeline">How to contribute a pipeline</h2>
+<p>We encourage contributors to get in touch early in the development process so that we can work together to make pipelines reusable, reproducible, and compatible with BEE.</p>
+<section id="step-1.-get-in-touch" class="level3">
+<h3 class="anchored" data-anchor-id="step-1.-get-in-touch">Step 1. Get in touch</h3>
+<p>Contact the BON in a Box team at <a href="mailto:boninabox@geobon.org">boninabox@geobon.org</a> to discuss your proposed contribution.</p>
+<p>We can help determine whether your method is a good fit, identify existing components that could be reused, and discuss the resources and technical support needed for integration.</p>
+</section>
+<section id="step-2.-design-your-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="step-2.-design-your-pipeline">Step 2. Design your pipeline</h3>
+<p>Develop a high-level overview of the analytical workflow, including its inputs, processing steps, and expected outputs.</p>
+<p>The BON in a Box team can help identify opportunities to make the pipeline modular, generalizable, and compatible with existing BEE components.</p>
+<p>We recommend starting with a simple, functional version before adding more complex features.</p>
+</section>
+<section id="step-3.-develop-and-test" class="level3">
+<h3 class="anchored" data-anchor-id="step-3.-develop-and-test">Step 3. Develop and test</h3>
+<p>Develop your pipeline following the <a href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html">Pipeline Standards</a>, which outline requirements for documentation, reproducibility, usability, and technical integration.</p>
+<p>Contributors can work with the BON in a Box team to test their pipelines and ensure they function correctly within BEE.</p>
+</section>
+<section id="step-4.-peer-review" class="level3">
+<h3 class="anchored" data-anchor-id="step-4.-peer-review">Step 4. Peer review</h3>
+<p>Once a pipeline is complete and meets the required standards, it can be submitted for peer review.</p>
+<p>The review process evaluates the scientific methodology, reproducibility, documentation, and usability of the pipeline.</p>
+<p>Contributors may be asked to make revisions based on reviewer feedback before the pipeline is accepted.</p>
+<p>For more information, see our <a href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/peer_review.html">Peer Review Process</a>.</p>
+</section>
+<section id="step-5.-publication-and-continued-development" class="level3">
+<h3 class="anchored" data-anchor-id="step-5.-publication-and-continued-development">Step 5. Publication and continued development</h3>
+<p>Once accepted, the pipeline can be published through BON in a Box and made available for use by the wider community.</p>
+<p>Published pipelines can receive a DOI, allowing the contribution to be identified and cited.</p>
+<p>Contributors are encouraged to continue improving their pipelines as new methods, datasets, and scientific knowledge become available.</p>
+</section>
+</section>
+<section id="other-ways-to-contribute" class="level2">
+<h2 class="anchored" data-anchor-id="other-ways-to-contribute">Other ways to contribute</h2>
+<p>You do not need to develop a complete analytical pipeline to contribute to BON in a Box.</p>
+<p>We also welcome contributions to existing pipelines, documentation, testing, and software development.</p>
+<p>You can explore our open-source repositories on the <a href="https://github.com/GEO-BON">GEO BON GitHub organization</a> or contact the team to discuss opportunities to contribute.</p>
+</section>
+<section id="interested-in-contributing" class="level2">
+<h2 class="anchored" data-anchor-id="interested-in-contributing">Interested in contributing?</h2>
+<p>Whether you have an existing analytical method, an idea for a new pipeline, or would like to support the development of BEE, we would be happy to hear from you.</p>
+<p><strong>Contact us at <a href="mailto:boninabox@geobon.org">boninabox@geobon.org</a> to discuss your contribution.</strong></p>
 
 
 </section>
@@ -281,7 +357,8 @@ ul.task-list li input[type="checkbox"] {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
       // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
       for (var i=0; i<links.length; i++) {
         const link = links[i];
         if (!isInternal(link.href)) {
@@ -290,8 +367,69 @@ ul.task-list li input[type="checkbox"] {
           if (link.dataset.originalHref !== undefined) {
             link.href = link.dataset.originalHref;
           }
+          if (!link.classList.contains('no-external-icon')) {
+          }
         }
       }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
     function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
       const config = {
         allowHTML: true,
@@ -305,6 +443,7 @@ ul.task-list li input[type="checkbox"] {
         interactiveBorder: 10,
         theme: 'quarto',
         placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
       };
       if (contentFn) {
         config.content = contentFn;
@@ -467,44 +606,54 @@ ul.task-list li input[type="checkbox"] {
           const lineIds = lines.map((line) => {
             return targetCell + "-" + line;
           })
-          let top = null;
-          let height = null;
-          let parent = null;
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
           if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
             }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
             }
+            placeBand(gutterDiv, el, lastEl);
             selectedAnnoteEl = annoteEl;
           }
         };
@@ -602,6 +751,9 @@ ul.task-list li input[type="checkbox"] {
       }
     }
   });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
   </script>
 </div> <!-- /content -->
 

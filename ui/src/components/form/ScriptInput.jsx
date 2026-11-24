@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -9,7 +9,7 @@ import Alert from "@mui/material/Alert";
 import AutoResizeTextArea from "./AutoResizeTextArea";
 import Choosers from "./Choosers";
 import { useTranslation } from "react-i18next";
-import { uiContext } from "../../uiContext.jsx";
+import StacChooser from "./Choosers/StacChooser";
 import FileBrowser from "../FileBrowser";
 
 function joinIfArray(value) {
@@ -161,6 +161,20 @@ export default function ScriptInput({
     } else {
       return <span className="ioWarning">{t("form.optionsNotDefined")}</span>;
     }
+  }
+
+  // The STAC chooser produces a list of selections
+  if (type === "stac_asset[]") {
+    return (
+      <StacChooser
+        inputId={passedProps.id}
+        value={value}
+        updateValue={(value) => {
+          onValueUpdated(value);
+        }}
+        isCompact={size == "small"}
+      />
+    );
   }
 
   if (type.endsWith("[]")) {
