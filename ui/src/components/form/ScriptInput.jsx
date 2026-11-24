@@ -8,6 +8,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 import AutoResizeTextArea from "./AutoResizeTextArea";
 import Choosers from "./Choosers";
+import StacChooser from "./Choosers/StacChooser";
 import { uiContext } from "../../uiContext.jsx";
 import FileBrowser from "../FileBrowser";
 export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
@@ -161,6 +162,20 @@ export default function ScriptInput({
     } else {
       return <span className="ioWarning">Options not defined</span>;
     }
+  }
+
+  // The STAC chooser produces a list of selections
+  if (type === "stac_asset[]") {
+    return (
+      <StacChooser
+        inputId={passedProps.id}
+        value={value}
+        updateValue={(value) => {
+          onValueUpdated(value);
+        }}
+        isCompact={size == "small"}
+      />
+    );
   }
 
   if (type.endsWith("[]")) {

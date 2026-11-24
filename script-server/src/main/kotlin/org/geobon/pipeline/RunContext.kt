@@ -81,7 +81,7 @@ open class RunContext(val runId: String, val inputs: Map<String, Any?>, val serv
 
     companion object {
 
-        private fun preserveNulls(inputMap: Map<String, Any?>) : Map<String, Any> {
+        private fun preserveNulls(inputMap: Map<String, Any?>): Map<String, Any> {
             return inputMap.mapValues { it.value ?: JSONObject.NULL }
         }
 
@@ -111,11 +111,11 @@ open class RunContext(val runId: String, val inputs: Map<String, Any?>, val serv
         @OptIn(ExperimentalTime::class)
         fun getGitInfo(): Map<String, String?> {
             val gitPath = System.getenv("GIT_LOCATION")
-            if(gitPath == null)
+            if (gitPath == null)
                 return mapOf("error" to "Git folder not defined.")
 
             val gitDir = File(gitPath)
-            if(!gitDir.isDirectory) {
+            if (!gitDir.isDirectory) {
                 return mapOf("error" to "Invalid .git directory path $gitPath")
             }
 
