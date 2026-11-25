@@ -49,14 +49,6 @@
     cursor: pointer;
 }
 
-.language-selector {
-    position: relative;
-    padding: 6px 16px;
-    color: var(--dark-blue);
-    font-size: 15px;
-    font-weight: 500;
-}
-
 .language-button {
     display: inline-flex;
     align-items: center;
@@ -75,15 +67,14 @@
     background-color: #E3E3E2;
 }
 
-.language-flag {
+.language-icon {
     flex: none;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+    width: 22px;
+    height: 22px;
 }
 
-.language-triangle {
-    font-size: 10px;
+.language-expand-icon {
+    margin-left: auto;
 }
 
 .language-list {
@@ -188,7 +179,7 @@
     padding: 4px;
     color: var(--dark-blue);
     font-size: 15px;
-    
+
     a {
         color: inherit;
         font-weight: 500;

@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import ArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import ArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { changePreference, getPreference } from "../i18n";
-
 import { DEFAULT_LANGUAGE, LANGUAGES, isSupportedLanguage } from "../languages";
+import languageIcon from "../img/fa-language.svg";
+import { NavLink } from "react-router-dom";
 
-function Flag({ language }) {
-  return <img className="language-flag" src={language.flag} alt="" aria-hidden="true" />;
+function LanguageIcon() {
+  return <img className="language-icon" src={languageIcon} alt="" aria-hidden="true" />;
 }
 
 export default function LanguageSelector() {
@@ -13,20 +16,10 @@ export default function LanguageSelector() {
   const [initial] = useState(getPreference);
   const [storageError, setStorageError] = useState(initial.error);
   const [open, setOpen] = useState(false);
-  const rootRef = useRef(null);
   const buttonRef = useRef(null);
 
   const currentLanguageCode = isSupportedLanguage(i18n.resolvedLanguage) ? i18n.resolvedLanguage : DEFAULT_LANGUAGE;
   const currentLanguageDef = LANGUAGES.find(({ code }) => code === currentLanguageCode);
-
-  useEffect(() => {
-    if (!open) return;
-    const onMouseDown = (event) => {
-      if (!rootRef.current?.contains(event.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onMouseDown);
-    return () => document.removeEventListener("mousedown", onMouseDown);
-  }, [open]);
 
   const choose = (value) => {
     const result = changePreference(value);
@@ -48,54 +41,48 @@ export default function LanguageSelector() {
     event.preventDefault();
   };
 
-  return (
-    <div className="language-selector" ref={rootRef}>
-      <button
-        type="button"
-        ref={buttonRef}
-        className="language-button"
+  return (<>
+    <NavLink className="navbar-profile-popup-option" onClick={() => setOpen((value) => !value)}>
+      <LanguageIcon />
+      {currentLanguageDef.label}
+      {open
+        ? <ArrowUpIcon className="language-expand-icon" aria-hidden="true" />
+        : <ArrowDownIcon className="language-expand-icon" aria-hidden="true" />}
+    </NavLink>
+
+    {open && (
+      <ul
+        className="language-list"
+        role="listbox"
         aria-label={t("language.label")}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
+        onKeyDown={onListKeyDown}
       >
-        <Flag language={currentLanguageDef} />
-        <span className="language-triangle" aria-hidden="true">▼</span>
-      </button>
-      {open && (
-        <ul
-          className="language-list"
-          role="listbox"
-          aria-label={t("language.label")}
-          onKeyDown={onListKeyDown}
-        >
-          {LANGUAGES.map((language) => (
-            <li
-              key={language.code}
-              role="option"
-              tabIndex={-1}
-              ref={(node) => language.code === currentLanguageCode && node?.focus()}
-              className="language-option"
-              aria-selected={language.code === currentLanguageCode}
-              onClick={() => choose(language.code)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  choose(language.code);
-                }
-              }}
-            >
-              <Flag language={language} />
-              {language.label}
-            </li>
-          ))}
-        </ul>
-      )}
-      {storageError && (
-        <span role="alert" className="language-storage-error">
-          {t("language.storageError")}
-        </span>
-      )}
-    </div>
+        {LANGUAGES.map((language) => (
+          <li
+            key={language.code}
+            role="option"
+            tabIndex={-1}
+            ref={(node) => language.code === currentLanguageCode && node?.focus()}
+            className="language-option"
+            aria-selected={language.code === currentLanguageCode}
+            onClick={() => choose(language.code)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                choose(language.code);
+              }
+            }}
+          >
+            <span>{language.label}</span>
+          </li>
+        ))}
+      </ul>
+    )}
+    {storageError && (
+      <span role="alert" className="language-storage-error">
+        {t("language.storageError")}
+      </span>
+    )}
+  </>
   );
 }
