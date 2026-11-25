@@ -41,7 +41,10 @@ describe("French typography (OQLF)", () => {
         .filter((match) => !ignore?.test(match[0]))
         .map((match) => `${key}: ${JSON.stringify(match[0])}`)
     );
-    expect(violations).toEqual([]);
+    expect(
+      violations,
+      "Fix common violations by running this command from the ui/ folder: python3 scripts/fix_french_typography.py src/locales/fr/translation.json"
+    ).toEqual([]);
   });
 
   it("has narrow no-break spaces before the question marks (sanity check)", () => {
