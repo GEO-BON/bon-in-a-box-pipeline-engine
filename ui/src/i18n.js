@@ -48,7 +48,8 @@ export function changePreference(preference) {
 }
 
 i18n.use(initReactI18next).init({
-  resources: Object.fromEntries(LANGUAGES.map(({ code, translation }) => [code, { translation }])),
+  resources: Object.fromEntries(LANGUAGES.map(({ code, translation, fileManager }) =>
+    [code, { translation, fileManager }])),
   lng: language,
   fallbackLng: DEFAULT_LANGUAGE,
   supportedLngs: LANGUAGES.map(({ code }) => code),

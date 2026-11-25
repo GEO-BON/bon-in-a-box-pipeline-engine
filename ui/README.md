@@ -10,10 +10,9 @@ and other content supplied by APIs are not translated by the UI.
 
 Third-party localization has limits: React Flow's editor controls, minimap, and
 connection-handle labels use its `ariaLabelConfig` localization API. The SVAR
-file manager currently ships English and Chinese locale strings, but the
-installed React component exposes no locale prop; it remains in English until a
-French locale or supported integration is available. Review embedded third-party
-controls separately when upgrading those dependencies.
+file manager uses its `Locale` provider and a local adapter for French strings.
+SVAR formats file sizes with fixed English unit abbreviations in the file list
+and details. Review embedded third-party controls when upgrading dependencies.
 
 The browser's preferred supported language is used by default, falling back to
 English. The language selector in the user menu (a round flag of the current
@@ -29,6 +28,13 @@ translate API data or machine-readable values. `Trans` can preserve React
 components such as links in sentences; use a non-HTML placeholder name and
 verify that the link retains its text.
 
+SVAR strings are kept separately in `src/locales/en/file-manager.json` and
+`src/locales/fr/file-manager.json`, in the i18next `fileManager` namespace. The
+English catalog provides Weblate source text and fallback; SVAR's built-in
+English remains in use when English is selected. The adapter maps stable
+catalog keys to SVAR's exact keys and supplies French date settings. When
+upgrading SVAR, review its locale keys and update both catalogs and the adapter.
+
 ### Weblate setup
 
 The self-hosted Weblate instance is separate from this application. Create a
@@ -39,6 +45,15 @@ component for this repository with:
 - Source language: English; monolingual base file: `ui/src/locales/en/translation.json`
 - Target language: French (`fr`)
 - Review enabled, with authorized reviewers and i18next interpolation checks.
+
+Create a second component in the same project and Git repository for the file
+manager, using the same format, languages, and review settings:
+
+- File mask: `ui/src/locales/*/file-manager.json`
+- Monolingual base file: `ui/src/locales/en/file-manager.json`
+
+Use Weblate's linked-repository configuration to share the repository between
+components, and verify commits, review and export settings for both.
 
 Developers maintain English source strings; translators propose French text in
 Weblate. Require linguistic approval before merging translation updates into
@@ -121,8 +136,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 Language flags in `src/assets/flags/` are from
 [circle-flags](https://github.com/HatScripts/circle-flags) (MIT). To add a
-language, create `src/locales/<code>/translation.json`, add its SVG flag, and add one
-entry to the list in `src/languages.js` (the only place languages are declared).
+language, create both `src/locales/<code>/translation.json` and
+`src/locales/<code>/file-manager.json`, add its SVG flag, add an entry to
+`src/languages.js`, and add its file-manager locale settings.
 
 `npm test` also checks the French catalog against the OQLF punctuation spacing rules
 (`src/locales/fr.typography.test.js`). 
@@ -132,6 +148,7 @@ To fix common French typography issues in a JSON or Markdown file, run from `ui/
 
 ```sh
 python3 scripts/fix_french_typography.py src/locales/fr/translation.json
+python3 scripts/fix_french_typography.py src/locales/fr/file-manager.json
 python3 scripts/fix_french_typography.py ../path/to/french.md
 ```
 

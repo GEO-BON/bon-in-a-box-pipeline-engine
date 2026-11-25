@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import fr from "./fr/translation.json";
+import frFileManager from "./fr/file-manager.json";
 
 // Rules from the OQLF "Espacement avant et après les signes de ponctuation et les symboles":
 // https://vitrinelinguistique.oqlf.gouv.qc.ca/22039/la-typographie/espacement/espacement-avant-et-apres-les-signes-de-ponctuation-et-les-symboles
@@ -38,7 +39,7 @@ const rules = [
 ];
 
 describe("French typography (OQLF)", () => {
-  const entries = flatten(fr);
+  const entries = [...flatten(fr), ...flatten(frFileManager, "fileManager")];
 
   it.each(rules)("$name", ({ pattern, ignore }) => {
     const violations = entries.flatMap(([key, value]) =>

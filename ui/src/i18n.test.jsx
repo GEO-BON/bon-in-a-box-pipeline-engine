@@ -10,6 +10,8 @@ import { formatError } from "./components/HttpErrors";
 import { GeneralDescription } from "./components/StepDescription";
 import en from "./locales/en/translation.json";
 import fr from "./locales/fr/translation.json";
+import enFileManager from "./locales/en/file-manager.json";
+import frFileManager from "./locales/fr/file-manager.json";
 
 const scrollIntoViewDescriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollIntoView");
 
@@ -108,13 +110,16 @@ describe("language selection", () => {
 });
 
 describe("translation catalogs", () => {
-  it("keeps English and French keys and interpolation placeholders in sync", () => {
+  it.each([
+    ["UI", en, fr],
+    ["file manager", enFileManager, frFileManager],
+  ])("keeps %s English and French keys and interpolation placeholders in sync", (_, english, french) => {
     const flatten = (object, prefix = "") => Object.entries(object).flatMap(([key, value]) => {
       const path = prefix ? `${prefix}.${key}` : key;
       return typeof value === "string" ? [[path, value]] : flatten(value, path);
     });
-    const source = Object.fromEntries(flatten(en));
-    const target = Object.fromEntries(flatten(fr));
+    const source = Object.fromEntries(flatten(english));
+    const target = Object.fromEntries(flatten(french));
     expect(Object.keys(target).sort()).toEqual(Object.keys(source).sort());
     for (const key of Object.keys(source)) {
       const placeholders = (value) => [...value.matchAll(/{{\s*(\w+)\s*}}/g)].map((match) => match[1]).sort();
