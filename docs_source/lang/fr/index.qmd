@@ -4,17 +4,17 @@ title: "À propos"
 
 BON in a Box est une initiative du Group on Earth Observations Biodiversity Observation Network (GEO BON) qui réunit expertise scientifique, outils et analyses de la biodiversité pour soutenir le suivi de la biodiversité et la production de rapports.
 
-La plateforme offre des ressources pour le développement de réseaux d'observation de la biodiversité (BON): un catalogue de projets et d'outils de suivi de la biodiversité, ainsi que le Biodiversity Evaluation Engine (BEE), qui permet aux utilisateurs de calculer des variables essentielles de biodiversité (VEB, ou EBV en anglais) et des indicateurs de biodiversité.
+La plateforme offre des ressources pour le développement de réseaux d'observation de la biodiversité (BON): un catalogue de projets et d'outils de suivi de la biodiversité, ainsi que le Moteur d'Évaluation de la Biodiversité (BEE), qui permet aux utilisateurs de calculer des variables essentielles de biodiversité (VEB, ou EBV en anglais) et des indicateurs de biodiversité.
 
 *Pour plus d'informations sur BON in a Box en général, consultez [le site Web de BON in a Box](https://boninabox.geobon.org/about).* *Pour plus de détails sur les motivations à l'origine du moteur de pipelines, consultez notre [publication dans BioScience (en anglais)](https://doi.org/10.1093/biosci/biaf189 "BON in a Box: An Open and Collaborative Platform for Biodiversity Monitoring, Indicator Calculation, and Reporting").*
 
-# Qu'est-ce que le Biodiversity Evaluation Engine (BEE) de BON in a Box? {#what-is-bon-in-a-boxs-biodiversity-evaluation-engine-bee}
+# Qu'est-ce que le Moteur d'Évaluation de la Biodiversité (BEE) de BON in a Box? {#what-is-bon-in-a-boxs-biodiversity-evaluation-engine-bee}
 
-Le Biodiversity Evaluation Engine (BEE) est une plateforme ouverte qui réunit des données sur la biodiversité et des méthodes scientifiques pour calculer des VEB et des indicateurs destinés au suivi de la biodiversité, à la planification de la conservation et à la production de rapports.
+Le Moteur d'Évaluation de la Biodiversité (BEE) est une plateforme ouverte qui réunit des données sur la biodiversité et des méthodes scientifiques pour calculer des VEB et des indicateurs destinés au suivi de la biodiversité, à la planification de la conservation et à la production de rapports.
 
-Le BEE rend les analyses scientifiques plus accessibles en permettant aux utilisateurs d'exécuter des flux de travail analytiques standardisés et reproductibles sans devoir développer eux-mêmes le code sous-jacent. Ces flux de travail automatisés sont appelés *pipelines*.
+BEE rend les analyses scientifiques plus accessibles en permettant aux utilisateurs d'exécuter des flux de travail analytiques standardisés et reproductibles sans devoir développer eux-mêmes le code sous-jacent. Ces flux de travail automatisés sont appelés *pipelines*.
 
-Développé grâce aux contributions de la communauté scientifique de GEO BON, le BEE intègre l'expertise et les méthodes scientifiques de chercheurs du monde entier et permet aux utilisateurs de :
+Développé grâce aux contributions de la communauté scientifique de GEO BON, BEE intègre l'expertise et les méthodes scientifiques de chercheurs du monde entier et permet aux utilisateurs de :
 
 - **Calculer des indicateurs de biodiversité et des VEB** à l'aide de méthodes scientifiques rigoureuses et transparentes.
 
@@ -24,7 +24,7 @@ Développé grâce aux contributions de la communauté scientifique de GEO BON, 
 
 - **Accéder à des méthodes scientifiques et y contribuer** par l'intermédiaire d'une plateforme libre et communautaire.
 
-Le BEE soutient le suivi de la biodiversité aux échelles locale, nationale et mondiale, notamment par le calcul d'indicateurs pertinents pour le Cadre mondial de la biodiversité de Kunming-Montréal (GBF).
+BEE soutient le suivi de la biodiversité aux échelles locale, nationale et mondiale, notamment par le calcul d'indicateurs pertinents pour le Cadre mondial de la biodiversité de Kunming-Montréal (GBF).
 
 # Pourquoi avons-nous besoin d'une telle plateforme? {#why-do-we-need-this-platform}
 
@@ -32,19 +32,19 @@ Partout dans le monde, des scientifiques développent des flux de calcul de vari
 
 De surcroît, les pays et les organisations responsables du suivi de la biodiversité et de la production de rapports peuvent manquer des ressources techniques ou de l'expertise nécessaires pour mettre en œuvre ces méthodes.
 
-**Le BEE vise à combler le fossé entre la recherche scientifique et son application pratique au suivi de la biodiversité et à la prise de décision.**
+**BEE vise à combler le fossé entre la recherche scientifique et son application pratique au suivi de la biodiversité et à la prise de décision.**
 
-En réunissant des méthodes analytiques au sein d'une plateforme libre et partagée, le BEE réduit le dédoublement des efforts, favorise la collaboration scientifique et rend les analyses de biodiversité accessibles à un plus large éventail d'utilisateurs.
+En réunissant des méthodes analytiques au sein d'une plateforme libre et partagée, BEE réduit le dédoublement des efforts, favorise la collaboration scientifique et rend les analyses de biodiversité accessibles à un plus large éventail d'utilisateurs.
 
 # Des données à la prise de décision {#from-biodiversity-data-to-decision-making}
 
-Le BEE transforme les données sur la biodiversité grâce à sa sélection de méthodes scientifiques afin de produire des résultats pouvant éclairer la planification de la conservation, le suivi de la biodiversité et la production de rapports.
+BEE transforme les données sur la biodiversité grâce à sa sélection de méthodes scientifiques afin de produire des résultats pouvant éclairer la planification de la conservation, le suivi de la biodiversité et la production de rapports.
 
 Les utilisateurs peuvent combiner leurs propres données avec des jeux de données accessibles au public, notamment des données sur les occurrences d'espèces, les aires protégées, les variables environnementales et les produits d'imagerie satellitaire.
 
 Ces données sont traitées par des chaînes de traitement afin de produire notamment des cartes de répartition des espèces, des mesures de connectivité, des VEB et des indicateurs de biodiversité.
 
-En fournissant des méthodes transparentes et reproductibles, le BEE permet de réaliser des évaluations cohérentes de la biodiversité entre les régions et au fil du temps, tout en permettant aux utilisateurs d'intégrer des données et des informations pertinentes pour leur contexte local.
+En fournissant des méthodes transparentes et reproductibles, BEE permet de réaliser des évaluations cohérentes de la biodiversité entre les régions et au fil du temps, tout en permettant aux utilisateurs d'intégrer des données et des informations pertinentes pour leur contexte local.
 
 # Qu'est-ce qu'un pipeline? {#what-is-a-pipeline}
 
@@ -56,7 +56,7 @@ Ces scripts peuvent être combinés et réutilisés dans différents pipelines, 
 
 Si un pipeline s'appuie sur les résultats d'un autre pipeline, ce pipeline « interne » peut être inclus comme étape du pipeline « externe »; on parle alors de pipeline imbriqué. Un pipeline SDM pourrait servir à générer des cartes de répartition au sein d'un pipeline Species Habitat Index ou être intégré à un pipeline Species Richness. Nous pouvons ainsi définir une étape comme « un script ou un pipeline imbriqué exécutant une opération dans le contexte d'un pipeline ».
 
-Le BEE prend en charge des scripts développés dans plusieurs langages de programmation, notamment R, Python et Julia, ce qui permet d'intégrer les méthodes de différentes communautés scientifiques dans un cadre analytique commun.
+BEE prend en charge des scripts développés dans plusieurs langages de programmation, notamment R, Python et Julia, ce qui permet d'intégrer les méthodes de différentes communautés scientifiques dans un cadre analytique commun.
 
 ![Pipeline simplifié avec étapes (bleu), résultats intermédiaires (gris) et résultats finaux (vert)](../pipeline.png)
 
@@ -66,7 +66,7 @@ Le succès de BON in a Box repose sur la collaboration au sein de la communauté
 
 Les chercheurs et les développeurs peuvent contribuer des pipelines analytiques, des méthodes scientifiques, des améliorations aux flux de travail existants, et réviser le travail de leurs pairs, contribuant ainsi à rendre leurs recherches accessibles et applicables au-delà de leur contexte initial.
 
-Contribuer au BEE peut aider à :
+Contribuer à BEE peut aider à :
 
 - **Accroître l'impact de la recherche** en mettant des méthodes scientifiques à disposition pour le suivi de la biodiversité et la prise de décisions en matière de conservation.
 
@@ -78,7 +78,7 @@ Contribuer au BEE peut aider à :
 
 Les pipelines proposés respectent des normes de qualité documentées; l'évaluation par les pairs contribue à la rigueur scientifique, à la facilité d'utilisation et à la généralisabilité des flux de travail publiés.
 
-Pour en savoir plus, consultez nos [directives de contribution](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html) (en anglais; voir aussi les [normes en français](pipeline_standards.qmd)) et notre [processus d'évaluation par les pairs](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/peer_review.html) (en anglais; voir aussi la [version française](peer_review.qmd)).
+Pour en savoir plus, consultez nos [directives de contribution](pipeline_standards.qmd) et notre [processus d'évaluation par les pairs](peer_review.qmd).
 
 # Comment citer {#how-to-cite}
 

@@ -3,37 +3,37 @@ title: "Guide d'utilisation"
 format: html
 ---
 
-Le Biodiversity Evaluation Engine (BEE) est accessible directement sur notre plateforme en ligne ou peut être installé localement sur votre ordinateur.
+Le Moteur d'Évaluation de la Biodiversité (BEE) est accessible directement sur notre plateforme en ligne ou peut être installé localement sur votre ordinateur.
 
 Pour la plupart des utilisateurs, **nous recommandons la plateforme en ligne**, qui permet d'exécuter des pipelines d'analyse de la biodiversité et de calculer des variables essentielles de biodiversité (EBV) et des indicateurs sans installer de logiciel.
 
-## Accéder au BEE en ligne (recommandé)
+## Accéder à BEE en ligne (recommandé)
 
-Le BEE est accessible par une interface Web; aucune expérience en programmation ni installation locale n'est nécessaire pour analyser la biodiversité.
+BEE est accessible par une interface Web; aucune expérience en programmation ni installation locale n'est nécessaire pour analyser la biodiversité.
 
 Pour commencer :
 
 1.  **Créer un compte GEO BON :** Si vous n'êtes pas déjà membre, inscrivez-vous gratuitement sur [members.geobon.org](https://members.geobon.org/).
 
-2.  **Demander l'accès au BEE :** Communiquez avec l'équipe de BON in a Box à [boninabox\@geobon.org](mailto:boninabox@geobon.org) pour faire approuver votre compte.
+2.  **Demander l'accès à BEE :** Communiquez avec l'équipe de BON in a Box à [boninabox\@geobon.org](mailto:boninabox@geobon.org) pour faire approuver votre compte.
 
-3.  **Se connecter au BEE :** Une fois votre compte approuvé, accédez à la plateforme à [auth.bee.geobon.org](https://auth.bee.geobon.org/).
+3.  **Se connecter à BEE :** Une fois votre compte approuvé, accédez à la plateforme à [auth.bee.geobon.org](https://auth.bee.geobon.org/).
 
 Une fois connecté, vous pouvez explorer les pipelines disponibles, fournir vos propres données d'entrée, exécuter des analyses et télécharger les résultats directement dans votre navigateur.
 
-Les sections ci-dessous expliquent étape par étape comment utiliser le BEE.
+Les sections ci-dessous expliquent étape par étape comment utiliser BEE.
 
-## Exécuter le BEE localement (facultatif)
+## Exécuter BEE localement (facultatif)
 
-La plupart des utilisateurs n'ont pas besoin d'installer le BEE localement. Une installation locale peut toutefois être utile si vous :
+La plupart des utilisateurs n'ont pas besoin d'installer BEE localement. Une installation locale peut toutefois être utile si vous :
 
-- **Souhaitez contribuer au BEE :** développer, tester ou modifier des pipelines et des scripts analytiques, ou contribuer au développement de la plateforme.
+- **Souhaitez contribuer à BEE :** développer, tester ou modifier des pipelines et des scripts analytiques, ou contribuer au développement de la plateforme.
 
 - **Avez des exigences de confidentialité ou de sécurité des données :** exécuter les analyses dans votre propre environnement informatique plutôt que de téléverser des données potentiellement sensibles sur la plateforme en ligne.
 
 - **Souhaitez mieux contrôler votre environnement informatique :** configurer ou gérer votre propre installation selon des exigences techniques ou institutionnelles particulières.
 
-Pour installer le BEE localement, suivez les [instructions d'installation](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_install.html) (en anglais; consultez aussi la [version française](how_to_install.qmd)).
+Pour installer BEE localement, suivez les [instructions d'installation](how_to_install.qmd).
 
 Une fois l'installation terminée :
 
@@ -45,11 +45,11 @@ Vous pourrez ensuite utiliser la même interface que celle décrite dans le guid
 
 # Guide d'utilisation
 
-Voici un guide détaillé sur l'exécution d'analyses dans le BEE. Il présente les fonctionnalités du BEE et explique comment les utiliser.
+Voici un guide détaillé sur l'exécution d'analyses dans BEE. Il présente les fonctionnalités de BEE et explique comment les utiliser.
 
 ## Accueil
 
-Dans l'onglet `Accueil`, vous trouverez une description du Biodiversity Evaluation Engine de BON in a Box, ses pipelines mis en vedette et vos exécutions de pipelines les plus récentes.
+Dans l'onglet `Accueil`, vous trouverez une description du Moteur d'Évaluation de la Biodiversité de BON in a Box, ses pipelines mis en vedette et vos exécutions de pipelines les plus récentes.
 
 ::: {style="margin-top: 40px;"}
 :::

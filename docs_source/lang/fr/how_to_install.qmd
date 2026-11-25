@@ -2,25 +2,25 @@
 title: "Installation"
 ---
 
-Le Biodiversity Evaluation Engine (BEE) est accessible directement sur notre [plateforme en ligne](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_use.html) (en anglais; consultez aussi le [guide d'utilisation en français](how_to_use.qmd)), sans qu'il soit nécessaire d'installer un logiciel. **Pour la plupart des utilisateurs, nous recommandons la version en ligne.**
+Le Moteur d'Évaluation de la Biodiversité (BEE) est accessible directement sur notre [plateforme en ligne](how_to_use.qmd), sans qu'il soit nécessaire d'installer un logiciel. **Pour la plupart des utilisateurs, nous recommandons la version en ligne.**
 
-Vous pourriez toutefois souhaiter installer le BEE localement si vous :
+Vous pourriez toutefois souhaiter installer BEE localement si vous :
 
-- **Souhaitez contribuer au BEE :** développer, tester ou modifier des pipelines analytiques, des scripts ou d'autres composants de la plateforme.
+- **Souhaitez contribuer à BEE :** développer, tester ou modifier des pipelines analytiques, des scripts ou d'autres composants de la plateforme.
 
 - **Avez des préoccupations concernant la confidentialité ou la sécurité des données :** exécuter des analyses dans votre propre environnement informatique plutôt que de téléverser des données sensibles sur la plateforme en ligne.
 
-- **Avez besoin d'un environnement informatique personnalisé :** configurer le BEE selon des exigences techniques ou institutionnelles particulières.
+- **Avez besoin d'un environnement informatique personnalisé :** configurer BEE selon des exigences techniques ou institutionnelles particulières.
 
-Pour exécuter le BEE localement, suivez les instructions d'installation ci-dessous.
+Pour exécuter BEE localement, suivez les instructions d'installation ci-dessous.
 
 ## Tutoriel vidéo
 
 {{< video https://www.youtube.com/watch?v=h3T36nLvg1E&t=4s >}}
 
-## Déployer le Biodiversity Evaluation Engine (BEE) localement
+## Déployer le Moteur d'Évaluation de la Biodiversité (BEE) localement
 
-Le BEE peut être installé et exécuté sur un ordinateur local. Même si les ordinateurs personnels disposent de moins de puissance de calcul que les serveurs, ils conviennent mieux au développement de pipelines et au travail avec de petits exemples. Les utilisateurs qui ajoutent des scripts et créent des pipelines sur leur ordinateur peuvent les exécuter directement dans l'interface du BEE.
+BEE peut être installé et exécuté sur un ordinateur local. Même si les ordinateurs personnels disposent de moins de puissance de calcul que les serveurs, ils conviennent mieux au développement de pipelines et au travail avec de petits exemples. Les utilisateurs qui ajoutent des scripts et créent des pipelines sur leur ordinateur peuvent les exécuter directement dans l'interface de BEE.
 
 Prérequis :
 
@@ -118,19 +118,19 @@ Prérequis :
 
 5.  Le script de démarrage peut vous proposer une mise à jour. Il est recommandé de l'accepter.
 
-### Étape 5 : Ouvrir le BEE dans le navigateur
+### Étape 5 : Ouvrir BEE dans le navigateur
 
-1.  Dans un navigateur, saisissez <http://localhost/> pour ouvrir le BEE.
+1.  Dans un navigateur, saisissez <http://localhost/> pour ouvrir BEE.
 
 2.  Ouvrez l'onglet « Exécuter un pipeline » et sélectionnez le pipeline qui vous intéresse. Consultez la section [Exécuter un script ou un pipeline](how_to_use.qmd).
 
-### Étape 6 : Arrêter le BEE
+### Étape 6 : Arrêter BEE
 
 1.  Lorsque vous avez terminé, exécutez `./server-down.sh` dans le terminal pour arrêter le serveur.
 
 2.  Sous Windows, il peut être nécessaire d'exécuter `wsl --shutdown` pour arrêter complètement les processus.
 
-### Mettre à jour le BEE
+### Mettre à jour BEE
 
 Chaque fois que le serveur démarre, le script de démarrage vérifie les mises à jour et vous les propose. Saisissez `y` pour les accepter ou appuyez sur Entrée pour lancer la mise à jour.
 
@@ -160,13 +160,13 @@ Dans `runner.env` :
 
 - Configurez la section « Cloud-scaling » si vous avez accès à un cluster Kubernetes. Cette fonctionnalité est encore expérimentale.
 
-- La connexion à un ordinateur de haute performance (HPC) est encore expérimentale. Consultez la [documentation destinée aux développeurs](../README-dev.html#setting-up-drac-cluster-connection) pour connaître les instructions et les limites.
+- La connexion à un ordinateur de haute performance (HPC) est encore expérimentale. Consultez la [documentation destinée aux développeurs](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/blob/main/README-dev.md#setting-up-digital-research-alliance-of-canada-drac-cluster-connection) (en anglais) pour connaître les instructions et les limites.
 
 Configuration du serveur :
 
-- Les sorties sont précieuses, tandis que le serveur peut être recréé à tout moment. Envisagez de monter un lecteur externe sauvegardé dans le dossier de sortie de votre installation du BEE.
+- Les sorties sont précieuses, tandis que le serveur peut être recréé à tout moment. Envisagez de monter un lecteur externe sauvegardé dans le dossier de sortie de votre installation de BEE.
 
-- Par défaut, le BEE écoute les requêtes HTTP. Pour activer HTTPS, placez-le derrière un proxy inverse (documentation [ici](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)) et activez HTTPS avec Certbot (documentation [ici](https://certbot.eff.org/)).
+- Par défaut, BEE écoute les requêtes HTTP. Pour activer HTTPS, placez-le derrière un proxy inverse (documentation [ici](https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/)) et activez HTTPS avec Certbot (documentation [ici](https://certbot.eff.org/)).
 
 # Dépannage
 
@@ -182,7 +182,7 @@ Voici quelques erreurs d'installation courantes et leurs solutions.
 
     [Cette discussion](https://github.com/docker/desktop-linux/issues/156) présente plusieurs causes possibles. Pour l'un de nos utilisateurs, le problème a été résolu en désactivant « containerd image store » dans les paramètres de Docker Desktop.
 
-3.  **Le BEE ne s'affiche pas à http://localhost**
+3.  **BEE ne s'affiche pas à http://localhost**
 
     Un conflit de ports peut survenir si vous utilisez un Mac ou si Apache ou NGINX est installé. Pour le résoudre, modifiez le fichier `runner.env` et indiquez un autre port dans `HTTP_PORT`. Par exemple, avec `HTTP_PORT=5522`, BON in a Box sera accessible à http://localhost:5522.
 
@@ -196,7 +196,7 @@ Si vous rencontrez d'autres erreurs, communiquez avec nous sur [Discourse](https
 
 # Exécuter un script ou un pipeline
 
-Vous avez installé localement une instance du Biodiversity Evaluation Engine de BON in a Box et souhaitez exécuter votre premier script ou pipeline.
+Vous avez installé localement une instance du Moteur d'Évaluation de la Biodiversité de BON in a Box et souhaitez exécuter votre premier script ou pipeline.
 
 Une page permet d'exécuter les scripts et une autre les pipelines. Sélectionnez le script ou le pipeline dans le menu déroulant, puis remplissez le formulaire.
 

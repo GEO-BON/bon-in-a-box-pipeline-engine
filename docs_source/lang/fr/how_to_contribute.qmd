@@ -2,9 +2,9 @@
 title: "Adapter votre code à un pipeline d'analyse"
 ---
 
-Ce guide présente étape par étape comment adapter un flux de travail analytique existant ou développer un nouveau pipeline pour le Biodiversity Evaluation Engine (BEE).
+Ce guide présente étape par étape comment adapter un flux de travail analytique existant ou développer un nouveau pipeline pour le Moteur d'Évaluation de la Biodiversité (BEE).
 
-Le BEE prend en charge les pipelines développés en R, Python, Julia et dans d'autres langages pris en charge. Les pipelines sont constitués de scripts individuels qui peuvent être reliés afin de créer des flux de travail analytiques reproductibles.
+BEE prend en charge les pipelines développés en R, Python, Julia et dans d'autres langages pris en charge. Les pipelines sont constitués de scripts individuels qui peuvent être reliés afin de créer des flux de travail analytiques reproductibles.
 
 Les instructions ci-dessous vous guideront dans la préparation du code, la définition des entrées et des sorties, la création et les tests du pipeline, ainsi que sa soumission à l'évaluation.
 
@@ -16,7 +16,7 @@ Pour développer et tester des pipelines, vous aurez besoin :
 
 - **D'un compte GitHub :** les contributions sont gérées dans le [dépôt des pipelines BON in a Box](https://github.com/GEO-BON/bon-in-a-box-pipelines).
 
-- **D'une installation locale du BEE :** suivez le [guide d'installation](how_to_install.qmd) pour configurer la plateforme sur votre ordinateur.
+- **D'une installation locale de BEE :** suivez le [guide d'installation](how_to_install.qmd) pour configurer la plateforme sur votre ordinateur.
 
 - **D'un flux de travail analytique :** il peut s'agir d'un script existant ou d'une nouvelle méthode que vous souhaitez développer sous forme de pipeline.
 

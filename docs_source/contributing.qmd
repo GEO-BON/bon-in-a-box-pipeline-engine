@@ -51,7 +51,7 @@ We are particularly interested in pipelines that:
 
 Pipelines do not need to be fully developed or meet all technical requirements before you contact us. The BON in a Box team can help assess whether a proposed contribution is suitable and identify what may be needed for integration.
 
-For more details, see our [Pipeline Standards](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html).
+For more details, see our [Pipeline Standards](pipeline_standards.qmd).
 
 ## How to contribute a pipeline
 
@@ -73,7 +73,7 @@ We recommend starting with a simple, functional version before adding more compl
 
 ### Step 3. Develop and test
 
-Develop your pipeline following the [Pipeline Standards](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html), which outline requirements for documentation, reproducibility, usability, and technical integration.
+Develop your pipeline following the [Pipeline Standards](pipeline_standards.qmd), which outline requirements for documentation, reproducibility, usability, and technical integration.
 
 Contributors can work with the BON in a Box team to test their pipelines and ensure they function correctly within BEE.
 
@@ -85,7 +85,7 @@ The review process evaluates the scientific methodology, reproducibility, docume
 
 Contributors may be asked to make revisions based on reviewer feedback before the pipeline is accepted.
 
-For more information, see our [Peer Review Process](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/peer_review.html).
+For more information, see our [Peer Review Process](peer_review.qmd).
 
 ### Step 5. Publication and continued development
 

@@ -3,9 +3,9 @@ title: "Évaluation par les pairs"
 format: html
 ---
 
-Pour garantir que les pipelines analytiques accessibles par l'intermédiaire du Biodiversity Evaluation Engine (BEE) sont scientifiquement rigoureux, reproductibles et accessibles, BON in a Box a établi un processus d'évaluation par les pairs pour les pipelines proposés.
+Pour garantir que les pipelines analytiques accessibles par l'intermédiaire du Moteur d'Évaluation de la Biodiversité (BEE) sont scientifiquement rigoureux, reproductibles et accessibles, BON in a Box a établi un processus d'évaluation par les pairs pour les pipelines proposés.
 
-Le processus d'évaluation examine la méthodologie scientifique, la fonctionnalité technique, la capacité de généralisation, la documentation et la facilité d'utilisation de chaque pipeline. Il permet également aux chercheurs et aux praticiens de mettre leur expertise à contribution pour améliorer les outils disponibles dans le BEE.
+Le processus d'évaluation examine la méthodologie scientifique, la fonctionnalité technique, la capacité de généralisation, la documentation et la facilité d'utilisation de chaque pipeline. Il permet également aux chercheurs et aux praticiens de mettre leur expertise à contribution pour améliorer les outils disponibles dans BEE.
 
 Les pipelines sont généralement évalués par 2 à 5 experts possédant des expertises scientifiques, techniques ou pratiques complémentaires. Dans la mesure du possible, nous cherchons à inclure des évaluateurs issus à la fois du milieu universitaire et des communautés de suivi de la biodiversité ou d'administration publique.
 
@@ -13,7 +13,7 @@ Les pipelines sont généralement évalués par 2 à 5 experts possédant des ex
 
 Avant qu'un pipeline soit soumis à une évaluation externe, l'équipe de BON in a Box travaille avec les contributeurs pour s'assurer qu'il :
 
-- Respecte les exigences décrites dans les [normes des pipelines](../pipeline_standards.html) (en anglais).
+- Respecte les exigences décrites dans les [normes des pipelines](pipeline_standards.qmd).
 
 - S'exécute correctement avec les exemples de données d'entrée fournis et les paramètres par défaut.
 
@@ -85,7 +85,7 @@ Selon l'ampleur des révisions nécessaires, les évaluateurs peuvent être invi
 
 - **À réviser :** Des changements plus importants sont nécessaires et le pipeline devra faire l'objet d'une nouvelle évaluation.
 
-- **Non accepté :** Le pipeline ne répond pas actuellement aux exigences pour être inclus dans le BEE.
+- **Non accepté :** Le pipeline ne répond pas actuellement aux exigences pour être inclus dans BEE.
 
 L'équipe de BON in a Box coordonne la décision finale en fonction des commentaires des évaluateurs et des normes de pipelines.
 
@@ -101,11 +101,11 @@ Les évaluateurs recevront un formulaire d'évaluation propre au pipeline conten
 
 - Toute information supplémentaire ou tout jeu de données d'exemple pertinent pour l'évaluation.
 
-Les pipelines en cours d'évaluation seront accessibles sur la plateforme BEE en ligne; les évaluateurs n'ont donc pas besoin d'installer le BEE localement. Le code source correspondant sera accessible au public sur GitHub, y compris pour les pipelines qui n'ont pas encore été fusionnés dans la branche principale.
+Les pipelines en cours d'évaluation seront accessibles sur la plateforme BEE en ligne; les évaluateurs n'ont donc pas besoin d'installer BEE localement. Le code source correspondant sera accessible au public sur GitHub, y compris pour les pipelines qui n'ont pas encore été fusionnés dans la branche principale.
 
-### Étape 1. Accéder au BEE {#step-1.-access-bee}
+### Étape 1. Accéder à BEE {#step-1.-access-bee}
 
-Les évaluateurs peuvent accéder au BEE par la [plateforme en ligne](https://auth.bee.geobon.org/).
+Les évaluateurs peuvent accéder à BEE par la [plateforme en ligne](https://auth.bee.geobon.org/).
 
 Si vous n'avez pas déjà accès, créez un [compte GEO BON](https://members.geobon.org/) gratuit et suivez les instructions d'accès fournies dans votre formulaire d'évaluation.
 

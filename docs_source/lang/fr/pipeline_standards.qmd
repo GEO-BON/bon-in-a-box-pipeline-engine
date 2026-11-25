@@ -3,7 +3,7 @@ title: "Exigences de qualité des pipelines d'analyse BON in a Box"
 format: html
 ---
 
-Le Biodiversity Evaluation Engine (BEE) réunit des pipelines analytiques élaborés par la communauté scientifique afin de soutenir le suivi de la biodiversité, le calcul d'indicateurs et la production de rapports.
+Le Moteur d'Évaluation de la Biodiversité (BEE) réunit des pipelines analytiques élaborés par la communauté scientifique afin de soutenir le suivi de la biodiversité, le calcul d'indicateurs et la production de rapports.
 
 Pour garantir la rigueur scientifique, la reproductibilité et l'accessibilité de ces pipelines au plus grand nombre, tous les pipelines proposés doivent respecter des normes communes en matière de science, de technique et de documentation.
 
@@ -21,9 +21,9 @@ Ces normes visent à :
 
 Ces normes orientent le développement des pipelines et le processus d'évaluation scientifique par les pairs.
 
-Les **contributeurs** doivent consulter ce document lors du développement ou de la mise à jour des pipelines. Les **évaluateurs** doivent l'utiliser avec le [processus d'évaluation par les pairs](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/peer_review.html) (en anglais; voir aussi la [version française](peer_review.qmd)) pour déterminer si les pipelines satisfont aux exigences de publication.
+Les **contributeurs** doivent consulter ce document lors du développement ou de la mise à jour des pipelines. Les **évaluateurs** doivent l'utiliser avec le [processus d'évaluation par les pairs](peer_review.qmd) pour déterminer si les pipelines satisfont aux exigences de publication.
 
-Les sections ci-dessous décrivent les normes scientifiques, relatives aux données et au code, ainsi que celles concernant la documentation et le versionnage des pipelines du BEE.
+Les sections ci-dessous décrivent les normes scientifiques, relatives aux données et au code, ainsi que celles concernant la documentation et le versionnage des pipelines de BEE.
 
 ## Glossaire
 
@@ -146,7 +146,7 @@ Le code doit respecter les exigences suivantes :
 
 ### Fichiers descriptifs YAML
 
-Chaque script doit être accompagné d'un fichier descriptif YAML (au format `.yml`) qui décrit le script, précise ses entrées et ses sorties, définit ses dépendances Conda et fournit ses références. Consultez nos [instructions](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#step-1-creating-a-yaml-file) (en anglais; voir aussi les [instructions en français](how_to_contribute.qmd#step-3-create-a-yaml-file)) sur le formatage des fichiers YAML.
+Chaque script doit être accompagné d'un fichier descriptif YAML (au format `.yml`) qui décrit le script, précise ses entrées et ses sorties, définit ses dépendances Conda et fournit ses références. Consultez nos [instructions](how_to_contribute.qmd#step-3-create-a-yaml-file) sur le formatage des fichiers YAML.
 
 #### **Normes relatives aux fichiers YAML**
 
@@ -166,11 +166,11 @@ Chaque script doit être accompagné d'un fichier descriptif YAML (au format `.y
 
 - Pour les **sorties de fichiers**, le champ `type` doit être un type MIME.
 
-- Pour les **sorties primitives**, comme du texte ou des nombres, utilisez un type primitif (`int`, `float`, `text`). Consultez la section sur les [entrées](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#inputs) (en anglais; voir aussi la [version française](how_to_contribute.qmd#inputs)) de la documentation utilisateur.
+- Pour les **sorties primitives**, comme du texte ou des nombres, utilisez un type primitif (`int`, `float`, `text`). Consultez la section sur les [entrées](how_to_contribute.qmd#inputs) de la documentation utilisateur.
 
-- Pour les **valeurs** : la valeur d'exemple remplira automatiquement le champ d'entrée correspondant dans le BEE. Vérifiez que l'exemple est valide et respecte le format requis.
+- Pour les **valeurs** : la valeur d'exemple remplira automatiquement le champ d'entrée correspondant dans BEE. Vérifiez que l'exemple est valide et respecte le format requis.
 
-- Pour les **fichiers** : les utilisateurs peuvent téléverser des fichiers dans la section Mes fichiers du BEE, puis sélectionner le fichier voulu dans le formulaire d'entrée du pipeline. Si un fichier d'exemple est inclus dans le pipeline, son chemin d'accès doit être correctement indiqué dans la description YAML.
+- Pour les **fichiers** : les utilisateurs peuvent téléverser des fichiers dans la section Mes fichiers de BEE, puis sélectionner le fichier voulu dans le formulaire d'entrée du pipeline. Si un fichier d'exemple est inclus dans le pipeline, son chemin d'accès doit être correctement indiqué dans la description YAML.
 
 ##### **Dépendances Conda**
 

@@ -78,7 +78,7 @@ Contributing to BEE can help:
 
 Contributed pipelines follow documented quality standards, with peer review supporting the scientific robustness, usability, and generalizability of published workflows.
 
-To learn more, see our [contribution guidelines](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/pipeline_standards.html) and [peer-review process](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/peer_review.html).
+To learn more, see our [contribution guidelines](pipeline_standards.qmd) and [peer-review process](peer_review.qmd).
 
 # How to cite
 

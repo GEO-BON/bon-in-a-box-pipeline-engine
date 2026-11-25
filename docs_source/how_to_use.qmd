@@ -33,7 +33,7 @@ For most users, installing BEE locally is not necessary. However, a local instal
 
 - **Need greater control over your computing environment:** Configure or manage your own installation for specific technical or institutional requirements.
 
-To install BEE locally, follow our [installation instructions](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_install.html).
+To install BEE locally, follow our [installation instructions](how_to_install.qmd).
 
 Once installed:
 
