@@ -167,6 +167,8 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
     <div className="filebrowser">
       <Button
         className="button-modal"
+        aria-label={t("fileBrowser.open")}
+        title={t("fileBrowser.open")}
         onClick={handleOpen}
         disabled={disableMyFiles}
       >

@@ -105,7 +105,7 @@ export function PipelineResults({
                     if (value === null || value === undefined) {
                       let noValueStatus = null;
                       if (/pipeline@\d+|default_output/.test(ioId)) {
-                        noValueStatus = <span>N/A</span>;
+                        noValueStatus = <span>{t("results.notAvailable")}</span>;
                       } else if (runningScripts.size > 0) {
                         noValueStatus = <InlineSpinner />;
                       } else {

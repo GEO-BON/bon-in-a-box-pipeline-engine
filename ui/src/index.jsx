@@ -153,11 +153,12 @@ function TranslatedPageTitle({ name }) {
 
 function NotFound() {
   const location = useLocation();
+  const { t } = useTranslation();
   return (
     <main style={{ padding: "1rem" }}>
-      <h2>404 - Page not found</h2>
+      <h2>{t("notFound.title")}</h2>
       <p>{location.pathname}</p>
-      <p>Lost in the wilderness?</p>
+      <p>{t("notFound.description")}</p>
     </main>
   );
 }

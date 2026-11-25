@@ -2,11 +2,18 @@
 
 ## UI translation
 
-The UI translates the navigation, home page, startup messages and the main user
-journeys (pipeline/script selection, input forms, results, run history, file
-selection) into English and French. The pipeline editor, chat controls and
-remaining dialogs remain in English for now. Names, descriptions, statuses, errors, and other content
-supplied by APIs are not translated by the UI.
+The UI translates navigation, the home page, startup messages, the main user
+journeys (pipeline/script selection, input forms, results, run history, and file
+selection), the pipeline editor, information page, chat controls, and the STAC
+asset chooser into English and French. Names, descriptions, statuses, raw errors,
+and other content supplied by APIs are not translated by the UI.
+
+Third-party localization has limits: React Flow's editor controls, minimap, and
+connection-handle labels use its `ariaLabelConfig` localization API. The SVAR
+file manager currently ships English and Chinese locale strings, but the
+installed React component exposes no locale prop; it remains in English until a
+French locale or supported integration is available. Review embedded third-party
+controls separately when upgrading those dependencies.
 
 The browser's preferred supported language is used by default, falling back to
 English. The language selector in the user menu (a round flag of the current

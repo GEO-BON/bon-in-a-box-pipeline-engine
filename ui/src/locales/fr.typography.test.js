@@ -13,7 +13,12 @@ const flatten = (object, prefix = "") =>
   });
 
 // Interpolation placeholders and markup are not French text.
-const prose = (value) => value.replace(/{{[^}]*}}/g, "X").replace(/<\/?\w+>/g, "");
+const prose = (value) =>
+  value
+    .replace(/{{[^}]*}}/g, "X")
+    .replace(/<code>[\s\S]*?<\/code>/g, "CODE")
+    .replace(/<\/?\w+>/g, "")
+    .replace(/`[^`]*`/g, "CODE");
 
 // Each rule reports the offending text; `pattern` matches violations only.
 const rules = [

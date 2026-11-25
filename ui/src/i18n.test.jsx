@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { Trans, useTranslation } from "react-i18next";
 import i18n, { browserLanguage, changePreference, getPreference, LANGUAGE_KEY, readPreference } from "./i18n";
 import LanguageSelector from "./components/LanguageSelector";
 import HomePage from "./components/HomePage";
@@ -10,9 +11,18 @@ import { GeneralDescription } from "./components/StepDescription";
 import en from "./locales/en/translation.json";
 import fr from "./locales/fr/translation.json";
 
+const scrollIntoViewDescriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, "scrollIntoView");
+
 vi.mock("./components/RunHistory", () => ({
   LastNRuns: () => <div>API content</div>,
 }));
+vi.mock("./components/info/Versions", () => ({ default: () => null }));
+vi.mock("./components/info/K8sStatus", () => ({ default: () => null }));
+vi.mock("./components/info/HPCStatus", () => ({ default: () => null }));
+
+import Chat from "./components/chat";
+import InfoPage from "./components/info/InfoPage";
+import StacChooser from "./components/form/Choosers/StacChooser";
 
 beforeEach(() => {
   localStorage.clear();
@@ -22,6 +32,12 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+  if (scrollIntoViewDescriptor) {
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", scrollIntoViewDescriptor);
+  } else {
+    delete HTMLElement.prototype.scrollIntoView;
+  }
 });
 
 const pick = (button, option) => {
@@ -205,5 +221,68 @@ describe("translated UI", () => {
     await i18n.changeLanguage("fr");
     expect(i18n.t("fileBrowser.useSelected", { count: 0 })).toBe("Utiliser la sélection");
     expect(i18n.t("description.compute", { count: 4, mem: "8G" })).toContain("4 cœurs");
+  });
+
+  it("translates the complete CSV partial-data notice around its download link", async () => {
+    function CsvPartialDownload() {
+      useTranslation();
+      return (
+        <p>
+          <Trans i18nKey="csv.partialDownload" components={{ download: <a href="/full.csv" /> }} />
+        </p>
+      );
+    }
+
+    render(<CsvPartialDownload />);
+    const englishLink = screen.getByRole("link", { name: "Download the full CSV file" });
+    expect(englishLink.getAttribute("href")).toBe("/full.csv");
+    expect(englishLink.parentElement.textContent).toBe(
+      "Displaying partial data. Download the full CSV file for complete data.",
+    );
+
+    await act(() => i18n.changeLanguage("fr"));
+    const frenchLink = screen.getByRole("link", { name: "Télécharger le fichier CSV complet" });
+    expect(frenchLink.getAttribute("href")).toBe("/full.csv");
+    expect(frenchLink.parentElement.textContent).toBe(
+      "Affichage de données partielles. Télécharger le fichier CSV complet pour obtenir toutes les données.",
+    );
+  });
+
+  it("translates the info page, chat, and STAC chooser when the language changes", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => ({ tools: ["pipeline"] }),
+      }),
+    );
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      configurable: true,
+      value: vi.fn(),
+    });
+    render(
+      <>
+        <InfoPage />
+        <StacChooser inputId="test-stac" />
+        <Chat />
+      </>,
+    );
+
+    expect(screen.getByRole("heading", { name: "License" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Choose STAC assets" })).toBeTruthy();
+    expect(screen.getByText(en.chat.greeting)).toBeTruthy();
+    const englishLicenseStatement = screen.getByText("Pipelines and scripts have their own licenses");
+    expect(englishLicenseStatement.tagName).toBe("STRONG");
+    expect(englishLicenseStatement.parentElement.textContent).toContain(", as specified in their metadata.");
+
+    await act(() => i18n.changeLanguage("fr"));
+
+    expect(screen.getByRole("heading", { name: "Licence" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Choisir des ressources STAC" })).toBeTruthy();
+    expect(document.querySelector(".chat-message p").textContent).toBe(fr.chat.greeting);
+    const frenchLicenseStatement = screen.getByText("Les pipelines et les scripts ont leurs propres licences");
+    expect(frenchLicenseStatement.tagName).toBe("STRONG");
+    expect(frenchLicenseStatement.parentElement.textContent).toContain(", comme indiqué dans leurs métadonnées.");
   });
 });

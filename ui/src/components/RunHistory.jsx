@@ -286,21 +286,22 @@ const isHistoryLocation = (value, input) => {
 };
 
 const HistoryLocationSummary = ({ location }) => {
+  const { t } = useTranslation();
   const crs = location.CRS;
   const code = crs.code == null ? "" :
     (crs.authority ? `${crs.authority}:` : "") + crs.code;
 
   return (
     <div className="history-location-summary">
-      <div><span>Country:</span> {location.country?.englishName}</div>
-      <div><span>Region:</span> {location.region?.regionName}</div>
-      <div><span>CRS:</span> {crs.name}{code && ` (${code})`}</div>
-      <div className="history-bbox-label">Bounding box:</div>
+      <div><span>{t("choosers.country")}</span> {location.country?.englishName}</div>
+      <div><span>{t("choosers.region")}</span> {location.region?.regionName}</div>
+      <div><span>{t("choosers.crs")}</span> {crs.name}{code && ` (${code})`}</div>
+      <div className="history-bbox-label">{t("choosers.boundingBoxLabel")}</div>
       <ul>
-        <li>Minimum X: {location.bbox[0]}</li>
-        <li>Minimum Y: {location.bbox[1]}</li>
-        <li>Maximum X: {location.bbox[2]}</li>
-        <li>Maximum Y: {location.bbox[3]}</li>
+        <li>{t("choosers.minX")} {location.bbox[0]}</li>
+        <li>{t("choosers.minY")} {location.bbox[1]}</li>
+        <li>{t("choosers.maxX")} {location.bbox[2]}</li>
+        <li>{t("choosers.maxY")} {location.bbox[3]}</li>
       </ul>
     </div>
   );

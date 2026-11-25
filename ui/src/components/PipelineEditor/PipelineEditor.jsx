@@ -53,6 +53,7 @@ import { IOListPane } from "./IOListPane";
 import { MetadataPane } from "./MetadataPane";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { uiContext } from "../../uiContext.jsx";
+import { useTranslation } from "react-i18next";
 
 import yaml, { YAMLException } from "js-yaml";
 import _lang from "lodash/lang";
@@ -88,6 +89,7 @@ document.addEventListener('keydown', e => {
 });
 
 export default function PipelineEditor(props) {
+  const { t } = useTranslation();
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -209,7 +211,7 @@ export default function PipelineEditor(props) {
 
       if (type === "constant") {
         setPopupMenuOptions({
-          "Convert to user input": () =>
+          [t("editor.convertToUserInput")]: () =>
             setNodes((nds) =>
               nds.map((node) =>
                 node.id === id ? { ...node, type: "userInput" } : node
@@ -218,7 +220,7 @@ export default function PipelineEditor(props) {
         });
       } else if (type === "userInput") {
         setPopupMenuOptions({
-          "Convert to constant": () =>
+          [t("editor.convertToConstant")]: () =>
             setNodes((nds) =>
               nds.map((node) =>
                 node.id === id ? { ...node, type: "constant" } : node
@@ -227,7 +229,7 @@ export default function PipelineEditor(props) {
         });
       }
     },
-    [setPopupMenuPos, setPopupMenuOptions, setNodes]
+    [setPopupMenuPos, setPopupMenuOptions, setNodes, t]
   );
 
   const onPopupMenuHide = useCallback(() => {
@@ -729,7 +731,7 @@ export default function PipelineEditor(props) {
           setMetadataError((prevError) => {
             const newError = {
               line: ex.mark.line + 1,
-              message: "YAML Syntax: " + ex.reason
+              message: t("editor.yamlSyntax", { reason: ex.reason })
             }
             return _lang.isEqual(prevError, newError) ? prevError : newError;
           })
@@ -740,7 +742,7 @@ export default function PipelineEditor(props) {
     }
 
     return JSON.stringify(flow, null, 2);
-  }, [inputList, outputList, metadata, reactFlowInstance]);
+  }, [inputList, outputList, metadata, reactFlowInstance, t]);
 
   const warnDeprecatedNode = (jsonString) => {
     const toSave = JSON.parse(jsonString);
@@ -749,7 +751,11 @@ export default function PipelineEditor(props) {
         if (node.data && node.data.descriptionFile) {
           fetchStepDescription(node.data.descriptionFile, (metadata) => {
             if (metadata.lifecycle && metadata.lifecycle.status == "deprecated") {
-              showAlert('warning', 'Pipeline contains a deprecated step', `"${metadata.name}" is deprecated in file ${node.data.descriptionFile}`)
+              showAlert(
+                'warning',
+                t("editor.deprecatedStepTitle"),
+                t("editor.deprecatedStepMessage", { name: metadata.name, file: node.data.descriptionFile })
+              )
             }
           });
         }
@@ -771,7 +777,7 @@ export default function PipelineEditor(props) {
             setModal('saveError');
 
           } else if (response.text) {
-            showAlert('warning', 'Pipeline saved with errors', response.text)
+            showAlert('warning', t("editor.savedWithErrors"), response.text)
 
           } else {
             localStorage.setItem("currentFileName", fileName);
@@ -785,16 +791,16 @@ export default function PipelineEditor(props) {
         .writeText(saveJSON)
         .then(() => {
             setSavedJSON(saveJSON);
-            showAlert('info', 'Pipeline content copied to clipboard',
-              'Use git to add the code to the BON in a Box repository.'
+            showAlert('info', t("editor.copiedTitle"),
+              t("editor.copyToGit")
             );
           })
           .catch(() => {
-            showAlert('error', 'Error', 'Failed to copy content to clipboard.');
+            showAlert('error', t("editor.errorTitle"), t("editor.copyFailed"));
           });
       }
     }
-  }, [showAlert, setSavedJSON, setModal, generateSaveJSON]);
+  }, [showAlert, setSavedJSON, setModal, generateSaveJSON, t]);
 
   const onLoadFromFileBtnClick = useCallback(() => {
     if(hasUnsavedChanges) {
@@ -832,7 +838,7 @@ export default function PipelineEditor(props) {
         setLoadDialogOpen(false);
         showAlert(
           'error',
-          'Error loading the pipeline list',
+          t("editor.pipelineListError"),
           getErrorString(error, response)
         )
       } else {
@@ -869,7 +875,7 @@ export default function PipelineEditor(props) {
         localStorage.removeItem("currentFileName");
         showAlert(
           'error',
-          'Error while loading the previously opened pipeline "' + descriptionFile + '"',
+          t("editor.previousPipelineError", { file: descriptionFile }),
           getErrorString(error, response)
         )
       } else {
@@ -985,7 +991,7 @@ export default function PipelineEditor(props) {
           case "output":
             break;
           default:
-            showAlert('error', 'Pipeline loaded with errors', 'Unsupported node type ' + node.type)
+            showAlert('error', t("editor.loadedWithErrors"), t("editor.unsupportedNode", { type: node.type }))
         }
       });
       id++;
@@ -1001,7 +1007,7 @@ export default function PipelineEditor(props) {
         setEdges(flow.edges || []);
       });
     } else {
-      showAlert('error', 'Error loading the pipeline', 'No data received.')
+      showAlert('error', t("editor.loadError"), t("editor.noData"))
     }
   }, [
     reactFlowInstance,
@@ -1014,7 +1020,8 @@ export default function PipelineEditor(props) {
     injectOutput,
     onConstantValueChange,
     onPopupMenu,
-    showAlert
+    showAlert,
+    t
   ]);
 
   const loadFromServer = useCallback((descriptionFile) => {
@@ -1022,7 +1029,7 @@ export default function PipelineEditor(props) {
       if (error) {
         showAlert(
           'error',
-          'Error loading the pipeline',
+          t("editor.loadError"),
           getErrorString(error, response)
         )
       } else {
@@ -1032,16 +1039,15 @@ export default function PipelineEditor(props) {
         onLoadFlow(data);
       }
     });
-  }, [showAlert, setCurrentFileName, setSavedJSON, onLoadFlow])
+  }, [showAlert, setCurrentFileName, setSavedJSON, onLoadFlow, t])
 
   const saveFileToServer = useCallback((descriptionFile) => {
     api.getListOf("pipeline", {}, (error, pipelineList, response) => {
       if (error) {
         showAlert(
           'error',
-          'Error saving the pipeline',
-          'Failed to retrieve pipeline list.\n'
-           + getErrorString(error, response)
+          t("editor.saveError"),
+          t("editor.pipelineListSaveError", { details: getErrorString(error, response) })
         );
       } else {
         let sanitized = descriptionFile.trim().replace(/\s*(\/|>)\s*/, '>')
@@ -1055,7 +1061,7 @@ export default function PipelineEditor(props) {
         onSave(descriptionFile);
       }
     });
-  }, [onSave, showAlert]);
+  }, [onSave, showAlert, t]);
 
   const clearPipelineEditor = useCallback(() => {
     setEditSession(Math.random());
@@ -1141,13 +1147,13 @@ export default function PipelineEditor(props) {
       </h2>
       {!savePipelineToServer && (
         <Alert severity="warning" sx={{ width: '250px', marginBottom: '10px', padding: '2px 15px', borderRadius: '10px' }}>
-          This instance is read-only
+          {t("editor.readOnly")}
         </Alert>
       )}
       <div className="narrowWarning">
-        <p>The pipeline engine cannot be used on a narrow display.</p>
-        <p><strong>A computer is recommended for pipeline edition.</strong></p>
-        <p>A phone can be used horizontally to preview a pipeline.</p>
+        <p>{t("editor.narrowDisplay")}</p>
+        <p><strong>{t("editor.computerRecommended")}</strong></p>
+        <p>{t("editor.phonePreview")}</p>
       </div>
       <Dialog
         open={modal === 'saveAs'}
@@ -1170,10 +1176,10 @@ export default function PipelineEditor(props) {
           }
         }}
       >
-        <DialogTitle>Save to server</DialogTitle>
+        <DialogTitle>{t("editor.saveToServer")}</DialogTitle>
         <DialogContent>
           <TextField
-            label="File name"
+            label={t("editor.fileName")}
             type="text"
             defaultValue={currentFileName}
             id="fileName"
@@ -1187,8 +1193,8 @@ export default function PipelineEditor(props) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => hideModal('saveAs')}>Cancel</Button>
-          <Button type="submit">Save</Button>
+          <Button onClick={() => hideModal('saveAs')}>{t("editor.cancel")}</Button>
+          <Button type="submit">{t("editor.save")}</Button>
         </DialogActions>
       </Dialog>
 
@@ -1196,15 +1202,15 @@ export default function PipelineEditor(props) {
         open={modal === 'saveError'}
         onClose={() => hideModal('saveError')}
       >
-        <DialogTitle>Error saving the pipeline</DialogTitle>
+        <DialogTitle>{t("editor.saveError")}</DialogTitle>
         <DialogContent>
           <Alert severity="error" style={{ whiteSpace: "pre-wrap" }}>
             {alertMessage}
           </Alert>
         </DialogContent>
         <DialogActions>
-          <Button onClick={(_) => { hideModal('saveError'); onSave() }}>Save to clipboard</Button>
-          <Button onClick={(_) => hideModal('saveError')}>Dismiss</Button>
+          <Button onClick={(_) => { hideModal('saveError'); onSave() }}>{t("editor.saveToClipboard")}</Button>
+          <Button onClick={(_) => hideModal('saveError')}>{t("editor.dismiss")}</Button>
         </DialogActions>
       </Dialog>
 
@@ -1212,10 +1218,10 @@ export default function PipelineEditor(props) {
         open={modal === 'clear'}
         onClose={() => hideModal('clear')}
       >
-        <DialogTitle>Are you sure you want to clear the pipeline editor?</DialogTitle>
+        <DialogTitle>{t("editor.confirmClear")}</DialogTitle>
         <DialogActions>
-          <Button onClick={() => {clearPipelineEditor()}}>Clear canvas</Button>
-          <Button onClick={() => hideModal('clear')}>Keep changes</Button>
+          <Button onClick={() => {clearPipelineEditor()}}>{t("editor.clearCanvas")}</Button>
+          <Button onClick={() => hideModal('clear')}>{t("editor.keepChanges")}</Button>
         </DialogActions>
       </Dialog>
 
@@ -1225,16 +1231,16 @@ export default function PipelineEditor(props) {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">This file name already exists.</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{t("editor.fileExists")}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Do you want to continue and overwrite the existing file?
+            {t("editor.overwriteConfirm")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setModal('saveAs')}>Cancel</Button>
+          <Button onClick={() => setModal('saveAs')}>{t("editor.cancel")}</Button>
           <Button onClick={() => { hideModal('overwrite'); onSave(currentFileName) }} autoFocus>
-            Overwrite
+            {t("editor.overwrite")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1243,15 +1249,15 @@ export default function PipelineEditor(props) {
         open={modal === 'leavePage'}
         onClose={handleLeavePageModalClose}
       >
-        <DialogTitle>Leaving the editor</DialogTitle>
+        <DialogTitle>{t("editor.leavingEditor")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            There are unsaved modifications that will be lost when leaving the page.
+            {t("editor.unsavedLeave")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleLeavePageModalClose}>Stay</Button>
-          <Button onClick={blocker.proceed}>Leave</Button>
+          <Button onClick={handleLeavePageModalClose}>{t("editor.stay")}</Button>
+          <Button onClick={blocker.proceed}>{t("editor.leave")}</Button>
         </DialogActions>
       </Dialog>
 
@@ -1260,20 +1266,20 @@ export default function PipelineEditor(props) {
           (modal === "unsavedLoadFromFile" || modal.startsWith("unsavedLoadFromServer:"))}
         onClose={hideCurrentModal}
       >
-        <DialogTitle>Unsaved changes</DialogTitle>
+        <DialogTitle>{t("editor.unsavedChanges")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            There are unsaved modifications that will be lost when loading the new pipeline.
+            {t("editor.unsavedLoad")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={hideCurrentModal}>Stay</Button>
+          <Button onClick={hideCurrentModal}>{t("editor.stay")}</Button>
           <Button onClick={() => {
             hideCurrentModal();
             if (modal === "unsavedLoadFromFile") inputFile.current.click()
             else loadFromServer(modal.substring("unsavedLoadFromServer:".length))
           }}>
-            Leave
+            {t("editor.leave")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1285,7 +1291,7 @@ export default function PipelineEditor(props) {
             {alertMessage}
           </Alert>
           <DialogActions>
-            <Button onClick={clearAlert}>OK</Button>
+            <Button onClick={clearAlert}>{t("editor.ok")}</Button>
           </DialogActions>
         </Dialog>
       }
@@ -1295,7 +1301,7 @@ export default function PipelineEditor(props) {
         autoHideDuration={3000} onClose={() => hideModal('saveSuccess')}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="success">Pipeline saved to server</Alert>
+        <Alert severity="success">{t("editor.saved")}</Alert>
       </Snackbar>
 
 
@@ -1310,6 +1316,15 @@ export default function PipelineEditor(props) {
               onEdgesChange={onEdgesChange}
               onConnect={onConnect}
               onInit={setReactFlowInstance}
+              ariaLabelConfig={{
+                "controls.ariaLabel": t("editor.controlsLabel"),
+                "controls.zoomIn.ariaLabel": t("editor.zoomIn"),
+                "controls.zoomOut.ariaLabel": t("editor.zoomOut"),
+                "controls.fitView.ariaLabel": t("editor.fitView"),
+                "controls.interactive.ariaLabel": t("editor.toggleInteractivity"),
+                "minimap.ariaLabel": t("editor.minimapLabel"),
+                "handle.ariaLabel": t("editor.handleLabel"),
+              }}
               onDrop={onDrop}
               onDragOver={onDragOver}
               onSelectionChange={onSelectionChange}
@@ -1322,7 +1337,7 @@ export default function PipelineEditor(props) {
               {toolTip && <div className="tooltip">{toolTip}</div>}
 
               <div className="save__controls">
-                <button onClick={() => onLayout()}>Layout</button>
+                <button onClick={() => onLayout()}>{t("editor.layout")}</button>
                 <input
                   type="file"
                   id="file"
@@ -1331,15 +1346,15 @@ export default function PipelineEditor(props) {
                   onChange={onLoadFromFile}
                   style={{ display: "none" }}
                 />
-                <button id="loadFromFileBtn" onClick={onLoadFromFileBtnClick}>Load from file</button>
+                <button id="loadFromFileBtn" onClick={onLoadFromFileBtnClick}>{t("editor.loadFromFile")}</button>
                 <button onClick={onLoadFromServerBtnClick}>
-                  Load from server
+                  {t("editor.loadFromServer")}
                 </button>
-                <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>Clear</button>
+                <button id="clear" disabled={nodes.length === 0} onClick={() => setModal('clear')}>{t("editor.clear")}</button>
                 {savePipelineToServer && (
                   <>
-                    <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>Save</button>
-                    <button id="saveAsBtn" onClick={() => setModal('saveAs')}>Save as...</button>
+                    <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>{t("editor.save")}</button>
+                    <button id="saveAsBtn" onClick={() => setModal('saveAs')}>{t("editor.saveAs")}</button>
                   </>            
                 )}
               </div>
@@ -1384,7 +1399,7 @@ export default function PipelineEditor(props) {
               />
 
               <div className="react-flow__panel react-flow__attribution top left previewMode">
-                  Currently in <strong>preview mode</strong>. Use a larger screen to edit.
+                  {t("editor.previewMode")}
               </div>
             </ReactFlow>
           </div>
@@ -1404,7 +1419,7 @@ export default function PipelineEditor(props) {
         fullWidth
         maxWidth="sm"
       >
-        <DialogTitle>Load pipeline from server</DialogTitle>
+        <DialogTitle>{t("editor.loadPipeline")}</DialogTitle>
         <DialogContent>
           <PipelineMenu
             pipelineMap={serverPipelineMap}
@@ -1418,7 +1433,7 @@ export default function PipelineEditor(props) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setLoadDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setLoadDialogOpen(false)}>{t("editor.cancel")}</Button>
         </DialogActions>
       </Dialog>
     </div>

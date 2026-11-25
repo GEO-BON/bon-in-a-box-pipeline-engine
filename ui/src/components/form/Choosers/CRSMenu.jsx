@@ -172,13 +172,13 @@ export default function CRSMenu({ states, dispatch, value, dialog = false }) {
               setSelectedCRS({ label: def.name, value: value.value });
               setBadCRS("");
             } else {
-              setBadCRS("CRS not recognized");
+              setBadCRS(t("choosers.crsNotRecognized"));
               setSelectedCRS({ label: value.value, value: value.value });
             }
           }
         });
       } else {
-        setBadCRS("CRS not recognized");
+        setBadCRS(t("choosers.crsNotRecognized"));
         dispatch({
           type: "changeCRSFromInput",
           CRS: { name: "unrecognized CRS", authority: code[0], code: code[1] },

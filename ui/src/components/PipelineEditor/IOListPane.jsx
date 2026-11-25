@@ -24,6 +24,7 @@ import {
 } from "@dnd-kit/modifiers";
 
 import { IOListItem } from "./IOListItem";
+import { useTranslation } from "react-i18next";
 
 /**
  * @returns rendered view of the pipeline inputs and outputs
@@ -36,6 +37,7 @@ export const IOListPane = ({
   selectedNodes,
   editSession,
 }) => {
+  const { t } = useTranslation();
   const [collapsedPane, setCollapsedPane] = useState(true);
   const [areItemsCollapsed, setItemsCollapsed] = useState(false);
 
@@ -52,23 +54,21 @@ export const IOListPane = ({
           {collapsedPane ? <>&lt;&lt;</> : <>&gt;&gt;</>}
           <span className="topToBottomText">
             &nbsp;&nbsp;
-            {inputList.length < 10 && <>&nbsp;</>}
-            {inputList.length}&nbsp;Inputs,&nbsp;
-            {outputList.length < 10 && <>&nbsp;</>}
+            {t("editor.inputCount", { count: inputList.length })},{" "}
             <span className={outputList.length === 0 ? "errorText" : undefined}>
-              {outputList.length}&nbsp;Outputs
+              {t("editor.outputCount", { count: outputList.length })}
             </span>
           </span>
         </>
       </div>
       <div className="rightPaneInner">
         {areItemsCollapsed
-          ? <img src={expandImg} className="expandButton" alt="expand" title="Expand to edit descriptions and examples" onClick={(_) => setItemsCollapsed(false)} />
-          : <img src={collapseImg} className="collapseButton" alt="collapse" title="Collapse to reorder inputs and outputs" onClick={(_) => setItemsCollapsed(true)} />
+          ? <img src={expandImg} className="expandButton" alt={t("editor.expand")} title={t("editor.expandItems")} onClick={(_) => setItemsCollapsed(false)} />
+          : <img src={collapseImg} className="collapseButton" alt={t("editor.collapse")} title={t("editor.collapseItems")} onClick={(_) => setItemsCollapsed(true)} />
         }
-        <h3>User inputs</h3>
+        <h3>{t("editor.userInputs")}</h3>
         {inputList.length === 0 ? (
-          "No inputs"
+          t("editor.noInputs")
         ) : (
           <IOList
             list={inputList}
@@ -80,10 +80,10 @@ export const IOListPane = ({
           />
         )}
 
-        <h3>Pipeline outputs</h3>
+        <h3>{t("editor.pipelineOutputs")}</h3>
         {outputList.length === 0 ? (
           <Alert severity="error">
-            At least one output is needed for the pipeline to run
+            {t("editor.needOutput")}
           </Alert>
         ) : (
           <IOList

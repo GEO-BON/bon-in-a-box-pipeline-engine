@@ -6,9 +6,11 @@ import ReactMarkdown from 'react-markdown'
 import { PopupContentContext } from '../../Layout.jsx';
 import { fetchStepDescription } from './StepDescriptionStore'
 import { StepDescription } from '../StepDescription.jsx';
+import { useTranslation } from 'react-i18next';
 
 // props content, see https://reactflow.dev/docs/api/nodes/custom-nodes/#passed-prop-types
 export default function IONode({ id, data }) {
+  const { t } = useTranslation();
   const [descriptionFileLocation] = useState(data.descriptionFile);
   const [metadata, setMetadata] = useState(null);
   const [missing, setMissing] = useState(false);
@@ -28,7 +30,7 @@ export default function IONode({ id, data }) {
 
   function showScriptTooltip() {
     if (!metadata) {
-      data.setToolTip(<span>Script or pipeline not found. Remove or replace this step to avoid errors.</span>);
+      data.setToolTip(<span>{t("editor.scriptNotFound")}</span>);
       return;
     }
     data.setToolTip(
@@ -50,8 +52,8 @@ export default function IONode({ id, data }) {
   }, [])
 
   function checkForWarning(desc) {
-    return !desc.label ? "Label missing in script's description file" :
-      !desc.description ? "Description missing in script's description file" : null;
+    return !desc.label ? t("editor.missingLabel") :
+      !desc.description ? t("editor.missingDescription") : null;
   }
 
   if (missing) {
@@ -106,7 +108,7 @@ export default function IONode({ id, data }) {
         {metadata.inputs && Object.entries(metadata.inputs).map(([inputName, desc]) => {
           let warning = checkForWarning(desc)
 
-          return <ScriptIO key={inputName} desc={desc} setToolTip={data.setToolTip}
+          return <ScriptIO key={inputName} desc={desc} setToolTip={data.setToolTip} t={t}
             onDoubleClick={(e) => data.injectConstant(e, desc, id, inputName)}
             warning={warning}>
             <Handle id={inputName} type="target" position={Position.Left} />
@@ -118,14 +120,14 @@ export default function IONode({ id, data }) {
         {pathList.map((s, i) => <span key={i} className={i!==pathList.length-1?'ioNode-folder':'ioNode-script'}>{s}{i!==pathList.length-1?' >':''}</span>)}
         {
           metadata.lifecycle?.status == "deprecated"
-          && <LifecycleMessage status={metadata.lifecycle.status} message={metadata.lifecycle.message ? `Deprecated: ${metadata.lifecycle.message}` : "Deprecated"} />
+          && <LifecycleMessage status={metadata.lifecycle.status} message={metadata.lifecycle.message ? t("editor.deprecatedMessage", { message: metadata.lifecycle.message }) : t("lifecycle.deprecated.label")} />
         }
       </td>
       <td className='outputs'>
         {metadata.outputs && Object.entries(metadata.outputs).map(([outputName, desc]) => {
           let warning = checkForWarning(desc)
 
-          return <ScriptIO key={outputName} desc={desc} setToolTip={data.setToolTip}
+          return <ScriptIO key={outputName} desc={desc} setToolTip={data.setToolTip} t={t}
             onDoubleClick={(e) => data.injectOutput(e, id, outputName)}
             warning={warning}>
             <span className={warning && 'ioWarning'}>{desc.label ? desc.label : outputName}</span>
@@ -139,10 +141,10 @@ export default function IONode({ id, data }) {
   </>
 }
 
-function ScriptIO({children, desc, setToolTip, onDoubleClick, warning}) {
+function ScriptIO({children, desc, setToolTip, onDoubleClick, warning, t}) {
   function renderType(type) {
     if(type === 'options') {
-      return "Options: " + (desc.options && desc.options.join(', '))
+      return t("editor.optionsList", { options: desc.options && desc.options.join(', ') })
     } else {
       return type
     }
@@ -153,7 +155,7 @@ function ScriptIO({children, desc, setToolTip, onDoubleClick, warning}) {
       {warning && <><span className='warning'>{warning}</span><br/></>}
       {desc.type && <>{renderType(desc.type)} <br /></>}
       {desc.description && <div className="reactMarkdown noLink"><ReactMarkdown>{desc.description}</ReactMarkdown></div>}
-      {desc.example && <>Example: {renderExample(desc.example)}</>}
+      {desc.example && <>{t("editor.example")} {renderExample(desc.example)}</>}
     </>)
   }
 
