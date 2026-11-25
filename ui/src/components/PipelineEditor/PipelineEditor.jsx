@@ -89,7 +89,7 @@ document.addEventListener('keydown', e => {
 });
 
 export default function PipelineEditor(props) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -301,7 +301,7 @@ export default function PipelineEditor(props) {
         type: "output",
         position,
         targetPosition: Position.Left,
-        data: { label: "Output" },
+        data: { label: t("editor.outputNode") },
       };
       setNodes((nds) => nds.concat(newNode));
 
@@ -313,7 +313,7 @@ export default function PipelineEditor(props) {
       };
       addEdgeWithHighlight(newEdge);
     },
-    [reactFlowInstance, setNodes]
+    [reactFlowInstance, setNodes, t]
   );
 
   const onNodesDelete = useCallback(
@@ -349,7 +349,6 @@ export default function PipelineEditor(props) {
     (event) => {
       event.preventDefault();
 
-      const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
       const type = event.dataTransfer.getData("application/reactflow");
       const descriptionFile = event.dataTransfer.getData("descriptionFile");
 
@@ -382,7 +381,7 @@ export default function PipelineEditor(props) {
           };
           break;
         case "output":
-          newNode.data = { label: "Output" };
+          newNode.data = { label: t("editor.outputNode") };
           newNode.targetPosition = Position.Left;
           break;
         default:
@@ -391,7 +390,7 @@ export default function PipelineEditor(props) {
 
       setNodes((nds) => nds.concat(newNode));
     },
-    [reactFlowInstance, injectConstant, injectOutput, setNodes]
+    [reactFlowInstance, injectConstant, injectOutput, setNodes, t]
   );
 
   // Descriptions may vary between all steps connected, we pick the one from the first outgoing edge.
@@ -671,6 +670,7 @@ export default function PipelineEditor(props) {
       return null
 
     const flow = _lang.cloneDeep(reactFlowInstance.toObject());
+    const tEnglish = i18n.getFixedT("en");
 
     // react-flow properties that are not necessary to rebuild graph when loading
     flow.nodes.forEach((node) => {
@@ -681,6 +681,9 @@ export default function PipelineEditor(props) {
       delete node.height;
       if (node.type === "userInput" || node.type === "constant")
         delete node.data.label;
+
+      if (node.type === "output") // Make sure not to save a localized string in json
+        node.data.label = tEnglish("editor.outputNode");
 
       // These we will reinject when loading
       delete node.targetPosition;
@@ -742,7 +745,7 @@ export default function PipelineEditor(props) {
     }
 
     return JSON.stringify(flow, null, 2);
-  }, [inputList, outputList, metadata, reactFlowInstance, t]);
+  }, [inputList, outputList, metadata, reactFlowInstance, t, i18n]);
 
   const warnDeprecatedNode = (jsonString) => {
     const toSave = JSON.parse(jsonString);
@@ -989,6 +992,7 @@ export default function PipelineEditor(props) {
             ).label;
             break;
           case "output":
+            node.data = { ...node.data, label: t("editor.outputNode") };
             break;
           default:
             showAlert('error', t("editor.loadedWithErrors"), t("editor.unsupportedNode", { type: node.type }))
@@ -1355,7 +1359,7 @@ export default function PipelineEditor(props) {
                   <>
                     <button id="saveBtn" onClick={() => { if (currentFileName) onSave(currentFileName); else setModal('saveAs') }}>{t("editor.save")}</button>
                     <button id="saveAsBtn" onClick={() => setModal('saveAs')}>{t("editor.saveAs")}</button>
-                  </>            
+                  </>
                 )}
               </div>
 

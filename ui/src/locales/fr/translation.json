@@ -305,6 +305,7 @@
   },
   "editor": {
     "stepHint": "Cliquer pour plus d’info, ou glisser-déposer pour ajouter au pipeline.",
+    "outputNode": "Sortie",
     "pipelineOutput": "Sortie du pipeline",
     "search": "Rechercher des pipelines et des scripts…",
     "noResults": "Aucun résultat trouvé",

@@ -305,6 +305,7 @@
   },
   "editor": {
     "stepHint": "Click for info, drag and drop to add to pipeline.",
+    "outputNode": "Output",
     "pipelineOutput": "Pipeline output",
     "search": "Search pipelines and scripts...",
     "noResults": "No results found",
