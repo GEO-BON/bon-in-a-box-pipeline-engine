@@ -5,7 +5,6 @@ import ArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { changePreference, getPreference } from "../i18n";
 import { DEFAULT_LANGUAGE, LANGUAGES, isSupportedLanguage } from "../languages";
 import languageIcon from "../img/fa-language.svg";
-import { NavLink } from "react-router-dom";
 
 function LanguageIcon() {
   return <img className="language-icon" src={languageIcon} alt="" aria-hidden="true" />;
@@ -41,48 +40,57 @@ export default function LanguageSelector() {
     event.preventDefault();
   };
 
-  return (<>
-    <NavLink className="navbar-profile-popup-option" onClick={() => setOpen((value) => !value)}>
-      <LanguageIcon />
-      {currentLanguageDef.label}
-      {open
-        ? <ArrowUpIcon className="language-expand-icon" aria-hidden="true" />
-        : <ArrowDownIcon className="language-expand-icon" aria-hidden="true" />}
-    </NavLink>
-
-    {open && (
-      <ul
-        className="language-list"
-        role="listbox"
+  return (
+    <>
+      <button
+        ref={buttonRef}
+        type="button"
+        className="navbar-profile-popup-option language-button"
         aria-label={t("language.label")}
-        onKeyDown={onListKeyDown}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
       >
-        {LANGUAGES.map((language) => (
-          <li
-            key={language.code}
-            role="option"
-            tabIndex={-1}
-            ref={(node) => language.code === currentLanguageCode && node?.focus()}
-            className="language-option"
-            aria-selected={language.code === currentLanguageCode}
-            onClick={() => choose(language.code)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                choose(language.code);
-              }
-            }}
-          >
-            <span>{language.label}</span>
-          </li>
-        ))}
-      </ul>
-    )}
-    {storageError && (
-      <span role="alert" className="language-storage-error">
-        {t("language.storageError")}
-      </span>
-    )}
-  </>
+        <LanguageIcon />
+        {currentLanguageDef.label}
+        {open
+          ? <ArrowUpIcon className="language-expand-icon" aria-hidden="true" />
+          : <ArrowDownIcon className="language-expand-icon" aria-hidden="true" />}
+      </button>
+
+      {open && (
+        <ul
+          className="language-list"
+          role="listbox"
+          aria-label={t("language.label")}
+          onKeyDown={onListKeyDown}
+        >
+          {LANGUAGES.map((language) => (
+            <li
+              key={language.code}
+              role="option"
+              tabIndex={-1}
+              ref={(node) => language.code === currentLanguageCode && node?.focus()}
+              className="language-option"
+              aria-selected={language.code === currentLanguageCode}
+              onClick={() => choose(language.code)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  choose(language.code);
+                }
+              }}
+            >
+              <span>{language.label}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {storageError && (
+        <span role="alert" className="language-storage-error">
+          {t("language.storageError")}
+        </span>
+      )}
+    </>
   );
 }
