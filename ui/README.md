@@ -120,3 +120,17 @@ entry to the list in `src/languages.js` (the only place languages are declared).
 `npm test` also checks the French catalog against the OQLF punctuation spacing rules
 (`src/locales/fr.typography.test.js`). 
 We could add similar tests for other languages.
+
+To fix common French typography issues in a JSON or Markdown file, run from `ui/`:
+
+```sh
+python3 scripts/fix_french_typography.py src/locales/fr/translation.json
+python3 scripts/fix_french_typography.py ../path/to/french.md
+```
+
+The command edits the file in place; add `--check` to report whether changes
+are needed without writing. JSON keys are left unchanged. Markdown code blocks,
+inline code, link destinations, and common placeholders are protected. The
+fixer is heuristic, not a Markdown parser or a linguistic review: inspect the
+diff, especially for unusual markup, technical identifiers, or literal quotes.
+It preserves the option of no space before `?`, `!`, and `;`.
