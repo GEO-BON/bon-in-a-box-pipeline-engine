@@ -40,7 +40,8 @@ export function PipelineResults({
   isPipeline,
   displayTimeStamp,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.resolvedLanguage;
   const [activeRenderer, setActiveRenderer] = useState({});
   const [pipelineOutputResults, setPipelineOutputResults] = useState({});
 
@@ -339,7 +340,7 @@ export function DelayedResult({
 
   useEffect(() => {
     console.log("Fetching metadata for ", script);
-    fetchStepDescriptionAsync(script)
+    fetchStepDescriptionAsync(script, lang)
       .then((data) => {
         if(data) {
           setScriptMetadata(data);
@@ -347,7 +348,7 @@ export function DelayedResult({
           setScriptMetadata({});
         }
       })
-  }, [script]);
+  }, [script, lang]);
 
   let inputsContent,
     outputsContent,

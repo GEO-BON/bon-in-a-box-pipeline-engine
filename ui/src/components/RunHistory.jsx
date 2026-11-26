@@ -330,7 +330,7 @@ const RunCard = (props) => {
     setExpanded(false); // close card if card reused for another history item
     const descriptionPath = `${pipeline}.${run.type === "script" ? "yaml" : "json"
       }`;
-    api.getInfo(run.type, descriptionPath, (error, _, response) => {
+    api.getInfo(run.type, descriptionPath, { lang: i18n.resolvedLanguage }, (error, _, response) => {
       if (response.status !== 404) {
         const res = JSON.parse(response.text);
         setDesc(res.description);
@@ -342,7 +342,7 @@ const RunCard = (props) => {
         setStatus("unavailable");
       }
     });
-  }, [pipeline, run, setExpanded]);
+  }, [pipeline, run, setExpanded, i18n.resolvedLanguage]);
   return (
     <Grid size={history ? { xs: 12, lg: 5 } : latest ? { xs: 12, md: 10, lg: 5 } : { md: 10, lg: 5 }} className={history ? "history-run-item" : latest ? "latest-run-item" : undefined}>
       <Card

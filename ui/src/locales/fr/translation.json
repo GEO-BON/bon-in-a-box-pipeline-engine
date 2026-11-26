@@ -373,6 +373,7 @@
     "pipelineListSaveError": "Impossible de récupérer la liste des pipelines.\n{{details}}",
     "yamlSyntax": "Syntaxe YAML : {{reason}}",
     "readOnly": "Ce site est en lecture seule",
+    "englishOnly": "Les pipelines sont modifiés en anglais.",
     "narrowDisplay": "Le moteur de pipelines ne peut pas être utilisé sur un écran étroit.",
     "computerRecommended": "Veuillez utiliser un ordinateur pour modifier les pipelines.",
     "phonePreview": "Tournez le téléphone à l’horizontale pour visualiser un pipeline.",

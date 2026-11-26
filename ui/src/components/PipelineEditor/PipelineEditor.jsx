@@ -1154,6 +1154,12 @@ export default function PipelineEditor(props) {
           {t("editor.readOnly")}
         </Alert>
       )}
+      {i18n.resolvedLanguage !== "en" && (
+        // Pipeline content is always loaded and saved in English, even when the interface is translated.
+        <Alert severity="info" sx={{ width: 'fit-content', marginBottom: '10px', padding: '2px 15px', borderRadius: '10px' }}>
+          {t("editor.englishOnly")}
+        </Alert>
+      )}
       <div className="narrowWarning">
         <p>{t("editor.narrowDisplay")}</p>
         <p><strong>{t("editor.computerRecommended")}</strong></p>

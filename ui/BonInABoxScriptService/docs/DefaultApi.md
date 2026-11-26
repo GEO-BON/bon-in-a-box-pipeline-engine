@@ -4,26 +4,73 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**clearLanguage**](DefaultApi.md#clearLanguage) | **DELETE** /api/language | Removes the saved language, so the browser language is used.
 [**getCountriesList**](DefaultApi.md#getCountriesList) | **GET** /region/countries_list | Returns the list of countries from FieldMaps.io with their ISO3 and English names
-[**getCountryRegionBbox**](DefaultApi.md#getCountryRegionBbox) | **GET** /region/country_region_bbox | Bounding box of a country or region, or the selector object a bboxCRS input takes
+[**getCountryRegionBbox**](DefaultApi.md#getCountryRegionBbox) | **GET** /region/country_region_bbox | Bounding box of a country or region, or the selector object a \&quot;location\&quot; input takes
 [**getHPCStatus**](DefaultApi.md#getHPCStatus) | **GET** /hpc/status | Get status of HPC connection.
 [**getHistory**](DefaultApi.md#getHistory) | **GET** /api/history | Get the history of runs for all pipelines on this server, or using pagination with start and limit.
 [**getInfo**](DefaultApi.md#getInfo) | **GET** /{type}/{descriptionPath}/info | Get metadata about this script or pipeline.
 [**getK8sStatus**](DefaultApi.md#getK8sStatus) | **GET** /api/k8s/status | Get status of Kubernetes cluster workers.
+[**getLanguage**](DefaultApi.md#getLanguage) | **GET** /api/language | Returns the language saved in the shared geobon_lang cookie.
 [**getListOf**](DefaultApi.md#getListOf) | **GET** /{type}/list | Get a list of available steps of given type and their names.
 [**getOutputFolders**](DefaultApi.md#getOutputFolders) | **GET** /{type}/{id}/outputs | Get the output folders of the scripts composing this pipeline
 [**getPipeline**](DefaultApi.md#getPipeline) | **GET** /pipeline/{descriptionPath}/get | Get JSON file that describes the pipeline.
 [**getRegionGeometry**](DefaultApi.md#getRegionGeometry) | **GET** /region/geometry | Returns the geometry of the specified country or region from Fieldmaps.io in GeoJSON format
 [**getRegionsList**](DefaultApi.md#getRegionsList) | **GET** /region/regions_list | Returns the list of regions with their ID (adm1_src), Country, English names and bounding box
 [**getServerStatus**](DefaultApi.md#getServerStatus) | **GET** /api/features | Returns which optional features are enabled on this instance.
+[**getStacAssetsList**](DefaultApi.md#getStacAssetsList) | **GET** /stac/assets_list | Returns the Cloud Optimized GeoTIFF assets of an item, or of the items of a collection
+[**getStacCatalogsList**](DefaultApi.md#getStacCatalogsList) | **GET** /stac/catalogs_list | Returns the STAC catalogs offered by default in the STAC chooser
+[**getStacCollectionsList**](DefaultApi.md#getStacCollectionsList) | **GET** /stac/collections_list | Returns all the collections of a STAC catalog
+[**getStacDatesList**](DefaultApi.md#getStacDatesList) | **GET** /stac/dates_list | Returns the distinct dates of the items of a collection, with the number of items on each
+[**getStacItemsList**](DefaultApi.md#getStacItemsList) | **GET** /stac/items_list | Returns one page of items from a collection
 [**getSystemStatus**](DefaultApi.md#getSystemStatus) | **GET** /api/systemStatus | Returns the system status.
 [**getVersions**](DefaultApi.md#getVersions) | **GET** /api/versions | Returns the version of system components.
 [**hpcPrepareGet**](DefaultApi.md#hpcPrepareGet) | **GET** /hpc/prepare | Prepare the HPC to run tasks from BON in a Box. The apptainer images will be created for every runner.
 [**prepareK8s**](DefaultApi.md#prepareK8s) | **GET** /api/k8s/prepare | Refresh and validate Kubernetes worker readiness for BON in a Box tasks.
 [**run**](DefaultApi.md#run) | **POST** /{type}/{descriptionPath}/run | Runs the script or pipeline matching &#x60;descriptionPath&#x60;.
 [**savePipeline**](DefaultApi.md#savePipeline) | **POST** /pipeline/save/{filename} | Save a json file to the pipeline folder.
+[**setLanguage**](DefaultApi.md#setLanguage) | **PUT** /api/language/{lang} | Saves the language in the shared geobon_lang cookie.
 [**stop**](DefaultApi.md#stop) | **GET** /{type}/{id}/stop | Stop the specified pipeline run.
 
+
+
+## clearLanguage
+
+> clearLanguage()
+
+Removes the saved language, so the browser language is used.
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+apiInstance.clearLanguage((error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+});
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
 
 
 ## getCountriesList
@@ -69,7 +116,7 @@ No authorization required
 
 > Object getCountryRegionBbox(id, opts)
 
-Bounding box of a country or region, or the selector object a bboxCRS input takes
+Bounding box of a country or region, or the selector object a \&quot;location\&quot; input takes
 
 With &#x60;output_format&#x3D;chooser_input&#x60;, returns the object that a &#x60;bboxCRS&#x60;, &#x60;country&#x60;, &#x60;countryRegion&#x60;, &#x60;countryRegionCRS&#x60; or &#x60;CRS&#x60; input takes. Use what it returns unchanged as that input&#39;s value. 
 
@@ -210,7 +257,7 @@ No authorization required
 
 ## getInfo
 
-> Info getInfo(type, descriptionPath)
+> Info getInfo(type, descriptionPath, opts)
 
 Get metadata about this script or pipeline.
 
@@ -222,7 +269,10 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script, pipeline or openEO
 let descriptionPath = "descriptionPath_example"; // String | Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder.
-apiInstance.getInfo(type, descriptionPath, (error, data, response) => {
+let opts = {
+  'lang': "fr" // String | Language for pipeline names, descriptions and input/output text. Text without a translation stays in English. Ignored for scripts. English when omitted.
+};
+apiInstance.getInfo(type, descriptionPath, opts, (error, data, response) => {
   if (error) {
     console.error(error);
   } else {
@@ -236,9 +286,9 @@ apiInstance.getInfo(type, descriptionPath, (error, data, response) => {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **type** | **String**| Script, pipeline or openEO |
- **lifecycleStatus** | [**[String]**](String.md)| Only list steps with one of these lifecycle statuses. Steps without a status are considered in_development. Lists everything when omitted. Currently applies to pipelines only. | [optional]
- **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. |
+ **type** | **String**| Script, pipeline or openEO | 
+ **descriptionPath** | **String**| Where to find the step. For scripts, paths are relative to the /script folder. For pipelines, paths are relative to the /pipeline folder. | 
+ **lang** | **String**| Language for pipeline names, descriptions and input/output text. Text without a translation stays in English. Ignored for scripts. English when omitted. | [optional] 
 
 ### Return type
 
@@ -293,6 +343,47 @@ No authorization required
 - **Accept**: application/json
 
 
+## getLanguage
+
+> GetLanguage200Response getLanguage()
+
+Returns the language saved in the shared geobon_lang cookie.
+
+The geobon_lang cookie is shared with the other GEO BON sites and is HttpOnly, so web pages read it through this call. 
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+apiInstance.getLanguage((error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**GetLanguage200Response**](GetLanguage200Response.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
 ## getListOf
 
 > {String: String} getListOf(type, opts)
@@ -307,7 +398,8 @@ import BonInABoxScriptService from 'bon_in_a_box_script_service';
 let apiInstance = new BonInABoxScriptService.DefaultApi();
 let type = "type_example"; // String | Script, pipeline or openEO
 let opts = {
-  'lifecycleStatus': ["null"] // [String] | Only list steps with one of these lifecycle statuses. Steps without a status are considered in_development. Lists everything when omitted. Currently applies to pipelines only.
+  'lifecycleStatus': ["null"], // [String] | Only list steps with one of these lifecycle statuses. Steps without a status are considered in_development. Lists everything when omitted. Currently applies to pipelines only.
+  'lang': "fr" // String | Language for pipeline names, descriptions and input/output text. Text without a translation stays in English. Ignored for scripts. English when omitted.
 };
 apiInstance.getListOf(type, opts, (error, data, response) => {
   if (error) {
@@ -324,6 +416,8 @@ apiInstance.getListOf(type, opts, (error, data, response) => {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **type** | **String**| Script, pipeline or openEO | 
+ **lifecycleStatus** | [**[String]**](String.md)| Only list steps with one of these lifecycle statuses. Steps without a status are considered in_development. Lists everything when omitted. Currently applies to pipelines only. | [optional] 
+ **lang** | **String**| Language for pipeline names, descriptions and input/output text. Text without a translation stays in English. Ignored for scripts. English when omitted. | [optional] 
 
 ### Return type
 
@@ -547,6 +641,245 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**GetServerStatus200Response**](GetServerStatus200Response.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## getStacAssetsList
+
+> [GetStacAssetsList200ResponseInner] getStacAssetsList(catalog, collection, opts)
+
+Returns the Cloud Optimized GeoTIFF assets of an item, or of the items of a collection
+
+Other formats are left out. Without &#x60;item&#x60;, describes the assets the collection&#39;s items carry, from its item_assets declaration or from a sample item (taken from &#x60;date&#x60; when given). 
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+let catalog = "geobon"; // String | Key of a configured catalog (see /stac/catalogs_list), or the URL of any public STAC catalog.
+let collection = "collection_example"; // String | Id of the collection.
+let opts = {
+  'item': "item_example", // String | Id of the item. Leave empty to describe the assets of the whole collection.
+  'date': new Date("2013-10-20") // Date | Keep only the items of this UTC day (YYYY-MM-DD).
+};
+apiInstance.getStacAssetsList(catalog, collection, opts, (error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **catalog** | **String**| Key of a configured catalog (see /stac/catalogs_list), or the URL of any public STAC catalog. | 
+ **collection** | **String**| Id of the collection. | 
+ **item** | **String**| Id of the item. Leave empty to describe the assets of the whole collection. | [optional] 
+ **date** | **Date**| Keep only the items of this UTC day (YYYY-MM-DD). | [optional] 
+
+### Return type
+
+[**[GetStacAssetsList200ResponseInner]**](GetStacAssetsList200ResponseInner.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## getStacCatalogsList
+
+> [GetStacCatalogsList200ResponseInner] getStacCatalogsList()
+
+Returns the STAC catalogs offered by default in the STAC chooser
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+apiInstance.getStacCatalogsList((error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+This endpoint does not need any parameter.
+
+### Return type
+
+[**[GetStacCatalogsList200ResponseInner]**](GetStacCatalogsList200ResponseInner.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## getStacCollectionsList
+
+> [GetStacCollectionsList200ResponseInner] getStacCollectionsList(catalog)
+
+Returns all the collections of a STAC catalog
+
+Results are cached for 5 minutes.
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+let catalog = "geobon"; // String | Key of a configured catalog (see /stac/catalogs_list), or the URL of any public STAC catalog.
+apiInstance.getStacCollectionsList(catalog, (error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **catalog** | **String**| Key of a configured catalog (see /stac/catalogs_list), or the URL of any public STAC catalog. | 
+
+### Return type
+
+[**[GetStacCollectionsList200ResponseInner]**](GetStacCollectionsList200ResponseInner.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## getStacDatesList
+
+> GetStacDatesList200Response getStacDatesList(catalog, collection)
+
+Returns the distinct dates of the items of a collection, with the number of items on each
+
+Walks the items of the collection, stopping after 5000 of them. Results are cached for 5 minutes. 
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+let catalog = "geobon"; // String | Key of a configured catalog (see /stac/catalogs_list), or the URL of any public STAC catalog.
+let collection = "collection_example"; // String | Id of the collection.
+apiInstance.getStacDatesList(catalog, collection, (error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **catalog** | **String**| Key of a configured catalog (see /stac/catalogs_list), or the URL of any public STAC catalog. | 
+ **collection** | **String**| Id of the collection. | 
+
+### Return type
+
+[**GetStacDatesList200Response**](GetStacDatesList200Response.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+
+## getStacItemsList
+
+> GetStacItemsList200Response getStacItemsList(catalog, collection, opts)
+
+Returns one page of items from a collection
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+let catalog = "geobon"; // String | Key of a configured catalog (see /stac/catalogs_list), or the URL of any public STAC catalog.
+let collection = "collection_example"; // String | Id of the collection.
+let opts = {
+  'limit': 50, // Number | Number of items per page.
+  'page': 1, // Number | Page number, starting at 1.
+  'filter': "filter_example", // String | Keep only the items whose id contains this text (case-insensitive).
+  'date': new Date("2013-10-20") // Date | Keep only the items of this UTC day (YYYY-MM-DD).
+};
+apiInstance.getStacItemsList(catalog, collection, opts, (error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully. Returned data: ' + data);
+  }
+});
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **catalog** | **String**| Key of a configured catalog (see /stac/catalogs_list), or the URL of any public STAC catalog. | 
+ **collection** | **String**| Id of the collection. | 
+ **limit** | **Number**| Number of items per page. | [optional] [default to 50]
+ **page** | **Number**| Page number, starting at 1. | [optional] [default to 1]
+ **filter** | **String**| Keep only the items whose id contains this text (case-insensitive). | [optional] 
+ **date** | **Date**| Keep only the items of this UTC day (YYYY-MM-DD). | [optional] 
+
+### Return type
+
+[**GetStacItemsList200Response**](GetStacItemsList200Response.md)
 
 ### Authorization
 
@@ -808,6 +1141,51 @@ No authorization required
 
 - **Content-Type**: application/json
 - **Accept**: text/plain
+
+
+## setLanguage
+
+> setLanguage(lang)
+
+Saves the language in the shared geobon_lang cookie.
+
+The cookie is set for .geobon.org on GEO BON hosts, so all GEO BON sites share it. On other hosts it is set for the current host only. 
+
+### Example
+
+```javascript
+import BonInABoxScriptService from 'bon_in_a_box_script_service';
+
+let apiInstance = new BonInABoxScriptService.DefaultApi();
+let lang = "lang_example"; // String | 
+apiInstance.setLanguage(lang, (error, data, response) => {
+  if (error) {
+    console.error(error);
+  } else {
+    console.log('API called successfully.');
+  }
+});
+```
+
+### Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **lang** | **String**|  | 
+
+### Return type
+
+null (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
 
 
 ## stop

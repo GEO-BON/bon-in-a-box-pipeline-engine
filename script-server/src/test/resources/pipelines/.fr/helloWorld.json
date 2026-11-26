@@ -1,0 +1,14 @@
+{
+  "metadata": {
+    "name": "Pipeline Bonjour le monde"
+  },
+  "inputs": {
+    "helloWorld>helloPython.yml@0|some_int": {
+      "label": "Un entier",
+      "description": "Un nombre que nous allons incrémenter"
+    },
+    "removed>input.yml@9|gone": {
+      "label": "Entrée supprimée"
+    }
+  }
+}

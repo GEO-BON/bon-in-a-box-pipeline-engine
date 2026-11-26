@@ -34,6 +34,8 @@ if __name__ == "__main__":
                 yield file_path
         else:
             for root, dirs, files in os.walk(path):
+                # Hidden folders hold translations (e.g. pipelines/.fr), not pipelines.
+                dirs[:] = [d for d in dirs if not d.startswith('.')]
                 for file_path in glob.iglob(root + "/*." + extension):
                     yield file_path
 

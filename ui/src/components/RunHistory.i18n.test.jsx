@@ -38,7 +38,7 @@ it("updates run controls and date while preserving API-provided content", async 
     startTime: "2025-01-02T03:04:05Z",
   };
   api.getHistory.mockImplementation((options, callback) => callback(null, null, { body: [run] }));
-  api.getInfo.mockImplementation((type, path, callback) => callback(null, null, {
+  api.getInfo.mockImplementation((type, path, opts, callback) => callback(null, null, {
     status: 200,
     text: JSON.stringify({ name: "API pipeline name", description: "API description", inputs: {} }),
   }));
@@ -52,4 +52,6 @@ it("updates run controls and date while preserving API-provided content", async 
   expect(screen.getByText(new Date(run.startTime).toLocaleString("fr"))).toBeTruthy();
   expect(screen.getByRole("button", { name: "Visionneuse" })).toBeTruthy();
   expect(api.getHistory).toHaveBeenCalledTimes(1);
+  // Pipeline text is requested again in the new language.
+  expect(api.getInfo).toHaveBeenLastCalledWith("pipeline", "example.json", { lang: "fr" }, expect.any(Function));
 });

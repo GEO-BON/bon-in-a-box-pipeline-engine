@@ -49,6 +49,8 @@ fun Application.configureRouting() {
     val serverContext = ServerContext(hpc, k8s)
 
     routing {
+        languageRoutes()
+
         get("/api/systemStatus") {
             val systemStatus = SystemStatus()
             // Perform server sanity check
@@ -129,11 +131,15 @@ fun Application.configureRouting() {
                 ?.toSet()
                 ?.takeIf { it.isNotEmpty() }
 
+            // Optional language for pipeline names. English when absent or not translated.
+            val lang = call.request.queryParameters["lang"]
+
             // TODO: This is accessing many files and should not be done at every call.
             // But if we cache, when do we refresh?
             val possible = mutableMapOf<String, String>()
             roots.forEach { root ->
-                root.walkTopDown().forEach { file ->
+                // Hidden folders (e.g. pipelines/.fr translations) are not steps.
+                root.walkTopDown().onEnter { it == root || !it.name.startsWith(".") }.forEach { file ->
                     if (file.extension == extension) {
                         val relativePath = file.relativeTo(root).path.replace('/', FILE_SEPARATOR)
 
@@ -161,7 +167,8 @@ fun Application.configureRouting() {
                                 if (status.name.uppercase() !in lifecycleFilter) return@forEach
                             }
 
-                            metadata?.optString(METADATA__NAME)?.takeIf { it.isNotEmpty() }
+                            Translations.translatedName(root, file.relativeTo(root).path, lang)
+                                ?: metadata?.optString(METADATA__NAME)?.takeIf { it.isNotEmpty() }
                         }
                         possible[relativePath] = name ?: file.name // Fallback on file name
                     }
@@ -182,6 +189,10 @@ fun Application.configureRouting() {
             try {
                 val type = call.parameters["type"]
                 val descriptionPath = call.parameters["descriptionPath"] ?: return@get
+                if (Translations.isHiddenPath(descriptionPath)) {
+                    call.respondText(text = "Requested files not found.", status = HttpStatusCode.NotFound)
+                    return@get
+                }
                 when (type) {
                     "script" -> {
                         val ymlPath = descriptionPath
@@ -191,9 +202,11 @@ fun Application.configureRouting() {
                     }
 
                     "pipeline" -> {
+                        // Translated text when ?lang= is given and available, English otherwise.
                         val jsonPath = descriptionPath.replace('>', '/')
-                        val descriptionFile = File(serverContext.pipelinesRoot, jsonPath)
-                        call.respondText(JSONPipeline.getPipelineDescription(descriptionFile).toString(), ContentType.Application.Json)
+                        val lang = call.request.queryParameters["lang"]
+                        val pipelineJSON = Translations.translatedPipelineJson(serverContext.pipelinesRoot, jsonPath, lang)
+                        call.respondText(JSONPipeline.getPipelineDescription(pipelineJSON).toString(), ContentType.Application.Json)
                     }
                     "openEO" -> {
                         val file = updateYaml(serverContext, descriptionPath)
@@ -210,6 +223,10 @@ fun Application.configureRouting() {
         }
 
         get("/pipeline/{descriptionPath}/get") {
+            if (Translations.isHiddenPath(call.parameters["descriptionPath"]!!)) {
+                call.respondText(text = "Hidden files cannot be edited.", status = HttpStatusCode.NotFound)
+                return@get
+            }
             val descriptionFile = File(serverContext.pipelinesRoot, call.parameters["descriptionPath"]!!.replace(FILE_SEPARATOR, '/'))
             if (descriptionFile.exists()) {
                 call.respondText(descriptionFile.readText(), ContentType.Application.Json)
@@ -234,6 +251,10 @@ fun Application.configureRouting() {
 
             val inputFileContent = call.receive<String>()
             val descriptionPath = call.parameters["descriptionPath"]!!
+            if (Translations.isHiddenPath(descriptionPath)) {
+                call.respondText(text = "Script $descriptionPath not found on this server.", status = HttpStatusCode.NotFound)
+                return@post
+            }
 
             val withoutExtension = descriptionPath.removeSuffix(".json").removeSuffix(".yml")
 
@@ -468,6 +489,11 @@ fun Application.configureRouting() {
                 .replace("""\s*$FILE_SEPARATOR\s*""".toRegex(), "/") // Support sub-directories
                 .replace("../", "") // Avoid any attempt to access outside of pipelines directory
                 .trim() // Remove trailing whitespaces
+
+            if (Translations.isHiddenPath(filename)) {
+                call.respond(HttpStatusCode.BadRequest, "Pipelines cannot be saved in hidden folders.")
+                return@post
+            }
 
             val file = File(serverContext.pipelinesRoot, "$filename.json")
             if (file.nameWithoutExtension.isEmpty()) {

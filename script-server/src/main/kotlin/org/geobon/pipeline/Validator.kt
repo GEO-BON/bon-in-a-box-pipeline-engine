@@ -45,7 +45,8 @@ object Validator {
         var errorMessages = ""
         directory.listFiles()?.forEach { file ->
             if (file.isDirectory) {
-                validateAllPipelines(file)
+                // Hidden folders hold translations (e.g. .fr), not pipelines.
+                if (!file.name.startsWith(".")) validateAllPipelines(file)
             } else if (file.extension == "json") {
                 try {
                     // Generate fake inputs
