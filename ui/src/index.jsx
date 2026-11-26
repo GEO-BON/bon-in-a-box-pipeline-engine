@@ -2,6 +2,8 @@ import { useState, useEffect, useContext, lazy, Suspense } from "react";
 
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import "./i18n";
+import { useTranslation } from "react-i18next";
 import reportWebVitals from "./reportWebVitals";
 import {
   BrowserRouter,
@@ -20,7 +22,7 @@ import InfoPage from "./components/info/InfoPage";
 import RunHistory from "./components/RunHistory";
 import Chat from "./components/chat";
 import { Spinner } from "./components/Spinner";
-import { HttpError } from "./components/HttpErrors";
+import { getErrorString } from "./components/HttpErrors";
 import { uiContext } from "./uiContext.jsx";
 
 const PipelineEditor = lazy(() =>
@@ -117,10 +119,11 @@ function isStarting({ error }) {
 }
 
 function ManageFilesPage() {
+  const { t } = useTranslation();
   const { disableMyFiles } = useContext(uiContext);
   return (
     <>
-      <PageTitle title="Manage files" />
+      <PageTitle title={t("navigation.files")} />
       {!disableMyFiles && (
         <Suspense fallback={<Spinner />}>
           <FileManager />
@@ -131,10 +134,11 @@ function ManageFilesPage() {
 }
 
 function PipelineEditorPage() {
+  const { t } = useTranslation();
   const { savePipelineToServer } = useContext(uiContext);
   return (
       <>
-        <PageTitle title={savePipelineToServer ? "Pipeline Editor" : "Pipeline Inspector"} />
+        <PageTitle title={t(savePipelineToServer ? "navigation.editor" : "navigation.inspector")} />
         <Suspense fallback={<Spinner />}>
         <PipelineEditor />
         </Suspense>
@@ -142,13 +146,19 @@ function PipelineEditorPage() {
   )
 }
 
+function TranslatedPageTitle({ name }) {
+  const { t } = useTranslation();
+  return <PageTitle title={t(name)} />;
+}
+
 function NotFound() {
   const location = useLocation();
+  const { t } = useTranslation();
   return (
     <main style={{ padding: "1rem" }}>
-      <h2>404 - Page not found</h2>
+      <h2>{t("notFound.title")}</h2>
       <p>{location.pathname}</p>
-      <p>Lost in the wilderness?</p>
+      <p>{t("notFound.description")}</p>
     </main>
   );
 }
@@ -210,7 +220,7 @@ const router = createBrowserRouter([
     element: (
       <Layout right={
         <>
-          <PageTitle title="History" />
+          <TranslatedPageTitle name="navigation.history" />
           <RunHistory />
         </>
         }
@@ -222,7 +232,7 @@ const router = createBrowserRouter([
     element: (
       <Layout right={
         <>
-          <PageTitle title="Info" />
+          <TranslatedPageTitle name="navigation.info" />
           <InfoPage />
         </>
         }
@@ -250,6 +260,7 @@ const staticRouter = (content) => {
 };
 
 function App() {
+  const { t } = useTranslation();
   const status = useHealthCheck(checkSystemStatus);
   const fileManager = useHealthCheck(checkFileManager);
   const features = useHealthCheck(checkServerStatus);
@@ -257,10 +268,11 @@ function App() {
   if (status.pending) return staticRouter(<Spinner />);
 
   // Which check is failing decides the wording: "Script server is offline" is simply
-  // untrue when it is the file service that has not come up.
+  // untrue when it is the file service that has not come up. Each has its own whole
+  // sentence, since a translated fragment cannot be slotted into another language's grammar.
   const checks = [
-    { label: "Script server", state: status },
-    { label: "File service", state: fileManager },
+    { offlineKey: "startup.scriptServerOffline", state: status },
+    { offlineKey: "startup.fileServiceOffline", state: fileManager },
   ];
   // A real failure outranks a not-up-yet one, so a configuration error is never
   // hidden behind a notice that says to keep waiting.
@@ -269,19 +281,16 @@ function App() {
 
   if (failed) {
     return staticRouter(
-      <HttpError
-        className="systemError"
-        error={failed.state.error.error}
-        response={failed.state.error.response}
-      />
+      <Alert severity="error" className="systemError">
+        {t("startup.error", { details: getErrorString(failed.state.error.error, failed.state.error.response) })}
+      </Alert>
     );
   }
 
   if (starting) {
     return staticRouter(
       <Alert severity="error" className="systemError">
-        {starting.label} appears to be offline. If it is starting, it is not yet
-        ready to respond — retrying every {HEALTH_RETRY_MS / 1000} seconds.
+        {t(starting.offlineKey, { seconds: HEALTH_RETRY_MS / 1000 })}
       </Alert>
     );
   }

@@ -1,6 +1,8 @@
 import { Box, Typography } from "@mui/material"
+import { useTranslation } from "react-i18next"
 
 export const ScriptInputExample = ({ example, type }) => {
+    const { t } = useTranslation()
     if (example === null || example === undefined)
         return null
 
@@ -21,7 +23,7 @@ export const ScriptInputExample = ({ example, type }) => {
                 color: "#555",
             }}
         >
-            <>Example: {exampleString}</>
+            <>{t("form.example", { example: exampleString })}</>
         </Typography>
     </Box>
 

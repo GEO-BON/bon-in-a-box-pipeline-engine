@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { DefaultApi } from "bon_in_a_box_script_service";
+import { useTranslation } from "react-i18next";
 export const api = new DefaultApi();
 
 import {
@@ -17,6 +18,7 @@ export default function CountryRegionMenu({
   dialog = false,
   value = null,
 }) {
+  const { t } = useTranslation();
   const [countryOptions, setCountryOptions] = useState([]);
   const [regionOptions, setRegionOptions] = useState([]);
   const savedCountryValue =
@@ -172,7 +174,7 @@ export default function CountryRegionMenu({
     <div style={paperStyle(dialog)}>
       {dialog && (
         <h4 style={{ marginTop: "3px", marginBottom: "6px" }}>
-          Country/Region
+          {t("choosers.countryRegion")}
         </h4>
       )}
       <Autocomplete
@@ -191,7 +193,7 @@ export default function CountryRegionMenu({
         }}
         value={selectedCountry}
         renderInput={(params) => (
-          <TextField {...params} size="small" label="Select country" />
+          <TextField {...params} size="small" label={t("choosers.selectCountry")} />
         )}
         onChange={(event, value) => {
           setSelectedCountry(value);
@@ -219,7 +221,7 @@ export default function CountryRegionMenu({
               return option.label || "";
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Select region" />
+              <TextField {...params} label={t("choosers.selectRegion")} />
             )}
             onChange={(_, value) => {
               setSelectedRegion(value);
@@ -233,7 +235,7 @@ export default function CountryRegionMenu({
               margin: "0px 0px 2px 5px",
             }}
           >
-            Reference for toponyms:{" "}
+            {t("choosers.toponyms")}{" "}
             <a target="_blank" href="https://gadm.org/">
               GADM
             </a>

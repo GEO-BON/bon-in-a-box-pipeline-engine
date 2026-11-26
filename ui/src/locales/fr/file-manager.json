@@ -1,0 +1,111 @@
+{
+  "filemanager": {
+    "myFiles": "Mes fichiers",
+    "addNew": "Ajouter",
+    "ok": "OK",
+    "cancel": "Annuler",
+    "deleteFiles": "Supprimer les fichiers",
+    "files": "Fichiers",
+    "folder": "Dossier",
+    "backToParent": "Retour au dossier parent",
+    "information": "Information",
+    "found": "Trouvé",
+    "confirmDelete": "Voulez-vous vraiment supprimer ces éléments :",
+    "enterFileName": "Saisir le nom du fichier",
+    "enterFolderName": "Saisir le nom du dossier",
+    "newFile": "Nouveau fichier",
+    "newFolder": "Nouveau dossier",
+    "result": "Résultat",
+    "search": "Rechercher",
+    "searchResultsIn": "Résultats de recherche dans",
+    "addNewFile": "Ajouter un fichier",
+    "addNewFolder": "Ajouter un dossier",
+    "uploadFile": "Téléverser un fichier",
+    "size": "Taille",
+    "name": "Nom",
+    "type": "Type",
+    "date": "Date",
+    "rename": "Renommer",
+    "cut": "Couper",
+    "delete": "Supprimer",
+    "copy": "Copier",
+    "paste": "Coller",
+    "download": "Télécharger",
+    "count": "Nombre",
+    "folderSingular": "dossier",
+    "folderPlural": "dossiers",
+    "fileSingular": "fichier",
+    "filePlural": "fichiers",
+    "multipleFiles": "Plusieurs fichiers",
+    "multiple": "multiple",
+    "preview": "Aperçu",
+    "of": "sur",
+    "used": "utilisés",
+    "selectForDetails": "Sélectionner un fichier ou un dossier pour voir les détails",
+    "emptyFolder": "Ce dossier semble vide",
+    "unknownFile": "Fichier inconnu",
+    "fileThumbnail": "Miniature du fichier"
+  },
+  "core": {
+    "ok": "OK",
+    "cancel": "Annuler",
+    "select": "Sélectionner",
+    "noData": "Aucune donnée",
+    "rowsPerPage": "Lignes par page",
+    "totalPages": "Nombre total de pages"
+  },
+  "uploader": {
+    "bytes": "o",
+    "kilobytes": "ko",
+    "megabytes": "Mo",
+    "gigabytes": "Go",
+    "terabytes": "To",
+    "petabytes": "Po",
+    "exabytes": "Eo",
+    "dropFiles": "Déposer des fichiers ici ou",
+    "selectFiles": "sélectionner des fichiers"
+  },
+  "grid": {
+    "addBefore": "Ajouter avant",
+    "addAfter": "Ajouter après",
+    "copy": "Copier",
+    "cut": "Couper",
+    "paste": "Coller",
+    "delete": "Supprimer",
+    "newRow": "Nouvelle ligne",
+    "moveUp": "Déplacer vers le haut",
+    "moveDown": "Déplacer vers le bas",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "selected": "sélectionné"
+  },
+  "calendar": {
+    "monthFull": {
+      "january": "janvier", "february": "février", "march": "mars", "april": "avril",
+      "may": "mai", "june": "juin", "july": "juillet", "august": "août",
+      "september": "septembre", "october": "octobre", "november": "novembre", "december": "décembre"
+    },
+    "monthShort": {
+      "january": "janv.", "february": "févr.", "march": "mars", "april": "avr.",
+      "may": "mai", "june": "juin", "july": "juil.", "august": "août",
+      "september": "sept.", "october": "oct.", "november": "nov.", "december": "déc."
+    },
+    "dayFull": {
+      "sunday": "dimanche", "monday": "lundi", "tuesday": "mardi", "wednesday": "mercredi",
+      "thursday": "jeudi", "friday": "vendredi", "saturday": "samedi"
+    },
+    "dayShort": {
+      "sunday": "dim.", "monday": "lun.", "tuesday": "mar.", "wednesday": "mer.",
+      "thursday": "jeu.", "friday": "ven.", "saturday": "sam."
+    },
+    "hours": "Heures",
+    "minutes": "Minutes",
+    "done": "Terminé",
+    "clear": "Effacer",
+    "today": "Aujourd’hui",
+    "am": "am",
+    "amUpper": "AM",
+    "pm": "pm",
+    "pmUpper": "PM"
+  }
+}

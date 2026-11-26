@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CsvToHtmlTable, { parseCsvToRowsAndColumn } from "./CsvToHtmlTable";
 import MapResult from "../map/Map";
 import { Spinner } from "../Spinner";
 import Alert from "@mui/material/Alert";
-import { set } from "lodash";
+import { Trans, useTranslation } from "react-i18next";
 
 /**
  * Properties
@@ -11,12 +11,13 @@ import { set } from "lodash";
  * - delimiter: used to parse the CSV file
  */
 function RenderedCSV({ url, delimiter }) {
+  const { t } = useTranslation();
   const [asMap, setAsMap] = useState(false);
 
   return (
     <>
       <button onClick={() => setAsMap((b) => !b)}>
-        {asMap ? "View in table" : "View on map"}
+        {asMap ? t("csv.viewTable") : t("csv.viewMap")}
       </button>
       {asMap ? (
         <CsvToMap url={url} delimiter={delimiter} />
@@ -68,8 +69,10 @@ function CsvToTable({ url, delimiter }) {
         {data && <CsvToHtmlTable data={data} csvDelimiter={delimiter} />}
         {partial && (
           <p>
-            Displaying partial data. <a href={url}>Download full csv file</a>{" "}
-            for complete data.
+            <Trans
+              i18nKey="csv.partialDownload"
+              components={{ download: <a href={url} /> }}
+            />
           </p>
         )}
       </>
@@ -78,6 +81,7 @@ function CsvToTable({ url, delimiter }) {
 }
 
 function CsvToMap({ url, delimiter }) {
+  const { t } = useTranslation();
   const [error, setError] = useState();
   const [data, setData] = useState(null);
 
@@ -89,7 +93,7 @@ function CsvToMap({ url, delimiter }) {
           return;
         }
         if(result.features?.length==0){
-          setError("No coordinates found in this CSV file.");
+          setError(t("csv.noCoordinates"));
           return
         }
         setData(result);
@@ -103,7 +107,7 @@ function CsvToMap({ url, delimiter }) {
   if (data || error)
     return (
       <>
-        {error && <Alert severity="error">Couldn't display table on map. Are you sure this table has spatial coordinates?</Alert>}
+        {error && <Alert severity="error">{t("csv.mapError")}</Alert>}
         {!error && data && (
           <MapResult json={data} />
         )}

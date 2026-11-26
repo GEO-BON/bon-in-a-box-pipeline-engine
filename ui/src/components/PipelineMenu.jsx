@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import Select from "react-select";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
@@ -43,6 +44,7 @@ export default function PipelineMenu({
   label,
   ...selectProps
 }) {
+  const { t } = useTranslation();
   const options = useMemo(
     () => groupOptionsByFolder(pipelineMap || {}),
     [pipelineMap],
@@ -56,7 +58,7 @@ export default function PipelineMenu({
 
   const toggle = onShowAllPipelinesChange && (
     <FormControlLabel
-      title="Also list pipelines that have not been reviewed: stale, subpipeline, etc."
+      title={t("pipelineMenu.showAllTooltip")}
       sx={{
         m: 0,
         color: textColor,
@@ -80,7 +82,7 @@ export default function PipelineMenu({
           }}
         />
       }
-      label="Show stale pipelines, subpipelines, etc."
+      label={t("pipelineMenu.showAll")}
     />
   );
 
@@ -89,13 +91,14 @@ export default function PipelineMenu({
       className="blackText"
       options={options}
       value={selectedOption}
-      placeholder="Search or select a pipeline..."
+      placeholder={t("pipelineMenu.placeholder")}
+      noOptionsMessage={() => t("pipelineMenu.noOptions")}
       menuPortalTarget={inline ? null : document.body}
       menuIsOpen={inline || undefined}
       maxMenuHeight={inline ? 450 : 420}
       styles={inline ? inlineSelectStyles : selectStyles}
       filterOption={filterOption}
-      formatGroupLabel={formatGroupLabel}
+      formatGroupLabel={(group) => formatGroupLabel(group, t)}
       formatOptionLabel={formatOptionLabel}
       onChange={(v) => v && onChange(v.value, v.label)}
       {...selectProps}
@@ -192,7 +195,7 @@ function filterOption(option, input) {
     .every((word) => haystack.includes(word));
 }
 
-function formatGroupLabel(group) {
+function formatGroupLabel(group, t) {
   return (
     <span
       style={{
@@ -207,7 +210,7 @@ function formatGroupLabel(group) {
         className="pipeline-icon"
         style={{ width: "18px", height: "18px" }}
       ></img>
-      {group.label || "General"}
+      {group.label || t("pipelineMenu.general")}
     </span>
   );
 }

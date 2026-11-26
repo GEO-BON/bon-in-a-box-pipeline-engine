@@ -2,11 +2,12 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
 import { ControlledTextArea } from "../form/AutoResizeTextArea";
 import ScriptInput from "../form/ScriptInput";
-import TextField from "@mui/material/TextField";
+import { useTranslation } from "react-i18next";
 
 
 
 export function IOListItem({ io, id, valueEdited, setter, className, expand }) {
+    const { t } = useTranslation();
     const {
         attributes,
         listeners,
@@ -50,7 +51,7 @@ export function IOListItem({ io, id, valueEdited, setter, className, expand }) {
                             {io.type &&
                                 <>
                                     <div>
-                                        <label className="inline-label"><span>Type:&nbsp;</span>
+                                        <label className="inline-label"><span>{t("editor.type")}&nbsp;</span>
                                         <input className="type"
                                             name="type"
                                             defaultValue={io.type}
@@ -60,7 +61,7 @@ export function IOListItem({ io, id, valueEdited, setter, className, expand }) {
                                         </label>
                                     </div>
                                     <div>
-                                        <label className="inline-label"><span>Example:&nbsp;</span>
+                                        <label className="inline-label"><span>{t("editor.example")}&nbsp;</span>
                                             <ScriptInput type={io.type}
                                                 className="example"
                                                 value={io.example}
