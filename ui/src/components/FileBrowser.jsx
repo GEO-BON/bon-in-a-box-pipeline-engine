@@ -87,8 +87,81 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
   const [fileNames, setfileNames] = useState([]);
   const { disableMyFiles } = useContext(uiContext);
 
-  // const multipleFiles = true or false, will be passed on as a variable
+  // Strip the prefix so the incoming value matches the file ids in the list,
+  // otherwise nothing shows as selected and the prefix gets added twice.
+  useEffect(() => {
+    setfileNames(toFileIds(value));
+  }, [value]);
 
+  useEffect(() => {
+    if (open) {
+      // loads all the files (from fastapi endpoint)
+      fetch("/file-manager/files/all")
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(t("fileBrowser.networkError"));
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setData(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    }
+  }, [open]);
+
+  if (error) {
+    return <p>{t("fileBrowser.error", { message: error })}</p>;
+  }
+
+  return (
+    <div className="filebrowser">
+      <Button
+        className="button-modal"
+        aria-label={t("fileBrowser.open")}
+        title={t("fileBrowser.open")}
+        onClick={handleOpen}
+        disabled={disableMyFiles}
+      >
+        <NoteAddIcon />
+      </Button>
+      <Modal
+        className="filebrowser-modal-card"
+        open={open}
+        onClose={handleModalClose}
+      >
+        <Box className="filebrowser-modal-box">
+          <Typography id="modal-modal-title">{t("fileBrowser.title")}</Typography>
+
+          {loading
+            ? <p>{t("fileBrowser.loading")}</p>
+            : <FileChooserForm
+                data={data}
+                fileNames={fileNames}
+                setfileNames={setfileNames}
+                multipleFiles={multipleFiles}
+              />
+          }
+
+          <Button
+            className="filebrowser-select-button"
+            variant="contained"
+            onClick={confirmSelection}
+          >
+            {t("fileBrowser.useSelected", { count: fileNames.length })}
+          </Button>
+        </Box>
+      </Modal>
+    </div>
+  );
+}
+
+function FileChooserForm({ data, fileNames, setfileNames, multipleFiles }) {
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
 
@@ -101,7 +174,7 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
   // In single mode, keep only the newly clicked file and close the menu.
   const handleChange = (event) => {
     const { value } = event.target;
-    const ids = typeof value === "string" ? value.split(",") : value; // saves all fileIDs under an array
+    const ids = typeof value === "string" ? value.split(",") : value;
     if (multipleFiles) {
       setfileNames(ids);
     } else {
@@ -109,39 +182,6 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
       closeMenu();
     }
   };
-
-  // Strip the prefix so the incoming value matches the file ids in the list,
-  // otherwise nothing shows as selected and the prefix gets added twice.
-  useEffect(() => {
-    setfileNames(toFileIds(value));
-  }, [value]);
-
-  useEffect(() => {
-    // loads all the files (from fastapi endpoint)
-    fetch("/file-manager/files/all")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(t("fileBrowser.networkError"));
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setData(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
-    return <p>{t("fileBrowser.loading")}</p>;
-  }
-
-  if (error) {
-    return <p>{t("fileBrowser.error", { message: error })}</p>;
-  }
 
   // gets all the ids of all the files (in alphabetical order)
   function findFileIDs(data) {
@@ -164,107 +204,78 @@ export default function FileBrowser({ multipleFiles, onSelect, value }) {
     : all_fileIDs;
 
   return (
-    <div className="filebrowser">
-      <Button
-        className="button-modal"
-        aria-label={t("fileBrowser.open")}
-        title={t("fileBrowser.open")}
-        onClick={handleOpen}
-        disabled={disableMyFiles}
+    <FormControl fullWidth>
+      <InputLabel>{t("fileBrowser.files")}</InputLabel>
+      <Select
+        className="file-select-chip"
+        multiple
+        value={fileNames}
+        onChange={handleChange}
+        open={menuOpen}
+        onOpen={() => setMenuOpen(true)}
+        onClose={closeMenu}
+        input={<OutlinedInput label={t("fileBrowser.files")} />}
+        MenuProps={MenuProps}
+        renderValue={(selected) => {
+          if (!multipleFiles) {
+            return selected[0];
+          }
+          return (
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+              {selected.map((value) => (
+                <Chip key={value} label={value} />
+              ))}
+            </Box>
+          );
+        }}
       >
-        <NoteAddIcon />
-      </Button>
-      <Modal
-        className="filebrowser-modal-card"
-        open={open}
-        onClose={handleModalClose}
-      >
-        <Box className="filebrowser-modal-box">
-          <Typography id="modal-modal-title">{t("fileBrowser.title")}</Typography>
-
-          <FormControl fullWidth>
-            <InputLabel>{t("fileBrowser.files")}</InputLabel>
-            <Select
-              className="file-select-chip"
-              multiple
-              value={fileNames}
-              onChange={handleChange}
-              open={menuOpen}
-              onOpen={() => setMenuOpen(true)}
-              onClose={closeMenu}
-              input={<OutlinedInput label={t("fileBrowser.files")} />}
-              MenuProps={MenuProps}
-              renderValue={(selected) => {
-                if (!multipleFiles) {
-                  return selected[0];
-                }
-                return (
-                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                    {selected.map((value) => (
-                      <Chip key={value} label={value} />
-                    ))}
-                  </Box>
-                );
-              }}
-            >
-              <ListSubheader sx={{ bgcolor: "background.paper", pt: 1 }}>
-                <TextField
-                  size="small"
-                  autoFocus
-                  fullWidth
-                  placeholder={t("fileBrowser.search")}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  // let the field get keys instead of the menu's type-to-select
-                  onKeyDown={(e) => {
-                    if (e.key !== "Escape") e.stopPropagation();
-                  }}
-                  slotProps={{
-                    input: {
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon fontSize="small" />
-                        </InputAdornment>
-                      ),
-                    },
-                  }}
-                />
-              </ListSubheader>
-              {shownFileIDs.length === 0 && (
-                <MenuItem disabled>{t("fileBrowser.noMatch")}</MenuItem>
-              )}
-              {/* for rendering the checkboxes */}
-              {shownFileIDs.map((fileId) => {
-                const selected = fileNames.includes(fileId);
-                const SelectionIcon = selected
-                  ? CheckBoxIcon
-                  : CheckBoxOutlineBlankIcon;
-                return (
-                  <MenuItem key={fileId} value={fileId}>
-                    <SelectionIcon
-                      fontSize="small"
-                      style={{
-                        marginRight: 8,
-                        padding: 9,
-                        boxSizing: "content-box",
-                      }}
-                    />
-                    <ListItemText primary={fileId} />
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
-
-          <Button
-            className="filebrowser-select-button"
-            variant="contained"
-            onClick={confirmSelection}
-          >
-            {t("fileBrowser.useSelected", { count: fileNames.length })}
-          </Button>
-        </Box>
-      </Modal>
-    </div>
+        <ListSubheader sx={{ bgcolor: "background.paper", pt: 1 }}>
+          <TextField
+            size="small"
+            autoFocus
+            fullWidth
+            placeholder={t("fileBrowser.search")}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            // let the field get keys instead of the menu's type-to-select
+            onKeyDown={(e) => {
+              if (e.key !== "Escape") e.stopPropagation();
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+        </ListSubheader>
+        {shownFileIDs.length === 0 && (
+          <MenuItem disabled>{t("fileBrowser.noMatch")}</MenuItem>
+        )}
+        {/* for rendering the checkboxes */}
+        {shownFileIDs.map((fileId) => {
+          const selected = fileNames.includes(fileId);
+          const SelectionIcon = selected
+            ? CheckBoxIcon
+            : CheckBoxOutlineBlankIcon;
+          return (
+            <MenuItem key={fileId} value={fileId}>
+              <SelectionIcon
+                fontSize="small"
+                style={{
+                  marginRight: 8,
+                  padding: 9,
+                  boxSizing: "content-box",
+                }}
+              />
+              <ListItemText primary={fileId} />
+            </MenuItem>
+          );
+        })}
+      </Select>
+    </FormControl>
   );
 }
