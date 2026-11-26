@@ -13,7 +13,8 @@ services:
     volumes:
       - "./ui:/app:rw"
     working_dir: "/app"
-    command: sh -c "cd BonInABoxScriptService; npm run build; cd -; npm install; npm start;"
+    # --force: re-bundle dependencies so the freshly built API client is used, not Vite's cached copy.
+    command: sh -c "cd BonInABoxScriptService; npm run build; cd -; npm install; npm start -- --force;"
     expose:
       - "3000"
     environment:

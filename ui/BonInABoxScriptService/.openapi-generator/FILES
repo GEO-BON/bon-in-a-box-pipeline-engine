@@ -93,13 +93,3 @@ src/model/RenameItem200ResponseResult.js
 src/model/RenameItemRequest.js
 src/model/UploadFile200Response.js
 src/model/UploadFile400Response.js
-test/model/GetLanguage200Response.spec.js
-test/model/GetStacAssetsList200ResponseInner.spec.js
-test/model/GetStacAssetsList200ResponseInnerClassesInner.spec.js
-test/model/GetStacCatalogsList200ResponseInner.spec.js
-test/model/GetStacCollectionsList200ResponseInner.spec.js
-test/model/GetStacCollectionsList400Response.spec.js
-test/model/GetStacDatesList200Response.spec.js
-test/model/GetStacDatesList200ResponseDatesInner.spec.js
-test/model/GetStacItemsList200Response.spec.js
-test/model/GetStacItemsList200ResponseItemsInner.spec.js
