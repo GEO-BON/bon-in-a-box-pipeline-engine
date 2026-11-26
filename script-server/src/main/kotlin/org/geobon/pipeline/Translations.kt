@@ -19,6 +19,9 @@ object Translations {
     private val METADATA_FIELDS = listOf(METADATA__NAME, "description")
     private val IO_FIELDS = listOf("label", "description")
 
+    /** Input field holding the translated text of each option, keyed by option value. */
+    const val OPTION_LABELS = "optionLabels"
+
     /** True if a component of the path is hidden, such as the .fr translation folders (or ".."). */
     fun isHiddenPath(path: String) = path.split('/', '\\', '>').any { it.startsWith(".") }
 
@@ -72,8 +75,25 @@ object Translations {
             val translatedItems = translation.optJSONObject(section) ?: continue
             for (id in items.keySet()) {
                 copyStrings(items.optJSONObject(id), translatedItems.optJSONObject(id), IO_FIELDS)
+                addOptionLabels(items.optJSONObject(id), translatedItems.optJSONObject(id))
             }
         }
+    }
+
+    /**
+     * Option values are passed to scripts, so they stay in English.
+     * Their translated text goes in a separate optionLabels map, for display only.
+     */
+    private fun addOptionLabels(target: JSONObject?, source: JSONObject?) {
+        val options = target?.optJSONArray("options") ?: return
+        val translated = source?.optJSONObject("options") ?: return
+        val labels = JSONObject()
+        for (i in 0 until options.length()) {
+            val value = options.opt(i) as? String ?: continue
+            val label = translated.opt(value) as? String ?: continue
+            if (label.isNotBlank()) labels.put(value, label)
+        }
+        if (!labels.isEmpty) target.put(OPTION_LABELS, labels)
     }
 
     private fun copyStrings(target: JSONObject?, source: JSONObject?, fields: List<String>) {

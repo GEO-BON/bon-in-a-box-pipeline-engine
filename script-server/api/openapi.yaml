@@ -1816,6 +1816,15 @@ components:
                 example:
                   - Option 1
                   - Option 2
+              optionLabels:
+                type: object
+                description: Translated text to display for each option, keyed by option value.
+                  Only present when info is requested with a lang that has translations.
+                  The option values themselves are never translated.
+                additionalProperties:
+                  type: string
+                example:
+                  Option 1: Choix 1
               properties:
                 type: array
                 items:

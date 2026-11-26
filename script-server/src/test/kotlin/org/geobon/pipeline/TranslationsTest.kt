@@ -73,6 +73,26 @@ class TranslationsTest {
     }
 
     @Test
+    fun `given option translations_when overlaid_then labels added and values unchanged`() {
+        File(root, "folder/p.json").writeText(
+            """{"metadata": {"name": "Hello"},
+                "inputs": {"t": {"label": "Type", "type": "options", "options": ["Country or region", "Polygon of bounding box"]}},
+                "outputs": {}}"""
+        )
+        writeFrench(
+            """{"inputs": {"t": {"options": {"Country or region": "Pays ou région", "Removed option": "Supprimée"}}}}"""
+        )
+        val input = Translations.translatedPipelineJson(root, "folder/p.json", "fr")
+            .getJSONObject("inputs").getJSONObject("t")
+
+        assertEquals(listOf("Country or region", "Polygon of bounding box"), input.getJSONArray("options").toList())
+        val labels = input.getJSONObject(Translations.OPTION_LABELS)
+        assertEquals("Pays ou région", labels.getString("Country or region"))
+        assertFalse(labels.has("Polygon of bounding box"))
+        assertFalse(labels.has("Removed option"))
+    }
+
+    @Test
     fun `given no translation file_when overlaid_then English`() {
         File(root, ".fr").mkdirs()
         val result = Translations.translatedPipelineJson(root, "folder/p.json", "fr")
