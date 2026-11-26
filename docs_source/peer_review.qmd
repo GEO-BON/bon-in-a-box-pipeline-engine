@@ -23,6 +23,8 @@ Before a pipeline is submitted for external review, the BON in a Box team works 
 
 - Includes input and output descriptions, documentation, and a workflow description.
 
+- Clearly discloses the limitations inherent to its methodology.
+
 - Has its code available in the BON in a Box GitHub repository, either in the main branch or in a development branch or pull request.
 
 The BON in a Box team conducts initial testing and technical checks before inviting external reviewers. **External reviewers are then asked to conduct additional, independent testing** to evaluate the pipeline's functionality, scientific validity, and applicability across different contexts.
@@ -127,7 +129,7 @@ We encourage reviewers to test the pipeline using data or study areas they are f
 
 Document any errors, unexpected behaviour, or concerns in the review form.
 
-### Step 5. Review the code (where applicable)
+### Step 5. Review the code
 
 Reviewers with relevant programming experience are encouraged to examine the source code using the GitHub links provided in the review form.
 

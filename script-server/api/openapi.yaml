@@ -3,7 +3,7 @@ info:
   title: BON in a Box - Script service
   contact:
     email: jean-michel.lord@mcgill.ca
-  version: 1.4.0
+  version: 2.0.0
 servers:
   - url: http://localhost/
     description: script service
@@ -1015,7 +1015,7 @@ paths:
   /file-manager/is_disabled:
     get:
       summary: Returns whether the file manager is disabled or not.
-      tags: 
+      tags:
         - File manager
       operationId: isFileManagerDisabled
       responses:
@@ -1033,7 +1033,7 @@ paths:
   /file-manager/files:
     get:
       summary: Returns the list of root files and folders uploaded by the user.
-      tags: 
+      tags:
         - File manager
       operationId: getRootItems
       responses:
@@ -1077,55 +1077,55 @@ paths:
                   detail: "Cannot load files. This instance is read-only"
     put:
       summary: Moves or copies one or multiple files/folders.
-      tags: 
+      tags:
         - File manager
       operationId: moveCopyItem
-      requestBody: 
+      requestBody:
         required: true
-        content: 
+        content:
           application/json:
-            schema: 
+            schema:
               type: object
-              required: 
+              required:
               - operation
               - target
               - ids
-              properties: 
+              properties:
                 operation:
                   type: string
                   enum: [move, copy]
                   description: The action to perform. Must be set to 'move' or 'copy'.
                   example: "move"
-                target: 
+                target:
                   type: string
                   description: The ID for the destination folder in where the files/folders will move into.
                   example: "/folder1"
-                ids: 
+                ids:
                   type: array
                   description: An array containing the IDs of the files/folders that will be processed.
-                  items: 
+                  items:
                     type: string
                   example: ["/file1.txt", "/file2.txt"]
       responses:
         "200" :
           description: Item was successfully copied/moved. It returns the updated file metadata.
           content:
-            application/json: 
-              schema: 
+            application/json:
+              schema:
                 type: object
-                properties: 
-                  result: 
-                    type: array 
+                properties:
+                  result:
+                    type: array
                     items:
-                      type: object 
-                      required: 
+                      type: object
+                      required:
                         - id
                         - name
-                      properties: 
-                        id: 
+                      properties:
+                        id:
                           type: string
                           example: "/folder1/file1.txt"
-                        name: 
+                        name:
                           type: string
                           example: "file1.txt"
         "403":
@@ -1139,27 +1139,27 @@ paths:
                     type: string
                 example:
                   detail: "Cannot load files. This instance is read-only"
-    delete: 
+    delete:
       summary: Deletes a file or folder.
-      tags: 
+      tags:
         - File manager
       operationId: deleteItem
-      requestBody: 
+      requestBody:
         required: true
         content:
-          application/json: 
-            schema: 
+          application/json:
+            schema:
               type: object
-              required: 
+              required:
                 - ids
-              properties: 
-                ids: 
+              properties:
+                ids:
                   type: array
                   description: An array containing the IDs of the files/folders that will be deleted.
-                  items: 
+                  items:
                     type: string
                   example: ["/file1.txt", "/file2.txt"]
-      responses: 
+      responses:
         "200":
           description: Array with list of root files and folders.
           content:
@@ -1183,14 +1183,14 @@ paths:
                     type: string
                 example:
                   detail: "Cannot load files. This instance is read-only"
-  /file-manager/files/all: 
-    get: 
+  /file-manager/files/all:
+    get:
       summary: Returns the list of all files and folders uploaded by the user.
-      tags: 
+      tags:
         - File manager
       operationId: getAllItems
-      responses: 
-        "200": 
+      responses:
+        "200":
           description: Array with list of all files and folders.
           content:
             application/json:
@@ -1232,7 +1232,7 @@ paths:
   /file-manager/files/{id}:
     get:
       summary: Returns the list of files and folders uploaded by the user under a specific subfolder.
-      tags: 
+      tags:
         - File manager
       operationId: getSubfolderItems
       parameters:
@@ -1277,7 +1277,7 @@ paths:
                   detail: "Cannot load files. This instance is read-only"
     post:
       summary: Creates a file or folder.
-      tags: 
+      tags:
         - File manager
       operationId: createItem
       parameters:
@@ -1348,7 +1348,7 @@ paths:
 
     put:
       summary: Renames a file or folder.
-      tags: 
+      tags:
         - File manager
       operationId: renameItem
       parameters:
@@ -1415,9 +1415,9 @@ paths:
                   detail: "Cannot load files. This instance is read-only"
 
   /file-manager/upload:
-    post: 
+    post:
       summary: Uploads a file to the user's profile.
-      tags: 
+      tags:
         - File manager
       operationId: uploadFile
       parameters:
@@ -1442,9 +1442,9 @@ paths:
                   format: binary
                   description: The file that will be uploaded
       responses:
-        "200": 
+        "200":
           description: File is successfully uploaded. It returns the file's metadata.
-          content : 
+          content :
             application/json:
               schema:
                 type: object
@@ -1512,7 +1512,7 @@ paths:
   /file-manager/info:
     get:
       summary: Gets the total, used, and free storage.
-      tags: 
+      tags:
         - File manager
       operationId: getFileStorage
       responses:

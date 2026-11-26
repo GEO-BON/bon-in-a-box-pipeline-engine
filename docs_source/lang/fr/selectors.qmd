@@ -1,0 +1,134 @@
+---
+title: "Description des sélecteurs pour certains types d'entrée"
+---
+
+Lorsque vous indiquez les types d'entrée `location`, `country`, `countryRegion`, `countryRegionCRS`, `CRS`, `crsBbox` ou `stac_asset[]`, des sélecteurs sont créés automatiquement pour faciliter le choix de ces entrées. Après leur sélection, elles figurent dans le fichier `input.json` du script ou du pipeline sous forme d'objets comprenant divers paramètres accessibles lors de leur chargement dans R, Python ou Julia.
+
+Par exemple, le sélecteur `location` permet de définir une boîte englobante en choisissant un pays, une région et un système de coordonnées de référence. Voici un exemple d'objet créé en sélectionnant le département de Putumayo, en Colombie, dans le système de référence Bogota 1975 / Colombia West zone :
+
+``` {#location .yaml}
+bbox:
+  - 983337
+  - 428305
+  - 1360903
+  - 659616
+CRS:
+  name: Bogota 1975 / Colombia West zone
+  authority: EPSG
+  code: 21896
+  proj4Def: >-
+    +proj=tmerc +lat_0=4.59904722222222 +lon_0=-77.0809166666667 +k=1
+    +x_0=1000000 +y_0=1000000 +ellps=intl +towgs84=307,304,-318,0,0,0,0 +units=m
+    +no_defs +type=crs
+  unit: metre
+  bbox:
+    - -79.1
+    - 0.03
+    - -75.58
+    - 10.21
+country:
+  englishName: Colombia
+  ISO3: COL
+region:
+  regionName: Putumayo Department
+  regionGID: COL.24_2
+  countryEnglishName: Colombia
+```
+
+Voici la signification de chaque clé.
+
+| Nom de la clé      | Section | Description                                                                                                                                    |
+|--------------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| bbox               | bbox    | Tableau contenant les coordonnées minimale x, minimale y, maximale x et maximale y (dans cet ordre) de la boîte englobante, dans les unités du CRS sélectionné. |
+| name               | CRS     | Nom en texte brut du système de coordonnées de référence sélectionné.                                                                           |
+| authority          | CRS     | Autorité associée au code du système de référence. Il s'agit généralement de EPSG ou ESRI. Par exemple, `EPSG` pour `EPSG:4326`.                  |
+| code               | CRS     | Code associé à l'autorité du système de référence. Il s'agit généralement d'un entier de 4 ou 5 chiffres, p. ex. `4326` pour EPSG:4326.          |
+| proj4Def           | CRS     | Définition du CRS sous forme de chaîne Proj4.                                                                                                   |
+| wktDef             | CRS     | Définition Well-Known Text du CRS, si elle est disponible.                                                                                      |
+| unit               | CRS     | Unité associée au CRS. Il s'agit généralement de `meter`, `degree` ou `feet`.                                                                   |
+| CRSBboxWGS84       | CRS     | Boîte englobante couverte par ce système de coordonnées de référence, en latitude et longitude WGS84 (EPSG:4326).                               |
+| englishName        | country | Nom anglais du pays sélectionné, selon GADM.org.                                                                                               |
+| ISO3               | country | Code ISO à 3 lettres du pays.                                                                                                                    |
+| regionName         | region  | Nom de la région, selon GADM.                                                                                                                   |
+| regionGID          | region  | Identifiant de la région dans GADM.                                                                                                             |
+| countryEnglishName | region  | Nom anglais du pays auquel appartient cette région.                                                                                            |
+
+Avec les autres sélecteurs, l'objet créé contient un sous-ensemble des champs du sélecteur `location`. Par exemple, le sélecteur `countryRegion` ne contient que les sections du pays et de la région, tandis que `countryRegionCRS` contient toutes les sections sauf celle de la boîte englobante (`bbox`).
+
+## Ressources STAC {#stac-assets}
+
+Le type d'entrée `stac_asset[]` ouvre un navigateur de catalogues STAC. L'utilisateur choisit un catalogue, une collection, puis un seul élément ou toutes les tuiles de la collection pour une date donnée, ainsi que la ressource à utiliser. Plusieurs ressources peuvent être sélectionnées; le script reçoit donc une **liste**, même si une seule ressource a été choisie. Une sélection unique est de type `stac_asset`, par exemple pour transmettre une ressource d'un script au suivant.
+
+``` {#stac_assets .yaml}
+- catalog: https://stac.geobon.org
+  collection: some-collection
+  date: "2020-01-01"
+  item: some-item
+  items_are_tiles: false
+  asset: data
+  href: https://example.com/some-item/data.tif
+  type: image/tiff; application=geotiff; profile=cloud-optimized
+  categorical: false
+- catalog: https://planetarycomputer.microsoft.com/api/stac/v1
+  collection: some-other-collection
+  date: "2020-01-01"
+  item: null
+  items_are_tiles: true
+  asset: data
+  href: null
+  type: image/tiff; application=geotiff; profile=cloud-optimized
+  categorical: true
+```
+
+| Nom de la clé | Description                                                                                                                                     |
+|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| catalog     | URL du catalogue STAC.                                                                                                                          |
+| collection  | Identifiant de la collection dans ce catalogue.                                                                                                  |
+| date        | Date concernée, au format `YYYY-MM-DD` : date de l'élément choisi ou date choisie avec `items_are_tiles`. Peut être nulle.                       |
+| item        | Identifiant de l'élément choisi. Nul lorsque `items_are_tiles` vaut `true`.                                                                       |
+| items_are_tiles | Lorsque cette valeur est `true`, le script doit rechercher tous les éléments de la collection (à la date indiquée, le cas échéant) et mosaïquer lui-même leurs ressources (`asset`). |
+| asset       | Clé de la ressource au sein du ou des éléments.                                                                                                  |
+| href        | Lien direct vers la ressource de l'élément choisi. Nul lorsque `items_are_tiles` vaut `true`.                                                     |
+| type        | Type de média de la ressource, tel que déclaré par le catalogue.                                                                                 |
+| categorical | Vrai si la ressource contient des classes (p. ex. la couverture terrestre) plutôt que des mesures. Sert à choisir une méthode de rééchantillonnage (plus proche voisin ou bilinéaire). |
+
+### Ressources de Planetary Computer
+
+Les ressources de Planetary Computer de Microsoft doivent être signées avant de pouvoir être lues. La signature fonctionne sans clé, mais les limites de débit sont alors strictes. Pour les augmenter, définissez `PLANETARY_COMPUTER_API_KEY` dans `runner.env`, puis redémarrez le serveur. La clé sera ensuite accessible aux scripts en tant que variable d'environnement.
+
+En Python, avec les paquets `planetary-computer` et `pystac-client` :
+
+``` python
+import os
+import planetary_computer
+from pystac_client import Client
+
+if os.environ.get("PLANETARY_COMPUTER_API_KEY"):
+    planetary_computer.settings.set_subscription_key(os.environ["PLANETARY_COMPUTER_API_KEY"])
+
+for selection in biab_inputs()["stac"]:
+    if selection["items_are_tiles"]:
+        catalog = Client.open(selection["catalog"], modifier=planetary_computer.sign_inplace)
+        items = catalog.search(collections=[selection["collection"]], datetime=selection["date"]).items()
+        hrefs = [item.assets[selection["asset"]].href for item in items]  # to be mosaicked
+    else:
+        hrefs = [planetary_computer.sign(selection["href"])]
+```
+
+En R, avec le paquet `rstac` :
+
+``` r
+library(rstac)
+
+key <- Sys.getenv("PLANETARY_COMPUTER_API_KEY")
+sign_fn <- sign_planetary_computer(
+  headers = if (key != "") c("Ocp-Apim-Subscription-Key" = key)
+)
+
+selection <- input$stac[[1]]
+found <- stac(selection$catalog) |>
+  stac_search(collections = selection$collection, ids = selection$item) |>
+  post_request() |>
+  items_sign(sign_fn)
+href <- found$features[[1]]$assets[[selection$asset]]$href
+```

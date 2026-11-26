@@ -5,6 +5,8 @@ project:
     - "*.qmd"
     - "*.md"
     - "!ui/"
+    - "!lang/"
+  post-render: sh render-languages.sh
 
 website:
   title: BON in a Box
@@ -32,6 +34,9 @@ website:
             text: openEO integration
       - href: peer_review.qmd
         text: Peer review
+    right:
+      - href: fr/index.html
+        text: Français
     tools:
       - icon: box-arrow-up-right
         href: https://boninabox.geobon.org/
