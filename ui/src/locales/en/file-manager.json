@@ -1,0 +1,111 @@
+{
+  "filemanager": {
+    "myFiles": "My files",
+    "addNew": "Add New",
+    "ok": "Ok",
+    "cancel": "Cancel",
+    "deleteFiles": "Delete Files",
+    "files": "Files",
+    "folder": "Folder",
+    "backToParent": "Back to parent folder",
+    "information": "Information",
+    "found": "Found",
+    "confirmDelete": "Are you sure you want to delete these items:",
+    "enterFileName": "Enter file name",
+    "enterFolderName": "Enter folder name",
+    "newFile": "New file",
+    "newFolder": "New folder",
+    "result": "Result",
+    "search": "Search",
+    "searchResultsIn": "Search results in",
+    "addNewFile": "Add new file",
+    "addNewFolder": "Add new folder",
+    "uploadFile": "Upload file",
+    "size": "Size",
+    "name": "Name",
+    "type": "Type",
+    "date": "Date",
+    "rename": "Rename",
+    "cut": "Cut",
+    "delete": "Delete",
+    "copy": "Copy",
+    "paste": "Paste",
+    "download": "Download",
+    "count": "Count",
+    "folderSingular": "folder",
+    "folderPlural": "folders",
+    "fileSingular": "file",
+    "filePlural": "files",
+    "multipleFiles": "Multiple files",
+    "multiple": "multiple",
+    "preview": "Preview",
+    "of": "of",
+    "used": "used",
+    "selectForDetails": "Select file or folder to view details",
+    "emptyFolder": "Looks like nothing is here",
+    "unknownFile": "Unknown file",
+    "fileThumbnail": "A miniature file preview"
+  },
+  "core": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "select": "Select",
+    "noData": "No data",
+    "rowsPerPage": "Rows per page",
+    "totalPages": "Total pages"
+  },
+  "uploader": {
+    "bytes": "B",
+    "kilobytes": "KB",
+    "megabytes": "MB",
+    "gigabytes": "GB",
+    "terabytes": "TB",
+    "petabytes": "PB",
+    "exabytes": "EB",
+    "dropFiles": "Drop files here or",
+    "selectFiles": "select files"
+  },
+  "grid": {
+    "addBefore": "Add before",
+    "addAfter": "Add after",
+    "copy": "Copy",
+    "cut": "Cut",
+    "paste": "Paste",
+    "delete": "Delete",
+    "newRow": "New row",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "undo": "Undo",
+    "redo": "Redo",
+    "selected": "selected"
+  },
+  "calendar": {
+    "monthFull": {
+      "january": "January", "february": "February", "march": "March", "april": "April",
+      "may": "May", "june": "June", "july": "July", "august": "August",
+      "september": "September", "october": "October", "november": "November", "december": "December"
+    },
+    "monthShort": {
+      "january": "Jan", "february": "Feb", "march": "Mar", "april": "Apr",
+      "may": "May", "june": "Jun", "july": "Jul", "august": "Aug",
+      "september": "Sep", "october": "Oct", "november": "Nov", "december": "Dec"
+    },
+    "dayFull": {
+      "sunday": "Sunday", "monday": "Monday", "tuesday": "Tuesday", "wednesday": "Wednesday",
+      "thursday": "Thursday", "friday": "Friday", "saturday": "Saturday"
+    },
+    "dayShort": {
+      "sunday": "Sun", "monday": "Mon", "tuesday": "Tue", "wednesday": "Wed",
+      "thursday": "Thu", "friday": "Fri", "saturday": "Sat"
+    },
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "done": "Done",
+    "clear": "Clear",
+    "today": "Today",
+    "am": "am",
+    "amUpper": "AM",
+    "pm": "pm",
+    "pmUpper": "PM"
+  }
+}

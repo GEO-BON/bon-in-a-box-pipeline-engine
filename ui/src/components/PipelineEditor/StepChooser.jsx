@@ -1,5 +1,6 @@
 import "./StepChooser.css";
 
+import i18n from "../../i18n";
 import { isValidElement, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { PopupContentContext } from "../../Layout.jsx";
 
@@ -11,6 +12,7 @@ import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import SubdirectoryArrowRightIcon from '@mui/icons-material/SubdirectoryArrowRight';
 import { Alert } from '@mui/material';
 import { filterAndRankResults, SearchResultStep } from "./StepSearch.jsx";
+import { useTranslation } from "react-i18next";
 
 const api = new BonInABoxScriptService.DefaultApi();
 
@@ -21,6 +23,7 @@ const onDragStart = (event, nodeType, descriptionFile) => {
 };
 
 function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onStepClick }) {
+  const { t } = useTranslation();
   let [isDeprecated, setIsDeprecated] = useState(false);
 
   // Check deprecation status on mount
@@ -52,7 +55,7 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
         onDragStart(event, "io", descriptionFile)
       }
       draggable
-      title="Click for info, drag and drop to add to pipeline."
+      title={t("editor.stepHint")}
       className={
         "dndnode" +
         (descriptionFile === selectedStep ? " selected" : "") + (isDeprecated ? " deprecated" : "")
@@ -65,6 +68,7 @@ function PipelineStep({ descriptionFile, fileName, selectedStep, stepName, onSte
 }
 
 export default function StepChooser(_) {
+  const { t } = useTranslation();
   const [scriptFiles, setScriptFiles] = useState([]);
   const [pipelineFiles, setPipelineFiles] = useState([]);
   const [udpFiles, setUdpFiles] = useState([]);
@@ -79,7 +83,7 @@ export default function StepChooser(_) {
     api.getListOf("pipeline", {}, (error, pipelineList, response) => {
       if (error) {
         console.error(error);
-        setPipelineFiles(<HttpError httpError={error} response={response} context="Unable to get list of pipelines" />)
+        setPipelineFiles(<HttpError error={error} response={response} message={i18n.t("errors.pipelineList")} />)
 
       } else {
         setPipelineFiles(pipelineList);
@@ -90,7 +94,7 @@ export default function StepChooser(_) {
     api.getListOf("script", {}, (error, scriptList, response) => {
       if (error) {
         console.error(error);
-        setScriptFiles(<HttpError httpError={error} response={response} context="unable ot get list of scripts" />)
+        setScriptFiles(<HttpError error={error} response={response} message={i18n.t("errors.scriptList")} />)
 
       } else {
         setScriptFiles(scriptList);
@@ -119,7 +123,7 @@ export default function StepChooser(_) {
           if (!metadata) {
             setPopupContent(
               <Alert className="error">
-                Failed to fetch script description for {descriptionFile}
+                {t("editor.fetchDescriptionError", { file: descriptionFile })}
               </Alert>
             );
             return;
@@ -134,7 +138,7 @@ export default function StepChooser(_) {
         });
       }
     },
-    [selectedStep, setSelectedStep, setPopupContent]
+    [selectedStep, setSelectedStep, setPopupContent, t]
   );
 
   // Removes the highlighting if popup closed with the X, or by re-clicking the step
@@ -164,9 +168,9 @@ export default function StepChooser(_) {
   // Memoized filtered results
   const filteredResults = useMemo(() => {
     if (searchKeywords.length > 0) {
-      return filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles, udpFiles);
+      return filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles, udpFiles, t);
     }
-  }, [searchKeywords, pipelineFiles, scriptFiles, udpFiles, filterAndRankResults]);
+  }, [searchKeywords, pipelineFiles, scriptFiles, udpFiles, t]);
 
   /**
    *
@@ -249,14 +253,14 @@ export default function StepChooser(_) {
         onDragStart={(event) => onDragStart(event, "output")}
         draggable
       >
-        Pipeline output
+        {t("editor.pipelineOutput")}
       </div>
 
       <div className="search-container">
         <input
           type="search"
           className="step-search-input"
-          placeholder="Search pipelines and scripts..."
+          placeholder={t("editor.search")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           autoFocus
@@ -266,7 +270,7 @@ export default function StepChooser(_) {
       {searchKeywords.length > 0 && filteredResults
         ? ( // Show filtered search results
           filteredResults.length === 0
-            ? <div className="no-results">No results found</div>
+            ? <div className="no-results">{t("editor.noResults")}</div>
             : <div>
               {filteredResults.map((result) => {
                 return (
@@ -287,7 +291,7 @@ export default function StepChooser(_) {
           <>
             {pipelineFiles && (
               <div key="Pipelines">
-                <h3>Pipelines</h3>
+                <h3>{t("editor.pipelines")}</h3>
                 <div>
                   {isValidElement(pipelineFiles) && pipelineFiles.type === HttpError ? pipelineFiles : renderTree(
                     [],
@@ -299,7 +303,7 @@ export default function StepChooser(_) {
 
             {scriptFiles && (
               <div key="Scripts">
-                <h3>Scripts</h3>
+                <h3>{t("editor.scripts")}</h3>
                 {isValidElement(scriptFiles) && scriptFiles.type === HttpError ? scriptFiles : renderTree(
                   [],
                   Object.entries(scriptFiles).map((entry) => [
@@ -312,7 +316,7 @@ export default function StepChooser(_) {
 
             {udpFiles && Object.keys(udpFiles).length > 0 && (
               <div key="openEO">
-                <h3>openEO</h3>
+                <h3>{t("editor.openEO")}</h3>
                 {isValidElement(udpFiles) && udpFiles.type === HttpError ? udpFiles :
                   Object.entries(udpFiles).map(([fileName, stepName]) => (
                     <PipelineStep

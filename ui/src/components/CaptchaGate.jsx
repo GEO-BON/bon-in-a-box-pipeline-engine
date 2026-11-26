@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
+import i18n from "../i18n";
+import { useTranslation } from "react-i18next";
 import { CustomButtonGreen } from "./CustomMUI";
 import CircularProgress from "@mui/material/CircularProgress";
 import "./CaptchaGate.css";
@@ -24,6 +26,7 @@ function hideRecaptchaBadge() {
 };
 
 export default function CaptchaGate({ children, size }) {
+  const { t } = useTranslation();
 
   const [errorMessage, setErrorMessage] = useState("");
   const [clientKey, setClientKey] = useState(
@@ -100,7 +103,7 @@ export default function CaptchaGate({ children, size }) {
       executeRecaptcha(clientKey);
     };
     script.onerror = () => {
-      setErrorMessage("Failed to load reCAPTCHA script. Please refresh the page.");
+      setErrorMessage(i18n.t("captcha.scriptFailed"));
       setState(States.ERROR);
     };
     document.head.appendChild(script);
@@ -142,15 +145,15 @@ export default function CaptchaGate({ children, size }) {
             return;
 
           } else {
-            setErrorMessage("Verification failed. Are you a robot? Please try again.");
+            setErrorMessage(i18n.t("captcha.failed"));
           }
         } else {
           const errorData = await res.json().catch(() => ({}));
-          setErrorMessage(errorData.error || "Verification failed: reCAPTCHA verification endpoint not available.");
+          setErrorMessage(errorData.error || i18n.t("captcha.endpointUnavailable"));
         }
       } catch (err) {
         console.error("reCAPTCHA error:", err);
-        setErrorMessage("Verification error. Please refresh the page.");
+        setErrorMessage(i18n.t("captcha.error"));
       }
 
       setState(States.ERROR);
@@ -163,8 +166,8 @@ export default function CaptchaGate({ children, size }) {
         <div className={"captcha-gate-screen " + size}>
           {size === "small" && <CircularProgress />}
           <div className="captcha-gate-text">
-            <p className="title">Verifying access...</p>
-            <p>This process is automatic. Please wait.</p>
+            <p className="title">{t("captcha.verifying")}</p>
+            <p>{t("captcha.automatic")}</p>
           </div>
         </div>
       );
@@ -177,7 +180,7 @@ export default function CaptchaGate({ children, size }) {
         <div className={"captcha-gate-screen " + size}>
           <div className="captcha-gate-text" style={{width: '100%'}}>
             <Alert severity="error">
-              <AlertTitle>Verification Error</AlertTitle>
+              <AlertTitle>{t("captcha.errorTitle")}</AlertTitle>
               {errorMessage}
             </Alert>
             <CustomButtonGreen
@@ -187,7 +190,7 @@ export default function CaptchaGate({ children, size }) {
                 window.location.reload();
               }}
             >
-              Retry
+              {t("captcha.retry")}
             </CustomButtonGreen>
           </div>
         </div>

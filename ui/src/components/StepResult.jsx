@@ -1,4 +1,5 @@
 import { memo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import MapResult from "./map/Map";
 import RenderedCSV from "./csv/RenderedCSV";
 import yaml from "js-yaml";
@@ -95,11 +96,12 @@ function AllSectionResults({ results, sectionMetadata, sectionName }) {
 
 export const SingleIOResult = memo(
   ({ ioId, value, ioMetadata, componentId, sectionName }) => {
+    const { t } = useTranslation();
     if (!componentId) componentId = ioId;
 
     function renderContent(content) {
       if (content === null || content === undefined) return "null";
-      if (content === "") return "Empty string";
+      if (content === "") return t("results.emptyString");
 
       let error = "";
       if (ioMetadata) {
@@ -107,10 +109,10 @@ export const SingleIOResult = memo(
           // Got our mime type!
           return renderWithMime(content, ioMetadata.type);
         } else {
-          error = `Missing mime type in ${sectionName} description.`;
+          error = t(`results.missingMime.${sectionName}`);
         }
       } else {
-        error = `The ${sectionName} was not found in this script's YML description file.`;
+        error = t(`results.notInYml.${sectionName}`);
       }
 
       return (
@@ -186,7 +188,7 @@ export const SingleIOResult = memo(
 
     function renderInline(content) {
       if (content === null || content === undefined) return "null";
-      if (content === "") return "Empty string";
+      if (content === "") return t("results.emptyString");
 
       if (Array.isArray(content)) {
         return content
@@ -283,13 +285,13 @@ export const SingleIOResult = memo(
       ) {
         errorMsg = (
           <Alert severity="warning">
-            Output id {ioId.replace(/^(.*\|)/, "")} should be a snake_case id
+            {t("results.notSnakeCase", { id: ioId.replace(/^(.*\|)/, "") })}
           </Alert>
         );
       }
     } else {
       // error message taken care by children
-      icon = <img src={errorImg} alt="Error" className="error-inline" />;
+      icon = <img src={errorImg} alt={t("results.error")} className="error-inline" />;
       icon = <Error color="error"/>
     }
 
@@ -319,12 +321,13 @@ export const SingleIOResult = memo(
 );
 
 function Logs({ logs }) {
+  const { t } = useTranslation();
   if (!logs) return null;
 
   const myId = "logs";
   return (
     <FoldableOutputWithContext
-      title="Logs"
+      title={t("results.logs")}
       componentId={myId}
       className="foldableOutput"
     >

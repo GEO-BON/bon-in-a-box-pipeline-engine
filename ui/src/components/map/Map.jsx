@@ -10,6 +10,7 @@ import TiTilerLayer from "./TiTilerLayer";
 import Alert from "@mui/material/Alert";
 import GeoPackageLayer from './GeoPackageLayer';
 import GeoJSONLayer from './GeoJSONLayer';
+import { useTranslation } from "react-i18next";
 
 // Reimport default icon for markers (the Icon would otherwise not show up)
 import icon from "leaflet/dist/images/marker-icon.png";
@@ -37,6 +38,7 @@ L.Icon.Default.mergeOptions({
 });
 
 export default function MapResult({ tiff, range, json, geopackage }) {
+  const { t } = useTranslation();
   const [error, setError] = useState();
   const [jsonContent, setJsonContent] = useState();
   const [geopackageContent, setGeopackageContent] = useState();
@@ -60,7 +62,7 @@ export default function MapResult({ tiff, range, json, geopackage }) {
       } else if(typeof json === 'object'){
         setJsonContent(json);
       } else {
-        setError("Invalid JSON data");
+        setError(t("map.invalidJson"));
       }
     }
   }, [json]);

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import i18n from "../../i18n";
 import { Spinner } from "../Spinner";
 import { HttpError } from "../HttpErrors";
 import { isEmptyObject } from "../../utils/isEmptyObject";
@@ -9,10 +10,12 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import PendingIcon from '@mui/icons-material/Pending';
 import { Tooltip } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export default function K8sStatus() {
+  const { t } = useTranslation();
   let [status, setStatus] = useState();
   let [errorMessage, setErrorMessage] = useState();
 
@@ -23,7 +26,7 @@ export default function K8sStatus() {
     let timeout = null
     api.getK8sStatus((error, data, response) => {
       if (error) {
-        setErrorMessage(<HttpError error={error} response={response} context={"while getting K8s status"} />)
+        setErrorMessage(<HttpError error={error} response={response} message={i18n.t("errors.k8sStatus")} />)
         setStatus(null)
 
       } else {
@@ -48,7 +51,7 @@ export default function K8sStatus() {
   const connect = useCallback(() => {
     api.prepareK8s((error, data, response) => {
       if (error) {
-        setErrorMessage(<HttpError httpError={error} response={response} context={"while preparing K8s"} />)
+        setErrorMessage(<HttpError error={error} response={response} message={i18n.t("errors.k8sPrepare")} />)
         setStatus(null)
       } else {
         refreshStatus()
@@ -74,25 +77,25 @@ export default function K8sStatus() {
             {
               {
                 NOT_CONFIGURED: <>
-                  <Tooltip title="Not configured"><HideSourceIcon style={{ height: "1rem" }} /></Tooltip>
-                  <small>Not Configured.</small>
+                  <Tooltip title={t("info.notConfigured")}><HideSourceIcon style={{ height: "1rem" }} /></Tooltip>
+                  <small>{t("info.notConfiguredSentence")}</small>
                 </>,
                 CONFIGURED: <>
-                  <Tooltip title="Configured">
+                  <Tooltip title={t("info.configured")}>
                     <PlayCircleIcon style={{ height: "1rem", cursor: "pointer" }} onClick={connect} />
                   </Tooltip>
-                  <small>Press play to connect.</small>
+                  <small>{t("info.pressPlay")}</small>
                 </>,
                 PREPARING: <>
-                  <Tooltip title="Preparing"><PendingIcon style={{ height: "1rem" }} /></Tooltip>
-                  <small>Connection in progress...</small>
+                  <Tooltip title={t("info.preparing")}><PendingIcon style={{ height: "1rem" }} /></Tooltip>
+                  <small>{t("info.connecting")}</small>
                 </>,
                 READY: <>
-                  <Tooltip title="Ready"><CheckCircleIcon style={{ height: "1rem" }} /></Tooltip>
+                  <Tooltip title={t("info.ready")}><CheckCircleIcon style={{ height: "1rem" }} /></Tooltip>
                 </>,
                 ERROR: <>
-                  <Tooltip title="Error"><ErrorIcon style={{ height: "1rem" }} onClick={connect} /></Tooltip>
-                  <a onClick={connect} style={{ cursor: 'pointer' }}>Try again</a>
+                  <Tooltip title={t("info.error")}><ErrorIcon style={{ height: "1rem" }} onClick={connect} /></Tooltip>
+                  <a onClick={connect} style={{ cursor: 'pointer' }}>{t("info.tryAgain")}</a>
                 </>,
               }[state]
             }
@@ -103,7 +106,7 @@ export default function K8sStatus() {
           }
           {image &&
             <p>
-              <small>Image:&nbsp;
+              <small>{t("info.image")}&nbsp;
                 <a href={"https://" + image}
                   target="_blank">
                   {image}

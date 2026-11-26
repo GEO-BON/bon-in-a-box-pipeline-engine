@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useEffect, useRef, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
 import Alert from "@mui/material/Alert";
 import Autocomplete from "@mui/material/Autocomplete";
 import Checkbox from "@mui/material/Checkbox";
@@ -154,11 +155,14 @@ function selectionKey(selection) {
 }
 
 /** How a selection reads in the lists, e.g. "all items on 2019-06-01". */
-function selectionScope(selection) {
-  if (!selection.items_are_tiles) return selection.item;
-  return selection.date
-    ? `all items on ${selection.date}`
-    : "all items in the collection";
+function useSelectionScope() {
+  const { t } = useTranslation();
+  return (selection) => {
+    if (!selection.items_are_tiles) return selection.item;
+    return selection.date
+      ? t("stac.allItemsOn", { date: selection.date })
+      : t("stac.allItemsInCollection");
+  };
 }
 
 export default function StacChooser({
@@ -167,6 +171,8 @@ export default function StacChooser({
   updateValue = () => {},
   isCompact = false,
 }) {
+  const { t } = useTranslation();
+  const getSelectionScope = useSelectionScope();
   const [openModal, setOpenModal] = useState(false);
   const selections = asSelections(value);
 
@@ -177,6 +183,7 @@ export default function StacChooser({
         endIcon={<TravelExploreIcon />}
         onClick={() => setOpenModal(true)}
         className="locationChooserButton"
+        aria-label={t("stac.openChooser")}
         style={{
           marginBottom: "1rem",
           fontSize: "1rem",
@@ -184,8 +191,8 @@ export default function StacChooser({
         }}
       >
         {selections.length > 0
-          ? `Choose STAC assets (${selections.length})`
-          : "Choose STAC assets"}
+          ? t("stac.chooseAssetsCount", { count: selections.length })
+          : t("stac.chooseAssets")}
       </CustomButtonGreen>
       {selections.length > 0 && !isCompact && (
         <div
@@ -194,7 +201,7 @@ export default function StacChooser({
           {selections.map((selection) => (
             <div key={selectionKey(selection)}>
               <b>{selection.collection}</b> / {selection.asset} —{" "}
-              {selectionScope(selection)}
+              {getSelectionScope(selection)}
             </div>
           ))}
         </div>
@@ -220,6 +227,7 @@ export default function StacChooser({
 
 // Shows the first two lines, with a toggle for the rest when it overflows.
 function CollapsibleDescription({ text }) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const [overflows, setOverflows] = useState(false);
   const ref = useRef(null);
@@ -255,54 +263,35 @@ function CollapsibleDescription({ text }) {
           onClick={() => setExpanded(!expanded)}
           onKeyDown={(e) => e.key === "Enter" && setExpanded(!expanded)}
         >
-          {expanded ? "Show less ⌃" : "Show more ⌄"}
+          {expanded ? t("stac.showLess") : t("stac.showMore")}
         </span>
       )}
     </div>
   );
 }
 
-const STAC_HELP = (
+const STAC_HELP = (t) => (
   <div style={{ fontSize: "0.8rem", lineHeight: 1.45 }}>
     <p style={{ margin: "0 0 6px" }}>
-      A STAC catalog is an online library of maps and satellite images. Work
-      from top to bottom:
+      {t("stac.helpIntro")}
     </p>
     <ol style={{ margin: 0, paddingLeft: "18px" }}>
-      <li>
-        <b>Catalog</b>: pick one from the list, or paste the web address of
-        another catalog.
-      </li>
-      <li>
-        <b>Collection</b>: pick a dataset. Open its description to learn what
-        it contains.
-      </li>
-      <li>
-        <b>Date</b>: if the collection covers several dates, pick one.
-      </li>
-      <li>
-        <b>Item</b>: pick one file from the list. Type in the filter box to
-        search by name. If the collection is split into tiles, tick
-        &quot;Mosaic&quot; to use all of them as one layer instead.
-      </li>
-      <li>
-        <b>Asset</b>: pick the layer you need, such as a band or a variable.
-        Tick &quot;Categorical&quot; if its values are classes (land cover
-        types, for example) rather than measurements.
-      </li>
-      <li>
-        Use <b>Preview</b> to check the layer, then <b>Add to selection</b>.
-        Repeat for as many layers as you need.
-      </li>
+      <li><Trans i18nKey="stac.helpCatalog" components={{ b: <b /> }} /></li>
+      <li><Trans i18nKey="stac.helpCollection" components={{ b: <b /> }} /></li>
+      <li><Trans i18nKey="stac.helpDate" components={{ b: <b /> }} /></li>
+      <li><Trans i18nKey="stac.helpItem" components={{ b: <b /> }} /></li>
+      <li><Trans i18nKey="stac.helpAsset" components={{ b: <b /> }} /></li>
+      <li><Trans i18nKey="stac.helpPreview" components={{ b: <b /> }} /></li>
     </ol>
     <p style={{ margin: "6px 0 0" }}>
-      When you are done, press <b>Accept</b>. <b>Clear</b> empties the
-      selection, and <b>Cancel</b> closes the window without changes.
+      <Trans i18nKey="stac.helpFinish" components={{ b: <b /> }} />
     </p>
   </div>
 );
 
 function StacBrowser({ value, updateValue, setOpenModal }) {
+  const { t } = useTranslation();
+  const getSelectionScope = useSelectionScope();
   const previousValue = useRef(value);
   // Catalog and collection of the last saved entry, restored so that the
   // browser reopens where it left off. Consumed as each list arrives.
@@ -655,13 +644,13 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
       // selection", say) in a render where the image is still on screen.
       setPreview({
         url: previewBlob.current,
-        label: `Preview of ${asset.key}`,
+        assetKey: asset.key,
         params: params.toString(),
       });
     } catch (e) {
       // Keep the tiler's reason in the console, show a plain message.
       console.warn("Preview failed:", e.message);
-      if (!stale()) setPreviewError("Preview can't be loaded");
+      if (!stale()) setPreviewError(t("stac.previewError"));
     } finally {
       if (!stale()) setLoadingPreview(false);
     }
@@ -685,7 +674,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         (existing) => selectionKey(existing) === selectionKey(entry),
       )
     ) {
-      setError("That asset is already in the list.");
+      setError(t("stac.alreadySelected"));
       return;
     }
     commit([...selections, entry]);
@@ -749,15 +738,15 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         id="stac-chooser-title"
         style={{ marginTop: 0, display: "flex", alignItems: "center" }}
       >
-        Choose assets from a STAC catalog
+        {t("stac.title")}
         <Tooltip
-          title={STAC_HELP}
+          title={STAC_HELP(t)}
           placement="bottom-start"
           enterTouchDelay={0}
           leaveTouchDelay={20000}
           componentsProps={{ tooltip: { sx: { maxWidth: "420px" } } }}
         >
-          <IconButton size="small" aria-label="How to use this window">
+          <IconButton size="small" aria-label={t("stac.helpTitle")}>
             <HelpOutlineIcon fontSize="small" />
           </IconButton>
         </Tooltip>
@@ -789,7 +778,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Catalog (choose one, or paste a catalog URL)"
+              label={t("stac.catalog")}
             />
           )}
           onChange={(_, chosen) => setCatalog(chosen)}
@@ -825,7 +814,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Collection"
+              label={t("stac.collection")}
               InputProps={{
                 ...params.InputProps,
                 endAdornment: (
@@ -853,7 +842,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                View STAC collection in API
+                {t("stac.viewCollection")}
               </a>
             )}
             {collection.description && (
@@ -888,7 +877,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                 <li {...props} key={option.date}>
                   <ListItemText
                     primary={option.date}
-                    secondary={`${option.count} item${option.count === 1 ? "" : "s"}`}
+                    secondary={t("stac.itemCount", { count: option.count })}
                   />
                 </li>
               )}
@@ -897,8 +886,8 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                   {...params}
                   label={
                     loadingDates
-                      ? "Date"
-                      : `Date (${dates.length} in this collection)`
+                      ? t("stac.date")
+                      : t("stac.datesCount", { count: dates.length })
                   }
                   InputProps={{
                     ...params.InputProps,
@@ -925,8 +914,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                   color: "#555",
                 }}
               >
-                This collection is large, so only the dates of its first items
-                are listed.
+                {t("stac.datesTruncated")}
               </p>
             )}
             {datesError && (
@@ -937,8 +925,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                   color: "#a33",
                 }}
               >
-                Dates could not be listed ({datesError}). Every item is still
-                browsable below.
+                {t("stac.datesError", { error: datesError })}
               </p>
             )}
           </>
@@ -959,10 +946,12 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
             }
             label={
               date
-                ? `Mosaic all ${date.count} tiles on ${date.date}`
+                ? t("stac.mosaicDate", { count: date.count, date: date.date })
                 : dates.length > 1
-                  ? "Mosaic all tiles on one date"
-                  : `Mosaic all ${collectionCount === null ? "" : `${collectionCount} `}tiles in this collection`
+                  ? t("stac.mosaicDateOption")
+                  : collectionCount === null
+                    ? t("stac.mosaicCollection")
+                    : t("stac.mosaicCollectionCount", { count: collectionCount })
             }
           />
         )}
@@ -970,7 +959,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
         {!itemsAreTiles && (
           <>
             <TextField
-              label="Filter items by id"
+              label={t("stac.filterItems")}
               size="small"
               fullWidth
               disabled={!collection}
@@ -1001,8 +990,8 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                   style={{ padding: "8px", color: "#888" }}
                   primary={
                     collection
-                      ? "No items match."
-                      : "Choose a collection first."
+                      ? t("stac.noItems")
+                      : t("stac.chooseCollection")
                   }
                 />
               )}
@@ -1034,14 +1023,14 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                     disabled={page <= 1 || loadingItems}
                     onClick={() => setPage(page - 1)}
                   >
-                    Previous
+                    {t("stac.previous")}
                   </CustomButtonGrey>
-                  <span style={{ fontSize: "0.8rem" }}>Page {page}</span>
+                  <span style={{ fontSize: "0.8rem" }}>{t("stac.page", { page })}</span>
                   <CustomButtonGrey
                     disabled={!hasNext || loadingItems}
                     onClick={() => setPage(page + 1)}
                   >
-                    Next
+                    {t("stac.next")}
                   </CustomButtonGrey>
                 </>
               )}
@@ -1052,7 +1041,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                   rel="noopener noreferrer"
                   style={{ fontSize: "11px", marginLeft: "auto" }}
                 >
-                  STAC item {item.id}
+                  {t("stac.itemLink", { id: item.id })}
                 </a>
               )}
             </div>
@@ -1074,7 +1063,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
             value={asset}
             disabled={(!item && !itemsAreTiles) || loadingAssets}
             loading={loadingAssets}
-            noOptionsText="No Cloud Optimized GeoTIFF assets here"
+            noOptionsText={t("stac.noAssets")}
             size="small"
             sx={{
               background: "#fff",
@@ -1096,7 +1085,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Asset"
+                label={t("stac.asset")}
                 InputProps={{
                   ...params.InputProps,
                   endAdornment: (
@@ -1121,11 +1110,10 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
             }
             label={
               <span style={{ fontSize: "0.8rem" }}>
-                Categorical layer (classes, not measurements)
+                {t("stac.categorical")}
                 {asset && asset.kind && (
                   <span style={{ color: "#888" }}>
-                    {" "}
-                    — catalog says {asset.kind}
+                    {" ("}{t("stac.catalogKind", { kind: asset.kind })})
                   </span>
                 )}
               </span>
@@ -1140,8 +1128,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                 color: "#a33",
               }}
             >
-              This collection spans {dates.length} dates. Choose one above, so
-              that the tiles mosaic into a single layer.
+              {t("stac.needsDate", { count: dates.length })}
             </p>
           )}
           {itemsAreTiles && !needsDate && assets.length > 0 && (
@@ -1152,10 +1139,9 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                 color: "#555",
               }}
             >
-              Asset names read from a sample item. The script receives the
-              collection, the asset name
-              {date ? ` and the date ${date.date}` : ""}, and mosaics the tiles
-              itself.
+              {t("stac.tileAssetDescription", {
+                dateText: date ? ` ${t("stac.dateText", { date: date.date })}` : "",
+              })}
             </p>
           )}
           <div
@@ -1171,14 +1157,14 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
               endIcon={<PlaylistAddIcon />}
               onClick={addSelection}
             >
-              Add to selection
+              {t("stac.addSelection")}
             </CustomButtonGreen>
             <CustomButtonGrey
               disabled={!sourceQuery || loadingPreview}
               endIcon={<ImageIcon />}
               onClick={loadPreview}
             >
-              Preview
+              {t("stac.preview")}
             </CustomButtonGrey>
           </div>
         </div>
@@ -1201,8 +1187,8 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
           {expandedUrl && (
             <IconButton
               size="small"
-              title="Open this asset in the tiler's map"
-              aria-label="Open this asset in the tiler's map"
+              title={t("stac.openOnMap")}
+              aria-label={t("stac.openOnMap")}
               href={expandedUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -1226,16 +1212,16 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
           ) : preview ? (
             <img
               src={preview.url}
-              alt={preview.label}
+              alt={t("stac.previewOf", { asset: preview.assetKey })}
               style={{ maxWidth: "100%", maxHeight: "240px" }}
             />
           ) : (
             <span style={{ fontSize: "0.75rem", color: "#888" }}>
               {!asset
-                ? "Choose an asset to preview it."
+                ? t("stac.chooseAssetPreview")
                 : sourceQuery
-                  ? 'Use "Preview" to render this asset.'
-                  : "This catalog does not say where the item lives, so it cannot be previewed."}
+                  ? t("stac.usePreview")
+                  : t("stac.noPreviewLocation")}
             </span>
           )}
         </div>
@@ -1245,12 +1231,11 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
 
       <div style={paperStyle(true)}>
         <h4 style={{ marginTop: "3px", marginBottom: "6px" }}>
-          Selected assets ({selections.length})
+          {t("stac.selectedAssets", { count: selections.length })}
         </h4>
         {selections.length === 0 ? (
           <p style={{ fontSize: "0.8rem", color: "#888", margin: "4px 5px" }}>
-            Nothing selected yet. Pick an item and an asset above, then use "Add
-            to selection".
+            {t("stac.nothingSelected")}
           </p>
         ) : (
           <List dense style={{ maxHeight: "180px", overflowY: "auto" }}>
@@ -1260,7 +1245,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                 secondaryAction={
                   <IconButton
                     edge="end"
-                    aria-label={`Remove ${selection.asset}`}
+                    aria-label={t("stac.removeAsset", { asset: selection.asset })}
                     onClick={() =>
                       commit(selections.filter((_, i) => i !== index))
                     }
@@ -1272,8 +1257,8 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
                 <ListItemText
                   primary={`${selection.collection} / ${selection.asset}`}
                   secondary={
-                    selectionScope(selection) +
-                    (selection.categorical ? " · categorical" : "")
+                    getSelectionScope(selection) +
+                    (selection.categorical ? ` ${t("stac.categoricalTag")}` : "")
                   }
                 />
               </ListItem>
@@ -1284,7 +1269,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
 
       <div>
         <CustomButtonGreen onClick={() => setOpenModal(false)}>
-          Accept
+          {t("stac.accept")}
         </CustomButtonGreen>
         <CustomButtonGreen
           onClick={() => {
@@ -1297,7 +1282,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
             setFilter("");
           }}
         >
-          Clear
+          {t("stac.clear")}
         </CustomButtonGreen>
         <CustomButtonGreen
           onClick={() => {
@@ -1305,7 +1290,7 @@ function StacBrowser({ value, updateValue, setOpenModal }) {
             updateValue(previousValue.current);
           }}
         >
-          Cancel
+          {t("stac.cancel")}
         </CustomButtonGreen>
       </div>
     </div>
