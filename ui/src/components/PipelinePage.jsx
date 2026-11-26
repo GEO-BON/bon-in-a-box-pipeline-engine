@@ -91,7 +91,8 @@ function pipInitialState(init) {
 }
 
 export function PipelinePage({ runType }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.resolvedLanguage;
   const [stoppable, setStoppable] = useState(null);
   const [runningScripts, setRunningScripts] = useState(new Set());
   const [resultsData, setResultsData] = useState(null);
@@ -176,8 +177,16 @@ export function PipelinePage({ runType }) {
         }
       }
     };
-    api.getInfo(runType, choice, callback);
+    api.getInfo(runType, choice, { lang }, callback);
   }
+
+  // Language changed: reload the translated text, keeping the user's input values.
+  const loadedLang = useRef(lang);
+  useEffect(() => {
+    if (loadedLang.current === lang) return;
+    loadedLang.current = lang;
+    loadPipelineMetadata(pipStates.descriptionFile, false);
+  }, [lang]);
 
   const restoreDefaults = useCallback(
     (metadata) => {

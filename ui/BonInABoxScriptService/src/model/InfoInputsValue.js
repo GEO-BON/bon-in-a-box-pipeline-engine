@@ -63,6 +63,9 @@ class InfoInputsValue {
             if (data.hasOwnProperty('options')) {
                 obj['options'] = ApiClient.convertToType(data['options'], ['String']);
             }
+            if (data.hasOwnProperty('optionLabels')) {
+                obj['optionLabels'] = ApiClient.convertToType(data['optionLabels'], {'String': 'String'});
+            }
             if (data.hasOwnProperty('properties')) {
                 obj['properties'] = ApiClient.convertToType(data['properties'], ['String']);
             }
@@ -144,6 +147,12 @@ InfoInputsValue.prototype['options'] = undefined;
 /**
  * @member {Array.<String>} properties
  */
+/**
+ * Translated text to display for each option, keyed by option value.
+ * @member {Object.<String, String>} optionLabels
+ */
+InfoInputsValue.prototype['optionLabels'] = undefined;
+
 InfoInputsValue.prototype['properties'] = undefined;
 
 /**

@@ -28,6 +28,7 @@ paths:
             items:
               type: string
               enum: [in_development, in_review, reviewed, core, example, subpipeline, stale, deprecated]
+        - $ref: "#/components/parameters/contentLanguage"
       responses:
         "200":
           description: Map of step description files to their names.
@@ -181,6 +182,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/stepType"
         - $ref: "#/components/parameters/descriptionPath"
+        - $ref: "#/components/parameters/contentLanguage"
       responses:
         "200":
           description: Returns the metadata, in JSON format
@@ -371,6 +373,50 @@ paths:
                 type: string
                 x-content-type: text/plain
                 example: Output folder is improperly configured
+  /api/language:
+    get:
+      summary: Returns the language saved in the shared geobon_lang cookie.
+      description: >
+        The geobon_lang cookie is shared with the other GEO BON sites and is HttpOnly,
+        so web pages read it through this call.
+      operationId: getLanguage
+      responses:
+        "200":
+          description: The saved language, or null when none is saved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  language:
+                    type: string
+                    nullable: true
+                    enum: [en, fr]
+    delete:
+      summary: Removes the saved language, so the browser language is used.
+      operationId: clearLanguage
+      responses:
+        "204":
+          description: Cookie removed.
+  /api/language/{lang}:
+    put:
+      summary: Saves the language in the shared geobon_lang cookie.
+      description: >
+        The cookie is set for .geobon.org on GEO BON hosts, so all GEO BON sites share it.
+        On other hosts it is set for the current host only.
+      operationId: setLanguage
+      parameters:
+        - name: lang
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [en, fr]
+      responses:
+        "204":
+          description: Cookie saved.
+        "400":
+          description: Unsupported language.
   /api/features:
     get:
       summary: Returns which optional features are enabled on this instance.
@@ -1609,6 +1655,17 @@ components:
       schema:
         type: string
         enum: [script, pipeline, openEO]
+    contentLanguage:
+      name: lang
+      in: query
+      description: Language for pipeline names, descriptions and input/output text.
+        Text without a translation stays in English. Ignored for scripts.
+        English when omitted.
+      required: false
+      schema:
+        type: string
+        pattern: "^[a-z]{2}$"
+        example: fr
     descriptionPath:
       name: descriptionPath
       in: path
@@ -1759,6 +1816,15 @@ components:
                 example:
                   - Option 1
                   - Option 2
+              optionLabels:
+                type: object
+                description: Translated text to display for each option, keyed by option value.
+                  Only present when info is requested with a lang that has translations.
+                  The option values themselves are never translated.
+                additionalProperties:
+                  type: string
+                example:
+                  Option 1: Choix 1
               properties:
                 type: array
                 items:

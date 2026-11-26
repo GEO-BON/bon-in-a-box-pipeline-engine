@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { Trans, useTranslation } from "react-i18next";
-import i18n, { browserLanguage, changePreference, getPreference, LANGUAGE_KEY, readPreference } from "./i18n";
+import i18n, { browserLanguage, changePreference, getPreference, LANGUAGE_KEY, readPreference, syncSharedPreference } from "./i18n";
 import LanguageSelector from "./components/LanguageSelector";
 import HomePage from "./components/HomePage";
 import InputType, { inputTypeToDisplay } from "./components/form/InputType";
@@ -106,6 +106,45 @@ describe("language selection", () => {
     await i18n.changeLanguage("fr");
     expect(i18n.t("testFallback", { ns: "pilot-test" })).toBe("English fallback");
     i18n.removeResourceBundle("en", "pilot-test");
+  });
+});
+
+describe("shared geobon_lang cookie", () => {
+  const mockFetch = (body = {}) => {
+    const fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => body });
+    vi.stubGlobal("fetch", fetch);
+    return fetch;
+  };
+
+  it("saves an explicit choice to the shared cookie, and clears it for the browser language", () => {
+    const fetch = mockFetch();
+    changePreference("fr");
+    expect(fetch).toHaveBeenCalledWith("/api/language/fr", { method: "PUT" });
+    changePreference("browser");
+    expect(fetch).toHaveBeenCalledWith("/api/language", { method: "DELETE" });
+  });
+
+  it("follows the language saved by another GEO BON site", async () => {
+    vi.spyOn(navigator, "languages", "get").mockReturnValue(["en-US"]);
+    changePreference("browser");
+    mockFetch({ language: "fr" });
+    await act(() => syncSharedPreference());
+    expect(i18n.resolvedLanguage).toBe("fr");
+    expect(localStorage.getItem(LANGUAGE_KEY)).toBe("fr");
+    expect(getPreference().preference).toBe("fr");
+  });
+
+  it("keeps the current language when no or an unsupported language is saved", async () => {
+    vi.spyOn(navigator, "languages", "get").mockReturnValue(["en-US"]);
+    changePreference("browser");
+    for (const body of [{ language: null }, { language: "es" }]) {
+      mockFetch(body);
+      await act(() => syncSharedPreference());
+      expect(i18n.resolvedLanguage).toBe("en");
+    }
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+    await act(() => syncSharedPreference());
+    expect(i18n.resolvedLanguage).toBe("en");
   });
 });
 

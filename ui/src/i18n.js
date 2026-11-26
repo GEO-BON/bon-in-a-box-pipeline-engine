@@ -44,7 +44,40 @@ export function changePreference(preference) {
   const saved = savePreference(preference);
   currentPreference = { preference, error: !saved };
   i18n.changeLanguage(preference === "browser" ? browserLanguage() : preference);
+  saveSharedPreference(preference);
   return currentPreference;
+}
+
+// The geobon_lang cookie is shared with the other GEO BON sites (e.g. members).
+// It is HttpOnly, so it is read and written through the server.
+export const SHARED_LANGUAGE_API = "/api/language";
+
+function saveSharedPreference(preference) {
+  if (typeof fetch !== "function") return;
+  const request = preference === "browser"
+    ? fetch(SHARED_LANGUAGE_API, { method: "DELETE" })
+    : fetch(`${SHARED_LANGUAGE_API}/${preference}`, { method: "PUT" });
+  Promise.resolve(request).catch((error) => console.debug("Unable to save the shared language:", error));
+}
+
+/** Follows the language chosen on another GEO BON site, if any. Called once at startup. */
+export async function syncSharedPreference() {
+  try {
+    const response = await fetch(SHARED_LANGUAGE_API);
+    if (!response.ok) return;
+    const { language } = await response.json();
+    if (isSupportedLanguage(language) && language !== currentPreference.preference) {
+      currentPreference = { preference: language, error: !savePreference(language) };
+      await i18n.changeLanguage(language);
+    }
+  } catch (error) {
+    console.debug("Unable to read the shared language:", error);
+  }
+}
+
+/** Language for pipeline content (names, descriptions, inputs and outputs). */
+export function contentLanguage() {
+  return i18n.resolvedLanguage;
 }
 
 i18n.use(initReactI18next).init({

@@ -3,12 +3,39 @@ import _ from "underscore";
 import { getBreadcrumbs, getScriptOutput } from "./IOId";
 import { GetCOGInfo } from "./api";
 
+const SUPPORTED_LANGUAGES = ["en", "fr"];
+let languagePromise: Promise<string> | null = null;
+
+/**
+ * Language for pipeline text: the geobon_lang cookie shared with the main UI and
+ * other GEO BON sites (read through the server, it is HttpOnly), else the browser language.
+ */
+export const GetContentLanguage = (): Promise<string> => {
+  if (!languagePromise) {
+    languagePromise = axios
+      .get("/api/language")
+      .then((response) => response.data?.language)
+      .catch(() => null)
+      .then((saved) => {
+        if (SUPPORTED_LANGUAGES.includes(saved)) return saved;
+        const browser = (navigator.languages || [navigator.language])
+          .map((language) => language?.toLowerCase().split("-")[0])
+          .find((language) => SUPPORTED_LANGUAGES.includes(language));
+        return browser || "en";
+      });
+  }
+  return languagePromise;
+};
+
 export const GetPipelineIO = async (pipeline_id: string) => {
   let result: any = { data: { outputs: [] } };
   try {
+    // Translated pipeline text when available; scripts stay in English.
+    const lang = await GetContentLanguage();
     result = await axios({
       method: "get",
       baseURL: `/pipeline/${pipeline_id}.json/info`,
+      params: lang === "en" ? {} : { lang },
     });
   } catch (error) {
     result = { data: {} };

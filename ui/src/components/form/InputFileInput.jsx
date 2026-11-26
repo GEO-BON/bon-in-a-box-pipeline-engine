@@ -142,6 +142,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                       id={inputId}
                       type={inputDescription.type}
                       options={options}
+                      optionLabels={inputDescription.optionLabels}
                       value={inputFileContent && inputFileContent[inputId]}
                       onValueUpdated={(value) =>
                         updateInputFile(inputId, value)
@@ -157,6 +158,7 @@ const InputForm = ({ inputs, inputFileContent, setInputFileContent }) => {
                           <ScriptInputExample
                             example={example}
                             type={inputDescription.type}
+                            optionLabels={inputDescription.optionLabels}
                           />
                         )))}
                   </>

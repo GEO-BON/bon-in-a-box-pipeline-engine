@@ -210,7 +210,8 @@ object CWLExportMain {
             currentDirectory.listFiles()?.forEach { file ->
                 launch(Dispatchers.IO) {
                     if (file.isDirectory) {
-                        exportAllFiles(type, sourceRoot, destinationRoot, file)
+                        // Hidden folders hold translations (e.g. pipelines/.fr), not steps.
+                        if (!file.name.startsWith(".")) exportAllFiles(type, sourceRoot, destinationRoot, file)
 
                     } else if (file.extension == extension) {
                         val destinationFile = File(destinationFolder, "${file.nameWithoutExtension}.cwl")

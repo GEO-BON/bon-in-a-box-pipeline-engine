@@ -2,7 +2,7 @@ import { useState, useEffect, useContext, lazy, Suspense } from "react";
 
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import "./i18n";
+import { syncSharedPreference } from "./i18n";
 import { useTranslation } from "react-i18next";
 import reportWebVitals from "./reportWebVitals";
 import {
@@ -32,6 +32,10 @@ const FileManager = lazy(() => import("./components/FileManager"));
 
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
 import { Alert } from "@mui/material";
+
+// Follow the language saved by other GEO BON sites.
+syncSharedPreference();
+
 export const api = new BonInABoxScriptService.DefaultApi();
 export const fm_api = new BonInABoxScriptService.FileManagerApi();
 
@@ -52,6 +56,7 @@ const HEALTH_RETRY_MS = 5000;
 const HEALTH_TIMEOUT_MS = 10000;
 
 const healthClient = new BonInABoxScriptService.ApiClient();
+
 healthClient.timeout = HEALTH_TIMEOUT_MS;
 const healthApi = new BonInABoxScriptService.DefaultApi(healthClient);
 const healthFmApi = new BonInABoxScriptService.FileManagerApi(healthClient);

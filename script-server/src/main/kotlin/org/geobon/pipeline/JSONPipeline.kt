@@ -42,22 +42,28 @@ class JSONPipeline (
          */
         fun getPipelineDescription(descriptionFile: File): JSONObject {
             if (descriptionFile.exists()) {
-                val descriptionJSON = JSONObject(descriptionFile.readText())
-                val metadataJSON = JSONObject()
-                metadataJSON.putOpt(INPUTS, descriptionJSON.get(INPUTS))
-                metadataJSON.putOpt(OUTPUTS, descriptionJSON.get(OUTPUTS))
-
-                descriptionJSON.optJSONObject(METADATA)?.let { metadata ->
-                    metadata.keys().forEach { key ->
-                        metadataJSON.putOpt(key, metadata.get(key))
-                    }
-                }
-
-                return metadataJSON
-
+                return getPipelineDescription(JSONObject(descriptionFile.readText()))
             } else {
                 throw FileNotFoundException("$descriptionFile does not exist.")
             }
+        }
+
+        /**
+         * @param descriptionJSON the pipeline file content (possibly with translations laid over it)
+         * @return the pipeline metadata as a JSONObject
+         */
+        fun getPipelineDescription(descriptionJSON: JSONObject): JSONObject {
+            val metadataJSON = JSONObject()
+            metadataJSON.putOpt(INPUTS, descriptionJSON.get(INPUTS))
+            metadataJSON.putOpt(OUTPUTS, descriptionJSON.get(OUTPUTS))
+
+            descriptionJSON.optJSONObject(METADATA)?.let { metadata ->
+                metadata.keys().forEach { key ->
+                    metadataJSON.putOpt(key, metadata.get(key))
+                }
+            }
+
+            return metadataJSON
         }
 
         fun createRootPipeline(serverContext: ServerContext, relPath: String, inputsJSON: String? = null) =

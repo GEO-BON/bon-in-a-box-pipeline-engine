@@ -61,6 +61,7 @@ export default function ScriptInput({
   type,
   value,
   options,
+  optionLabels,
   onValueUpdated,
   cols,
   label,
@@ -87,8 +88,9 @@ export default function ScriptInput({
   if (type.startsWith("options")) {
     if (options) {
       const multiple = type === "options[]";
+      // optionLabels holds translated text for display; the value sent to scripts stays as is.
       const optionObjects = options.map((choice) => {
-        return { value: choice, label: choice };
+        return { value: choice, label: optionLabels?.[choice] ?? choice };
       });
 
       let optionsValue;
@@ -96,7 +98,9 @@ export default function ScriptInput({
         optionsValue = fieldValue
           ? optionObjects.filter((opt) => fieldValue.includes(opt.value))
           : [];
-      else optionsValue = fieldValue || "";
+      else
+        optionsValue =
+          optionObjects.find((opt) => opt.value === fieldValue) || fieldValue || "";
 
       return (
         <Autocomplete
@@ -105,6 +109,7 @@ export default function ScriptInput({
           multiple={multiple}
           filterSelectedOptions={multiple}
           options={optionObjects}
+          isOptionEqualToValue={(option, selected) => option.value === (selected?.value ?? selected)}
           renderInput={(params) => (
             <TextField
               {...params}

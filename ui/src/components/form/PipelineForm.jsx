@@ -23,7 +23,8 @@ export function PipelineForm({
   runType,
   restoreDefaults,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.resolvedLanguage;
   const formRef = useRef();
   const navigate = useNavigate();
   const [pipelineMap, setPipelineMap] = useState();
@@ -87,7 +88,7 @@ export function PipelineForm({
   // Load list of scripts/pipelines into pipelineMap.
   // Pipelines are filtered on lifecycle status unless the user asked to see them all.
   useEffect(() => {
-    const opts = isPipeline ? lifecycleListOpts(showAllPipelines) : {};
+    const opts = isPipeline ? { ...lifecycleListOpts(showAllPipelines), lang } : {};
     api.getListOf(runType, opts, (error, data, response) => {
       if (error) {
         console.error(error);
@@ -95,7 +96,7 @@ export function PipelineForm({
         setPipelineMap(data);
       }
     });
-  }, [runType, isPipeline, showAllPipelines, setPipelineMap]);
+  }, [runType, isPipeline, showAllPipelines, setPipelineMap, lang]);
 
   // Keep the current pipeline in the list even if it is filtered out (e.g. opened from a link)
   const displayedPipelineMap = useMemo(() => {

@@ -373,6 +373,7 @@
     "pipelineListSaveError": "Failed to retrieve pipeline list.\n{{details}}",
     "yamlSyntax": "YAML Syntax: {{reason}}",
     "readOnly": "This instance is read-only",
+    "englishOnly": "Pipelines are edited in English.",
     "narrowDisplay": "The pipeline engine cannot be used on a narrow display.",
     "computerRecommended": "A computer is recommended for pipeline edition.",
     "phonePreview": "A phone can be used horizontally to preview a pipeline.",

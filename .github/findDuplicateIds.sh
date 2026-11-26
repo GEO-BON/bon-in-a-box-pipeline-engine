@@ -11,7 +11,8 @@ echo "Checking for duplicate ids inside each json file..."
 # The number of spaces here is important, because it matches the indentation of node ids.
 # It is normal that input or output "id" repeats if a script is there twice.
 
-RESULTS=$(find . -name "*.json" -exec sh -c "echo {}; \
+# Hidden folders (e.g. .fr translations) are skipped.
+RESULTS=$(find . -name "*.json" -not -path '*/.*' -exec sh -c "echo {}; \
 grep \"^      \\\"id\\\": \\\"\" '{}' \
   | sort \
   | uniq -d \
