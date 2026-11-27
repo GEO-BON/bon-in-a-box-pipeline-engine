@@ -448,7 +448,7 @@
     "pipelineAttribution": "Consultez les lignes directrices d’attribution des pipelines et des scripts.",
     "citation": "Veuillez utiliser la citation suivante pour référencer le moteur de pipelines BON in a Box :",
     "serverVersions": "Versions du serveur",
-    "cloudStatus": "État de la mise à l’échelle dans le nuage",
+    "cloudStatus": "État des ressources infonuagiques",
     "cloudDescription": "Les instances BON in a Box peuvent exécuter leurs tâches sur un cluster Kubernetes (K8s) si cette option est configurée dans <code>runner.env</code>. Dans ce cas, toutes les exécutions de scripts sont envoyées aux nœuds de calcul K8s.",
     "hpcStatus": "État du calcul haute performance",
     "hpcDescription": "Les instances BON in a Box peuvent déléguer des tâches à un ordinateur haute performance (HPC) si cette option est configurée dans <code>runner.env</code>. Seuls les scripts dont les métadonnées indiquent qu’ils prennent en charge le HPC y seront envoyés.",
