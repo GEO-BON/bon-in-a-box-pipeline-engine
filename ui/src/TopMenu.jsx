@@ -18,6 +18,7 @@ import IconLogout from "./img/icon-logout.png";
 import IconFiles from "./img/icon-gear.png";
 import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";
+import IconEBV from "./img/icon-ebv.png";
 import { uiContext } from "./uiContext.jsx";
 import getUserInfo from "./utils/getUserInfo.js";
 import { useTranslation } from "react-i18next";
@@ -28,7 +29,7 @@ function TopMenu() {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const { disableMyFiles, savePipelineToServer, chatEnabled } =
     React.useContext(uiContext);
-  const [userInfo, setUserInfo] = React.useState({ name: "FirstName" });
+  const [userInfo, setUserInfo] = React.useState();
 
   const pages = [
     { title: t("navigation.home"), link: "/" },
@@ -214,10 +215,9 @@ function TopMenu() {
               aria-controls={shouldRender ? "user-menu" : undefined}
             >
               <img className="navigation-bar-avatar" src={Avatar} alt="" />
-              <p className="navigation-bar-profile">{userInfo.name}</p>
+              {userInfo && <p className="navigation-bar-profile">{userInfo.name}</p>}
             </button>
 
-            {/* popup for user space */}
             {shouldRender && (
               <Box
                 id="user-menu"
@@ -234,12 +234,11 @@ function TopMenu() {
                             </NavLink> */}
 
                 <LanguageSelector />
-                <div className="divider"></div>
 
                 {!disableMyFiles && (
                   <NavLink
                     to="/manage-files"
-                    className="navbar-profile-popup-option mobile-popup-link"
+                    className="navbar-profile-popup-option mobile-only"
                   >
                     <img
                       src={IconFiles}
@@ -249,7 +248,7 @@ function TopMenu() {
                   </NavLink>
                 )}
 
-                <NavLink
+                {userInfo && <NavLink
                   to="https://members.geobon.org/pages/dashboard/profile"
                   className="navbar-profile-popup-option"
                 >
@@ -259,10 +258,13 @@ function TopMenu() {
                   ></img>
                   {t("navigation.profile")}
                 </NavLink>
+                }
+
+                <div className="divider mobile-only"></div>
 
                 <NavLink
                   to="https://discourse.geobon.org/"
-                  className="navbar-profile-popup-option mobile-popup-link"
+                  className="navbar-profile-popup-option mobile-only"
                 >
                   <img
                     src={IconDiscourse}
@@ -273,7 +275,7 @@ function TopMenu() {
 
                 <NavLink
                   to="https://members.geobon.org/"
-                  className="navbar-profile-popup-option mobile-popup-link"
+                  className="navbar-profile-popup-option mobile-only"
                 >
                   <img
                     src={IconMembers}
@@ -282,18 +284,30 @@ function TopMenu() {
                   {t("navigation.members")}
                 </NavLink>
 
-                <div className="divider"></div>
-
                 <NavLink
-                  to="https://auth.bee.geobon.org/oauth2/sign_out"
-                  className="navbar-profile-popup-option"
+                  className="navbar-profile-popup-option mobile-only"
+                  target="_blank"
+                  to="https://portal.geobon.org/datasets"
+                  title={t("navigation.portalTitle")}
                 >
-                  <img
-                    src={IconLogout}
-                    className="navbar-profile-popup-icon"
-                  ></img>
-                  {t("navigation.logout")}
+                  <img src={IconEBV} className="left-pane-icon"></img>
+                  {t("navigation.portal")}
                 </NavLink>
+
+                {userInfo && <>
+                  <div className="divider"></div>
+                  <NavLink
+                    to="https://auth.bee.geobon.org/oauth2/sign_out"
+                    className="navbar-profile-popup-option"
+                  >
+                    <img
+                      src={IconLogout}
+                      className="navbar-profile-popup-icon"
+                    ></img>
+                    {t("navigation.logout")}
+                  </NavLink>
+                </>
+                }
               </Box>
             )}
 

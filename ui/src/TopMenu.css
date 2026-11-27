@@ -60,6 +60,7 @@
     color: inherit;
     font: inherit;
     cursor: pointer;
+    font-weight: 500;
 }
 
 .language-button:hover,
@@ -218,7 +219,7 @@
     background-color: #D5D5D5;
 }
 
-.mobile-popup-link {
+.mobile-only {
     display: none;
 }
 
@@ -298,7 +299,7 @@
         width: 224px;
     }
 
-    .mobile-popup-link {
+    .mobile-only {
         display: inherit;
     }
 }
