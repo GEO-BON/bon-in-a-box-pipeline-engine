@@ -21,7 +21,7 @@ These standards are intended to:
 
 These standards guide both pipeline development and the scientific peer-review process.
 
-**Contributors** should use this document when developing or updating pipelines. **Reviewers** should use it alongside the [Peer Review Process](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/peer_review.html) to evaluate whether pipelines meet the requirements for publication.
+**Contributors** should use this document when developing or updating pipelines. **Reviewers** should use it alongside the [Peer Review Process](peer_review.qmd) to evaluate whether pipelines meet the requirements for publication.
 
 The sections below outline the scientific, data, code, documentation, and versioning standards for BEE pipelines.
 
@@ -146,7 +146,7 @@ Code should adhere to the following requirements:
 
 ### YAML description files
 
-Each script will be accompanied by a YAML description file (.yml format) that has a description of the script, specifies the inputs and outputs, defines the Conda dependencies, and provides references (see [our documentation](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#step-1-creating-a-yaml-file) for guidelines on how to format your YAML file).
+Each script will be accompanied by a YAML description file (.yml format) that has a description of the script, specifies the inputs and outputs, defines the Conda dependencies, and provides references (see [our documentation](how_to_contribute.qmd#step-3-create-a-yaml-file) for guidelines on how to format your YAML file).
 
 #### **YAML file standards**
 
@@ -166,7 +166,7 @@ Each script will be accompanied by a YAML description file (.yml format) that ha
 
 - For **file outputs, type** should be written as a MIME type
 
-- For **primitive outputs**, such as text and numbers, use a primitive type (int, float, text). Refer to [the inputs section of the user documentation](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_contribute.html#inputs).
+- For **primitive outputs**, such as text and numbers, use a primitive type (int, float, text). Refer to [the inputs section of the user documentation](how_to_contribute.qmd#inputs).
 
 - For **values**: The example value will automatically populate the corresponding input field in BEE. Ensure that the example is valid and uses the appropriate format.
 

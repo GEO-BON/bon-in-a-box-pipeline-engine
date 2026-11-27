@@ -8,13 +8,15 @@ import IconDiscourse from "./img/icon-discourse.png";
 import IconMembers from "./img/icon-members.png";
 import IconEBV from "./img/icon-ebv.png";
 import { uiContext } from "./uiContext.jsx";
+import { useTranslation } from "react-i18next";
 
 export default function LeftPane({ leftContent }) {
+  const { t } = useTranslation();
   const { disableMyFiles, savePipelineToServer } = useContext(uiContext);
   return (
     <div className="left-pane">
       <NavLink to="/">
-        <img id="logo" src={BiaBLogo} alt="BON in a Box logo" />
+        <img id="logo" src={BiaBLogo} alt={t("navigation.logo")} />
       </NavLink>
       {/* <div className="divider"></div> */}
 
@@ -35,9 +37,13 @@ export default function LeftPane({ leftContent }) {
             <>
               {/* doesn't render if this is a READ ONLY environment */}
               {!disableMyFiles && (
-                <NavLink className="left-pane-link" to="/manage-files">
+                <NavLink 
+                className="left-pane-link" 
+                to="/manage-files"
+                title={t("navigation.filesTitle")}
+                >
                   <img src={IconFiles} className="left-pane-icon"></img>
-                  My files
+                  {t("navigation.files")}
                 </NavLink>
               )}
               <div className="divider"></div>
@@ -45,6 +51,7 @@ export default function LeftPane({ leftContent }) {
                 className="left-pane-link"
                 target="_blank"
                 to="https://discourse.geobon.org/"
+                title={t("navigation.discourseTitle")}
               >
                 <img src={IconDiscourse} className="left-pane-icon"></img>
                 Discourse
@@ -53,17 +60,19 @@ export default function LeftPane({ leftContent }) {
                 className="left-pane-link"
                 target="_blank"
                 to="https://members.geobon.org/pages/index"
+                title={t("navigation.membersTitle")}
               >
                 <img src={IconMembers} className="left-pane-icon"></img>
-                Members
+                {t("navigation.members")}
               </NavLink>
               <NavLink
                 className="left-pane-link"
                 target="_blank"
                 to="https://portal.geobon.org/datasets"
+                title={t("navigation.portalTitle")}
               >
                 <img src={IconEBV} className="left-pane-icon"></img>
-                Data portal
+                {t("navigation.portal")}
               </NavLink>
             </>
           )}

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./style.css";
@@ -18,17 +19,17 @@ async function checkAvailability() {
   try {
     res = await fetch(HEALTH_URL);
   } catch {
-    return "The chat assistant is unavailable: it could not be reached. Please try again later.";
+    return "chat.unavailableNetwork";
   }
   const body = await res.json().catch(() => null);
   if (res.status === 503 && body?.ollama_status) {
-    return "The chat assistant is unavailable: the language model server cannot be reached. Please try again later.";
+    return "chat.unavailableModel";
   }
   if (!res.ok) {
-    return "The chat assistant is unavailable right now. It may still be starting up. Please try again in a minute.";
+    return "chat.unavailableStarting";
   }
   if (!body?.tools) {
-    return "The chat assistant is unavailable: it could not connect to the engine's MCP server. Please try again later.";
+    return "chat.unavailableEngine";
   }
   return null;
 }
@@ -48,14 +49,14 @@ const MODEL_NAME = import.meta.env.VITE_CHAT_MODEL || "qwen3.5:9b";
 // Strip tool-call JSON blocks and bridge-injected "Assistant:" prefixes that leak
 // through when the model emits tool calls as plain text instead of using Ollama's
 // native tool_calls field. Smaller models do this often enough to matter.
-function cleanContent(text) {
+function cleanContent(text, t) {
   const trimmed = text.trim();
   // If the entire response is a tool-call JSON object, the bridge failed to execute
   // the tool -- show a neutral placeholder rather than raw JSON.
   try {
     const parsed = JSON.parse(trimmed);
     if (parsed && typeof parsed === "object" && "name" in parsed && "arguments" in parsed) {
-      return "_Querying the engine…_";
+      return `_${t("chat.querying")}_`;
     }
   } catch {
     // Not a bare tool call; fall through to the partial strip below.
@@ -70,25 +71,25 @@ function cleanContent(text) {
 function friendlyError(err) {
   const status = err?.status;
   if (status === 502 || status === 503 || status === 504) {
-    return "The assistant is unavailable right now. It may be starting up or busy with another request. Please try again in a minute.";
+    return "chat.errorUnavailable";
   }
   if (status === 429) {
-    return "The assistant is handling too many requests. Please wait a moment and try again.";
+    return "chat.errorBusy";
   }
   if (status === 408) {
-    return "The assistant took too long to respond. Try again, or ask a narrower question.";
+    return "chat.errorTimeout";
   }
   if (status >= 500) {
-    return "The assistant ran into a problem on the server. Please try again shortly.";
+    return "chat.errorServer";
   }
   if (status >= 400) {
-    return "The request to the assistant could not be processed. Please reload the page and try again.";
+    return "chat.errorRequest";
   }
   // fetch() rejects with a TypeError when the network or connection fails.
   if (err instanceof TypeError) {
-    return "Could not reach the assistant. Check your connection and try again.";
+    return "chat.errorNetwork";
   }
-  return "Something went wrong while generating the answer. Please try again.";
+  return "chat.errorGeneric";
 }
 
 // The conversation is kept in localStorage so it survives leaving the chat tab.
@@ -97,13 +98,6 @@ const GREETING = {
   role: "assistant",
   content: "Hi! How can I assist you with the Biodiversity Evaluation Engine today?",
 };
-
-// Shown under the greeting until the user asks something.
-const EXAMPLE_QUESTIONS = [
-  "What pipelines are available for protected areas?",
-  "What are the inputs needed to run ProtConn?",
-  "Run Biodiversity Intactness for Albania",
-];
 
 function loadMessages() {
   let saved;
@@ -125,6 +119,7 @@ function loadMessages() {
 }
 
 export default function Chat() {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState(loadMessages);
 
   useEffect(() => {
@@ -323,14 +318,14 @@ export default function Chat() {
       // reasoning, if there is any, sits in the disclosure above this text.
       setMessages((m) => {
         const last = m.at(-1);
-        if (last?.role !== "assistant" || cleanContent(last.content)) return m;
+        if (last?.role !== "assistant" || cleanContent(last.content, t)) return m;
         return [
           ...m.slice(0, -1),
           {
             ...last,
             content: last.thinking
-              ? "_Stopped while still reasoning, without reaching an answer. The reasoning is above. Asking again, more narrowly, usually helps._"
-              : "_No answer was returned. Please try again._",
+              ? `_${t("chat.stoppedReasoning")}_`
+              : `_${t("chat.noAnswer")}_`,
           },
         ];
       });
@@ -339,7 +334,7 @@ export default function Chat() {
       console.error("Chat request failed:", err);
       setMessages((m) => [
         ...m.slice(0, -1),
-        { role: "assistant", content: `_${friendlyError(err)}_` },
+        { role: "assistant", content: `_${t(friendlyError(err))}_` },
       ]);
     } finally {
       setLoading(false);
@@ -347,16 +342,22 @@ export default function Chat() {
     }
   }
 
+  const exampleQuestions = [
+    t("chat.exampleProtectedAreas"),
+    t("chat.exampleInputs"),
+    t("chat.exampleIntactness"),
+  ];
+
   return (
     <div className="chat-container">
       <div className="chat-header">
-        Biodiversity Evaluation Engine Assistant
+        {t("chat.assistantTitle")}
         <button
           className="chat-new"
           onClick={() => setMessages([GREETING])}
           disabled={loading}
         >
-          New chat
+          {t("chat.newChat")}
         </button>
       </div>
       <div className="chat-messages">
@@ -367,7 +368,7 @@ export default function Chat() {
                 <>
                   {m.thinking && (
                     <details className="thinking-block">
-                      <summary>Thinking…</summary>
+                      <summary>{t("chat.thinking")}</summary>
                       <div className="thinking-content">{m.thinking}</div>
                     </details>
                   )}
@@ -381,7 +382,7 @@ export default function Chat() {
                       ),
                     }}
                   >
-                    {cleanContent(m.content)}
+                    {i === 0 && m.role === "assistant" ? t("chat.greeting") : cleanContent(m.content, t)}
                   </ReactMarkdown>
                 </>
               ) : (
@@ -395,7 +396,7 @@ export default function Chat() {
         ))}
         {messages.length === 1 && !unavailable && (
           <div className="chat-examples">
-            {EXAMPLE_QUESTIONS.map((q) => (
+            {exampleQuestions.map((q) => (
               <button key={q} className="chat-example" onClick={() => pickExample(q)}>
                 {q}
               </button>
@@ -404,15 +405,14 @@ export default function Chat() {
         )}
         {waiting && (
           <div className="chat-waiting">
-            Waiting for the assistant — the model handles one request at a time, so
-            this may queue behind another session.
+            {t("chat.waiting")}
           </div>
         )}
         {unavailable && (
           <div className="chat-unavailable">
-            {unavailable}
+            {t(unavailable)}
             <button className="chat-retry" onClick={recheck}>
-              Retry
+            {t("chat.retry")}
             </button>
           </div>
         )}
@@ -424,8 +424,8 @@ export default function Chat() {
           value={input}
           placeholder={
             unavailable
-              ? "The chat assistant is unavailable"
-              : "Ask the Biodiversity Evaluation Engine for information or to run a pipeline..."
+              ? t("chat.unavailablePlaceholder")
+              : t("chat.inputPlaceholder")
           }
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
@@ -433,7 +433,7 @@ export default function Chat() {
           disabled={loading || !!unavailable}
         />
         <button className="chat-send" onClick={send} disabled={loading || !!unavailable}>
-          {loading ? "…" : "Send"}
+          {loading ? "…" : t("chat.send")}
         </button>
       </div>
     </div>

@@ -9,6 +9,7 @@ import { formatError } from "../HttpErrors";
 import { Alert } from "@mui/material";
 import SpamField from "../SpamField";
 import CaptchaGate from "../CaptchaGate";
+import { useTranslation } from "react-i18next";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
@@ -22,6 +23,7 @@ export function PipelineForm({
   runType,
   restoreDefaults,
 }) {
+  const { t } = useTranslation();
   const formRef = useRef();
   const navigate = useNavigate();
   const [pipelineMap, setPipelineMap] = useState();
@@ -53,7 +55,7 @@ export function PipelineForm({
           formatError(
             error,
             response,
-            "while launching pipeline on script server",
+            t("form.errorLaunch"),
           ),
         );
       } else if (runId) {
@@ -68,9 +70,9 @@ export function PipelineForm({
       } else {
         setHttpError(
           formatError(
-            "Server returned empty result",
+            t("form.emptyResult"),
             null,
-            "while getting run ID from script server",
+            t("form.errorRunId"),
           ),
         );
       }
@@ -124,8 +126,8 @@ export function PipelineForm({
           value={pipStates.descriptionFile}
           placeholder={
             runType === "pipeline"
-              ? "Search or select a pipeline..."
-              : "Search or select a script..."
+              ? t("pipelineMenu.placeholder")
+              : t("pipelineMenu.placeholderScript")
           }
           onChange={(descriptionFile, name) =>
             handlePipelineChange(name, descriptionFile)
@@ -136,7 +138,7 @@ export function PipelineForm({
           }
           originPage="input-form"
           togglePosition="top"
-          label={isPipeline ? "Pipeline" : "Script"}
+          label={isPipeline ? t("form.pipeline") : t("form.script")}
           inputId="pipelineChoiceInput"
         />
         <br />
@@ -159,7 +161,7 @@ export function PipelineForm({
               <br />
               {validationError && (
                 <Alert severity="error">
-                  Error parsing YAML input.
+                  {t("form.yamlError")}
                   <br />
                   {validationError}
                 </Alert>
@@ -170,7 +172,7 @@ export function PipelineForm({
                 disabled={validationError != null}
                 variant="contained"
               >
-                {runType === "pipeline" ? "Run pipeline" : "Run script"}
+                {runType === "pipeline" ? t("form.runPipeline") : t("form.runScript")}
               </CustomButtonGreen>
             </>
           )}

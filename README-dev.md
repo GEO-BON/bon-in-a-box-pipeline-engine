@@ -101,6 +101,12 @@ gitGraph
 ### Public release
 
 1. Regenerate documentation by running `quarto render` in the docs_source folder.
+   This also renders each language project in `docs_source/lang/` to a
+   corresponding directory in `docs/` (for example, `lang/fr/` to `docs/fr/`).
+   To add a language, create a Quarto website project under `docs_source/lang/`
+   and add its pages to the language navigation menu. English is the source
+   language; translations should preserve technical content, code, commands,
+   links, and cross-reference anchors.
 2. Merge to main
 
    The changes are live as soon as they are merged to main branch: the dockers are built, pushed to the GitHub package registry ([server](https://github.com/orgs/GEO-BON/packages?repo_name=bon-in-a-box-pipeline-engine) and [runners](https://github.com/orgs/GEO-BON/packages?repo_name=bon-in-a-box-pipelines)), and next time someone starts the server, the new docker images will be pulled.

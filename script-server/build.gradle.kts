@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "org.geobon"
-version = "1.4.0"
+version = "2.0.0"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 }

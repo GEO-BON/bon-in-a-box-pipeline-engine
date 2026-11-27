@@ -1,4 +1,6 @@
 import ReactMarkdown from 'react-markdown';
+import i18n from "../i18n";
+import { useTranslation } from "react-i18next";
 import { LifecycleChip, LifecycleMessage } from './Lifecycle';
 import { HoverCard } from './HoverCard';
 import Typography from "@mui/material/Typography";
@@ -46,7 +48,7 @@ function findLogoImageFromURL(url) {
 
 function IdentifierLogo({ src, href }) {
     return <a href={href} target="_blank">
-        <img src={src} alt="Identifier logo" title="Go to profile" width="20px"></img>
+        <img src={src} alt={i18n.t("description.identifierLogo")} title={i18n.t("description.goToProfile")} width="20px"></img>
     </a>
 }
 
@@ -65,7 +67,7 @@ function generatePersonList(list) {
             </div>
             <hr />
             {email}
-            {role && <p>Contribution: {role}</p> || <p></p>}
+            {role && <p>{i18n.t("description.contribution", { role })}</p> || <p></p>}
             {identifierLogo ? null : person.identifier && <a href={person.identifier} target="_blank">{person.identifier.replace(/https?:\/\//, '')}</a>}
         </>
 
@@ -85,23 +87,26 @@ function generatePersonList(list) {
  * @param {object} Script metadata
 */
 export function GeneralDescription({ ymlPath, metadata }) {
+    const { t } = useTranslation()
     if (!metadata)
         return null
 
     if (isEmptyObject(metadata)) {
         return <div className='stepDescription'>
-            <Alert severity='warning'>Script was not found on this server. Raw results will be displayed.</Alert>
+            <Alert severity='warning'>{t('description.notFound')}</Alert>
         </div>
     }
 
     const codeLink = getCodeUrl(ymlPath, metadata.script)
 
     let computeMessage = metadata.compute &&
-        `Compute: Uses ${metadata.compute["cpus-per-task"]} core${metadata.compute["cpus-per-task"] > 1 ? "s" : ""
-        } capped to ${metadata.compute.mem} of memory.`
+        t("description.compute", {
+            count: metadata.compute["cpus-per-task"],
+            mem: metadata.compute.mem,
+        })
 
     if (metadata.compute?.hpc === true) {
-        computeMessage += ` This script can run on a HPC, with a maximum duration of ${metadata.compute.time}.`
+        computeMessage += ` ${t("description.computeHpc", { time: metadata.compute.time })}`
     }
 
     return <div className='stepDescription'>
@@ -126,24 +131,24 @@ export function GeneralDescription({ ymlPath, metadata }) {
         }
         {metadata.reviewer &&
             <div><small>
-                Reviewed by:&nbsp;
+                {t('description.reviewedBy')}&nbsp;
                 <i>{generatePersonList(metadata.reviewer)}</i>
             </small></div>
         }
         {metadata.description && <div className="reactMarkdown"><ReactMarkdown children={metadata.description} /></div>}
         {codeLink && <p style={{wordBreak: 'break-all'}}>
-                Code: <a href={codeLink} target="_blank">{codeLink.substring(codeLink.search(/(scripts|pipelines)\//))}</a>
+                {t('description.code')} <a href={codeLink} target="_blank">{codeLink.substring(codeLink.search(/(scripts|pipelines)\//))}</a>
             </p>
         }
         {computeMessage && <p>{computeMessage}</p>}
         {metadata.external_link &&
-            <p>See&nbsp;
+            <p>{t('description.see')}&nbsp;
                 <a href={metadata.external_link} target="_blank">{metadata.external_link}</a>
             </p>
         }
         {metadata.references &&
             <div className='references'>
-                <p className='noMargin'>References: </p>
+                <p className='noMargin'>{t('description.references')} </p>
                 <ul>{metadata.references.map((r, i) => {
                     let link = r.link || r.doi
                     return <li key={i}>{r.text} {link && <><br /><a href={link} target="_blank">{link}</a></>}</li>
@@ -194,7 +199,7 @@ function printLicense(license) {
             </a>
 
         default:
-            return <p>License: {license}</p>
+            return <p>{i18n.t("description.license", { license })}</p>
     }
 }
 
@@ -220,11 +225,12 @@ function removeLastSlash(s) {
  * @param {object} Script metadata
  */
 export function InputsDescription({ metadata }) {
+    const { t } = useTranslation()
     if (!metadata || !metadata.inputs)
         return null
 
     return <>
-        <h3>Inputs</h3>
+        <h3>{t('description.inputs')}</h3>
         <pre className='yaml'>{jsonToYaml(metadata.inputs)}</pre>
     </>
 }
@@ -234,11 +240,12 @@ export function InputsDescription({ metadata }) {
  * @param {object} Script metadata
  */
 export function OutputsDescription({ metadata }) {
+    const { t } = useTranslation()
     if (!metadata || !metadata.outputs)
         return null
 
     return <>
-        <h3>Outputs</h3>
+        <h3>{t('description.outputs')}</h3>
         <pre className='yaml'>{jsonToYaml(metadata.outputs)}</pre>
     </>
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import i18n from "../../i18n";
 import { Spinner } from "../Spinner";
 import { HttpError } from "../HttpErrors";
 import * as BonInABoxScriptService from "bon_in_a_box_script_service";
@@ -36,7 +37,7 @@ export default function Versions() {
 
   useEffect(() => {
     api.getVersions((error, _, response) => {
-      if (error) setVersions(<HttpError httpError={error} response={response} context="fetching version information" />);
+      if (error) setVersions(<HttpError error={error} response={response} message={i18n.t("errors.versions")} />);
       else if (response && response.text) setVersions(formatVersionJson(response.text).trim());
       else setVersions(null);
     });

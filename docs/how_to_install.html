@@ -47,7 +47,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-665ee2a288131b436dc9b19ef6dcd906.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-887c0eefb0bd987f213c44d7542ba662.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -136,6 +136,12 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Peer review</span></a>
   </li>  
 </ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./fr/index.html"> 
+<span class="menu-text">Français</span></a>
+  </li>  
+</ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
     <a href="https://boninabox.geobon.org/" title="BON in a Box website" class="quarto-navigation-tool px-1" aria-label="BON in a Box website"><i class="bi bi-box-arrow-up-right"></i></a>
@@ -193,7 +199,7 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>The Biodiversity Evaluation Engine (BEE) can be accessed directly through our <a href="https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_use.html">online platform</a>, without installing any software. <strong>For most users, we recommend using the online version.</strong></p>
+<p>The Biodiversity Evaluation Engine (BEE) can be accessed directly through our <a href="./how_to_use.html">online platform</a>, without installing any software. <strong>For most users, we recommend using the online version.</strong></p>
 <p>However, you may want to install BEE locally if you:</p>
 <ul>
 <li><p><strong>Want to contribute to BEE:</strong> Develop, test, or modify analytical pipelines, scripts, or other platform components.</p></li>
@@ -278,7 +284,10 @@ ul.task-list li input[type="checkbox"] {
 <ol type="a">
 <li><p>Find the file called <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env"><code>runner-sample.env</code></a></p></li>
 <li><p>Duplicate the file and rename the copy to <code>runner.env</code>.</p></li>
-<li><p>Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g.&nbsp;GBIF or IUCN)</p></li>
+<li><p>Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g.&nbsp;GBIF or IUCN)</p>
+<ul>
+<li>To access the UN Biodiversity Lab catalogue in the STAC chooser, set <code>UNBL_API_KEY</code> to the key provided by UN Biodiversity Lab. The catalogue currently answers without one, but it is needed to access the items in pipelines.</li>
+</ul></li>
 <li><p>Adjust any server option as you see fit (optional).</p></li>
 </ol></li>
 <li><p>Using a Linux terminal (terminal on Mac, Git Bash or WSL on Windows), navigate to the folder of the cloned repository.</p></li>
@@ -335,7 +344,7 @@ In this case, defer the update until you can afford the time to start a run that
 <li><p>It is recommended to use a captcha on public-facing servers. Add your keys for Google’s repatcha.</p></li>
 <li><p>In the case where a server is used for demonstration purposes only, set environment variable <code>BLOCK_RUNS=true</code></p></li>
 <li><p>Configure the “Cloud-scaling” section if you have access to a kubernetes cluster. This is still experimental.</p></li>
-<li><p>Connecting to a High-Performance Computer (HPC) is still experimental. Refer to the <a href="README-dev.html#setting-up-drac-cluster-connection">developer documentation</a> for guidance and limitations.</p></li>
+<li><p>Connecting to a High-Performance Computer (HPC) is still experimental. Refer to the <a href="https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/blob/main/README-dev.md#setting-up-digital-research-alliance-of-canada-drac-cluster-connection">developer documentation</a> for guidance and limitations.</p></li>
 </ul>
 <p>Server setup:</p>
 <ul>

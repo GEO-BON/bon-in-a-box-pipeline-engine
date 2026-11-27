@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import { paperStyle } from "./utils";
 import _lang from "lodash/lang";
+import { useTranslation } from "react-i18next";
 
 export default function BBox({ states, dispatch, value = null, setMessage }) {
+  const { t } = useTranslation();
   const bboxSavedValue =
     Array.isArray(value?.bbox) && value?.bbox.length == 4 ? value?.bbox : null;
   const [bbInput, setBboxInput] = useState(bboxSavedValue || ["", "", "", ""]);
@@ -40,10 +42,10 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
 
   return (
     <div style={paperStyle(true)}>
-      <h4 style={{ marginTop: "3px", marginBottom: "3px" }}>Bounding Box</h4>
+      <h4 style={{ marginTop: "3px", marginBottom: "3px" }}>{t("choosers.boundingBox")}</h4>
       <TextField
         type="number"
-        label="Minimum X"
+        label={t("choosers.minXLabel")}
         size="small"
         value={bbInput[0]}
         onChange={(e) => updateBBox(0, e.target.value)}
@@ -55,7 +57,7 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
       <TextField
         type="number"
         size="small"
-        label="Minimum Y"
+        label={t("choosers.minYLabel")}
         value={bbInput[1]}
         onChange={(e) => updateBBox(1, e.target.value)}
         sx={{ marginBottom: "10px", width: "100%" }}
@@ -65,7 +67,7 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
       />
       <TextField
         type="number"
-        label="Maximum X"
+        label={t("choosers.maxXLabel")}
         size="small"
         value={bbInput[2]}
         onChange={(e) => updateBBox(2, e.target.value)}
@@ -76,7 +78,7 @@ export default function BBox({ states, dispatch, value = null, setMessage }) {
       />
       <TextField
         type="number"
-        label="Maximum Y"
+        label={t("choosers.maxYLabel")}
         size="small"
         value={bbInput[3]}
         onChange={(e) => updateBBox(3, e.target.value)}

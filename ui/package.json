@@ -1,6 +1,6 @@
 {
   "name": "ui",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "private": true,
   "//dependencies": {
     "//dnd-kit": "used to drag and drop steps into the pipeline editor canvas.",
@@ -27,7 +27,12 @@
     "//web-vitals": "Currently unused: frontend performance metrics. Was there in project template.",
     "//proj4": "used to transform coordinates between different coordinate reference systems.",
     "//@svar-ui/react-filemanager": "provides a file manager UI component to select files from the server.",
-    "//@svar-ui/filemanager-data-provider": "provides a data provider for the file manager UI component to select files from the server."
+    "//@svar-ui/filemanager-data-provider": "provides a data provider for the file manager UI component to select files from the server.",
+    "//@svar-ui/react-core": "provides the locale context for the file manager.",
+    "//i18next": "translation engine: language detection, catalogs in src/locales (managed with Weblate) and the t() function.",
+    "//react-i18next": "React bindings for i18next: useTranslation hook and Trans component to translate UI strings.",
+    "//vitest": "test runner (npm test). Used with jsdom to test the translation setup and components.",
+    "//jsdom": "simulated browser DOM environment for vitest component tests."
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -41,6 +46,7 @@
     "@mui/material": "^7.3.9",
     "@ngageoint/geopackage": "^4.2.8",
     "@svar-ui/filemanager-data-provider": "^2.6.0",
+    "@svar-ui/react-core": "^2.6.0",
     "@svar-ui/react-filemanager": "^2.6.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -49,6 +55,7 @@
     "axios": "^1.14.0",
     "bon_in_a_box_script_service": "file:BonInABoxScriptService",
     "elkjs": "^0.11.1",
+    "i18next": "^26.7.2",
     "js-yaml": "^4.1.1",
     "leaflet": "^1.9.4",
     "lodash": "^4.17.23",
@@ -57,6 +64,7 @@
     "proj4": "^2.20.9",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+    "react-i18next": "^17.1.13",
     "react-leaflet": "^4.2.1",
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.13.2",
@@ -65,15 +73,21 @@
     "web-vitals": "^5.2.0"
   },
   "devDependencies": {
+    "@svar-ui/core-locales": "^2.6.0",
+    "@svar-ui/filemanager-locales": "^2.6.0",
+    "@svar-ui/grid-locales": "^2.7.0",
+    "@svar-ui/uploader-locales": "^2.5.3",
     "@vitejs/plugin-react": "^6.0.1",
     "@watergis/maplibre-gl-terradraw": "^1.12.2",
-    "vite": "^8.0.3"
+    "jsdom": "^31.0.0",
+    "vite": "^8.0.3",
+    "vitest": "^5.1.0"
   },
   "scripts": {
     "start": "vite --host --no-open",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "react-scripts test"
+    "test": "vitest run"
   },
   "eslintConfig": {
     "extends": [

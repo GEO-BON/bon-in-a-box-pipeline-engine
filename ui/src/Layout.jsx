@@ -5,6 +5,7 @@ import theme from "./components/styles/theme";
 import useWindowDimensions from "./utils/WindowDimensions";
 import TopMenu from "./TopMenu";
 import LeftPane from "./LeftPane";
+import { useTranslation } from "react-i18next";
 
 export const PopupContentContext = createContext();
 export const TitleContext = createContext();
@@ -22,6 +23,7 @@ export function PageTitle({ title }) {
 }
 
 export function Layout(props) {
+  const { t } = useTranslation();
   const { windowHeight } = useWindowDimensions();
   const [mainHeight, setMainHeight] = useState();
   const [popupContent, setPopupContent] = useState();
@@ -60,7 +62,7 @@ export function Layout(props) {
                     <div className="fullScreenPopup">
                         <div className="content">{popupContent}</div>
                         <button
-                        title="Close"
+                        title={t("navigation.close")}
                         className="close"
                         onClick={() => setPopupContent(null)}
                         >
@@ -79,4 +81,3 @@ export function Layout(props) {
     </PopupContentContext.Provider>
   );
 }
-

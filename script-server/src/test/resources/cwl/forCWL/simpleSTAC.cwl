@@ -150,7 +150,9 @@ inputs:
 
   envFolder:
     type: Directory?
-    doc: Folder for conda-pack to export environments. This avoids downloading/resolving the same environment multiple times.
+    doc: Optional folder for conda-pack environments, allowing reuse between runs.
+      If omitted, environments are prepared in a CWL-managed temporary directory
+      and shared between steps for this run only.
 
   runFolder:
     type: Directory?
@@ -164,6 +166,8 @@ inputs:
       Optional. URL (http/https) or file:// URI pointing to a BON in a Box runner.env
       file, necessary for scripts requiring credentials. If not provided, an empty one will be used.
       Relative paths are not supported.
+      An example file is provided at https://github.com/GEO-BON/bon-in-a-box-pipelines/blob/main/runner-sample.env
+      Note that server configurations do not apply when running as CWL, hence only the top part of the file is relevant.
 
   #################################################################
   # The following inputs should not be changed in a regular setup #
@@ -182,7 +186,7 @@ inputs:
 
 steps:
   prepareRunnerEnv:
-    doc: 
+    doc:
       Copy or download environment file (runner.env) into a CWL output.
       This step is a patch to go around issue https://github.com/common-workflow-language/cwltool/issues/1842.
     when: $(inputs.environment != null)
@@ -198,24 +202,29 @@ steps:
         EnvVarRequirement:
           envDef:
             RUNNER_ENV_URI: $(inputs.environment)
-      baseCommand: [ bash, -c ]
+      baseCommand: [ sh, -c ]
       arguments:
         - |
           echo "Preparing runner.env..."
-          
-          if [[ "$RUNNER_ENV_URI" == http://* ||
-                  "$RUNNER_ENV_URI" == https://* ||
-                  "$RUNNER_ENV_URI" == file://* ]]; then
-            if ! curl -fsSL "$RUNNER_ENV_URI" -o runner.env; then
-              echo "ERROR: failed to download runner.env from $RUNNER_ENV_URI" >&2
+
+          case "$RUNNER_ENV_URI" in
+            http://*|https://*|file://*)
+              if ! curl -fsSL "$RUNNER_ENV_URI" -o runner.env; then
+                echo "ERROR: failed to download runner.env from $RUNNER_ENV_URI" >&2
+                exit 1
+              fi
+
+              if ! . ./runner.env; then
+                echo "ERROR: failed to source runner.env" >&2
+                exit 1
+              fi
+              ;;
+            *)
+              echo "ERROR: environment file input, BON in a Box's "runner.env", was not provided as an URI." >&2
+              echo "Please use the format file:// or https://" >&2
               exit 1
-            fi
-            source runner.env
-          else
-            echo "ERROR: environment file input, BON in a Box's "runner.env", was not provided as an URI." >&2
-            echo "Please use the format file:// or https://" >&2
-            exit 1;
-          fi
+              ;;
+          esac
       inputs:
         environment:
           type: string
@@ -228,7 +237,6 @@ steps:
 
   # This step prepares the environments for all the following steps
   preparePackedEnvs:
-    when: $(inputs.envFolderWrite != null)
     run:
       class: CommandLineTool
       requirements:
@@ -241,7 +249,11 @@ steps:
           listing: |
             ${
               return [
-                { entry: inputs.envFolderWrite, writable: true },
+                {
+                  entry: inputs.envFolderWrite || { "class": "Directory", "listing": [] },
+                  entryname: "packed-envs",
+                  writable: true
+                },
                 {
                   entry: { "class": "Directory", "basename": "conda-env-yml", "listing": [] },
                   entryname: "/conda-env-yml",
@@ -249,7 +261,7 @@ steps:
                 }
               ].concat(
                 inputs.runFolderWrite
-                  ? [{ entry: inputs.runFolder, writable: true }]
+                  ? [{ entry: inputs.runFolderWrite, writable: true }]
                   : []
               );
             }
@@ -261,24 +273,25 @@ steps:
             CONDA_ENVS_PATH: /opt/conda/envs:/conda-env-yml/envs
             SCRIPT_STUBS_LOCATION: /script-stubs
             OUTPUT_LOCATION: "$(inputs.runFolderWrite ? inputs.runFolderWrite.path : runtime.outdir)"
+            PACKED_ENVS_LOCATION: "$(inputs.envFolderWrite ? inputs.envFolderWrite.path : runtime.outdir + '/packed-envs')"
             CONDA_PACK_URL: $(inputs.condaPackURL)
       baseCommand: [bash, -c]
       arguments:
         - |
           echo "Exporting all environments"
-          mkdir -p "$OUTPUT_LOCATION" "$CONDA_PKGS_DIRS" /conda-env-yml/envs
-          
+          mkdir -p "$OUTPUT_LOCATION" "$CONDA_PKGS_DIRS" /conda-env-yml/envs || exit 1
+
           function getPackedEnv {
             condaEnvName=$1
             condaEnvYml=$2
             # We use a dedicated env folder to avoid copying the whole env folder between steps in a k8 context
-            dedicatedEnvFolder=$(inputs.envFolderWrite.path)/$condaEnvName
-            mkdir -p "$dedicatedEnvFolder"
-            
+            dedicatedEnvFolder="$PACKED_ENVS_LOCATION/$condaEnvName"
+            mkdir -p "$dedicatedEnvFolder" || return 1
+
             echo "Exporting $condaEnvName..."
             source $SCRIPT_STUBS_LOCATION/system/condaEnvironment.sh "$OUTPUT_LOCATION" "$condaEnvName" \
-              "$condaEnvYml" "$dedicatedEnvFolder" "$CONDA_PACK_URL" --noActivate
-            source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh "$condaEnvName" "$dedicatedEnvFolder"
+              "$condaEnvYml" "$dedicatedEnvFolder" "$CONDA_PACK_URL" --noActivate || return 1
+            source $SCRIPT_STUBS_LOCATION/system/condaPackEnvironment.sh "$condaEnvName" "$dedicatedEnvFolder" || return 1
             echo "Done."
           }
           export -f getPackedEnv
@@ -287,13 +300,13 @@ steps:
           dependencies: [libgdal, r-lubridate, proj, r-proj, r-gdalcubes=0.7.4, r-rstac, r-dplyr,
             r-rcurl, r-rjson, r-sf, r-stars, r-terra]
           name: forCWL__simpleSTAC__loadFromStac
-          "'
+          "' || exit 1
           
           bash -c 'getPackedEnv "forCWL__simpleSTAC__createCollection" "channels: [conda-forge]
           dependencies: [pystac, gdal, jsonschema, rasterio, shapely, pyproj, geopandas, rasterstats,
             numpy]
           name: forCWL__simpleSTAC__createCollection
-          "'
+          "' || exit 1
       inputs:
         envFolderWrite:
           type: Directory?
@@ -305,8 +318,7 @@ steps:
         envFolder:
           type: Directory
           outputBinding:
-            glob: .
-            outputEval: $(inputs.envFolderWrite)
+            glob: packed-envs
     in:
       envFolderWrite: envFolder
       runFolder:

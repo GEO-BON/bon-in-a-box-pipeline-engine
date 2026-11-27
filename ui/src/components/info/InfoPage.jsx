@@ -3,20 +3,22 @@ import gplImg from "../../img/gplv3-127x51.png";
 import Versions from "./Versions";
 import HPCStatus from "./HPCStatus";
 import K8sStatus from "./K8sStatus";
+import { Trans, useTranslation } from "react-i18next";
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export default function InfoPage() {
+  const { t } = useTranslation();
 
   return (
     <>
-      <h2>License</h2>
+      <h2>{t("info.license")}</h2>
       <table>
         <tbody>
           <tr>
             <td style={{ border: 'none', padding: 0 }}>
-              The BON in a Box pipeline engine and modelling tool are licensed under GPL-v3.<br />
-              Make sure to review the attribution guidelines for the platform.
+              {t("info.engineLicense")}<br />
+              {t("info.platformAttribution")}
             </td>
             <td style={{ border: 'none', padding: "0 0 0 5px" }}>
               <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" target="_blank">
@@ -27,11 +29,12 @@ export default function InfoPage() {
         </tbody>
       </table>
       <p>
-        <strong>Pipelines and scripts have their own licenses</strong>, specified in their metadata.<br />
-        Make sure to review the attribution guidelines for pipelines and scripts.
+        <Trans i18nKey="info.ownLicensesSentence" components={{ strong: <strong /> }} />
+        <br />
+        {t("info.pipelineAttribution")}
       </p>
       <p>
-        Please use the following citation to reference the BON in a Box pipeline engine:
+        {t("info.citation")}
       </p>
       <cite>
         Jory Griffith, Jean-Michel Lord, Michael D Catchen, Maria Isabel Arce-Plata, F Guillaume Blanchet,
@@ -47,20 +50,18 @@ export default function InfoPage() {
         https://doi.org/10.1093/biosci/biaf189</a>
       </cite>
 
-      <h2>Server versions</h2>
+      <h2>{t("info.serverVersions")}</h2>
       <Versions />
 
-      <h2>Cloud-scaling Status</h2>
+      <h2>{t("info.cloudStatus")}</h2>
       <p>
-        BON in a Box instances can run their jobs on a Kubernetes (K8s) cluster when configured in runner.env.
-        If configured, all script runs will be sent to the K8s workers.
+        <Trans i18nKey="info.cloudDescription" components={{ code: <code /> }} />
       </p>
       <K8sStatus />
 
-      <h2>HPC Status</h2>
+      <h2>{t("info.hpcStatus")}</h2>
       <p>
-        BON in a Box instances can delegate jobs to a High Performance Computer (HPC) when configured in runner.env.
-        Only the scripts that are marked as supporting HPC in their metadata will be sent.
+        <Trans i18nKey="info.hpcDescription" components={{ code: <code /> }} />
       </p>
       <HPCStatus />
       <div style={{ height: '40px' }}></div>

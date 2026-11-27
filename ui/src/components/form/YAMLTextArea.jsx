@@ -1,10 +1,12 @@
 import React, { useRef, useEffect, useState, Suspense, useCallback } from "react";
 import yaml, { YAMLException } from "js-yaml";
 import { Spinner } from "../Spinner";
+import { useTranslation } from "react-i18next";
 import _lang from "lodash/lang";
 const Editor = React.lazy(() => import('@monaco-editor/react'));
 
 export default function YAMLTextArea({ metadata, data, setData, setValidationError, restoreDefaults }) {
+  const { t } = useTranslation();
   const [isTyping, setTyping] = useState(false);
   const [error, setError] = useState();
   const [shouldResetData, setShouldResetData] = useState(false);
@@ -52,7 +54,7 @@ export default function YAMLTextArea({ metadata, data, setData, setValidationErr
         setError(() => {
           const newError = {
             line: ex.mark.line + 1,
-            message: "YAML Syntax: " + ex.reason
+            message: t("form.yamlSyntax", { reason: ex.reason })
           }
           return newError;
         })
@@ -91,7 +93,7 @@ export default function YAMLTextArea({ metadata, data, setData, setValidationErr
                 severity: monaco.MarkerSeverity.Error
               }
             ]);
-            setValidationError("At line " + line + ": " + error.message);
+            setValidationError(t("form.atLine", { line, message: error.message }));
           }
         } else {
           monaco.editor.setModelMarkers(model, "owner", []);

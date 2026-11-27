@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Checkbox, Menu, MenuItem, FormControlLabel } from '@mui/material';
 import { CustomButtonGreen } from './CustomMUI';
 import filterIconGreen from "../img/filter-icon-green.svg";
@@ -7,6 +8,7 @@ import filterIconWhite from "../img/filter-icon-white.svg";
 const FILTER_LABELS = ["All", "Completed", "Running", "Error", "Cancelled"];
 
 export default function FilterMenu({ onChange }) {
+  const { t } = useTranslation();
   const [filters, setFilters] = useState(
     Object.fromEntries(FILTER_LABELS.map((label) => [label, true]))
   );
@@ -71,7 +73,7 @@ export default function FilterMenu({ onChange }) {
           marginRight: "0px"
         }}
       >
-        Filter
+        {t("filter.button")}
       </CustomButtonGreen>
       <Menu
         id={menuId}
@@ -93,13 +95,13 @@ export default function FilterMenu({ onChange }) {
                   onChange={() => handleCheck(label)}
                 />
               }
-              label={label}
+              label={t(`filter.${label.toLowerCase()}`)}
             />
           </MenuItem>
         ))}
         <MenuItem>
           <CustomButtonGreen onClick={() => { onChange?.(filters); handleClose(); }}>
-            Apply filters
+            {t("filter.apply")}
           </CustomButtonGreen>
         </MenuItem>
       </Menu>

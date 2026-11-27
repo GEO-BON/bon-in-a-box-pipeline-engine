@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -8,10 +8,9 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 import AutoResizeTextArea from "./AutoResizeTextArea";
 import Choosers from "./Choosers";
-import { uiContext } from "../../uiContext.jsx";
+import { useTranslation } from "react-i18next";
+import StacChooser from "./Choosers/StacChooser";
 import FileBrowser from "../FileBrowser";
-export const ARRAY_PLACEHOLDER = "Array (comma-separated)";
-export const CONSTANT_PLACEHOLDER = "Constant";
 
 function joinIfArray(value) {
   return value && typeof value.join === "function" ? value.join(", ") : value;
@@ -69,6 +68,7 @@ export default function ScriptInput({
   keepWidth,
   ...passedProps
 }) {
+  const { t } = useTranslation();
   const [fieldValue, setFieldValue] = useState(value);
   const small = size == "small";
 
@@ -79,7 +79,7 @@ export default function ScriptInput({
   if (!type) {
     return (
       <Alert severity="error" className="error">
-        Input does not declare a type!
+        {t("form.noType")}
       </Alert>
     );
   }
@@ -159,8 +159,22 @@ export default function ScriptInput({
         ></Autocomplete>
       );
     } else {
-      return <span className="ioWarning">Options not defined</span>;
+      return <span className="ioWarning">{t("form.optionsNotDefined")}</span>;
     }
+  }
+
+  // The STAC chooser produces a list of selections
+  if (type === "stac_asset[]") {
+    return (
+      <StacChooser
+        inputId={passedProps.id}
+        value={value}
+        updateValue={(value) => {
+          onValueUpdated(value);
+        }}
+        isCompact={size == "small"}
+      />
+    );
   }
 
   if (type.endsWith("[]")) {
@@ -182,7 +196,7 @@ export default function ScriptInput({
         {...passedProps}
         value={joinIfArray(fieldValue) || ""}
         onChange={(e) => setFieldValue(e.target.value)}
-        placeholder={ARRAY_PLACEHOLDER}
+        placeholder={t("form.arrayPlaceholder")}
         cols={cols}
         onBlur={onUpdateArray}
         slotProps={{ input: { style: small ? smallPadding() : null } }}
@@ -250,7 +264,7 @@ export default function ScriptInput({
             setFieldValue(e.target.value);
             onValueUpdated(parseInt(e.target.value));
           }}
-          placeholder={CONSTANT_PLACEHOLDER}
+          placeholder={t("form.constantPlaceholder")}
           slotProps={{
             htmlInput: { style: small ? smallPaddingNumeric() : null },
           }}
@@ -275,7 +289,7 @@ export default function ScriptInput({
           className={`input-float ${
             passedProps.className ? passedProps.className : ""
           }`}
-          placeholder={CONSTANT_PLACEHOLDER}
+          placeholder={t("form.constantPlaceholder")}
           slotProps={{
             htmlInput: { style: small ? smallPaddingNumeric() : null },
           }}
@@ -303,7 +317,7 @@ export default function ScriptInput({
       return (
         <Choosers
           inputId={passedProps.id}
-          inputDescription={{ type: type, label: "Bounding Box" }}
+          inputDescription={{ type: type, label: t("choosers.boundingBox") }}
           value={value}
           updateValue={(value) => {
             onValueUpdated(value);
@@ -319,7 +333,7 @@ export default function ScriptInput({
           inputId={passedProps.id}
           inputDescription={{
             type: type,
-            label: "Country, region, CRS and Bounding Box",
+            label: t("choosers.location"),
           }}
           value={value}
           updateValue={(value) => {

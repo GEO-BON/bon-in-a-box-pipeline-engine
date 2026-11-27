@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Description des sélecteurs pour certains types d’entrée – BON in a Box</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./../BiaB_logo_small.png" rel="icon" type="image/png">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-887c0eefb0bd987f213c44d7542ba662.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Pas de résultats",
+    "search-matching-documents-text": "documents trouvés",
+    "search-copy-link-title": "Copier le lien vers la recherche",
+    "search-hide-matches-text": "Cacher les correspondances additionnelles",
+    "search-more-match-text": "correspondance de plus dans ce document",
+    "search-more-matches-text": "correspondances de plus dans ce document",
+    "search-clear-button-title": "Effacer",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Annuler",
+    "search-submit-button-title": "Envoyer",
+    "search-label": "Recherche"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Aller au contenu principal</a>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site web">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">BON in a Box</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Basculer la navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">À propos</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./how_to_use.html"> 
+<span class="menu-text">Guide d’utilisation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./how_to_install.html"> 
+<span class="menu-text">Installation</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-contribuer-à-un-pipeline" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Contribuer à un pipeline</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-contribuer-à-un-pipeline">    
+        <li>
+    <a class="dropdown-item" href="./contributing.html">
+ <span class="dropdown-text">Envie de contribuer?</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./how_to_contribute.html">
+ <span class="dropdown-text">Instructions de contribution</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./pipeline_standards.html">
+ <span class="dropdown-text">Normes des pipelines</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="./openEO.html">
+ <span class="dropdown-text">Intégration openEO</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="./peer_review.html"> 
+<span class="menu-text">Évaluation par les pairs</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./../index.html"> 
+<span class="menu-text">English</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+    <a href="https://boninabox.geobon.org/" title="Site Web de BON in a Box" class="quarto-navigation-tool px-1" aria-label="Site Web de BON in a Box"><i class="bi bi-box-arrow-up-right"></i></a>
+    <a href="https://github.com/GEO-BON/bon-in-a-box-pipelines/" title="GitHub de BON in a Box" class="quarto-navigation-tool px-1" aria-label="GitHub de BON in a Box"><i class="bi bi-github"></i></a>
+</div>
+            <div id="quarto-search" class="" title="Recherche"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active">
+    <h2 id="toc-title">Sur cette page</h2>
+   
+  <ul>
+  <li><a href="#stac-assets" id="toc-stac-assets" class="nav-link active" data-scroll-target="#stac-assets">Ressources STAC</a>
+  <ul class="collapse">
+  <li><a href="#ressources-de-planetary-computer" id="toc-ressources-de-planetary-computer" class="nav-link" data-scroll-target="#ressources-de-planetary-computer">Ressources de Planetary Computer</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content" tabindex="-1">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Description des sélecteurs pour certains types d’entrée</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Lorsque vous indiquez les types d’entrée <code>location</code>, <code>country</code>, <code>countryRegion</code>, <code>countryRegionCRS</code>, <code>CRS</code>, <code>crsBbox</code> ou <code>stac_asset[]</code>, des sélecteurs sont créés automatiquement pour faciliter le choix de ces entrées. Après leur sélection, elles figurent dans le fichier <code>input.json</code> du script ou du pipeline sous forme d’objets comprenant divers paramètres accessibles lors de leur chargement dans R, Python ou Julia.</p>
+<p>Par exemple, le sélecteur <code>location</code> permet de définir une boîte englobante en choisissant un pays, une région et un système de coordonnées de référence. Voici un exemple d’objet créé en sélectionnant le département de Putumayo, en Colombie, dans le système de référence Bogota 1975 / Colombia West zone :</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="location"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="location-1"><a href="#location-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bbox</span><span class="kw">:</span></span>
+<span id="location-2"><a href="#location-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">983337</span></span>
+<span id="location-3"><a href="#location-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">428305</span></span>
+<span id="location-4"><a href="#location-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">1360903</span></span>
+<span id="location-5"><a href="#location-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="kw">-</span><span class="at"> </span><span class="dv">659616</span></span>
+<span id="location-6"><a href="#location-6" aria-hidden="true" tabindex="-1"></a><span class="fu">CRS</span><span class="kw">:</span></span>
+<span id="location-7"><a href="#location-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Bogota 1975 / Colombia West zone</span></span>
+<span id="location-8"><a href="#location-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">authority</span><span class="kw">:</span><span class="at"> EPSG</span></span>
+<span id="location-9"><a href="#location-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">code</span><span class="kw">:</span><span class="at"> </span><span class="dv">21896</span></span>
+<span id="location-10"><a href="#location-10" aria-hidden="true" tabindex="-1"></a><span class="fu">  proj4Def</span><span class="kw">: </span><span class="ch">&gt;-</span></span>
+<span id="location-11"><a href="#location-11" aria-hidden="true" tabindex="-1"></a>    +proj=tmerc +lat_0=4.59904722222222 +lon_0=-77.0809166666667 +k=1</span>
+<span id="location-12"><a href="#location-12" aria-hidden="true" tabindex="-1"></a>    +x_0=1000000 +y_0=1000000 +ellps=intl +towgs84=307,304,-318,0,0,0,0 +units=m</span>
+<span id="location-13"><a href="#location-13" aria-hidden="true" tabindex="-1"></a>    +no_defs +type=crs</span>
+<span id="location-14"><a href="#location-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">unit</span><span class="kw">:</span><span class="at"> metre</span></span>
+<span id="location-15"><a href="#location-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">bbox</span><span class="kw">:</span></span>
+<span id="location-16"><a href="#location-16" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">-79.1</span></span>
+<span id="location-17"><a href="#location-17" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">0.03</span></span>
+<span id="location-18"><a href="#location-18" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">-75.58</span></span>
+<span id="location-19"><a href="#location-19" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fl">10.21</span></span>
+<span id="location-20"><a href="#location-20" aria-hidden="true" tabindex="-1"></a><span class="fu">country</span><span class="kw">:</span></span>
+<span id="location-21"><a href="#location-21" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">englishName</span><span class="kw">:</span><span class="at"> Colombia</span></span>
+<span id="location-22"><a href="#location-22" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">ISO3</span><span class="kw">:</span><span class="at"> COL</span></span>
+<span id="location-23"><a href="#location-23" aria-hidden="true" tabindex="-1"></a><span class="fu">region</span><span class="kw">:</span></span>
+<span id="location-24"><a href="#location-24" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">regionName</span><span class="kw">:</span><span class="at"> Putumayo Department</span></span>
+<span id="location-25"><a href="#location-25" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">regionGID</span><span class="kw">:</span><span class="at"> COL.24_2</span></span>
+<span id="location-26"><a href="#location-26" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">countryEnglishName</span><span class="kw">:</span><span class="at"> Colombia</span></span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Voici la signification de chaque clé.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 5%">
+<col style="width: 83%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Nom de la clé</th>
+<th>Section</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>bbox</td>
+<td>bbox</td>
+<td>Tableau contenant les coordonnées minimale x, minimale y, maximale x et maximale y (dans cet ordre) de la boîte englobante, dans les unités du CRS sélectionné.</td>
+</tr>
+<tr class="even">
+<td>name</td>
+<td>CRS</td>
+<td>Nom en texte brut du système de coordonnées de référence sélectionné.</td>
+</tr>
+<tr class="odd">
+<td>authority</td>
+<td>CRS</td>
+<td>Autorité associée au code du système de référence. Il s’agit généralement de EPSG ou ESRI. Par exemple, <code>EPSG</code> pour <code>EPSG:4326</code>.</td>
+</tr>
+<tr class="even">
+<td>code</td>
+<td>CRS</td>
+<td>Code associé à l’autorité du système de référence. Il s’agit généralement d’un entier de 4 ou 5 chiffres, p.&nbsp;ex. <code>4326</code> pour EPSG:4326.</td>
+</tr>
+<tr class="odd">
+<td>proj4Def</td>
+<td>CRS</td>
+<td>Définition du CRS sous forme de chaîne Proj4.</td>
+</tr>
+<tr class="even">
+<td>wktDef</td>
+<td>CRS</td>
+<td>Définition Well-Known Text du CRS, si elle est disponible.</td>
+</tr>
+<tr class="odd">
+<td>unit</td>
+<td>CRS</td>
+<td>Unité associée au CRS. Il s’agit généralement de <code>meter</code>, <code>degree</code> ou <code>feet</code>.</td>
+</tr>
+<tr class="even">
+<td>CRSBboxWGS84</td>
+<td>CRS</td>
+<td>Boîte englobante couverte par ce système de coordonnées de référence, en latitude et longitude WGS84 (EPSG:4326).</td>
+</tr>
+<tr class="odd">
+<td>englishName</td>
+<td>country</td>
+<td>Nom anglais du pays sélectionné, selon GADM.org.</td>
+</tr>
+<tr class="even">
+<td>ISO3</td>
+<td>country</td>
+<td>Code ISO à 3 lettres du pays.</td>
+</tr>
+<tr class="odd">
+<td>regionName</td>
+<td>region</td>
+<td>Nom de la région, selon GADM.</td>
+</tr>
+<tr class="even">
+<td>regionGID</td>
+<td>region</td>
+<td>Identifiant de la région dans GADM.</td>
+</tr>
+<tr class="odd">
+<td>countryEnglishName</td>
+<td>region</td>
+<td>Nom anglais du pays auquel appartient cette région.</td>
+</tr>
+</tbody>
+</table>
+<p>Avec les autres sélecteurs, l’objet créé contient un sous-ensemble des champs du sélecteur <code>location</code>. Par exemple, le sélecteur <code>countryRegion</code> ne contient que les sections du pays et de la région, tandis que <code>countryRegionCRS</code> contient toutes les sections sauf celle de la boîte englobante (<code>bbox</code>).</p>
+<section id="stac-assets" class="level2">
+<h2 class="anchored" data-anchor-id="stac-assets">Ressources STAC</h2>
+<p>Le type d’entrée <code>stac_asset[]</code> ouvre un navigateur de catalogues STAC. L’utilisateur choisit un catalogue, une collection, puis un seul élément ou toutes les tuiles de la collection pour une date donnée, ainsi que la ressource à utiliser. Plusieurs ressources peuvent être sélectionnées; le script reçoit donc une <strong>liste</strong>, même si une seule ressource a été choisie. Une sélection unique est de type <code>stac_asset</code>, par exemple pour transmettre une ressource d’un script au suivant.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="stac_assets"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="stac_assets-1"><a href="#stac_assets-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">catalog</span><span class="kw">:</span><span class="at"> https://stac.geobon.org</span></span>
+<span id="stac_assets-2"><a href="#stac_assets-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">collection</span><span class="kw">:</span><span class="at"> some-collection</span></span>
+<span id="stac_assets-3"><a href="#stac_assets-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">date</span><span class="kw">:</span><span class="at"> </span><span class="st">"2020-01-01"</span></span>
+<span id="stac_assets-4"><a href="#stac_assets-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">item</span><span class="kw">:</span><span class="at"> some-item</span></span>
+<span id="stac_assets-5"><a href="#stac_assets-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">items_are_tiles</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="stac_assets-6"><a href="#stac_assets-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">asset</span><span class="kw">:</span><span class="at"> data</span></span>
+<span id="stac_assets-7"><a href="#stac_assets-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">href</span><span class="kw">:</span><span class="at"> https://example.com/some-item/data.tif</span></span>
+<span id="stac_assets-8"><a href="#stac_assets-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> image/tiff; application=geotiff; profile=cloud-optimized</span></span>
+<span id="stac_assets-9"><a href="#stac_assets-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">categorical</span><span class="kw">:</span><span class="at"> </span><span class="ch">false</span></span>
+<span id="stac_assets-10"><a href="#stac_assets-10" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">catalog</span><span class="kw">:</span><span class="at"> https://planetarycomputer.microsoft.com/api/stac/v1</span></span>
+<span id="stac_assets-11"><a href="#stac_assets-11" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">collection</span><span class="kw">:</span><span class="at"> some-other-collection</span></span>
+<span id="stac_assets-12"><a href="#stac_assets-12" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">date</span><span class="kw">:</span><span class="at"> </span><span class="st">"2020-01-01"</span></span>
+<span id="stac_assets-13"><a href="#stac_assets-13" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">item</span><span class="kw">:</span><span class="at"> </span><span class="ch">null</span></span>
+<span id="stac_assets-14"><a href="#stac_assets-14" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">items_are_tiles</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span>
+<span id="stac_assets-15"><a href="#stac_assets-15" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">asset</span><span class="kw">:</span><span class="at"> data</span></span>
+<span id="stac_assets-16"><a href="#stac_assets-16" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">href</span><span class="kw">:</span><span class="at"> </span><span class="ch">null</span></span>
+<span id="stac_assets-17"><a href="#stac_assets-17" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">type</span><span class="kw">:</span><span class="at"> image/tiff; application=geotiff; profile=cloud-optimized</span></span>
+<span id="stac_assets-18"><a href="#stac_assets-18" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">categorical</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 91%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Nom de la clé</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>catalog</td>
+<td>URL du catalogue STAC.</td>
+</tr>
+<tr class="even">
+<td>collection</td>
+<td>Identifiant de la collection dans ce catalogue.</td>
+</tr>
+<tr class="odd">
+<td>date</td>
+<td>Date concernée, au format <code>YYYY-MM-DD</code> : date de l’élément choisi ou date choisie avec <code>items_are_tiles</code>. Peut être nulle.</td>
+</tr>
+<tr class="even">
+<td>item</td>
+<td>Identifiant de l’élément choisi. Nul lorsque <code>items_are_tiles</code> vaut <code>true</code>.</td>
+</tr>
+<tr class="odd">
+<td>items_are_tiles</td>
+<td>Lorsque cette valeur est <code>true</code>, le script doit rechercher tous les éléments de la collection (à la date indiquée, le cas échéant) et mosaïquer lui-même leurs ressources (<code>asset</code>).</td>
+</tr>
+<tr class="even">
+<td>asset</td>
+<td>Clé de la ressource au sein du ou des éléments.</td>
+</tr>
+<tr class="odd">
+<td>href</td>
+<td>Lien direct vers la ressource de l’élément choisi. Nul lorsque <code>items_are_tiles</code> vaut <code>true</code>.</td>
+</tr>
+<tr class="even">
+<td>type</td>
+<td>Type de média de la ressource, tel que déclaré par le catalogue.</td>
+</tr>
+<tr class="odd">
+<td>categorical</td>
+<td>Vrai si la ressource contient des classes (p.&nbsp;ex. la couverture terrestre) plutôt que des mesures. Sert à choisir une méthode de rééchantillonnage (plus proche voisin ou bilinéaire).</td>
+</tr>
+</tbody>
+</table>
+<section id="ressources-de-planetary-computer" class="level3">
+<h3 class="anchored" data-anchor-id="ressources-de-planetary-computer">Ressources de Planetary Computer</h3>
+<p>Les ressources de Planetary Computer de Microsoft doivent être signées avant de pouvoir être lues. La signature fonctionne sans clé, mais les limites de débit sont alors strictes. Pour les augmenter, définissez <code>PLANETARY_COMPUTER_API_KEY</code> dans <code>runner.env</code>, puis redémarrez le serveur. La clé sera ensuite accessible aux scripts en tant que variable d’environnement.</p>
+<p>En Python, avec les paquets <code>planetary-computer</code> et <code>pystac-client</code> :</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> planetary_computer</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pystac_client <span class="im">import</span> Client</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.environ.get(<span class="st">"PLANETARY_COMPUTER_API_KEY"</span>):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    planetary_computer.settings.set_subscription_key(os.environ[<span class="st">"PLANETARY_COMPUTER_API_KEY"</span>])</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> selection <span class="kw">in</span> biab_inputs()[<span class="st">"stac"</span>]:</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> selection[<span class="st">"items_are_tiles"</span>]:</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        catalog <span class="op">=</span> Client.<span class="bu">open</span>(selection[<span class="st">"catalog"</span>], modifier<span class="op">=</span>planetary_computer.sign_inplace)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        items <span class="op">=</span> catalog.search(collections<span class="op">=</span>[selection[<span class="st">"collection"</span>]], datetime<span class="op">=</span>selection[<span class="st">"date"</span>]).items()</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        hrefs <span class="op">=</span> [item.assets[selection[<span class="st">"asset"</span>]].href <span class="cf">for</span> item <span class="kw">in</span> items]  <span class="co"># to be mosaicked</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        hrefs <span class="op">=</span> [planetary_computer.sign(selection[<span class="st">"href"</span>])]</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
+<p>En R, avec le paquet <code>rstac</code> :</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstac)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>key <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"PLANETARY_COMPUTER_API_KEY"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>sign_fn <span class="ot">&lt;-</span> <span class="fu">sign_planetary_computer</span>(</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">headers =</span> <span class="cf">if</span> (key <span class="sc">!=</span> <span class="st">""</span>) <span class="fu">c</span>(<span class="st">"Ocp-Apim-Subscription-Key"</span> <span class="ot">=</span> key)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>selection <span class="ot">&lt;-</span> input<span class="sc">$</span>stac[[<span class="dv">1</span>]]</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>found <span class="ot">&lt;-</span> <span class="fu">stac</span>(selection<span class="sc">$</span>catalog) <span class="sc">|&gt;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stac_search</span>(<span class="at">collections =</span> selection<span class="sc">$</span>collection, <span class="at">ids =</span> selection<span class="sc">$</span>item) <span class="sc">|&gt;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">post_request</span>() <span class="sc">|&gt;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">items_sign</span>(sign_fn)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>href <span class="ot">&lt;-</span> found<span class="sc">$</span>features[[<span class="dv">1</span>]]<span class="sc">$</span>assets[[selection<span class="sc">$</span>asset]]<span class="sc">$</span>href</span></code></pre></div><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copié");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copié");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Code défilable","output":"Sortie défilable"};
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

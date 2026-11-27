@@ -18,6 +18,80 @@
   .wx-no-info-wrapper {
     padding-bottom: 30px;
   }
+
+  /* Cards: menu in the top-right corner*/
+  .wx-cards {
+    .wx-item {
+      position: relative;
+    }
+
+    .wx-more {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+    }
+
+    .wx-folder-name,
+    .wx-file-name {
+      min-width: 0;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .wx-cards .wx-more {
+      padding: 8px;
+    }
+
+    /* Table view: narrow the Size column so Name gets the space.
+       SVAR hard-codes width: 100px inline (no columns prop), hence !important.
+       81px fits the widest formatSize() output, "1023.9 MB" (69px). */
+    .wx-list .wx-grid .wx-cell[aria-colindex="2"] {
+      width: 81px !important;
+      min-width: 81px !important;
+      padding-right: 4px;
+    }
+
+    .wx-wrapper .wx-cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding-inline: 0;
+
+     &.wx-has-back-link {
+        padding-inline: 0;
+      }
+
+      .wx-back-item {
+        grid-column: 1 / -1;
+      }
+
+      .wx-item {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 4 / 3;
+        margin: 0;
+      }
+
+      .wx-preview {
+        container-type: size;
+      }
+
+      .wx-preview i {
+        font-size: clamp(36px, 68cqh, 80px);
+      }
+
+      .wx-preview i::before {
+        line-height: 1;
+      }
+
+      .wx-file-icon .wx-card-preview {
+        width: auto;
+        height: clamp(36px, 68cqh, 80px);
+        aspect-ratio: 1;
+      }
+    }
+  }
 }
 
 /* didn't need the !important before -- why?  */
@@ -72,7 +146,10 @@ wx-content-wrapper.wx-RJbNonjJ {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 400px;
+    box-sizing: border-box;
+    width: min(464px, calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
     background-color: var(--grey);
     border-radius: 8px;
     box-shadow:
@@ -105,11 +182,49 @@ wx-content-wrapper.wx-RJbNonjJ {
   .MuiChip-root {
     background-color: #abd6c680;
     font-weight: 500;
+    max-width: 100%;
+    height: auto;
+    min-height: 32px;
+  }
+
+  .MuiSelect-select,
+  .MuiChip-label {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .MuiChip-label {
+    padding-top: 6px;
+    padding-bottom: 6px;
   }
 
   #modal-modal-title {
     font-size: 20px;
     color: #1d7368;
     font-weight: 700;
+  }
+}
+
+/* The Select menu is rendered in a portal outside the modal. */
+.filebrowser-menu {
+  max-width: calc(100% - 32px);
+
+  .MuiMenuItem-root {
+    white-space: normal;
+  }
+
+  .MuiListItemText-root {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .MuiSvgIcon-root {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 599px) {
+  .filebrowser-modal-card .filebrowser-modal-box {
+    padding: 16px;
   }
 }

@@ -1,0 +1,1298 @@
+/* eslint-disable prettier/prettier */
+import { useEffect, useRef, useState } from "react";
+import { Trans, useTranslation } from "react-i18next";
+import Alert from "@mui/material/Alert";
+import Autocomplete from "@mui/material/Autocomplete";
+import Checkbox from "@mui/material/Checkbox";
+import CircularProgress from "@mui/material/CircularProgress";
+import Divider from "@mui/material/Divider";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import Modal from "@mui/material/Modal";
+import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
+import DeleteIcon from "@mui/icons-material/Delete";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import ImageIcon from "@mui/icons-material/Image";
+import OpenInFullIcon from "@mui/icons-material/OpenInFull";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import TravelExploreIcon from "@mui/icons-material/TravelExplore";
+import { CustomButtonGreen, CustomButtonGrey } from "../../CustomMUI";
+import ReactMarkdown from "react-markdown";
+import { paperStyle } from "./utils";
+
+// Served by python-api (main_api.py -> stac_api.py), proxied by nginx.
+const STAC_URL = window.location.origin + "/stac";
+
+// Titiler, in the same container, proxied by nginx. Its /stac endpoints read a
+// STAC item and render one of its assets.
+const TILER_URL = window.location.origin + "/tiler";
+
+const ITEMS_PER_PAGE = 50;
+const PREVIEW_MAX_SIZE = 512;
+const PREVIEW_COLORMAP = "spectral"; // matches the result map, see TiTilerLayer
+const CATEGORICAL_COLORMAP = "tab20c"; // distinct colours for classes
+
+async function getJson(path, params) {
+  const query = new URLSearchParams(params).toString();
+  const response = await fetch(`${STAC_URL}/${path}?${query}`);
+  let body = null;
+  try {
+    body = await response.json();
+  } catch {
+    // Non-JSON error page, fall through to the generic message below.
+  }
+  if (!response.ok) {
+    throw new Error(
+      (body && body.detail) || `Request to ${path} failed (${response.status})`,
+    );
+  }
+  return body;
+}
+
+/** Titiler reports errors as {detail: "..."} or as a list of validation errors. */
+function tilerMessage(body, status) {
+  const detail = body && body.detail;
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail))
+    return detail.map((d) => d.msg || JSON.stringify(d)).join("; ");
+  return `Tiler request failed (${status})`;
+}
+
+/**
+ * Per-band statistics of one asset, as a flat list.
+ *
+ * Titiler nests them by asset and by band, in a shape that has changed between
+ * versions, so pick out whatever nodes carry percentiles.
+ */
+function bandStatistics(body) {
+  const bands = [];
+  const visit = (node) => {
+    if (!node || typeof node !== "object") return;
+    if (
+      typeof node.percentile_2 === "number" &&
+      typeof node.percentile_98 === "number"
+    ) {
+      bands.push(node);
+    } else {
+      Object.values(node).forEach(visit);
+    }
+  };
+  visit(body);
+  return bands;
+}
+
+/**
+ * The colour table embedded in an asset's file, from the tiler's /info, or
+ * null. Tables are padded to 256 entries with one repeated colour. Values left
+ * out render transparent, so the padding and transparent entries are dropped to
+ * keep the tile URLs short.
+ */
+function embeddedColormap(body) {
+  // /stac/info nests by asset, /cog/info doesn't.
+  const asset =
+    body && ("colorinterp" in body ? body : Object.values(body)[0]);
+  if (
+    !asset ||
+    !asset.colormap ||
+    !(asset.colorinterp || []).includes("palette")
+  )
+    return null;
+  const entries = Object.entries(asset.colormap);
+  const counts = {};
+  entries.forEach(([, rgba]) => {
+    const key = rgba.join();
+    counts[key] = (counts[key] || 0) + 1;
+  });
+  const padding = Object.keys(counts).reduce((a, b) =>
+    counts[a] >= counts[b] ? a : b,
+  );
+  const kept = entries.filter(
+    ([, rgba]) =>
+      rgba[3] !== 0 && (counts[padding] < 2 || rgba.join() !== padding),
+  );
+  return kept.length > 0 ? Object.fromEntries(kept) : null;
+}
+
+/** The catalog value can be a chosen option or a URL typed by the user. */
+function catalogUrl(catalog) {
+  if (!catalog) return null;
+  return typeof catalog === "string" ? catalog.trim() : catalog.url;
+}
+
+/**
+ * UNBL items point at Azure paths the tiler's /stac reader can't open without
+ * credentials, so its assets are read directly as COGs.
+ */
+function readsCogDirectly(catalog) {
+  const url = catalogUrl(catalog);
+  return Boolean(url && url.includes("unbiodiversitylab"));
+}
+
+/** The input holds a list, but tolerate a lone object from an older run. */
+function asSelections(value) {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+/** The UTC day a listed item falls on, in the same form as dates_list. */
+function itemDay(item) {
+  return item.datetime ? item.datetime.slice(0, 10) : null;
+}
+
+function selectionKey(selection) {
+  return [
+    selection.catalog,
+    selection.collection,
+    selection.date || "",
+    selection.items_are_tiles ? "*" : selection.item,
+    selection.asset,
+  ].join("|");
+}
+
+/** How a selection reads in the lists, e.g. "all items on 2019-06-01". */
+function useSelectionScope() {
+  const { t } = useTranslation();
+  return (selection) => {
+    if (!selection.items_are_tiles) return selection.item;
+    return selection.date
+      ? t("stac.allItemsOn", { date: selection.date })
+      : t("stac.allItemsInCollection");
+  };
+}
+
+export default function StacChooser({
+  inputId,
+  value = null,
+  updateValue = () => {},
+  isCompact = false,
+}) {
+  const { t } = useTranslation();
+  const getSelectionScope = useSelectionScope();
+  const [openModal, setOpenModal] = useState(false);
+  const selections = asSelections(value);
+
+  return (
+    <div className="chooserFieldBody">
+      <CustomButtonGreen
+        variant="contained"
+        endIcon={<TravelExploreIcon />}
+        onClick={() => setOpenModal(true)}
+        className="locationChooserButton"
+        aria-label={t("stac.openChooser")}
+        style={{
+          marginBottom: "1rem",
+          fontSize: "1rem",
+          width: !isCompact && "500px",
+        }}
+      >
+        {selections.length > 0
+          ? t("stac.chooseAssetsCount", { count: selections.length })
+          : t("stac.chooseAssets")}
+      </CustomButtonGreen>
+      {selections.length > 0 && !isCompact && (
+        <div
+          style={{ fontSize: "0.8rem", color: "#555", marginBottom: "0.5rem" }}
+        >
+          {selections.map((selection) => (
+            <div key={selectionKey(selection)}>
+              <b>{selection.collection}</b> / {selection.asset} —{" "}
+              {getSelectionScope(selection)}
+            </div>
+          ))}
+        </div>
+      )}
+      <Modal
+        key={`modal-stac-chooser-${inputId}`}
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        aria-labelledby="stac-chooser-title"
+      >
+        <>
+          {openModal && (
+            <StacBrowser
+              key={`stac-browser-${inputId}`}
+              {...{ value, updateValue, setOpenModal }}
+            />
+          )}
+        </>
+      </Modal>
+    </div>
+  );
+}
+
+// Shows the first two lines, with a toggle for the rest when it overflows.
+function CollapsibleDescription({ text }) {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const [overflows, setOverflows] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (el && !expanded) setOverflows(el.scrollHeight > el.clientHeight + 1);
+  }, [text, expanded]);
+
+  return (
+    <div style={{ marginTop: "2px", lineHeight: 1.4 }}>
+      <div
+        ref={ref}
+        style={
+          expanded
+            ? { maxHeight: "200px", overflowY: "auto" }
+            : { maxHeight: "2.8em", overflow: "hidden" }
+        }
+      >
+        <ReactMarkdown
+          components={{
+            p: ({ node, ...props }) => <p style={{ margin: 0 }} {...props} />,
+          }}
+        >
+          {text}
+        </ReactMarkdown>
+      </div>
+      {overflows && (
+        <span
+          role="button"
+          tabIndex={0}
+          style={{ cursor: "pointer", textDecoration: "underline" }}
+          onClick={() => setExpanded(!expanded)}
+          onKeyDown={(e) => e.key === "Enter" && setExpanded(!expanded)}
+        >
+          {expanded ? t("stac.showLess") : t("stac.showMore")}
+        </span>
+      )}
+    </div>
+  );
+}
+
+const STAC_HELP = (t) => (
+  <div style={{ fontSize: "0.8rem", lineHeight: 1.45 }}>
+    <p style={{ margin: "0 0 6px" }}>
+      {t("stac.helpIntro")}
+    </p>
+    <ol style={{ margin: 0, paddingLeft: "18px" }}>
+      <li><Trans i18nKey="stac.helpCatalog" components={{ b: <b /> }} /></li>
+      <li><Trans i18nKey="stac.helpCollection" components={{ b: <b /> }} /></li>
+      <li><Trans i18nKey="stac.helpDate" components={{ b: <b /> }} /></li>
+      <li><Trans i18nKey="stac.helpItem" components={{ b: <b /> }} /></li>
+      <li><Trans i18nKey="stac.helpAsset" components={{ b: <b /> }} /></li>
+      <li><Trans i18nKey="stac.helpPreview" components={{ b: <b /> }} /></li>
+    </ol>
+    <p style={{ margin: "6px 0 0" }}>
+      <Trans i18nKey="stac.helpFinish" components={{ b: <b /> }} />
+    </p>
+  </div>
+);
+
+function StacBrowser({ value, updateValue, setOpenModal }) {
+  const { t } = useTranslation();
+  const getSelectionScope = useSelectionScope();
+  const previousValue = useRef(value);
+  // Catalog and collection of the last saved entry, restored so that the
+  // browser reopens where it left off. Consumed as each list arrives.
+  const toRestore = useRef(asSelections(value).slice(-1)[0] || null);
+  // Same, for the date, which is only restorable once the date list has loaded.
+  const dateToRestore = useRef(toRestore.current && toRestore.current.date);
+
+  const [error, setError] = useState(null);
+  const [selections, setSelections] = useState(asSelections(value));
+
+  const [catalogs, setCatalogs] = useState([]);
+  const [catalog, setCatalog] = useState(null);
+
+  const [collections, setCollections] = useState([]);
+  const [collection, setCollection] = useState(null);
+  const [loadingCollections, setLoadingCollections] = useState(false);
+
+  const [dates, setDates] = useState([]);
+  const [date, setDate] = useState(null);
+  const [datesTruncated, setDatesTruncated] = useState(false);
+  // Items in the whole collection, or null when the walk stopped early and the
+  // true total is unknown (but certainly large).
+  const [collectionCount, setCollectionCount] = useState(null);
+  // Every item covers the same area: a time series, not tiles to stitch.
+  const [sameExtent, setSameExtent] = useState(false);
+  const [datesError, setDatesError] = useState(null);
+  const [loadingDates, setLoadingDates] = useState(false);
+
+  const [items, setItems] = useState([]);
+  const [item, setItem] = useState(null);
+  const [itemsAreTiles, setitemsAreTiles] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
+  const [filter, setFilter] = useState("");
+  const [loadingItems, setLoadingItems] = useState(false);
+
+  const [assets, setAssets] = useState([]);
+  const [asset, setAsset] = useState(null);
+  const [loadingAssets, setLoadingAssets] = useState(false);
+  // Whether the chosen asset holds classes rather than measurements. Starts from
+  // what the catalogue says, which it often doesn't, so the user can override it.
+  const [categorical, setCategorical] = useState(false);
+
+  // The colour table in the asset's file, if it has one. Used over any
+  // colormap we would pick.
+  const [palette, setPalette] = useState(null);
+
+  const [preview, setPreview] = useState(null);
+  const [previewError, setPreviewError] = useState(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
+  const previewBlob = useRef(null);
+  const previewRequest = useRef(0);
+
+  const commit = (next) => {
+    setSelections(next);
+    updateValue(next.length > 0 ? next : null);
+  };
+
+  // Catalogs, and the catalog of the entry we are reopening on.
+  useEffect(() => {
+    let cancelled = false;
+    getJson("catalogs_list")
+      .then((list) => {
+        if (cancelled) return;
+        setCatalogs(list);
+        const restoring = toRestore.current;
+        if (restoring && restoring.catalog) {
+          setCatalog(
+            list.find((c) => c.url === restoring.catalog) || restoring.catalog,
+          );
+        }
+      })
+      .catch((e) => !cancelled && setError(e.message));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Collections of the chosen catalog.
+  useEffect(() => {
+    const url = catalogUrl(catalog);
+    setCollections([]);
+    setCollection(null);
+    if (!url) return;
+
+    let cancelled = false;
+    setLoadingCollections(true);
+    setError(null);
+    getJson("collections_list", { catalog: url })
+      .then((list) => {
+        if (cancelled) return;
+        setCollections(list);
+        const restoring = toRestore.current;
+        toRestore.current = null; // nothing further is restored
+        if (restoring && restoring.collection) {
+          setCollection(
+            list.find((c) => c.id === restoring.collection) || null,
+          );
+        }
+      })
+      .catch((e) => !cancelled && setError(e.message))
+      .finally(() => !cancelled && setLoadingCollections(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [catalog]);
+
+  // Dates covered by the chosen collection, so that a collection holding one
+  // tile set per date can be narrowed to one of them.
+  useEffect(() => {
+    const url = catalogUrl(catalog);
+    setDates([]);
+    setDate(null);
+    setDatesTruncated(false);
+    setCollectionCount(null);
+    setSameExtent(false);
+    setDatesError(null);
+    if (!url || !collection) return;
+
+    let cancelled = false;
+    setLoadingDates(true);
+    getJson("dates_list", { catalog: url, collection: collection.id })
+      .then((result) => {
+        if (cancelled) return;
+        setDates(result.dates);
+        setDatesTruncated(result.truncated);
+        setSameExtent(Boolean(result.same_extent));
+        setCollectionCount(
+          result.truncated
+            ? null
+            : result.dates.reduce((total, d) => total + d.count, 0) +
+                result.undated,
+        );
+        const restoring = dateToRestore.current;
+        dateToRestore.current = null;
+        if (restoring)
+          setDate(result.dates.find((d) => d.date === restoring) || null);
+      })
+      // Browsing still works without dates, so report this next to the selector
+      // rather than as an error over the whole chooser.
+      .catch((e) => !cancelled && setDatesError(e.message))
+      .finally(() => !cancelled && setLoadingDates(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [catalog, collection]);
+
+  // One page of items. Skipped in "all items" mode, where no item is listed.
+  useEffect(() => {
+    const url = catalogUrl(catalog);
+    if (!url || !collection || itemsAreTiles) {
+      setItems([]);
+      setHasNext(false);
+      return;
+    }
+
+    let cancelled = false;
+    setLoadingItems(true);
+    const timer = setTimeout(
+      () => {
+        getJson("items_list", {
+          catalog: url,
+          collection: collection.id,
+          limit: ITEMS_PER_PAGE,
+          page,
+          filter,
+          date: date ? date.date : "",
+        })
+          .then((result) => {
+            if (cancelled) return;
+            setItems(result.items);
+            setHasNext(result.has_next);
+          })
+          .catch((e) => !cancelled && setError(e.message))
+          .finally(() => !cancelled && setLoadingItems(false));
+      },
+      filter ? 300 : 0, // debounce typing, but load the first page immediately
+    );
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [catalog, collection, page, filter, itemsAreTiles, date]);
+
+  // Assets of the chosen item, or of a sample item in "all items" mode.
+  useEffect(() => {
+    const url = catalogUrl(catalog);
+    setAssets([]);
+    setAsset(null);
+    if (!url || !collection || (!item && !itemsAreTiles)) return;
+
+    let cancelled = false;
+    setLoadingAssets(true);
+    setError(null);
+    getJson("assets_list", {
+      catalog: url,
+      collection: collection.id,
+      item: itemsAreTiles ? "" : item.id,
+      date: itemsAreTiles && date ? date.date : "",
+    })
+      .then((list) => {
+        if (cancelled) return;
+        setAssets(list);
+        // A lone asset leaves no choice to make, so make it for the user.
+        if (list.length === 1) setAsset(list[0]);
+      })
+      .catch((e) => !cancelled && setError(e.message))
+      .finally(() => !cancelled && setLoadingAssets(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [catalog, collection, item, itemsAreTiles, date]);
+
+  useEffect(() => {
+    setCategorical(Boolean(asset && asset.kind === "categorical"));
+  }, [asset]);
+
+  // A preview belongs to one asset, so drop it as soon as the choice moves.
+  useEffect(() => {
+    previewRequest.current += 1; // abandons a render still in flight
+    if (previewBlob.current) {
+      URL.revokeObjectURL(previewBlob.current);
+      previewBlob.current = null;
+    }
+    setPreview(null);
+    setPreviewError(null);
+    setLoadingPreview(false);
+  }, [
+    catalog,
+    collection,
+    item,
+    itemsAreTiles,
+    date,
+    asset,
+    categorical,
+    palette,
+  ]);
+
+  useEffect(
+    () => () => {
+      if (previewBlob.current) URL.revokeObjectURL(previewBlob.current);
+    },
+    [],
+  );
+
+  // In "all items" mode the assets, and so the preview, come from a sample item.
+  const previewItemUrl =
+    asset && (itemsAreTiles ? asset.item_url : item && item.url);
+
+  // Where the tiler reads the asset from: the COG itself, or the STAC item.
+  const useCog = Boolean(readsCogDirectly(catalog) && asset && asset.href);
+  const tilerBase = `${TILER_URL}/${useCog ? "cog" : "stac"}`;
+  const sourceQuery = useCog
+    ? new URLSearchParams({ url: asset.href }).toString()
+    : previewItemUrl
+      ? new URLSearchParams({ url: previewItemUrl, assets: asset.key }).toString()
+      : null;
+
+  // A file with a colour table holds classes: its values index the table.
+  useEffect(() => {
+    setPalette(null);
+    if (!sourceQuery) return;
+    let cancelled = false;
+    fetch(`${tilerBase}/info?${sourceQuery}`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body) => {
+        const found = embeddedColormap(body);
+        if (cancelled || !found) return;
+        setPalette(found);
+        setCategorical(true);
+      })
+      .catch(() => {
+        // No table then; fall back to our own colormap.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [tilerBase, sourceQuery]);
+
+  const expandedUrl =
+    sourceQuery &&
+    `${tilerBase}/WebMercatorQuad/map.html?` +
+      (preview
+        ? preview.params
+        : new URLSearchParams({
+            ...Object.fromEntries(new URLSearchParams(sourceQuery)),
+            ...(palette
+              ? { colormap: JSON.stringify(palette) }
+              : categorical && { colormap_name: CATEGORICAL_COLORMAP }),
+          }));
+
+  const loadPreview = async () => {
+    const request = previewRequest.current;
+    const stale = () => request !== previewRequest.current;
+
+    setLoadingPreview(true);
+    setPreviewError(null);
+    try {
+      // Kept with the image: the expanded view renders it the same way.
+      const params = new URLSearchParams(sourceQuery);
+
+      if (palette) {
+        // The file's own colour table maps raw values, so no rescale.
+        params.set("colormap", JSON.stringify(palette));
+      } else {
+        // Measured data renders black without a range, so scale on the asset's
+        // own percentiles, as the result map does. A missing range is not fatal:
+        // byte imagery renders fine without one.
+        let bands = [];
+        try {
+          const response = await fetch(
+            `${tilerBase}/statistics?${sourceQuery}`,
+          );
+          if (response.ok) bands = bandStatistics(await response.json());
+        } catch {
+          // Leave the rescale out and let the tiler do what it can.
+        }
+        if (stale()) return;
+        bands.forEach((band) =>
+          params.append(
+            "rescale",
+            `${band.percentile_2},${band.percentile_98}`,
+          ),
+        );
+        // A colormap only makes sense on a single band; a 3-band asset is RGB.
+        if (bands.length === 1)
+          params.set(
+            "colormap_name",
+            categorical ? CATEGORICAL_COLORMAP : PREVIEW_COLORMAP,
+          );
+      }
+
+      const rendered = await fetch(
+        `${tilerBase}/preview.png?${params}&max_size=${PREVIEW_MAX_SIZE}`,
+      );
+      if (!rendered.ok) {
+        let body = null;
+        try {
+          body = await rendered.json();
+        } catch {
+          // Not a JSON error page.
+        }
+        throw new Error(tilerMessage(body, rendered.status));
+      }
+      const blob = await rendered.blob();
+      if (stale()) return;
+      previewBlob.current = URL.createObjectURL(blob);
+      // Carries its own label: the chosen asset can be cleared (by "Add to
+      // selection", say) in a render where the image is still on screen.
+      setPreview({
+        url: previewBlob.current,
+        assetKey: asset.key,
+        params: params.toString(),
+      });
+    } catch (e) {
+      // Keep the tiler's reason in the console, show a plain message.
+      console.warn("Preview failed:", e.message);
+      if (!stale()) setPreviewError(t("stac.previewError"));
+    } finally {
+      if (!stale()) setLoadingPreview(false);
+    }
+  };
+
+  const addSelection = () => {
+    const entry = {
+      catalog: catalogUrl(catalog),
+      collection: collection.id,
+      // The day in scope: chosen alongside items_are_tiles, or the one the item covers.
+      date: itemsAreTiles ? (date ? date.date : null) : itemDay(item),
+      item: itemsAreTiles ? null : item.id,
+      items_are_tiles: itemsAreTiles,
+      asset: asset.key,
+      href: itemsAreTiles ? null : asset.href,
+      type: asset.type,
+      categorical,
+    };
+    if (
+      selections.some(
+        (existing) => selectionKey(existing) === selectionKey(entry),
+      )
+    ) {
+      setError(t("stac.alreadySelected"));
+      return;
+    }
+    commit([...selections, entry]);
+    // Keep the catalog and collection so the next one is a couple of clicks away.
+    setItem(null);
+    setAsset(null);
+  };
+
+  // Tiles in what is currently in scope: one date's worth, or the collection.
+  // Null means unknown, in which case assume there are several.
+  const tileCount = date ? date.count : collectionCount;
+  // Nothing to stitch when the scope holds a single tile, so the option goes.
+  const canMosaic =
+    !sameExtent &&
+    (tileCount === null || tileCount > 1) &&
+    (collectionCount === null || dates.length < collectionCount);
+
+  // Mosaicking every tile yields one layer only if the tiles share a date, so a
+  // collection spanning several dates has to be narrowed to one first.
+  const needsDate = itemsAreTiles && dates.length > 1 && !date;
+  const canAdd = Boolean(
+    collection && asset && (item || itemsAreTiles) && !needsDate,
+  );
+
+  // Picking a date with a lone tile hides the option, which must not stay on.
+  useEffect(() => {
+    if (!canMosaic) setitemsAreTiles(false);
+  }, [canMosaic]);
+
+  // Clearly tiles: a chosen date with several of them, or one date for all.
+  const obviousMosaic =
+    canMosaic &&
+    (date ? date.count > 1 : dates.length === 1 && !datesTruncated);
+
+  // Tick it once per collection or date; the user can still untick it.
+  useEffect(() => {
+    if (!obviousMosaic) return;
+    setitemsAreTiles(true);
+    setItem(null);
+    setPage(1);
+  }, [obviousMosaic, collection, date]);
+
+  return (
+    <div
+      className="location-chooser-modal"
+      style={{
+        width: "70%",
+        maxWidth: "900px",
+        maxHeight: "90%",
+        overflowY: "auto",
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        backgroundColor: "#fff",
+        padding: "20px",
+        borderRadius: "8px",
+      }}
+    >
+      <h4
+        id="stac-chooser-title"
+        style={{ marginTop: 0, display: "flex", alignItems: "center" }}
+      >
+        {t("stac.title")}
+        <Tooltip
+          title={STAC_HELP(t)}
+          placement="bottom-start"
+          enterTouchDelay={0}
+          leaveTouchDelay={20000}
+          componentsProps={{ tooltip: { sx: { maxWidth: "420px" } } }}
+        >
+          <IconButton size="small" aria-label={t("stac.helpTitle")}>
+            <HelpOutlineIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </h4>
+
+      {error && (
+        <Alert
+          severity="error"
+          className="error"
+          onClose={() => setError(null)}
+        >
+          {error}
+        </Alert>
+      )}
+
+      <div style={paperStyle(true)}>
+        <Autocomplete
+          freeSolo
+          options={catalogs}
+          value={catalog}
+          size="small"
+          sx={{ background: "#fff", borderRadius: "4px" }}
+          getOptionLabel={(option) =>
+            typeof option === "string" ? option : option.label || ""
+          }
+          isOptionEqualToValue={(option, selected) =>
+            option.url === catalogUrl(selected)
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t("stac.catalog")}
+            />
+          )}
+          onChange={(_, chosen) => setCatalog(chosen)}
+          onBlur={(event) => {
+            // freeSolo keeps typed text out of the value until it is committed.
+            const typed = event.target.value.trim();
+            if (
+              typed &&
+              typed !== catalogUrl(catalog) &&
+              !catalogs.some((c) => c.label === typed)
+            ) {
+              setCatalog(typed);
+            }
+          }}
+        />
+      </div>
+
+      <div style={paperStyle(true)}>
+        <Autocomplete
+          options={collections}
+          value={collection}
+          disabled={!catalog || loadingCollections}
+          loading={loadingCollections}
+          size="small"
+          sx={{ background: "#fff", borderRadius: "4px" }}
+          getOptionLabel={(option) => option.title || option.id || ""}
+          isOptionEqualToValue={(option, selected) => option.id === selected.id}
+          renderOption={(props, option) => (
+            <li {...props} key={option.id}>
+              <ListItemText primary={option.title} secondary={option.id} />
+            </li>
+          )}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t("stac.collection")}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {loadingCollections && <CircularProgress size="14px" />}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }}
+            />
+          )}
+          onChange={(_, chosen) => {
+            setCollection(chosen);
+            dateToRestore.current = null; // a hand-picked collection is not a reopen
+            setItem(null);
+            setPage(1);
+            setFilter("");
+          }}
+        />
+        {collection && (collection.description || collection.url) && (
+          <div style={{ fontSize: "11px", margin: "4px 0px 0px 5px" }}>
+            {collection.url && (
+              <a
+                href={collection.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("stac.viewCollection")}
+              </a>
+            )}
+            {collection.description && (
+              <CollapsibleDescription
+                key={collection.id}
+                text={collection.description}
+              />
+            )}
+          </div>
+        )}
+      </div>
+
+      <div style={paperStyle(true)}>
+        {(dates.length > 1 || loadingDates || datesError) && (
+          <>
+            <Autocomplete
+              options={dates}
+              value={date}
+              disabled={!collection || loadingDates || dates.length === 0}
+              loading={loadingDates}
+              size="small"
+              sx={{
+                background: "#fff",
+                borderRadius: "4px",
+                marginBottom: "8px",
+              }}
+              getOptionLabel={(option) => option.date || ""}
+              isOptionEqualToValue={(option, selected) =>
+                option.date === selected.date
+              }
+              renderOption={(props, option) => (
+                <li {...props} key={option.date}>
+                  <ListItemText
+                    primary={option.date}
+                    secondary={t("stac.itemCount", { count: option.count })}
+                  />
+                </li>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={
+                    loadingDates
+                      ? t("stac.date")
+                      : t("stac.datesCount", { count: dates.length })
+                  }
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loadingDates && <CircularProgress size="14px" />}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
+              onChange={(_, chosen) => {
+                setDate(chosen);
+                setItem(null);
+                setPage(1);
+              }}
+            />
+            {datesTruncated && (
+              <p
+                style={{
+                  fontSize: "11px",
+                  margin: "0px 0px 6px 5px",
+                  color: "#555",
+                }}
+              >
+                {t("stac.datesTruncated")}
+              </p>
+            )}
+            {datesError && (
+              <p
+                style={{
+                  fontSize: "11px",
+                  margin: "0px 0px 6px 5px",
+                  color: "#a33",
+                }}
+              >
+                {t("stac.datesError", { error: datesError })}
+              </p>
+            )}
+          </>
+        )}
+
+        {canMosaic && (
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={itemsAreTiles}
+                disabled={!collection}
+                onChange={(e) => {
+                  setitemsAreTiles(e.target.checked);
+                  setItem(null);
+                  setPage(1);
+                }}
+              />
+            }
+            label={
+              date
+                ? t("stac.mosaicDate", { count: date.count, date: date.date })
+                : dates.length > 1
+                  ? t("stac.mosaicDateOption")
+                  : collectionCount === null
+                    ? t("stac.mosaicCollection")
+                    : t("stac.mosaicCollectionCount", { count: collectionCount })
+            }
+          />
+        )}
+
+        {!itemsAreTiles && (
+          <>
+            <TextField
+              label={t("stac.filterItems")}
+              size="small"
+              fullWidth
+              disabled={!collection}
+              value={filter}
+              onChange={(e) => {
+                setFilter(e.target.value);
+                setPage(1);
+              }}
+              sx={{ marginBottom: "8px" }}
+            />
+            <List
+              dense
+              style={{
+                maxHeight: "200px",
+                overflowY: "auto",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+              }}
+            >
+              {loadingItems && (
+                <ListItemText
+                  style={{ padding: "8px" }}
+                  primary={<CircularProgress size="14px" />}
+                />
+              )}
+              {!loadingItems && items.length === 0 && (
+                <ListItemText
+                  style={{ padding: "8px", color: "#888" }}
+                  primary={
+                    collection
+                      ? t("stac.noItems")
+                      : t("stac.chooseCollection")
+                  }
+                />
+              )}
+              {!loadingItems &&
+                items.map((listed) => (
+                  <ListItemButton
+                    key={listed.id}
+                    selected={Boolean(item) && item.id === listed.id}
+                    onClick={() => setItem(listed)}
+                  >
+                    <ListItemText
+                      primary={listed.id}
+                      secondary={listed.datetime}
+                    />
+                  </ListItemButton>
+                ))}
+            </List>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                marginTop: "6px",
+              }}
+            >
+              {(page > 1 || hasNext) && (
+                <>
+                  <CustomButtonGrey
+                    disabled={page <= 1 || loadingItems}
+                    onClick={() => setPage(page - 1)}
+                  >
+                    {t("stac.previous")}
+                  </CustomButtonGrey>
+                  <span style={{ fontSize: "0.8rem" }}>{t("stac.page", { page })}</span>
+                  <CustomButtonGrey
+                    disabled={!hasNext || loadingItems}
+                    onClick={() => setPage(page + 1)}
+                  >
+                    {t("stac.next")}
+                  </CustomButtonGrey>
+                </>
+              )}
+              {item && item.url && (
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: "11px", marginLeft: "auto" }}
+                >
+                  {t("stac.itemLink", { id: item.id })}
+                </a>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+
+      <div
+        style={{
+          ...paperStyle(true),
+          display: "flex",
+          gap: "12px",
+          alignItems: "stretch",
+        }}
+      >
+        <div style={{ flex: "1 1 auto", minWidth: 0 }}>
+          <Autocomplete
+            options={assets}
+            value={asset}
+            disabled={(!item && !itemsAreTiles) || loadingAssets}
+            loading={loadingAssets}
+            noOptionsText={t("stac.noAssets")}
+            size="small"
+            sx={{
+              background: "#fff",
+              borderRadius: "4px",
+              "&:has(.Mui-disabled)": { opacity: 0.5 },
+            }}
+            getOptionLabel={(option) => option.title || option.key || ""}
+            isOptionEqualToValue={(option, selected) =>
+              option.key === selected.key
+            }
+            renderOption={(props, option) => (
+              <li {...props} key={option.key}>
+                <ListItemText
+                  primary={option.title}
+                  secondary={option.type || option.key}
+                />
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t("stac.asset")}
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <>
+                      {loadingAssets && <CircularProgress size="14px" />}
+                      {params.InputProps.endAdornment}
+                    </>
+                  ),
+                }}
+              />
+            )}
+            onChange={(_, chosen) => setAsset(chosen)}
+          />
+          <FormControlLabel
+            disabled={!asset}
+            control={
+              <Checkbox
+                size="small"
+                checked={categorical}
+                onChange={(e) => setCategorical(e.target.checked)}
+              />
+            }
+            label={
+              <span style={{ fontSize: "0.8rem" }}>
+                {t("stac.categorical")}
+                {asset && asset.kind && (
+                  <span style={{ color: "#888" }}>
+                    {" ("}{t("stac.catalogKind", { kind: asset.kind })})
+                  </span>
+                )}
+              </span>
+            }
+            style={{ margin: "4px 0px 0px 0px" }}
+          />
+          {needsDate && (
+            <p
+              style={{
+                fontSize: "11px",
+                margin: "4px 0px 2px 5px",
+                color: "#a33",
+              }}
+            >
+              {t("stac.needsDate", { count: dates.length })}
+            </p>
+          )}
+          {itemsAreTiles && !needsDate && assets.length > 0 && (
+            <p
+              style={{
+                fontSize: "11px",
+                margin: "4px 0px 2px 5px",
+                color: "#555",
+              }}
+            >
+              {t("stac.tileAssetDescription", {
+                dateText: date ? ` ${t("stac.dateText", { date: date.date })}` : "",
+              })}
+            </p>
+          )}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              marginTop: "8px",
+            }}
+          >
+            <CustomButtonGreen
+              disabled={!canAdd}
+              endIcon={<PlaylistAddIcon />}
+              onClick={addSelection}
+            >
+              {t("stac.addSelection")}
+            </CustomButtonGreen>
+            <CustomButtonGrey
+              disabled={!sourceQuery || loadingPreview}
+              endIcon={<ImageIcon />}
+              onClick={loadPreview}
+            >
+              {t("stac.preview")}
+            </CustomButtonGrey>
+          </div>
+        </div>
+
+        <div
+          style={{
+            position: "relative",
+            flex: "0 0 260px",
+            minHeight: "180px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "6px",
+            textAlign: "center",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            background: "#fafafa",
+          }}
+        >
+          {expandedUrl && (
+            <IconButton
+              size="small"
+              title={t("stac.openOnMap")}
+              aria-label={t("stac.openOnMap")}
+              href={expandedUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                position: "absolute",
+                top: "2px",
+                right: "2px",
+                zIndex: 1,
+                background: "#fffc",
+              }}
+            >
+              <OpenInFullIcon fontSize="small" />
+            </IconButton>
+          )}
+          {loadingPreview ? (
+            <CircularProgress size="20px" />
+          ) : previewError ? (
+            <span style={{ fontSize: "0.75rem", color: "#a33" }}>
+              {previewError}
+            </span>
+          ) : preview ? (
+            <img
+              src={preview.url}
+              alt={t("stac.previewOf", { asset: preview.assetKey })}
+              style={{ maxWidth: "100%", maxHeight: "240px" }}
+            />
+          ) : (
+            <span style={{ fontSize: "0.75rem", color: "#888" }}>
+              {!asset
+                ? t("stac.chooseAssetPreview")
+                : sourceQuery
+                  ? t("stac.usePreview")
+                  : t("stac.noPreviewLocation")}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <Divider style={{ margin: "10px 0px" }} />
+
+      <div style={paperStyle(true)}>
+        <h4 style={{ marginTop: "3px", marginBottom: "6px" }}>
+          {t("stac.selectedAssets", { count: selections.length })}
+        </h4>
+        {selections.length === 0 ? (
+          <p style={{ fontSize: "0.8rem", color: "#888", margin: "4px 5px" }}>
+            {t("stac.nothingSelected")}
+          </p>
+        ) : (
+          <List dense style={{ maxHeight: "180px", overflowY: "auto" }}>
+            {selections.map((selection, index) => (
+              <ListItem
+                key={selectionKey(selection)}
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    aria-label={t("stac.removeAsset", { asset: selection.asset })}
+                    onClick={() =>
+                      commit(selections.filter((_, i) => i !== index))
+                    }
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                }
+              >
+                <ListItemText
+                  primary={`${selection.collection} / ${selection.asset}`}
+                  secondary={
+                    getSelectionScope(selection) +
+                    (selection.categorical ? ` ${t("stac.categoricalTag")}` : "")
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        )}
+      </div>
+
+      <div>
+        <CustomButtonGreen onClick={() => setOpenModal(false)}>
+          {t("stac.accept")}
+        </CustomButtonGreen>
+        <CustomButtonGreen
+          onClick={() => {
+            commit([]);
+            setItem(null);
+            setAsset(null);
+            setitemsAreTiles(false);
+            setDate(null);
+            setPage(1);
+            setFilter("");
+          }}
+        >
+          {t("stac.clear")}
+        </CustomButtonGreen>
+        <CustomButtonGreen
+          onClick={() => {
+            setOpenModal(false);
+            updateValue(previousValue.current);
+          }}
+        >
+          {t("stac.cancel")}
+        </CustomButtonGreen>
+      </div>
+    </div>
+  );
+}

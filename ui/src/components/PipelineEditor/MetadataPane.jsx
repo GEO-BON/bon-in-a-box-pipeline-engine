@@ -1,28 +1,29 @@
 import { useRef, useEffect, useState, lazy } from "react";
+import { useTranslation } from "react-i18next";
 const Editor = lazy(() => import('@monaco-editor/react'));
 
 // See https://github.com/suren-atoyan/monaco-react for configuration
 // TODO: Try this for code validation: https://github.com/suren-atoyan/monaco-react/issues/228#issuecomment-1159365104
 
-const emptyMetadata = `name: # short name, such as My Script
-description: # Targeted to those who will interpret pipeline results and edit pipelines.
-author: # 1 to many
-  - name: # Full name
-    email: # Optional, email address of the author. This will be publicly available.
-    identifier: # Optional, full URL of a unique digital identifier, such as an ORCID.
-license: # Optional. If unspecified, the project's MIT license will apply.
-external_link: # Optional, link to a separate project, github repo, etc.
-references: # 0 to many
-  - text: # plain text reference
-    link: # full link to the resource (ex. https://doi.org/...)
-  - text: # plain text reference
-    link: # full link to the resource (ex. https://doi.org/...)
-compute: # Optional, specify compute requirements for kubernetes or HPC clusters. If absent, default values apply.
-  hpc: false  # Optional, send to a HPC cluster if available. Defaults to false.
-  mem: 4Gi # Hard cap for the memory usage, default 4Gi.
-  cpus-per-task: 4 # Number of CPU  allocated, default 4.
-  time: "02:00:00" # Only when "hpc: true", maximum time allowed before the job is interrupted.
-`
+const emptyMetadata = (t) => `name: # ${t("editor.metadataName")}
+description: # ${t("editor.metadataDescription")}
+author: # ${t("editor.metadataAuthors")}
+  - name: # ${t("editor.metadataFullName")}
+    email: # ${t("editor.metadataEmail")}
+    identifier: # ${t("editor.metadataIdentifier")}
+license: # ${t("editor.metadataLicense")}
+external_link: # ${t("editor.metadataExternalLink")}
+references: # ${t("editor.metadataReferences")}
+  - text: # ${t("editor.metadataReferenceText")}
+    link: # ${t("editor.metadataReferenceLink")}
+  - text: # ${t("editor.metadataReferenceText")}
+    link: # ${t("editor.metadataReferenceLink")}
+compute: # ${t("editor.metadataCompute")}
+  hpc: false  # ${t("editor.metadataHpc")}
+  mem: 4Gi # ${t("editor.metadataMemory")}
+  cpus-per-task: 4 # ${t("editor.metadataCpus")}
+  time: "02:00:00" # ${t("editor.metadataTime")}
+`;
 
 /**
  * @returns rendered view of the pipeline inputs and outputs
@@ -30,6 +31,7 @@ compute: # Optional, specify compute requirements for kubernetes or HPC clusters
 export const MetadataPane = ({
   metadata, setMetadata, metadataError
 }) => {
+  const { t } = useTranslation();
   const [collapsedPane, setCollapsedPane] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [isTyping, setTyping] = useState(false);
@@ -95,7 +97,7 @@ export const MetadataPane = ({
           {collapsedPane ? <>&lt;&lt;</> : <>&gt;&gt;</>}
           <span className="topToBottomText">
             &nbsp;&nbsp;
-            Metadata
+            {t("editor.metadata")}
           </span>
         </>
       </div>
@@ -103,7 +105,7 @@ export const MetadataPane = ({
         <div className="rightPaneInner">
           <Editor
             defaultLanguage="yaml"
-            value={metadata === "" ? emptyMetadata : metadata}
+            value={metadata === "" ? emptyMetadata(t) : metadata}
             onChange={handleEditorChange}
             onMount={handleEditorDidMount}
             options={{

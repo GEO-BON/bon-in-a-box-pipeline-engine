@@ -1,4 +1,5 @@
 import Alert from "@mui/material/Alert";
+import i18n from "../i18n";
 
 function getErrorMessage(error, response) {
     if (response && response.text)
@@ -35,14 +36,15 @@ function getErrorString(error, response) {
         : errorMessage
 }
 
-function formatError(error, response, context = "") {
-    return "Error " + context + ": " +
-        getErrorString(error, response)
+// `message` is a complete, already translated sentence such as "Error getting run history".
+function formatError(error, response, message = "") {
+    const details = getErrorString(error, response);
+    return message ? i18n.t("errors.withDetails", { message, details }) : details;
 }
 
-function HttpError({ error, response, context = "", ...props }) {
+function HttpError({ error, response, message = "", ...props }) {
     return <Alert {...props} severity="error">
-        {formatError(error, response, context)}
+        {formatError(error, response, message)}
     </Alert>
 }
 

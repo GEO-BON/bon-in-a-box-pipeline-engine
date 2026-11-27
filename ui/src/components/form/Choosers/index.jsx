@@ -14,6 +14,7 @@ import Modal from "@mui/material/Modal";
 import { chooserReducer } from "./chooserReducer";
 import { Spinner } from "../../Spinner";
 import LocationDescription from "./LocationDescription";
+import { useTranslation } from "react-i18next";
 
 export default function Choosers({
   inputId,
@@ -27,6 +28,7 @@ export default function Choosers({
   value = null,
   isCompact = false,
 }) {
+  const { t } = useTranslation();
   const [openModal, setOpenModal] = useState(false);
   const isPhone = useMediaQuery("(max-width: 599px)");
 
@@ -56,7 +58,7 @@ export default function Choosers({
           className="locationChooserButton"
           style={{ marginBottom: "1rem", fontSize: "1rem", width: !isCompact && "500px" }}
         >
-          {`Choose ${inputDescription.label}`}
+          {t("choosers.choose", { label: inputDescription.label })}
         </CustomButtonGreen>
         {value && !isCompact && <LocationDescription location={value} />}
         <Modal
@@ -108,6 +110,7 @@ function Chooser({
   value,
   updateValue = () => {},
 }) {
+  const { t } = useTranslation();
   const [clearFeatures, setClearFeatures] = useState(0);
   const [digitize, setDigitize] = useState(false);
   const [states, dispatch] = useReducer(chooserReducer, {
@@ -246,9 +249,9 @@ function Chooser({
                   setDigitize(true);
                 }}
               >
-                Draw area of interest on map <CropIcon />
+                {t("choosers.draw")} <CropIcon />
               </CustomButtonGreen>
-              <div style={{ marginLeft: "15px" }}>or choose</div>
+              <div style={{ marginLeft: "15px" }}>{t("choosers.orChoose")}</div>
             </>
           )}
           {showCountry && (
@@ -294,14 +297,14 @@ function Chooser({
                   setOpenModal(false);
                 }}
               >
-                Accept
+                {t("choosers.accept")}
               </CustomButtonGreen>
               <CustomButtonGreen
                 onClick={() => {
                   dispatch({ type: "clear" });
                 }}
               >
-                Clear
+                {t("choosers.clear")}
               </CustomButtonGreen>
               <CustomButtonGreen
                 onClick={() => {
@@ -309,7 +312,7 @@ function Chooser({
                   updateValue(oldValues);
                 }}
               >
-                Cancel
+                {t("choosers.cancel")}
               </CustomButtonGreen>
             </div>
           )}

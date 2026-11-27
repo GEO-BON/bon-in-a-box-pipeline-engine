@@ -23,28 +23,25 @@ import TableCell from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import { styled } from "@mui/material/styles";
 import ReactMarkdown from "react-markdown";
-import { CustomButtonGreen, CustomButtonGrey, CustomSelect } from "./CustomMUI";
+import { CustomButtonGreen, CustomButtonGrey } from "./CustomMUI";
 import { Alert } from "@mui/material";
 import Warning from "@mui/icons-material/Warning";
 import yaml from "js-yaml";
 import debounce from "lodash.debounce";
-import filterIconWhite from "../img/filter-icon-white.svg"
-import filterIconGreen from "../img/filter-icon-green.svg"
-import { center } from "@turf/turf";
 import FilterMenu from "./FilterMenu";
+import { useTranslation } from "react-i18next";
 
 
 export const api = new BonInABoxScriptService.DefaultApi();
 
 export default function RunHistory() {
+  const { t } = useTranslation();
   let [runHistory, setRunHistory] = useState(null);
   let [start, setStart] = useState(0);
   let [keyword, setKeyword] = useState("");
   let [inputValue, setInputValue] = useState("");
   let [filterStatus, setFilterStatus] = useState(null);
   let limit = 30;
-
-  const [activeFilters, setActiveFilters] = useState(null);
 
   const debouncedSetKeyword = useCallback(
     debounce((value) => {
@@ -78,53 +75,18 @@ export default function RunHistory() {
     api.getHistory(request,
       (error, _, response) => {
         if (error) {
-          setRunHistory(
-            <Box sx={{ padding: "50px" }}>
-              <HttpError
-                httpError={error}
-                response={response}
-                context={"getting run history"}
-              />
-            </Box>
-          );
+          setRunHistory({ error, response });
         } else if (response && response.body.length === 0) {
-          setRunHistory(
-            <Box sx={{ padding: "5px" }}>
-              <h1>Previous runs</h1>
-              <Alert severity="info">
-                {keyword || filterStatus ? "No runs match your search or filter." : "There are no runs in history."}
-              </Alert>
-            </Box>
-          );
+          setRunHistory({ empty: true, filtered: Boolean(keyword || filterStatus) });
         } else if (response && response.body.length > 0) {
           const runs = response.body.sort((a, b) => {
             const aa = new Date(a.startTime);
             const bb = new Date(b.startTime);
             return bb - aa;
           });
-          setRunHistory(
-            <div id="pageTop">
-              <h1>Previous runs</h1>
-              <Grid container spacing={2}>
-                {runs.map((res, i) => (
-                  <RunCard key={i} run={res} />
-                ))}
-              </Grid>
-              <PreviousNext
-                start={start}
-                limit={limit}
-                runsLength={runs.length}
-                showNext={response.status === 206}
-                setStart={setStart}
-              />
-            </div>
-          );
+          setRunHistory({ runs, showNext: response.status === 206 });
         } else {
-          setRunHistory(
-            <Alert severity="warning">
-              Could not retrieve history: empty response.
-            </Alert>
-          );
+          setRunHistory({ noResponse: true });
         }
       });
   }, [start, limit, keyword, filterStatus]);
@@ -139,13 +101,58 @@ export default function RunHistory() {
       ?.scrollIntoView({ behavior: "smooth" });
   }, [start]);
 
+  const renderHistory = () => {
+    if (runHistory.error) {
+      return (
+        <Box sx={{ padding: "50px" }}>
+          <HttpError
+            error={runHistory.error}
+            response={runHistory.response}
+            message={t("history.gettingHistory")}
+          />
+        </Box>
+      );
+    }
+    if (runHistory.empty) {
+      return (
+        <Box sx={{ padding: "5px" }}>
+          <h1>{t("history.title")}</h1>
+          <Alert severity="info">
+            {runHistory.filtered ? t("history.noMatch") : t("history.none")}
+          </Alert>
+        </Box>
+      );
+    }
+    if (runHistory.noResponse) {
+      return <Alert severity="warning">{t("history.emptyResponse")}</Alert>;
+    }
+    return (
+      <div id="pageTop">
+        <h1>{t("history.title")}</h1>
+        <Grid container spacing={2}>
+          {runHistory.runs.map((res, i) => (
+            <RunCard key={i} run={res} history />
+          ))}
+        </Grid>
+        <PreviousNext
+          start={start}
+          limit={limit}
+          runsLength={runHistory.runs.length}
+          showNext={runHistory.showNext}
+          setStart={setStart}
+        />
+      </div>
+    );
+  };
+
   return (
     <div className="history">
       <div className="search-container">
         <input
           type="search"
-          className="step-search-input"
-          placeholder="Search history..."
+          className="history-search-input"
+          placeholder={t("history.search")}
+          aria-label={t("history.search")}
           value={inputValue}
           onChange={(e) => {
             setInputValue(e.target.value);
@@ -154,34 +161,22 @@ export default function RunHistory() {
         />
         <FilterMenu onChange={handleFilterChange}></FilterMenu>
       </div>
-      {runHistory ? runHistory : <Spinner variant="light" />}
+      {runHistory ? renderHistory() : <Spinner variant="light" />}
     </div>
   );
 }
 
 export const LastNRuns = ({ n }) => {
+  const { t } = useTranslation();
   const [lastRuns, setLastRuns] = useState(null);
 
   useEffect(() => {
     api.getHistory({ start: 0, limit: n }, (error, _, response) => {
-      let resp = null;
       if (!error && response && response.body) {
-        if (response.body.length > 0) {
-          resp = (
-            <Grid container spacing={3}>
-              {response.body.map((res, i) => (
-                <RunCard key={i} run={res} />
-              ))}
-            </Grid>
-          );
-        } else {
-          resp = <p>There are currently no runs to display.</p>
-        }
-
+        setLastRuns({ runs: response.body });
       } else {
-        resp = <p>Failed to retrieve latest runs.</p>
+        setLastRuns({ error: true });
       }
-      setLastRuns(resp);
     });
   }, [n]);
 
@@ -191,9 +186,13 @@ export const LastNRuns = ({ n }) => {
         className="home-page-subtitle"
         style={{ marginTop: "30px", marginBottom: "20px" }}
       >
-        LATEST RUNS
+        {t("home.latestRuns")}
       </div>
-      {lastRuns}
+      {lastRuns.error ? <p>{t("home.runsError")}</p> : lastRuns.runs.length === 0
+        ? <p>{t("home.noRuns")}</p>
+        : <Grid container spacing={3} className="latest-runs-grid">
+            {lastRuns.runs.map((run, i) => <RunCard key={i} run={run} latest />)}
+          </Grid>}
     </div>
   )
 };
@@ -240,6 +239,7 @@ const ExpandMore = styled((props) => {
 
 const PreviousNext = (props) => {
   const { start, limit, runsLength, showNext, setStart } = props;
+  const { t } = useTranslation();
   return (
     <Grid
       container
@@ -254,7 +254,7 @@ const PreviousNext = (props) => {
               setStart((prev) => Math.max(prev - limit, 0));
             }}
           >
-            {"<< Previous page"}
+            {"<< " + t("history.previous")}
           </CustomButtonGrey>
         </Grid>
       )}
@@ -265,7 +265,7 @@ const PreviousNext = (props) => {
               setStart((prev) => prev + limit);
             }}
           >
-            {"Next page >>"}
+            {t("history.next") + " >>"}
           </CustomButtonGrey>
         </Grid>
       )}
@@ -273,8 +273,43 @@ const PreviousNext = (props) => {
   );
 };
 
+const isHistoryLocation = (value, input) => {
+  const type = input?.type?.toLowerCase();
+  return value !== null && typeof value === "object" &&
+    !Array.isArray(value) && Array.isArray(value.bbox) &&
+    value.bbox.length === 4 &&
+    value.bbox.every((coordinate) =>
+      typeof coordinate === "number" || typeof coordinate === "string") &&
+    value.CRS !== null && typeof value.CRS === "object" &&
+    !Array.isArray(value.CRS) &&
+    (!type || ["location", "bboxcrs", "crsbbox"].includes(type));
+};
+
+const HistoryLocationSummary = ({ location }) => {
+  const { t } = useTranslation();
+  const crs = location.CRS;
+  const code = crs.code == null ? "" :
+    (crs.authority ? `${crs.authority}:` : "") + crs.code;
+
+  return (
+    <div className="history-location-summary">
+      <div><span>{t("choosers.country")}</span> {location.country?.englishName}</div>
+      <div><span>{t("choosers.region")}</span> {location.region?.regionName}</div>
+      <div><span>{t("choosers.crs")}</span> {crs.name}{code && ` (${code})`}</div>
+      <div className="history-bbox-label">{t("choosers.boundingBoxLabel")}</div>
+      <ul>
+        <li>{t("choosers.minX")} {location.bbox[0]}</li>
+        <li>{t("choosers.minY")} {location.bbox[1]}</li>
+        <li>{t("choosers.maxX")} {location.bbox[2]}</li>
+        <li>{t("choosers.maxY")} {location.bbox[3]}</li>
+      </ul>
+    </div>
+  );
+};
+
 const RunCard = (props) => {
-  const { run } = props;
+  const { t, i18n } = useTranslation();
+  const { run, history = false, latest = false } = props;
   const [expanded, setExpanded] = useState(false);
   const [desc, setDesc] = useState("");
   const [inputs, setInputs] = useState({});
@@ -309,7 +344,7 @@ const RunCard = (props) => {
     });
   }, [pipeline, run, setExpanded]);
   return (
-    <Grid size={{ md: 10, lg: 5 }}>
+    <Grid size={history ? { xs: 12, lg: 5 } : latest ? { xs: 12, md: 10, lg: 5 } : { md: 10, lg: 5 }} className={history ? "history-run-item" : latest ? "latest-run-item" : undefined}>
       <Card
         sx={{
           width: "100%",
@@ -328,7 +363,7 @@ const RunCard = (props) => {
                 </Avatar>
               }
               title={run.runId.substring(0, index)}
-              subheader={date.toLocaleString(navigator.language)}
+              subheader={date.toLocaleString(i18n.resolvedLanguage)}
             />
           </>
         </Tooltip>
@@ -339,22 +374,18 @@ const RunCard = (props) => {
             </Typography>
           </Tooltip>
           <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-            Status:{" "}
-            {status === "unavailable" && (
-              <>This pipeline is not available in the current branch</>
-            )}
-            {status !== "unavailable" && <>{status}</>}
+            {t("runCard.status", { status: status === "unavailable" ? t("runCard.unavailable") : status })}
           </Typography>
         </CardContent>
         <CardActions disableSpacing>
           {run.type === "pipeline" && status === "completed" && (
             <a href={`/viewer/${run.runId}`} target="_blank">
-              <CustomButtonGreen>See in viewer</CustomButtonGreen>
+              <CustomButtonGreen>{t("runCard.viewer")}</CustomButtonGreen>
             </a>
           )}
           {status !== "unavailable" && (
             <a href={debug_url} target="_blank">
-              <CustomButtonGreen>See in run UI</CustomButtonGreen>
+              <CustomButtonGreen>{t("runCard.runUi")}</CustomButtonGreen>
             </a>
           )}
 
@@ -362,7 +393,7 @@ const RunCard = (props) => {
             expand={expanded}
             onClick={handleExpandClick}
             aria-expanded={expanded}
-            aria-label="show more"
+            aria-label={t("runCard.showMore")}
           >
             <ExpandMoreIcon
               sx={{ fontSize: "1.2em", color: "var(--biab-green-trans-main)" }}
@@ -376,8 +407,8 @@ const RunCard = (props) => {
                 <ReactMarkdown>
                   {desc}
                 </ReactMarkdown>
-                <h3 style={{ color: "var(--biab-green-main)" }}>Inputs</h3>
-                <Table size="small">
+                <h3 style={{ color: "var(--biab-green-main)" }}>{t("runCard.inputs")}</h3>
+                <Table size="small" className="history-inputs">
                   <TableBody>
                     {Object.entries(run.inputs).map((i) => {
                       const inputId = i[0];
@@ -403,7 +434,9 @@ const RunCard = (props) => {
                             <>
                               {(() => {
                                 // Format the value for the table, handle types
-                                if (Array.isArray(value)) {
+                                if (isHistoryLocation(value, inputs[inputId])) {
+                                  return <HistoryLocationSummary location={value} />;
+                                } else if (Array.isArray(value)) {
                                   return value.join(", ");
                                 } else if (
                                   typeof value === "object" &&
@@ -444,8 +477,9 @@ const RunCard = (props) => {
 // Either the whole script / pipeline is missing,
 // or the input does not exist anymore.
 const UnknownInputId = ({ id }) => {
+  const { t } = useTranslation();
   const warningIcon = (
-    <Tooltip title="Input description not found">
+    <Tooltip title={t("runCard.inputNotFound")}>
       <Warning
         color="warning"
         style={{ height: "1rem", transform: "translate(0, 0.15rem)" }}

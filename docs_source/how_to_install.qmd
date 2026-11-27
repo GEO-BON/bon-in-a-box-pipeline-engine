@@ -2,7 +2,7 @@
 title: "Install"
 ---
 
-The Biodiversity Evaluation Engine (BEE) can be accessed directly through our [online platform](https://geo-bon.github.io/bon-in-a-box-pipeline-engine/how_to_use.html), without installing any software. **For most users, we recommend using the online version.**
+The Biodiversity Evaluation Engine (BEE) can be accessed directly through our [online platform](how_to_use.qmd), without installing any software. **For most users, we recommend using the online version.**
 
 However, you may want to install BEE locally if you:
 
@@ -93,6 +93,8 @@ Prerequisites:
 
     c.  Fill the properties depending on what you intend to run. Include any API keys that you need to access data (e.g. GBIF or IUCN)
 
+        -   To access the UN Biodiversity Lab catalogue in the STAC chooser, set `UNBL_API_KEY` to the key provided by UN Biodiversity Lab. The catalogue currently answers without one, but it is needed to access the items in pipelines. 
+
     d.  Adjust any server option as you see fit (optional).
 
 2.  Using a Linux terminal (terminal on Mac, Git Bash or WSL on Windows), navigate to the folder of the cloned repository.
@@ -158,7 +160,7 @@ In `runner.env`:
 
 - Configure the "Cloud-scaling" section if you have access to a kubernetes cluster. This is still experimental.
 
-- Connecting to a High-Performance Computer (HPC) is still experimental. Refer to the [developer documentation](README-dev.html#setting-up-drac-cluster-connection) for guidance and limitations.
+- Connecting to a High-Performance Computer (HPC) is still experimental. Refer to the [developer documentation](https://github.com/GEO-BON/bon-in-a-box-pipeline-engine/blob/main/README-dev.md#setting-up-digital-research-alliance-of-canada-drac-cluster-connection) for guidance and limitations.
 
 Server setup:
 

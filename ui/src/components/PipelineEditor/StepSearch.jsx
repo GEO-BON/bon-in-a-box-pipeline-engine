@@ -1,9 +1,11 @@
 import { isValidElement, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { extractExcerpt, highlightText } from "../../utils/HighlightText.jsx";
 import { getStepDescription } from "./StepDescriptionStore.jsx";
 
 
 export function SearchResultStep({ result, selectedStep, ...props }) {
+  const { t } = useTranslation();
   const { descriptionFile, metadata, type, titleHighlighted, metadataExcerpt } = result;
 
   const [isDeprecated, setIsDeprecated] = useState(false);
@@ -16,7 +18,7 @@ export function SearchResultStep({ result, selectedStep, ...props }) {
 
   return (
     <div
-      title="Click for info, drag and drop to add to pipeline."
+      title={t("editor.stepHint")}
       className={
         "dndnode search-result"
         + (descriptionFile === selectedStep ? " selected" : "")
@@ -39,7 +41,7 @@ export function SearchResultStep({ result, selectedStep, ...props }) {
 
 // Helper function to get metadata excerpt with highlighted keywords
 // Returns JSX element with chosen excerpt and highlights, or null if no match
-export function getMetadataExcerpt(metadata, keywords) {
+export function getMetadataExcerpt(metadata, keywords, t) {
   if (!metadata || keywords.length === 0) {
     return null;
   }
@@ -53,7 +55,7 @@ export function getMetadataExcerpt(metadata, keywords) {
   if (metadata.author && Array.isArray(metadata.author)) {
     for (let i = 0; i < metadata.author.length; i++) {
       let person = metadata.author[i];
-      let personStr = "In authors: "
+      let personStr = `${t("editor.inAuthors")} `
       if (person.name) personStr += person.name + " ";
       if (person.email) personStr += person.email + " ";
       if (person.role) personStr += person.role;
@@ -66,7 +68,7 @@ export function getMetadataExcerpt(metadata, keywords) {
   if (metadata.reviewer && Array.isArray(metadata.reviewer)) {
     for (let i = 0; i < metadata.reviewer.length; i++) {
       let person = metadata.reviewer[i];
-      let personStr = "In reviewers: "
+      let personStr = `${t("editor.inReviewers")} `
       if (person.name) personStr += person.name + " ";
       if (person.email) personStr += person.email;
 
@@ -78,7 +80,7 @@ export function getMetadataExcerpt(metadata, keywords) {
   if (metadata.references && Array.isArray(metadata.references)) {
     for (let i = 0; i < metadata.references.length; i++) {
       let ref = metadata.references[i];
-      let refStr = "In references: ";
+      let refStr = `${t("editor.inReferences")} `;
       if (ref.text) refStr += ref.text + " ";
       if (ref.link) refStr += ref.link;
       else if (ref.doi) refStr += ref.doi; // deprecated in favor of link
@@ -101,11 +103,11 @@ export function getMetadataExcerpt(metadata, keywords) {
   return null;
 }
 
-function scoreResult(searchKeywords, descriptionFile, stepName, metadata) {
+function scoreResult(searchKeywords, descriptionFile, stepName, metadata, t) {
   let score = 0;
 
   // Metadata match
-  let metadataExcerpt = getMetadataExcerpt(metadata, searchKeywords);
+  let metadataExcerpt = getMetadataExcerpt(metadata, searchKeywords, t);
   if (metadataExcerpt) {
     // Using stringify here is inaccurate since we can match on the keys
     // (label, description, etc) but it only affects the scoring since
@@ -150,15 +152,15 @@ function sortResults(arr) {
 //   metadataExcerpt: JSX element,
 //   type: "pipeline" | "script" | "openEO"
 // }
-export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles, udpFiles) {
+export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles, udpFiles, t) {
   if (searchKeywords.length === 0) {
     return [];
   }
 
   // Process pipelines, scripts and openEO
-  let pipelines = filterAndRankType(searchKeywords, "pipeline", pipelineFiles);
-  let scripts = filterAndRankType(searchKeywords, "script", scriptFiles);
-  let openEO = filterAndRankType(searchKeywords, "openEO", udpFiles);
+  let pipelines = filterAndRankType(searchKeywords, "pipeline", pipelineFiles, t);
+  let scripts = filterAndRankType(searchKeywords, "script", scriptFiles, t);
+  let openEO = filterAndRankType(searchKeywords, "openEO", udpFiles, t);
 
   // Combine, sort, then remove sorting properties
   let results = pipelines.concat(scripts, openEO)
@@ -170,12 +172,12 @@ export function filterAndRankResults(searchKeywords, pipelineFiles, scriptFiles,
   return results;
 }
 
-function filterAndRankType(searchKeywords, type, files) {
+function filterAndRankType(searchKeywords, type, files, t) {
   let results = [];
   if (files && !isValidElement(files)) {
     Object.entries(files).forEach(([descriptionFile, stepName]) => {
       const metadata = getStepDescription(descriptionFile);
-      const result = scoreResult(searchKeywords, descriptionFile, stepName, metadata);
+      const result = scoreResult(searchKeywords, descriptionFile, stepName, metadata, t);
       if (result.score > 0) {
         result.type = type;
         results.push(result);
